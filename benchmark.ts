@@ -1,7 +1,7 @@
 import { Map as ImmutableMap } from 'immutable';
 import { HAMT, resetBuffer, getUsedBytes, configureAutoGC } from './hamt';
 
-const SIZES = [100, 1000, 10000, 100000];
+const SIZES = [100, 1000, 10000];
 
 function bench(fn: () => void, iterations: number): number {
   for (let i = 0; i < Math.min(50, iterations); i++) fn();

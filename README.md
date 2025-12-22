@@ -62,36 +62,34 @@ Performance comparison vs Immutable.js:
 --- N=100 (500 iterations) ---
 Operation     │ HAMT (ms) │ Imm (ms) │ Ratio
 ──────────────┼───────────┼──────────┼────────
-insert       │    0.0529 │   0.0770 │ 1.46x faster
-batch ins    │    0.0517 │   0.0299 │ 1.73x slower
-get          │    0.0086 │   0.0070 │ 1.23x slower
-has          │    0.0066 │   0.0047 │ 1.41x slower
-delete       │    0.0053 │   0.0049 │ 1.07x slower
-iter         │    0.0057 │   0.0026 │ 2.17x slower
+insert       │    0.0505 │   0.0566 │ 1.12x faster
+batch ins    │    0.0333 │   0.0254 │ 1.31x slower
+get          │    0.0095 │   0.0068 │ 1.40x slower
+has          │    0.0084 │   0.0060 │ 1.40x slower
+delete       │    0.0085 │   0.0123 │ 1.45x faster
+iter         │    0.0067 │   0.0028 │ 2.40x slower
 
 --- N=1000 (100 iterations) ---
 Operation     │ HAMT (ms) │ Imm (ms) │ Ratio
 ──────────────┼───────────┼──────────┼────────
-insert       │    0.4287 │   0.3591 │ 1.19x slower
-batch ins    │    0.3400 │   0.1858 │ 1.83x slower
-get          │    0.0747 │   0.0923 │ 1.23x faster
-has          │    0.0500 │   0.0802 │ 1.60x faster
-delete       │    0.0057 │   0.0030 │ 1.88x slower
-iter         │    0.2050 │   0.0236 │ 8.67x slower
+insert       │    0.4612 │   0.3750 │ 1.23x slower
+batch ins    │    0.3188 │   0.1901 │ 1.68x slower
+get          │    0.0830 │   0.0994 │ 1.20x faster
+has          │    0.0695 │   0.0840 │ 1.21x faster
+delete       │    0.0045 │   0.0030 │ 1.51x slower
+iter         │    0.2256 │   0.0217 │ 10.38x slower
 
 --- N=10000 (100 iterations) ---
 Operation     │ HAMT (ms) │ Imm (ms) │ Ratio
 ──────────────┼───────────┼──────────┼────────
-insert       │    5.0446 │   4.6805 │ 1.08x slower
-get          │    1.4595 │   1.1494 │ 1.27x slower
-has          │    0.5963 │   1.0766 │ 1.81x faster
-delete       │    0.0986 │   0.0049 │ 20.09x slower
-iter         │    1.4951 │   0.3185 │ 4.69x slower
+insert       │    5.4919 │   4.0373 │ 1.36x slower
+get          │    1.6247 │   0.9736 │ 1.67x slower
+has          │    0.7715 │   1.0530 │ 1.36x faster
+delete       │    0.0058 │   0.0064 │ 1.11x faster
+iter         │    1.5197 │   0.3128 │ 4.86x slower
 
---- N=100000 (100 iterations) ---
-Operation     │ HAMT (ms) │ Imm (ms) │ Ratio
-──────────────┼───────────┼──────────┼────────
-insert       │   73.3939 │  86.8649 │ 1.18x faster
+--- Key Advantage ---
+HAMT uses SharedArrayBuffer for zero-copy worker sharing.
 ```
 
 ## Scripts
