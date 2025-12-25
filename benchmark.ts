@@ -476,7 +476,7 @@ async function benchPriorityQueue() {
 
   for (const N of [1000, 10000]) {
     resetPriorityQueue();
-    const iterations = Math.max(50, Math.floor(10000 / N));
+    const iterations = N === 10000 ? 5 : 50; // Native sorted insert is O(n²)
     console.log(`\nN=${N}, iterations=${iterations}`);
     header2();
 
@@ -502,10 +502,9 @@ async function benchPriorityQueue() {
     for (let i = 0; i < N; i++) {
       const p = Math.random() * N;
       pq = pq.enqueue(i, p);
-      const idx = arr.findIndex(([, pr]) => pr > p);
-      if (idx === -1) arr.push([i, p]);
-      else arr.splice(idx, 0, [i, p]);
+      arr.push([i, p]);
     }
+    arr.sort((a, b) => a[1] - b[1]);
 
     // Peek
     const pqPeek = bench(() => { for (let i = 0; i < 100; i++) pq.peek(); }, iterations * 10);

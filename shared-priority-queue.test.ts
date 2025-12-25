@@ -106,6 +106,32 @@ describe('SharedPriorityQueue', () => {
       expect(pq2.peek()).toBe(2);
       expect(pq2.size).toBe(2);
     });
+
+    test('dequeue does not modify original', () => {
+      const pq1 = new SharedPriorityQueue('string')
+        .enqueue('a', 1)
+        .enqueue('b', 2);
+      const pq2 = pq1.dequeue();
+      expect(pq1.peek()).toBe('a');
+      expect(pq1.size).toBe(2);
+      expect(pq2.peek()).toBe('b');
+      expect(pq2.size).toBe(1);
+    });
+
+    test('branching creates independent versions', () => {
+      const base = new SharedPriorityQueue('string')
+        .enqueue('a', 1)
+        .enqueue('b', 2)
+        .enqueue('c', 3);
+      const branch1 = base.dequeue();
+      const branch2 = base.dequeue();
+      expect(base.peek()).toBe('a');
+      expect(branch1.peek()).toBe('b');
+      expect(branch2.peek()).toBe('b');
+      expect(base.size).toBe(3);
+      expect(branch1.size).toBe(2);
+      expect(branch2.size).toBe(2);
+    });
   });
 
   describe('edge cases', () => {

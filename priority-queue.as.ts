@@ -1,13 +1,12 @@
-// Binary Heap WASM for priority queue
+// Persistent Leftist Heap WASM for priority queue
+// Leftist heap: tree-based, O(log n) merge/insert/extractMin with structural sharing
 const BLOB_BUF: u32 = 0;
 const HEAP_START: u32 = 65536;
 let heapEnd: u32 = HEAP_START;
 let freeList: u32 = 0;
 
-// Entry: [priority:f64][valuePacked:u32][pad:u32] = 16 bytes
-const ENTRY_SIZE: u32 = 16;
-// Heap array: [capacity:u32][size:u32][entries...]
-const HEAP_HEADER: u32 = 8;
+// Node: [priority:f64][valuePacked:u32][rank:u32][left:u32][right:u32] = 24 bytes
+const NODE_SIZE: u32 = 24;
 
 export function blobBuf(): u32 { return BLOB_BUF; }
 export function getHeapEnd(): u32 { return heapEnd; }
@@ -16,120 +15,91 @@ export function getFreeList(): u32 { return freeList; }
 export function setFreeList(v: u32): void { freeList = v; }
 export function reset(): void { heapEnd = HEAP_START; freeList = 0; }
 
-function alloc(size: u32): u32 {
+function alloc(): u32 {
+  if (freeList) {
+    const ptr = freeList;
+    freeList = load<u32>(ptr + 16); // use right child slot for free list
+    return ptr;
+  }
   const ptr = heapEnd;
-  heapEnd += size;
+  heapEnd += NODE_SIZE;
   const memBytes = <u32>memory.size() << 16;
   if (heapEnd > memBytes) memory.grow(((heapEnd - memBytes) >> 16) + 1);
   return ptr;
 }
 
 export function allocBlob(len: u32): u32 {
-  const ptr = alloc(len);
+  const ptr = heapEnd;
+  heapEnd += (len + 7) & ~7; // align to 8
+  const memBytes = <u32>memory.size() << 16;
+  if (heapEnd > memBytes) memory.grow(((heapEnd - memBytes) >> 16) + 1);
   memory.copy(ptr, BLOB_BUF, len);
   return ptr;
 }
 
-export function createHeap(initialCapacity: u32): u32 {
-  const cap = initialCapacity > 0 ? initialCapacity : 16;
-  const ptr = alloc(HEAP_HEADER + cap * ENTRY_SIZE);
-  store<u32>(ptr, cap);
-  store<u32>(ptr + 4, 0);
-  return ptr;
+// Node accessors
+function getPriority(n: u32): f64 { return load<f64>(n); }
+function getValue(n: u32): u32 { return load<u32>(n + 8); }
+function getRank(n: u32): u32 { return n ? load<u32>(n + 12) : 0; }
+function getLeft(n: u32): u32 { return n ? load<u32>(n + 16) : 0; }
+function getRight(n: u32): u32 { return n ? load<u32>(n + 20) : 0; }
+
+function createNode(priority: f64, value: u32, rank: u32, left: u32, right: u32): u32 {
+  const n = alloc();
+  store<f64>(n, priority);
+  store<u32>(n + 8, value);
+  store<u32>(n + 12, rank);
+  store<u32>(n + 16, left);
+  store<u32>(n + 20, right);
+  return n;
 }
 
-function getCapacity(heap: u32): u32 { return load<u32>(heap); }
-function getSize(heap: u32): u32 { return load<u32>(heap + 4); }
-function setSize(heap: u32, s: u32): void { store<u32>(heap + 4, s); }
-
-function entryPtr(heap: u32, i: u32): u32 { return heap + HEAP_HEADER + i * ENTRY_SIZE; }
-function getPriority(heap: u32, i: u32): f64 { return load<f64>(entryPtr(heap, i)); }
-function getValue(heap: u32, i: u32): u32 { return load<u32>(entryPtr(heap, i) + 8); }
-function setEntry(heap: u32, i: u32, priority: f64, value: u32): void {
-  const p = entryPtr(heap, i);
-  store<f64>(p, priority);
-  store<u32>(p + 8, value);
+// Merge two heaps - core operation, O(log n)
+// isMaxHeap: 0 = min-heap, 1 = max-heap
+export function merge(h1: u32, h2: u32, isMaxHeap: u32): u32 {
+  if (!h1) return h2;
+  if (!h2) return h1;
+  
+  // Ensure h1 has better priority (smaller for min-heap, larger for max-heap)
+  const p1 = getPriority(h1);
+  const p2 = getPriority(h2);
+  const swap = isMaxHeap ? (p2 > p1) : (p2 < p1);
+  if (swap) {
+    const tmp = h1; h1 = h2; h2 = tmp;
+  }
+  
+  // Merge h2 with right subtree of h1
+  const newRight = merge(getRight(h1), h2, isMaxHeap);
+  const left = getLeft(h1);
+  
+  // Maintain leftist property: rank(left) >= rank(right)
+  const rankLeft = getRank(left);
+  const rankRight = getRank(newRight);
+  
+  if (rankLeft >= rankRight) {
+    return createNode(getPriority(h1), getValue(h1), rankRight + 1, left, newRight);
+  } else {
+    return createNode(getPriority(h1), getValue(h1), rankLeft + 1, newRight, left);
+  }
 }
 
-function copyEntry(heap: u32, from: u32, to: u32): void {
-  const src = entryPtr(heap, from);
-  const dst = entryPtr(heap, to);
-  store<f64>(dst, load<f64>(src));
-  store<u32>(dst + 8, load<u32>(src + 8));
-}
-
-// Returns new heap ptr (may reallocate)
+// Insert: merge with singleton node
 export function insert(heap: u32, priority: f64, valuePacked: u32, isMaxHeap: u32): u32 {
-  let h = heap;
-  const size = getSize(h);
-  const cap = getCapacity(h);
-  
-  if (size >= cap) {
-    const newCap = cap * 2;
-    const newHeap = alloc(HEAP_HEADER + newCap * ENTRY_SIZE);
-    memory.copy(newHeap, h, HEAP_HEADER + size * ENTRY_SIZE);
-    store<u32>(newHeap, newCap);
-    h = newHeap;
-  }
-  
-  setEntry(h, size, priority, valuePacked);
-  siftUp(h, size, isMaxHeap);
-  setSize(h, size + 1);
-  return h;
+  const singleton = createNode(priority, valuePacked, 1, 0, 0);
+  return merge(heap, singleton, isMaxHeap);
 }
 
-function siftUp(heap: u32, i: u32, isMaxHeap: u32): void {
-  while (i > 0) {
-    const parent = (i - 1) >> 1;
-    const cmp = getPriority(heap, i) - getPriority(heap, parent);
-    const shouldSwap = isMaxHeap ? cmp > 0 : cmp < 0;
-    if (!shouldSwap) break;
-    // Swap
-    const pi = getPriority(heap, i), vi = getValue(heap, i);
-    copyEntry(heap, parent, i);
-    setEntry(heap, parent, pi, vi);
-    i = parent;
-  }
+// Extract min/max: return new heap (merge of children)
+export function extractTop(heap: u32, isMaxHeap: u32): u32 {
+  if (!heap) return 0;
+  return merge(getLeft(heap), getRight(heap), isMaxHeap);
 }
 
-export function extract(heap: u32, isMaxHeap: u32): void {
-  const size = getSize(heap);
-  if (size == 0) return;
-  if (size == 1) { setSize(heap, 0); return; }
-  copyEntry(heap, size - 1, 0);
-  setSize(heap, size - 1);
-  siftDown(heap, 0, size - 1, isMaxHeap);
-}
-
-function siftDown(heap: u32, i: u32, size: u32, isMaxHeap: u32): void {
-  while (true) {
-    const left = (i << 1) + 1;
-    const right = left + 1;
-    let best = i;
-    
-    if (left < size) {
-      const cmp = getPriority(heap, left) - getPriority(heap, best);
-      if (isMaxHeap ? cmp > 0 : cmp < 0) best = left;
-    }
-    if (right < size) {
-      const cmp = getPriority(heap, right) - getPriority(heap, best);
-      if (isMaxHeap ? cmp > 0 : cmp < 0) best = right;
-    }
-    if (best == i) break;
-    
-    const pi = getPriority(heap, i), vi = getValue(heap, i);
-    copyEntry(heap, best, i);
-    setEntry(heap, best, pi, vi);
-    i = best;
-  }
-}
-
+// Peek operations
 export function peekPriority(heap: u32): f64 {
-  return getSize(heap) > 0 ? getPriority(heap, 0) : 0;
+  return heap ? getPriority(heap) : 0;
 }
 
 export function peekValue(heap: u32): u32 {
-  return getSize(heap) > 0 ? getValue(heap, 0) : 0;
+  return heap ? getValue(heap) : 0;
 }
-
-export function heapSize(heap: u32): u32 { return getSize(heap); }

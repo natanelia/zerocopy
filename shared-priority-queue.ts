@@ -60,24 +60,19 @@ function decodeValueFast(buf: Uint8Array, ptr: number, len: number): string {
 export type SharedPriorityQueueType = ValueType;
 
 export class SharedPriorityQueue<T extends SharedPriorityQueueType> {
-  readonly heapPtr: number;
+  readonly root: number;
   readonly size: number;
   readonly valueType: T;
   readonly isMaxHeap: boolean;
-  private _topValue: ValueOf<T> | undefined;
-  private _topPriority: number | undefined;
 
-  constructor(type: T, options?: { maxHeap?: boolean } | { heapPtr: number; size: number; isMaxHeap: boolean; topValue?: ValueOf<T>; topPriority?: number }) {
+  constructor(type: T, options?: { maxHeap?: boolean } | { root: number; size: number; isMaxHeap: boolean }) {
     this.valueType = type;
-    if (options && 'heapPtr' in options) {
-      this.heapPtr = options.heapPtr;
+    if (options && 'root' in options) {
+      this.root = options.root;
       this.size = options.size;
       this.isMaxHeap = options.isMaxHeap;
-      this._topValue = options.topValue;
-      this._topPriority = options.topPriority;
     } else {
-      if (mem.buf.buffer !== wasmMemory.buffer) mem.refresh();
-      this.heapPtr = wasm.createHeap(16);
+      this.root = 0;
       this.size = 0;
       this.isMaxHeap = options?.maxHeap ?? false;
     }
@@ -87,8 +82,12 @@ export class SharedPriorityQueue<T extends SharedPriorityQueueType> {
     if (mem.buf.buffer !== wasmMemory.buffer) mem.refresh();
     let valuePacked: number;
     if (this.valueType === 'number') {
+      // Store f64 as blob (8 bytes)
       const f64 = new Float64Array([value as number]);
-      valuePacked = new Uint32Array(f64.buffer)[0];
+      const bytes = new Uint8Array(f64.buffer);
+      mem.buf.set(bytes, blobBufPtr);
+      const blobPtr = wasm.allocBlob(8);
+      valuePacked = blobPtr | (8 << 20);
     } else if (this.valueType === 'boolean') {
       valuePacked = (value as boolean) ? 1 : 0;
     } else {
@@ -97,38 +96,34 @@ export class SharedPriorityQueue<T extends SharedPriorityQueueType> {
       const blobPtr = wasm.allocBlob(len);
       valuePacked = blobPtr | (len << 20);
     }
-    const newHeapPtr = wasm.insert(this.heapPtr, priority, valuePacked, this.isMaxHeap ? 1 : 0);
-    const newSize = this.size + 1;
-    // Update top if this is now the best priority
-    let topValue = this._topValue, topPriority = this._topPriority;
-    if (newSize === 1 || (this.isMaxHeap ? priority > topPriority! : priority < topPriority!)) {
-      topValue = value;
-      topPriority = priority;
-    }
-    return new SharedPriorityQueue(this.valueType, { heapPtr: newHeapPtr, size: newSize, isMaxHeap: this.isMaxHeap, topValue, topPriority });
+    const newRoot = wasm.insert(this.root, priority, valuePacked, this.isMaxHeap ? 1 : 0);
+    return new SharedPriorityQueue(this.valueType, { root: newRoot, size: this.size + 1, isMaxHeap: this.isMaxHeap });
   }
 
   dequeue(): SharedPriorityQueue<T> {
     if (this.size === 0) return this;
-    wasm.extract(this.heapPtr, this.isMaxHeap ? 1 : 0);
-    const newSize = this.size - 1;
-    let topValue: ValueOf<T> | undefined, topPriority: number | undefined;
-    if (newSize > 0) {
-      if (mem.buf.buffer !== wasmMemory.buffer) mem.refresh();
-      topPriority = wasm.peekPriority(this.heapPtr);
-      topValue = this._decodeValue(wasm.peekValue(this.heapPtr));
-    }
-    return new SharedPriorityQueue(this.valueType, { heapPtr: this.heapPtr, size: newSize, isMaxHeap: this.isMaxHeap, topValue, topPriority });
+    const newRoot = wasm.extractTop(this.root, this.isMaxHeap ? 1 : 0);
+    return new SharedPriorityQueue(this.valueType, { root: newRoot, size: this.size - 1, isMaxHeap: this.isMaxHeap });
   }
 
-  peek(): ValueOf<T> | undefined { return this._topValue; }
-  peekPriority(): number | undefined { return this._topPriority; }
+  peek(): ValueOf<T> | undefined {
+    if (this.size === 0) return undefined;
+    return this._decodeValue(wasm.peekValue(this.root));
+  }
+
+  peekPriority(): number | undefined {
+    if (this.size === 0) return undefined;
+    return wasm.peekPriority(this.root);
+  }
+
   get isEmpty(): boolean { return this.size === 0; }
 
   private _decodeValue(packed: number): ValueOf<T> {
     if (this.valueType === 'number') {
-      const u32 = new Uint32Array([packed, 0]);
-      return new Float64Array(u32.buffer)[0] as ValueOf<T>;
+      const ptr = packed & 0xFFFFF;
+      if (mem.buf.buffer !== wasmMemory.buffer) mem.refresh();
+      const f64 = new Float64Array(mem.buf.buffer, ptr, 1);
+      return f64[0] as ValueOf<T>;
     }
     if (this.valueType === 'boolean') return (packed !== 0) as ValueOf<T>;
     const ptr = packed & 0xFFFFF, len = packed >>> 20;
@@ -137,14 +132,9 @@ export class SharedPriorityQueue<T extends SharedPriorityQueueType> {
     return (this.valueType === 'string' ? str : JSON.parse(str)) as ValueOf<T>;
   }
 
-  static fromWorkerData<T extends SharedPriorityQueueType>(data: { heapPtr: number; size: number; type: T; isMaxHeap: boolean }): SharedPriorityQueue<T> {
-    if (data.size === 0) return new SharedPriorityQueue(data.type, { heapPtr: data.heapPtr, size: 0, isMaxHeap: data.isMaxHeap });
-    if (mem.buf.buffer !== wasmMemory.buffer) mem.refresh();
-    const topPriority = wasm.peekPriority(data.heapPtr);
-    const pq = new SharedPriorityQueue(data.type, { heapPtr: data.heapPtr, size: data.size, isMaxHeap: data.isMaxHeap, topPriority });
-    const topValue = pq._decodeValue(wasm.peekValue(data.heapPtr));
-    return new SharedPriorityQueue(data.type, { heapPtr: data.heapPtr, size: data.size, isMaxHeap: data.isMaxHeap, topValue, topPriority });
+  static fromWorkerData<T extends SharedPriorityQueueType>(data: { root: number; size: number; type: T; isMaxHeap: boolean }): SharedPriorityQueue<T> {
+    return new SharedPriorityQueue(data.type, { root: data.root, size: data.size, isMaxHeap: data.isMaxHeap });
   }
 
-  toWorkerData() { return { heapPtr: this.heapPtr, size: this.size, type: this.valueType, isMaxHeap: this.isMaxHeap }; }
+  toWorkerData() { return { root: this.root, size: this.size, type: this.valueType, isMaxHeap: this.isMaxHeap }; }
 }
