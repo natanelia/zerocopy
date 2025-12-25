@@ -10,6 +10,7 @@ import { SharedOrderedMap, resetOrderedMap } from './shared-ordered-map';
 import { SharedOrderedSet, resetOrderedSet } from './shared-ordered-set';
 import { SharedSortedMap, resetSortedMap } from './shared-sorted-map';
 import { SharedSortedSet, resetSortedSet } from './shared-sorted-set';
+import { SharedPriorityQueue, resetPriorityQueue } from './shared-priority-queue';
 
 function bench(fn: () => void, iterations: number): number {
   for (let i = 0; i < Math.min(50, iterations); i++) fn();
@@ -468,6 +469,56 @@ async function benchSortedMap() {
   }
 }
 
+async function benchPriorityQueue() {
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`SharedPriorityQueue vs Native Array (sorted insert)`);
+  console.log(`${'='.repeat(80)}`);
+
+  for (const N of [1000, 10000]) {
+    resetPriorityQueue();
+    const iterations = Math.max(50, Math.floor(10000 / N));
+    console.log(`\nN=${N}, iterations=${iterations}`);
+    header2();
+
+    // Enqueue
+    const pqEnq = bench(() => {
+      let pq = new SharedPriorityQueue('number');
+      for (let i = 0; i < N; i++) pq = pq.enqueue(i, Math.random() * N);
+    }, iterations);
+    const arrEnq = bench(() => {
+      const arr: [number, number][] = [];
+      for (let i = 0; i < N; i++) {
+        const p = Math.random() * N;
+        const idx = arr.findIndex(([, pr]) => pr > p);
+        if (idx === -1) arr.push([i, p]);
+        else arr.splice(idx, 0, [i, p]);
+      }
+    }, iterations);
+    console.log(`${'enqueue'.padEnd(14)} │ ${pqEnq.toFixed(4).padStart(11)} │ ${arrEnq.toFixed(4).padStart(8)} │ ${pqEnq < arrEnq ? `${(arrEnq/pqEnq).toFixed(2)}x faster` : `${(pqEnq/arrEnq).toFixed(2)}x slower`}`);
+
+    // Build queues for other tests
+    let pq = new SharedPriorityQueue('number');
+    const arr: [number, number][] = [];
+    for (let i = 0; i < N; i++) {
+      const p = Math.random() * N;
+      pq = pq.enqueue(i, p);
+      const idx = arr.findIndex(([, pr]) => pr > p);
+      if (idx === -1) arr.push([i, p]);
+      else arr.splice(idx, 0, [i, p]);
+    }
+
+    // Peek
+    const pqPeek = bench(() => { for (let i = 0; i < 100; i++) pq.peek(); }, iterations * 10);
+    const arrPeek = bench(() => { for (let i = 0; i < 100; i++) arr[0]; }, iterations * 10);
+    console.log(`${'peek(100)'.padEnd(14)} │ ${pqPeek.toFixed(4).padStart(11)} │ ${arrPeek.toFixed(4).padStart(8)} │ ${pqPeek < arrPeek ? `${(arrPeek/pqPeek).toFixed(2)}x faster` : `${(pqPeek/arrPeek).toFixed(2)}x slower`}`);
+
+    // Dequeue
+    const pqDeq = bench(() => { let x = pq; for (let i = 0; i < 10; i++) x = x.dequeue(); }, iterations);
+    const arrDeq = bench(() => { const x = [...arr]; for (let i = 0; i < 10; i++) x.shift(); }, iterations);
+    console.log(`${'dequeue(10)'.padEnd(14)} │ ${pqDeq.toFixed(4).padStart(11)} │ ${arrDeq.toFixed(4).padStart(8)} │ ${pqDeq < arrDeq ? `${(arrDeq/pqDeq).toFixed(2)}x faster` : `${(pqDeq/arrDeq).toFixed(2)}x slower`}`);
+  }
+}
+
 async function run() {
   await benchSharedMap();
   await benchSet();
@@ -478,6 +529,7 @@ async function run() {
   await benchDoublyLinkedList();
   await benchOrderedMap();
   await benchSortedMap();
+  await benchPriorityQueue();
   await benchStringTypes();
   
   console.log(`\n${'='.repeat(80)}`);

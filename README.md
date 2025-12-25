@@ -4,7 +4,7 @@ High-performance immutable data structures using WebAssembly with SharedArrayBuf
 
 ## Features
 
-- Immutable persistent data structures (Map, Set, List, Stack, Queue, LinkedList, DoublyLinkedList, OrderedMap, OrderedSet, SortedMap, SortedSet)
+- Immutable persistent data structures (Map, Set, List, Stack, Queue, LinkedList, DoublyLinkedList, OrderedMap, OrderedSet, SortedMap, SortedSet, PriorityQueue)
 - WASM-accelerated operations via AssemblyScript
 - SharedArrayBuffer for cross-worker sharing
 - Typed value support: `string`, `number`, `boolean`, `object`
@@ -20,7 +20,7 @@ bun run build:wasm
 ## Usage
 
 ```typescript
-import { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet } from './shared';
+import { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue } from './shared';
 
 // SharedMap - O(log32 n) operations
 const map = new SharedMap('string').set('name', 'Alice');
@@ -70,6 +70,20 @@ const ss = new SharedSortedSet<string>().add('z').add('a').add('m');
 const customSorted = new SharedSortedMap('string', (a, b) => b.localeCompare(a));
 customSorted.set('a', 'A').set('c', 'C').set('b', 'B');
 [...customSorted.keys()]; // ['c', 'b', 'a'] - reverse sorted
+
+// SharedPriorityQueue - O(log n) enqueue/dequeue, O(1) peek
+const pq = new SharedPriorityQueue('string')
+  .enqueue('low', 3)
+  .enqueue('high', 1)
+  .enqueue('med', 2);
+pq.peek(); // 'high' - lowest priority first (min-heap)
+pq.peekPriority(); // 1
+
+// Max-heap priority queue
+const maxPq = new SharedPriorityQueue('number', { maxHeap: true })
+  .enqueue(10, 1)
+  .enqueue(30, 3);
+maxPq.peek(); // 30 - highest priority first
 ```
 
 ## Worker Sharing
@@ -162,6 +176,12 @@ list.get(0);     // 1
 - `values()` / `forEach(fn)` / `size`
 - Optional custom comparator for non-natural ordering
 
+### SharedPriorityQueue<T>
+- `new SharedPriorityQueue<T>(type, options?)` - Binary heap priority queue
+- `enqueue(value, priority)` / `dequeue()` / `peek()` / `peekPriority()`
+- `size` / `isEmpty`
+- Options: `{ maxHeap: true }` for max-heap (default is min-heap)
+
 ## Architecture
 
 ```
@@ -188,6 +208,7 @@ shared-immutable/
 ├── doubly-linked-list.as.ts   # WASM: Doubly linked list
 ├── ordered-map.as.ts      # WASM: HAMT + DoublyLinkedList
 ├── sorted-tree.as.ts      # WASM: Red-Black Tree
+├── priority-queue.as.ts   # WASM: Binary heap
 └── *.wasm                 # Compiled WASM modules
 ```
 
@@ -208,6 +229,7 @@ Key characteristics:
 - **SharedQueue**: O(1) enqueue/dequeue/peek (vs O(n) for Array.shift)
 - **SharedOrderedMap/Set**: O(log32 n) operations with insertion order iteration
 - **SharedSortedMap/Set**: O(log n) operations with sorted iteration (Red-Black Tree)
+- **SharedPriorityQueue**: O(log n) enqueue/dequeue, O(1) peek (Binary Heap)
 - **SharedLinkedList**: O(1) prepend/removeFirst, O(n) random access
 - **SharedDoublyLinkedList**: O(1) prepend/append/removeFirst/removeLast, O(n) random access
 
