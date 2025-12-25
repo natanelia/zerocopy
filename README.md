@@ -4,7 +4,7 @@ High-performance immutable data structures using WebAssembly with SharedArrayBuf
 
 ## Features
 
-- Immutable persistent data structures (Map, Set, List, Stack, Queue, LinkedList, DoublyLinkedList)
+- Immutable persistent data structures (Map, Set, List, Stack, Queue, LinkedList, DoublyLinkedList, OrderedMap, OrderedSet, SortedMap, SortedSet)
 - WASM-accelerated operations via AssemblyScript
 - SharedArrayBuffer for cross-worker sharing
 - Typed value support: `string`, `number`, `boolean`, `object`
@@ -20,7 +20,7 @@ bun run build:wasm
 ## Usage
 
 ```typescript
-import { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList } from './shared';
+import { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet } from './shared';
 
 // SharedMap - O(log32 n) operations
 const map = new SharedMap('string').set('name', 'Alice');
@@ -49,6 +49,27 @@ ll.toArray(); // [0, 1, 2]
 // SharedDoublyLinkedList - O(1) prepend/append/removeFirst/removeLast
 const dll = new SharedDoublyLinkedList('string').append('b').prepend('a').append('c');
 dll.toArrayReverse(); // ['c', 'b', 'a']
+
+// SharedOrderedMap - O(log32 n) with insertion order iteration
+const om = new SharedOrderedMap('string').set('c', 'C').set('a', 'A').set('b', 'B');
+[...om.keys()]; // ['c', 'a', 'b'] - insertion order preserved
+
+// SharedOrderedSet - O(log32 n) with insertion order iteration
+const os = new SharedOrderedSet<string>().add('z').add('a').add('m');
+[...os.values()]; // ['z', 'a', 'm'] - insertion order preserved
+
+// SharedSortedMap - O(log n) with sorted key iteration
+const sm = new SharedSortedMap('number').set('c', 3).set('a', 1).set('b', 2);
+[...sm.keys()]; // ['a', 'b', 'c'] - sorted order
+
+// SharedSortedSet - O(log n) with sorted value iteration
+const ss = new SharedSortedSet<string>().add('z').add('a').add('m');
+[...ss.values()]; // ['a', 'm', 'z'] - sorted order
+
+// Custom comparator for sorted structures
+const customSorted = new SharedSortedMap('string', (a, b) => b.localeCompare(a));
+customSorted.set('a', 'A').set('c', 'C').set('b', 'B');
+[...customSorted.keys()]; // ['c', 'b', 'a'] - reverse sorted
 ```
 
 ## Worker Sharing
@@ -119,6 +140,28 @@ list.get(0);     // 1
 - `forEach(fn)` / `forEachReverse(fn)` / `toArray()` / `toArrayReverse()`
 - `size` / `isEmpty`
 
+### SharedOrderedMap<T>
+- `new SharedOrderedMap<T>(type)` - Map with insertion order iteration
+- `set(key, value)` / `get(key)` / `has(key)` / `delete(key)`
+- `forEach(fn)` / `entries()` / `keys()` / `values()` / `size`
+
+### SharedOrderedSet<T>
+- `new SharedOrderedSet<T>()` - Set with insertion order iteration
+- `add(value)` / `has(value)` / `delete(value)`
+- `values()` / `forEach(fn)` / `size`
+
+### SharedSortedMap<T>
+- `new SharedSortedMap<T>(type, comparator?)` - Map with sorted key iteration
+- `set(key, value)` / `get(key)` / `has(key)` / `delete(key)`
+- `forEach(fn)` / `entries()` / `keys()` / `values()` / `size`
+- Optional custom comparator for non-natural ordering
+
+### SharedSortedSet<T>
+- `new SharedSortedSet<T>(comparator?)` - Set with sorted value iteration
+- `add(value)` / `has(value)` / `delete(value)`
+- `values()` / `forEach(fn)` / `size`
+- Optional custom comparator for non-natural ordering
+
 ## Architecture
 
 ```
@@ -131,6 +174,10 @@ shared-immutable/
 ├── shared-queue.ts        # Linked list Queue
 ├── shared-linked-list.ts  # Singly linked list
 ├── shared-doubly-linked-list.ts # Doubly linked list
+├── shared-ordered-map.ts  # Insertion-ordered Map
+├── shared-ordered-set.ts  # Insertion-ordered Set
+├── shared-sorted-map.ts   # Sorted Map (Red-Black Tree)
+├── shared-sorted-set.ts   # Sorted Set
 ├── types.ts               # Shared type definitions
 ├── codec.ts               # Value encoding/decoding
 ├── wasm-utils.ts          # WASM loading utilities
@@ -139,6 +186,8 @@ shared-immutable/
 ├── linked-list.as.ts      # WASM: Linked list for Stack/Queue
 ├── singly-linked-list.as.ts   # WASM: Singly linked list
 ├── doubly-linked-list.as.ts   # WASM: Doubly linked list
+├── ordered-map.as.ts      # WASM: HAMT + DoublyLinkedList
+├── sorted-tree.as.ts      # WASM: Red-Black Tree
 └── *.wasm                 # Compiled WASM modules
 ```
 
@@ -157,6 +206,8 @@ Key characteristics:
 - **SharedList**: O(log32 n) random access, O(1) amortized push
 - **SharedStack**: O(1) push/pop/peek
 - **SharedQueue**: O(1) enqueue/dequeue/peek (vs O(n) for Array.shift)
+- **SharedOrderedMap/Set**: O(log32 n) operations with insertion order iteration
+- **SharedSortedMap/Set**: O(log n) operations with sorted iteration (Red-Black Tree)
 - **SharedLinkedList**: O(1) prepend/removeFirst, O(n) random access
 - **SharedDoublyLinkedList**: O(1) prepend/append/removeFirst/removeLast, O(n) random access
 
@@ -217,6 +268,28 @@ The main advantage is **cross-worker sharing** via SharedArrayBuffer - native st
 | removeLast | 0.01ms | 0.02ms | 2x faster |
 
 > Note: Linked lists excel at prepend and remove operations where arrays require O(n) element shifting. DoublyLinkedList optimizes access from both ends.
+
+**SharedOrderedMap vs Immutable.OrderedMap vs Native Map** (N=10000)
+| Operation | Shared | Immutable | vs Imm | Native | vs Native |
+|-----------|--------|-----------|--------|--------|-----------|
+| set | 5.1ms | 8.3ms | 1.6x faster | 1.2ms | 4x slower |
+| get | 3.3ms | 1.5ms | 2.2x slower | 0.02ms | 200x slower |
+| has | 1.6ms | 1.4ms | 1.1x slower | 0.02ms | 100x slower |
+| delete | 0.006ms | 0.009ms | 1.5x faster | 0.14ms | 25x faster |
+| forEach | 3.2ms | 0.23ms | 14x slower | 0.21ms | 15x slower |
+
+> Note: SharedOrderedMap maintains insertion order while providing O(log32 n) lookups via HAMT + DoublyLinkedList hybrid.
+
+**SharedSortedMap vs Native Map** (N=10000)
+| Operation | Shared | Native | vs Native |
+|-----------|--------|--------|-----------|
+| set | 4.6ms | 1.1ms | 4x slower |
+| get | 2.3ms | 0.02ms | 125x slower |
+| has | 2.8ms | 0.02ms | 160x slower |
+| delete | 0.002ms | 0.17ms | 90x faster |
+| keys(sorted) | 2.1ms | 3.3ms | 1.6x faster |
+
+> Note: SharedSortedMap uses a Red-Black Tree for O(log n) sorted operations. Native Map requires sorting on iteration which is O(n log n).
 
 ## License
 

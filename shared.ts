@@ -8,12 +8,16 @@ import { SharedStack, sharedMemory as stackMemory, getAllocState as getStackAllo
 import { SharedQueue, resetQueue } from './shared-queue';
 import { SharedLinkedList, sharedMemory as linkedListMemory, getAllocState as getLinkedListAllocState, getBufferCopy as getLinkedListBufferCopy, attachToMemory as attachLinkedListToMemory, resetLinkedList } from './shared-linked-list';
 import { SharedDoublyLinkedList, sharedMemory as doublyLinkedListMemory, getAllocState as getDoublyLinkedListAllocState, getBufferCopy as getDoublyLinkedListBufferCopy, attachToMemory as attachDoublyLinkedListToMemory, resetDoublyLinkedList } from './shared-doubly-linked-list';
+import { SharedOrderedMap, sharedMemory as orderedMapMemory, getAllocState as getOrderedMapAllocState, getBufferCopy as getOrderedMapBufferCopy, attachToMemory as attachOrderedMapToMemory, resetOrderedMap } from './shared-ordered-map';
+import { SharedOrderedSet, resetOrderedSet } from './shared-ordered-set';
+import { SharedSortedMap, sharedMemory as sortedMapMemory, getAllocState as getSortedMapAllocState, getBufferCopy as getSortedMapBufferCopy, attachToMemory as attachSortedMapToMemory, resetSortedMap } from './shared-sorted-map';
+import { SharedSortedSet, resetSortedSet } from './shared-sorted-set';
 
-export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList };
-export { resetMap, resetSharedList, resetStack, resetQueue, resetLinkedList, resetDoublyLinkedList };
+export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet };
+export { resetMap, resetSharedList, resetStack, resetQueue, resetLinkedList, resetDoublyLinkedList, resetOrderedMap, resetOrderedSet, resetSortedMap, resetSortedSet };
 export type { ValueType, SharedListType };
 
-type SharedStructure = SharedMap<any> | SharedList<any> | SharedSet<any> | SharedStack<any> | SharedQueue<any> | SharedLinkedList<any> | SharedDoublyLinkedList<any>;
+type SharedStructure = SharedMap<any> | SharedList<any> | SharedSet<any> | SharedStack<any> | SharedQueue<any> | SharedLinkedList<any> | SharedDoublyLinkedList<any> | SharedOrderedMap<any> | SharedOrderedSet<any> | SharedSortedMap<any> | SharedSortedSet<any>;
 
 interface WorkerData {
   __shared: true;
@@ -30,6 +34,12 @@ interface WorkerData {
   doublyLinkedListMemory?: WebAssembly.Memory;
   doublyLinkedListBufferCopy?: Uint8Array;
   doublyLinkedListAllocState?: { heapEnd: number; freeList: number };
+  orderedMapMemory?: WebAssembly.Memory;
+  orderedMapBufferCopy?: Uint8Array;
+  orderedMapAllocState?: { heapEnd: number; freeList: number };
+  sortedMapMemory?: WebAssembly.Memory;
+  sortedMapBufferCopy?: Uint8Array;
+  sortedMapAllocState?: { heapEnd: number; freeList: number };
   structures: Record<string, { type: string; data: any }>;
 }
 
@@ -37,7 +47,7 @@ const isBun = typeof Bun !== 'undefined';
 
 export function getWorkerData(structures: Record<string, SharedStructure>): WorkerData {
   const serialized: Record<string, { type: string; data: any }> = {};
-  let hasList = false, hasStack = false, hasLinkedList = false, hasDoublyLinkedList = false;
+  let hasList = false, hasStack = false, hasLinkedList = false, hasDoublyLinkedList = false, hasOrderedMap = false, hasSortedMap = false;
   
   for (const [name, struct] of Object.entries(structures)) {
     if (struct instanceof SharedMap) {
@@ -59,6 +69,18 @@ export function getWorkerData(structures: Record<string, SharedStructure>): Work
     } else if (struct instanceof SharedDoublyLinkedList) {
       serialized[name] = { type: 'SharedDoublyLinkedList', data: struct.toWorkerData() };
       hasDoublyLinkedList = true;
+    } else if (struct instanceof SharedOrderedMap) {
+      serialized[name] = { type: 'SharedOrderedMap', data: struct.toWorkerData() };
+      hasOrderedMap = true;
+    } else if (struct instanceof SharedOrderedSet) {
+      serialized[name] = { type: 'SharedOrderedSet', data: struct.toWorkerData() };
+      hasOrderedMap = true;
+    } else if (struct instanceof SharedSortedMap) {
+      serialized[name] = { type: 'SharedSortedMap', data: struct.toWorkerData() };
+      hasSortedMap = true;
+    } else if (struct instanceof SharedSortedSet) {
+      serialized[name] = { type: 'SharedSortedSet', data: struct.toWorkerData() };
+      hasSortedMap = true;
     }
   }
   
@@ -69,23 +91,30 @@ export function getWorkerData(structures: Record<string, SharedStructure>): Work
     if (isBun) result.listBufferCopy = getBufferCopy();
     else result.listMemory = sharedMemory;
   }
-  
   if (hasStack) {
     result.stackAllocState = getStackAllocState();
     if (isBun) result.stackBufferCopy = getStackBufferCopy();
     else result.stackMemory = stackMemory;
   }
-  
   if (hasLinkedList) {
     result.linkedListAllocState = getLinkedListAllocState();
     if (isBun) result.linkedListBufferCopy = getLinkedListBufferCopy();
     else result.linkedListMemory = linkedListMemory;
   }
-  
   if (hasDoublyLinkedList) {
     result.doublyLinkedListAllocState = getDoublyLinkedListAllocState();
     if (isBun) result.doublyLinkedListBufferCopy = getDoublyLinkedListBufferCopy();
     else result.doublyLinkedListMemory = doublyLinkedListMemory;
+  }
+  if (hasOrderedMap) {
+    result.orderedMapAllocState = getOrderedMapAllocState();
+    if (isBun) result.orderedMapBufferCopy = getOrderedMapBufferCopy();
+    else result.orderedMapMemory = orderedMapMemory;
+  }
+  if (hasSortedMap) {
+    result.sortedMapAllocState = getSortedMapAllocState();
+    if (isBun) result.sortedMapBufferCopy = getSortedMapBufferCopy();
+    else result.sortedMapMemory = sortedMapMemory;
   }
   
   return result;
@@ -111,6 +140,12 @@ export async function initWorker<T extends Record<string, SharedStructure>>(data
     if (data.doublyLinkedListAllocState) {
       if (data.doublyLinkedListMemory) attachDoublyLinkedListToMemory(data.doublyLinkedListMemory, data.doublyLinkedListAllocState);
     }
+    if (data.orderedMapAllocState) {
+      if (data.orderedMapMemory) attachOrderedMapToMemory(data.orderedMapMemory, data.orderedMapAllocState);
+    }
+    if (data.sortedMapAllocState) {
+      if (data.sortedMapMemory) attachSortedMapToMemory(data.sortedMapMemory, data.sortedMapAllocState);
+    }
     workerInitialized = true;
   }
   
@@ -124,6 +159,10 @@ export async function initWorker<T extends Record<string, SharedStructure>>(data
       case 'SharedQueue': result[name] = SharedQueue.fromWorkerData(structData); break;
       case 'SharedLinkedList': result[name] = SharedLinkedList.fromWorkerData(structData); break;
       case 'SharedDoublyLinkedList': result[name] = SharedDoublyLinkedList.fromWorkerData(structData); break;
+      case 'SharedOrderedMap': result[name] = SharedOrderedMap.fromWorkerData(structData); break;
+      case 'SharedOrderedSet': result[name] = SharedOrderedSet.fromWorkerData(structData); break;
+      case 'SharedSortedMap': result[name] = SharedSortedMap.fromWorkerData(structData); break;
+      case 'SharedSortedSet': result[name] = SharedSortedSet.fromWorkerData(structData); break;
     }
   }
   return result as T;

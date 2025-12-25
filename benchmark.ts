@@ -1,4 +1,4 @@
-import { Set as ImmutableSet, List as ImmutableList, Map as ImmutableMap, Stack as ImmutableStack } from 'immutable';
+import { Set as ImmutableSet, List as ImmutableList, Map as ImmutableMap, Stack as ImmutableStack, OrderedMap as ImmutableOrderedMap, OrderedSet as ImmutableOrderedSet, SortedMap as ImmutableSortedMap, SortedSet as ImmutableSortedSet } from 'immutable';
 import { SharedSet } from './shared-set';
 import { SharedStack, resetStack } from './shared-stack';
 import { SharedQueue, resetQueue } from './shared-queue';
@@ -6,6 +6,10 @@ import { SharedList, resetSharedList } from './shared-list';
 import { SharedMap, resetMap, configureAutoGC, getUsedBytes } from './shared-map';
 import { SharedLinkedList, resetLinkedList } from './shared-linked-list';
 import { SharedDoublyLinkedList, resetDoublyLinkedList } from './shared-doubly-linked-list';
+import { SharedOrderedMap, resetOrderedMap } from './shared-ordered-map';
+import { SharedOrderedSet, resetOrderedSet } from './shared-ordered-set';
+import { SharedSortedMap, resetSortedMap } from './shared-sorted-map';
+import { SharedSortedSet, resetSortedSet } from './shared-sorted-set';
 
 function bench(fn: () => void, iterations: number): number {
   for (let i = 0; i < Math.min(50, iterations); i++) fn();
@@ -377,6 +381,93 @@ async function benchDoublyLinkedList() {
   }
 }
 
+async function benchOrderedMap() {
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`SharedOrderedMap vs Immutable.OrderedMap vs Native Map`);
+  console.log(`${'='.repeat(80)}`);
+
+  for (const N of [100, 1000, 10000]) {
+    resetOrderedMap();
+    const iterations = Math.max(50, Math.floor(10000 / N));
+    const keys = Array.from({ length: N }, (_, i) => `key${i}`);
+    const vals = Array.from({ length: N }, (_, i) => `val${i}`);
+
+    console.log(`\n--- N=${N} (${iterations} iterations) ---`);
+    header3();
+
+    printRow('set',
+      bench(() => { resetOrderedMap(); let m = new SharedOrderedMap('string'); for (let i = 0; i < N; i++) m = m.set(keys[i], vals[i]); }, iterations),
+      bench(() => { let m = ImmutableOrderedMap<string,string>(); for (let i = 0; i < N; i++) m = m.set(keys[i], vals[i]); }, iterations),
+      bench(() => { const m = new Map(); for (let i = 0; i < N; i++) m.set(keys[i], vals[i]); }, iterations));
+
+    resetOrderedMap();
+    let om = new SharedOrderedMap('string'); for (let i = 0; i < N; i++) om = om.set(keys[i], vals[i]);
+    let iom = ImmutableOrderedMap<string,string>(); for (let i = 0; i < N; i++) iom = iom.set(keys[i], vals[i]);
+    const nm = new Map(keys.map((k,i) => [k, vals[i]]));
+
+    printRow('get',
+      bench(() => { for (const k of keys) om.get(k); }, iterations),
+      bench(() => { for (const k of keys) iom.get(k); }, iterations),
+      bench(() => { for (const k of keys) nm.get(k); }, iterations));
+
+    printRow('has',
+      bench(() => { for (const k of keys) om.has(k); }, iterations),
+      bench(() => { for (const k of keys) iom.has(k); }, iterations),
+      bench(() => { for (const k of keys) nm.has(k); }, iterations));
+
+    printRow('delete',
+      bench(() => { let x = om; for (let i = 0; i < 10; i++) x = x.delete(keys[i]); }, iterations),
+      bench(() => { let x = iom; for (let i = 0; i < 10; i++) x = x.delete(keys[i]); }, iterations),
+      bench(() => { const x = new Map(nm); for (let i = 0; i < 10; i++) x.delete(keys[i]); }, iterations));
+
+    printRow('forEach',
+      bench(() => { let c = 0; om.forEach(() => c++); }, iterations),
+      bench(() => { let c = 0; iom.forEach(() => c++); }, iterations),
+      bench(() => { let c = 0; nm.forEach(() => c++); }, iterations));
+  }
+}
+
+async function benchSortedMap() {
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`SharedSortedMap vs Native Map (sorted iteration)`);
+  console.log(`${'='.repeat(80)}`);
+
+  for (const N of [100, 1000, 10000]) {
+    resetSortedMap();
+    const iterations = Math.max(50, Math.floor(10000 / N));
+    const keys = Array.from({ length: N }, (_, i) => `key${String(i).padStart(5, '0')}`);
+    const shuffledKeys = [...keys].sort(() => Math.random() - 0.5);
+    const vals = Array.from({ length: N }, (_, i) => i);
+
+    console.log(`\n--- N=${N} (${iterations} iterations) ---`);
+    header2();
+
+    const smSet = bench(() => { resetSortedMap(); let m = new SharedSortedMap('number'); for (let i = 0; i < N; i++) m = m.set(shuffledKeys[i], vals[i]); }, iterations);
+    const nmSet = bench(() => { const m = new Map(); for (let i = 0; i < N; i++) m.set(shuffledKeys[i], vals[i]); }, iterations);
+    console.log(`${'set'.padEnd(14)} │ ${smSet.toFixed(4).padStart(11)} │ ${nmSet.toFixed(4).padStart(8)} │ ${smSet < nmSet ? `${(nmSet/smSet).toFixed(2)}x faster` : `${(smSet/nmSet).toFixed(2)}x slower`}`);
+
+    resetSortedMap();
+    let sm = new SharedSortedMap('number'); for (let i = 0; i < N; i++) sm = sm.set(shuffledKeys[i], vals[i]);
+    const nm = new Map(shuffledKeys.map((k,i) => [k, vals[i]]));
+
+    const smGet = bench(() => { for (const k of keys) sm.get(k); }, iterations);
+    const nmGet = bench(() => { for (const k of keys) nm.get(k); }, iterations);
+    console.log(`${'get'.padEnd(14)} │ ${smGet.toFixed(4).padStart(11)} │ ${nmGet.toFixed(4).padStart(8)} │ ${smGet < nmGet ? `${(nmGet/smGet).toFixed(2)}x faster` : `${(smGet/nmGet).toFixed(2)}x slower`}`);
+
+    const smHas = bench(() => { for (const k of keys) sm.has(k); }, iterations);
+    const nmHas = bench(() => { for (const k of keys) nm.has(k); }, iterations);
+    console.log(`${'has'.padEnd(14)} │ ${smHas.toFixed(4).padStart(11)} │ ${nmHas.toFixed(4).padStart(8)} │ ${smHas < nmHas ? `${(nmHas/smHas).toFixed(2)}x faster` : `${(smHas/nmHas).toFixed(2)}x slower`}`);
+
+    const smDelete = bench(() => { let x = sm; for (let i = 0; i < 10; i++) x = x.delete(keys[i]); }, iterations);
+    const nmDelete = bench(() => { const x = new Map(nm); for (let i = 0; i < 10; i++) x.delete(keys[i]); }, iterations);
+    console.log(`${'delete'.padEnd(14)} │ ${smDelete.toFixed(4).padStart(11)} │ ${nmDelete.toFixed(4).padStart(8)} │ ${smDelete < nmDelete ? `${(nmDelete/smDelete).toFixed(2)}x faster` : `${(smDelete/nmDelete).toFixed(2)}x slower`}`);
+
+    const smIter = bench(() => { let c = 0; for (const _ of sm.keys()) c++; }, iterations);
+    const nmIter = bench(() => { let c = 0; for (const _ of [...nm.keys()].sort()) c++; }, iterations);
+    console.log(`${'keys(sorted)'.padEnd(14)} │ ${smIter.toFixed(4).padStart(11)} │ ${nmIter.toFixed(4).padStart(8)} │ ${smIter < nmIter ? `${(nmIter/smIter).toFixed(2)}x faster` : `${(smIter/nmIter).toFixed(2)}x slower`}`);
+  }
+}
+
 async function run() {
   await benchSharedMap();
   await benchSet();
@@ -385,6 +476,8 @@ async function run() {
   await benchQueue();
   await benchLinkedList();
   await benchDoublyLinkedList();
+  await benchOrderedMap();
+  await benchSortedMap();
   await benchStringTypes();
   
   console.log(`\n${'='.repeat(80)}`);
@@ -397,7 +490,8 @@ Key Advantages of Shared* structures:
 • WASM-accelerated operations
 • O(1) Stack push/pop/peek, O(1) Queue enqueue/dequeue/peek
 • O(1) LinkedList prepend/removeFirst, O(1) DoublyLinkedList prepend/append/removeFirst/removeLast
-• O(log32 n) Map/Set/List operations
+• O(log32 n) Map/Set/List/OrderedMap/OrderedSet operations
+• O(log n) SortedMap/SortedSet operations (Red-Black Tree)
 
 Native structures are mutable and cannot be safely shared across workers.
 `);
