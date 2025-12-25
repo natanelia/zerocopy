@@ -9,7 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "bench": "bun benchmark.ts",
-    "build:wasm": "asc shared-map.as.ts -o shared-map.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc shared-list.as.ts -o shared-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc linked-list.as.ts -o linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads"
+    "build:wasm": "asc shared-map.as.ts -o shared-map.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc shared-list.as.ts -o shared-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc linked-list.as.ts -o linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc singly-linked-list.as.ts -o singly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc doubly-linked-list.as.ts -o doubly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads"
   },
   "keywords": [
     "immutable",

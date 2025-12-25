@@ -4,6 +4,8 @@ import { SharedStack, resetStack } from './shared-stack';
 import { SharedQueue, resetQueue } from './shared-queue';
 import { SharedList, resetSharedList } from './shared-list';
 import { SharedMap, resetMap, configureAutoGC, getUsedBytes } from './shared-map';
+import { SharedLinkedList, resetLinkedList } from './shared-linked-list';
+import { SharedDoublyLinkedList, resetDoublyLinkedList } from './shared-doubly-linked-list';
 
 function bench(fn: () => void, iterations: number): number {
   for (let i = 0; i < Math.min(50, iterations); i++) fn();
@@ -299,12 +301,90 @@ async function benchStringTypes() {
   console.log(`get(string): ${strGetTime.toFixed(4)}ms, get(number): ${numGetTime.toFixed(4)}ms, ratio: ${(strGetTime/numGetTime).toFixed(2)}x`);
 }
 
+async function benchLinkedList() {
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`SharedLinkedList vs Native Array`);
+  console.log(`${'='.repeat(80)}`);
+
+  for (const N of [100, 1000, 10000]) {
+    resetLinkedList();
+    const iterations = Math.max(50, Math.floor(10000 / N));
+
+    console.log(`\n--- N=${N} (${iterations} iterations) ---`);
+    header2();
+
+    const llPrepend = bench(() => { resetLinkedList(); let l = new SharedLinkedList('number'); for (let i = 0; i < N; i++) l = l.prepend(i); }, iterations);
+    const naPrepend = bench(() => { const a: number[] = []; for (let i = 0; i < N; i++) a.unshift(i); }, iterations);
+    console.log(`${'prepend'.padEnd(14)} │ ${llPrepend.toFixed(4).padStart(11)} │ ${naPrepend.toFixed(4).padStart(8)} │ ${llPrepend < naPrepend ? `${(naPrepend/llPrepend).toFixed(2)}x faster` : `${(llPrepend/naPrepend).toFixed(2)}x slower`}`);
+
+    const llAppend = bench(() => { resetLinkedList(); let l = new SharedLinkedList('number'); for (let i = 0; i < N; i++) l = l.append(i); }, iterations);
+    const naAppend = bench(() => { const a: number[] = []; for (let i = 0; i < N; i++) a.push(i); }, iterations);
+    console.log(`${'append'.padEnd(14)} │ ${llAppend.toFixed(4).padStart(11)} │ ${naAppend.toFixed(4).padStart(8)} │ ${llAppend < naAppend ? `${(naAppend/llAppend).toFixed(2)}x faster` : `${(llAppend/naAppend).toFixed(2)}x slower`}`);
+
+    resetLinkedList();
+    let ll = new SharedLinkedList('number'); for (let i = 0; i < N; i++) ll = ll.append(i);
+    const na = Array.from({ length: N }, (_, i) => i);
+
+    const llGet = bench(() => { for (let i = 0; i < Math.min(100, N); i++) ll.get(i); }, iterations);
+    const naGet = bench(() => { for (let i = 0; i < Math.min(100, N); i++) na[i]; }, iterations);
+    console.log(`${'get(0-99)'.padEnd(14)} │ ${llGet.toFixed(4).padStart(11)} │ ${naGet.toFixed(4).padStart(8)} │ ${llGet < naGet ? `${(naGet/llGet).toFixed(2)}x faster` : `${(llGet/naGet).toFixed(2)}x slower`}`);
+
+    const llRemove = bench(() => { let l = ll; for (let i = 0; i < 10; i++) l = l.removeFirst(); }, iterations);
+    const naRemove = bench(() => { const a = [...na]; for (let i = 0; i < 10; i++) a.shift(); }, iterations);
+    console.log(`${'removeFirst'.padEnd(14)} │ ${llRemove.toFixed(4).padStart(11)} │ ${naRemove.toFixed(4).padStart(8)} │ ${llRemove < naRemove ? `${(naRemove/llRemove).toFixed(2)}x faster` : `${(llRemove/naRemove).toFixed(2)}x slower`}`);
+  }
+}
+
+async function benchDoublyLinkedList() {
+  console.log(`\n${'='.repeat(80)}`);
+  console.log(`SharedDoublyLinkedList vs Native Array`);
+  console.log(`${'='.repeat(80)}`);
+
+  for (const N of [100, 1000, 10000]) {
+    resetDoublyLinkedList();
+    const iterations = Math.max(50, Math.floor(10000 / N));
+
+    console.log(`\n--- N=${N} (${iterations} iterations) ---`);
+    header2();
+
+    const dllPrepend = bench(() => { resetDoublyLinkedList(); let l = new SharedDoublyLinkedList('number'); for (let i = 0; i < N; i++) l = l.prepend(i); }, iterations);
+    const naPrepend = bench(() => { const a: number[] = []; for (let i = 0; i < N; i++) a.unshift(i); }, iterations);
+    console.log(`${'prepend'.padEnd(14)} │ ${dllPrepend.toFixed(4).padStart(11)} │ ${naPrepend.toFixed(4).padStart(8)} │ ${dllPrepend < naPrepend ? `${(naPrepend/dllPrepend).toFixed(2)}x faster` : `${(dllPrepend/naPrepend).toFixed(2)}x slower`}`);
+
+    const dllAppend = bench(() => { resetDoublyLinkedList(); let l = new SharedDoublyLinkedList('number'); for (let i = 0; i < N; i++) l = l.append(i); }, iterations);
+    const naAppend = bench(() => { const a: number[] = []; for (let i = 0; i < N; i++) a.push(i); }, iterations);
+    console.log(`${'append'.padEnd(14)} │ ${dllAppend.toFixed(4).padStart(11)} │ ${naAppend.toFixed(4).padStart(8)} │ ${dllAppend < naAppend ? `${(naAppend/dllAppend).toFixed(2)}x faster` : `${(dllAppend/naAppend).toFixed(2)}x slower`}`);
+
+    resetDoublyLinkedList();
+    let dll = new SharedDoublyLinkedList('number'); for (let i = 0; i < N; i++) dll = dll.append(i);
+    const na = Array.from({ length: N }, (_, i) => i);
+
+    const dllGetFront = bench(() => { for (let i = 0; i < Math.min(50, N); i++) dll.get(i); }, iterations);
+    const naGetFront = bench(() => { for (let i = 0; i < Math.min(50, N); i++) na[i]; }, iterations);
+    console.log(`${'get(front)'.padEnd(14)} │ ${dllGetFront.toFixed(4).padStart(11)} │ ${naGetFront.toFixed(4).padStart(8)} │ ${dllGetFront < naGetFront ? `${(naGetFront/dllGetFront).toFixed(2)}x faster` : `${(dllGetFront/naGetFront).toFixed(2)}x slower`}`);
+
+    const dllGetBack = bench(() => { for (let i = N - 50; i < N; i++) dll.get(i); }, iterations);
+    const naGetBack = bench(() => { for (let i = N - 50; i < N; i++) na[i]; }, iterations);
+    console.log(`${'get(back)'.padEnd(14)} │ ${dllGetBack.toFixed(4).padStart(11)} │ ${naGetBack.toFixed(4).padStart(8)} │ ${dllGetBack < naGetBack ? `${(naGetBack/dllGetBack).toFixed(2)}x faster` : `${(dllGetBack/naGetBack).toFixed(2)}x slower`}`);
+
+    const dllRemoveFirst = bench(() => { let l = dll; for (let i = 0; i < 10; i++) l = l.removeFirst(); }, iterations);
+    const naRemoveFirst = bench(() => { const a = [...na]; for (let i = 0; i < 10; i++) a.shift(); }, iterations);
+    console.log(`${'removeFirst'.padEnd(14)} │ ${dllRemoveFirst.toFixed(4).padStart(11)} │ ${naRemoveFirst.toFixed(4).padStart(8)} │ ${dllRemoveFirst < naRemoveFirst ? `${(naRemoveFirst/dllRemoveFirst).toFixed(2)}x faster` : `${(dllRemoveFirst/naRemoveFirst).toFixed(2)}x slower`}`);
+
+    const dllRemoveLast = bench(() => { let l = dll; for (let i = 0; i < 10; i++) l = l.removeLast(); }, iterations);
+    const naRemoveLast = bench(() => { const a = [...na]; for (let i = 0; i < 10; i++) a.pop(); }, iterations);
+    console.log(`${'removeLast'.padEnd(14)} │ ${dllRemoveLast.toFixed(4).padStart(11)} │ ${naRemoveLast.toFixed(4).padStart(8)} │ ${dllRemoveLast < naRemoveLast ? `${(naRemoveLast/dllRemoveLast).toFixed(2)}x faster` : `${(dllRemoveLast/naRemoveLast).toFixed(2)}x slower`}`);
+  }
+}
+
 async function run() {
   await benchSharedMap();
   await benchSet();
   await benchList();
   await benchStack();
   await benchQueue();
+  await benchLinkedList();
+  await benchDoublyLinkedList();
   await benchStringTypes();
   
   console.log(`\n${'='.repeat(80)}`);
@@ -316,6 +396,7 @@ Key Advantages of Shared* structures:
 • Immutable/persistent - safe concurrent reads
 • WASM-accelerated operations
 • O(1) Stack push/pop/peek, O(1) Queue enqueue/dequeue/peek
+• O(1) LinkedList prepend/removeFirst, O(1) DoublyLinkedList prepend/append/removeFirst/removeLast
 • O(log32 n) Map/Set/List operations
 
 Native structures are mutable and cannot be safely shared across workers.
