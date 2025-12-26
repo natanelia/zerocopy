@@ -1,4 +1,5 @@
 import { SharedSortedMap, Comparator, sharedMemory, getAllocState, getBufferCopy, attachToMemory, resetSortedMap } from './shared-sorted-map';
+import { structureRegistry } from './codec';
 
 export { sharedMemory as sortedSetMemory, getAllocState as getSortedSetAllocState, getBufferCopy as getSortedSetBufferCopy, attachToMemory as attachSortedSetToMemory, resetSortedMap as resetSortedSet };
 
@@ -46,3 +47,6 @@ export class SharedSortedSet<T extends string | number> {
     return new SharedSortedSet(undefined, new SharedSortedMap('number', undefined, data.root, data.size));
   }
 }
+
+// Register SharedSortedSet in structure registry for nested type support
+structureRegistry['SharedSortedSet'] = { fromWorkerData: (d: any) => SharedSortedSet.fromWorkerData(d) };

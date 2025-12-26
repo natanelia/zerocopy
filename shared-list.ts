@@ -89,6 +89,9 @@ export function syncBuffer(): void {
   refreshMem();
 }
 
+import { parseNestedType } from './types';
+import { structureRegistry } from './codec';
+
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
@@ -98,8 +101,8 @@ const registry = new FinalizationRegistry<{ root: number; depth: number; gen: nu
   }
 );
 
-export type SharedListType = 'number' | 'string' | 'boolean' | 'object';
-type ValueOf<T extends SharedListType> = T extends 'number' ? number : T extends 'string' ? string : T extends 'boolean' ? boolean : object;
+export type SharedListType = 'number' | 'string' | 'boolean' | 'object' | `Shared${string}<${string}>`;
+type ValueOf<T extends string> = T extends 'number' ? number : T extends 'string' ? string : T extends 'boolean' ? boolean : T extends 'object' ? object : any;
 
 function packPtrLen(ptr: number, len: number): number {
   const buf = new ArrayBuffer(8);
@@ -116,13 +119,14 @@ function unpackPtrLen(val: number): [number, number] {
   return [dv.getUint32(0, true), dv.getUint32(4, true)];
 }
 
-export class SharedList<T extends SharedListType = 'number'> {
+export class SharedList<T extends string = SharedListType> {
   readonly root: number;
   private depth: number;
   private _size: number;
   private gen: number;
   private disposed = false;
   readonly type: T;
+  private nestedInfo: { structureType: string; innerType: string } | null;
 
   constructor(type: T, root = 0, depth = 0, size = 0) {
     this.type = type;
@@ -130,6 +134,7 @@ export class SharedList<T extends SharedListType = 'number'> {
     this.depth = depth;
     this._size = size;
     this.gen = generation;
+    this.nestedInfo = parseNestedType(type);
     if (root && !isWorker) registry.register(this, { root, depth, gen: generation });
   }
 
@@ -144,7 +149,12 @@ export class SharedList<T extends SharedListType = 'number'> {
     if (this.type === 'number') return value as number;
     if (this.type === 'boolean') return (value as boolean) ? 1 : 0;
     refreshMem();
-    const str = this.type === 'string' ? value as string : JSON.stringify(value);
+    let str: string;
+    if (this.nestedInfo) {
+      str = JSON.stringify({ __t: this.nestedInfo.structureType, __i: this.nestedInfo.innerType, __d: (value as any).toWorkerData() });
+    } else {
+      str = this.type === 'string' ? value as string : JSON.stringify(value);
+    }
     const { written } = encoder.encodeInto(str, memBuf.subarray(blobBufPtr));
     const ptr = wasm.allocBlob(written);
     refreshMem();
@@ -157,6 +167,12 @@ export class SharedList<T extends SharedListType = 'number'> {
     refreshMem();
     const [ptr, len] = unpackPtrLen(raw);
     const str = decoder.decode(memBuf.subarray(ptr, ptr + len));
+    if (this.nestedInfo) {
+      const { __t, __i, __d } = JSON.parse(str);
+      const factory = structureRegistry[__t];
+      if (!factory) throw new Error(`Unknown structure type: ${__t}`);
+      return factory.fromWorkerData({ ...__d, valueType: __d.valueType ?? __i }) as ValueOf<T>;
+    }
     if (this.type === 'string') return str as ValueOf<T>;
     return JSON.parse(str) as ValueOf<T>;
   }
@@ -227,7 +243,10 @@ export class SharedList<T extends SharedListType = 'number'> {
     return { root: this.root, depth: this.depth, size: this._size, type: this.type };
   }
 
-  static fromWorkerData<T extends VectorType>(data: { root: number; depth: number; size: number; type: T }): SharedList<T> {
+  static fromWorkerData<T extends string>(data: { root: number; depth: number; size: number; type: T }): SharedList<T> {
     return new SharedList(data.type, data.root, data.depth, data.size);
   }
 }
+
+// Register SharedList in structure registry for nested type support
+structureRegistry['SharedList'] = { fromWorkerData: (d: any) => SharedList.fromWorkerData(d) };

@@ -8,6 +8,7 @@ High-performance immutable data structures using WebAssembly with SharedArrayBuf
 - WASM-accelerated operations via AssemblyScript
 - SharedArrayBuffer for cross-worker sharing
 - Typed value support: `string`, `number`, `boolean`, `object`
+- **Nested structures**: Any structure can contain other structures (e.g., `SharedMap<'SharedSet<string>'>`)
 - Reference counting with automatic cleanup via FinalizationRegistry
 
 ## Installation
@@ -85,6 +86,33 @@ const maxPq = new SharedPriorityQueue('number', { maxHeap: true })
   .enqueue(30, 3);
 maxPq.peek(); // 30 - highest priority first
 ```
+
+## Nested Structures
+
+Any data structure can contain other data structures as values. Use the type string format `'StructureName<innerType>'`:
+
+```typescript
+// Map containing Sets
+const userTags = new SharedMap<'SharedSet<string>'>('SharedSet<string>');
+const tags = new SharedSet<string>().add('admin').add('active');
+const userTags2 = userTags.set('user1', tags);
+userTags2.get('user1')!.has('admin'); // true
+
+// List containing Maps
+const records = new SharedList<'SharedMap<number>'>('SharedMap<number>');
+const record = new SharedMap('number').set('x', 10).set('y', 20);
+const records2 = records.push(record);
+records2.get(0)!.get('x'); // 10
+
+// Deeply nested structures
+const nested = new SharedMap<'SharedMap<SharedList<string>>'>('SharedMap<SharedList<string>>');
+
+// Works with all structures: Stack, Queue, LinkedList, OrderedMap, SortedMap, PriorityQueue, etc.
+const stack = new SharedStack<'SharedSet<number>'>('SharedSet<number>');
+const queue = new SharedQueue<'SharedMap<string>'>('SharedMap<string>');
+```
+
+Nested structures use zero-copy sharing across workers - only pointers are transferred, the actual data stays in SharedArrayBuffer.
 
 ## Worker Sharing
 

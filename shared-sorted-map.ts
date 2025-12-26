@@ -1,6 +1,7 @@
 import { loadWasm, createSharedMemory, MemoryView } from './wasm-utils';
-import { encoder, decoder } from './codec';
-import type { ValueType, ValueOf } from './types';
+import { encoder, decoder, structureRegistry } from './codec';
+import { parseNestedType } from './types';
+import type { ValueOf } from './types';
 
 const wasmBytes = loadWasm('sorted-tree.wasm');
 const wasmModule = new WebAssembly.Module(wasmBytes);
@@ -42,7 +43,12 @@ export function attachToMemory(memory: WebAssembly.Memory, allocState?: { heapEn
 
 export function getBufferCopy(): Uint8Array { return new Uint8Array(wasmMemory.buffer).slice(); }
 export function getAllocState() { return { heapEnd: wasm.getHeapEnd(), freeList: wasm.getFreeList() }; }
-export function resetSortedMap(): void { wasm.reset(); }
+export function resetSortedMap(): void { generation++; wasm.reset(); }
+
+let generation = 0;
+const registry = new FinalizationRegistry<{ gen: number }>(({ gen }) => {
+  // Structure became unreachable - could trigger cleanup if gen matches
+});
 
 export type Comparator<K> = (a: K, b: K) => number;
 
@@ -65,7 +71,7 @@ function encodeKeyFast(key: string): number {
 }
 
 // Encode value and return [ptr, len] - avoids double encoding
-function encodeValueFast<T extends ValueType>(type: T, value: ValueOf<T>): [number, number] {
+function encodeValueFast(type: string, value: any, nestedInfo: { structureType: string; innerType: string } | null): [number, number] {
   refresh();
   if (type === 'number') {
     mem.dv.setFloat64(blobBufPtr, value as number, true);
@@ -75,20 +81,31 @@ function encodeValueFast<T extends ValueType>(type: T, value: ValueOf<T>): [numb
     mem.buf[blobBufPtr] = (value as boolean) ? 1 : 0;
     return [wasm.allocBlob(1), 1];
   }
-  const str = type === 'string' ? value as string : JSON.stringify(value);
+  let str: string;
+  if (nestedInfo) {
+    str = JSON.stringify({ __t: nestedInfo.structureType, __i: nestedInfo.innerType, __d: value.toWorkerData() });
+  } else {
+    str = type === 'string' ? value as string : JSON.stringify(value);
+  }
   const bytes = encoder.encode(str);
   mem.buf.set(bytes, blobBufPtr);
   return [wasm.allocBlob(bytes.length), bytes.length];
 }
 
-function decodeValue<T extends ValueType>(type: T, packed: number): ValueOf<T> {
+function decodeValue(type: string, packed: number, nestedInfo: { structureType: string; innerType: string } | null): any {
   refresh();
   const ptr = packed & 0xFFFFF;
   const len = packed >>> 20;
-  if (type === 'number') return mem.dv.getFloat64(ptr, true) as ValueOf<T>;
-  if (type === 'boolean') return (mem.buf[ptr] !== 0) as ValueOf<T>;
+  if (type === 'number') return mem.dv.getFloat64(ptr, true);
+  if (type === 'boolean') return mem.buf[ptr] !== 0;
   const str = decoder.decode(mem.buf.subarray(ptr, ptr + len));
-  return (type === 'string' ? str : JSON.parse(str)) as ValueOf<T>;
+  if (nestedInfo) {
+    const { __t, __i, __d } = JSON.parse(str);
+    const factory = structureRegistry[__t];
+    if (!factory) throw new Error(`Unknown structure type: ${__t}`);
+    return factory.fromWorkerData({ ...__d, valueType: __d.valueType ?? __i });
+  }
+  return type === 'string' ? str : JSON.parse(str);
 }
 
 // Fast ASCII key decoding
@@ -107,22 +124,27 @@ function decodeKeyFast(packed: number): string {
   return s;
 }
 
-export class SharedSortedMap<T extends ValueType> {
+export type SharedSortedMapType = 'string' | 'number' | 'boolean' | 'object' | `Shared${string}<${string}>`;
+
+export class SharedSortedMap<T extends string = SharedSortedMapType> {
   readonly root: number;
   readonly size: number;
   readonly valueType: T;
   private comparator?: Comparator<string>;
+  private nestedInfo: { structureType: string; innerType: string } | null;
 
   constructor(type: T, comparator?: Comparator<string>, root = 0, size = 0) {
     this.valueType = type;
     this.comparator = comparator;
     this.root = root;
     this.size = size;
+    this.nestedInfo = parseNestedType(type);
+    if (root) registry.register(this, { gen: generation });
   }
 
   set(key: string, value: ValueOf<T>): SharedSortedMap<T> {
     const keyLen = encodeKeyFast(key);
-    const [valPtr, valLen] = encodeValueFast(this.valueType, value);
+    const [valPtr, valLen] = encodeValueFast(this.valueType, value, this.nestedInfo);
     const valPacked = valPtr | (valLen << 20);
     
     wasm.insertBlob(this.root, keyLen, valPacked);
@@ -138,7 +160,7 @@ export class SharedSortedMap<T extends ValueType> {
     const keyLen = encodeKeyFast(key);
     const node = wasm.findBlob(this.root, keyLen);
     if (!node) return undefined;
-    return decodeValue(this.valueType, wasm.getValPacked(node));
+    return decodeValue(this.valueType, wasm.getValPacked(node), this.nestedInfo);
   }
 
   has(key: string): boolean {
@@ -159,7 +181,7 @@ export class SharedSortedMap<T extends ValueType> {
     let node = wasm.iterStart(this.root);
     while (node) {
       const key = decodeKeyFast(wasm.getKeyPacked(node));
-      const value = decodeValue(this.valueType, wasm.getValPacked(node));
+      const value = decodeValue(this.valueType, wasm.getValPacked(node), this.nestedInfo);
       yield [key, value];
       node = wasm.iterNext();
     }
@@ -191,7 +213,10 @@ export class SharedSortedMap<T extends ValueType> {
     return { root: this.root, size: this.size, valueType: this.valueType };
   }
 
-  static fromWorkerData<T extends ValueType>(data: { root: number; size: number; valueType: T }): SharedSortedMap<T> {
+  static fromWorkerData<T extends string>(data: { root: number; size: number; valueType: T }): SharedSortedMap<T> {
     return new SharedSortedMap(data.valueType, undefined, data.root, data.size);
   }
 }
+
+// Register SharedSortedMap in structure registry for nested type support
+structureRegistry['SharedSortedMap'] = { fromWorkerData: (d: any) => SharedSortedMap.fromWorkerData(d) };

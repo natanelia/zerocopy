@@ -1,4 +1,5 @@
 import { SharedMap } from './shared-map';
+import { structureRegistry } from './codec';
 
 export class SharedSet<T extends string | number> {
   private _map: SharedMap<'number'>;
@@ -41,11 +42,16 @@ export class SharedSet<T extends string | number> {
     return entries.length ? new SharedSet(this._map.setMany(entries)) : this;
   }
 
-  static fromWorkerData<T extends string | number>(root: number): SharedSet<T> {
-    return new SharedSet(SharedMap.fromWorkerData(root, 'number'));
+  static fromWorkerData<T extends string | number>(data: { root: number; size: number }): SharedSet<T> {
+    const map = SharedMap.fromWorkerData(data.root, 'number');
+    (map as any)._size = data.size;
+    return new SharedSet(map);
   }
 
-  toWorkerData(): { root: number } {
-    return { root: (this._map as any).root };
+  toWorkerData(): { root: number; size: number } {
+    return { root: (this._map as any).root, size: this._map.size };
   }
 }
+
+// Register SharedSet in structure registry for nested type support
+structureRegistry['SharedSet'] = { fromWorkerData: (d: any) => SharedSet.fromWorkerData(d) };

@@ -167,9 +167,9 @@ export async function initWorker<T extends Record<string, SharedStructure>>(data
   const result: Record<string, SharedStructure> = {};
   for (const [name, { type, data: structData }] of Object.entries(data.structures)) {
     switch (type) {
-      case 'SharedMap': result[name] = SharedMap.fromWorkerData(structData.root, structData.valueType); break;
+      case 'SharedMap': result[name] = SharedMap.fromWorkerData(structData.root, structData.valueType, structData.size); break;
       case 'SharedList': result[name] = SharedList.fromWorkerData(structData); break;
-      case 'SharedSet': result[name] = SharedSet.fromWorkerData(structData.root); break;
+      case 'SharedSet': result[name] = SharedSet.fromWorkerData(structData); break;
       case 'SharedStack': result[name] = SharedStack.fromWorkerData(structData); break;
       case 'SharedQueue': result[name] = SharedQueue.fromWorkerData(structData); break;
       case 'SharedLinkedList': result[name] = SharedLinkedList.fromWorkerData(structData); break;

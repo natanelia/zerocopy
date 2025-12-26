@@ -1,5 +1,6 @@
 // Shared codec utilities for encoding/decoding values
-import type { ValueType, ValueOf } from './types';
+import type { ValueOf, PrimitiveType } from './types';
+import { parseNestedType } from './types';
 
 export const encoder = new TextEncoder();
 export const decoder = new TextDecoder();
@@ -22,7 +23,7 @@ function strLen(s: string): number {
   return len;
 }
 
-export const codecs: Record<ValueType, Codec<any>> = {
+export const codecs: Record<PrimitiveType, Codec<any>> = {
   string: {
     size: (v: string) => strLen(v),
     encode: (v: string, buf: Uint8Array, ptr: number) => encoder.encodeInto(v, buf.subarray(ptr)).written!,
@@ -45,6 +46,30 @@ export const codecs: Record<ValueType, Codec<any>> = {
   },
 };
 
-export function getCodec<T extends ValueType>(type: T): Codec<ValueOf<T>> {
-  return codecs[type];
+// Registry for nested structure reconstruction - populated by each structure module
+export const structureRegistry: Record<string, {
+  fromWorkerData: (data: any) => any;
+}> = {};
+
+export function createNestedCodec(structureType: string, innerType: string): Codec<any> {
+  return {
+    size: (v: any) => strLen(JSON.stringify({ __t: structureType, __i: innerType, __d: v.toWorkerData() })),
+    encode: (v: any, buf: Uint8Array, ptr: number) => {
+      const json = JSON.stringify({ __t: structureType, __i: innerType, __d: v.toWorkerData() });
+      return encoder.encodeInto(json, buf.subarray(ptr)).written!;
+    },
+    decode: (buf: Uint8Array, ptr: number, len: number) => {
+      const { __t, __i, __d } = JSON.parse(decoder.decode(buf.subarray(ptr, ptr + len)));
+      const factory = structureRegistry[__t];
+      if (!factory) throw new Error(`Unknown structure type: ${__t}`);
+      return factory.fromWorkerData({ ...__d, valueType: __d.valueType ?? __i });
+    },
+  };
+}
+
+export function getCodec<T extends string>(type: T): Codec<ValueOf<T>> {
+  if (type in codecs) return codecs[type as PrimitiveType];
+  const nested = parseNestedType(type);
+  if (nested) return createNestedCodec(nested.structureType, nested.innerType);
+  throw new Error(`Unknown type: ${type}`);
 }

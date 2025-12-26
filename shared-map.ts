@@ -1,6 +1,8 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { parseNestedType } from './types';
+import { structureRegistry } from './codec';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const wasmBytes = readFileSync(join(__dirname, 'shared-map.wasm'));
@@ -114,10 +116,17 @@ function decodeObj(ptr: number, len: number): object {
   return obj;
 }
 
-export type ValueType = 'string' | 'number' | 'boolean' | 'object';
+function decodeNested(ptr: number, len: number): any {
+  const { __t, __i, __d } = JSON.parse(decodeStr(ptr, len));
+  const factory = structureRegistry[__t];
+  if (!factory) throw new Error(`Unknown structure type: ${__t}`);
+  return factory.fromWorkerData({ ...__d, valueType: __d.valueType ?? __i });
+}
+
+export type ValueType = 'string' | 'number' | 'boolean' | 'object' | `Shared${string}<${string}>`;
 type Codec<T> = [(v: T) => number, (v: T, buf: Uint8Array, ptr: number) => number, (ptr: number, len: number) => T];
 
-const codecs: Record<ValueType, Codec<any>> = {
+const codecs: Record<string, Codec<any>> = {
   string: [
     (v: string) => strLen(v),
     (v: string, buf: Uint8Array, ptr: number) => encoder.encodeInto(v, buf.subarray(ptr)).written!,
@@ -140,7 +149,20 @@ const codecs: Record<ValueType, Codec<any>> = {
   ],
 };
 
-type ValueOf<T extends ValueType> = T extends 'string' ? string : T extends 'number' ? number : T extends 'boolean' ? boolean : object;
+function getCodecForType(type: string): Codec<any> {
+  if (codecs[type]) return codecs[type];
+  const nested = parseNestedType(type);
+  if (nested) {
+    return [
+      (v: any) => strLen(JSON.stringify({ __t: nested.structureType, __i: nested.innerType, __d: v.toWorkerData() })),
+      (v: any, buf: Uint8Array, ptr: number) => encoder.encodeInto(JSON.stringify({ __t: nested.structureType, __i: nested.innerType, __d: v.toWorkerData() }), buf.subarray(ptr)).written!,
+      (ptr: number, len: number) => decodeNested(ptr, len)
+    ];
+  }
+  throw new Error(`Unknown type: ${type}`);
+}
+
+type ValueOf<T extends string> = T extends 'string' ? string : T extends 'number' ? number : T extends 'boolean' ? boolean : T extends 'object' ? object : any;
 
 let memBuf = new Uint8Array(wasmMemory.buffer);
 let memDv = new DataView(wasmMemory.buffer);
@@ -164,7 +186,7 @@ function encodeKey(key: string, ptr: number): number {
   return len;
 }
 
-export class SharedMap<T extends ValueType> {
+export class SharedMap<T extends string = ValueType> {
   private _type: T;
   private root: number;
   private _size: number;
@@ -177,7 +199,7 @@ export class SharedMap<T extends ValueType> {
     this._type = type;
     this.root = root;
     this._size = size;
-    const codec = codecs[type];
+    const codec = getCodecForType(type);
     this.valLen = codec[0];
     this.enc = codec[1];
     this.dec = codec[2];
@@ -356,20 +378,24 @@ export class SharedMap<T extends ValueType> {
   get valueType(): T { return this._type; }
 
   /** Create from worker data (read-only in worker) */
-  static fromWorkerData<T extends ValueType>(root: number, valueType: T): SharedMap<T> {
+  static fromWorkerData<T extends string>(root: number, valueType: T, size?: number): SharedMap<T> {
     const map = new SharedMap<T>(valueType, 0, 0);
     (map as any).root = root;
+    if (size !== undefined) (map as any)._size = size;
     return map;
   }
 
   /** Serialize for worker transfer */
-  toWorkerData(): { root: number; valueType: T } {
-    return { root: this.root, valueType: this._type };
+  toWorkerData(): { root: number; valueType: T; size: number } {
+    return { root: this.root, valueType: this._type, size: this._size };
   }
 }
 
+// Register SharedMap in structure registry for nested type support
+structureRegistry['SharedMap'] = { fromWorkerData: (d: any) => SharedMap.fromWorkerData(d.root, d.valueType, d.size) };
+
 // Internal numeric key class for HAMTList - shares WASM instance
-export class SharedMapNumeric<T extends ValueType> {
+export class SharedMapNumeric<T extends string = ValueType> {
   readonly _type: T;
   readonly root: number;
   private valLen: (v: ValueOf<T>) => number;
@@ -379,7 +405,7 @@ export class SharedMapNumeric<T extends ValueType> {
   constructor(type: T, root = 0) {
     this._type = type;
     this.root = root;
-    const codec = codecs[type];
+    const codec = getCodecForType(type);
     this.valLen = codec[0];
     this.enc = codec[1];
     this.dec = codec[2];

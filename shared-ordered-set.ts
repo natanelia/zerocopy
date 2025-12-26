@@ -1,4 +1,5 @@
 import { SharedOrderedMap, sharedMemory, getAllocState, getBufferCopy, attachToMemory, resetOrderedMap } from './shared-ordered-map';
+import { structureRegistry } from './codec';
 
 export { sharedMemory as orderedSetMemory, getAllocState as getOrderedSetAllocState, getBufferCopy as getOrderedSetBufferCopy, attachToMemory as attachOrderedSetToMemory, resetOrderedMap as resetOrderedSet };
 
@@ -45,3 +46,6 @@ export class SharedOrderedSet<T extends string | number> {
     return new SharedOrderedSet(SharedOrderedMap.fromWorkerData({ ...data, valueType: 'number' }));
   }
 }
+
+// Register SharedOrderedSet in structure registry for nested type support
+structureRegistry['SharedOrderedSet'] = { fromWorkerData: (d: any) => SharedOrderedSet.fromWorkerData(d) };
