@@ -1,5 +1,5 @@
 import { SharedMap } from './shared-map';
-import { structureRegistry } from './codec';
+import { structureRegistry } from './codec.ts';
 
 export class SharedSet<T extends string | number> {
   private _map: SharedMap<'number'>;

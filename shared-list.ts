@@ -89,8 +89,8 @@ export function syncBuffer(): void {
   refreshMem();
 }
 
-import { parseNestedType } from './types';
-import { structureRegistry } from './codec';
+import { parseNestedType } from './types.ts';
+import { structureRegistry } from './codec.ts';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();

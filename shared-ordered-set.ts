@@ -1,5 +1,5 @@
 import { SharedOrderedMap, sharedMemory, getAllocState, getBufferCopy, attachToMemory, resetOrderedMap } from './shared-ordered-map';
-import { structureRegistry } from './codec';
+import { structureRegistry } from './codec.ts';
 
 export { sharedMemory as orderedSetMemory, getAllocState as getOrderedSetAllocState, getBufferCopy as getOrderedSetBufferCopy, attachToMemory as attachOrderedSetToMemory, resetOrderedMap as resetOrderedSet };
 

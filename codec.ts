@@ -1,6 +1,6 @@
 // Shared codec utilities for encoding/decoding values
-import type { ValueOf, PrimitiveType } from './types';
-import { parseNestedType } from './types';
+import type { ValueOf, PrimitiveType } from './types.ts';
+import { parseNestedType } from './types.ts';
 
 export const encoder = new TextEncoder();
 export const decoder = new TextDecoder();

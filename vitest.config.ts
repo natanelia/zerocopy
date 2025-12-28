@@ -12,5 +12,6 @@ export default defineConfig({
     teardownTimeout: 1000,
     minWorkers: 1,
     maxWorkers: 4,
+    exclude: ['**/node_modules/**', '**/demo/**'],
   },
 });

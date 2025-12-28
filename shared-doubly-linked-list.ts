@@ -1,7 +1,7 @@
 import { loadWasm, createSharedMemory, MemoryView } from './wasm-utils';
-import { encoder, decoder, structureRegistry } from './codec';
-import { parseNestedType } from './types';
-import type { ValueOf } from './types';
+import { encoder, decoder, structureRegistry } from './codec.ts';
+import { parseNestedType } from './types.ts';
+import type { ValueOf } from './types.ts';
 
 const wasmBytes = loadWasm('doubly-linked-list.wasm');
 const wasmModule = new WebAssembly.Module(wasmBytes);

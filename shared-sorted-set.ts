@@ -1,5 +1,5 @@
 import { SharedSortedMap, Comparator, sharedMemory, getAllocState, getBufferCopy, attachToMemory, resetSortedMap } from './shared-sorted-map';
-import { structureRegistry } from './codec';
+import { structureRegistry } from './codec.ts';
 
 export { sharedMemory as sortedSetMemory, getAllocState as getSortedSetAllocState, getBufferCopy as getSortedSetBufferCopy, attachToMemory as attachSortedSetToMemory, resetSortedMap as resetSortedSet };
 

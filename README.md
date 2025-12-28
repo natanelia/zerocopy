@@ -341,6 +341,114 @@ The main advantage is **cross-worker sharing** via SharedArrayBuffer - native st
 
 > Note: SharedSortedMap uses a Red-Black Tree for O(log n) sorted operations. Native Map requires sorting on iteration which is O(n log n).
 
+## d2ts Integration
+
+This library integrates with [@electric-sql/d2ts](https://github.com/electric-sql/d2ts) for differential dataflow pipelines with SharedArrayBuffer-backed state.
+
+### Installation
+
+```bash
+bun add @electric-sql/d2ts
+```
+
+### Basic Usage
+
+```typescript
+import { createSharedPipeline, SharedMultiSet } from './d2ts-integration';
+import { map, filter, reduce, keyBy } from '@electric-sql/d2ts';
+
+// Create a pipeline with shared output
+const { run } = createSharedPipeline<number, number>(
+  (input) => input.pipe(
+    map((x) => x + 5),
+    filter((x) => x % 2 === 0)
+  )
+);
+
+// Run with input data (value, multiplicity pairs)
+const results = run([[1, 1], [2, 1], [3, 1]]);
+// Results: [[6, 1], [8, 1]] - backed by SharedArrayBuffer
+```
+
+### Incremental Updates
+
+```typescript
+const { graph, input, getResults } = createSharedPipeline<
+  { id: string; value: number },
+  { id: string; doubled: number }
+>(
+  (inp) => inp.pipe(map((x) => ({ id: x.id, doubled: x.value * 2 })))
+);
+
+// Initial data
+input.sendData(0, new MultiSet([[{ id: 'a', value: 10 }, 1]]));
+input.sendFrontier(1);
+graph.run();
+
+// Incremental update: delete 'a', add 'b'
+input.sendData(1, new MultiSet([
+  [{ id: 'a', value: 10 }, -1],  // Delete (negative multiplicity)
+  [{ id: 'b', value: 20 }, 1],   // Insert
+]));
+input.sendFrontier(2);
+graph.run();
+```
+
+### SharedMultiSet
+
+Direct multiset operations backed by SharedArrayBuffer:
+
+```typescript
+import { SharedMultiSet } from './d2ts-integration';
+
+let state = new SharedMultiSet<string>([['alice', 1], ['bob', 1]]);
+
+// Apply changes (differential semantics)
+const change = new SharedMultiSet<string>([['bob', -1], ['charlie', 1]]);
+state = state.concat(change);
+// Result: alice=1, charlie=1 (bob removed)
+
+// Transform operations
+const mapped = state.mapValues(s => s.toUpperCase());
+const filtered = state.filter(s => s.length > 5);
+```
+
+### SharedIndex
+
+Versioned state storage for stateful operators:
+
+```typescript
+import { SharedIndex, v } from './d2ts-integration';
+
+const index = new SharedIndex<string, number>();
+index.addValue('user:1', v(0), [100, 1]);  // Version 0
+index.addValue('user:1', v(1), [50, 1]);   // Version 1
+
+// Reconstruct state at any version
+index.reconstructAt('user:1', v(0));  // [[100, 1]]
+index.reconstructAt('user:1', v(1));  // [[100, 1], [50, 1]]
+
+// Join two indexes
+const joined = index1.join(index2);
+```
+
+### State Serialization
+
+Share pipeline results across workers:
+
+```typescript
+import { getSharedPipelineState, initSharedPipelineState } from './d2ts-integration';
+
+// Main thread
+const results = pipeline.run(data);
+const sharedState = getSharedPipelineState(results);
+worker.postMessage(sharedState);
+
+// Worker thread
+const workerResults = initSharedPipelineState<number>(workerData);
+// Continue processing with shared data
+```
+
 ## License
 
 MIT

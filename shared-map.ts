@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { parseNestedType } from './types';
-import { structureRegistry } from './codec';
+import { parseNestedType } from './types.ts';
+import { structureRegistry } from './codec.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const wasmBytes = readFileSync(join(__dirname, 'shared-map.wasm'));

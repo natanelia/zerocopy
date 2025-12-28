@@ -8,7 +8,10 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:browser": "vitest run --config vitest.browser.config.ts",
     "bench": "bun benchmark.ts",
+    "demo": "bun demo/serve.ts",
+    "demo:tunnel": "bun demo/serve.ts & sleep 1 && npx cloudflared tunnel --url http://localhost:3000",
     "build:wasm": "asc shared-map.as.ts -o shared-map.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc shared-list.as.ts -o shared-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc linked-list.as.ts -o linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc singly-linked-list.as.ts -o singly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc doubly-linked-list.as.ts -o doubly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads"
   },
   "keywords": [
@@ -21,8 +24,16 @@
   "author": "natanelia",
   "license": "MIT",
   "devDependencies": {
+    "@vitest/browser": "^4.0.16",
+    "@vitest/browser-playwright": "^4.0.16",
     "assemblyscript": "^0.28.9",
     "immutable": "^5.1.4",
+    "playwright": "^1.57.0",
     "vitest": "^4.0.16"
+  },
+  "dependencies": {
+    "@electric-sql/d2ts": "^0.1.8",
+    "@tanstack/db": "^0.5.16",
+    "@tanstack/store": "^0.8.0"
   }
 }
