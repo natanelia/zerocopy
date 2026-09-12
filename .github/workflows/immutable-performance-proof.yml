@@ -1,0 +1,36 @@
+name: Immutable performance proof
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run build:wasm
+      - name: Run the existing test suite
+        run: bun run test 2>&1 | tee /tmp/zerocopy-tests.log
+      - name: Prepare offline verification bundle
+        if: always()
+        run: |
+          mkdir -p .proof-tools
+          cp "$(command -v bun)" .proof-tools/bun
+          git rev-parse HEAD > .proof-tools/source-commit.txt
+          cp /tmp/zerocopy-tests.log .proof-tools/baseline-tests.log || true
+          tar --exclude=.git -czf /tmp/zerocopy-offline.tar.gz .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zerocopy-offline-verification
+          path: /tmp/zerocopy-offline.tar.gz
+          retention-days: 1
