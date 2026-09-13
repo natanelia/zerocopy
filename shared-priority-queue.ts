@@ -41,6 +41,22 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
   }
   peek(): ValueOf<T> | undefined { const a = arenaOf(this); return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.root + 8, true)) : undefined; }
   peekPriority(): number | undefined { return this.size ? arenaOf(this).dv.getFloat64(this.root, true) : undefined; }
+  /** Read entries in heap traversal order, not priority order. This also works
+   * on read-only worker snapshots and allocates no WASM nodes. Returned tuples
+   * are detached from the immutable heap. Equal-priority order is unspecified.
+   */
+  *entries(): Generator<[ValueOf<T>, number]> {
+    const arena = arenaOf(this), pending = this.root ? [this.root] : [];
+    while (pending.length) {
+      const node = pending.pop()!;
+      const priority = arena.dv.getFloat64(node, true);
+      const value = arena.decode(this.valueType, arena.dv.getFloat64(node + 8, true));
+      const left = arena.dv.getUint32(node + 16, true), right = arena.dv.getUint32(node + 20, true);
+      if (right) pending.push(right);
+      if (left) pending.push(left);
+      yield [value, priority];
+    }
+  }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ root: this.root, size: this.size, type: this.valueType, isMaxHeap: this.isMaxHeap }); }
   static fromWorkerData<T extends string>(d: { root: number; size: number; type: T; isMaxHeap: boolean }, source: Arena = current): SharedPriorityQueue<T> { return new SharedPriorityQueue(d.type, d, source); }

@@ -4,7 +4,7 @@ import { readFileSync, rmSync } from 'node:fs';
 const encoded = readFileSync(new URL('../persistent-core.wasm', import.meta.url)).toString('base64');
 rmSync('dist', { recursive: true, force: true });
 const result = await Bun.build({
-  entrypoints: ['shared.ts', 'tanstack-db-collection.ts'], outdir: 'dist', naming: '[name].js', target: 'browser', format: 'esm', splitting: true,
+  entrypoints: ['shared.ts', 'tanstack-db-collection.ts', 'redux.ts'], outdir: 'dist', naming: '[name].js', target: 'browser', format: 'esm', splitting: true,
   plugins: [{ name: 'embedded-wasm', setup(build) {
     build.onLoad({ filter: /[\\/]wasm-utils\.ts$/ }, () => ({ contents: `export function loadWasm() { const text = atob(${JSON.stringify(encoded)}); const bytes = new Uint8Array(text.length); for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i); return bytes; }`, loader: 'js' }));
   } }],
