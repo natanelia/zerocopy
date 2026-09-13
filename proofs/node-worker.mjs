@@ -5,6 +5,11 @@ import * as S from '../dist/shared.js';
 
 function readAll(s, readOnly = true) {
   assert.equal(s.map.get('old'), 7);
+  assert.equal(s.largeList.get(2048), 2048);
+  assert.equal(s.largeLinked.get(2048), 2048);
+  assert.equal(s.largeDoubly.get(2048), 2048);
+  assert.equal(s.largeQueue.size, 2049);
+  assert.equal(s.largeQueue.peek(), 0);
   assert.deepEqual(s.list.toArray(), [1, 2, 3]);
   assert.deepEqual(new Set(s.set.values()), new Set([1, '1']));
   assert.equal(s.stack.peek(), 2);
@@ -39,7 +44,10 @@ if (!isMainThread) {
       } else if (message.type === 'concurrent') {
         const control = new Int32Array(workerData.control);
         Atomics.store(control, 0, 1); Atomics.notify(control, 0);
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < 10000 || Atomics.load(control, 1) === 0; i++) {
+          assert.equal(old.largeList.get(i % 2049), i % 2049);
+          assert.equal(old.largeLinked.get(i % 2049), i % 2049);
+          assert.equal(old.largeDoubly.get(i % 2049), i % 2049);
           assert.equal(old.map.get('old'), 7);
           assert.deepEqual(old.list.toArray(), [1, 2, 3]);
         }
@@ -49,6 +57,9 @@ if (!isMainThread) {
         assert.equal(next.map.get('old'), 8);
         assert.equal(next.map.get('long'), '🙂'.repeat(18000));
         assert.equal(next.map.size, 5002);
+        assert.equal(next.largeList.size, 6145); assert.equal(next.largeList.get(6144), 6144);
+        assert.equal(next.largeLinked.get(6144), 6144); assert.equal(next.largeDoubly.get(6144), 6144);
+        assert.equal(next.largeQueue.size, 6145);
         readAll(old);
         parentPort.postMessage({ type: 'ok', oldValue: old.map.get('old'), nextValue: next.map.get('old') });
       }
@@ -56,7 +67,11 @@ if (!isMainThread) {
   });
 } else {
   const list = new S.SharedList('number').pushMany([1, 2, 3]);
-  const items = {
+  const large = Array.from({ length: 2049 }, (_, i) => i);
+  let largeLinked = new S.SharedLinkedList('number'), largeDoubly = new S.SharedDoublyLinkedList('number'), largeQueue = new S.SharedQueue('number');
+  for (const value of large) { largeLinked = largeLinked.append(value); largeDoubly = largeDoubly.append(value); largeQueue = largeQueue.enqueue(value); }
+  let largeList = new S.SharedList('number').pushMany(large);
+  const items = { largeList, largeLinked, largeDoubly, largeQueue,
     map: new S.SharedMap('object').set('old', 7), list,
     set: new S.SharedSet().add(1).add('1'),
     stack: new S.SharedStack('number').push(1).push(2),
@@ -70,7 +85,7 @@ if (!isMainThread) {
     heap: new S.SharedPriorityQueue('number').enqueue(10, 2).enqueue(20, 1),
     nested: new S.SharedMap('SharedList<number>').set('list', list),
   };
-  const control = new SharedArrayBuffer(4);
+  const control = new SharedArrayBuffer(8);
   const worker = new Worker(new URL(import.meta.url), { workerData: { control } });
   const timer = setTimeout(() => { console.error('Worker proof timed out'); process.exit(1); }, 30000);
   async function exchange(message) {
@@ -86,11 +101,13 @@ if (!isMainThread) {
     const response = once(worker, 'message'); worker.postMessage({ type: 'concurrent' });
     assert.notEqual(Atomics.wait(new Int32Array(control), 0, 0, 10000), 'timed-out');
     const next = items.map.setMany(Array.from({ length: 5000 }, (_, i) => [`k${i}`, i])).set('old', 8).set('long', '🙂'.repeat(18000));
+    for (let i = 2049; i < 6145; i++) { largeList = largeList.push(i); largeLinked = largeLinked.append(i); largeDoubly = largeDoubly.append(i); largeQueue = largeQueue.enqueue(i); }
+    Atomics.store(new Int32Array(control), 1, 1);
     const [concurrent] = await response; if (concurrent.error) throw new Error(concurrent.error);
     assert.equal(concurrent.type, 'concurrent-ok');
     S.resetMap(); S.resetSharedList();
-    const result = await exchange({ type: 'new', data: S.getWorkerData({ map: next }, { copy: false }) });
+    const result = await exchange({ type: 'new', data: S.getWorkerData({ map: next, largeList, largeLinked, largeDoubly, largeQueue }, { copy: false }) });
     assert.equal(result.type, 'ok'); readAll(items, false);
-    console.log(JSON.stringify({ passed: true, runtime: process.version, structures: 12, nested: true, concurrentReads: 10000, workerSharesBackingMemory: true, repeatedAttachment: true, resetKeepsOldSnapshots: true }));
+    console.log(JSON.stringify({ passed: true, runtime: process.version, structures: 12, nested: true, concurrentReadsAtLeast: 10000, largeRetainedSequences: 4, workerSharesBackingMemory: true, repeatedAttachment: true, resetKeepsOldSnapshots: true }));
   } finally { clearTimeout(timer); await worker.terminate(); }
 }

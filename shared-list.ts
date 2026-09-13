@@ -23,50 +23,75 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   readonly type: T;
   readonly size: number;
   readonly depth: number;
-  constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = current) {
-    super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); Object.freeze(this);
+  readonly tail: number;
+  constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = current, tail = 0) {
+    super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); this.tail = tail; Object.freeze(this);
   }
   /** @deprecated Arena lifetime is managed by JavaScript reachability. */
   dispose(): void {}
   push(value: ValueOf<T>): SharedList<T> {
-    const a = arenaOf(this); a.assertWritable(); const size = checkedSize(this.size + 1), depth = vectorDepth(size);
-    const root = a.wasm.vecPush(this.root, this.depth, depth, this.size, a.encode(this.type, value)) >>> 0;
-    return new SharedList(this.type, root, depth, size, a);
+    const a = arenaOf(this), raw = a.encode(this.type, value), size = checkedSize(this.size + 1);
+    const length = this.size ? ((this.size - 1) & 31) + 1 : 0;
+    if (length < 32) return new SharedList(this.type, this.root, this.depth, size, a, a.wasm.tailAppend(this.tail, length, raw) >>> 0);
+    const depth = vectorDepth(this.size);
+    const root = a.wasm.vecLink(this.root, this.depth, depth, this.size - 32, this.tail, 32) >>> 0;
+    return new SharedList(this.type, root, depth, size, a, a.wasm.tailAppend(0, 0, raw) >>> 0);
   }
   pushMany(values: readonly ValueOf<T>[]): SharedList<T> {
     if (!values.length) return this;
-    const a = arenaOf(this), size = checkedSize(this.size + values.length);
-    return new SharedList(this.type, a.append(this.type, this.root, this.depth, this.size, values), vectorDepth(size), size, a);
+    const a = arenaOf(this); a.assertWritable();
+    const size = checkedSize(this.size + values.length);
+    const oldLength = this.size ? ((this.size - 1) & 31) + 1 : 0;
+    // Encode first. User serialization may reenter the owning arena.
+    const input = a.encodeRange(this.type, values, this.tail, oldLength);
+    const length = ((size - 1) & 31) + 1, treeSize = size - length;
+    const depth = vectorDepth(treeSize), start = this.size - oldLength;
+    const root = a.wasm.vecLink(this.root, this.depth, depth, start, input, treeSize - start) >>> 0;
+    return new SharedList(this.type, root, depth, size, a, input + (treeSize - start) * 8);
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const a = arenaOf(this); return a.decode(this.type, a.wasm.vecGet(this.root, this.depth, index));
+    const a = arenaOf(this), start = (this.size - 1) & ~31;
+    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.wasm.vecGet(this.root, this.depth, index);
+    return a.decode(this.type, raw);
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;
-    const a = arenaOf(this); a.assertWritable();
-    return new SharedList(this.type, a.wasm.vecSet(this.root, this.depth, index, a.encode(this.type, value)) >>> 0, this.depth, this.size, a);
+    const a = arenaOf(this), raw = a.encode(this.type, value), start = (this.size - 1) & ~31;
+    if (index >= start) return new SharedList(this.type, this.root, this.depth, this.size, a, a.wasm.tailSet(this.tail, this.size - start, index - start, raw) >>> 0);
+    return new SharedList(this.type, a.wasm.vecSet(this.root, this.depth, index, raw) >>> 0, this.depth, this.size, a, this.tail);
   }
   pop(): SharedList<T> {
     if (!this.size) return this;
-    const a = arenaOf(this), size = this.size - 1; let root = this.root, depth = this.depth;
-    if (!size) { root = 0; depth = 0; }
-    else while (depth > vectorDepth(size)) { root = a.dv.getUint32(root, true); depth--; }
-    return new SharedList(this.type, root, depth, size, a);
+    const a = arenaOf(this), size = this.size - 1;
+    if (!size) return new SharedList(this.type, 0, 0, 0, a);
+    if ((this.size - 1) & 31) return new SharedList(this.type, this.root, this.depth, size, a, this.tail);
+    const tail = a.wasm.vecLeaf(this.root, this.depth, size - 32) >>> 0;
+    const depth = vectorDepth(size - 32); let root = this.root, oldDepth = this.depth;
+    if (size === 32) root = 0;
+    else while (oldDepth-- > depth) root = a.dv.getUint32(root, true);
+    return new SharedList(this.type, root, depth, size, a, tail);
   }
-  *values(): Generator<ValueOf<T>> { const a = arenaOf(this); for (const raw of a.vector(this.root, this.depth, 0, this.size)) yield a.decode(this.type, raw); }
+  *values(): Generator<ValueOf<T>> {
+    if (!this.size) return;
+    const a = arenaOf(this), start = (this.size - 1) & ~31;
+    for (const raw of a.vector(this.root, this.depth, 0, start)) yield a.decode(this.type, raw);
+    for (let i = 0; i < this.size - start; i++) yield a.decode(this.type, a.dv.getFloat64(this.tail + i * 8, true));
+  }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void { let i = 0; for (const value of this.values()) fn(value, i++); }
   toArray(): ValueOf<T>[] {
     const a = arenaOf(this), result = new Array<ValueOf<T>>(this.size);
+    const start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
-      const leaf = a.wasm.vecLeaf(this.root, this.depth, first) >>> 0, stop = Math.min(this.size, first + 32), dv = a.dv;
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const stop = Math.min(this.size, first + 32), dv = a.dv;
       for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
     }
     return result;
   }
-  toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type }); }
-  static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T }, source: Arena = current): SharedList<T> {
-    return new SharedList(d.type, d.root, d.depth, d.size, source);
+  toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }
+  static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = current): SharedList<T> {
+    return new SharedList(d.type, d.root, d.depth, d.size, source, d.tail);
   }
 }
 structureRegistry.SharedList = { fromWorkerData: (d, a) => SharedList.fromWorkerData(d, a) };

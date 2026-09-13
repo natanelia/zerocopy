@@ -2,18 +2,33 @@
 // Bytes below HEAP_START are writer scratch, never part of a published snapshot.
 const HEAP_START: u32 = 65536;
 let heapEnd: u32 = HEAP_START;
+let capacity: u32 = min(<u32>memory.size(), 32767) << 16;
 export function getHeapEnd(): u32 { return heapEnd; }
-export function setHeapEnd(end: u32): void { heapEnd = end; }
-export function getUsedBytes(): u32 { return heapEnd - HEAP_START; }
-export function alloc(bytes: u32): u32 {
-  // Keep pointers below 2 GiB; reject overflow and failed growth, never wrap.
-  if (bytes > 0x7fff0000 || heapEnd > 0x7fff0000 - bytes - 8) unreachable();
-  const p = heapEnd;
-  const end = (p + bytes + 7) & ~7;
-  const available = <u64>memory.size() << 16;
-  if (<u64>end > available && memory.grow(<i32>((<u64>end - available + 65535) >> 16)) < 0) unreachable();
+export function setHeapEnd(end: u32): void {
+  if (end < HEAP_START || end > 0x7fff0000 || <u64>end > (<u64>memory.size() << 16)) unreachable();
   heapEnd = end;
-  return p;
+}
+function growTo(end: u32): void {
+  if (end > 0x7fff0000) unreachable();
+  const pages = (end + 65535) >> 16, current = <u32>memory.size();
+  if (pages > current && memory.grow(pages - current) < 0) unreachable();
+  capacity = min(<u32>memory.size(), 32767) << 16;
+}
+export function alloc(bytes: u32): u32 {
+  // Both operands are <= 0x7fff0000, so addition plus alignment cannot wrap.
+  // Page queries and 64-bit limit checks stay off the common allocation path.
+  if (bytes > 0x7fff0000) unreachable();
+  const p = heapEnd, end = (p + bytes + 7) & ~7;
+  if (end > capacity) growTo(end);
+  heapEnd = end; return p;
+}
+
+// Pointer-array copies are short, aligned, and non-overlapping. Word loads
+// avoid the shared-memory bulk-copy runtime path for these small node arrays.
+@inline function copyWords(to: u32, from: u32, bytes: u32): void {
+  let i: u32 = 0;
+  while (i + 8 <= bytes) { store<u64>(to + i, load<u64>(from + i)); i += 8; }
+  if (i < bytes) store<u32>(to + i, load<u32>(from + i));
 }
 
 // HAMT: leaf [0,hash,keyLen,valLen,key...,value...];
@@ -21,17 +36,17 @@ export function alloc(bytes: u32): u32 {
 @inline function tag(p: u32): u32 { return load<u32>(p); }
 export function mapSize(p: u32): u32 { return p ? (tag(p) == 0 ? 1 : load<u32>(p + 8)) : 0; }
 @inline function pc(n: u32): u32 { return <u32>popcnt(n); }
-export function hashAt(p: u32, len: u32): u32 {
+function hashAt(p: u32, len: u32): u32 {
   let h: u32 = 2166136261;
   for (let i: u32 = 0; i < len; i++) h = (h ^ load<u8>(p + i)) * 16777619;
   return h;
 }
 export function mapLeaf(keyLen: u32, valLen: u32): u32 {
+  if (keyLen > 0x7ffe0000 || valLen > 0x7ffe0000 - keyLen) unreachable();
   const p = alloc(16 + keyLen + valLen);
   store<u32>(p, 0); store<u32>(p + 8, keyLen); store<u32>(p + 12, valLen);
   return p;
 }
-export function sealLeaf(p: u32): void { store<u32>(p + 4, hashAt(p + 16, load<u32>(p + 8))); }
 @inline function sameKey(a: u32, b: u32): bool {
   const n = load<u32>(a + 8);
   return load<u32>(a + 4) == load<u32>(b + 4) && n == load<u32>(b + 8) && memory.compare(a + 16, b + 16, n) == 0;
@@ -47,49 +62,58 @@ function bucket(hash: u32, count: u32): u32 {
   return p;
 }
 function mergeHashed(a: u32, b: u32, shift: u32): u32 {
-  const ai = (load<u32>(a + 4) >> shift) & 31;
-  const bi = (load<u32>(b + 4) >> shift) & 31;
+  const ai = (load<u32>(a + 4) >> shift) & 15;
+  const bi = (load<u32>(b + 4) >> shift) & 15;
   const p = branch((1 << ai) | (1 << bi), mapSize(a) + mapSize(b));
-  if (ai == bi) store<u32>(p + 16, mergeHashed(a, b, shift + 5));
+  if (ai == bi) store<u32>(p + 16, mergeHashed(a, b, shift + 4));
   else {
     store<u32>(p + 16, ai < bi ? a : b);
     store<u32>(p + 20, ai < bi ? b : a);
   }
   return p;
 }
-function insertAt(root: u32, leaf: u32, shift: u32): u32 {
+function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u32 {
   if (!root) return leaf;
   const kind = tag(root);
   if (kind != 1) {
     if (load<u32>(root + 4) != load<u32>(leaf + 4)) return mergeHashed(root, leaf, shift);
     if (kind == 0) {
-      if (sameKey(root, leaf)) return leaf;
+      if (delta == 0 || (delta == 0xffffffff && sameKey(root, leaf))) return leaf;
       const p = bucket(load<u32>(leaf + 4), 2);
       store<u32>(p + 16, root); store<u32>(p + 20, leaf);
       return p;
     }
     const count = mapSize(root);
     let position = count;
-    for (let i: u32 = 0; i < count; i++) if (sameKey(load<u32>(root + 16 + i * 4), leaf)) { position = i; break; }
+    if (delta != 1) for (let i: u32 = 0; i < count; i++) if (sameKey(load<u32>(root + 16 + i * 4), leaf)) { position = i; break; }
     const p = bucket(load<u32>(leaf + 4), count + (position == count ? 1 : 0));
-    memory.copy(p + 16, root + 16, count * 4);
+    copyWords(p + 16, root + 16, count * 4);
     store<u32>(p + 16 + position * 4, leaf);
     return p;
   }
   const bitmap = load<u32>(root + 4), count = pc(bitmap);
-  const bit: u32 = 1 << ((load<u32>(leaf + 4) >> shift) & 31);
+  const bit: u32 = 1 << ((load<u32>(leaf + 4) >> shift) & 15);
   const position = pc(bitmap & (bit - 1));
   const old = bitmap & bit ? load<u32>(root + 16 + position * 4) : 0;
-  const child = insertAt(old, leaf, shift + 5);
-  const p = branch(bitmap | bit, mapSize(root) - mapSize(old) + mapSize(child));
-  memory.copy(p + 16, root + 16, position * 4);
+  const child = insertAt(old, leaf, shift + 4, delta);
+  const size = delta == 0xffffffff ? mapSize(root) - mapSize(old) + mapSize(child) : load<u32>(root + 8) + delta;
+  if (old) {
+    const p = alloc(16 + count * 4); copyWords(p, root, 16 + count * 4);
+    store<u32>(p + 8, size); store<u32>(p + 16 + position * 4, child); return p;
+  }
+  const p = branch(bitmap | bit, size);
+  copyWords(p + 16, root + 16, position * 4);
   store<u32>(p + 16 + position * 4, child);
   const skip: u32 = bitmap & bit ? 1 : 0;
-  memory.copy(p + 20 + position * 4, root + 16 + (position + skip) * 4, (count - position - skip) * 4);
+  copyWords(p + 20 + position * 4, root + 16 + (position + skip) * 4, (count - position - skip) * 4);
   return p;
 }
-export function mapInsert(root: u32, leaf: u32): u32 { return insertAt(root, leaf, 0); }
+export function mapInsert(root: u32, leaf: u32): u32 { return insertAt(materializeJournal(root, 0), leaf, 0); }
 export function mapFind(root: u32, key: u32, len: u32, hash: u32): u32 {
+  if (root && tag(root) == JOURNAL) {
+    const p = journalFind(root, key, len, hash); if (p) return p;
+    root = load<u32>(root + 4);
+  }
   let shift: u32 = 0;
   while (root) {
     const kind = tag(root);
@@ -103,10 +127,10 @@ export function mapFind(root: u32, key: u32, len: u32, hash: u32): u32 {
       }
       return 0;
     }
-    const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 31);
+    const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 15);
     if (!(bitmap & bit)) return 0;
     root = load<u32>(root + 16 + pc(bitmap & (bit - 1)) * 4);
-    shift += 5;
+    shift += 4;
   }
   return 0;
 }
@@ -121,15 +145,15 @@ function deleteAt(root: u32, key: u32, len: u32, hash: u32, shift: u32): u32 {
     if (pos == count) return root;
     if (count == 2) return load<u32>(root + 16 + (1 - pos) * 4);
     const p = bucket(hash, count - 1);
-    memory.copy(p + 16, root + 16, pos * 4);
-    memory.copy(p + 16 + pos * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
+    copyWords(p + 16, root + 16, pos * 4);
+    copyWords(p + 16 + pos * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
     return p;
   }
-  const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 31);
+  const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 15);
   if (!(bitmap & bit)) return root;
   const count = pc(bitmap), pos = pc(bitmap & (bit - 1));
   const old = load<u32>(root + 16 + pos * 4);
-  const child = deleteAt(old, key, len, hash, shift + 5);
+  const child = deleteAt(old, key, len, hash, shift + 4);
   if (old == child) return root;
   if (!child && count == 1) return 0;
   if (!child && count == 2) {
@@ -138,29 +162,32 @@ function deleteAt(root: u32, key: u32, len: u32, hash: u32, shift: u32): u32 {
   }
   if (child && count == 1 && tag(child) != 1) return child;
   const p = branch(child ? bitmap : bitmap & ~bit, mapSize(root) - 1);
-  memory.copy(p + 16, root + 16, pos * 4);
+  copyWords(p + 16, root + 16, pos * 4);
   if (child) store<u32>(p + 16 + pos * 4, child);
-  memory.copy(p + 16 + (pos + (child ? 1 : 0)) * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
+  copyWords(p + 16 + (pos + (child ? 1 : 0)) * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
   return p;
 }
-export function mapDelete(root: u32, key: u32, len: u32, hash: u32): u32 { return deleteAt(root, key, len, hash, 0); }
+export function mapDelete(root: u32, key: u32, len: u32, hash: u32): u32 { return deleteAt(materializeJournal(root, 0), key, len, hash, 0); }
 
 // Prefix-fused batch update. Partition the private input array by the next
-// 5-bit digit with an in-place American-flag pass, then merge directly into the
+// 4-bit digit with an in-place American-flag pass, then merge directly into the
 // old trie. There is no JS sort, intermediate patch trie, or mutable owner epoch.
 @inline function childAt(root: u32, digit: u32, shift: u32): u32 {
   if (!root) return 0;
-  if (tag(root) != 1) return ((load<u32>(root + 4) >> shift) & 31) == digit ? root : 0;
+  if (tag(root) != 1) return ((load<u32>(root + 4) >> shift) & 15) == digit ? root : 0;
   const bitmap = load<u32>(root + 4), bit: u32 = 1 << digit;
   return bitmap & bit ? load<u32>(root + 16 + pc(bitmap & (bit - 1)) * 4) : 0;
 }
 function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
   if (!count) return old;
-  if (count == 1) return insertAt(old, load<u32>(input), shift);
+  if (count <= 4) {
+    for (let i: u32 = 0; i < count; i++) old = insertAt(old, load<u32>(input + i * 4), shift);
+    return old;
+  }
   if (shift >= 32) {
     if (!old) {
       const p = bucket(load<u32>(load<u32>(input) + 4), count);
-      memory.copy(p + 16, input, count * 4); return p;
+      copyWords(p + 16, input, count * 4); return p;
     }
     // Exact full-hash collisions require full-key comparisons. Correctness does
     // not depend on hash uniqueness; this rare path can be quadratic in count.
@@ -168,23 +195,23 @@ function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
     return old;
   }
   // Per-depth counts and cursors. Only this synchronous writer uses the scratch.
-  const frame: u32 = 8192 + (shift / 5) * 256;
+  const frame: u32 = 8192 + (shift / 4) * 256;
   memory.fill(frame, 0, 256);
   for (let i: u32 = 0; i < count; i++) {
-    const digit = (load<u32>(load<u32>(input + i * 4) + 4) >> shift) & 31;
+    const digit = (load<u32>(load<u32>(input + i * 4) + 4) >> shift) & 15;
     store<u32>(frame + digit * 4, load<u32>(frame + digit * 4) + 1);
   }
   let offset: u32 = 0;
-  for (let digit: u32 = 0; digit < 32; digit++) {
+  for (let digit: u32 = 0; digit < 16; digit++) {
     store<u32>(frame + 128 + digit * 4, offset);
     offset += load<u32>(frame + digit * 4);
   }
   let start: u32 = 0;
-  for (let digit: u32 = 0; digit < 32; digit++) {
+  for (let digit: u32 = 0; digit < 16; digit++) {
     const end = start + load<u32>(frame + digit * 4), cursor = frame + 128 + digit * 4;
     while (load<u32>(cursor) < end) {
       const pos = load<u32>(cursor), leaf = load<u32>(input + pos * 4);
-      const target = (load<u32>(leaf + 4) >> shift) & 31;
+      const target = (load<u32>(leaf + 4) >> shift) & 15;
       if (target == digit) store<u32>(cursor, pos + 1);
       else {
         const targetCursor = frame + 128 + target * 4, dest = load<u32>(targetCursor);
@@ -196,9 +223,9 @@ function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
   }
   let bitmap: u32 = 0, children: u32 = 0, size: u32 = 0;
   start = 0;
-  for (let digit: u32 = 0; digit < 32; digit++) {
+  for (let digit: u32 = 0; digit < 16; digit++) {
     const n = load<u32>(frame + digit * 4);
-    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 5);
+    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 4);
     if (child) {
       bitmap |= 1 << digit; size += mapSize(child);
       store<u32>(frame + 128 + children++ * 4, child);
@@ -206,9 +233,9 @@ function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
     start += n;
   }
   const p = branch(bitmap, size);
-  memory.copy(p + 16, frame + 128, children * 4); return p;
+  copyWords(p + 16, frame + 128, children * 4); return p;
 }
-export function mapBatch(old: u32, input: u32, count: u32): u32 { return batchAt(old, input, count, 0); }
+export function mapBatch(old: u32, input: u32, count: u32): u32 { return batchAt(materializeJournal(old, 0), input, count, 0); }
 
 // Legacy read-only WASM ABI for existing direct-reader examples. Do not use the
 // scratch-writing getInfo API concurrently on one memory; the TS reader is scratch-free.
@@ -238,94 +265,11 @@ function vecSetAt(root: u32, depth: u32, index: u32, value: f64): u32 {
   return p;
 }
 export function vecSet(root: u32, depth: u32, index: u32, value: f64): u32 { return vecSetAt(root, depth, index, value); }
-function fillRange(root: u32, depth: u32, base: u32, start: u32, end: u32, input: u32, origin: u32): u32 {
-  const bytes: u32 = depth ? 128 : 256;
-  const p = alloc(bytes);
-  if (root) memory.copy(p, root, bytes); else memory.fill(p, 0, bytes);
-  if (!depth) memory.copy(p + (start - base) * 8, input + (start - origin) * 8, (end - start) * 8);
-  else {
-    const span: u32 = 1 << (depth * 5);
-    const first = (start - base) / span, last = (end - 1 - base) / span;
-    for (let i = first; i <= last; i++) {
-      const b = base + i * span;
-      const lo = start > b ? start : b, hi = end < b + span ? end : b + span;
-      store<u32>(p + i * 4, fillRange(root ? load<u32>(root + i * 4) : 0, depth - 1, b, lo, hi, input, origin));
-    }
-  }
-  return p;
-}
-export function vecAppend(root: u32, depth: u32, newDepth: u32, size: u32, input: u32, count: u32): u32 {
-  if (!count) return root;
-  if (root) while (depth < newDepth) {
-    const p = alloc(128); memory.fill(p, 0, 128); store<u32>(p, root); root = p; depth++;
-  }
-  return fillRange(root, newDepth, 0, size, size + count, input, size);
-}
-
-// Indexed AVL sequence. No next/previous pointers are ever changed in old nodes.
-// [left:u32,right:u32,size:u32,height:u32,value:f64] = 24 bytes.
+// Shared accessors for the immutable block sequence tree.
 @inline function sl(p: u32): u32 { return p ? load<u32>(p) : 0; }
 @inline function sr(p: u32): u32 { return p ? load<u32>(p + 4) : 0; }
-export function seqSize(p: u32): u32 { return p ? load<u32>(p + 8) : 0; }
+function seqSize(p: u32): u32 { return p ? load<u32>(p + 8) : 0; }
 @inline function sh(p: u32): u32 { return p ? load<u32>(p + 12) : 0; }
-function sn(left: u32, value: f64, right: u32): u32 {
-  const p = alloc(24); store<u32>(p, left); store<u32>(p + 4, right);
-  store<u32>(p + 8, seqSize(left) + seqSize(right) + 1);
-  store<u32>(p + 12, max(sh(left), sh(right)) + 1); store<f64>(p + 16, value); return p;
-}
-function sb(left: u32, value: f64, right: u32): u32 {
-  if (sh(left) > sh(right) + 1) {
-    const ll = sl(left), lr = sr(left), lv = load<f64>(left + 16);
-    if (sh(ll) >= sh(lr)) return sn(ll, lv, sn(lr, value, right));
-    return sn(sn(ll, lv, sl(lr)), load<f64>(lr + 16), sn(sr(lr), value, right));
-  }
-  if (sh(right) > sh(left) + 1) {
-    const rl = sl(right), rr = sr(right), rv = load<f64>(right + 16);
-    if (sh(rr) >= sh(rl)) return sn(sn(left, value, rl), rv, rr);
-    return sn(sn(left, value, sl(rl)), load<f64>(rl + 16), sn(sr(rl), rv, rr));
-  }
-  return sn(left, value, right);
-}
-export function seqInsert(root: u32, index: u32, value: f64): u32 {
-  if (!root) return sn(0, value, 0);
-  const left = sl(root), right = sr(root), rank = seqSize(left), old = load<f64>(root + 16);
-  return index <= rank ? sb(seqInsert(left, index, value), old, right) : sb(left, old, seqInsert(right, index - rank - 1, value));
-}
-export function seqNode(root: u32, index: u32): u32 {
-  while (root) {
-    const rank = seqSize(sl(root));
-    if (rank == index) return root;
-    if (index < rank) root = sl(root); else { index -= rank + 1; root = sr(root); }
-  }
-  return 0;
-}
-export function seqDelete(root: u32, index: u32): u32 {
-  const left = sl(root), right = sr(root), rank = seqSize(left), value = load<f64>(root + 16);
-  if (index < rank) return sb(seqDelete(left, index), value, right);
-  if (index > rank) return sb(left, value, seqDelete(right, index - rank - 1));
-  if (!left) return right;
-  if (!right) return left;
-  return sb(left, load<f64>(seqNode(right, 0) + 16), seqDelete(right, 0));
-}
-// Same AVL balancing machinery, but values are map-leaf pointers, ordered by key.
-@inline function leafCompare(a: u32, b: u32): i32 {
-  const an = load<u32>(a + 8), bn = load<u32>(b + 8);
-  const c = memory.compare(a + 16, b + 16, min(an, bn));
-  return c != 0 ? c : (an < bn ? -1 : an > bn ? 1 : 0);
-}
-export function treeInsert(root: u32, leaf: u32): u32 {
-  if (!root) return sn(0, <f64>leaf, 0);
-  const old = <u32>load<f64>(root + 16), c = leafCompare(leaf, old);
-  if (!c) return sn(sl(root), <f64>leaf, sr(root));
-  return c < 0 ? sb(treeInsert(sl(root), leaf), <f64>old, sr(root)) : sb(sl(root), <f64>old, treeInsert(sr(root), leaf));
-}
-export function treeDelete(root: u32, leaf: u32): u32 {
-  if (!root) return 0;
-  const old = <u32>load<f64>(root + 16), c = leafCompare(leaf, old);
-  if (!c) return seqDelete(root, seqSize(sl(root)));
-  if (c < 0) { const child = treeDelete(sl(root), leaf); return child == sl(root) ? root : sb(child, <f64>old, sr(root)); }
-  const child = treeDelete(sr(root), leaf); return child == sr(root) ? root : sb(sl(root), <f64>old, child);
-}
 
 // Immutable cons stack [next:u32,pad:u32,value:f64].
 export function cons(next: u32, value: f64): u32 {
@@ -341,7 +285,7 @@ function hn(priority: f64, value: f64, left: u32, right: u32): u32 {
   const p = alloc(32); store<f64>(p, priority); store<f64>(p + 8, value);
   store<u32>(p + 16, left); store<u32>(p + 20, right); store<u32>(p + 24, hr(right) + 1); store<u32>(p + 28, hs(left) + hs(right) + 1); return p;
 }
-export function heapMerge(a: u32, b: u32, isMax: bool): u32 {
+function heapMerge(a: u32, b: u32, isMax: bool): u32 {
   if (!a) return b; if (!b) return a;
   const ap = load<f64>(a), bp = load<f64>(b);
   if (isMax ? bp > ap : bp < ap) { const t = a; a = b; b = t; }
@@ -352,9 +296,307 @@ export function heapInsert(root: u32, priority: f64, value: f64, isMax: bool): u
 }
 export function heapPop(root: u32, isMax: bool): u32 { return root ? heapMerge(load<u32>(root + 16), load<u32>(root + 20), isMax) : 0; }
 
-export function vecPush(root: u32, depth: u32, newDepth: u32, index: u32, value: f64): u32 {
+
+// Extend a tail only at the allocation frontier. Bytes below heapEnd are never
+// rewritten. A fork or an intervening allocation copies the visible prefix.
+export function tailAppend(tail: u32, length: u32, value: f64): u32 {
+  if (length && tail + length * 8 == heapEnd) {
+    const p = alloc(8); store<f64>(p, value); return tail;
+  }
+  const p = alloc((length + 1) * 8);
+  if (length) memory.copy(p, tail, length * 8);
+  store<f64>(p + length * 8, value); return p;
+}
+export function tailSet(tail: u32, length: u32, index: u32, value: f64): u32 {
+  const p = alloc(length * 8); memory.copy(p, tail, length * 8);
+  store<f64>(p + index * 8, value); return p;
+}
+export function tailInsert(tail: u32, length: u32, index: u32, value: f64): u32 {
+  if (index == length) return tailAppend(tail, length, value);
+  const p = alloc((length + 1) * 8);
+  memory.copy(p, tail, index * 8); store<f64>(p + index * 8, value);
+  memory.copy(p + (index + 1) * 8, tail + index * 8, (length - index) * 8); return p;
+}
+export function tailRemove(tail: u32, length: u32, index: u32): u32 {
+  if (length == 1) return 0;
+  if (!index) return tail + 8;
+  if (index == length - 1) return tail;
+  const p = alloc((length - 1) * 8);
+  memory.copy(p, tail, index * 8);
+  memory.copy(p + index * 8, tail + (index + 1) * 8, (length - index - 1) * 8); return p;
+}
+
+// Attach complete immutable blocks. Input bytes become the actual leaves, not
+// temporary staging that is copied into a second set of leaves.
+function linkRange(root: u32, depth: u32, base: u32, start: u32, end: u32, input: u32, origin: u32): u32 {
+  if (!depth) return input + (base - origin) * 8;
+  const p = alloc(128);
+  if (root) memory.copy(p, root, 128); else memory.fill(p, 0, 128);
+  const span: u32 = 1 << (depth * 5);
+  const first = (start - base) / span, last = (end - 1 - base) / span;
+  for (let i = first; i <= last; i++) {
+    const b = base + i * span;
+    const lo = start > b ? start : b, hi = end < b + span ? end : b + span;
+    store<u32>(p + i * 4, linkRange(root ? load<u32>(root + i * 4) : 0, depth - 1, b, lo, hi, input, origin));
+  }
+  return p;
+}
+export function vecLink(root: u32, depth: u32, newDepth: u32, start: u32, input: u32, count: u32): u32 {
+  if (!count) return root;
   if (root) while (depth < newDepth) {
     const p = alloc(128); memory.fill(p, 0, 128); store<u32>(p, root); root = p; depth++;
   }
-  return vecSetAt(root, newDepth, index, value);
+  return linkRange(root, newDepth, 0, start, start + count, input, start);
 }
+
+// Block AVL sequence: [left,right,itemCount,height,dataPointer,dataLength].
+// Blocks contain 1..32 f64 values. Boundary deletion shares a shorter byte span.
+@inline function bd(p: u32): u32 { return load<u32>(p + 16); }
+@inline function bn(p: u32): u32 { return load<u32>(p + 20); }
+function bnode(left: u32, data: u32, length: u32, right: u32): u32 {
+  const p = alloc(24); store<u32>(p, left); store<u32>(p + 4, right);
+  store<u32>(p + 8, seqSize(left) + length + seqSize(right));
+  store<u32>(p + 12, max(sh(left), sh(right)) + 1);
+  store<u32>(p + 16, data); store<u32>(p + 20, length); return p;
+}
+function bbal(left: u32, data: u32, length: u32, right: u32): u32 {
+  if (sh(left) > sh(right) + 1) {
+    const ll = sl(left), lr = sr(left);
+    if (sh(ll) >= sh(lr)) return bnode(ll, bd(left), bn(left), bnode(lr, data, length, right));
+    return bnode(bnode(ll, bd(left), bn(left), sl(lr)), bd(lr), bn(lr), bnode(sr(lr), data, length, right));
+  }
+  if (sh(right) > sh(left) + 1) {
+    const rl = sl(right), rr = sr(right);
+    if (sh(rr) >= sh(rl)) return bnode(bnode(left, data, length, rl), bd(right), bn(right), rr);
+    return bnode(bnode(left, data, length, sl(rl)), bd(rl), bn(rl), bnode(sr(rl), bd(right), bn(right), rr));
+  }
+  return bnode(left, data, length, right);
+}
+export function blockAppend(root: u32, data: u32, length: u32): u32 {
+  return root ? bbal(sl(root), bd(root), bn(root), blockAppend(sr(root), data, length)) : bnode(0, data, length, 0);
+}
+function blockPrepend(root: u32, data: u32, length: u32): u32 {
+  return root ? bbal(blockPrepend(sl(root), data, length), bd(root), bn(root), sr(root)) : bnode(0, data, length, 0);
+}
+export function blockGet(root: u32, index: u32): f64 {
+  while (root) {
+    const before = seqSize(sl(root)), count = bn(root);
+    if (index < before) root = sl(root);
+    else if (index >= before + count) { index -= before + count; root = sr(root); }
+    else return load<f64>(bd(root) + (index - before) * 8);
+  }
+  unreachable(); return 0;
+}
+export function blockInsert(root: u32, index: u32, value: f64): u32 {
+  if (!root) return bnode(0, tailAppend(0, 0, value), 1, 0);
+  const left = sl(root), right = sr(root), before = seqSize(left), length = bn(root), data = bd(root);
+  if (index < before) return bbal(blockInsert(left, index, value), data, length, right);
+  if (index > before + length) return bbal(left, data, length, blockInsert(right, index - before - length, value));
+  const p = tailInsert(data, length, index - before, value);
+  if (length < 32) return bnode(left, p, length + 1, right);
+  return bbal(left, p, 16, blockPrepend(right, p + 128, 17));
+}
+function dropFirstBlock(root: u32): u32 {
+  return sl(root) ? bbal(dropFirstBlock(sl(root)), bd(root), bn(root), sr(root)) : sr(root);
+}
+export function blockDelete(root: u32, index: u32): u32 {
+  const left = sl(root), right = sr(root), before = seqSize(left), length = bn(root), data = bd(root);
+  if (index < before) return bbal(blockDelete(left, index), data, length, right);
+  if (index >= before + length) return bbal(left, data, length, blockDelete(right, index - before - length));
+  if (length > 1) return bnode(left, tailRemove(data, length, index - before), length - 1, right);
+  if (!left) return right;
+  if (!right) return left;
+  let first = right; while (sl(first)) first = sl(first);
+  return bbal(left, bd(first), bn(first), dropFirstBlock(right));
+}
+
+export function mapNumber(root: u32, key: u32, len: u32, hash: u32): f64 {
+  const p = mapFind(root, key, len, hash);
+  return p ? load<f64>(p + 16 + len) : NaN;
+}
+// An ordered map needs order traversal, not indexed access. A persistent log
+// records only new insertions. Overwrites and deletes only replace the HAMT.
+export function orderCons(previous: u32, leaf: u32): u32 {
+  const p = alloc(8); store<u32>(p, previous); store<u32>(p + 4, leaf); return p;
+}
+
+// Compressed nibble radix index. Digits 1..16 encode nibbles; zero is the
+// end marker. Branch: [position+3,bitmap,size,representativeLeaf,children...].
+export function radixSize(root: u32): u32 { return root ? (tag(root) ? load<u32>(root + 8) : 1) : 0; }
+@inline function rdigit(key: u32, len: u32, position: u32): u32 {
+  const i = position >> 1;
+  return i < len ? ((<u32>load<u8>(key + i) >> ((position & 1) ? 0 : 4)) & 15) + 1 : 0;
+}
+@inline function representative(root: u32): u32 { return tag(root) ? load<u32>(root + 12) : root; }
+function radixBranch(position: u32, bitmap: u32, size: u32, rep: u32): u32 {
+  const p = alloc(16 + pc(bitmap) * 4);
+  store<u32>(p, position + 3); store<u32>(p + 4, bitmap); store<u32>(p + 8, size); store<u32>(p + 12, rep); return p;
+}
+function radixCandidate(root: u32, key: u32, len: u32): u32 {
+  while (root && tag(root)) {
+    const bitmap = load<u32>(root + 4), bit: u32 = 1 << rdigit(key, len, tag(root) - 3);
+    if (!(bitmap & bit)) return load<u32>(root + 12);
+    root = load<u32>(root + 16 + pc(bitmap & (bit - 1)) * 4);
+  }
+  return root;
+}
+export function radixFind(root: u32, key: u32, len: u32): u32 {
+  if (root && tag(root) == JOURNAL) {
+    const p = journalFind(root, key, len, hashAt(key, len)); if (p) return p;
+    root = load<u32>(root + 4);
+  }
+  const p = radixCandidate(root, key, len);
+  return p && load<u32>(p + 8) == len && memory.compare(p + 16, key, len) == 0 ? p : 0;
+}
+function radixSplice(root: u32, leaf: u32, critical: u32, mark: u32): u32 {
+  if (!root) return leaf;
+  const kind = tag(root);
+  if (!kind || kind - 3 > critical) {
+    if (critical == 0xffffffff) return leaf;
+    const rep = representative(root), a = rdigit(rep + 16, load<u32>(rep + 8), critical), b = rdigit(leaf + 16, load<u32>(leaf + 8), critical);
+    const p = radixBranch(critical, (1 << a) | (1 << b), radixSize(root) + 1, leaf);
+    store<u32>(p + 16, a < b ? root : leaf); store<u32>(p + 20, a < b ? leaf : root); return p;
+  }
+  const position = kind - 3, bitmap = load<u32>(root + 4), bit: u32 = 1 << rdigit(leaf + 16, load<u32>(leaf + 8), position);
+  const offset = pc(bitmap & (bit - 1)), count = pc(bitmap), exists: u32 = bitmap & bit ? 1 : 0;
+  const old = exists ? load<u32>(root + 16 + offset * 4) : 0;
+  const oldSize = radixSize(old), child = radixSplice(old, leaf, critical, mark);
+  if (root >= mark && exists) {
+    store<u32>(root + 8, radixSize(root) - oldSize + radixSize(child));
+    store<u32>(root + 12, leaf); store<u32>(root + 16 + offset * 4, child); return root;
+  }
+  if (exists) {
+    const p = alloc(16 + count * 4); copyWords(p, root, 16 + count * 4);
+    store<u32>(p + 8, radixSize(root) - oldSize + radixSize(child));
+    store<u32>(p + 12, leaf); store<u32>(p + 16 + offset * 4, child); return p;
+  }
+  const p = radixBranch(position, bitmap | bit, radixSize(root) - oldSize + radixSize(child), leaf);
+  copyWords(p + 16, root + 16, offset * 4); store<u32>(p + 16 + offset * 4, child);
+  copyWords(p + 20 + offset * 4, root + 16 + (offset + exists) * 4, (count - offset - exists) * 4); return p;
+}
+function radixInsertOwned(root: u32, leaf: u32, mark: u32): u32 {
+  if (!root) return leaf;
+  const len = load<u32>(leaf + 8), old = radixCandidate(root, leaf + 16, len), oldLen = load<u32>(old + 8);
+  const limit = min(len, oldLen); let i: u32 = 0;
+  while (i + 8 <= limit && load<u64>(leaf + 16 + i) == load<u64>(old + 16 + i)) i += 8;
+  while (i < limit && load<u8>(leaf + 16 + i) == load<u8>(old + 16 + i)) i++;
+  if (i == limit && len == oldLen) return radixSplice(root, leaf, 0xffffffff, mark);
+  const critical = i * 2 + (i < limit && (load<u8>(leaf + 16 + i) >> 4) == (load<u8>(old + 16 + i) >> 4) ? 1 : 0);
+  return radixSplice(root, leaf, critical, mark);
+}
+export function radixInsert(root: u32, leaf: u32): u32 { return journalInsert(root, leaf, 2); }
+function radixRemove(root: u32, key: u32, len: u32): u32 {
+  const kind = tag(root);
+  if (!kind) return load<u32>(root + 8) == len && memory.compare(root + 16, key, len) == 0 ? 0 : root;
+  const bitmap = load<u32>(root + 4), bit: u32 = 1 << rdigit(key, len, kind - 3);
+  if (!(bitmap & bit)) return root;
+  const offset = pc(bitmap & (bit - 1)), count = pc(bitmap), old = load<u32>(root + 16 + offset * 4), child = radixRemove(old, key, len);
+  if (old == child) return root;
+  if (!child && count == 2) return load<u32>(root + 16 + (1 - offset) * 4);
+  const p = radixBranch(kind - 3, child ? bitmap : bitmap & ~bit, radixSize(root) - 1, 0);
+  copyWords(p + 16, root + 16, offset * 4);
+  if (child) store<u32>(p + 16 + offset * 4, child);
+  copyWords(p + 16 + (offset + (child ? 1 : 0)) * 4, root + 20 + offset * 4, (count - offset - 1) * 4);
+  store<u32>(p + 12, representative(load<u32>(p + 16))); return p;
+}
+export function radixDelete(root: u32, key: u32, len: u32): u32 { root = materializeJournal(root, 2); return root ? radixRemove(root, key, len) : 0; }
+
+// Single synchronous writer call: allocate the leaf, update the selected index,
+// and report new metadata. STAGE and result words are not snapshot payloads.
+const WRITE_STAGE: u32 = 16384;
+@inline
+export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, value: f64, mode: u32, kind: u32, order: u32, ordinal: u32): u32 {
+  const previous = kind == 1 ? mapFind(root, WRITE_STAGE, keyLen, hash) : 0;
+  const prefix: u32 = kind == 1 ? 4 : 0;
+  const position = previous ? load<u32>(previous + 16 + keyLen) : ordinal;
+  const leaf = mapLeaf(keyLen, valueLen + prefix);
+  store<u32>(leaf + 4, hash);
+  if (mode == 0 && keyLen <= 8) store<u64>(leaf + 16, load<u64>(WRITE_STAGE));
+  else memory.copy(leaf + 16, WRITE_STAGE, keyLen);
+  const destination = leaf + 16 + keyLen;
+  if (prefix) store<u32>(destination, position);
+  if (mode == 0) store<f64>(destination + prefix, value);
+  else if (mode == 1) store<u8>(destination + prefix, <u8>value);
+  else memory.copy(destination + prefix, WRITE_STAGE + keyLen, valueLen);
+  const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? insertAt(root, leaf, 0, previous ? 0 : 1) : mapInsert(root, leaf);
+  store<u32>(0, leaf); store<u32>(16, hash);
+  store<u32>(4, kind == 1 && !previous ? orderCons(order, leaf) : order);
+  store<u32>(8, kind == 2 ? radixSize(next) : mapSize(next));
+  store<u32>(12, kind == 1 && !previous ? ordinal + 1 : ordinal);
+  return next;
+}
+
+// Bounded immutable update journal. The fifth distinct pending key folds the
+// journal into a canonical index. Each published journal owns its pointer array.
+const JOURNAL: u32 = 0xffffffff;
+const JOURNAL_LIMIT: u32 = 4;
+export function journalFind(root: u32, key: u32, len: u32, hash: u32): u32 {
+  const count = load<u32>(root + 12);
+  for (let i: u32 = 0; i < count; i++) {
+    const leaf = load<u32>(root + 16 + i * 4);
+    if (load<u32>(leaf + 4) == hash && load<u32>(leaf + 8) == len && memory.compare(leaf + 16, key, len) == 0) return leaf;
+  }
+  return 0;
+}
+function foldJournal(base: u32, input: u32, count: u32, kind: u32): u32 {
+  if (kind != 2) return batchAt(base, input, count, 0);
+  const mark = heapEnd;
+  // Address ownership is valid only inside this synchronous construction call.
+  // Published nodes are below mark; only new branch nodes may be edited here.
+  for (let i: u32 = 0; i < count; i++) base = radixInsertOwned(base, load<u32>(input + i * 4), mark);
+  return base;
+}
+function materializeJournal(root: u32, kind: u32): u32 {
+  if (!root || tag(root) != JOURNAL) return root;
+  const count = load<u32>(root + 12);
+  copyWords(1024, root + 16, count * 4);
+  return foldJournal(load<u32>(root + 4), 1024, count, kind);
+}
+function journalInsert(root: u32, leaf: u32, kind: u32, known: u32 = 0xffffffff): u32 {
+  if (!root) return leaf;
+  const pending = tag(root) == JOURNAL, count = pending ? load<u32>(root + 12) : 0;
+  const base = pending ? load<u32>(root + 4) : root;
+  let position = count;
+  for (let i: u32 = 0; i < count; i++) if (sameKey(load<u32>(root + 16 + i * 4), leaf)) { position = i; break; }
+  if (count == JOURNAL_LIMIT && position == count) {
+    copyWords(1024, root + 16, count * 4); store<u32>(1024 + count * 4, leaf);
+    return foldJournal(base, 1024, count + 1, kind);
+  }
+  const exists = known != 0xffffffff ? known != 0 : position < count || (kind == 2 ? radixFind(base, leaf + 16, load<u32>(leaf + 8)) : mapFind(base, leaf + 16, load<u32>(leaf + 8), load<u32>(leaf + 4))) != 0;
+  const nextCount = count + (position == count ? 1 : 0), p = alloc(16 + nextCount * 4);
+  store<u32>(p, JOURNAL); store<u32>(p + 4, base);
+  store<u32>(p + 8, (kind == 2 ? radixSize(root) : mapSize(root)) + (exists ? 0 : 1));
+  store<u32>(p + 12, nextCount);
+  if (count) copyWords(p + 16, root + 16, count * 4);
+  store<u32>(p + 16 + position * 4, leaf); return p;
+}
+export function compareLeaves(a: u32, b: u32): i32 {
+  const an = load<u32>(a + 8), bn = load<u32>(b + 8);
+  const cmp = memory.compare(a + 16, b + 16, min(an, bn));
+  return cmp ? cmp : an < bn ? -1 : an > bn ? 1 : 0;
+}
+
+// The numeric command ABI passes only i32 metadata across the JS/WASM boundary.
+// Value bytes and key bytes are in writer scratch; hashing stays inside WASM.
+export function writeMapNumber(root: u32, len: u32): u32 {
+  return stagedWrite(root, len, 8, hashAt(WRITE_STAGE, len), load<f64>(WRITE_STAGE - 8), 0, 0, 0, 0);
+}
+export function writeSortedNumber(root: u32, len: u32): u32 {
+  return stagedWrite(root, len, 8, hashAt(WRITE_STAGE, len), load<f64>(WRITE_STAGE - 8), 0, 2, 0, 0);
+}
+export function writeOrderedNumber(root: u32, len: u32, head: u32, count: u32): u32 {
+  return stagedWrite(root, len, 8, hashAt(WRITE_STAGE, len), load<f64>(WRITE_STAGE - 8), 0, 1, head, count);
+}
+
+// Private bulk builders: only freshly allocated branches can be changed.
+export function radixBuild(input: u32, count: u32): u32 {
+  const mark = heapEnd; let root: u32 = 0;
+  for (let i: u32 = 0; i < count; i++) root = radixInsertOwned(root, load<u32>(input + i * 4), mark);
+  return root;
+}
+function blockBuildRange(input: u32, first: u32, end: u32): u32 {
+  if (first == end) return 0;
+  const mid = first + ((end - first) >> 1);
+  return bnode(blockBuildRange(input, first, mid), input + mid * 256, 32, blockBuildRange(input, mid + 1, end));
+}
+export function blockBuild(input: u32, blocks: u32): u32 { return blockBuildRange(input, 0, blocks); }

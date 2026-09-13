@@ -23,21 +23,65 @@ function checkAVL(snapshot: any, root = snapshot.head ?? snapshot.root): void {
     const [ls, lh] = visit(dv.getUint32(p, true));
     const [rs, rh] = visit(dv.getUint32(p + 4, true));
     expect(Math.abs(lh - rh)).toBeLessThanOrEqual(1);
-    expect(dv.getUint32(p + 8, true)).toBe(ls + rs + 1);
+    const weight = snapshot.tailSize !== undefined ? dv.getUint32(p + 20, true) : 1;
+    expect(weight).toBeGreaterThan(0); expect(weight).toBeLessThanOrEqual(32);
+    expect(dv.getUint32(p + 8, true)).toBe(ls + rs + weight);
     expect(dv.getUint32(p + 12, true)).toBe(Math.max(lh, rh) + 1);
-    return [ls + rs + 1, Math.max(lh, rh) + 1];
+    return [ls + rs + weight, Math.max(lh, rh) + 1];
   };
-  expect(visit(root)[0]).toBe(snapshot.size);
+  expect(visit(root)[0] + (snapshot.tailSize ?? 0)).toBe(snapshot.size);
+}
+function checkRadix(snapshot: any): void {
+  const a = arenaOf(snapshot), dv = a.dv;
+  const visit = (p: number, previous = -1, lookup = snapshot.root): number => {
+    if (!p) return 0;
+    const tag = dv.getUint32(p, true);
+    if (!tag) { expect(a.radixFind(lookup, a.leafKey(p))).toBe(p); return 1; }
+    if (tag === 0xffffffff) {
+      const base = dv.getUint32(p + 4, true), n = dv.getUint32(p + 12, true);
+      expect(n).toBeGreaterThan(0); expect(n).toBeLessThanOrEqual(4);
+      let count = visit(base, -1, base); const seen = new Set<string>();
+      for (let i = 0; i < n; i++) {
+        const leaf = dv.getUint32(p + 16 + i * 4, true), key = a.leafKey(leaf);
+        expect(seen.has(key)).toBe(false); seen.add(key);
+        expect(a.radixFind(p, key)).toBe(leaf);
+        if (!a.radixFind(base, key)) count++;
+      }
+      expect(dv.getUint32(p + 8, true)).toBe(count); return count;
+    }
+    const critical = tag - 3;
+    expect(critical).toBeGreaterThan(previous);
+    const bitmap = dv.getUint32(p + 4, true);
+    expect(bitmap & ~0x1ffff).toBe(0); expect(popcount(bitmap)).toBeGreaterThanOrEqual(2);
+    let count = 0;
+    for (let i = 0; i < popcount(bitmap); i++) count += visit(dv.getUint32(p + 16 + i * 4, true), critical, lookup);
+    expect(dv.getUint32(p + 8, true)).toBe(count); return count;
+  };
+  expect(visit(snapshot.root)).toBe(snapshot.size);
+  const keys = [...snapshot.keys()].map(k => new TextEncoder().encode(k));
+  for (let i = 1; i < keys.length; i++) expect(Buffer.compare(keys[i - 1], keys[i])).toBeLessThan(0);
 }
 function checkHAMT(snapshot: any): void {
   const a = arenaOf(snapshot), dv = a.dv;
-  const visit = (p: number, prefix: readonly number[]): number => {
+  const visit = (p: number, prefix: readonly number[], lookup = snapshot.root): number => {
     if (!p) return 0;
     const tag = dv.getUint32(p, true);
+    if (tag === 0xffffffff) {
+      expect(prefix).toEqual([]);
+      const base = dv.getUint32(p + 4, true), n = dv.getUint32(p + 12, true);
+      expect(n).toBeGreaterThan(0); expect(n).toBeLessThanOrEqual(4);
+      let count = visit(base, [], base); const seen = new Set<string>();
+      for (let i = 0; i < n; i++) {
+        const leaf = dv.getUint32(p + 16 + i * 4, true), key = a.leafKey(leaf);
+        expect(seen.has(key)).toBe(false); seen.add(key); expect(a.find(p, key)).toBe(leaf);
+        if (!a.find(base, key)) count++;
+      }
+      expect(dv.getUint32(p + 8, true)).toBe(count); return count;
+    }
     if (tag === 0) {
       const hash = dv.getUint32(p + 4, true);
-      for (let d = 0; d < prefix.length; d++) expect((hash >>> (d * 5)) & 31).toBe(prefix[d]);
-      expect(a.find(snapshot.root, a.leafKey(p))).toBe(p);
+      for (let d = 0; d < prefix.length; d++) expect((hash >>> (d * 4)) & 15).toBe(prefix[d]);
+      expect(a.find(lookup, a.leafKey(p))).toBe(p);
       return 1;
     }
     if (tag === 2) {
@@ -45,14 +89,14 @@ function checkHAMT(snapshot: any): void {
       for (let i = 0; i < n; i++) {
         const leaf = dv.getUint32(p + 16 + i * 4, true);
         expect(dv.getUint32(leaf + 4, true)).toBe(dv.getUint32(p + 4, true));
-        visit(leaf, prefix);
+        visit(leaf, prefix, lookup);
       }
       return n;
     }
     expect(tag).toBe(1);
     const bm = dv.getUint32(p + 4, true);
     let n = 0, i = 0;
-    for (let digit = 0; digit < 32; digit++) if (bm & (1 << digit)) n += visit(dv.getUint32(p + 16 + i++ * 4, true), [...prefix, digit]);
+    for (let digit = 0; digit < 16; digit++) if (bm & (1 << digit)) n += visit(dv.getUint32(p + 16 + i++ * 4, true), [...prefix, digit], lookup);
     expect(i).toBe(popcount(bm));
     expect(dv.getUint32(p + 8, true)).toBe(n);
     return n;
@@ -110,7 +154,7 @@ describe('forked model histories', () => {
       else expect([...s.entries()]).toEqual(entries);
       expect(s.size).toBe(models[i].size);
       if (name === 'HAMT') checkHAMT(s);
-      if (name === 'sorted') checkAVL(s);
+      if (name === 'sorted') checkRadix(s);
     });
   });
   for (const [name, C] of [['singly', S.SharedLinkedList], ['doubly', S.SharedDoublyLinkedList]] as const) test(`${name}: 500 branching versions and AVL ranks`, () => {

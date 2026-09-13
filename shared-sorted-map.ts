@@ -23,20 +23,20 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
   readonly size: number;
   readonly valueType: T;
   private readonly comparator?: Comparator<string>;
-  constructor(type: T, comparator?: Comparator<string>, root = 0, _size = 0, source: Arena = current) {
-    super(source); this.valueType = type; this.comparator = comparator; this.root = root; this.size = source.wasm.seqSize(root); Object.freeze(this);
+  constructor(type: T, comparator?: Comparator<string>, root = 0, _size: number | undefined = undefined, source: Arena = current) {
+    super(source); this.valueType = type; this.comparator = comparator; this.root = root; this.size = _size ?? source.wasm.radixSize(root); Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedSortedMap<T> {
-    const a = arenaOf(this); a.assertWritable(); const leaf = a.leaf(this.valueType, key, value);
-    return new SharedSortedMap(this.valueType, this.comparator, a.wasm.treeInsert(this.root, leaf) >>> 0, 0, a);
+    const a = arenaOf(this), root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 2) : a.write(this.valueType, this.root, key, value, 2));
+    return new SharedSortedMap(this.valueType, this.comparator, root, a.writeSize, a);
   }
-  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.treeFind(this.root, key); return leaf ? a.leafValue(this.valueType, leaf) : undefined; }
-  has(key: string): boolean { return arenaOf(this).treeFind(this.root, key) !== 0; }
+  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.radixFind(this.root, key); return leaf ? a.leafValue(this.valueType, leaf) : undefined; }
+  has(key: string): boolean { return arenaOf(this).radixFind(this.root, key) !== 0; }
   delete(key: string): SharedSortedMap<T> {
-    const a = arenaOf(this); a.assertWritable(); const leaf = a.treeFind(this.root, key); if (!leaf) return this;
-    return new SharedSortedMap(this.valueType, this.comparator, a.wasm.treeDelete(this.root, leaf) >>> 0, 0, a);
+    const a = arenaOf(this); a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
+    return new SharedSortedMap(this.valueType, this.comparator, a.wasm.radixDelete(this.root, leaf + 16, a.dv.getUint32(leaf + 8, true)) >>> 0, undefined, a);
   }
-  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = arenaOf(this); for (const leaf of a.sequence(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
+  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = arenaOf(this); for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
   *entries(): Generator<[string, ValueOf<T>]> {
     if (this.comparator) yield* [...this.naturalEntries()].sort((a, b) => this.comparator!(a[0], b[0])); else yield* this.naturalEntries();
   }

@@ -7,9 +7,9 @@ const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as Buffer
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
 let nextId = 0;
-interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined }
+interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
 const realmId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-export const FORMAT_VERSION = 2;
+export const FORMAT_VERSION = 3;
 export const HEAP_START = 65536;
 export const MAX_SIZE = 0x3fffffff;
 
@@ -54,9 +54,9 @@ export function vectorDepth(size: number): number {
   while (size > capacity) { capacity *= 32; depth++; }
   return depth;
 }
-export function validIndex(index: number, size: number): boolean { return Number.isInteger(index) && index >= 0 && index < size; }
+export function validIndex(index: number, size: number): boolean { return typeof index === 'number' && (index >>> 0) === index && index < size; }
 export function checkedSize(size: number): number {
-  if (!Number.isSafeInteger(size) || size < 0 || size > MAX_SIZE) throw new RangeError(`Size must be between 0 and ${MAX_SIZE}`);
+  if (typeof size !== 'number' || (size >>> 0) !== size || size > MAX_SIZE) throw new RangeError(`Size must be between 0 and ${MAX_SIZE}`);
   return size;
 }
 export function arenaOf(snapshot: object): Arena {
@@ -78,6 +78,9 @@ export class Arena {
   readonly id: string;
   readonly readOnly: boolean;
   readonly dependencies = new Map<string, Arena>();
+  writeHead = 0;
+  writeSize = 0;
+  writeCount = 0;
   private buffer: ArrayBufferLike;
   private bytes: Uint8Array;
   private view: DataView;
@@ -187,7 +190,15 @@ export class Arena {
     if (!len) return '';
     const cached = this.strings.get(ptr);
     if (cached !== undefined) return cached;
-    const value = decodeUtf8(decoder, this.buf.subarray(ptr, ptr + len));
+    this.refresh();
+    let value = '';
+    if (len <= 32) {
+      for (let i = 0; i < len; i++) {
+        const c = this.bytes[ptr + i];
+        if (c > 127) { value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)); break; }
+        value += String.fromCharCode(c);
+      }
+    } else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
     // Empty byte ranges can share an address with a following allocation.
     if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
     return value;
@@ -202,10 +213,18 @@ export class Arena {
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     const cached = this.keys.get(key);
     if (cached) return cached;
-    const bytes = encoder.encode(key);
-    return this.rememberKey(key, { bytes, length: bytes.length, hash: hashBytes(bytes), ptr: undefined });
+    let hash = 2166136261;
+    for (let i = 0; i < key.length; i++) {
+      const c = key.charCodeAt(i);
+      if (c > 127) {
+        const bytes = encoder.encode(key);
+        return this.rememberKey(key, { bytes, length: bytes.length, hash: hashBytes(bytes), ptr: undefined });
+      }
+      hash = Math.imul(hash ^ c, 16777619);
+    }
+    return this.rememberKey(key, { bytes: undefined, length: key.length, hash: hash >>> 0, ptr: undefined });
   }
-  leaf(type: string, key: string, value: any, ordinal?: number): number {
+  leaf(type: string, key: string, value: any, ordinal?: number, prepared?: Uint8Array): number {
     this.assertWritable();
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     let token = this.keys.get(key);
@@ -223,7 +242,7 @@ export class Arena {
     // Finish user serialization before writing bytes. It can run callbacks.
     const number = type === 'number', boolean = type === 'boolean';
     if (number && typeof value !== 'number' || boolean && typeof value !== 'boolean') throw new TypeError(`Expected a ${type}`);
-    const v = number || boolean ? undefined : this.prepare(type, value);
+    const v = number || boolean ? undefined : prepared ?? this.prepare(type, value);
     const length = number ? 8 : boolean ? 1 : v!.length;
     const prefix = ordinal === undefined ? 0 : 4;
     const p = this.wasm.mapLeaf(token.length, length + prefix) >>> 0;
@@ -241,6 +260,70 @@ export class Arena {
     this.rememberKey(key, token);
     return p;
   }
+  writeNumber(root: number, key: string, value: number, kind = 0, head = 0, count = 0): number {
+    this.assertWritable();
+    if (typeof key !== 'string' || typeof value !== 'number') throw new TypeError('Expected a string key and a number value');
+    let n = key.length;
+    if (n > 49144) return this.write('number', root, key, value, kind, head, count);
+    // The scratch range exists in the initial memory. Shared-memory growth does
+    // not detach these old views, so this path needs no buffer refresh.
+    for (let i = 0; i < n; i++) {
+      const c = key.charCodeAt(i);
+      if (c > 127) {
+        const bytes = encoder.encode(key); n = bytes.length;
+        if (n > 49144) return this.write('number', root, key, value, kind, head, count);
+        this.bytes.set(bytes, 16384); break;
+      }
+      this.bytes[16384 + i] = c;
+    }
+    this.view.setFloat64(16376, value, true);
+    const next = (kind === 2 ? this.wasm.writeSortedNumber(root, n)
+      : kind === 1 ? this.wasm.writeOrderedNumber(root, n, head, count)
+      : this.wasm.writeMapNumber(root, n)) >>> 0;
+    this.writeSize = this.view.getUint32(8, true);
+    if (kind === 0 && this.keys.size < 2048 && this.keyBytes + n <= 262144 && !this.keys.has(key)) {
+      this.keys.set(key, { bytes: undefined, length: n, hash: this.view.getUint32(16, true), ptr: this.view.getUint32(0, true) + 16, readRoot: -1, readValue: undefined }); this.keyBytes += n;
+    }
+    if (kind === 1) { this.writeHead = this.view.getUint32(4, true); this.writeCount = this.view.getUint32(12, true); }
+    return next;
+  }
+  write(type: string, root: number, key: string, value: any, kind = 0, head = 0, count = 0): number {
+    this.assertWritable();
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    const mode = type === 'number' ? 0 : type === 'boolean' ? 1 : 2;
+    if (mode < 2 && typeof value !== type) throw new TypeError(`Expected a ${type}`);
+    // Complete all possible user callbacks before using shared writer scratch.
+    const v = mode === 2 ? this.prepare(type, value) : undefined;
+    let token = this.keys.get(key), n = token?.length ?? key.length;
+    let bytes: Uint8Array | undefined;
+    if (!token) for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { bytes = encoder.encode(key); n = bytes.length; break; }
+    const valueLength = mode === 0 ? 8 : mode === 1 ? 1 : v!.length;
+    if (n + valueLength > 49152) {
+      const previous = kind === 1 ? this.find(root, key) : 0;
+      const ordinal = previous ? this.dv.getUint32(previous + 16 + n, true) : count;
+      const leaf = this.leaf(type, key, value, kind === 1 ? ordinal : undefined, v);
+      const next = (kind === 2 ? this.wasm.radixInsert(root, leaf) : this.wasm.mapInsert(root, leaf)) >>> 0;
+      this.writeHead = kind === 1 && !previous ? this.wasm.orderCons(head, leaf) >>> 0 : head;
+      this.writeCount = kind === 1 && !previous ? count + 1 : count;
+      this.writeSize = kind === 2 ? this.wasm.radixSize(next) : this.wasm.mapSize(next);
+      return next;
+    }
+    this.refresh(); let hash = token?.hash ?? 2166136261;
+    if (token?.ptr !== undefined) this.bytes.copyWithin(16384, token.ptr, token.ptr + n);
+    else {
+      const source = token?.bytes ?? bytes;
+      hash = 2166136261;
+      for (let i = 0; i < n; i++) { const c = source ? source[i] : key.charCodeAt(i); this.bytes[16384 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+    }
+    if (v) this.bytes.set(v, 16384 + n);
+    const next = this.wasm.stagedWrite(root, n, valueLength, hash >>> 0, mode === 2 ? 0 : +value, mode, kind, head, count) >>> 0;
+    this.refresh();
+    this.writeHead = this.view.getUint32(4, true); this.writeSize = this.view.getUint32(8, true); this.writeCount = this.view.getUint32(12, true);
+    if (!token) token = this.rememberKey(key, { bytes, length: n, hash: hash >>> 0, ptr: this.view.getUint32(0, true) + 16 });
+    else if (token.ptr === undefined) token.ptr = this.view.getUint32(0, true) + 16;
+    if (kind === 0 && mode === 0) { token.readRoot = next; token.readValue = value; }
+    return next;
+  }
   leafKey(p: number): string { return this.string(p + 16, this.dv.getUint32(p + 8, true)); }
   leafValue(type: string, p: number, prefix = 0): any {
     const dv = this.dv, ptr = p + 16 + dv.getUint32(p + 8, true) + prefix;
@@ -248,37 +331,114 @@ export class Arena {
     if (type === 'boolean') return this.bytes[ptr] !== 0;
     return this.decodeAt(type, ptr, dv.getUint32(p + 12, true) - prefix);
   }
+  number(root: number, key: string): number | undefined {
+    const token = this.keys.get(key);
+    if (token?.ptr !== undefined) {
+      if (token.readRoot === root) return token.readValue;
+      const value = this.wasm.mapNumber(root, token.ptr, token.length, token.hash);
+      const result = !Number.isNaN(value) || this.wasm.mapFind(root, token.ptr, token.length, token.hash) ? value : undefined;
+      token.readRoot = root; token.readValue = result; return result;
+    }
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    // A cold numeric read does not allocate an interning entry. Scalar writes
+    // already seed the bounded hot-key cache. Cold bulk/worker reads use a hash
+    // descent followed by a complete byte comparison, including collisions.
+    let hash = 2166136261;
+    for (let i = 0; i < key.length; i++) {
+      const c = key.charCodeAt(i);
+      if (c > 127) {
+        const p = this.find(root, key);
+        return p ? this.dv.getFloat64(p + 16 + this.dv.getUint32(p + 8, true), true) : undefined;
+      }
+      hash = Math.imul(hash ^ c, 16777619);
+    }
+    const candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+    if (!candidate) return undefined;
+    const dv = this.dv, bytes = this.bytes, bucket = dv.getUint32(candidate, true) === 2;
+    const count = bucket ? dv.getUint32(candidate + 8, true) : 1;
+    for (let j = 0; j < count; j++) {
+      const p = bucket ? dv.getUint32(candidate + 16 + j * 4, true) : candidate;
+      if (dv.getUint32(p + 8, true) !== key.length) continue;
+      let same = true;
+      for (let i = 0; i < key.length; i++) if (bytes[p + 16 + i] !== key.charCodeAt(i)) { same = false; break; }
+      if (same) return dv.getFloat64(p + 16 + key.length, true);
+    }
+    return undefined;
+  }
+
+  *radixLeaves(root: number): Generator<number> {
+    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+      const pending: number[] = [], n = this.dv.getUint32(root + 12, true);
+      for (let i = 0; i < n; i++) pending.push(this.dv.getUint32(root + 16 + i * 4, true));
+      pending.sort((a, b) => this.wasm.compareLeaves(a, b));
+      let i = 0;
+      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
+        while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
+        if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
+      }
+      while (i < n) yield pending[i++]; return;
+    }
+    const stack = root ? [root] : [];
+    while (stack.length) {
+      const p = stack.pop()!, dv = this.dv;
+      if (!dv.getUint32(p, true)) yield p;
+      else for (let i = popcount(dv.getUint32(p + 4, true)) - 1; i >= 0; i--) stack.push(dv.getUint32(p + 16 + i * 4, true));
+    }
+  }
+  radixFind(root: number, key: string): number {
+    const token = this.key(key);
+    if (token.ptr !== undefined) return this.wasm.radixFind(root, token.ptr, token.length) >>> 0;
+    const bytes = token.bytes, length = token.length, dv = this.dv;
+    if (root && dv.getUint32(root, true) === 0xffffffff) {
+      for (let j = 0; j < dv.getUint32(root + 12, true); j++) {
+        const p = dv.getUint32(root + 16 + j * 4, true);
+        if (dv.getUint32(p + 4, true) !== token.hash || dv.getUint32(p + 8, true) !== length) continue;
+        let same = true; for (let i = 0; i < length; i++) if (this.bytes[p + 16 + i] !== (bytes ? bytes[i] : key.charCodeAt(i))) { same = false; break; }
+        if (same) { token.ptr = p + 16; return p; }
+      }
+      root = dv.getUint32(root + 4, true);
+    }
+    while (root && dv.getUint32(root, true)) {
+      const position = dv.getUint32(root, true) - 3, i = position >>> 1;
+      const digit = i < length ? (((bytes ? bytes[i] : key.charCodeAt(i)) >>> ((position & 1) ? 0 : 4)) & 15) + 1 : 0;
+      const bitmap = dv.getUint32(root + 4, true), bit = 1 << digit;
+      if (!(bitmap & bit)) return 0;
+      root = dv.getUint32(root + 16 + popcount(bitmap & (bit - 1)) * 4, true);
+    }
+    if (!root || dv.getUint32(root + 8, true) !== length) return 0;
+    for (let i = 0; i < length; i++) if (this.bytes[root + 16 + i] !== (bytes ? bytes[i] : key.charCodeAt(i))) return 0;
+    token.ptr = root + 16; return root;
+  }
   find(root: number, key: string): number {
     const token = this.key(key);
     if (token.ptr !== undefined) return this.wasm.mapFind(root, token.ptr, token.length, token.hash) >>> 0;
-    const k = token.bytes!, hash = token.hash, dv = this.dv, bytes = this.bytes;
-    let shift = 0;
+    const k = token.bytes, length = token.length, hash = token.hash, dv = this.dv, bytes = this.bytes;
     const equals = (p: number) => {
-      if (dv.getUint32(p + 4, true) !== hash || dv.getUint32(p + 8, true) !== k.length) return false;
-      for (let i = 0; i < k.length; i++) if (bytes[p + 16 + i] !== k[i]) return false;
+      if (dv.getUint32(p + 4, true) !== hash || dv.getUint32(p + 8, true) !== length) return false;
+      for (let i = 0; i < length; i++) if (bytes[p + 16 + i] !== (k ? k[i] : key.charCodeAt(i))) return false;
       return true;
     };
-    while (root) {
-      const tag = dv.getUint32(root, true);
-      if (tag === 0) {
-        if (!equals(root)) return 0;
-        token.ptr = root + 16; return root;
+    if (root && dv.getUint32(root, true) === 0xffffffff) {
+      for (let j = 0; j < dv.getUint32(root + 12, true); j++) {
+        const p = dv.getUint32(root + 16 + j * 4, true);
+        if (equals(p)) { token.ptr = p + 16; return p; }
       }
-      if (tag === 2) {
-        if (dv.getUint32(root + 4, true) !== hash) return 0;
-        const count = dv.getUint32(root + 8, true);
-        for (let i = 0; i < count; i++) {
-          const p = dv.getUint32(root + 16 + i * 4, true);
-          if (equals(p)) { token.ptr = p + 16; return p; }
-        }
-        return 0;
-      }
-      const bitmap = dv.getUint32(root + 4, true), bit = 1 << ((hash >>> shift) & 31);
-      if (!(bitmap & bit)) return 0;
-      root = dv.getUint32(root + 16 + popcount(bitmap & (bit - 1)) * 4, true); shift += 5;
+      root = dv.getUint32(root + 4, true);
+    }
+    const candidate = this.wasm.mapHashCandidate(root, hash) >>> 0;
+    if (!candidate) return 0;
+    if (!dv.getUint32(candidate, true)) {
+      if (!equals(candidate)) return 0;
+      token.ptr = candidate + 16; return candidate;
+    }
+    const count = dv.getUint32(candidate + 8, true);
+    for (let i = 0; i < count; i++) {
+      const leaf = dv.getUint32(candidate + 16 + i * 4, true);
+      if (equals(leaf)) { token.ptr = leaf + 16; return leaf; }
     }
     return 0;
   }
+
   delete(root: number, key: string): number {
     this.assertWritable();
     const leaf = this.find(root, key);
@@ -287,6 +447,15 @@ export class Arena {
   }
   *leaves(root: number): Generator<number> {
     // Each iterator owns its continuation. No shared stack or scratch survives yield.
+    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+      const n = this.dv.getUint32(root + 12, true), base = this.dv.getUint32(root + 4, true);
+      for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
+      for (const leaf of this.leaves(base)) {
+        const dv = this.dv;
+        if (!this.wasm.journalFind(root, leaf + 16, dv.getUint32(leaf + 8, true), dv.getUint32(leaf + 4, true))) yield leaf;
+      }
+      return;
+    }
     const stack = root ? [root] : [];
     while (stack.length) {
       const p = stack.pop()!, dv = this.dv, tag = dv.getUint32(p, true);
@@ -298,9 +467,28 @@ export class Arena {
   bulk(type: string, root: number, entries: readonly (readonly [string, any])[]): number {
     this.assertWritable();
     if (!entries.length) return root;
-    // Only temporary builder state is mutable. It is never published or returned.
     const latest = new Map<string, any>();
     for (const [key, value] of entries) latest.set(normalizeKey(key), value);
+    if (type === 'number' || type === 'boolean') {
+      const unicode = new Map<string, Uint8Array>(), length = type === 'number' ? 8 : 1;
+      let total = (latest.size * 4 + 7) & ~7;
+      for (const key of latest.keys()) {
+        let n = key.length;
+        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); unicode.set(key, b); n = b.length; break; }
+        total += (16 + n + length + 7) & ~7;
+      }
+      const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
+      let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+      for (const [key, value] of latest) {
+        if (typeof value !== type) throw new TypeError(`Expected a ${type}`);
+        const encoded = unicode.get(key), n = encoded?.length ?? key.length; let hash = 2166136261;
+        for (let i = 0; i < n; i++) { const c = encoded ? encoded[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+        dv.setUint32(p, 0, true); dv.setUint32(p + 4, hash >>> 0, true); dv.setUint32(p + 8, n, true); dv.setUint32(p + 12, length, true);
+        if (type === 'number') dv.setFloat64(p + 16 + n, value, true); else bytes[p + 16 + n] = value ? 1 : 0;
+        dv.setUint32(slot, p, true); slot += 4; p += (16 + n + length + 7) & ~7;
+      }
+      return this.wasm.mapBatch(root, input, latest.size) >>> 0;
+    }
     const leaves: number[] = [];
     for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
     const input = this.alloc(leaves.length * 4), dv = this.dv;
@@ -308,17 +496,29 @@ export class Arena {
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
   }
 
-  append(type: string, root: number, depth: number, size: number, values: readonly any[]): number {
-    this.assertWritable(); checkedSize(size + values.length);
-    if (!values.length) return root;
-    // Encode before allocating the contiguous input range. JSON callbacks may reenter.
+  encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {
+    this.assertWritable();
     const raw = type === 'number' ? values : values.map(value => this.encode(type, value));
-    const input = this.alloc(raw.length * 8), dv = this.dv;
+    const input = this.alloc((length + raw.length) * 8), dv = this.dv;
+    if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
     for (let i = 0; i < raw.length; i++) {
       if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
-      dv.setFloat64(input + i * 8, raw[i], true);
+      dv.setFloat64(input + (length + i) * 8, raw[i], true);
     }
-    return this.wasm.vecAppend(root, depth, vectorDepth(size + values.length), size, input, raw.length) >>> 0;
+    return input;
+  }
+  *blocks(root: number, reverse = false): Generator<number> {
+    const stack: number[] = []; let node = root;
+    const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
+    while (node || stack.length) {
+      while (node) { stack.push(node); node = this.dv.getUint32(node + first, true); }
+      node = stack.pop()!;
+      const data = this.dv.getUint32(node + 16, true), length = this.dv.getUint32(node + 20, true);
+      const next = this.dv.getUint32(node + second, true);
+      if (reverse) for (let i = length - 1; i >= 0; i--) yield this.dv.getFloat64(data + i * 8, true);
+      else for (let i = 0; i < length; i++) yield this.dv.getFloat64(data + i * 8, true);
+      node = next;
+    }
   }
   *vector(root: number, depth: number, start: number, count: number): Generator<number> {
     let i = start, end = start + count;
@@ -327,29 +527,5 @@ export class Arena {
       const stop = Math.min(end, (Math.floor(i / 32) + 1) * 32);
       while (i < stop) { const raw = this.dv.getFloat64(leaf + (i & 31) * 8, true); i++; yield raw; }
     }
-  }
-  *sequence(root: number, reverse = false): Generator<number> {
-    const stack: number[] = [];
-    let node = root;
-    const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
-    while (node || stack.length) {
-      while (node) { stack.push(node); node = this.dv.getUint32(node + first, true); }
-      node = stack.pop()!;
-      const value = this.dv.getFloat64(node + 16, true);
-      const next = this.dv.getUint32(node + second, true);
-      yield value; node = next;
-    }
-  }
-  treeFind(root: number, key: string): number {
-    const bytes = encoder.encode(normalizeKey(key)), dv = this.dv, buf = this.bytes;
-    while (root) {
-      const leaf = dv.getFloat64(root + 16, true), len = dv.getUint32(leaf + 8, true);
-      let cmp = 0;
-      for (let i = 0; i < Math.min(len, bytes.length); i++) if (bytes[i] !== buf[leaf + 16 + i]) { cmp = bytes[i] - buf[leaf + 16 + i]; break; }
-      if (!cmp) cmp = bytes.length - len;
-      if (!cmp) return leaf;
-      root = dv.getUint32(root + (cmp < 0 ? 0 : 4), true);
-    }
-    return 0;
   }
 }
