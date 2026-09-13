@@ -20,7 +20,7 @@ export interface WasmModule {
 }
 
 export function instantiateWasm(wasmBytes: Uint8Array, memory: WebAssembly.Memory): WasmModule {
-  const module = new WebAssembly.Module(wasmBytes);
+  const module = new WebAssembly.Module(wasmBytes as BufferSource);
   const instance = new WebAssembly.Instance(module, { env: { memory } });
   return { memory, instance, exports: instance.exports };
 }

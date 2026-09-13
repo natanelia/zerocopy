@@ -20,7 +20,7 @@ describe('Demo Worker Data', () => {
     // Serialize
     const workerData = getWorkerData({ todos });
     expect(workerData.__shared).toBe(true);
-    expect(workerData.mapBuffer).toBeInstanceOf(SharedArrayBuffer);
+    expect(workerData.arenas[0].memory.buffer).toBeInstanceOf(SharedArrayBuffer);
     
     // Deserialize (simulating worker receiving data)
     const { todos: restored } = await initWorker<{ todos: SharedMap<'object'> }>(workerData);
@@ -118,7 +118,7 @@ describe('Demo Worker Data', () => {
     
     const buffer1 = SharedMap.getSharedBuffer();
     const workerData = getWorkerData({ todos });
-    const buffer2 = workerData.mapBuffer;
+    const buffer2 = workerData.arenas[0].memory.buffer;
     
     // Same buffer reference = zero-copy
     expect(buffer1).toBe(buffer2);

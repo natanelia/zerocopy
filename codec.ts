@@ -17,10 +17,21 @@ function strLen(s: string): number {
     const c = s.charCodeAt(i);
     if (c < 128) len++;
     else if (c < 2048) len += 2;
-    else if (c >= 0xD800 && c < 0xDC00) { len += 4; i++; }
+    else if (c >= 0xd800 && c <= 0xdbff && s.charCodeAt(i + 1) >= 0xdc00 && s.charCodeAt(i + 1) <= 0xdfff) { len += 4; i++; }
     else len += 3;
   }
   return len;
+}
+
+function freezeDecoded(value: any): any {
+  if (value === null || typeof value !== 'object') return value;
+  const todo = [value];
+  while (todo.length) {
+    const item = todo.pop();
+    for (const child of Object.values(item)) if (child !== null && typeof child === 'object') todo.push(child);
+    Object.freeze(item);
+  }
+  return value;
 }
 
 export const codecs: Record<PrimitiveType, Codec<any>> = {
@@ -31,8 +42,8 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   },
   number: {
     size: () => 8,
-    encode: (v: number, buf: Uint8Array, ptr: number) => { new DataView(buf.buffer).setFloat64(ptr, v, true); return 8; },
-    decode: (buf: Uint8Array, ptr: number) => new DataView(buf.buffer).getFloat64(ptr, true),
+    encode: (v: number, buf: Uint8Array, ptr: number) => { new DataView(buf.buffer, buf.byteOffset, buf.byteLength).setFloat64(ptr, v, true); return 8; },
+    decode: (buf: Uint8Array, ptr: number) => new DataView(buf.buffer, buf.byteOffset, buf.byteLength).getFloat64(ptr, true),
   },
   boolean: {
     size: () => 1,
@@ -42,13 +53,13 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   object: {
     size: (v: object) => strLen(JSON.stringify(v)),
     encode: (v: object, buf: Uint8Array, ptr: number) => encoder.encodeInto(JSON.stringify(v), buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => JSON.parse(decoder.decode(buf.subarray(ptr, ptr + len))),
+    decode: (buf: Uint8Array, ptr: number, len: number) => freezeDecoded(JSON.parse(decoder.decode(buf.subarray(ptr, ptr + len)))),
   },
 };
 
 // Registry for nested structure reconstruction - populated by each structure module
 export const structureRegistry: Record<string, {
-  fromWorkerData: (data: any) => any;
+  fromWorkerData: (data: any, arena?: any) => any;
 }> = {};
 
 export function createNestedCodec(structureType: string, innerType: string): Codec<any> {

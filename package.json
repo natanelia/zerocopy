@@ -1,31 +1,39 @@
 {
   "name": "zerocopy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-copy immutable data structures for multi-threaded JavaScript via SharedArrayBuffer + WASM",
   "type": "module",
-  "main": "shared.ts",
-  "types": "shared.ts",
+  "main": "./dist/shared.js",
+  "types": "./dist/types/shared.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/shared.d.ts",
+      "browser": "./dist/shared.js",
       "bun": "./shared.ts",
-      "import": "./shared.ts",
-      "types": "./shared.ts"
+      "import": "./dist/shared.js"
     },
     "./tanstack": {
+      "types": "./dist/types/tanstack-db-collection.d.ts",
+      "browser": "./dist/tanstack-db-collection.js",
       "bun": "./tanstack-db-collection.ts",
-      "import": "./tanstack-db-collection.ts",
-      "types": "./tanstack-db-collection.ts"
+      "import": "./dist/tanstack-db-collection.js"
     }
   },
   "scripts": {
-    "build:wasm": "asc shared-map.as.ts -o shared-map.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc shared-list.as.ts -o shared-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc linked-list.as.ts -o linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc singly-linked-list.as.ts -o singly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc doubly-linked-list.as.ts -o doubly-linked-list.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc ordered-map.as.ts -o ordered-map.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc sorted-tree.as.ts -o sorted-tree.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads && asc priority-queue.as.ts -o priority-queue.wasm --importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536 --enable threads",
-    "test": "vitest run",
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "test": "bun --bun node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "bench": "bun benchmark.ts",
     "demo": "bun demo/serve.ts",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run build:wasm && bun test"
+    "prepublishOnly": "bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run test",
+    "proof:bench": "bun proofs/compare.ts",
+    "build:browser": "bun scripts/build-browser.ts",
+    "proof:node": "node proofs/node-worker.mjs",
+    "proof:allocation": "bun proofs/allocation.ts",
+    "proof:compare": "node proofs/run-comparison.mjs",
+    "build:types": "tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types"
   },
   "keywords": [
     "immutable",
@@ -53,14 +61,14 @@
     "bun": ">=1.0.0"
   },
   "devDependencies": {
-    "@vitest/browser": "^4.0.16",
-    "@vitest/browser-playwright": "^4.0.16",
-    "assemblyscript": "^0.28.9",
-    "bun-types": "^1.2.17",
-    "immutable": "^5.1.4",
-    "playwright": "^1.57.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "@vitest/browser": "4.1.11",
+    "@vitest/browser-playwright": "4.1.11",
+    "assemblyscript": "0.28.20",
+    "bun-types": "1.4.2",
+    "immutable": "5.1.9",
+    "playwright": "1.63.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
   },
   "peerDependencies": {
     "@tanstack/db": ">=0.5.0"

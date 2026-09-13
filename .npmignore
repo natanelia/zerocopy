@@ -17,9 +17,16 @@ demo-app/
 # Build artifacts
 bun.lock
 bun.lockb
-dist/
 
 # Misc
 *.log
 .DS_Store
 .env*
+
+# Offline evidence and build scripts are not runtime dependencies
+proofs/
+scripts/
+
+# Local verification dependencies and temporary checkouts
+.proof-tools/
+.proof-baseline/

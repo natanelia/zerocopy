@@ -67,7 +67,7 @@ describe('SharedMap Browser', () => {
     const data = getWorkerData({ map });
     
     expect(data.__shared).toBe(true);
-    expect(data.mapBuffer).toBeInstanceOf(SharedArrayBuffer);
+    expect(data.arenas[0].memory.buffer).toBeInstanceOf(SharedArrayBuffer);
     expect(data.structures.map.type).toBe('SharedMap');
   });
 });

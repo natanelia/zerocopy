@@ -1,0 +1,30 @@
+$ node scripts/build-wasm.mjs
+$ bun scripts/build-browser.ts
+Built 3 portable modules: 79389 bytes
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+$ tsc --noEmit
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /mnt/data/zerocopy
+
+ ✓ shared-doubly-linked-list.test.ts (44 tests) 792ms
+ ✓ shared-linked-list.test.ts (34 tests) 365ms
+ ✓ workers.test.ts (24 tests) 1261ms
+ ✓ shared-list.test.ts (23 tests) 231ms
+ ✓ shared-stack.test.ts (22 tests) 377ms
+ ✓ shared-priority-queue.test.ts (16 tests) 217ms
+ ✓ shared-sorted.test.ts (8 tests) 90ms
+ ✓ shared-set.test.ts (13 tests) 24ms
+ ✓ shared-map.test.ts (14 tests) 10ms
+ ✓ shared-queue.test.ts (22 tests) 329ms
+ ✓ tanstack-db-collection.test.ts (11 tests) 4ms
+ ✓ nested.test.ts (15 tests) 2063ms
+ ✓ immutable-proof.test.ts (34 tests) 3400ms
+
+ Test Files  13 passed (13)
+      Tests  280 passed (280)
+   Start at  02:50:45
+   Duration  3.92s (transform 981ms, setup 0ms, import 1.58s, tests 9.16s, environment 3ms)
+
+{"passed":true,"runtime":"v22.16.0","structures":12,"nested":true,"concurrentReads":10000,"workerSharesBackingMemory":true,"repeatedAttachment":true,"resetKeepsOldSnapshots":true}
+{"seedSize":32768,"updateCount":4096,"scalarBytes":1841408,"fusedBatchBytes":347240,"reduction":0.8114269081051022,"snapshotBytesPreserved":true}
