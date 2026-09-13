@@ -3,6 +3,7 @@ import { SharedMap } from './shared';
 import { arenaOf, type Arena } from './arena';
 import type { ValueOf } from './types';
 import { createZerocopyCodec, isPlainRecord, isSharedCollection, sharedCollectionKind, type ZerocopyCodec } from './redux-codec';
+import { createPortableSerialization } from './redux-jsan';
 export { createZerocopyCodec, isSharedCollection } from './redux-codec';
 export type { SharedCollection, ZerocopyCodec, ZerocopyCodecOptions, ZerocopyReduxEnvelope, EncodedReduxValue } from './redux-codec';
 export { encodeZerocopyState, decodeZerocopyState, serializeZerocopyState, deserializeZerocopyState } from './redux-checkpoint';
@@ -83,7 +84,7 @@ export function sanitizeZerocopyState<State>(state: State): State {
 export const summarizeZerocopyState = sanitizeZerocopyState;
 
 export interface ZerocopyDevToolsOptions {
-  /** Summary avoids scanning shared data. Portable mode serializes its logical values. */
+  /** Summary avoids scanning shared data. Portable mode serializes logical values. */
   mode?: 'summary' | 'portable';
   maxAge?: number;
   codec?: ZerocopyCodec;
@@ -94,20 +95,9 @@ export function createZerocopyDevToolsOptions(options: ZerocopyDevToolsOptions =
   if (options.mode !== undefined && options.mode !== 'summary' && options.mode !== 'portable') throw new TypeError('Invalid DevTools mode');
   if (options.mode !== 'portable') return {
     maxAge, stateSanitizer: sanitizeZerocopyState, actionSanitizer: sanitizeZerocopyState,
-    features: { import: false, export: false, persist: false },
+    // Setting features makes unlisted controls unavailable. Enable safe controls explicitly.
+    features: { pause: true, lock: true, jump: true, skip: true, reorder: true, dispatch: true, import: false, export: false, persist: false, test: false },
   };
-  const codec = options.codec ?? createZerocopyCodec();
-  return {
-    maxAge,
-    serialize: {
-      options: true as const,
-      replacer(_key: string, value: unknown): unknown {
-        return isSharedCollection(value) || (isPlainRecord(value) && Object.hasOwn(value, '$zerocopyRedux')) ? codec.encode(value) : value;
-      },
-      reviver(_key: string, value: unknown): unknown {
-        return isPlainRecord(value) && Object.hasOwn(value, '$zerocopyRedux') ? codec.decode(value) : value;
-      },
-    },
-  };
+  return { maxAge, serialize: createPortableSerialization(options.codec ?? createZerocopyCodec()) };
 }
 export const createZerocopyDevTools = createZerocopyDevToolsOptions;
