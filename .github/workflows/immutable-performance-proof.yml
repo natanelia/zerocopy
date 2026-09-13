@@ -22,6 +22,8 @@ jobs:
         with:
           bun-version: '1.4.2'
       - run: bun install
+      - name: Verify the complete historical raw evidence
+        run: node proofs/restore-local-evidence.mjs
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck
       - name: Unit and snapshot invariant tests
