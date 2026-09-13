@@ -32,8 +32,9 @@ export function createPortableSerialization(codec: ZerocopyCodec = createZerocop
   };
   return {
     options: {
-      date: false, function: false, regex: false, undefined: false,
-      error: false, symbol: false, map: false, set: false, nan: false, infinity: false,
+      // Omitted JSAN flags are disabled. Toolkit types accept true or undefined,
+      // not false. This shared optional flag also gives their weak type an overlap.
+      date: undefined as undefined,
       refs: false,
       circular(): never { throw new TypeError('zerocopy Redux: cyclic DevTools state is not supported'); },
     },
@@ -57,7 +58,7 @@ export function createPortableSerialization(codec: ZerocopyCodec = createZerocop
         result = new Decoded(codec.parse(value[TEXT_TAG]));
       }
       // Empty user keys can trigger this early. Already-decoded roots are skipped
-      // on the next visit. In particular, literal user envelopes are not decoded twice.
+      // on the next visit. Literal user envelopes are not decoded twice.
       return key === '' ? unwrap(result) : result;
     },
   };
