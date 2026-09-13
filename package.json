@@ -12,6 +12,12 @@
       "bun": "./shared.ts",
       "import": "./dist/shared.js"
     },
+    "./redux": {
+      "types": "./dist/types/redux.d.ts",
+      "browser": "./dist/redux.js",
+      "bun": "./redux.ts",
+      "import": "./dist/redux.js"
+    },
     "./tanstack": {
       "types": "./dist/types/tanstack-db-collection.d.ts",
       "browser": "./dist/tanstack-db-collection.js",
@@ -24,10 +30,13 @@
     "test": "bun --bun node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test:redux": "bun --bun node_modules/vitest/vitest.mjs run redux.test.ts redux-codec.test.ts",
+    "proof:redux": "node proofs/redux-node.mjs",
+    "typecheck:redux": "tsc --noEmit --strict --target ES2022 --module ESNext --moduleResolution bundler --skipLibCheck --types bun-types proofs/redux-types.ts",
     "bench": "bun benchmark.ts",
     "demo": "bun demo/serve.ts",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run test",
+    "prepublishOnly": "bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run typecheck:redux && bun run test && bun run proof:redux",
     "proof:bench": "bun proofs/compare.ts",
     "build:browser": "bun scripts/build-browser.ts",
     "proof:node": "node proofs/node-worker.mjs",
@@ -35,47 +44,26 @@
     "proof:compare": "node proofs/run-comparison.mjs",
     "build:types": "tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types"
   },
-  "keywords": [
-    "immutable",
-    "shared",
-    "wasm",
-    "sharedarraybuffer",
-    "worker",
-    "hamt",
-    "persistent",
-    "data-structures",
-    "tanstack-db",
-    "bun"
-  ],
+  "keywords": ["immutable", "shared", "wasm", "sharedarraybuffer", "worker", "hamt", "persistent", "data-structures", "tanstack-db", "redux", "redux-toolkit", "bun"],
   "author": "natanelia",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/natanelia/zerocopy.git"
-  },
-  "bugs": {
-    "url": "https://github.com/natanelia/zerocopy/issues"
-  },
+  "repository": { "type": "git", "url": "git+https://github.com/natanelia/zerocopy.git" },
+  "bugs": { "url": "https://github.com/natanelia/zerocopy/issues" },
   "homepage": "https://github.com/natanelia/zerocopy#readme",
-  "engines": {
-    "bun": ">=1.0.0"
-  },
+  "engines": { "bun": ">=1.0.0" },
   "devDependencies": {
+    "@redux-devtools/instrument": "3.0.0",
+    "@reduxjs/toolkit": "2.12.0",
     "@vitest/browser": "4.1.11",
     "@vitest/browser-playwright": "4.1.11",
     "assemblyscript": "0.28.20",
     "bun-types": "1.4.2",
     "immutable": "5.1.9",
+    "jsan": "3.1.14",
     "playwright": "1.63.0",
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   },
-  "peerDependencies": {
-    "@tanstack/db": ">=0.5.0"
-  },
-  "peerDependenciesMeta": {
-    "@tanstack/db": {
-      "optional": true
-    }
-  }
+  "peerDependencies": { "@tanstack/db": ">=0.5.0", "@reduxjs/toolkit": "^2.0.0" },
+  "peerDependenciesMeta": { "@tanstack/db": { "optional": true }, "@reduxjs/toolkit": { "optional": true } }
 }
