@@ -10,11 +10,7 @@ describe('portable DevTools transport boundary', () => {
     return jsonOnly ? JSON.parse(text, config.reviver) : jsan.parse(text, config.reviver);
   }
   it.each([false, true])('preserves marker objects and strings, JSON-only=%s', jsonOnly => {
-    const value = {
-      $jsan: 'user value',
-      nested: { $zerocopyReduxText: 'not a packet', $zerocopyRedux: 1 },
-      text: '$jsan',
-    };
+    const value = { $jsan: 'user value', nested: { $zerocopyReduxText: 'not a packet', $zerocopyRedux: 1 }, text: '$jsan' };
     expect(roundTrip(value, jsonOnly)).toEqual(value);
     expect(roundTrip({ ordinary: value, text: '$jsan' }, jsonOnly)).toEqual({ ordinary: value, text: '$jsan' });
   });
@@ -33,6 +29,16 @@ describe('portable DevTools transport boundary', () => {
     const value = { '': { $zerocopyReduxText: 'literal', nested: { $jsan: 'data' } }, sibling: { '': undefined } };
     expect(roundTrip(value)).toEqual(value);
     expect(Object.hasOwn(roundTrip(value).sibling, '')).toBe(true);
+  });
+  it('preserves null prototypes and own __proto__ fields without changing prototypes', () => {
+    const record = Object.create(null); record.value = 1;
+    const special = JSON.parse('{"__proto__":{"polluted":true},"normal":1}');
+    const result = roundTrip({ record, special });
+    expect(Object.getPrototypeOf(result.record)).toBeNull();
+    expect(Object.getPrototypeOf(result.special)).toBe(Object.prototype);
+    expect(Object.hasOwn(result.special, '__proto__')).toBe(true);
+    expect(result.special).toEqual(special);
+    expect(({} as any).polluted).toBeUndefined();
   });
   it('restores real collection classes without changing source snapshots', () => {
     const map = new SharedMap('object').set('x', { $jsan: 'payload', inner: { value: 1 } });
