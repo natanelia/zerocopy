@@ -41,109 +41,136 @@ input.position.x = 99;
 
 ## Performance
 
-These figures come from the completed [GitHub Actions run on September 13, 2026](https://github.com/natanelia/zerocopy/actions/runs/34764774485).
-The measured code is commit [`6e0510c`](https://github.com/natanelia/zerocopy/commit/6e0510c66e3cee0dc7762d71256800c41207e161),
-which uses worker format 3. These are CI results, not a mixture of the earlier
-local measurements and new CI measurements.
+### Benchmark Results (N=10000)
 
-The main improvements include **18.97x faster bulk vector creation**, **2.77x
-faster scalar vector append**, and **1.67x faster map lookup** against the matched
-original in this run. Indexed reads through the two linked-list interfaces are
-**74.07x and 37.90x faster**. Those indexed-read gains compare block trees with
-the original physical linked lists; they do not describe every sequence operation.
+**Zerocopy vs Immutable.js vs native collections**, in the original table format.
+`Shared` means Zerocopy. `vs Imm` and `vs Native` describe Zerocopy relative to
+that reference. All times are per workload, not per individual operation.
 
-### Method and reference versions
+Measured on [GitHub Actions](https://github.com/natanelia/zerocopy/actions/runs/34767533327)
+on September 13, 2026, using commit
+[`4d2934a`](https://github.com/natanelia/zerocopy/commit/4d2934a177c0490c01c7787656117b0861806b08):
+Bun 1.4.2, Immutable.js 5.1.9, AssemblyScript 0.28.20, Linux x64,
+AMD EPYC 7763. Each value is the median of 45 samples across three process
+rounds. The variant order rotates between rounds. Each case has 10 warm-ups.
+Output and retained-base checks run outside the timed section; reads return a
+checked result rather than an unused expression.
 
-The runner used **Bun 1.4.2**, **AssemblyScript 0.28.20**, Linux x64, and an
-AMD EPYC 7763 processor. Each operation ran in a separate process. The driver
-rotated the variant order across three rounds. Each process used 20 warm-ups
-and 15 measured samples. Each table entry is the median of **45 samples per
-operation per variant**. Output checks ran outside the timed sections.
+**Native update rows include a copy.** Native builds use a fresh mutable Map or
+Array. Updates to an existing native collection copy it once inside each timed
+workload, then apply the changes. Zerocopy and Immutable.js return new versions.
+Thus, native update timings are not the cost of an in-place mutation alone.
+Build rows include Zerocopy's arena reset, as in the original benchmark. The
+separate revision comparison excludes that setup. Do not compare times between
+these different test methods.
 
-The matched original is commit [`7aea444`](https://github.com/natanelia/zerocopy/commit/7aea44447177d37a303ab5c1b26d7c5e00e1c1f7),
-rebuilt with the same AssemblyScript compiler and build flags as the revision.
-The previous PR is commit [`59bd5ad`](https://github.com/natanelia/zerocopy/commit/59bd5ad9f84358f828968910c66b9a2e80c0673d).
-The raw record also includes the original build with its original flags.
-The matched build is not always faster than that original build.
+Build, read, peek, and scan rows process 10,000 items, except the explicitly
+limited indexed reads. `delete`, `pop`, `dequeue`, `removeFirst`, and `removeLast`
+apply 10 removals to a 10,000-item base. `setMany(100)` changes 100 entries;
+Immutable.js uses 100 persistent `set` calls, not `withMutations`.
+`enq+deq(100)` performs 100 enqueue/dequeue pairs. Linked-list `get(0-99)` reads
+100 positions; doubly linked-list front/back reads each cover 50 positions.
+Map and ordered-map values are strings; sequences and sorted-map values are
+numbers. Sorted-map keys are inserted in a fixed shuffled order, and the native
+`keys(sorted)` row includes sorting.
 
-**Ratio = reference median / revision median. Above 1.00x is faster; below
-1.00x is slower.** Times are for the complete workload in each row, not one
-operation. Differences near 1.00x are not established improvements. No confidence
-intervals or application-level speed guarantees are claimed.
+**SharedMap vs Immutable.Map vs Native Map**
+| Operation | Shared | Immutable | vs Imm | Native | vs Native |
+|-----------|--------|-----------|--------|--------|-----------|
+| set | 14.9972ms | 6.0262ms | 2.49x slower | 0.4025ms | 37.26x slower |
+| get | 2.5561ms | 0.9427ms | 2.71x slower | 0.1582ms | 16.16x slower |
+| has | 1.9670ms | 1.3029ms | 1.51x slower | 0.4959ms | 3.97x slower |
+| delete | 0.006529ms | 0.006770ms | 1.04x faster | 0.0921ms | 14.11x faster |
+| setMany(100) | 0.0788ms | 0.0568ms | 1.39x slower | 0.1139ms | 1.45x faster |
 
-| Workload | Revision time (ms) | vs matched original | vs previous PR |
-|---|---:|---:|---:|
-| Vector bulk build (4,096 numbers) | 0.0404 | 18.97x | 2.22x |
-| Vector scan (20 scans of 4,096 numbers) | 0.2501 | 3.39x | 1.20x |
-| Vector append (4,096 pushes) | 0.2787 | 2.77x | 4.27x |
-| Map bulk build (1,024 entries) | 0.2417 | 1.25x | 1.36x |
-| Map lookup (4,096 hits over 1,024 keys) | 0.2339 | 1.67x | 2.41x |
-| Singly linked-list indexed reads (4,096) | 0.1437 | 74.07x | 4.50x |
-| Singly linked-list append (4,096) | 0.2616 | 1.00x | 4.98x |
-| Doubly linked-list indexed reads (4,096) | 0.1603 | 37.90x | 4.04x |
-| Doubly linked-list append (4,096) | 0.2593 | 0.96x | 5.15x |
-| Ordered-map writes (1,024) | 0.3076 | 0.80x | 2.62x |
-| Sorted-map writes (1,024) | 0.2921 | 1.09x | 2.01x |
-| Priority-queue insertion (1,024) | 0.3693 | 1.63x | 0.95x |
-| Queue build (4,096 numbers) | 0.2813 | 1.02x | 4.30x |
-| Stack build (4,096 numbers) | 0.2391 | 1.24x | 1.06x |
+**SharedList vs Immutable.List vs Native Array**
+| Operation | Shared | Immutable | vs Imm | Native | vs Native |
+|-----------|--------|-----------|--------|--------|-----------|
+| push | 6.9640ms | 1.5909ms | 4.38x slower | 0.0524ms | 132.83x slower |
+| get | 0.1399ms | 0.1050ms | 1.33x slower | 0.0381ms | 3.67x slower |
+| pop | 0.000805ms | 0.003240ms | 4.02x faster | 0.0559ms | 69.37x faster |
+| forEach | 0.4856ms | 0.1789ms | 2.72x slower | 0.0328ms | 14.83x slower |
 
-Map lookup in this table uses keys written during setup. The cold-read workload
-below measures a different access pattern. Both results matter.
+**SharedStack vs Immutable.Stack vs Native Array**
+| Operation | Shared | Immutable | vs Imm | Native | vs Native |
+|-----------|--------|-----------|--------|--------|-----------|
+| push | 8.2205ms | 0.2006ms | 40.98x slower | 0.0816ms | 100.71x slower |
+| peek | 0.2382ms | 0.1313ms | 1.81x slower | 0.1140ms | 2.09x slower |
+| pop | 0.000585ms | 0.001055ms | 1.80x faster | 0.0517ms | 88.36x faster |
 
-### Complete write-and-read workloads
+**SharedQueue vs Native Array**
+| Operation | Shared | Native | vs Native |
+|-----------|--------|--------|-----------|
+| enqueue | 8.4668ms | 0.0830ms | 102.00x slower |
+| peek | 0.2477ms | 0.0789ms | 3.14x slower |
+| dequeue | 0.000551ms | 0.0537ms | 97.42x faster |
+| enq+deq(100) | 0.0120ms | 0.0419ms | 3.49x faster |
 
-These tests include iteration or reads after writes. They use the same compiler
-settings and sample counts. They expose costs that write-only timing can miss.
+**SharedLinkedList vs Native Array**
+| Operation | Shared | Native | vs Native |
+|-----------|--------|--------|-----------|
+| prepend | 12.0599ms | 9.3513ms | 1.29x slower |
+| append | 9.1034ms | 0.0490ms | 185.97x slower |
+| get(0-99) | 0.008144ms | 0.000666ms | 12.22x slower |
+| removeFirst | 0.003056ms | 0.0560ms | 18.34x faster |
 
-| Workload | Revision time (ms) | vs matched original | vs previous PR |
-|---|---:|---:|---:|
-| Ordered-map writes and scan (1,024) | 0.5029 | 0.77x | 3.28x |
-| Sorted-map writes and scan (1,024) | 0.5452 | 1.14x | 2.07x |
-| Sorted long-prefix writes and scan (512) | 1.0122 | 2.95x | 1.35x |
-| Cold map reads after bulk build (1,024) | 0.1204 | 0.97x | 1.03x |
-| Object-map writes and reads (512) | 1.1767 | 0.79x | 0.92x |
-| Complete queue fill and drain (4,096) | 0.4689 | 0.90x | 3.04x |
+**SharedDoublyLinkedList vs Native Array**
+| Operation | Shared | Native | vs Native |
+|-----------|--------|--------|-----------|
+| prepend | 12.0646ms | 9.3586ms | 1.29x slower |
+| append | 9.7454ms | 0.0533ms | 182.81x slower |
+| get(front) | 0.006268ms | 0.000341ms | 18.37x slower |
+| get(back) | 0.007473ms | 0.000345ms | 21.68x slower |
+| removeFirst | 0.003018ms | 0.0878ms | 29.09x faster |
+| removeLast | 0.000879ms | 0.0227ms | 25.80x faster |
 
-**Remaining regressions are not hidden.** In this CI run, ordered-map writes
-are about 25% slower than the matched original. Ordered-map writes plus a scan
-are about 30% slower. Object-map writes plus reads are about 27% slower.
-Doubly linked-list append, cold map reads, and a full queue cycle also trail
-the matched original. Priority insertion and object writes plus reads trail
-the previous PR in this run. The original also has separate snapshot-correctness
-failures; passing these timing checks does not establish equivalent immutability.
+**SharedOrderedMap vs Immutable.OrderedMap vs Native Map**
+| Operation | Shared | Immutable | vs Imm | Native | vs Native |
+|-----------|--------|-----------|--------|--------|-----------|
+| set | 17.6527ms | 10.2759ms | 1.72x slower | 0.8526ms | 20.70x slower |
+| get | 3.0094ms | 1.6540ms | 1.82x slower | 0.6434ms | 4.68x slower |
+| has | 2.0607ms | 1.8913ms | 1.09x slower | 0.5614ms | 3.67x slower |
+| delete | 0.006755ms | 0.0102ms | 1.50x faster | 0.0708ms | 10.47x faster |
+| forEach | 1.6116ms | 0.2227ms | 7.24x slower | 0.1001ms | 16.11x slower |
 
-These are small Bun workloads on one runner. They do not measure browser
-performance, main-thread latency, worker transfer time, concurrent write
-throughput, or every key distribution. Re-run them on the target runtime and
-workload. All four variants disable the original automatic-GC mechanism because
-it can invalidate retained snapshots. See the [snapshot counterexamples](proofs/snapshot-regressions.ts).
+**SharedSortedMap vs Native Map**
+| Operation | Shared | Native | vs Native |
+|-----------|--------|--------|-----------|
+| set | 12.8450ms | 0.7639ms | 16.81x slower |
+| get | 1.8042ms | 0.4767ms | 3.78x slower |
+| has | 1.7830ms | 0.4370ms | 4.08x slower |
+| delete | 0.006014ms | 0.1193ms | 19.84x faster |
+| keys(sorted) | 2.4067ms | 0.8586ms | 2.80x slower |
 
-### What reduces the work
 
-Tail blocks avoid a tree-path copy on most appends. A numeric append to a
-non-full tail at the allocation boundary needs eight new payload bytes.
-Old snapshots keep their original visible lengths. A fork or an intervening
-allocation copies the visible tail instead. A full tail still needs index work.
+The native-only groups keep the original format: no direct Immutable.js queue,
+linked-list, doubly linked-list, or sorted-map type is used in this comparison.
+The results include slow paths as well as fast paths. These are single-runtime
+microbenchmarks, not browser, worker-transfer, or application performance claims.
+Differences near 1.00x are not established improvements.
 
-Bulk vector input becomes the stored value blocks instead of a second staging
-copy. Linked-list interfaces use blocks of up to 32 values. Numeric map writes
-use a compact WASM command buffer, and the HAMT has 16-way branches. Ordered
-maps use a persistent insertion log. Default sorted maps use a compressed radix
-index with a bounded journal of up to four pending updates. These changes do not
-remove encoding, decoding, returned-object allocation, or all update costs.
+[Exact medians and source checksums](proofs/results/readme-libraries-summary.json)
+are committed with this README. The
+[raw CI artifact](https://github.com/natanelia/zerocopy/actions/runs/34767533327/artifacts/10320684023)
+contains all 4,005 samples, the three round files, and the generated tables.
+The artifact retention ends on December 12, 2026. The benchmark source is
+[readme-libraries.ts](proofs/readme-libraries.ts); the
+[summarizer](proofs/summarize-readme-libraries.mjs) checks the data and generates
+the tables. Build samples contain one workload. Other samples average 20
+workloads to reduce timer overhead. These validated figures replace the older
+unchecked `benchmark.ts` readings; the operation groups and table columns stay
+the same.
 
-### Evidence
-
-The [recorded CI summary](proofs/results/readme-ci-summary.json) preserves exact
-medians, ratios, allocation measurements, environment details, and checksums.
-The [raw CI artifact](https://github.com/natanelia/zerocopy/actions/runs/34764774485/artifacts/10319983686)
-contains all timing samples, worker results, and allocation records. GitHub's
-artifact retention ends on October 13, 2026; the committed summary remains.
-Reproduction commands are below. The [earlier performance report](proofs/README.md)
-and its `local.json` results describe the initial implementation, not this revision.
+The **Zerocopy revision-vs-revision** comparison is kept separately in the
+[revision performance report](proofs/revision-performance.md). It does not
+replace the library comparison above.
 
 ## Memory and compaction measurements
+
+The memory figures below come from the separate
+[performance revision CI run](https://github.com/natanelia/zerocopy/actions/runs/34764774485)
+for commit `6e0510c`, not the library timing run above. The
+[recorded memory summary](proofs/results/readme-ci-summary.json) retains its data.
 
 The allocation test uses 4,096 numeric values. A bulk vector build allocates
 **33,408 bytes**, compared with **2,052,112 bytes** in the original bulk build:
@@ -354,7 +381,7 @@ bunx playwright install --with-deps chromium
 bun run test:browser
 ```
 
-For the measured code revision, [CI](https://github.com/natanelia/zerocopy/actions/runs/34764774487),
+For code revision `6e0510c`, [CI](https://github.com/natanelia/zerocopy/actions/runs/34764774487),
 [the full proof workflow](https://github.com/natanelia/zerocopy/actions/runs/34764774481),
 and [performance revision verification](https://github.com/natanelia/zerocopy/actions/runs/34764774485)
 all passed. They cover builds, type checking, unit and snapshot tests, a real
@@ -363,7 +390,21 @@ all 12 collection types, nested snapshots, and at least 10,000 retained reads
 during writer updates. These are executable checks, not formal verification of
 the entire implementation.
 
-### Reproduce the performance comparison
+### Reproduce the library comparison
+
+Run the original-format library comparison from the project directory after
+installing dependencies and building WASM. Use the versions listed above to
+compare with the recorded run. The commands generate three raw JSON files,
+a validated summary, and the eight Markdown tables.
+
+```sh
+for round in 1 2 3; do
+  SOURCE_COMMIT="$(git rev-parse HEAD)" ROUND="$round" SAMPLES=15 bun proofs/readme-libraries.ts
+done
+node proofs/summarize-readme-libraries.mjs
+```
+
+### Reproduce the revision-to-revision comparison
 
 Use Bun 1.4.2 and AssemblyScript 0.28.20 for comparison with the recorded run.
 Run the build steps above first. Run these commands from the revision checkout
