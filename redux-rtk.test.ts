@@ -75,9 +75,7 @@ describe('Redux Toolkit integration', () => {
     expect(isZerocopyCollection(Object.freeze(Object.create(SharedMap.prototype)))).toBe(false);
     class OtherMap extends SharedMap {}
     expect(isZerocopyCollection(new OtherMap('number'))).toBe(false);
-    for (const value of [new Date(), new Map(), () => 1, Symbol('x'), 1n, Promise.resolve(1)]) {
-      expect(zerocopySerializableCheck.isSerializable(value)).toBe(false);
-    }
+    for (const value of [new Date(), new Map(), () => 1, Symbol('x'), 1n, Promise.resolve(1)]) expect(zerocopySerializableCheck.isSerializable(value)).toBe(false);
   });
 
   it('retains serializability warnings outside collections, including action payloads', () => {
@@ -141,20 +139,26 @@ describe('Redux DevTools', () => {
     expect(other.getState().data).toBeInstanceOf(SharedMap);
     expect(other.getState().data.get('x')).toBe(2);
     other.liftedStore.dispatch(ActionCreators.jumpToState(1));
-    expect(other.getState().data.get('x')).toBe(1);
+    const retained = other.getState();
+    expect(retained.data.get('x')).toBe(1);
+    // DevTools leaves its cursor on an old state when new actions are appended.
+    // Commit the selected state first to start a new history from that snapshot.
+    other.liftedStore.dispatch(ActionCreators.commit());
     other.dispatch(slice.actions.write(3));
     expect(other.getState().data.get('x')).toBe(3);
+    expect(retained.data.get('x')).toBe(1);
     expect(store.getState().data.get('x')).toBe(2);
   });
   it('escapes user objects that contain the DevTools tag', () => {
     const config = createZerocopyDevTools({ mode: 'portable' }).serialize!;
-    const value = { __zerocopy_redux_devtools_v1__: true, checkpoint: 'ordinary user data' };
-    expect(jsan.parse(jsan.stringify(value, config.replacer, null, true), config.reviver)).toEqual(value);
+    const value = { $zerocopyReduxText: 'ordinary user data', $zerocopyRedux: 1 };
+    expect(jsan.parse(jsan.stringify(value, config.replacer, null, config.options), config.reviver)).toEqual(value);
   });
-  it('makes summary mode explicit and prevents importing summaries', () => {
+  it('makes summary mode explicit without disabling time travel', () => {
     const config = createZerocopyDevTools();
     expect(config.maxAge).toBe(50);
-    expect(config.features).toEqual({ import: false, export: false, persist: false });
+    expect(config.features).toMatchObject({ import: false, export: false, persist: false, test: false });
+    expect(config.features).toMatchObject({ jump: true, skip: true, reorder: true, pause: true, lock: true, dispatch: true });
     expect(config.serialize).toBeUndefined();
     expect(() => createZerocopyDevTools({ maxAge: 1 })).toThrow();
   });
