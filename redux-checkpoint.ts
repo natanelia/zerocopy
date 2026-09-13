@@ -24,7 +24,7 @@ export interface ZerocopyStatePacket {
   readonly arenas: readonly Readonly<ArenaRecord>[];
   readonly structures: Readonly<Record<string, Readonly<StructureRecord>>>;
 }
-const fail = (message: string): never => { throw new TypeError(`zerocopy/redux: ${message}`); };
+function fail(message: string): never { throw new TypeError(`zerocopy/redux: ${message}`); }
 function limits(options: ZerocopyCodecOptions): Limits {
   const result = { maxBytes: options.maxBytes ?? 64 * 1024 * 1024, maxNodes: options.maxNodes ?? 100000, maxDepth: options.maxDepth ?? 128 };
   for (const [key, value] of Object.entries(result)) {
@@ -41,7 +41,7 @@ function toBase64(bytes: Uint8Array): string {
   return parts.join('');
 }
 function fromBase64(text: string, length: number): Uint8Array {
-  if (text.length !== Math.ceil(length / 3) * 4 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(text)) fail('invalid base64 arena');
+  if (text.length !== Math.ceil(length / 3) * 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(text)) fail('invalid base64 arena');
   const raw = atob(text);
   if (raw.length !== length) fail('arena length does not match its data');
   const bytes = new Uint8Array(length);
