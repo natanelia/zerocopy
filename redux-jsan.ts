@@ -41,7 +41,9 @@ export function createPortableSerialization(codec: ZerocopyCodec = createZerocop
     replacer(_key: string, value: unknown): unknown {
       if (isSharedCollection(value)) return wrap(value);
       if (value === undefined || (typeof value === 'number' && (!Number.isFinite(value) || Object.is(value, -0))) || value === '$jsan') return wrap(value);
-      if (isPlainRecord(value) && (Object.getPrototypeOf(value) === null || Object.hasOwn(value, '__proto__') || Object.hasOwn(value, '$jsan') || Object.hasOwn(value, '$zerocopyRedux') || Object.hasOwn(value, TEXT_TAG))) return wrap(value);
+      // Escape empty user keys too: JSON.parse uses '' for its final root visit.
+      // Without this boundary an early undefined result deletes a real user field.
+      if (isPlainRecord(value) && (Object.getPrototypeOf(value) === null || Object.hasOwn(value, '') || Object.hasOwn(value, '__proto__') || Object.hasOwn(value, '$jsan') || Object.hasOwn(value, '$zerocopyRedux') || Object.hasOwn(value, TEXT_TAG))) return wrap(value);
       if (Array.isArray(value)) {
         // JSAN iterates holes as undefined. The logical codec distinguishes them.
         const keys = Object.keys(value);
@@ -57,8 +59,7 @@ export function createPortableSerialization(codec: ZerocopyCodec = createZerocop
       if (isPlainRecord(value) && Object.keys(value).length === 1 && typeof value[TEXT_TAG] === 'string') {
         result = new Decoded(codec.parse(value[TEXT_TAG]));
       }
-      // Empty user keys can trigger this early. Already-decoded roots are skipped
-      // on the next visit. Literal user envelopes are not decoded twice.
+      // Literal empty user keys are inside codec text, not this wire tree.
       return key === '' ? unwrap(result) : result;
     },
   };
