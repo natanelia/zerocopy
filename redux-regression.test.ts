@@ -17,11 +17,9 @@ describe('Redux persistence boundary regressions', () => {
   });
   it('counts holes and plain record fields on both sides of the codec', () => {
     const small = createZerocopyCodec({ maxNodes: 2 });
-    expect(() => small.stringify(new Array(2))).toThrow();
-    expect(() => small.decode(codec.encode(new Array(2)))).toThrow();
+    expect(() => small.stringify(new Array(2))).toThrow(); expect(() => small.decode(codec.encode(new Array(2)))).toThrow();
     const fields = createZerocopyCodec({ maxCollectionSize: 1 });
-    expect(() => fields.stringify({ a: 1, b: 2 })).toThrow();
-    expect(() => fields.decode(codec.encode({ a: 1, b: 2 }))).toThrow();
+    expect(() => fields.stringify({ a: 1, b: 2 })).toThrow(); expect(() => fields.decode(codec.encode({ a: 1, b: 2 }))).toThrow();
   });
   it('rejects hand-written object payloads that JSON storage would change', () => {
     const envelope = (value: unknown) => ({ $zerocopyRedux: 1, value: ['c', 'SharedList', 'object', null, [value]] });
@@ -41,12 +39,11 @@ describe('Redux persistence boundary regressions', () => {
   it('rejects malformed heap graphs and wrong heap ordering', () => {
     const envelope = (rows: unknown[]) => ({ $zerocopyRedux: 1, value: ['c', 'SharedPriorityQueue', 'number', false, rows] });
     for (const rows of [
-      [[1, 1, 0, -1]], // cycle
-      [[1, 1, 2, -1]], // out of range
-      [[1, 1, -1, -1], [2, 2, -1, -1]], // disconnected
-      [[1, 1, 1, 1], [2, 2, -1, -1]], // duplicate parent
-      [[1, 2, 1, -1], [2, 1, -1, -1]], // invalid min heap
-      [[1, 1, -1, 1], [2, 2, -1, -1]], // not leftist
+      [[1, 1, 0, -1]], [[1, 1, 2, -1]],
+      [[1, 1, -1, -1], [2, 2, -1, -1]],
+      [[1, 1, 1, 1], [2, 2, -1, -1]],
+      [[1, 2, 1, -1], [2, 1, -1, -1]],
+      [[1, 1, -1, 1], [2, 2, -1, -1]],
     ]) expect(() => codec.decode(envelope(rows))).toThrow(/heap/);
   });
   it('iterates priority queues without allocating WASM nodes, including attached views', async () => {
@@ -55,12 +52,18 @@ describe('Redux persistence boundary regressions', () => {
     expect([...attached.entries()]).toEqual([...heap.entries()]); expect(arenaOf(heap).used).toBe(before);
     expect([...attached.entries()].every(([v]) => Object.isFrozen(v))).toBe(true);
   });
-  it('round-trips DevTools JSAN with shared state and reserved-key collisions', () => {
+  it('round-trips real DevTools JSAN, including our reserved marker', () => {
     const options = createZerocopyDevToolsOptions({ mode: 'portable' }).serialize!;
-    const state = { map: new SharedMap('object').set('a', { value: 1 }), collision: { $zerocopyRedux: 1, value: ['c', 'user-data'] }, jsanKey: { $jsan: 'user value' } };
-    const text = jsan.stringify(state, options.replacer, null, options.options);
-    const restored = jsan.parse(text, options.reviver);
-    expect(restored.map.get('a')).toEqual({ value: 1 }); expect(restored.collision).toEqual(state.collision); expect(restored.jsanKey).toEqual(state.jsanKey);
-    expect(restored.map.set('b', {}).size).toBe(2);
+    const state = { map: new SharedMap('object').set('a', { value: 1, $jsan: 'stored JSON' }), collision: { $zerocopyRedux: 1, value: ['c', 'user-data'] }, optional: undefined, special: NaN };
+    const text = jsan.stringify(state, options.replacer, null, options.options), restored = jsan.parse(text, options.reviver);
+    expect(restored.map.get('a')).toEqual({ value: 1, $jsan: 'stored JSON' }); expect(restored.collision).toEqual(state.collision);
+    expect(restored.map.set('b', {}).size).toBe(2); expect(Object.hasOwn(restored, 'optional')).toBe(true); expect(restored.special).toBeNaN();
+  });
+  it('rejects raw JSAN marker collisions explicitly, while the application codec preserves them', () => {
+    const options = createZerocopyDevToolsOptions({ mode: 'portable' }).serialize!;
+    for (const value of [{ $jsan: 'user value' }, { $zerocopyRedux: 1, nested: { $jsan: 'u' } }]) {
+      expect(() => jsan.stringify({ value }, options.replacer, null, options.options)).toThrow(/reserved by DevTools/);
+      expect(codec.parse(codec.stringify(value))).toEqual(value);
+    }
   });
 });

@@ -5,8 +5,8 @@ import { createZerocopyCodec, isPlainRecord, isSharedCollection, sharedCollectio
 export { createZerocopyCodec, isSharedCollection } from './redux-codec';
 export type { SharedCollection, ZerocopyCodec, ZerocopyCodecOptions, ZerocopyReduxEnvelope, EncodedReduxValue } from './redux-codec';
 
-/** Match RTK's plain-value policy, while admitting supported immutable snapshots.
- * Custom comparator functions remain non-serializable. The codec rejects them too.
+/** Admit plain Redux values and supported immutable snapshots. Custom comparator
+ * functions are not portable and remain non-serializable.
  */
 export function isZerocopySerializable(value: unknown): boolean {
   if (isSharedCollection(value)) {
@@ -14,9 +14,7 @@ export function isZerocopySerializable(value: unknown): boolean {
   }
   return value == null || ['undefined', 'string', 'boolean', 'number'].includes(typeof value) || Array.isArray(value) || isPlainRecord(value);
 }
-/** Treat snapshots as validated atomic values. Never enumerate WASM internals or
- * decode every entity on every dispatch. Other state and actions are still checked.
- */
+/** Treat validated snapshots as atomic values. Never scan their items on dispatch. */
 export function getZerocopyEntries(value: unknown): [string, unknown][] {
   if (isSharedCollection(value) || value === null || typeof value !== 'object') return [];
   return Object.entries(value);
@@ -25,9 +23,8 @@ export const zerocopyMiddlewareOptions = Object.freeze({
   serializableCheck: Object.freeze({ isSerializable: isZerocopySerializable, getEntries: getZerocopyEntries }),
 });
 
-/** A single-entry selector cache, bounded per selector instance. It uses the
- * immutable leaf identity, not decoded-object identity or the current root alone.
- * Make one selector per row/component. Keep selectors outside reducers.
+/** A bounded single-entry cache keyed by immutable leaf and arena identity.
+ * Use one selector per row/component. Keep selectors outside reducers.
  */
 export function createSharedMapValueSelector<State, T extends string>(
   selectMap: (state: State) => SharedMap<T>,
@@ -46,19 +43,17 @@ export function createSharedMapValueSelector<State, T extends string>(
   };
 }
 /** Immer's Draft type maps public fields even for a non-draftable class. Accept
- * that public view, then verify the real frozen class and its private arena brand.
+ * that view, then verify the frozen class and its actual private arena brand.
  */
 export type SharedMapView<T extends string> = Pick<SharedMap<T>, keyof SharedMap<T>>;
-/** Optional no-op guard. Equality is Object.is unless the application supplies
- * a pure domain-specific comparison. The core write path is not made slower.
- */
+/** Optional no-op guard. The core write path is unchanged. */
 export function setSharedMapValue<T extends string>(map: SharedMapView<T>, key: string, value: ValueOf<T>, equals: (previous: ValueOf<T>, next: ValueOf<T>) => boolean = Object.is): SharedMap<T> {
   if (sharedCollectionKind(map) !== 'SharedMap') throw new TypeError('Expected a frozen SharedMap');
   return map.has(key) && equals(map.get(key)!, value) ? map as SharedMap<T> : map.set(key, value);
 }
 
-/** Replace collections with small display-only metadata. This does not change
- * the real store or DevTools' in-page retained states. Summaries are NOT backups.
+/** Display-only metadata. This does not change the real store or retained states.
+ * The result is NOT a portable backup.
  */
 export function summarizeZerocopyState(state: unknown): any {
   const seen = new WeakMap<object, unknown>();
@@ -78,10 +73,25 @@ export function summarizeZerocopyState(state: unknown): any {
   return walk(state);
 }
 
+/** JSAN 3.1.14 can reinterpret an ordinary $jsan property after JSON revival.
+ * Reject this boundary explicitly instead of silently changing application data.
+ * createZerocopyCodec().stringify/parse has no such reserved-key restriction.
+ */
+function assertDevToolsRecord(value: unknown): void {
+  const seen = new WeakSet<object>(), pending: unknown[] = [value];
+  while (pending.length) {
+    const item = pending.pop();
+    if (!item || typeof item !== 'object' || isSharedCollection(item) || seen.has(item)) continue;
+    seen.add(item);
+    if (Object.prototype.hasOwnProperty.call(item, '$jsan')) {
+      throw new TypeError('zerocopy Redux: $jsan is reserved by DevTools; use createZerocopyCodec for this backup');
+    }
+    if (Array.isArray(item) || isPlainRecord(item)) for (const child of Object.values(item)) pending.push(child);
+  }
+}
+
 export interface ZerocopyDevToolsOptions {
-  /** Summary is O(number of ordinary state fields), not O(number of shared items).
-   * Portable mode walks collection contents and should be opt-in for large maps.
-   */
+  /** Summary does not scan shared items. Portable mode walks collection contents. */
   mode?: 'summary' | 'portable';
   maxAge?: number;
   codec?: ZerocopyCodec;
@@ -97,12 +107,19 @@ export function createZerocopyDevToolsOptions(options: ZerocopyDevToolsOptions =
     serialize: {
       options: true,
       replacer(_key: string, value: any): any {
-        // Escape ordinary records with the reserved marker too. User data cannot
-        // accidentally become a collection when the reviver processes it.
-        return isSharedCollection(value) || (isPlainRecord(value) && Object.prototype.hasOwnProperty.call(value, '$zerocopyRedux')) ? codec.encode(value) : value;
+        if (isSharedCollection(value)) return codec.encode(value);
+        if (isPlainRecord(value) && Object.prototype.hasOwnProperty.call(value, '$jsan')) assertDevToolsRecord(value);
+        // Escape collisions with our own marker, including its whole plain subtree.
+        if (isPlainRecord(value) && Object.prototype.hasOwnProperty.call(value, '$zerocopyRedux')) {
+          assertDevToolsRecord(value); return codec.encode(value);
+        }
+        return value;
       },
       reviver(_key: string, value: any): any {
-        return isPlainRecord(value) && Object.prototype.hasOwnProperty.call(value, '$zerocopyRedux') ? codec.decode(value) : value;
+        if (isPlainRecord(value) && Object.prototype.hasOwnProperty.call(value, '$zerocopyRedux')) {
+          const restored = codec.decode(value); assertDevToolsRecord(restored); return restored;
+        }
+        return value;
       },
     },
   };

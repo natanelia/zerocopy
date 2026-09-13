@@ -13,6 +13,7 @@ const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
   SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue });
 export type SharedCollection = InstanceType<(typeof classes)[keyof typeof classes]>;
 type Kind = keyof typeof classes;
+const kinds = Object.freeze(Object.keys(classes) as Kind[]);
 export type EncodedReduxValue = null | boolean | string | number | EncodedReduxValue[];
 export interface ZerocopyCodecOptions {
   /** Limits apply to both encoding and decoding. Text length is in UTF-16 units. */
@@ -30,7 +31,7 @@ export interface ZerocopyReduxEnvelope {
 export function sharedCollectionKind(value: unknown): Kind | undefined {
   if (!value || typeof value !== 'object' || !Object.isFrozen(value)) return undefined;
   const prototype = Object.getPrototypeOf(value);
-  const kind = (Object.keys(classes) as Kind[]).find(key => prototype === classes[key].prototype);
+  const kind = kinds.find(key => prototype === classes[key].prototype);
   if (!kind) return undefined;
   try { arenaOf(value); return kind; } catch { return undefined; }
 }
@@ -56,8 +57,8 @@ function checkValueType(type: unknown, depth = 0): asserts type is string {
   if (!nested || !hasOwn(classes, nested.structureType)) fail('invalid nested value type');
   checkValueType(nested!.innerType, depth + 1);
 }
-/** An object-typed collection stores JSON. Do not silently lose special values
- * if someone supplies a hand-written encoded tree rather than our own export.
+/** Object-typed collections store JSON. Reject hand-written imports that would
+ * lose values through JSON storage. Iteration avoids large argument-list limits.
  */
 function checkJSON(value: unknown): void {
   const pending: unknown[] = [value];
@@ -67,8 +68,9 @@ function checkJSON(value: unknown): void {
     if (typeof item === 'number' && Number.isFinite(item) && !Object.is(item, -0)) continue;
     if (Array.isArray(item)) {
       for (let i = 0; i < item.length; i++) { if (!hasOwn(item, i)) fail('object values must be JSON'); pending.push(item[i]); }
-    } else if (isPlainRecord(item) && Object.getPrototypeOf(item) !== null) pending.push(...Object.values(item));
-    else fail('object values must be JSON');
+    } else if (isPlainRecord(item) && Object.getPrototypeOf(item) !== null) {
+      for (const key of Object.keys(item)) pending.push(item[key]);
+    } else fail('object values must be JSON');
   }
 }
 function checkValue(type: string, value: unknown): void {
