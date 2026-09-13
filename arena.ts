@@ -1,3 +1,4 @@
+import { decodeUtf8 } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
@@ -169,7 +170,7 @@ export class Arena {
     if (type === 'boolean') return this.bytes[ptr] !== 0;
     if (type === 'string') return this.string(ptr, len);
     if (this.objects.has(ptr)) return this.objects.get(ptr);
-    const parsed = JSON.parse(decoder.decode(this.bytes.subarray(ptr, ptr + len)));
+    const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
     let result: any;
     if (nested) {
@@ -186,7 +187,7 @@ export class Arena {
     if (!len) return '';
     const cached = this.strings.get(ptr);
     if (cached !== undefined) return cached;
-    const value = decoder.decode(this.buf.subarray(ptr, ptr + len));
+    const value = decodeUtf8(decoder, this.buf.subarray(ptr, ptr + len));
     // Empty byte ranges can share an address with a following allocation.
     if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
     return value;

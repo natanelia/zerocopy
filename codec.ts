@@ -1,3 +1,4 @@
+import { decodeUtf8 } from './utf8';
 // Shared codec utilities for encoding/decoding values
 import type { ValueOf, PrimitiveType } from './types.ts';
 import { parseNestedType } from './types.ts';
@@ -38,7 +39,7 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   string: {
     size: (v: string) => strLen(v),
     encode: (v: string, buf: Uint8Array, ptr: number) => encoder.encodeInto(v, buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => decoder.decode(buf.subarray(ptr, ptr + len)),
+    decode: (buf: Uint8Array, ptr: number, len: number) => decodeUtf8(decoder, buf.subarray(ptr, ptr + len)),
   },
   number: {
     size: () => 8,
@@ -53,7 +54,7 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   object: {
     size: (v: object) => strLen(JSON.stringify(v)),
     encode: (v: object, buf: Uint8Array, ptr: number) => encoder.encodeInto(JSON.stringify(v), buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => freezeDecoded(JSON.parse(decoder.decode(buf.subarray(ptr, ptr + len)))),
+    decode: (buf: Uint8Array, ptr: number, len: number) => freezeDecoded(JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)))),
   },
 };
 
@@ -70,7 +71,7 @@ export function createNestedCodec(structureType: string, innerType: string): Cod
       return encoder.encodeInto(json, buf.subarray(ptr)).written!;
     },
     decode: (buf: Uint8Array, ptr: number, len: number) => {
-      const { __t, __i, __d } = JSON.parse(decoder.decode(buf.subarray(ptr, ptr + len)));
+      const { __t, __i, __d } = JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)));
       const factory = structureRegistry[__t];
       if (!factory) throw new Error(`Unknown structure type: ${__t}`);
       return factory.fromWorkerData({ ...__d, valueType: __d.valueType ?? __i });
