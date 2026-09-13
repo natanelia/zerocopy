@@ -31,7 +31,7 @@ export const zerocopyMiddlewareOptions = Object.freeze({ serializableCheck: zero
 
 /** One-entry cache per component/key stream. Arena identity prevents address reuse errors. */
 export function createSharedMapEntrySelector<State, Args extends unknown[], T extends string>(
-  selectMap: (state: State, ...args: NoInfer<Args>) => SharedMap<T>,
+  selectMap: (state: State, ...args: { [K in keyof Args]: NoInfer<Args[K]> }) => SharedMap<T>,
   selectKey: (state: State, ...args: Args) => string,
 ): (state: State, ...args: Args) => ValueOf<T> | undefined {
   let lastArena: Arena | undefined, lastLeaf = -1, lastType: string | undefined;
