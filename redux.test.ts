@@ -1,185 +1,229 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { configureStore, createSlice } from '@reduxjs/toolkit';
-import { instrument, ActionCreators } from '@redux-devtools/instrument';
-import jsan from 'jsan';
-import {
-  SharedMap, SharedSet, SharedList, SharedStack, SharedQueue,
-  SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap,
-  SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue,
-  compact, resetMap,
-} from './shared';
-import { configureAutoGC } from './shared-map';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureStore, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import * as instrumentation from '@redux-devtools/instrument';
+import { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList,
+  SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap,
+  SharedSortedSet, SharedPriorityQueue, getWorkerData, initWorker, compact, resetMap } from './shared';
 import { arenaOf } from './arena';
-import {
-  zerocopyMiddlewareOptions, zerocopySerializableCheck, isZerocopyCollection,
-  createZerocopyDevTools, sanitizeZerocopyState, createSharedMapEntrySelector,
-} from './redux';
+import { configureAutoGC } from './shared-map';
+import { createZerocopyCodec, isSharedCollection, isZerocopySerializable, getZerocopyEntries,
+  zerocopyMiddlewareOptions, createZerocopyDevToolsOptions, summarizeZerocopyState,
+  createSharedMapValueSelector, setSharedMapValue } from './redux';
 
+const codec = createZerocopyCodec();
 afterEach(() => vi.restoreAllMocks());
-const variants = [
-  ['SharedMap', () => new SharedMap('number').set('x', 1), (x: any) => x.set('x', 2), (x: any) => x.get('x')],
-  ['SharedSet', () => new SharedSet<number>().add(1), (x: any) => x.add(2), (x: any) => x.size],
-  ['SharedList', () => new SharedList('number').push(1), (x: any) => x.set(0, 2), (x: any) => x.get(0)],
-  ['SharedStack', () => new SharedStack('number').push(1), (x: any) => x.push(2), (x: any) => x.peek()],
-  ['SharedQueue', () => new SharedQueue('number').enqueue(1), (x: any) => x.enqueue(2).dequeue(), (x: any) => x.peek()],
-  ['SharedLinkedList', () => new SharedLinkedList('number').append(1), (x: any) => x.removeFirst().append(2), (x: any) => x.getFirst()],
-  ['SharedDoublyLinkedList', () => new SharedDoublyLinkedList('number').append(1), (x: any) => x.removeFirst().append(2), (x: any) => x.getFirst()],
-  ['SharedOrderedMap', () => new SharedOrderedMap('number').set('x', 1), (x: any) => x.set('x', 2), (x: any) => x.get('x')],
-  ['SharedOrderedSet', () => new SharedOrderedSet<number>().add(1), (x: any) => x.add(2), (x: any) => x.size],
-  ['SharedSortedMap', () => new SharedSortedMap('number').set('x', 1), (x: any) => x.set('x', 2), (x: any) => x.get('x')],
-  ['SharedSortedSet', () => new SharedSortedSet<number>().add(1), (x: any) => x.add(2), (x: any) => x.size],
-  ['SharedPriorityQueue', () => new SharedPriorityQueue('number').enqueue(1, 1), (x: any) => x.enqueue(2, 0), (x: any) => x.peek()],
-] as const;
+const kinds = ['SharedMap', 'SharedList', 'SharedSet', 'SharedStack', 'SharedQueue',
+  'SharedLinkedList', 'SharedDoublyLinkedList', 'SharedOrderedMap', 'SharedOrderedSet',
+  'SharedSortedMap', 'SharedSortedSet', 'SharedPriorityQueue'];
+function examples(empty = false): any[] {
+  const values = empty ? [] : [3, 1, 2];
+  return [
+    new SharedMap('number').setMany(values.map(v => [String(v), v])),
+    new SharedList('number').pushMany(values),
+    new SharedSet<number>().addMany(values),
+    values.reduce((s, v) => s.push(v), new SharedStack('number')),
+    values.reduce((s, v) => s.enqueue(v), new SharedQueue('number')),
+    values.reduce((s, v) => s.append(v), new SharedLinkedList('number')),
+    values.reduce((s, v) => s.append(v), new SharedDoublyLinkedList('number')),
+    values.reduce((s, v) => s.set(String(v), v), new SharedOrderedMap('number')),
+    values.reduce((s, v) => s.add(v), new SharedOrderedSet<number>()),
+    values.reduce((s, v) => s.set(String(v), v), new SharedSortedMap('number')),
+    values.reduce((s, v) => s.add(v), new SharedSortedSet<number>()),
+    values.reduce((s, v) => s.enqueue(v, v), new SharedPriorityQueue('number')),
+  ];
+}
+function contents(collection: any): any[] {
+  if (collection instanceof SharedPriorityQueue) return [...collection.entries()].sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  if (collection instanceof SharedStack) { const values = []; let s = collection; while (!s.isEmpty) { values.push(s.peek()); s = s.pop(); } return values; }
+  if (collection instanceof SharedQueue) { const values = []; let s = collection; while (!s.isEmpty) { values.push(s.peek()); s = s.dequeue(); } return values; }
+  if (collection instanceof SharedMap || collection instanceof SharedOrderedMap || collection instanceof SharedSortedMap) return [...collection.entries()];
+  const values = []; collection.forEach((v: any) => values.push(v)); return values;
+}
+function makeStore(instrument = false) {
+  const initialState = { values: new SharedMap('number'), selected: 'a', unrelated: 0 };
+  const slice = createSlice({ name: 'test', initialState, reducers: {
+    set(state, action: PayloadAction<[string, number]>) { state.values = setSharedMapValue(state.values as any, ...action.payload); },
+    unrelated(state) { state.unrelated++; },
+  } });
+  const enhance: any = (instrumentation as any).instrument ?? (instrumentation as any).default;
+  const store = configureStore({ reducer: slice.reducer, middleware: get => get(zerocopyMiddlewareOptions), devTools: false,
+    ...(instrument ? { enhancers: (get: any) => get().concat(enhance(() => null, { maxAge: 100 })) } : {}),
+  });
+  return { store, slice };
+}
 
 describe('Redux Toolkit integration', () => {
-  it.each(variants)('%s updates a frozen field without drafting collection internals', (_name, make, update, read) => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const slice = createSlice({ name: 'collection', initialState: { data: make() as any, ui: { visible: true } }, reducers: {
-      update(state) { state.data = update(state.data); },
-      noop(state) { state.data = state.data; },
-    } });
-    const store = configureStore({ reducer: slice.reducer, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
-    const before = store.getState();
-    store.dispatch(slice.actions.noop());
+  it('keeps Immer, serializability checks, old states, and action replay working', () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { store, slice } = makeStore(), first = store.getState();
+    const action = slice.actions.set(['a', 1]); store.dispatch(action);
+    const second = store.getState(); store.dispatch(slice.actions.set(['a', 2]));
+    expect(first.values.has('a')).toBe(false); expect(second.values.get('a')).toBe(1);
+    expect(store.getState().values.get('a')).toBe(2);
+    expect(slice.reducer(first, action).values.get('a')).toBe(1);
+    expect(Object.isFrozen(second.values)).toBe(true); expect(errors).not.toHaveBeenCalled();
+  });
+  it('preserves state identity for guarded no-op writes', () => {
+    const { store, slice } = makeStore(); store.dispatch(slice.actions.set(['a', 1]));
+    const before = store.getState(); store.dispatch(slice.actions.set(['a', 1]));
     expect(store.getState()).toBe(before);
-    store.dispatch(slice.actions.update());
-    const after = store.getState();
-    expect(after).not.toBe(before);
-    expect(after.data).not.toBe(before.data);
-    expect(after.ui).toBe(before.ui);
-    expect(Object.isFrozen(before.data)).toBe(true);
-    expect(Object.isFrozen(after.data)).toBe(true);
-    expect(read(before.data)).toBe(1);
-    expect(read(after.data)).toBe(2);
-    expect(error).not.toHaveBeenCalled();
+    expect(setSharedMapValue(new SharedMap('number').set('n', NaN), 'n', NaN).get('n')).toBeNaN();
   });
-
-  it('keeps 1,200 retained states readable through updates, reset, compaction and deprecated GC calls', () => {
-    const slice = createSlice({ name: 'history', initialState: { data: compact(new SharedMap('number').set('x', 0)) }, reducers: {
-      write(state, action) { state.data = state.data.set('x', action.payload); },
-      rotate(state) { state.data = compact(state.data as SharedMap<'number'>); },
-    } });
-    const store = configureStore({ reducer: slice.reducer, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
-    const history = [store.getState()];
-    for (let i = 1; i <= 1200; i++) { store.dispatch(slice.actions.write(i)); history.push(store.getState()); }
-    configureAutoGC({ enabled: true, opsThreshold: 1, memoryThreshold: 1 });
-    for (const state of history) state.data.dispose();
-    resetMap();
-    store.dispatch(slice.actions.rotate());
-    store.dispatch(slice.actions.write(9999));
-    for (let i = 0; i < history.length; i++) expect(history[i].data.get('x')).toBe(i);
-    expect(store.getState().data.get('x')).toBe(9999);
+  it('still reports an unrelated non-serializable action value', () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { store } = makeStore(); store.dispatch({ type: 'bad', payload: new Date() });
+    expect(errors).toHaveBeenCalled();
+    expect(isZerocopySerializable(new Date())).toBe(false);
+    expect(isZerocopySerializable(new Map())).toBe(false);
+    expect(isZerocopySerializable(Promise.resolve())).toBe(false);
   });
-
-  it('does not accept forged snapshots, unknown subclasses, or mutable classes', () => {
-    expect(isZerocopyCollection(Object.freeze(Object.create(SharedMap.prototype)))).toBe(false);
-    class OtherMap extends SharedMap {}
-    expect(isZerocopyCollection(new OtherMap('number'))).toBe(false);
-    for (const value of [new Date(), new Map(), () => 1, Symbol('x'), 1n, Promise.resolve(1)]) {
-      expect(zerocopySerializableCheck.isSerializable(value)).toBe(false);
-    }
+  it('does not decode collections during dispatch checks or summary rendering', () => {
+    const map = new SharedMap('object').set('a', { x: 1 });
+    vi.spyOn(SharedMap.prototype, 'entries').mockImplementation(() => { throw new Error('must not scan'); });
+    vi.spyOn(SharedMap.prototype, 'get').mockImplementation(() => { throw new Error('must not decode'); });
+    expect(getZerocopyEntries(map)).toEqual([]); expect(isZerocopySerializable(map)).toBe(true);
+    const store = configureStore({ reducer: (s = { map }) => s, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
+    store.dispatch({ type: 'noop' });
+    expect(summarizeZerocopyState(store.getState()).map.size).toBe(1);
   });
-
-  it('retains serializability warnings outside collections, including action payloads', () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const store = configureStore({ reducer: (state = { data: new SharedMap('number') }) => state, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
-    store.dispatch({ type: 'bad', payload: { callback: () => 1 } });
-    expect(error.mock.calls.some(call => String(call[0]).includes('non-serializable'))).toBe(true);
+  it('rejects forged collection prototypes and does not trust root descriptors', () => {
+    expect(isSharedCollection(Object.freeze(Object.create(SharedMap.prototype)))).toBe(false);
+    expect(isSharedCollection({ root: 65536, size: 1, valueType: 'number' })).toBe(false);
+    expect(isSharedCollection(Object.freeze({ constructor: SharedMap }))).toBe(false);
   });
-
-  it('retains mutation detection for ordinary state', () => {
-    const initial = { data: new SharedMap('number'), plain: { count: 0 } };
-    const store = configureStore({ reducer: (state = initial) => state, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
-    store.dispatch({ type: 'observe' });
-    store.getState().plain.count++;
-    expect(() => store.dispatch({ type: 'observe' })).toThrow(/mutat/i);
+  it('retains snapshots after legacy dispose, auto-GC settings, growth, and reset', () => {
+    resetMap(); const old = new SharedMap('object').set('old', { nested: { value: 1 } });
+    let next = old; configureAutoGC({ enabled: true, opsThreshold: 1 });
+    for (let i = 0; i < 1100; i++) next = next.set(String(i), { text: 'x'.repeat(80) });
+    old.dispose(); resetMap();
+    expect(old.get('old')).toEqual({ nested: { value: 1 } });
+    expect(old.set('fork', {}).size).toBe(2); expect(next.size).toBe(1101);
   });
-
-  it('does not scan or allocate collection data in development checks or summary views', () => {
-    const map = new SharedMap('number').setMany(Array.from({ length: 4096 }, (_, i) => [`k${i}`, i] as const));
-    const used = arenaOf(map).used;
-    const entries = vi.spyOn(SharedMap.prototype, 'entries').mockImplementation(() => { throw new Error('Unexpected scan'); });
-    const store = configureStore({ reducer: (state = { data: map }) => state, middleware: get => get(zerocopyMiddlewareOptions), devTools: false });
-    for (let i = 0; i < 20; i++) store.dispatch({ type: 'noop' });
-    expect(zerocopySerializableCheck.getEntries(map)).toEqual([]);
-    expect(sanitizeZerocopyState({ data: map })).toEqual({ data: { $zerocopy: 'SharedMap', size: 4096, valueType: 'number' } });
-    expect(entries).not.toHaveBeenCalled();
-    expect(arenaOf(map).used).toBe(used);
+  it('supports real DevTools time travel and a new action from an old state', () => {
+    const { store, slice } = makeStore(true);
+    store.dispatch(slice.actions.set(['a', 1])); const one = store.getState();
+    store.dispatch(slice.actions.set(['a', 2]));
+    (store as any).liftedStore.dispatch({ type: 'JUMP_TO_STATE', index: 1 });
+    expect(store.getState().values.get('a')).toBe(1);
+    store.dispatch(slice.actions.set(['a', 3]));
+    expect(store.getState().values.get('a')).toBe(3); expect(one.values.get('a')).toBe(1);
   });
 });
 
-describe('Redux DevTools', () => {
-  function makeStore() {
-    const slice = createSlice({ name: 'travel', initialState: { data: compact(new SharedMap('number').set('x', 0)) }, reducers: {
-      write(state, action) { state.data = state.data.set('x', action.payload); },
-    } });
-    const store = configureStore({ reducer: slice.reducer, devTools: false, middleware: get => get(zerocopyMiddlewareOptions), enhancers: get => get().concat(instrument()) });
-    return { slice, store };
-  }
-  it('uses real instrumentation to jump between retained immutable states', () => {
-    const { slice, store } = makeStore();
-    const zero = store.getState();
-    store.dispatch(slice.actions.write(1)); const one = store.getState();
-    store.dispatch(slice.actions.write(2)); const two = store.getState();
-    store.liftedStore.dispatch(ActionCreators.jumpToState(1));
-    expect(store.getState()).toBe(one);
-    expect(store.getState().data.get('x')).toBe(1);
-    store.liftedStore.dispatch(ActionCreators.jumpToState(2));
-    expect(store.getState()).toBe(two);
-    expect(zero.data.get('x')).toBe(0);
-    expect(one.data.get('x')).toBe(1);
+describe('selectors', () => {
+  it('retains uncached object identity across repeated reads and unrelated writes', () => {
+    resetMap(); let map = new SharedMap('object').setMany(Array.from({ length: 2060 }, (_, i) => [String(i), { i }]));
+    for (let i = 0; i < 2048; i++) map.get(String(i));
+    const select = createSharedMapValueSelector((s: { map: SharedMap<'object'>; key: string }) => s.map, s => s.key);
+    const value = select({ map, key: '2050' });
+    expect(select({ map, key: '2050' })).toBe(value);
+    map = map.set('other', { i: -1 }); expect(select({ map, key: '2050' })).toBe(value);
+    map = map.set('2050', { i: 2 }); expect(select({ map, key: '2050' })).not.toBe(value);
+    expect(select({ map, key: 'missing' })).toBeUndefined();
   });
-  it('exports and imports real lifted history through the JSAN replacer/reviver', () => {
-    const { slice, store } = makeStore();
-    store.dispatch(slice.actions.write(1));
-    store.dispatch(slice.actions.write(2));
-    const config = createZerocopyDevTools({ mode: 'portable' }).serialize!;
-    const encoded = jsan.stringify(store.liftedStore.getState(), config.replacer, null, config.options);
-    const decoded = jsan.parse(encoded, config.reviver);
-    const other = makeStore().store;
-    other.liftedStore.dispatch({ type: 'IMPORT_STATE', nextLiftedState: decoded, noRecompute: true });
-    expect(other.getState().data).toBeInstanceOf(SharedMap);
-    expect(other.getState().data.get('x')).toBe(2);
-    other.liftedStore.dispatch(ActionCreators.jumpToState(1));
-    expect(other.getState().data.get('x')).toBe(1);
-    other.dispatch(slice.actions.write(3));
-    expect(other.getState().data.get('x')).toBe(3);
-    expect(store.getState().data.get('x')).toBe(2);
-  });
-  it('escapes user objects that contain the DevTools tag', () => {
-    const config = createZerocopyDevTools({ mode: 'portable' }).serialize!;
-    const value = { __zerocopy_redux_devtools_v1__: true, checkpoint: 'ordinary user data' };
-    expect(jsan.parse(jsan.stringify(value, config.replacer, null, true), config.reviver)).toEqual(value);
-  });
-  it('makes summary mode explicit and prevents importing summaries', () => {
-    const config = createZerocopyDevTools();
-    expect(config.maxAge).toBe(50);
-    expect(config.features).toEqual({ import: false, export: false, persist: false });
-    expect(config.serialize).toBeUndefined();
-    expect(() => createZerocopyDevTools({ maxAge: 1 })).toThrow();
+  it('does not reuse a pointer identity from a different arena', () => {
+    resetMap(); const a = new SharedMap('number').set('a', 1);
+    resetMap(); const b = new SharedMap('number').set('a', 2);
+    const select = createSharedMapValueSelector((map: SharedMap<'number'>) => map, () => 'a');
+    expect(select(a)).toBe(1); expect(select(b)).toBe(2); expect(select(a)).toBe(1);
+    expect(select(compact(b))).toBe(2);
   });
 });
 
-describe('stable entry selectors', () => {
-  it('keeps object identity after the global decode cache is full and unrelated entries change', () => {
-    const map = compact(new SharedMap('object').setMany(Array.from({ length: 2050 }, (_, i) => [`k${i}`, { index: i }] as const)));
-    for (let i = 0; i < 2048; i++) map.get(`k${i}`);
-    const select = createSharedMapEntrySelector((state: { data: SharedMap<'object'> }) => state.data, () => 'k2049');
-    const before = select({ data: map });
-    expect(select({ data: map })).toBe(before);
-    expect(select({ data: map.set('unrelated', { index: -1 }) })).toBe(before);
-    const changed = select({ data: map.set('k2049', { index: 999 }) });
-    expect(changed).not.toBe(before);
-    expect(changed).toEqual({ index: 999 });
-    expect(Object.isFrozen(changed)).toBe(true);
+describe('portable state codec', () => {
+  it.each(kinds)('round-trips %s with a fresh writable arena', kind => {
+    const source = examples()[kinds.indexOf(kind)], bytes = arenaOf(source).used;
+    const result: any = codec.parse(codec.stringify({ collection: source }));
+    expect(result.collection.constructor).toBe(source.constructor);
+    expect(contents(result.collection)).toEqual(contents(source));
+    expect(Object.isFrozen(result.collection)).toBe(true);
+    expect(arenaOf(result.collection)).not.toBe(arenaOf(source));
+    expect(arenaOf(result.collection).readOnly).toBe(false);
+    expect(arenaOf(source).used).toBe(bytes);
   });
-  it('does not confuse equal offsets in different arenas, or different keys', () => {
-    const a = compact(new SharedMap('number').set('x', 1));
-    const b = compact(new SharedMap('number').set('x', 2));
-    const select = createSharedMapEntrySelector((state: { data: SharedMap<'number'> }) => state.data, (_state, key: string) => key);
-    expect(select({ data: a }, 'x')).toBe(1);
-    expect(select({ data: b }, 'x')).toBe(2);
-    expect(select({ data: a }, 'missing')).toBeUndefined();
-    expect(select({ data: a }, 'x')).toBe(1);
+  it.each(kinds)('round-trips empty %s', kind => {
+    const source = examples(true)[kinds.indexOf(kind)];
+    const restored: any = codec.parse(codec.stringify(source));
+    expect(restored.constructor).toBe(source.constructor); expect(restored.size).toBe(0);
+  });
+  it('restores nested snapshots, frozen JSON, and future writes', () => {
+    const child = new SharedList('object').push({ deep: { v: 1 } });
+    const source = new SharedMap<'SharedList<object>'>('SharedList<object>').set('a', child);
+    const restored: any = codec.parse(codec.stringify(source));
+    expect(restored.get('a').get(0)).toEqual({ deep: { v: 1 } });
+    expect(Object.isFrozen(restored.get('a').get(0).deep)).toBe(true);
+    const updated = restored.set('b', restored.get('a').push({ deep: { v: 2 } }));
+    expect(updated.size).toBe(2); expect(restored.size).toBe(1); expect(source.size).toBe(1);
+  });
+  it('preserves queue offsets, stack order, map order, and heap direction', () => {
+    const queue = new SharedQueue('number').enqueue(1).enqueue(2).enqueue(3).dequeue();
+    expect(contents(codec.parse(codec.stringify(queue)))).toEqual([2, 3]);
+    const map = new SharedOrderedMap('number').set('a', 1).set('b', 2).delete('a').set('a', 3);
+    expect(contents(codec.parse(codec.stringify(map)))).toEqual([['b', 2], ['a', 3]]);
+    const heap = new SharedPriorityQueue('number', { maxHeap: true }).enqueue(1, -Infinity).enqueue(2, Infinity);
+    const restored: any = codec.parse(codec.stringify(heap)); expect(restored.isMaxHeap).toBe(true); expect(restored.peek()).toBe(2);
+  });
+  it('preserves special numbers, undefined fields, sparse arrays, and null prototypes', () => {
+    const sparse = new Array(3); sparse[1] = undefined;
+    const object = Object.assign(Object.create(null), { field: undefined });
+    const restored: any = codec.parse(codec.stringify({ values: [NaN, Infinity, -Infinity, -0], field: undefined, sparse, object }));
+    expect(restored.values).toEqual([NaN, Infinity, -Infinity, -0]);
+    expect(Object.hasOwn(restored, 'field')).toBe(true); expect(0 in restored.sparse).toBe(false);
+    expect(1 in restored.sparse).toBe(true); expect(restored.sparse.length).toBe(3);
+    expect(Object.getPrototypeOf(restored.object)).toBe(null);
+  });
+  it('does not pollute prototypes when restoring object or map keys', () => {
+    const value = JSON.parse('{"__proto__":{"polluted":true},"constructor":1}');
+    const restored: any = codec.parse(codec.stringify(value));
+    expect(Object.hasOwn(restored, '__proto__')).toBe(true); expect(({} as any).polluted).toBeUndefined();
+    const map: any = codec.parse(codec.stringify(new SharedMap('number').set('__proto__', 2)));
+    expect(map.get('__proto__')).toBe(2);
+  });
+  it('rejects functions, dates, cycles, accessors, and custom comparators', () => {
+    const cycle: any = {}; cycle.self = cycle;
+    for (const input of [() => 1, new Date(), cycle, { get x() { return 1; } }]) expect(() => codec.stringify(input)).toThrow();
+    const sorted = new SharedSortedMap('number', (a, b) => b.localeCompare(a)).set('a', 1);
+    expect(isZerocopySerializable(sorted)).toBe(false); expect(() => codec.stringify(sorted)).toThrow(/comparator/);
+  });
+  it('validates versions, collection types, and duplicate map keys', () => {
+    expect(() => codec.parse('{"$zerocopyRedux":2,"value":null}')).toThrow();
+    expect(() => codec.decode({ $zerocopyRedux: 1, value: ['c', '__proto__', 'number', null, []] })).toThrow();
+    expect(() => codec.decode({ $zerocopyRedux: 1, value: ['c', 'SharedMap', 'number', null, [['a', 1], ['a', 2]]] })).toThrow(/duplicate/);
+    expect(() => codec.decode({ $zerocopyRedux: 1, value: ['c', 'SharedList', 'number', null, ['wrong']] })).toThrow();
+  });
+  it('enforces text, depth, node, and collection limits', () => {
+    expect(() => createZerocopyCodec({ maxTextLength: 2 }).parse('{} ')).toThrow();
+    expect(() => createZerocopyCodec({ maxDepth: 2 }).stringify({ a: { b: { c: 1 } } })).toThrow();
+    expect(() => createZerocopyCodec({ maxNodes: 2 }).stringify([1, 2])).toThrow();
+    expect(() => createZerocopyCodec({ maxCollectionSize: 2 }).stringify(new SharedList('number').pushMany([1, 2, 3]))).toThrow();
+    expect(() => createZerocopyCodec({ maxDepth: NaN })).toThrow();
+  });
+  it('exports read-only worker snapshots without writes or source resets', async () => {
+    const source = { map: new SharedMap('number').set('a', 1), heap: new SharedPriorityQueue('number').enqueue(2, 3), queue: new SharedQueue('number').enqueue(4) };
+    const attached = await initWorker<typeof source>(getWorkerData(source, { copy: true }));
+    const before = arenaOf(attached.heap).used;
+    const restored: any = codec.parse(codec.stringify(attached));
+    expect(restored.map.set('b', 2).size).toBe(2); expect(restored.heap.dequeue().size).toBe(0);
+    expect(arenaOf(attached.heap).used).toBe(before); expect(source.map.get('a')).toBe(1);
+  });
+});
+
+describe('DevTools display and portable serialization', () => {
+  it('defaults to bounded display summaries and leaves real state unchanged', () => {
+    const options = createZerocopyDevToolsOptions(), map = new SharedMap('number').set('a', 1);
+    expect(options.maxAge).toBe(50); expect(options.serialize).toBeUndefined();
+    expect(options.stateSanitizer!({ map }).map.size).toBe(1); expect(map.get('a')).toBe(1);
+  });
+  it('round-trips collection state and escapes reserved markers', () => {
+    const options = createZerocopyDevToolsOptions({ mode: 'portable' }).serialize!;
+    const original = { map: new SharedMap('number').set('a', 1), collision: { $zerocopyRedux: 1, value: ['c', 'not-a-kind'] } };
+    const restored = JSON.parse(JSON.stringify(original, options.replacer), options.reviver);
+    expect(restored.map.get('a')).toBe(1); expect(restored.collision).toEqual(original.collision);
+    expect(restored.map.set('b', 2).size).toBe(2);
+  });
+  it('keeps portable data independent of source arenas after compaction and reset', () => {
+    resetMap(); const old = new SharedMap('number').set('a', 1), text = codec.stringify(old);
+    compact(old); resetMap(); new SharedMap('number').set('a', 9);
+    const restored: any = codec.parse(text); expect(restored.get('a')).toBe(1); expect(old.get('a')).toBe(1);
   });
 });

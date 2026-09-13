@@ -28,9 +28,9 @@ jobs:
       - run: bun run typecheck && bun run typecheck:redux
       - name: Complete unit and Redux integration suite
         run: bun run test
-      - name: Packaged Node entrypoints and real worker
+      - name: Packaged Node entrypoints
         run: bun run proof:redux
-      - name: Existing Node worker proof
+      - name: Existing real Node worker proof
         run: bun run proof:node
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
