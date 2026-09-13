@@ -1,0 +1,42 @@
+name: README library comparison
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+    paths:
+      - 'proofs/readme-libraries.ts'
+      - 'proofs/summarize-readme-libraries.mjs'
+      - '.github/workflows/readme-libraries.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm
+      - name: Compare Zerocopy, Immutable.js, and native collections
+        shell: bash
+        run: |
+          export SOURCE_COMMIT="$(git rev-parse HEAD)"
+          for round in 1 2 3; do
+            ROUND="$round" SAMPLES=15 bun proofs/readme-libraries.ts
+          done
+          node proofs/summarize-readme-libraries.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: readme-library-comparison
+          path: proofs/results/readme-libraries-*
+          retention-days: 90
