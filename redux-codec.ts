@@ -6,6 +6,7 @@ import {
 import { Arena, arenaOf } from './arena';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
+import { readReduxHeap, restoreReduxHeap } from './redux-heap-codec';
 
 const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
   SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap,
@@ -14,7 +15,7 @@ export type SharedCollection = InstanceType<(typeof classes)[keyof typeof classe
 type Kind = keyof typeof classes;
 export type EncodedReduxValue = null | boolean | string | number | EncodedReduxValue[];
 export interface ZerocopyCodecOptions {
-  /** Limits apply to both encoding and decoding. */
+  /** Limits apply to both encoding and decoding. Text length is in UTF-16 units. */
   maxDepth?: number;
   maxNodes?: number;
   maxCollectionSize?: number;
@@ -25,7 +26,7 @@ export interface ZerocopyReduxEnvelope {
   readonly value: EncodedReduxValue;
 }
 
-/** Exact built-in classes only. A prototype or a worker descriptor is not a snapshot. */
+/** Exact built-in classes only. A prototype or worker descriptor is not a snapshot. */
 export function sharedCollectionKind(value: unknown): Kind | undefined {
   if (!value || typeof value !== 'object' || !Object.isFrozen(value)) return undefined;
   const prototype = Object.getPrototypeOf(value);
@@ -55,6 +56,21 @@ function checkValueType(type: unknown, depth = 0): asserts type is string {
   if (!nested || !hasOwn(classes, nested.structureType)) fail('invalid nested value type');
   checkValueType(nested!.innerType, depth + 1);
 }
+/** An object-typed collection stores JSON. Do not silently lose special values
+ * if someone supplies a hand-written encoded tree rather than our own export.
+ */
+function checkJSON(value: unknown): void {
+  const pending: unknown[] = [value];
+  while (pending.length) {
+    const item = pending.pop();
+    if (item === null || typeof item === 'string' || typeof item === 'boolean') continue;
+    if (typeof item === 'number' && Number.isFinite(item) && !Object.is(item, -0)) continue;
+    if (Array.isArray(item)) {
+      for (let i = 0; i < item.length; i++) { if (!hasOwn(item, i)) fail('object values must be JSON'); pending.push(item[i]); }
+    } else if (isPlainRecord(item) && Object.getPrototypeOf(item) !== null) pending.push(...Object.values(item));
+    else fail('object values must be JSON');
+  }
+}
 function checkValue(type: string, value: unknown): void {
   const nested = parseNestedType(type);
   if (nested) {
@@ -64,11 +80,11 @@ function checkValue(type: string, value: unknown): void {
       const d = (value as SharedCollection).toWorkerData() as any;
       if ((d.valueType ?? d.type) !== nested.innerType) fail('nested value type mismatch');
     }
-  } else if (type !== 'object' && typeof value !== type) fail(`expected ${type}`);
-  else if (type === 'object' && (value === undefined || isSharedCollection(value))) fail('expected a JSON value');
+  } else if (type === 'object') checkJSON(value);
+  else if (typeof value !== type) fail(`expected ${type}`);
 }
 
-/** Value-based, versioned persistence. No arena IDs, memory, or root pointers are persisted.
+/** Versioned value persistence. No arena IDs, memory, or root pointers are saved.
  * Repeated references are encoded by value; cyclic graphs are rejected. Restored
  * collections share a fresh writable arena, independent of current module arenas.
  */
@@ -83,6 +99,9 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
     return (depth: number) => {
       if (depth > limits.maxDepth || ++nodes > limits.maxNodes) throw new RangeError('zerocopy Redux: codec limit exceeded');
     };
+  }
+  function size(length: number): void {
+    if (length > limits.maxCollectionSize) throw new RangeError('zerocopy Redux: collection limit exceeded');
   }
   function encode(value: unknown): ZerocopyReduxEnvelope {
     const visit = budget(), active = new WeakSet<object>();
@@ -103,8 +122,8 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
         const kind = sharedCollectionKind(input);
         if (kind) {
           const collection = input as SharedCollection;
-          if (collection.size > limits.maxCollectionSize) throw new RangeError('zerocopy Redux: collection limit exceeded');
-          // This also rejects local comparator functions rather than silently losing them.
+          size(collection.size);
+          // Reject local comparators rather than silently dropping their behavior.
           const d = collection.toWorkerData() as any;
           const type = setKind(kind) ? '' : d.valueType ?? d.type;
           if (!setKind(kind)) checkValueType(type);
@@ -112,17 +131,16 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
           if (mapKind(kind)) {
             for (const [key, item] of (collection as SharedMap<any>).entries()) items.push([key, walk(item, depth + 1)]);
           } else if (kind === 'SharedPriorityQueue') {
-            for (const [item, priority] of (collection as SharedPriorityQueue<any>).entries()) items.push([walk(item, depth + 1), walk(priority, depth + 1)]);
+            return ['c', kind, type, (collection as SharedPriorityQueue<any>).isMaxHeap,
+              readReduxHeap(collection as SharedPriorityQueue<any>, item => walk(item, depth + 1))];
           } else if (kind === 'SharedStack') {
             let cursor = collection as SharedStack<any>;
             while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.pop(); }
           } else if (kind === 'SharedQueue') {
             let cursor = collection as SharedQueue<any>;
             while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.dequeue(); }
-          } else {
-            (collection as SharedList<any>).forEach(item => items.push(walk(item, depth + 1)));
-          }
-          return ['c', kind, type, kind === 'SharedPriorityQueue' ? (collection as SharedPriorityQueue<any>).isMaxHeap : null, items];
+          } else (collection as SharedList<any>).forEach(item => items.push(walk(item, depth + 1)));
+          return ['c', kind, type, null, items];
         }
         if (!Array.isArray(input) && !isPlainRecord(input)) fail('only plain records, arrays, and shared collections are supported');
         const descriptors = Object.getOwnPropertyDescriptors(input);
@@ -131,14 +149,17 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
           if (descriptor.enumerable && (typeof key === 'symbol' || !hasOwn(descriptor, 'value'))) fail('enumerable symbols and accessors are not supported');
         }
         if (Array.isArray(input)) {
-          if (input.length > limits.maxCollectionSize) throw new RangeError('zerocopy Redux: array limit exceeded');
+          size(input.length);
           if (Object.keys(input).some(key => !/^(0|[1-9]\d*)$/.test(key) || Number(key) >= input.length)) fail('array properties are not supported');
           const entries: EncodedReduxValue[] = [];
-          for (let i = 0; i < input.length; i++) entries.push(hasOwn(input, i) ? walk(input[i], depth + 1) : ['h']);
+          for (let i = 0; i < input.length; i++) {
+            if (hasOwn(input, i)) entries.push(walk(input[i], depth + 1));
+            else { visit(depth + 1); entries.push(['h']); }
+          }
           return ['a', entries];
         }
-        return [Object.getPrototypeOf(input) === null ? 'z' : 'o',
-          Object.keys(input).map(key => [key, walk((input as Record<string, unknown>)[key], depth + 1)])];
+        const keys = Object.keys(input); size(keys.length);
+        return [Object.getPrototypeOf(input) === null ? 'z' : 'o', keys.map(key => [key, walk((input as Record<string, unknown>)[key], depth + 1)])];
       } finally { active.delete(object); }
     }
     return Object.freeze({ $zerocopyRedux: 1 as const, value: walk(value, 0) });
@@ -148,9 +169,9 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
     const visit = budget();
     let arena: Arena | undefined;
     const target = () => arena ??= new Arena();
-    function array(value: unknown): any[] {
+    function array(value: unknown, payload = false): any[] {
       if (!Array.isArray(value)) fail('invalid encoded array');
-      if ((value as unknown[]).length > limits.maxCollectionSize) throw new RangeError('zerocopy Redux: collection limit exceeded');
+      if (payload) size((value as unknown[]).length);
       return value as any[];
     }
     function walk(input: unknown, depth: number): any {
@@ -167,7 +188,7 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
         fail('invalid number tag');
       }
       if (tag === 'a' && node.length === 2) {
-        const values = array(node[1]), result = new Array(values.length);
+        const values = array(node[1], true), result = new Array(values.length);
         for (let i = 0; i < values.length; i++) {
           if (Array.isArray(values[i]) && values[i].length === 1 && values[i][0] === 'h') { visit(depth + 1); continue; }
           result[i] = walk(values[i], depth + 1);
@@ -176,18 +197,19 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
       }
       if ((tag === 'o' || tag === 'z') && node.length === 2) {
         const result = tag === 'z' ? Object.create(null) : {};
-        for (const pair of array(node[1])) {
+        for (const pair of array(node[1], true)) {
           if (!Array.isArray(pair) || pair.length !== 2 || typeof pair[0] !== 'string' || hasOwn(result, pair[0])) fail('invalid or duplicate object key');
           Object.defineProperty(result, pair[0], { value: walk(pair[1], depth + 1), enumerable: true, configurable: true, writable: true });
         }
         return result;
       }
       if (tag !== 'c' || node.length !== 5 || typeof node[1] !== 'string' || !hasOwn(classes, node[1])) fail('invalid collection tag');
-      const kind = node[1] as Kind, type = node[2], extra = node[3], items = array(node[4]);
+      const kind = node[1] as Kind, type = node[2], extra = node[3], items = array(node[4], true);
       if (setKind(kind)) { if (type !== '') fail('invalid set value type'); }
       else checkValueType(type);
       if (kind === 'SharedPriorityQueue' ? typeof extra !== 'boolean' : extra !== null) fail('invalid collection options');
-      const empty = { root: 0, head: 0, tail: 0, tailSize: 0, block: 0, depth: 0, size: 0, type, valueType: setKind(kind) ? 'number' : type, isMaxHeap: extra ?? false };
+      if (kind === 'SharedPriorityQueue') return restoreReduxHeap(items, type, extra, target(), item => walk(item, depth + 1), value => checkValue(type, value));
+      const empty = { root: 0, head: 0, tail: 0, tailSize: 0, block: 0, depth: 0, size: 0, type, valueType: setKind(kind) ? 'number' : type };
       let result: any = structureRegistry[kind].fromWorkerData(empty, target());
       if (mapKind(kind)) {
         const entries: [string, any][] = items.map(pair => {
@@ -196,12 +218,6 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
         });
         if (kind === 'SharedMap') result = result.setMany(entries);
         else for (const [key, value] of entries) result = result.set(key, value);
-      } else if (kind === 'SharedPriorityQueue') {
-        for (const pair of items) {
-          if (!Array.isArray(pair) || pair.length !== 2) fail('invalid priority queue entry');
-          const value = walk(pair[0], depth + 1), priority = walk(pair[1], depth + 1);
-          checkValue(type, value); result = result.enqueue(value, priority);
-        }
       } else {
         const values = items.map(item => walk(item, depth + 1));
         if (setKind(kind)) {
