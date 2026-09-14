@@ -89,6 +89,19 @@ describe('small root-specific read indexes', () => {
     expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(1056);
     expect(a.valueMap.size).toBeLessThanOrEqual(16384);
   });
+  test('historical roots reuse prefix indexes beyond the value-cache limit', () => {
+    let base: any = ownerMap();
+    for (let i = 0; i < 20000; i++) base = base.set(`key${i}`, i);
+    const newer = base.set('key0', -1), a: any = arenaOf(base);
+    const before = a.buf.slice();
+    for (let i = 0; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
+    expect(a.prefixRoot).toBe(base.root);
+    expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(16896);
+    expect(newer.get('key0')).toBe(-1);
+    for (let i = 19000; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
+    expect(base.get('key0')).toBe(0);
+    expect(Buffer.compare(Buffer.from(before), Buffer.from(a.buf))).toBe(0);
+  });
   test('same-prefix and exact-hash collisions retain complete key checks', () => {
     const encoder = new TextEncoder();
     expect(hashBytes(encoder.encode('costarring'))).toBe(hashBytes(encoder.encode('liquid')));

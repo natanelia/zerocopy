@@ -554,7 +554,9 @@ export class Arena {
       root = view.getUint32(root + 4, true);
     }
     let candidate: number;
-    if (root === this.valueRoot) {
+    // Historical roots also need prefix reuse after their value cache fills.
+    // The exact-root check below invalidates the directory before any reuse.
+    if (root) {
       if (this.prefixRoot !== root) {
         const bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
         if (!this.prefixChildren || bits !== this.prefixBits) {
