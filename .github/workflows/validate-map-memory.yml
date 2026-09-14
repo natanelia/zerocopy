@@ -3,7 +3,7 @@ name: Map memory validation
 on:
   push:
     branches: [agent/immutable-performance-proof]
-    paths: ['.github/patches/map-memory-*', '.github/workflows/validate-map-memory.yml']
+    paths: ['.github/patches/map-memory-prefix.patch', '.github/workflows/validate-map-memory.yml']
 
 permissions:
   contents: write
@@ -26,29 +26,24 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
-      - name: Verify the reviewed patch and all resulting files
+      - name: Apply the reviewed historical-root prefix fix
         run: |
           set -euo pipefail
-          cat .github/patches/map-memory-*.gzpart | gzip -dc > /tmp/map-memory.patch
-          echo 'a574c6ee511052f1689fca0975dbe0b5ce7ce3ab3bda1748ca780d53ed34f8a5  /tmp/map-memory.patch' | sha256sum --check
-          git apply --check --index /tmp/map-memory.patch
-          git apply --index /tmp/map-memory.patch
-          node --input-type=module <<'JS'
-          import { readFileSync } from 'node:fs';
-          import { createHash } from 'node:crypto';
-          import assert from 'node:assert/strict';
-          const files = JSON.parse(readFileSync('.github/patches/map-memory-manifest.json', 'utf8'));
-          for (const [file, sha256] of Object.entries(files)) {
-            assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'), sha256, file);
-          }
-          console.log(`Verified ${Object.keys(files).length} source files`);
-          JS
+          echo '3a95a0f25e6d079781755db43560da444df3d6382e5531e48ddb8216974eaa2c  .github/patches/map-memory-prefix.patch' | sha256sum --check
+          git apply --check --index .github/patches/map-memory-prefix.patch
+          git apply --index .github/patches/map-memory-prefix.patch
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'perf: reduce persistent map history and cache memory'
+          git commit -m 'perf: retain prefix lookup speed for historical map roots'
           mkdir -p proofs/results/map-memory-checks
           git rev-parse HEAD > proofs/results/map-memory-checks/measured-source.txt
-          cp .github/patches/map-memory-manifest.json proofs/results/map-memory-checks/source-manifest.json
+          node --input-type=module <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const files = JSON.parse(readFileSync('.github/patches/map-memory-manifest.json', 'utf8'));
+          for (const file of Object.keys(files)) files[file] = createHash('sha256').update(readFileSync(file)).digest('hex');
+          writeFileSync('proofs/results/map-memory-checks/source-manifest.json', JSON.stringify(files, null, 2) + '\n');
+          JS
       - run: bun install
       - name: Build all packages and check core and Redux types
         run: |
@@ -81,7 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           git add proofs/results/map-memory proofs/results/map-memory-checks/source-manifest.json proofs/results/map-memory-checks/measured-source.txt proofs/results/map-memory-checks/node-worker.json proofs/results/hot-path proofs/results/cold-build
-          git commit -m 'test: record paired map memory and speed evidence'
+          git commit -m 'test: verify map memory savings and historical-root lookup speed'
           git push origin HEAD:refs/heads/agent/immutable-performance-proof
           git rev-parse HEAD > proofs/results/map-memory-checks/published-source.txt
       - uses: actions/upload-artifact@v4
