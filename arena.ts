@@ -301,6 +301,48 @@ export class Arena {
     this.rememberKey(key, token);
     return p;
   }
+  setNumber(root: number, key: string, value: number, size: number): number {
+    this.assertWritable();
+    if (typeof key !== 'string' || typeof value !== 'number') throw new TypeError('Expected a string key and a number value');
+    let n = key.length;
+    if (n > 49144) return this.write('number', root, key, value);
+    for (let i = 0; i < n; i++) {
+      const c = key.charCodeAt(i);
+      if (c > 127) {
+        const bytes = encoder.encode(key); n = bytes.length;
+        if (n > 49144) return this.write('number', root, key, value);
+        this.bytes.set(bytes, 16384); break;
+      }
+      this.bytes[16384 + i] = c;
+    }
+    this.view.setFloat64(16376, value, true);
+    const result = this.wasm.mapSetNumber(root, n, size), next = result & 0x7fffffff;
+    this.writeSize = size + (result >>> 31);
+    if (this.valueMap) this.cachePrimitive(root, next, key, value, 2);
+    else { this.valueRoot = next; this.valueCode = 2; }
+    return next;
+  }
+  setString(root: number, key: string, value: string, size: number): number {
+    this.assertWritable();
+    if (typeof key !== 'string' || typeof value !== 'string') throw new TypeError('Expected a string key and a string value');
+    const n = key.length, v = value.length;
+    if (n + v > 49152) return this.write('string', root, key, value);
+    for (let i = 0; i < n; i++) {
+      const c = key.charCodeAt(i);
+      if (c > 127) return this.write('string', root, key, value);
+      this.bytes[16384 + i] = c;
+    }
+    for (let i = 0; i < v; i++) {
+      const c = value.charCodeAt(i);
+      if (c > 127) return this.write('string', root, key, value);
+      this.bytes[16384 + n + i] = c;
+    }
+    const result = this.wasm.mapSetBytes(root, n, v, size), next = result & 0x7fffffff;
+    this.writeSize = size + (result >>> 31);
+    if (this.valueMap) this.cachePrimitive(root, next, key, value, 1);
+    else { this.valueRoot = next; this.valueCode = 1; }
+    return next;
+  }
   writeNumber(root: number, key: string, value: number, kind = 0, head = 0, count = 0): number {
     this.assertWritable();
     if (typeof key !== 'string' || typeof value !== 'number') throw new TypeError('Expected a string key and a number value');

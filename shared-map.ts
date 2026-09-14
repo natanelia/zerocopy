@@ -37,7 +37,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
   set(key: string, value: ValueOf<T>): SharedMap<T> {
     const a = this.arena; a.assertWritable();
     if (a.sameValue(this.root, key, this.valueType, value)) return this;
-    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : this.valueType === 'string' ? a.writeString(this.root, key, value as string) : a.write(this.valueType, this.root, key, value));
+    const root = (this.valueType === 'number' ? a.setNumber(this.root, key, value as number, this.size) : this.valueType === 'string' ? a.setString(this.root, key, value as string, this.size) : a.write(this.valueType, this.root, key, value));
     return new SharedMap(this.valueType, root, a.writeSize, a);
   }
   get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType); }
