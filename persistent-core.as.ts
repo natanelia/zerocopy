@@ -207,6 +207,46 @@ function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff, mar
   return replaceChild(root, bitmap | (1 << digit), <i32>insertedCount, digit, child, mark);
 }
 export function mapInsert(root: u32, leaf: u32): u32 { return insertAt(materializeJournal(root, 0), leaf, 0); }
+
+// Private, bounded writer index for the first two hash digits. A published
+// root never points here. Each cached lane is valid only for writerIndexRoot;
+// advancing from that exact root preserves all untouched lanes. Forks and
+// interleaved maps reset the validity masks before using this scratch.
+const WRITE_FIRST: u32 = 12288; // 16 child pointers
+const WRITE_SECOND: u32 = 12352; // 256 child pointers
+const WRITE_VALID: u32 = 13376; // 16 second-level validity masks
+let writerIndexRoot: u32 = 0;
+let writerFirstValid: u32 = 0;
+function mapInsertIndexed(root: u32, leaf: u32, known: u32 = 0xffffffff): u32 {
+  if (!root || tag(root) == JOURNAL || !isBranch(root)) {
+    writerIndexRoot = 0;
+    return insertAt(materializeJournal(root, 0), leaf, 0, known);
+  }
+  if (writerIndexRoot != root) {
+    writerIndexRoot = root; writerFirstValid = 0;
+  }
+  writerIndexRoot = 0; // Invalidate scratch if any later allocation throws.
+  const hash = load<u32>(leaf + 4), first = hash & 15, bit = <u32>1 << first;
+  const valid = writerFirstValid & bit;
+  const old = valid ? load<u32>(WRITE_FIRST + first * 4) : branchChild(root, first);
+  let child: u32;
+  if (old && isBranch(old)) {
+    const digit = (hash >> 4) & 15, b = <u32>1 << digit;
+    const pos = WRITE_SECOND + (first * 16 + digit) * 4;
+    const mask = valid ? load<u32>(WRITE_VALID + first * 4) : 0;
+    const previous = mask & b ? load<u32>(pos) : branchChild(old, digit);
+    const next = insertAt(previous, leaf, 8, known);
+    child = replaceChild(old, branchBitmap(old) | b, <i32>insertedCount, digit, next);
+    store<u32>(pos, next); store<u32>(WRITE_VALID + first * 4, mask | b);
+  } else {
+    child = insertAt(old, leaf, 4, known);
+    store<u32>(WRITE_VALID + first * 4, 0);
+  }
+  const next = replaceChild(root, branchBitmap(root) | bit, <i32>insertedCount, first, child);
+  store<u32>(WRITE_FIRST + first * 4, child); writerFirstValid |= bit;
+  writerIndexRoot = next; return next;
+}
+
 export function mapFind(root: u32, key: u32, len: u32, hash: u32): u32 {
   if (root && tag(root) == JOURNAL) {
     const p = journalFind(root, key, len, hash); if (p) return p;
@@ -661,7 +701,7 @@ export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, va
   else if (mode == 1) store<u8>(destination + prefix, <u8>value);
   else if (prefix) copyBytes(destination + prefix, WRITE_STAGE + keyLen, valueLen);
   const oldSize = kind == 2 ? 0 : root == writeMapRoot ? writeMapSize : mapSize(root);
-  const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? insertAt(root, leaf, 0, previous ? 0 : 1) : mapInsert(root, leaf);
+  const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? mapInsertIndexed(root, leaf, previous ? 0 : 1) : mapInsertIndexed(root, leaf);
   store<u32>(0, leaf); store<u32>(16, hash);
   store<u32>(4, kind == 1 && !previous ? orderCons(order, leaf) : order);
   const nextSize = kind == 2 ? radixSize(next) : oldSize + insertedCount;
