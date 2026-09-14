@@ -1,6 +1,6 @@
 import { readFileSync, rmSync } from 'node:fs';
-// The browser uses the same source and WASM as Bun. Embed WASM so this entry
-// does not need Node APIs, asynchronous module initialization, or a fetch URL.
+// All entrypoints share one runtime and WASM instance graph through code splitting.
+// This is required for instanceof checks and arena ownership across subpath imports.
 const encoded = readFileSync(new URL('../persistent-core.wasm', import.meta.url)).toString('base64');
 rmSync('dist', { recursive: true, force: true });
 const result = await Bun.build({

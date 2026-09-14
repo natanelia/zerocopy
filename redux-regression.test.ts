@@ -59,10 +59,11 @@ describe('Redux persistence boundary regressions', () => {
     expect(restored.map.get('a')).toEqual({ value: 1, $jsan: 'stored JSON' }); expect(restored.collision).toEqual(state.collision);
     expect(restored.map.set('b', {}).size).toBe(2); expect(Object.hasOwn(restored, 'optional')).toBe(true); expect(restored.special).toBeNaN();
   });
-  it('rejects raw JSAN marker collisions explicitly, while the application codec preserves them', () => {
+  it('preserves literal JSAN marker keys through both supported codecs', () => {
     const options = createZerocopyDevToolsOptions({ mode: 'portable' }).serialize!;
     for (const value of [{ $jsan: 'user value' }, { $zerocopyRedux: 1, nested: { $jsan: 'u' } }]) {
-      expect(() => jsan.stringify({ value }, options.replacer, null, options.options)).toThrow(/reserved by DevTools/);
+      const text = jsan.stringify({ value }, options.replacer, null, options.options);
+      expect(jsan.parse(text, options.reviver)).toEqual({ value });
       expect(codec.parse(codec.stringify(value))).toEqual(value);
     }
   });

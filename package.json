@@ -15,11 +15,13 @@
     "test": "bun --bun node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test:redux": "bun --bun node_modules/vitest/vitest.mjs run redux",
+    "proof:redux": "node proofs/redux-node.mjs",
     "bench": "bun benchmark.ts",
     "demo": "bun demo/serve.ts",
     "typecheck": "tsc --noEmit",
     "typecheck:redux": "tsc --noEmit -p tsconfig.redux.json",
-    "prepublishOnly": "bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run typecheck:redux && bun run test",
+    "prepublishOnly": "bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run typecheck:redux && bun run test && bun run proof:redux",
     "proof:bench": "bun proofs/compare.ts",
     "build:browser": "bun scripts/build-browser.ts",
     "proof:node": "node proofs/node-worker.mjs",
@@ -50,6 +52,6 @@
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   },
-  "peerDependencies": { "@tanstack/db": ">=0.5.0" },
-  "peerDependenciesMeta": { "@tanstack/db": { "optional": true } }
+  "peerDependencies": { "@tanstack/db": ">=0.5.0", "@reduxjs/toolkit": "^2.0.0" },
+  "peerDependenciesMeta": { "@tanstack/db": { "optional": true }, "@reduxjs/toolkit": { "optional": true } }
 }
