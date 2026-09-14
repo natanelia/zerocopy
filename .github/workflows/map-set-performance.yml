@@ -1,0 +1,55 @@
+name: Map set performance
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+    paths:
+      - '*.ts'
+      - 'proofs/**'
+      - 'scripts/**'
+      - 'package.json'
+      - '.github/workflows/map-set-performance.yml'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:redux
+      - run: bun run test
+      - run: node proofs/node-worker.mjs
+      - name: Map set and memory comparison
+        run: |
+          if [ -f proofs/run-map-set.mjs ]; then
+            node proofs/run-map-set.mjs proofs/results/map-set-ci.json
+          fi
+      - name: Preserve source used by this check
+        if: always()
+        run: git archive --format=tar.gz HEAD > /tmp/map-set-source.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-set-source
+          path: /tmp/map-set-source.tar.gz
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-set-evidence
+          path: proofs/results/map-set-ci*
+          if-no-files-found: ignore
+          retention-days: 90
