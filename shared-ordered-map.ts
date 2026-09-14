@@ -36,11 +36,11 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
     return new SharedOrderedMap(this.valueType, root, a.writeHead, a.writeCount, a.writeSize, a, this.orderStable && a.writeSize > this.size);
   }
   get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 4); }
-  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
+  has(key: string): boolean { return this.arena.contains(this.root, key); }
   delete(key: string): SharedOrderedMap<T> {
-    const a = this.arena; a.assertWritable(); const leaf = a.find(this.root, key); if (!leaf) return this;
-    const root = a.delete(this.root, key);
-    return root ? new SharedOrderedMap(this.valueType, root, this.head, this.tail, undefined, a, false)
+    const a = this.arena, root = a.delete(this.root, key);
+    if (root === this.root) return this;
+    return root ? new SharedOrderedMap(this.valueType, root, this.head, this.tail, this.size - 1, a, false)
       : new SharedOrderedMap(this.valueType, 0, 0, 0, 0, a);
   }
   *entries(): Generator<[string, ValueOf<T>]> {

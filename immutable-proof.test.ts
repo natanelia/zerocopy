@@ -93,12 +93,53 @@ function checkHAMT(snapshot: any): void {
       }
       return n;
     }
-    expect(tag).toBe(1);
+    if (tag & 0x80000000) {
+      const patches: number[] = []; let base = p;
+      while (dv.getUint32(base, true) & 0x80000000) {
+        const t = dv.getUint32(base, true);
+        expect((t >>> 21) & 15).toBeGreaterThan(0);
+        expect((t >>> 21) & 15).toBeLessThanOrEqual(8);
+        patches.push(base);
+        const distance = (dv.getUint32(base, true) & 16383) * 4;
+        expect(distance).toBeGreaterThan(0);
+        const previous = base - distance;
+        expect(previous).toBeGreaterThanOrEqual(HEAP_START);
+        expect(previous).toBeLessThan(base); base = previous;
+      }
+      expect(patches.length).toBe((tag >>> 21) & 15);
+      expect(dv.getUint32(base, true) & 3).toBe(1);
+      const children = new Array<number>(16).fill(0);
+      const original = dv.getUint32(base + 4, true); let offset = 0;
+      for (let d = 0; d < 16; d++) if (original & (1 << d)) children[d] = dv.getUint32(base + 8 + offset++ * 4, true);
+      let expectedSize = dv.getUint32(base, true) >>> 2, changed = 0;
+      for (let i = patches.length - 1; i >= 0; i--) {
+        const patch = patches[i], t = dv.getUint32(patch, true);
+        const anchorWord = dv.getUint32(patch + 8, true);
+        expect(patch - (anchorWord & 65535) * 4).toBe(base);
+        const distance = ((t >>> 14) & 127) * 4;
+        const child = distance ? patch - distance : 0;
+        if (child) expect(child).toBeGreaterThanOrEqual(HEAP_START);
+        const digits = dv.getUint32(patch + 4, true);
+        children[digits & 15] = child;
+        expectedSize += (t << 1) >> 26;
+        changed = ((changed << 4) | (digits & 15)) >>> 0;
+        expect(digits).toBe(changed);
+        let bitmap = 0; for (let d = 0; d < 16; d++) if (children[d]) bitmap |= 1 << d;
+        expect(bitmap).toBe(anchorWord >>> 16);
+        expect(a.wasm.mapSize(patch)).toBe(expectedSize);
+        for (let d = 0; d < 16; d++) expect(a.wasm.mapChild(patch, d)).toBe(children[d]);
+      }
+      let count = 0;
+      for (let d = 0; d < 16; d++) if (children[d]) count += visit(children[d], [...prefix, d], lookup);
+      expect(count).toBe(expectedSize); return count;
+    }
+    expect(tag & 3).toBe(1);
     const bm = dv.getUint32(p + 4, true);
+    expect(bm & ~65535).toBe(0);
     let n = 0, i = 0;
-    for (let digit = 0; digit < 16; digit++) if (bm & (1 << digit)) n += visit(dv.getUint32(p + 16 + i++ * 4, true), [...prefix, digit], lookup);
+    for (let digit = 0; digit < 16; digit++) if (bm & (1 << digit)) n += visit(dv.getUint32(p + 8 + i++ * 4, true), [...prefix, digit], lookup);
     expect(i).toBe(popcount(bm));
-    expect(dv.getUint32(p + 8, true)).toBe(n);
+    expect(tag >>> 2).toBe(n);
     return n;
   };
   expect(visit(snapshot.root, [])).toBe(snapshot.size);

@@ -41,10 +41,10 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     return new SharedMap(this.valueType, root, a.writeSize, a);
   }
   get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType); }
-  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
+  has(key: string): boolean { return this.arena.contains(this.root, key); }
   delete(key: string): SharedMap<T> {
     const a = this.arena, root = a.delete(this.root, key);
-    return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
+    return root === this.root ? this : new SharedMap(this.valueType, root, this.size - 1, a);
   }
   setMany(entries: readonly (readonly [string, ValueOf<T>])[]): SharedMap<T> {
     if (!entries.length) return this;

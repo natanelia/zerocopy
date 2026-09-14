@@ -33,7 +33,7 @@ const constructors = { SharedMap, SharedList, SharedSet, SharedStack, SharedQueu
 type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
 export interface WorkerData {
   readonly __shared: true;
-  readonly version: 3;
+  readonly version: 4;
   readonly arenas: readonly { readonly id: string; readonly used: number; readonly memory?: WebAssembly.Memory; readonly copy?: Uint8Array }[];
   readonly structures: Readonly<Record<string, { readonly type: string; readonly arena: string; readonly data: any }>>;
 }
@@ -59,7 +59,7 @@ export function getWorkerData(structures: Readonly<Record<string, SharedStructur
 }
 
 export async function initWorker<T extends Record<string, SharedStructure>>(data: WorkerData): Promise<T> {
-  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v3 payload with getWorkerData()');
+  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
   const arenas = new Map<string, Arena>();
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');

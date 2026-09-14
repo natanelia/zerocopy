@@ -106,6 +106,6 @@ describe('maps, journals and raw live-data compaction', () => {
   });
   test('worker wire format rejects the former layout', async () => {
     const data = S.getWorkerData({ list: new S.SharedList('number') });
-    expect(data.version).toBe(3); await expect(S.initWorker({ ...data, version: 2 } as any)).rejects.toThrow(/Unsupported/);
+    expect(data.version).toBe(4); await expect(S.initWorker({ ...data, version: 2 } as any)).rejects.toThrow(/Unsupported/);
   });
 });

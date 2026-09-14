@@ -480,7 +480,7 @@ describe('Seamless Worker API', () => {
     
     // Verify serialization works
     expect(data.__shared).toBe(true);
-    expect(data.version).toBe(3);
+    expect(data.version).toBe(4);
     expect(data.arenas.length).toBeGreaterThan(0);
     expect(data.arenas.every(a => a.copy || a.memory)).toBe(true);
     expect(data.structures.map.type).toBe('SharedMap');

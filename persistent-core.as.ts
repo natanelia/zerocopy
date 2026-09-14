@@ -18,7 +18,7 @@ export function alloc(bytes: u32): u32 {
   // Both operands are <= 0x7fff0000, so addition plus alignment cannot wrap.
   // Page queries and 64-bit limit checks stay off the common allocation path.
   if (bytes > 0x7fff0000) unreachable();
-  const p = heapEnd, end = (p + bytes + 7) & ~7;
+  const p = (heapEnd + 7) & ~7, end = (p + bytes + 7) & ~7;
   if (end > capacity) growTo(end);
   heapEnd = end; return p;
 }
@@ -42,9 +42,17 @@ export function alloc(bytes: u32): u32 {
 }
 
 // HAMT: leaf [0,hash,keyLen,valLen,key...,value...];
-// branch [1,bitmap,size,unused,children...]; collision [2,hash,count,unused,leaves...].
+// branch [(size << 2) | 1, bitmap, children...], with a compact 8-byte header;
+// collision [2,hash,count,unused,leaves...]. Map records have 4-byte alignment.
 @inline function tag(p: u32): u32 { return load<u32>(p); }
-export function mapSize(p: u32): u32 { return p ? (tag(p) == 0 ? 1 : load<u32>(p + 8)) : 0; }
+export function mapSize(p: u32): u32 {
+  let delta: i32 = 0;
+  while (p && tag(p) != 0xffffffff && (tag(p) & OVERLAY)) {
+    delta += <i32>(tag(p) << 1) >> 26;
+    p = overlayPrevious(p);
+  }
+  return (p ? (tag(p) == 0 ? 1 : (tag(p) & 3) == 1 ? tag(p) >> 2 : load<u32>(p + 8)) : 0) + delta;
+}
 @inline function pc(n: u32): u32 { return <u32>popcnt(n); }
 function hashAt(p: u32, len: u32): u32 {
   let h: u32 = 2166136261;
@@ -53,7 +61,10 @@ function hashAt(p: u32, len: u32): u32 {
 }
 export function mapLeaf(keyLen: u32, valLen: u32): u32 {
   if (keyLen > 0x7ffe0000 || valLen > 0x7ffe0000 - keyLen) unreachable();
-  const p = alloc(16 + keyLen + valLen);
+  // Map records require only u32 alignment. Values already use unaligned loads.
+  const p = heapEnd, end = (p + 16 + keyLen + valLen + 3) & ~3;
+  if (end > capacity) growTo(end);
+  heapEnd = end;
   store<u32>(p, 0); store<u32>(p + 8, keyLen); store<u32>(p + 12, valLen);
   return p;
 }
@@ -62,32 +73,117 @@ export function mapLeaf(keyLen: u32, valLen: u32): u32 {
   return load<u32>(a + 4) == load<u32>(b + 4) && n == load<u32>(b + 8) && memory.compare(a + 16, b + 16, n) == 0;
 }
 function branch(bitmap: u32, size: u32): u32 {
-  const p = alloc(16 + pc(bitmap) * 4);
-  store<u32>(p, 1); store<u32>(p + 4, bitmap); store<u32>(p + 8, size); store<u32>(p + 12, 0);
-  return p;
+  const p = heapEnd, end = p + 8 + pc(bitmap) * 4;
+  if (end > capacity) growTo(end);
+  heapEnd = end;
+  store<u32>(p, (size << 2) | 1); store<u32>(p + 4, bitmap); return p;
 }
 function bucket(hash: u32, count: u32): u32 {
   const p = alloc(16 + count * 4);
   store<u32>(p, 2); store<u32>(p + 4, hash); store<u32>(p + 8, count); store<u32>(p + 12, 0);
   return p;
 }
+
+// Persistent 12-byte branch patch. No published bytes change.
+// tag: [overlay:1, signed size delta:6, chain depth:4,
+//       child distance:7, previous distance:14]. Distances count u32 words.
+// Next: eight changed digits, newest in the low nibble. Last: [anchor:16,
+// final bitmap:16]. A zero child distance denotes deletion. An offset that
+// does not fit causes materialization, never truncation.
+const OVERLAY: u32 = 0x80000000;
+const OVERLAY_LIMIT: u32 = 8;
+@inline function overlayPrevious(p: u32): u32 { return p - (tag(p) & 16383) * 4; }
+@inline function overlayAnchor(p: u32): u32 { return p - (load<u32>(p + 8) & 65535) * 4; }
+@inline function overlayChild(p: u32): u32 {
+  const distance = (tag(p) >> 14) & 127; return distance ? p - distance * 4 : 0;
+}
+@inline function isBranch(p: u32): bool { return (tag(p) & 3) == 1 || (tag(p) & OVERLAY) != 0; }
+@inline function branchBitmap(p: u32): u32 { return tag(p) & OVERLAY ? load<u32>(p + 8) >> 16 : load<u32>(p + 4); }
+@inline function branchChild(p: u32, digit: u32): u32 {
+  if (tag(p) & OVERLAY) {
+    const t = tag(p), depth = (t >> 21) & 15;
+    const x = load<u32>(p + 4) ^ (digit * 0x11111111);
+    // The lowest zero nibble is the newest matching change. Borrow can mark
+    // higher nibbles too, but cannot precede the first real zero nibble.
+    const matches = (x - 0x11111111) & ~x & 0x88888888 & (0xffffffff >> ((8 - depth) * 4));
+    if (matches) {
+      let steps = <u32>ctz(matches) >> 2;
+      while (steps) { p = overlayPrevious(p); steps--; }
+      return overlayChild(p);
+    }
+    p = overlayAnchor(p);
+  }
+  const bitmap = load<u32>(p + 4), bit: u32 = 1 << digit;
+  return bitmap & bit ? load<u32>(p + 8 + pc(bitmap & (bit - 1)) * 4) : 0;
+}
+// Flatten a short overlay chain once. Full branches use one contiguous copy.
+// Scratch is private to this synchronous writer; no callback can observe it.
+function fullBranch(root: u32, bitmap: u32, size: u32, digit: u32, child: u32): u32 {
+  let base = root, n: u32 = 0;
+  while (tag(base) & OVERLAY) { store<u32>(4096 + n++ * 4, base); base = overlayPrevious(base); }
+  const p = branch(bitmap, size), original = load<u32>(base + 4);
+  if (bitmap == 65535 && original == bitmap) {
+    copyWords(p + 8, base + 8, 64);
+    while (n) { const patch = load<u32>(4096 + --n * 4); store<u32>(p + 8 + (load<u32>(patch + 4) & 15) * 4, overlayChild(patch)); }
+    store<u32>(p + 8 + digit * 4, child); return p;
+  }
+  // Expand only the valid lanes. An output bit can originate in the base, an
+  // overlay, or this update; every lane read below has been initialized here.
+  let bits = original, pos: u32 = 0;
+  while (bits) { const d = <u32>ctz(bits); store<u32>(4224 + d * 4, load<u32>(base + 8 + pos++ * 4)); bits &= bits - 1; }
+  while (n) { const patch = load<u32>(4096 + --n * 4); store<u32>(4224 + (load<u32>(patch + 4) & 15) * 4, overlayChild(patch)); }
+  store<u32>(4224 + digit * 4, child); bits = bitmap; pos = 0;
+  while (bits) { const d = <u32>ctz(bits); store<u32>(p + 8 + pos++ * 4, load<u32>(4224 + d * 4)); bits &= bits - 1; }
+  return p;
+}
+function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32, mark: u32 = 0x7fffffff): u32 {
+  if (root >= mark) {
+    if (!(tag(root) & OVERLAY) && load<u32>(root + 4) == bitmap) {
+      store<u32>(root + 8 + pc(bitmap & ((1 << digit) - 1)) * 4, child);
+      store<u32>(root, tag(root) + (delta << 2)); return root;
+    }
+    return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
+  }
+  let depth = tag(root) & OVERLAY ? ((tag(root) >> 21) & 15) : 0;
+  if ((tag(root) & OVERLAY) && (load<u32>(root + 4) & 15) == digit) {
+    const combined = (<i32>(tag(root) << 1) >> 26) + delta;
+    if (combined >= -32 && combined <= 31) { delta = combined; root = overlayPrevious(root); depth--; }
+  }
+  if (depth < OVERLAY_LIMIT) {
+    const anchor = tag(root) & OVERLAY ? overlayAnchor(root) : root;
+    const digits = ((tag(root) & OVERLAY ? load<u32>(root + 4) : 0) << 4) | digit;
+    const p = heapEnd;
+    if (p - anchor > 262140 || p - root > 65532 || (child != 0 && p - child > 508)) {
+      return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
+    }
+    const end = p + 12;
+    if (end > capacity) growTo(end);
+    heapEnd = end;
+    store<u32>(p, OVERLAY | ((<u32>delta & 63) << 25) | ((depth + 1) << 21) | (child ? ((p - child) >> 2) << 14 : 0) | ((p - root) >> 2));
+    store<u32>(p + 4, digits);
+    store<u32>(p + 8, ((p - anchor) >> 2) | (bitmap << 16));
+    return p;
+  }
+  return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
+}
+
 function mergeHashed(a: u32, b: u32, shift: u32): u32 {
   const ai = (load<u32>(a + 4) >> shift) & 15;
   const bi = (load<u32>(b + 4) >> shift) & 15;
   const p = branch((1 << ai) | (1 << bi), mapSize(a) + mapSize(b));
-  if (ai == bi) store<u32>(p + 16, mergeHashed(a, b, shift + 4));
+  if (ai == bi) store<u32>(p + 8, mergeHashed(a, b, shift + 4));
   else {
-    store<u32>(p + 16, ai < bi ? a : b);
-    store<u32>(p + 20, ai < bi ? b : a);
+    store<u32>(p + 8, ai < bi ? a : b);
+    store<u32>(p + 12, ai < bi ? b : a);
   }
   return p;
 }
 // Private result of a synchronous insertion, not a field in a published node.
 let insertedCount: u32 = 0;
-function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u32 {
+function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff, mark: u32 = 0x7fffffff): u32 {
   if (!root) { insertedCount = 1; return leaf; }
   const kind = tag(root);
-  if (kind != 1) {
+  if (!isBranch(root)) {
     if (load<u32>(root + 4) != load<u32>(leaf + 4)) { insertedCount = 1; return mergeHashed(root, leaf, shift); }
     if (kind == 0) {
       if (delta == 0 || (delta == 0xffffffff && sameKey(root, leaf))) { insertedCount = 0; return leaf; }
@@ -105,22 +201,10 @@ function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u3
     store<u32>(p + 16 + position * 4, leaf);
     return p;
   }
-  const bitmap = load<u32>(root + 4), count = pc(bitmap);
-  const bit: u32 = 1 << ((load<u32>(leaf + 4) >> shift) & 15);
-  const position = pc(bitmap & (bit - 1));
-  const old = bitmap & bit ? load<u32>(root + 16 + position * 4) : 0;
-  const child = insertAt(old, leaf, shift + 4, delta);
-  const size = load<u32>(root + 8) + insertedCount;
-  if (old) {
-    const p = alloc(16 + count * 4); copyWords(p, root, 16 + count * 4);
-    store<u32>(p + 8, size); store<u32>(p + 16 + position * 4, child); return p;
-  }
-  const p = branch(bitmap | bit, size);
-  copyWords(p + 16, root + 16, position * 4);
-  store<u32>(p + 16 + position * 4, child);
-  const skip: u32 = bitmap & bit ? 1 : 0;
-  copyWords(p + 20 + position * 4, root + 16 + (position + skip) * 4, (count - position - skip) * 4);
-  return p;
+  const digit = (load<u32>(leaf + 4) >> shift) & 15;
+  const bitmap = branchBitmap(root), old = branchChild(root, digit);
+  const child = insertAt(old, leaf, shift + 4, delta, mark);
+  return replaceChild(root, bitmap | (1 << digit), <i32>insertedCount, digit, child, mark);
 }
 export function mapInsert(root: u32, leaf: u32): u32 { return insertAt(materializeJournal(root, 0), leaf, 0); }
 export function mapFind(root: u32, key: u32, len: u32, hash: u32): u32 {
@@ -141,9 +225,8 @@ export function mapFind(root: u32, key: u32, len: u32, hash: u32): u32 {
       }
       return 0;
     }
-    const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 15);
-    if (!(bitmap & bit)) return 0;
-    root = load<u32>(root + 16 + pc(bitmap & (bit - 1)) * 4);
+    const digit = (hash >> shift) & 15;
+    root = branchChild(root, digit);
     shift += 4;
   }
   return 0;
@@ -163,50 +246,87 @@ function deleteAt(root: u32, key: u32, len: u32, hash: u32, shift: u32): u32 {
     copyWords(p + 16 + pos * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
     return p;
   }
-  const bitmap = load<u32>(root + 4), bit: u32 = 1 << ((hash >> shift) & 15);
+  const bitmap = branchBitmap(root), digit = (hash >> shift) & 15, bit: u32 = 1 << digit;
   if (!(bitmap & bit)) return root;
-  const count = pc(bitmap), pos = pc(bitmap & (bit - 1));
-  const old = load<u32>(root + 16 + pos * 4);
-  const child = deleteAt(old, key, len, hash, shift + 4);
+  const old = branchChild(root, digit), child = deleteAt(old, key, len, hash, shift + 4);
   if (old == child) return root;
-  if (!child && count == 1) return 0;
-  if (!child && count == 2) {
-    const remaining = load<u32>(root + 16 + (1 - pos) * 4);
-    if (tag(remaining) != 1) return remaining;
+  const nextBitmap = child ? bitmap : bitmap & ~bit;
+  if (!nextBitmap) return 0;
+  if (pc(nextBitmap) == 1) {
+    const remaining = child ? child : branchChild(root, <u32>ctz(nextBitmap));
+    if (!isBranch(remaining)) return remaining;
   }
-  if (child && count == 1 && tag(child) != 1) return child;
-  const p = branch(child ? bitmap : bitmap & ~bit, mapSize(root) - 1);
-  copyWords(p + 16, root + 16, pos * 4);
-  if (child) store<u32>(p + 16 + pos * 4, child);
-  copyWords(p + 16 + (pos + (child ? 1 : 0)) * 4, root + 20 + pos * 4, (count - pos - 1) * 4);
-  return p;
+  return replaceChild(root, nextBitmap, -1, digit, child);
 }
 export function mapDelete(root: u32, key: u32, len: u32, hash: u32): u32 { return deleteAt(materializeJournal(root, 0), key, len, hash, 0); }
+
+// The caller already resolved a complete key to an immutable leaf. Reuse that
+// identity instead of checking its key again at the end of the copied path.
+function deleteLeafAt(root: u32, leaf: u32, hash: u32, shift: u32): u32 {
+  if (!root) return 0;
+  if (tag(root) == 0) return root == leaf ? 0 : root;
+  if (tag(root) == 2) {
+    const count = load<u32>(root + 8); let pos = count;
+    for (let i: u32 = 0; i < count; i++) if (load<u32>(root + 16 + i * 4) == leaf) { pos = i; break; }
+    if (pos == count) return root;
+    if (count == 2) return load<u32>(root + 16 + (1 - pos) * 4);
+    const p = bucket(hash, count - 1);
+    copyWords(p + 16, root + 16, pos * 4);
+    copyWords(p + 16 + pos * 4, root + 20 + pos * 4, (count - pos - 1) * 4); return p;
+  }
+  const bitmap = branchBitmap(root), digit = (hash >> shift) & 15, bit: u32 = 1 << digit;
+  if (!(bitmap & bit)) return root;
+  const old = branchChild(root, digit), child = deleteLeafAt(old, leaf, hash, shift + 4);
+  if (old == child) return root;
+  const nextBitmap = child ? bitmap : bitmap & ~bit;
+  if (!nextBitmap) return 0;
+  if (pc(nextBitmap) == 1) {
+    const remaining = child ? child : branchChild(root, <u32>ctz(nextBitmap));
+    if (!isBranch(remaining)) return remaining;
+  }
+  return replaceChild(root, nextBitmap, -1, digit, child);
+}
+// Keys are staged in writer-only scratch. This removes the preliminary lookup
+// and leaves both cache state and published bytes unchanged on a missing key.
+export function mapDeleteBytes(root: u32, length: u32): u32 {
+  const hash = hashAt(16384, length);
+  if (root && tag(root) == JOURNAL && !mapFind(root, 16384, length, hash)) return root;
+  return deleteAt(materializeJournal(root, 0), 16384, length, hash, 0);
+}
+export function mapDeleteLeaf(root: u32, leaf: u32): u32 {
+  return leaf ? deleteLeafAt(materializeJournal(root, 0), leaf, load<u32>(leaf + 4), 0) : root;
+}
+
 
 // Prefix-fused batch update. Partition the private input array by the next
 // 4-bit digit with an in-place American-flag pass, then merge directly into the
 // old trie. There is no JS sort, intermediate patch trie, or mutable owner epoch.
 @inline function childAt(root: u32, digit: u32, shift: u32): u32 {
   if (!root) return 0;
-  if (tag(root) != 1) return ((load<u32>(root + 4) >> shift) & 15) == digit ? root : 0;
-  const bitmap = load<u32>(root + 4), bit: u32 = 1 << digit;
-  return bitmap & bit ? load<u32>(root + 16 + pc(bitmap & (bit - 1)) * 4) : 0;
+  if (!isBranch(root)) return ((load<u32>(root + 4) >> shift) & 15) == digit ? root : 0;
+  return branchChild(root, digit);
 }
-function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
-  if (!count) return old;
+@inline export function mapChild(root: u32, digit: u32): u32 { return branchChild(root, digit); }
+
+// Private result of a synchronous recursive batch. Every path assigns it.
+let batchChange: u32 = 0;
+function batchAt(old: u32, input: u32, count: u32, shift: u32, mark: u32 = 0x7fffffff): u32 {
+  if (!count) { batchChange = 0; return old; }
   if (count <= 4) {
-    for (let i: u32 = 0; i < count; i++) old = insertAt(old, load<u32>(input + i * 4), shift);
-    return old;
+    let added: u32 = 0;
+    for (let i: u32 = 0; i < count; i++) { old = insertAt(old, load<u32>(input + i * 4), shift, 0xffffffff, mark); added += insertedCount; }
+    batchChange = added; return old;
   }
   if (shift >= 32) {
     if (!old) {
       const p = bucket(load<u32>(load<u32>(input) + 4), count);
-      copyWords(p + 16, input, count * 4); return p;
+      copyWords(p + 16, input, count * 4); batchChange = count; return p;
     }
     // Exact full-hash collisions require full-key comparisons. Correctness does
     // not depend on hash uniqueness; this rare path can be quadratic in count.
-    for (let i: u32 = 0; i < count; i++) old = insertAt(old, load<u32>(input + i * 4), shift);
-    return old;
+    let added: u32 = 0;
+    for (let i: u32 = 0; i < count; i++) { old = insertAt(old, load<u32>(input + i * 4), shift, 0xffffffff, mark); added += insertedCount; }
+    batchChange = added; return old;
   }
   // Per-depth counts and cursors. Only this synchronous writer uses the scratch.
   const frame: u32 = 8192 + (shift / 4) * 256;
@@ -235,21 +355,26 @@ function batchAt(old: u32, input: u32, count: u32, shift: u32): u32 {
     }
     start = end;
   }
-  let bitmap: u32 = 0, children: u32 = 0, size: u32 = 0;
+  let bitmap: u32 = 0, children: u32 = 0, added: u32 = 0;
+  const size = mapSize(old);
   start = 0;
   for (let digit: u32 = 0; digit < 16; digit++) {
     const n = load<u32>(frame + digit * 4);
-    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 4);
+    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 4, mark);
+    added += batchChange;
     if (child) {
-      bitmap |= 1 << digit; size += mapSize(child);
+      bitmap |= 1 << digit;
       store<u32>(frame + 128 + children++ * 4, child);
     }
     start += n;
   }
-  const p = branch(bitmap, size);
-  copyWords(p + 16, frame + 128, children * 4); return p;
+  const p = branch(bitmap, size + added);
+  copyWords(p + 8, frame + 128, children * 4); batchChange = added; return p;
 }
-export function mapBatch(old: u32, input: u32, count: u32): u32 { return batchAt(materializeJournal(old, 0), input, count, 0); }
+export function mapBatch(old: u32, input: u32, count: u32): u32 {
+  old = materializeJournal(old, 0);
+  return batchAt(old, input, count, 0, heapEnd);
+}
 
 // Legacy read-only WASM ABI for existing direct-reader examples. Do not use the
 // scratch-writing getInfo API concurrently on one memory; the TS reader is scratch-free.
@@ -518,6 +643,8 @@ export function radixDelete(root: u32, key: u32, len: u32): u32 { root = materia
 // Single synchronous writer call: allocate the leaf, update the selected index,
 // and report new metadata. STAGE and result words are not snapshot payloads.
 const WRITE_STAGE: u32 = 16384;
+let writeMapRoot: u32 = 0;
+let writeMapSize: u32 = 0;
 @inline
 export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, value: f64, mode: u32, kind: u32, order: u32, ordinal: u32): u32 {
   const previous = kind == 1 ? mapFind(root, WRITE_STAGE, keyLen, hash) : 0;
@@ -533,10 +660,13 @@ export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, va
   if (mode == 0) store<f64>(destination + prefix, value);
   else if (mode == 1) store<u8>(destination + prefix, <u8>value);
   else if (prefix) copyBytes(destination + prefix, WRITE_STAGE + keyLen, valueLen);
+  const oldSize = kind == 2 ? 0 : root == writeMapRoot ? writeMapSize : mapSize(root);
   const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? insertAt(root, leaf, 0, previous ? 0 : 1) : mapInsert(root, leaf);
   store<u32>(0, leaf); store<u32>(16, hash);
   store<u32>(4, kind == 1 && !previous ? orderCons(order, leaf) : order);
-  store<u32>(8, kind == 2 ? radixSize(next) : mapSize(next));
+  const nextSize = kind == 2 ? radixSize(next) : oldSize + insertedCount;
+  if (kind != 2) { writeMapRoot = next; writeMapSize = nextSize; }
+  store<u32>(8, nextSize);
   store<u32>(12, kind == 1 && !previous ? ordinal + 1 : ordinal);
   return next;
 }
