@@ -5,9 +5,9 @@ Updates return new frozen collection handles. Existing versions remain readable.
 Node and supported browsers can give read-only worker views access to the same
 backing memory. Bun uses a used-prefix copy by default.
 
-**This v0.2 candidate uses worker format 3 and changes the binary layout and
+**This v0.2 candidate uses worker format 4 and changes the binary layout and
 memory lifetime rules.** It is not compatible with v0.1 data or earlier
-worker-format-2 candidates. Read the migration section before upgrading.
+worker-format-2 or worker-format-3 candidates. Read the migration section before upgrading.
 The performance tables below include gains, remaining regressions, and their
 source measurements.
 
@@ -44,30 +44,24 @@ input.position.x = 99;
 ### Benchmark Results (N=10000)
 
 **Zerocopy vs Immutable.js vs native collections.** `Shared` means Zerocopy.
-The original eight groups and operation columns are retained. All times are
-per complete workload, not per individual operation. Lower times are better.
-The ratio columns describe Shared relative to the named reference.
+The original eight groups and operation columns are retained. Times are for
+complete workloads, not single calls. Lower times are better. The ratio
+columns describe Shared relative to the named reference.
 
-Measured on September 14, 2026, in the completed [GitHub validation run](https://github.com/natanelia/zerocopy/actions/runs/34793289405).
-Timing uses Bun 1.4.2, Immutable.js 5.1.9, AssemblyScript 0.28.20, Linux x64,
-and an AMD EPYC 9V45 processor. Each entry is the median of 45 samples from
-three process rounds, with ten warm-ups per case. Each round rotates the
-library order. Result checks run outside the timed sections. Read results
-are consumed and checked; they are not unused expressions.
+Measured on September 14, 2026, in the completed [GitHub validation run](https://github.com/natanelia/zerocopy/actions/runs/34801792862).
+The runner used Bun 1.4.2, Immutable.js 5.1.9, AssemblyScript 0.28.20,
+Linux x64, and an AMD EPYC 7763 processor. Each result is the median of
+45 samples across three process rounds, with ten warm-ups per case and
+rotated library order. Results and retained bases are checked outside timing.
 
-**These first tables measure operations in an initialized arena and repeated
-reads.** Shared arena creation happens before each timed build. Every build
-still creates a fresh collection through individual persistent updates.
-The first-use tables below include arena creation inside the timer. This is
-an explicit distinction, not a claim that initialization became free.
+**The first tables exclude arena creation and use repeated reads.** Every
+build still creates a fresh collection through individual persistent updates.
+First-use results below include arena creation. Native builds use a fresh
+mutable Map or Array. Updates to an existing native collection include one
+copy per workload to preserve its base, then apply changes to that copy.
+Shared and Immutable.js return new versions at each scalar update.
 
-**Native update rows include a copy.** Native builds use a fresh mutable Map
-or Array. An update workload on an existing native collection copies it once
-inside the timer, then applies the changes. Shared and Immutable.js return
-new versions. Native timing is therefore not always an in-place mutation cost.
-All retained bases and final results are checked.
-
-Build, read, peek, and scan rows process 10,000 items unless a row says otherwise.
+Build, read, peek, and scan rows process 10,000 items unless stated otherwise.
 Removal rows apply ten removals to a 10,000-item base. `setMany(100)` changes
 100 entries; Immutable.js uses persistent `set`, not `withMutations`.
 `enq+deq(100)` performs 100 enqueue/dequeue pairs. Linked-list indexed reads
@@ -79,242 +73,252 @@ use a fixed shuffled insertion order; native sorted iteration includes sorting.
 **SharedMap vs Immutable.Map vs Native Map**
 | Operation | Shared | Immutable | vs Imm | Native | vs Native |
 |-----------|--------|-----------|--------|--------|-----------|
-| set | 2.5176ms | 3.3243ms | 1.32x faster | 0.1793ms | 14.04x slower |
-| get | 0.1433ms | 0.5325ms | 3.72x faster | 0.0700ms | 2.05x slower |
-| has | 0.2493ms | 0.7487ms | 3.00x faster | 0.2174ms | 1.15x slower |
-| delete | 0.003647ms | 0.002726ms | 1.34x slower | 0.0322ms | 8.84x faster |
-| setMany(100) | 0.0416ms | 0.0248ms | 1.67x slower | 0.0412ms | 1.01x slower |
+| set | 3.8413ms | 5.6149ms | 1.46x faster | 0.4119ms | 9.33x slower |
+| get | 0.2339ms | 0.9340ms | 3.99x faster | 0.1553ms | 1.51x slower |
+| has | 0.5369ms | 1.2964ms | 2.41x faster | 0.4811ms | 1.12x slower |
+| delete | 0.006908ms | 0.006835ms | 1.01x slower | 0.1233ms | 17.84x faster |
+| setMany(100) | 0.0746ms | 0.0569ms | 1.31x slower | 0.1094ms | 1.47x faster |
 
 **SharedList vs Immutable.List vs Native Array**
 | Operation | Shared | Immutable | vs Imm | Native | vs Native |
 |-----------|--------|-----------|--------|--------|-----------|
-| push | 0.4781ms | 0.8271ms | 1.73x faster | 0.0490ms | 9.76x slower |
-| get | 0.0587ms | 0.0485ms | 1.21x slower | 0.0189ms | 3.11x slower |
-| pop | 0.000391ms | 0.001687ms | 4.31x faster | 0.0377ms | 96.45x faster |
-| forEach | 0.0364ms | 0.0922ms | 2.53x faster | 0.0172ms | 2.11x slower |
+| push | 0.7539ms | 1.5979ms | 2.12x faster | 0.0521ms | 14.47x slower |
+| get | 0.1263ms | 0.1030ms | 1.23x slower | 0.0381ms | 3.32x slower |
+| pop | 0.000648ms | 0.003137ms | 4.84x faster | 0.0392ms | 60.58x faster |
+| forEach | 0.0549ms | 0.1764ms | 3.21x faster | 0.0240ms | 2.29x slower |
 
 **SharedStack vs Immutable.Stack vs Native Array**
 | Operation | Shared | Immutable | vs Imm | Native | vs Native |
 |-----------|--------|-----------|--------|--------|-----------|
-| push | 0.5624ms | 0.1341ms | 4.19x slower | 0.0483ms | 11.64x slower |
-| peek | 0.0702ms | 0.0706ms | 1.01x faster | 0.0600ms | 1.17x slower |
-| pop | 0.000354ms | 0.000745ms | 2.10x faster | 0.0315ms | 88.98x faster |
+| push | 1.0043ms | 0.2010ms | 5.00x slower | 0.0611ms | 16.45x slower |
+| peek | 0.1310ms | 0.1313ms | 1.00x faster | 0.1144ms | 1.15x slower |
+| pop | 0.000732ms | 0.001400ms | 1.91x faster | 0.0373ms | 50.94x faster |
 
 **SharedQueue vs Native Array**
 | Operation | Shared | Native | vs Native |
 |-----------|--------|--------|-----------|
-| enqueue | 0.6258ms | 0.0465ms | 13.46x slower |
-| peek | 0.0909ms | 0.0467ms | 1.95x slower |
-| dequeue | 0.000256ms | 0.0284ms | 111.02x faster |
-| enq+deq(100) | 0.006464ms | 0.0284ms | 4.39x faster |
+| enqueue | 1.2133ms | 0.0482ms | 25.17x slower |
+| peek | 0.2426ms | 0.0661ms | 3.67x slower |
+| dequeue | 0.000509ms | 0.0359ms | 70.45x faster |
+| enq+deq(100) | 0.0116ms | 0.0425ms | 3.65x faster |
 
 **SharedLinkedList vs Native Array**
 | Operation | Shared | Native | vs Native |
 |-----------|--------|--------|-----------|
-| prepend | 3.0895ms | 4.4120ms | 1.43x faster |
-| append | 0.5374ms | 0.0185ms | 29.11x slower |
-| get(0-99) | 0.003823ms | 0.000458ms | 8.34x slower |
-| removeFirst | 0.001781ms | 0.0381ms | 21.41x faster |
+| prepend | 5.4781ms | 9.2912ms | 1.70x faster |
+| append | 1.3051ms | 0.0465ms | 28.08x slower |
+| get(0-99) | 0.006275ms | 0.000666ms | 9.43x slower |
+| removeFirst | 0.003049ms | 0.0393ms | 12.89x faster |
 
 **SharedDoublyLinkedList vs Native Array**
 | Operation | Shared | Native | vs Native |
 |-----------|--------|--------|-----------|
-| prepend | 3.0961ms | 4.4078ms | 1.42x faster |
-| append | 0.6071ms | 0.0189ms | 32.19x slower |
-| get(front) | 0.002589ms | 0.000225ms | 11.49x slower |
-| get(back) | 0.003050ms | 0.000225ms | 13.53x slower |
-| removeFirst | 0.001774ms | 0.0452ms | 25.47x faster |
-| removeLast | 0.000416ms | 0.0106ms | 25.36x faster |
+| prepend | 5.8770ms | 9.3235ms | 1.59x faster |
+| append | 1.3110ms | 0.0538ms | 24.39x slower |
+| get(front) | 0.005538ms | 0.000344ms | 16.12x slower |
+| get(back) | 0.005599ms | 0.000343ms | 16.34x slower |
+| removeFirst | 0.003077ms | 0.0376ms | 12.24x faster |
+| removeLast | 0.000863ms | 0.0259ms | 29.99x faster |
 
 **SharedOrderedMap vs Immutable.OrderedMap vs Native Map**
 | Operation | Shared | Immutable | vs Imm | Native | vs Native |
 |-----------|--------|-----------|--------|--------|-----------|
-| set | 3.2692ms | 5.8191ms | 1.78x faster | 0.2786ms | 11.73x slower |
-| get | 0.2123ms | 0.8679ms | 4.09x faster | 0.2583ms | 1.22x faster |
-| has | 0.2748ms | 1.0113ms | 3.68x faster | 0.2439ms | 1.13x slower |
-| delete | 0.003783ms | 0.004929ms | 1.30x faster | 0.0186ms | 4.91x faster |
-| forEach | 0.8722ms | 0.1095ms | 7.96x slower | 0.0401ms | 21.75x slower |
+| set | 6.3215ms | 10.2688ms | 1.62x faster | 0.7616ms | 8.30x slower |
+| get | 0.4301ms | 1.6793ms | 3.90x faster | 0.6198ms | 1.44x faster |
+| has | 0.5580ms | 1.9326ms | 3.46x faster | 0.5494ms | 1.02x slower |
+| delete | 0.006266ms | 0.0104ms | 1.65x faster | 0.0776ms | 12.38x faster |
+| forEach | 1.5027ms | 0.2105ms | 7.14x slower | 0.0998ms | 15.06x slower |
 
 **SharedSortedMap vs Native Map**
 | Operation | Shared | Native | vs Native |
 |-----------|--------|--------|-----------|
-| set | 3.2059ms | 0.4259ms | 7.53x slower |
-| get | 0.2519ms | 0.2346ms | 1.07x slower |
-| has | 0.1605ms | 0.1548ms | 1.04x slower |
-| delete | 0.002905ms | 0.0179ms | 6.17x faster |
-| keys(sorted) | 1.2281ms | 0.5249ms | 2.34x slower |
-
+| set | 6.6242ms | 0.6876ms | 9.63x slower |
+| get | 0.7011ms | 0.4880ms | 1.44x slower |
+| has | 0.6468ms | 0.4476ms | 1.45x slower |
+| delete | 0.006447ms | 0.0729ms | 11.32x faster |
+| keys(sorted) | 2.4290ms | 0.9531ms | 2.55x slower |
 <!-- library-timing-tables:end -->
 
-The repeated Map `get` and `has` rows exceed 2x Immutable.js in this run.
-That does **not** establish 2x performance for all operations. Map writes,
-list append, and ordered-map writes remain below that target. List indexed
-reads, stack push, map batch updates, and ordered-map scans still lose to
-Immutable.js in these tests. Native mutable construction is usually faster.
+**The original string `SharedMap.set` row is 1.46x faster than Immutable.js,
+not 2x.** The additional workloads below separate string inserts, numeric
+inserts, dispersed overwrites, Unicode, and forks. Results near 1.00x are not
+established improvements. These are Bun microbenchmarks, not application,
+browser, or worker-transfer speed guarantees.
 
 ### First-use builds, including arena creation
 
-The next table includes Shared arena reset, new WebAssembly memory, and
-WASM instance creation in the timed workload, as the earlier benchmark did.
-It uses the same three libraries, inputs, and 45-sample method. Native and
-Immutable.js have no equivalent arena initialization. Small one-off builds
-must pay this cost; do not substitute the initialized-arena results for them.
+This table includes Shared arena reset, new WebAssembly memory, and WASM
+instance creation inside the timed workload. Inputs and sample counts are
+the same as above. Immutable.js and native collections have no equivalent
+arena initialization cost.
 
 | Workload | Shared | Immutable | vs Imm | Native | vs Native |
 |---|---:|---:|---|---:|---|
-| SharedMap.set | 5.5816ms | 3.1420ms | 1.78x slower | 0.1745ms | 31.98x slower |
-| SharedList.push | 4.2219ms | 0.8122ms | 5.20x slower | 0.0479ms | 88.17x slower |
-| SharedStack.push | 4.4130ms | 0.1156ms | 38.16x slower | 0.0224ms | 197.32x slower |
-| SharedQueue.enqueue | 4.4658ms | N/A | N/A | 0.0227ms | 196.52x slower |
-| SharedLinkedList.prepend | 6.8818ms | N/A | N/A | 4.4026ms | 1.56x slower |
-| SharedLinkedList.append | 4.8450ms | N/A | N/A | 0.0208ms | 233.26x slower |
-| SharedDoublyLinkedList.prepend | 6.9103ms | N/A | N/A | 4.3595ms | 1.59x slower |
-| SharedDoublyLinkedList.append | 4.8736ms | N/A | N/A | 0.0162ms | 300.56x slower |
-| SharedOrderedMap.set | 7.2992ms | 5.6272ms | 1.30x slower | 0.2577ms | 28.32x slower |
-| SharedSortedMap.set | 6.6584ms | N/A | N/A | 0.2927ms | 22.75x slower |
+| SharedMap.set | 9.3940ms | 5.8996ms | 1.59x slower | 0.4128ms | 22.75x slower |
+| SharedList.push | 6.9694ms | 1.6735ms | 4.16x slower | 0.0940ms | 74.18x slower |
+| SharedStack.push | 6.6314ms | 0.1973ms | 33.61x slower | 0.0840ms | 78.96x slower |
+| SharedQueue.enqueue | 7.0335ms | N/A | N/A | 0.0492ms | 143.07x slower |
+| SharedLinkedList.prepend | 11.3363ms | N/A | N/A | 9.3290ms | 1.22x slower |
+| SharedLinkedList.append | 8.1099ms | N/A | N/A | 0.0453ms | 179.09x slower |
+| SharedDoublyLinkedList.prepend | 11.7740ms | N/A | N/A | 9.1520ms | 1.29x slower |
+| SharedDoublyLinkedList.append | 8.1714ms | N/A | N/A | 0.0371ms | 220.26x slower |
+| SharedOrderedMap.set | 12.2661ms | 10.0788ms | 1.22x slower | 0.7581ms | 16.18x slower |
+| SharedSortedMap.set | 11.5702ms | N/A | N/A | 0.6686ms | 17.31x slower |
+
+### Scalar map writes across different keys
+
+These tests call ordinary `set` for every update. They do not use a bulk
+builder, `withMutations`, or repeated changes to just a few keys. The insert
+order is a fixed shuffle. Overwrite rows change 1,000 distinct keys in a
+10,000-item base. The long-prefix case uses a shared 128-character key prefix.
+The fork row creates 64 separate snapshots from one base; native copies once
+per fork. All returned versions are immediately readable and shareable.
+
+Each workload and library runs in an independent process for each round.
+There are 45 timed samples per cell. Setup and full output checks are outside
+timing, except arena creation in the explicitly marked first-use row.
+
+| Workload | Shared | Immutable | vs Imm | Native | vs Native |
+|---|---:|---:|---|---:|---|
+| Insert 10,000 new string values; shuffled keys | 3.4796ms | 6.9285ms | 1.99x faster | 0.3104ms | 11.21x slower |
+| Insert 10,000 new numeric values; shuffled keys | 2.6059ms | 6.3545ms | 2.44x faster | 0.3160ms | 8.25x slower |
+| Insert 10,000 Unicode keys and values | 8.7007ms | 6.7029ms | 1.30x slower | 0.3389ms | 25.68x slower |
+| Insert 10,000 keys with a long shared prefix | 7.5466ms | 20.2847ms | 2.69x faster | 0.3452ms | 21.86x slower |
+| Change 1,000 distinct string entries | 0.3678ms | 0.6531ms | 1.78x faster | 0.1198ms | 3.07x slower |
+| Change 1,000 distinct numeric entries | 0.3335ms | 0.8786ms | 2.63x faster | 0.0963ms | 3.46x slower |
+| Change 1,000 numeric entries after a full read | 0.4374ms | 0.6407ms | 1.46x faster | 0.1059ms | 4.13x slower |
+| 64 independent updates from one retained base | 0.0599ms | 0.0443ms | 1.35x slower | 9.6084ms | 160.32x faster |
+| 1,000 changed set/get/has sequences | 0.5443ms | 0.8430ms | 1.55x faster | 0.1466ms | 3.71x slower |
+| Insert 10,000 strings including arena creation | 3.7682ms | 7.1686ms | 1.90x faster | 0.3706ms | 10.17x slower |
+
+Numeric insertion and dispersed numeric overwrites exceed 2x Immutable.js in
+this run. String insertion with shuffled keys reaches 1.99x, but string
+overwrites, post-read writes, mixed operations, and first-use builds miss 2x.
+Unicode construction and independent forks are slower than Immutable.js.
+There is no claim of a 2x advantage for all scalar writes.
 
 ### Cold reads, larger key sets, and mixed updates
 
-A repeated read can avoid tree traversal through a bounded process-local
-cache. The following cases prevent that benefit from hiding other costs.
-The first-read case attaches an empty read cache before each timed scan.
-The 32,768-key case exceeds the 16,384-entry cache limit. The mixed case
-changes a key, gets its new value, and checks membership 1,024 times.
-Native makes one copy for the mixed batch to preserve its original state.
-The final case alternates reads between two retained snapshots.
+A repeated read can use a bounded process-local cache. The first-read case
+attaches an empty read cache before each timed scan. The 32,768-key case
+exceeds the value-cache entry limit. The mixed case changes a key, reads its
+new value, and checks membership 1,024 times. The final case alternates reads
+between two retained snapshots. Each cell has 45 samples.
 
 | Workload | Shared | Immutable | vs Imm | Native | vs Native |
 |---|---:|---:|---|---:|---|
-| First read of 10,000 numeric keys | 1.2365ms | 0.6794ms | 1.82x slower | 0.1391ms | 8.89x slower |
-| Read 32,768 numeric keys | 2.4330ms | 2.3773ms | 1.02x slower | 0.6408ms | 3.80x slower |
-| 1,024 set/get/has sequences | 0.9736ms | 0.3330ms | 2.92x slower | 0.0851ms | 11.45x slower |
-| 10,000 reads alternating two snapshots | 0.1982ms | 0.7173ms | 3.62x faster | 0.2626ms | 1.32x faster |
+| First read of 10,000 numeric keys | 2.5339ms | 1.1957ms | 2.12x slower | 0.3142ms | 8.07x slower |
+| Read 32,768 numeric keys | 5.1745ms | 5.5349ms | 1.07x faster | 1.2018ms | 4.31x slower |
+| 1,024 set/get/has sequences | 0.8499ms | 0.6452ms | 1.32x slower | 0.4404ms | 1.93x slower |
+| 10,000 reads alternating two snapshots | 0.5495ms | 1.4999ms | 2.73x faster | 0.6843ms | 1.25x faster |
 
-The cold and mixed rows are still slower than Immutable.js. These remaining
-costs are part of the result. Warm lookup gains must not be described as
-uncached lookup gains or as guaranteed application speedups. These are Bun
-microbenchmarks, not browser timings, worker-transfer timings, or a complete
-application model. Small differences near 1.00x can reflect timing variation.
+The fixed-order workloads here differ from the independent-process shuffled
+write suite. Keep both results; do not substitute a favorable row for another
+access pattern. Warm lookup gains are not uncached lookup gains.
 
 ### How the fast paths work
 
-The read cache stores a key's immutable leaf address and its last root.
-An exact-root hit skips hashing, encoding, and tree traversal. A different
-root must perform a real lookup. If it reaches the same immutable leaf,
-the decoded primitive can be reused. Full key checks remain on uncached
-and hash-collision paths. A cached primitive no-op update can return the
-original handle without allocating a new path.
+Scalar writes use a bounded WASM index for the first two hash digits. It
+reuses resolved child pointers only while updating the exact last writer
+root. Forks, interleaved maps, bulk changes, and deletes invalidate those
+hints. The index uses 1,152 bytes inside the existing scratch prefix. It does
+not allocate extra nodes, store another full map, or change snapshot bytes.
+An allocation failure invalidates the index before a retry can use it.
 
-The cache is lazy and limited to 16,384 keys, 131,072 UTF-16 key code units,
-and a 1 MiB logical primitive-value budget. Its address array can reach
-256 KiB. JavaScript Map entries, keys, and array overhead are additional;
-the memory measurements below include them. Unrelated misses do not occupy
-cache entries. The cache is local to a process, not shared mutable state.
+The paired test checks equal allocated bytes for every sample and an equal
+final payload checksum for every workload and round, with and without the
+index. Thus, this write change preserves the compact node layout and its
+allocation savings. It does not eliminate value encoding, version handles,
+or the work needed to copy changed immutable paths.
 
-ASCII string writes use writer scratch directly instead of allocating
-encoding buffers. Short records use inline byte copies and a smaller WASM
-call interface. Unicode and large values keep the full encoding path.
-HAMT insertion carries one size-change result up the copied path instead
-of repeatedly loading child sizes. Nearby vector reads reuse one immutable
-leaf address. Vector scans process blocks without nested generators.
-Stack peek stores the encoded top value in the frozen handle, never a
-mutable reference to the caller's object.
+Map branches use compact headers and bounded 12-byte immutable branch
+changes. Reader hints and value caches are private and tied to an exact
+root. Cache limits and costs are included in the memory test. ASCII writes
+use scratch storage; Unicode and large values keep the general codec path.
+Vector scans work by block. These optimizations preserve old versions.
 
 ### Evidence
 
-The [library evidence summary](proofs/results/hot-path-libraries-summary.json)
-contains every median, ratio, memory result, environment, and checksum.
-The [raw timing and memory archive](https://github.com/natanelia/zerocopy/actions/runs/34793289405/artifacts/10328518177)
-contains all 4,005 primary timing samples, 1,080 first-use samples, 540 extra
-workload samples, 108 isolated memory measurements, and the Node worker result.
-The archive is retained until December 13, 2026. The summary and executable
-benchmark drivers remain in the repository. The reproduction command is below.
+The [recorded summary](proofs/results/map-set-index-summary.json) contains
+scalar-write medians, memory results, source and driver checksums, and test counts.
+The [raw archive](https://github.com/natanelia/zerocopy/actions/runs/34801792862/artifacts/10330799515) contains
+1,800 paired scalar-write timing samples, 4,005 original-table samples,
+1,080 first-use samples, 540 extra read-workload samples, 108 isolated memory
+measurements, and test logs. Artifact retention ends on December 13, 2026.
+The [scalar-write report](proofs/map-set-performance.md) states the remaining
+limits and the comparison with the same engine without the writer index.
 
 ## Memory: Shared vs Immutable.js vs native
 
-These are measured retained-memory comparisons, not comparisons with an older
-Zerocopy build. One MiB is 1,048,576 bytes. Lower memory is better. `vs Imm`
-and `vs Native` describe Shared's retained bytes relative to each reference.
-No claim of lower memory for every collection is made.
+Lower memory is better. One MiB is 1,048,576 bytes. These measurements use
+the same validated source and runner as the speed tables. They compare
+libraries, not different Zerocopy releases.
 
-Memory uses Node.js 22.23.2 and the portable library build, with Immutable.js
-5.1.9, on the same Linux x64 runner as the timing tests. It does not use Bun's
-heap reporting. Each library, type, size, and scenario runs in an isolated
-process with `--expose-gc`. The table shows the median of three processes.
-
-The metric is **incremental V8 heap used after forced garbage collection,
-plus the full retained backing-buffer bytes**. Shared's current WASM memory
-and auxiliary typed-array buffers are counted once. JavaScript keys, values,
-wrappers, caches, and index objects are included in the heap delta. Unused
-space in the current WASM buffer is included; this is not just payload size.
-
-Library imports, code warm-up, and empty default arenas are established before
-the heap baseline. These figures exclude total process RSS, code memory,
-startup cost, and peak temporary allocation. They are estimates of retained
-data cost in this method, not an exact accounting of the entire process.
+The metric is **incremental post-GC V8 heap use plus full retained backing
+buffers**. It includes Shared's JavaScript keys, values, caches, wrappers,
+auxiliary buffers, and unused space in its active WASM memory. It is not a
+comparison of Shared payload bytes with another library's complete storage.
+Node.js v22.23.2 runs each library, type, size, and scenario in an isolated
+process with `--expose-gc`. Results are medians of three independent processes.
+Library imports, warm-up, and empty default arenas precede the heap baseline.
+Startup, code memory, total process RSS, and peak temporary memory are excluded.
 
 ### One retained collection after reads
 
-Maps store string keys and string values. Lists and stacks store numbers.
-Each case builds through scalar updates and then checks all values. Thus,
-Shared's read-cache cost is included. Intermediate handles are released, but
-uncompacted Shared arenas still retain their allocated node history.
+Maps use string keys and string values. Lists and stacks use numbers.
+Construction uses scalar writes. All values are checked before measurement,
+so Shared's normal read-cache cost is included. Only the latest handle is
+retained, but Shared arenas still contain allocated intermediate nodes.
 
 | Collection and workload | Shared | Immutable | vs Imm | Native | vs Native |
 |---|---:|---:|---|---:|---|
-| Map, 10,000 items | 4.060 MiB | 2.056 MiB | 97.5% more | 0.905 MiB | 348.5% more |
-| List, 10,000 items | 0.289 MiB | 0.240 MiB | 20.4% more | 0.086 MiB | 234.5% more |
-| Stack, 10,000 items | 0.298 MiB | 0.404 MiB | 26.3% less | 0.078 MiB | 279.6% more |
-| OrderedMap, 10,000 items | 4.192 MiB | 2.935 MiB | 42.8% more | 0.905 MiB | 363.1% more |
-| Map, 100,000 items | 33.759 MiB | 19.110 MiB | 76.7% more | 8.085 MiB | 317.6% more |
-| List, 100,000 items | 1.908 MiB | 1.995 MiB | 4.4% less | 0.880 MiB | 116.7% more |
-| Stack, 100,000 items | 1.675 MiB | 3.837 MiB | 56.3% less | 0.875 MiB | 91.4% more |
-| OrderedMap, 100,000 items | 35.265 MiB | 27.207 MiB | 29.6% more | 8.085 MiB | 336.2% more |
+| Map, 10,000 items | 1.966 MiB | 2.050 MiB | 4.1% less | 0.898 MiB | 118.9% more |
+| List, 10,000 items | 0.297 MiB | 0.258 MiB | 15.3% more | 0.079 MiB | 274.5% more |
+| Stack, 10,000 items | 0.292 MiB | 0.409 MiB | 28.6% less | 0.078 MiB | 272.9% more |
+| OrderedMap, 10,000 items | 2.159 MiB | 2.938 MiB | 26.5% less | 0.898 MiB | 140.4% more |
+| Map, 100,000 items | 14.770 MiB | 19.104 MiB | 22.7% less | 8.081 MiB | 82.8% more |
+| List, 100,000 items | 1.922 MiB | 1.994 MiB | 3.6% less | 0.876 MiB | 119.3% more |
+| Stack, 100,000 items | 1.669 MiB | 3.843 MiB | 56.6% less | 0.875 MiB | 90.6% more |
+| OrderedMap, 100,000 items | 16.276 MiB | 27.210 MiB | 40.2% less | 8.081 MiB | 101.4% more |
 
-
-Shared uses less retained memory for the 100,000-value stack in this run.
-Uncompacted maps use more than Immutable.js and native Map. The list result
-is also size-dependent. These results must not be replaced with live payload
-bytes or with the claim that all shared-memory collections use less memory.
+The 10,000-item map uses 4.1% less than Immutable.js in this run, while the
+100,000-item map uses 22.7% less. The small difference at 10,000 items needs
+care with heap-measurement variation. Shared still uses more memory than
+native Map. The writer index adds no reserved backing memory: its small
+scratch area fits in the prefix already reserved by each arena.
 
 ### Compacted collections and retained history
 
-For compacted rows, only Shared requires an explicit live-data rebuild.
-The source arena and its default reference are released, then all current
-values are read again before measurement. Immutable.js and native collections
-use their normal garbage-collected representations. Compaction time and the
-peak memory while both arenas coexist are not part of this retained total.
+Compacted rows explicitly rebuild Shared's live data in a fresh arena.
+The source and its default arena reference are released, then all live
+values are checked again. The other libraries use their normal GC-managed
+representations. Compaction time and peak memory while both arenas coexist
+are not included in retained size.
 
-For history rows, a 10,000-key map keeps 32 snapshots while updating one key.
-Shared and Immutable.js retain their versions; native Map makes 31 shallow
-copies and retains all 32 maps. Only the changed key is checked across these
-versions, rather than warming all keys. Do not compare those cache states
-as though they were identical to the full-read rows above.
+History rows keep 32 snapshots of a 10,000-key map while changing one key.
+Shared and Immutable.js retain versions; native Map retains 31 shallow copies
+plus its original. Only the changed key is checked in these history cases.
+Their cache state differs from the full-read cases above.
 
 | Collection and workload | Shared | Immutable | vs Imm | Native | vs Native |
 |---|---:|---:|---|---:|---|
-| Map, 10,000 items; Shared compacted | 2.101 MiB | 2.056 MiB | 2.1% more | 0.905 MiB | 132.0% more |
-| Map, 10,000 items; 32 snapshots | 2.826 MiB | 2.053 MiB | 37.6% more | 14.470 MiB | 80.5% less |
-| OrderedMap, 10,000 items; Shared compacted | 2.219 MiB | 2.939 MiB | 24.5% less | 0.905 MiB | 145.1% more |
-| OrderedMap, 10,000 items; 32 snapshots | 2.965 MiB | 2.898 MiB | 2.3% more | 14.470 MiB | 79.5% less |
+| Map, 10,000 items; Shared compacted | 1.645 MiB | 2.051 MiB | 19.8% less | 0.898 MiB | 83.2% more |
+| Map, 10,000 items; 32 snapshots | 1.054 MiB | 2.048 MiB | 48.5% less | 14.463 MiB | 92.7% less |
+| OrderedMap, 10,000 items; Shared compacted | 1.747 MiB | 2.938 MiB | 40.6% less | 0.898 MiB | 94.5% more |
+| OrderedMap, 10,000 items; 32 snapshots | 1.248 MiB | 2.912 MiB | 57.1% less | 14.463 MiB | 91.4% less |
 
-
-Compaction helps the ordered map beat Immutable.js for this single retained
-collection. Keeping snapshots uses much less memory than copying native maps,
-but Shared does not beat Immutable.js for both history cases. A compacted
-arena still reserves at least 128 KiB. Old snapshots, worker payloads, nested
-references, or default arenas can keep source memory alive. Compaction is
-not automatic reclamation and does not release memory still in use.
-
+Compaction is explicit, not automatic reclamation. Old snapshots, workers,
+payloads, nested values, or default references can keep the source arena
+alive. An arena still reserves at least 128 KiB. The tables do not imply
+that every Shared collection is smaller than every alternative.
 Only directly corresponding Map, OrderedMap, List/Array, and Stack/Array
-types are measured here. The benchmark does not invent an Immutable.js queue,
-physical linked list, or sorted-map counterpart.
+representations are measured here. No missing Immutable.js type is invented.
 
 ## Collections
 
 | Type | Storage | Main operations |
 |---|---|---|
-| `SharedMap` | 16-way persistent HAMT | `get`, `has`, `set`, `delete`, `setMany`, `getMany`, `deleteMany` |
+| `SharedMap` | 16-way persistent HAMT with compact branch changes | `get`, `has`, `set`, `delete`, `setMany`, `getMany`, `deleteMany` |
 | `SharedSet` | HAMT with tagged keys | `add`, `addMany`, `has`, `delete`, `values`, `forEach` |
 | `SharedList` | 32-way persistent vector with a tail block | `get`, `set`, `push`, `pushMany`, `pop`, `toArray` |
 | `SharedStack` | Persistent cons nodes | `push`, `pop`, `peek` |
@@ -449,11 +453,10 @@ replace a module's default arena reference, but it does not invalidate old
 snapshots or force garbage collection. Any remaining holder keeps the old arena
 alive. See the retained-memory tables and measurement limits above.
 
-## Migration from v0.1 and worker format 2
+## Migration from v0.1 and older worker formats
 
 Rebuild all application and worker bundles together. Recreate data rather than
-loading old raw roots. Worker format 3 rejects older payloads, including those
-from the previous PR candidate. Node layouts, tail descriptors, the ordered-map
+loading old raw roots. Worker format 4 rejects older payloads, including formats 2 and 3. Node layouts, tail descriptors, the ordered-map
 log, the sorted-map index, and the WASM interface have changed.
 
 `dispose()` and `configureAutoGC()` are deprecated no-ops. They must not be used
@@ -481,12 +484,13 @@ bunx playwright install --with-deps chromium
 bun run test:browser
 ```
 
-The [completed validation run](https://github.com/natanelia/zerocopy/actions/runs/34793289405)
-passed 373 unit tests in 19 files, 16 Chromium tests in five files, all build
-steps, and both core and Redux type checks. The real Node worker checked
-all 12 collection types, nested values, large retained sequences, repeated
-attachment, and at least 10,000 reads during writer updates. These are
-executable checks, not machine-checked verification of the whole system.
+The [completed validation run](https://github.com/natanelia/zerocopy/actions/runs/34801792862)
+passed 395 unit tests in 21 files, 16 Chromium tests in five files, all builds,
+and core and Redux type checks. The real Node worker checked all 12 collection
+types, nested values, retained sequences, repeated attachment, and at least
+10,000 concurrent retained reads. Ten new writer-index tests cover forks,
+collisions, Unicode, callback reentry, allocation failure, and old bytes.
+These are executable checks, not machine-checked verification of the whole system.
 
 ### Reproduce the timing and memory comparisons
 
@@ -501,6 +505,12 @@ builds with arena creation, cold and mixed reads, and the three-library memory
 comparison. All variants retain the same inputs and validate their results.
 Raw JSON and generated tables are written below `proofs/results/hot-path/`
 and `proofs/results/cold-build/`.
+
+To run the independent-process scalar-write comparison:
+
+```sh
+node proofs/run-map-set.mjs proofs/results/map-set.json
+```
 
 To run only the memory comparison after the portable build:
 
