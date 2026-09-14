@@ -29,7 +29,7 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
     super(source); this.valueType = type; this.head = head; this.tail = tail; this.size = checkedSize(size); checkedSize(tail + size); this.block = block; this.depth = depth; Object.freeze(this);
   }
   enqueue(value: ValueOf<T>): SharedQueue<T> {
-    const a = arenaOf(this), raw = a.encode(this.valueType, value), end = checkedSize(this.tail + this.size), total = checkedSize(end + 1);
+    const a = this.arena, raw = a.encode(this.valueType, value), end = checkedSize(this.tail + this.size), total = checkedSize(end + 1);
     const length = end ? ((end - 1) & 31) + 1 : 0;
     if (length < 32) return new SharedQueue(this.valueType, this.head, this.tail, this.size + 1, undefined, a, a.wasm.tailAppend(this.block, length, raw) >>> 0, this.depth);
     const depth = vectorDepth(end), head = a.wasm.vecLink(this.head, this.depth, depth, end - 32, this.block, 32) >>> 0;
@@ -37,12 +37,12 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
   }
   dequeue(): SharedQueue<T> {
     if (!this.size) return this;
-    const a = arenaOf(this);
+    const a = this.arena;
     return this.size > 1 ? new SharedQueue(this.valueType, this.head, this.tail + 1, this.size - 1, undefined, a, this.block, this.depth) : new SharedQueue(this.valueType, 0, 0, 0, undefined, a);
   }
   peek(): ValueOf<T> | undefined {
     if (!this.size) return undefined;
-    const a = arenaOf(this), start = (this.tail + this.size - 1) & ~31;
+    const a = this.arena, start = (this.tail + this.size - 1) & ~31;
     const raw = this.tail >= start ? a.dv.getFloat64(this.block + (this.tail - start) * 8, true) : a.wasm.vecGet(this.head, this.depth, this.tail);
     return a.decode(this.valueType, raw);
   }

@@ -29,7 +29,7 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   }
   private insert(index: number, value: ValueOf<T>): SharedDoublyLinkedList<T> {
     if (index === this.size) return this.append(value);
-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
+    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
     if (index >= before && this.tailSize < 32) return new SharedDoublyLinkedList(this.valueType, this.head, a.wasm.tailInsert(this.tail, this.tailSize, index - before, raw) >>> 0, size, a, this.tailSize + 1);
     let head = this.head;
     if (index >= before && this.tailSize) head = a.wasm.blockAppend(head, this.tail, this.tailSize) >>> 0;
@@ -38,13 +38,13 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   }
   private removeAt(index: number): SharedDoublyLinkedList<T> {
     if (!validIndex(index, this.size)) return this;
-    const a = arenaOf(this); a.assertWritable(); const before = this.size - this.tailSize;
+    const a = this.arena; a.assertWritable(); const before = this.size - this.tailSize;
     if (index >= before) return new SharedDoublyLinkedList(this.valueType, this.head, a.wasm.tailRemove(this.tail, this.tailSize, index - before) >>> 0, this.size - 1, a, this.tailSize - 1);
     return new SharedDoublyLinkedList(this.valueType, a.wasm.blockDelete(this.head, index) >>> 0, this.tail, this.size - 1, a, this.tailSize);
   }
   prepend(value: ValueOf<T>): SharedDoublyLinkedList<T> { return this.insert(0, value); }
   append(value: ValueOf<T>): SharedDoublyLinkedList<T> {
-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
+    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
     if (this.tailSize < 32) return new SharedDoublyLinkedList(this.valueType, this.head, a.wasm.tailAppend(this.tail, this.tailSize, raw) >>> 0, size, a, this.tailSize + 1);
     const head = a.wasm.blockAppend(this.head, this.tail, 32) >>> 0;
     return new SharedDoublyLinkedList(this.valueType, head, a.wasm.tailAppend(0, 0, raw) >>> 0, size, a, 1);
@@ -54,13 +54,13 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   getLast(): ValueOf<T> | undefined { return this.get(this.size - 1); }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const a = arenaOf(this), before = this.size - this.tailSize;
+    const a = this.arena, before = this.size - this.tailSize;
     const raw = index >= before ? a.dv.getFloat64(this.tail + (index - before) * 8, true) : a.wasm.blockGet(this.head, index);
     return a.decode(this.valueType, raw);
   }
   insertAfter(index: number, value: ValueOf<T>): SharedDoublyLinkedList<T> { return validIndex(index, this.size) ? this.insert(index + 1, value) : this; }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
-    const a = arenaOf(this); let i = 0;
+    const a = this.arena; let i = 0;
     for (const raw of a.blocks(this.head)) fn(a.decode(this.valueType, raw), i++);
     for (let t = 0; t < this.tailSize; t++) fn(a.decode(this.valueType, a.dv.getFloat64(this.tail + t * 8, true)), i++);
   }
@@ -72,7 +72,7 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   remove(index: number): SharedDoublyLinkedList<T> { return this.removeAt(index); }
   insertBefore(index: number, value: ValueOf<T>): SharedDoublyLinkedList<T> { return validIndex(index, this.size) ? this.insert(index, value) : this; }
   forEachReverse(fn: (value: ValueOf<T>, index: number) => void): void {
-    const a = arenaOf(this); let i = this.size - 1;
+    const a = this.arena; let i = this.size - 1;
     for (let t = this.tailSize - 1; t >= 0; t--) fn(a.decode(this.valueType, a.dv.getFloat64(this.tail + t * 8, true)), i--);
     for (const raw of a.blocks(this.head, true)) fn(a.decode(this.valueType, raw), i--);
   }

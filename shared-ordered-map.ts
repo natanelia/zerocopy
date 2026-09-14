@@ -29,20 +29,22 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
     super(source); this.valueType = type; this.root = root; this.head = head; this.tail = tail; this.size = _size ?? source.wasm.mapSize(root); this.orderStable = orderStable; Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedOrderedMap<T> {
-    const a = arenaOf(this); checkedSize(this.tail + 1);
-    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 1, this.head, this.tail) : a.write(this.valueType, this.root, key, value, 1, this.head, this.tail));
+    const a = this.arena; a.assertWritable();
+    if (a.sameValue(this.root, key, this.valueType, value, 4)) return this;
+    checkedSize(this.tail + 1);
+    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 1, this.head, this.tail) : this.valueType === 'string' ? a.writeString(this.root, key, value as string, 1, this.head, this.tail) : a.write(this.valueType, this.root, key, value, 1, this.head, this.tail));
     return new SharedOrderedMap(this.valueType, root, a.writeHead, a.writeCount, a.writeSize, a, this.orderStable && a.writeSize > this.size);
   }
-  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.find(this.root, key); return leaf ? a.leafValue(this.valueType, leaf, 4) : undefined; }
-  has(key: string): boolean { return arenaOf(this).find(this.root, key) !== 0; }
+  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 4); }
+  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
   delete(key: string): SharedOrderedMap<T> {
-    const a = arenaOf(this); a.assertWritable(); const leaf = a.find(this.root, key); if (!leaf) return this;
+    const a = this.arena; a.assertWritable(); const leaf = a.find(this.root, key); if (!leaf) return this;
     const root = a.delete(this.root, key);
     return root ? new SharedOrderedMap(this.valueType, root, this.head, this.tail, undefined, a, false)
       : new SharedOrderedMap(this.valueType, 0, 0, 0, 0, a);
   }
   *entries(): Generator<[string, ValueOf<T>]> {
-    const a = arenaOf(this), order: number[] = [], view = a.dv; let p = this.head;
+    const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
     while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
     for (let i = order.length - 1; i >= 0; i--) {
       const old = order[i];

@@ -30,7 +30,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   /** @deprecated Arena lifetime is managed by JavaScript reachability. */
   dispose(): void {}
   push(value: ValueOf<T>): SharedList<T> {
-    const a = arenaOf(this), raw = a.encode(this.type, value), size = checkedSize(this.size + 1);
+    const a = this.arena, raw = a.encode(this.type, value), size = checkedSize(this.size + 1);
     const length = this.size ? ((this.size - 1) & 31) + 1 : 0;
     if (length < 32) return new SharedList(this.type, this.root, this.depth, size, a, a.wasm.tailAppend(this.tail, length, raw) >>> 0);
     const depth = vectorDepth(this.size);
@@ -39,7 +39,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   pushMany(values: readonly ValueOf<T>[]): SharedList<T> {
     if (!values.length) return this;
-    const a = arenaOf(this); a.assertWritable();
+    const a = this.arena; a.assertWritable();
     const size = checkedSize(this.size + values.length);
     const oldLength = this.size ? ((this.size - 1) & 31) + 1 : 0;
     // Encode first. User serialization may reenter the owning arena.
@@ -51,19 +51,19 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const a = arenaOf(this), start = (this.size - 1) & ~31;
-    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.wasm.vecGet(this.root, this.depth, index);
-    return a.decode(this.type, raw);
+    const a = this.arena, start = (this.size - 1) & ~31;
+    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.vectorValue(this.root, this.depth, index);
+    return this.type === 'number' ? raw as ValueOf<T> : a.decode(this.type, raw);
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;
-    const a = arenaOf(this), raw = a.encode(this.type, value), start = (this.size - 1) & ~31;
+    const a = this.arena, raw = a.encode(this.type, value), start = (this.size - 1) & ~31;
     if (index >= start) return new SharedList(this.type, this.root, this.depth, this.size, a, a.wasm.tailSet(this.tail, this.size - start, index - start, raw) >>> 0);
     return new SharedList(this.type, a.wasm.vecSet(this.root, this.depth, index, raw) >>> 0, this.depth, this.size, a, this.tail);
   }
   pop(): SharedList<T> {
     if (!this.size) return this;
-    const a = arenaOf(this), size = this.size - 1;
+    const a = this.arena, size = this.size - 1;
     if (!size) return new SharedList(this.type, 0, 0, 0, a);
     if ((this.size - 1) & 31) return new SharedList(this.type, this.root, this.depth, size, a, this.tail);
     const tail = a.wasm.vecLeaf(this.root, this.depth, size - 32) >>> 0;
@@ -74,13 +74,21 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   *values(): Generator<ValueOf<T>> {
     if (!this.size) return;
-    const a = arenaOf(this), start = (this.size - 1) & ~31;
+    const a = this.arena, start = (this.size - 1) & ~31;
     for (const raw of a.vector(this.root, this.depth, 0, start)) yield a.decode(this.type, raw);
     for (let i = 0; i < this.size - start; i++) yield a.decode(this.type, a.dv.getFloat64(this.tail + i * 8, true));
   }
-  forEach(fn: (value: ValueOf<T>, index: number) => void): void { let i = 0; for (const value of this.values()) fn(value, i++); }
+  forEach(fn: (value: ValueOf<T>, index: number) => void): void {
+    const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const stop = Math.min(this.size, first + 32), view = a.dv;
+      // Shared views remain valid if the callback grows memory or creates forks.
+      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
+    }
+  }
   toArray(): ValueOf<T>[] {
-    const a = arenaOf(this), result = new Array<ValueOf<T>>(this.size);
+    const a = this.arena, result = new Array<ValueOf<T>>(this.size);
     const start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;

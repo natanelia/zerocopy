@@ -27,16 +27,18 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
     super(source); this.valueType = type; this.comparator = comparator; this.root = root; this.size = _size ?? source.wasm.radixSize(root); Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedSortedMap<T> {
-    const a = arenaOf(this), root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 2) : a.write(this.valueType, this.root, key, value, 2));
+    const a = this.arena; a.assertWritable();
+    if (a.sameValue(this.root, key, this.valueType, value, 0, true)) return this;
+    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 2) : this.valueType === 'string' ? a.writeString(this.root, key, value as string, 2) : a.write(this.valueType, this.root, key, value, 2));
     return new SharedSortedMap(this.valueType, this.comparator, root, a.writeSize, a);
   }
-  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.radixFind(this.root, key); return leaf ? a.leafValue(this.valueType, leaf) : undefined; }
-  has(key: string): boolean { return arenaOf(this).radixFind(this.root, key) !== 0; }
+  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 0, true); }
+  has(key: string): boolean { return this.arena.radixFind(this.root, key) !== 0; }
   delete(key: string): SharedSortedMap<T> {
-    const a = arenaOf(this); a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
+    const a = this.arena; a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
     return new SharedSortedMap(this.valueType, this.comparator, a.wasm.radixDelete(this.root, leaf + 16, a.dv.getUint32(leaf + 8, true)) >>> 0, undefined, a);
   }
-  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = arenaOf(this); for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
+  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
   *entries(): Generator<[string, ValueOf<T>]> {
     if (this.comparator) yield* [...this.naturalEntries()].sort((a, b) => this.comparator!(a[0], b[0])); else yield* this.naturalEntries();
   }

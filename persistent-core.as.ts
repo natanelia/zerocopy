@@ -31,6 +31,16 @@ export function alloc(bytes: u32): u32 {
   if (i < bytes) store<u32>(to + i, load<u32>(from + i));
 }
 
+// Short unaligned UTF-8 records do not need the shared bulk-copy helper.
+@inline function copyBytes(to: u32, from: u32, count: u32): void {
+  if (count > 32) { memory.copy(to, from, count); return; }
+  let i: u32 = 0;
+  while (i + 8 <= count) { store<u64>(to + i, load<u64>(from + i)); i += 8; }
+  if (i + 4 <= count) { store<u32>(to + i, load<u32>(from + i)); i += 4; }
+  if (i + 2 <= count) { store<u16>(to + i, load<u16>(from + i)); i += 2; }
+  if (i < count) store<u8>(to + i, load<u8>(from + i));
+}
+
 // HAMT: leaf [0,hash,keyLen,valLen,key...,value...];
 // branch [1,bitmap,size,unused,children...]; collision [2,hash,count,unused,leaves...].
 @inline function tag(p: u32): u32 { return load<u32>(p); }
@@ -72,13 +82,16 @@ function mergeHashed(a: u32, b: u32, shift: u32): u32 {
   }
   return p;
 }
+// Private result of a synchronous insertion, not a field in a published node.
+let insertedCount: u32 = 0;
 function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u32 {
-  if (!root) return leaf;
+  if (!root) { insertedCount = 1; return leaf; }
   const kind = tag(root);
   if (kind != 1) {
-    if (load<u32>(root + 4) != load<u32>(leaf + 4)) return mergeHashed(root, leaf, shift);
+    if (load<u32>(root + 4) != load<u32>(leaf + 4)) { insertedCount = 1; return mergeHashed(root, leaf, shift); }
     if (kind == 0) {
-      if (delta == 0 || (delta == 0xffffffff && sameKey(root, leaf))) return leaf;
+      if (delta == 0 || (delta == 0xffffffff && sameKey(root, leaf))) { insertedCount = 0; return leaf; }
+      insertedCount = 1;
       const p = bucket(load<u32>(leaf + 4), 2);
       store<u32>(p + 16, root); store<u32>(p + 20, leaf);
       return p;
@@ -86,7 +99,8 @@ function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u3
     const count = mapSize(root);
     let position = count;
     if (delta != 1) for (let i: u32 = 0; i < count; i++) if (sameKey(load<u32>(root + 16 + i * 4), leaf)) { position = i; break; }
-    const p = bucket(load<u32>(leaf + 4), count + (position == count ? 1 : 0));
+    insertedCount = position == count ? 1 : 0;
+    const p = bucket(load<u32>(leaf + 4), count + insertedCount);
     copyWords(p + 16, root + 16, count * 4);
     store<u32>(p + 16 + position * 4, leaf);
     return p;
@@ -96,7 +110,7 @@ function insertAt(root: u32, leaf: u32, shift: u32, delta: u32 = 0xffffffff): u3
   const position = pc(bitmap & (bit - 1));
   const old = bitmap & bit ? load<u32>(root + 16 + position * 4) : 0;
   const child = insertAt(old, leaf, shift + 4, delta);
-  const size = delta == 0xffffffff ? mapSize(root) - mapSize(old) + mapSize(child) : load<u32>(root + 8) + delta;
+  const size = load<u32>(root + 8) + insertedCount;
   if (old) {
     const p = alloc(16 + count * 4); copyWords(p, root, 16 + count * 4);
     store<u32>(p + 8, size); store<u32>(p + 16 + position * 4, child); return p;
@@ -511,13 +525,14 @@ export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, va
   const position = previous ? load<u32>(previous + 16 + keyLen) : ordinal;
   const leaf = mapLeaf(keyLen, valueLen + prefix);
   store<u32>(leaf + 4, hash);
-  if (mode == 0 && keyLen <= 8) store<u64>(leaf + 16, load<u64>(WRITE_STAGE));
-  else memory.copy(leaf + 16, WRITE_STAGE, keyLen);
+  if (mode == 2 && prefix == 0) copyBytes(leaf + 16, WRITE_STAGE, keyLen + valueLen);
+  else if (mode == 0 && keyLen <= 8) store<u64>(leaf + 16, load<u64>(WRITE_STAGE));
+  else copyBytes(leaf + 16, WRITE_STAGE, keyLen);
   const destination = leaf + 16 + keyLen;
   if (prefix) store<u32>(destination, position);
   if (mode == 0) store<f64>(destination + prefix, value);
   else if (mode == 1) store<u8>(destination + prefix, <u8>value);
-  else memory.copy(destination + prefix, WRITE_STAGE + keyLen, valueLen);
+  else if (prefix) copyBytes(destination + prefix, WRITE_STAGE + keyLen, valueLen);
   const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? insertAt(root, leaf, 0, previous ? 0 : 1) : mapInsert(root, leaf);
   store<u32>(0, leaf); store<u32>(16, hash);
   store<u32>(4, kind == 1 && !previous ? orderCons(order, leaf) : order);
@@ -600,3 +615,15 @@ function blockBuildRange(input: u32, first: u32, end: u32): u32 {
   return bnode(blockBuildRange(input, first, mid), input + mid * 256, 32, blockBuildRange(input, mid + 1, end));
 }
 export function blockBuild(input: u32, blocks: u32): u32 { return blockBuildRange(input, 0, blocks); }
+
+// Strings/JSON are already in writer scratch. No floating-point argument crosses
+// the boundary and short records stay on the inline byte-copy path.
+export function writeMapBytes(root: u32, keyLen: u32, valueLen: u32): u32 {
+  return stagedWrite(root, keyLen, valueLen, hashAt(WRITE_STAGE, keyLen), 0, 2, 0, 0, 0);
+}
+export function writeOrderedBytes(root: u32, keyLen: u32, valueLen: u32, head: u32, count: u32): u32 {
+  return stagedWrite(root, keyLen, valueLen, hashAt(WRITE_STAGE, keyLen), 0, 2, 1, head, count);
+}
+export function writeSortedBytes(root: u32, keyLen: u32, valueLen: u32): u32 {
+  return stagedWrite(root, keyLen, valueLen, hashAt(WRITE_STAGE, keyLen), 0, 2, 2, 0, 0);
+}

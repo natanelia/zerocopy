@@ -1,3 +1,4 @@
+import { ReadCache } from './read-cache';
 import { decodeUtf8 } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
@@ -66,6 +67,7 @@ export abstract class Snapshot {
   readonly #owner: Arena;
   protected constructor(arena: Arena) { this.#owner = arena; }
   static owner(snapshot: Snapshot): Arena { return snapshot.#owner; }
+  protected get arena(): Arena { return this.#owner; }
 }
 
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
@@ -84,6 +86,7 @@ export class Arena {
   private buffer: ArrayBufferLike;
   private bytes: Uint8Array;
   private view: DataView;
+  private reads: ReadCache | undefined;
   private readonly objects = new Map<number, unknown>();
   private readonly keys = new Map<string, KeyToken>();
   private keyBytes = 0;
@@ -281,10 +284,37 @@ export class Arena {
       : kind === 1 ? this.wasm.writeOrderedNumber(root, n, head, count)
       : this.wasm.writeMapNumber(root, n)) >>> 0;
     this.writeSize = this.view.getUint32(8, true);
-    if (kind === 0 && this.keys.size < 2048 && this.keyBytes + n <= 262144 && !this.keys.has(key)) {
-      this.keys.set(key, { bytes: undefined, length: n, hash: this.view.getUint32(16, true), ptr: this.view.getUint32(0, true) + 16, readRoot: -1, readValue: undefined }); this.keyBytes += n;
-    }
     if (kind === 1) { this.writeHead = this.view.getUint32(4, true); this.writeCount = this.view.getUint32(12, true); }
+    return next;
+  }
+  writeString(root: number, key: string, value: string, kind = 0, head = 0, count = 0): number {
+    this.assertWritable();
+    if (typeof key !== 'string' || typeof value !== 'string') throw new TypeError('Expected a string key and a string value');
+    const length = key.length, valueLength = value.length;
+    if (length + valueLength > 49152) return this.write('string', root, key, value, kind, head, count);
+    // No encoding buffers for ASCII. Scratch is below the initial 64 KiB and
+    // shared-memory growth never detaches this view. Non-ASCII uses TextEncoder.
+    for (let i = 0; i < length; i++) {
+      const code = key.charCodeAt(i);
+      if (code > 127) return this.write('string', root, key, value, kind, head, count);
+      this.bytes[16384 + i] = code;
+    }
+    for (let i = 0; i < valueLength; i++) {
+      const code = value.charCodeAt(i);
+      if (code > 127) return this.write('string', root, key, value, kind, head, count);
+      this.bytes[16384 + length + i] = code;
+    }
+    const next = (kind === 1 ? this.wasm.writeOrderedBytes(root, length, valueLength, head, count)
+      : kind === 2 ? this.wasm.writeSortedBytes(root, length, valueLength)
+      : this.wasm.writeMapBytes(root, length, valueLength)) >>> 0;
+    this.writeSize = this.view.getUint32(8, true);
+    if (kind === 1) { this.writeHead = this.view.getUint32(4, true); this.writeCount = this.view.getUint32(12, true); }
+    const leaf = this.view.getUint32(0, true);
+    // Keep the already immutable JavaScript string instead of decoding it again.
+    const ptr = leaf + 16 + length + (kind === 1 ? 4 : 0);
+    if (valueLength && this.strings.size < 2048 && this.stringBytes + valueLength <= 2097152) {
+      this.strings.set(ptr, value); this.stringBytes += valueLength;
+    }
     return next;
   }
   write(type: string, root: number, key: string, value: any, kind = 0, head = 0, count = 0): number {
@@ -321,7 +351,6 @@ export class Arena {
     this.writeHead = this.view.getUint32(4, true); this.writeSize = this.view.getUint32(8, true); this.writeCount = this.view.getUint32(12, true);
     if (!token) token = this.rememberKey(key, { bytes, length: n, hash: hash >>> 0, ptr: this.view.getUint32(0, true) + 16 });
     else if (token.ptr === undefined) token.ptr = this.view.getUint32(0, true) + 16;
-    if (kind === 0 && mode === 0) { token.readRoot = next; token.readValue = value; }
     return next;
   }
   leafKey(p: number): string { return this.string(p + 16, this.dv.getUint32(p + 8, true)); }
@@ -331,40 +360,28 @@ export class Arena {
     if (type === 'boolean') return this.bytes[ptr] !== 0;
     return this.decodeAt(type, ptr, dv.getUint32(p + 12, true) - prefix);
   }
-  number(root: number, key: string): number | undefined {
-    const token = this.keys.get(key);
-    if (token?.ptr !== undefined) {
-      if (token.readRoot === root) return token.readValue;
-      const value = this.wasm.mapNumber(root, token.ptr, token.length, token.hash);
-      const result = !Number.isNaN(value) || this.wasm.mapFind(root, token.ptr, token.length, token.hash) ? value : undefined;
-      token.readRoot = root; token.readValue = result; return result;
-    }
-    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
-    // A cold numeric read does not allocate an interning entry. Scalar writes
-    // already seed the bounded hot-key cache. Cold bulk/worker reads use a hash
-    // descent followed by a complete byte comparison, including collisions.
-    let hash = 2166136261;
-    for (let i = 0; i < key.length; i++) {
-      const c = key.charCodeAt(i);
-      if (c > 127) {
-        const p = this.find(root, key);
-        return p ? this.dv.getFloat64(p + 16 + this.dv.getUint32(p + 8, true), true) : undefined;
-      }
-      hash = Math.imul(hash ^ c, 16777619);
-    }
-    const candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
-    if (!candidate) return undefined;
-    const dv = this.dv, bytes = this.bytes, bucket = dv.getUint32(candidate, true) === 2;
-    const count = bucket ? dv.getUint32(candidate + 8, true) : 1;
-    for (let j = 0; j < count; j++) {
-      const p = bucket ? dv.getUint32(candidate + 16 + j * 4, true) : candidate;
-      if (dv.getUint32(p + 8, true) !== key.length) continue;
-      let same = true;
-      for (let i = 0; i < key.length; i++) if (bytes[p + 16 + i] !== key.charCodeAt(i)) { same = false; break; }
-      if (same) return dv.getFloat64(p + 16 + key.length, true);
-    }
-    return undefined;
+  sameValue(root: number, key: string, type: string, value: any, prefix = 0, sorted = false): boolean {
+    if (!this.reads || (type !== 'string' && type !== 'number' && type !== 'boolean')) return false;
+    const slot = this.reads.slot(key);
+    if (slot === undefined || this.reads.root(slot) !== root) return false;
+    const leaf = this.reads.leaf(slot);
+    return leaf !== 0 && Object.is(this.value(root, key, type, prefix, sorted), value);
   }
+  value(root: number, key: string, type: string, prefix = 0, sorted = false): any {
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    if (!root) return undefined;
+    const code = (type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0) + (prefix ? 4 : 0);
+    let slot = this.reads?.slot(key);
+    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
+    // A root change can still resolve to the exact same immutable leaf.
+    slot = this.reads?.slot(key);
+    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    const result = leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    if (code !== 0 && code !== 4 && slot !== undefined) this.reads.cacheValue(slot, code, result);
+    return result;
+  }
+  number(root: number, key: string): number | undefined { return this.value(root, key, 'number'); }
 
   *radixLeaves(root: number): Generator<number> {
     if (root && this.dv.getUint32(root, true) === 0xffffffff) {
@@ -386,6 +403,20 @@ export class Arena {
     }
   }
   radixFind(root: number, key: string): number {
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    if (!root) return 0;
+    this.reads ??= new ReadCache();
+    const slot = this.reads.slot(key);
+    if (slot !== undefined) {
+      if (this.reads.root(slot) === root) return this.reads.leaf(slot);
+      const keyLeaf = this.reads.keyLeaf(slot), view = this.dv;
+      const leaf = this.wasm.radixFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true)) >>> 0;
+      this.reads.update(slot, root, leaf); return leaf;
+    }
+    const leaf = this.radixFindUncached(root, key);
+    this.reads.remember(key, root, leaf); return leaf;
+  }
+  private radixFindUncached(root: number, key: string): number {
     const token = this.key(key);
     if (token.ptr !== undefined) return this.wasm.radixFind(root, token.ptr, token.length) >>> 0;
     const bytes = token.bytes, length = token.length, dv = this.dv;
@@ -410,31 +441,46 @@ export class Arena {
     token.ptr = root + 16; return root;
   }
   find(root: number, key: string): number {
-    const token = this.key(key);
-    if (token.ptr !== undefined) return this.wasm.mapFind(root, token.ptr, token.length, token.hash) >>> 0;
-    const k = token.bytes, length = token.length, hash = token.hash, dv = this.dv, bytes = this.bytes;
-    const equals = (p: number) => {
-      if (dv.getUint32(p + 4, true) !== hash || dv.getUint32(p + 8, true) !== length) return false;
-      for (let i = 0; i < length; i++) if (bytes[p + 16 + i] !== (k ? k[i] : key.charCodeAt(i))) return false;
-      return true;
-    };
-    if (root && dv.getUint32(root, true) === 0xffffffff) {
-      for (let j = 0; j < dv.getUint32(root + 12, true); j++) {
-        const p = dv.getUint32(root + 16 + j * 4, true);
-        if (equals(p)) { token.ptr = p + 16; return p; }
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    if (!root) return 0;
+    this.reads ??= new ReadCache();
+    const slot = this.reads.slot(key);
+    if (slot !== undefined) {
+      if (this.reads.root(slot) === root) return this.reads.leaf(slot);
+      const keyLeaf = this.reads.keyLeaf(slot), view = this.dv;
+      const leaf = this.wasm.mapFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true), view.getUint32(keyLeaf + 4, true)) >>> 0;
+      this.reads.update(slot, root, leaf); return leaf;
+    }
+    const leaf = this.findUncached(root, key);
+    this.reads.remember(key, root, leaf); return leaf;
+  }
+  private findUncached(root: number, key: string): number {
+    let hash = 2166136261, encoded: Uint8Array | undefined;
+    for (let i = 0; i < key.length; i++) {
+      const code = key.charCodeAt(i);
+      if (code > 127) { encoded = encoder.encode(key); hash = hashBytes(encoded); break; }
+      hash = Math.imul(hash ^ code, 16777619);
+    }
+    const length = encoded?.length ?? key.length, view = this.dv, bytes = this.bytes;
+    // The generic journal path is retained for low-level imported descriptors.
+    if (root && view.getUint32(root, true) === 0xffffffff) {
+      for (let j = 0; j < view.getUint32(root + 12, true); j++) {
+        const leaf = view.getUint32(root + 16 + j * 4, true);
+        if (view.getUint32(leaf + 4, true) !== (hash >>> 0) || view.getUint32(leaf + 8, true) !== length) continue;
+        let i = 0; for (; i < length; i++) if (bytes[leaf + 16 + i] !== (encoded ? encoded[i] : key.charCodeAt(i))) break;
+        if (i === length) return leaf;
       }
-      root = dv.getUint32(root + 4, true);
+      root = view.getUint32(root + 4, true);
     }
-    const candidate = this.wasm.mapHashCandidate(root, hash) >>> 0;
+    const candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
     if (!candidate) return 0;
-    if (!dv.getUint32(candidate, true)) {
-      if (!equals(candidate)) return 0;
-      token.ptr = candidate + 16; return candidate;
-    }
-    const count = dv.getUint32(candidate + 8, true);
-    for (let i = 0; i < count; i++) {
-      const leaf = dv.getUint32(candidate + 16 + i * 4, true);
-      if (equals(leaf)) { token.ptr = leaf + 16; return leaf; }
+    const bucket = view.getUint32(candidate, true) === 2;
+    const count = bucket ? view.getUint32(candidate + 8, true) : 1;
+    for (let j = 0; j < count; j++) {
+      const leaf = bucket ? view.getUint32(candidate + 16 + j * 4, true) : candidate;
+      if (view.getUint32(leaf + 8, true) !== length) continue;
+      let i = 0; for (; i < length; i++) if (bytes[leaf + 16 + i] !== (encoded ? encoded[i] : key.charCodeAt(i))) break;
+      if (i === length) return leaf;
     }
     return 0;
   }
@@ -494,6 +540,22 @@ export class Arena {
     const input = this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
+  }
+
+  private vectorRoot = -1;
+  private vectorLevel = -1;
+  private vectorBlock = -1;
+  private vectorAddress = 0;
+  private vectorView: DataView | undefined;
+  vectorValue(root: number, depth: number, index: number): number {
+    const block = index >>> 5;
+    if (root !== this.vectorRoot || depth !== this.vectorLevel || block !== this.vectorBlock) {
+      this.vectorAddress = this.wasm.vecLeaf(root, depth, index) >>> 0;
+      this.vectorRoot = root; this.vectorLevel = depth; this.vectorBlock = block; this.vectorView = this.dv;
+    }
+    // One pointer-path lookup serves up to 32 nearby reads. The cached leaf is
+    // immutable; a later memory grow cannot invalidate its shared byte view.
+    return this.vectorView!.getFloat64(this.vectorAddress + (index & 31) * 8, true);
   }
 
   encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {

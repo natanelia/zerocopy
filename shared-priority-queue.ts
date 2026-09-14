@@ -30,23 +30,23 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
   }
   enqueue(value: ValueOf<T>, priority: number): SharedPriorityQueue<T> {
     if (typeof priority !== 'number' || Number.isNaN(priority)) throw new TypeError('Priority must be a number other than NaN');
-    const a = arenaOf(this); a.assertWritable(); const size = checkedSize(this.size + 1);
+    const a = this.arena; a.assertWritable(); const size = checkedSize(this.size + 1);
     const root = a.wasm.heapInsert(this.root, priority, a.encode(this.valueType, value), this.isMaxHeap) >>> 0;
     return new SharedPriorityQueue(this.valueType, { root, size, isMaxHeap: this.isMaxHeap }, a);
   }
   dequeue(): SharedPriorityQueue<T> {
     if (!this.size) return this;
-    const a = arenaOf(this); a.assertWritable();
+    const a = this.arena; a.assertWritable();
     return new SharedPriorityQueue(this.valueType, { root: a.wasm.heapPop(this.root, this.isMaxHeap) >>> 0, size: this.size - 1, isMaxHeap: this.isMaxHeap }, a);
   }
-  peek(): ValueOf<T> | undefined { const a = arenaOf(this); return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.root + 8, true)) : undefined; }
-  peekPriority(): number | undefined { return this.size ? arenaOf(this).dv.getFloat64(this.root, true) : undefined; }
+  peek(): ValueOf<T> | undefined { const a = this.arena; return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.root + 8, true)) : undefined; }
+  peekPriority(): number | undefined { return this.size ? this.arena.dv.getFloat64(this.root, true) : undefined; }
   /** Read entries in heap traversal order, not priority order. This also works
    * on read-only worker snapshots and allocates no WASM nodes. Returned tuples
    * are detached from the immutable heap. Equal-priority order is unspecified.
    */
   *entries(): Generator<[ValueOf<T>, number]> {
-    const arena = arenaOf(this), pending = this.root ? [this.root] : [];
+    const arena = this.arena, pending = this.root ? [this.root] : [];
     while (pending.length) {
       const node = pending.pop()!;
       const priority = arena.dv.getFloat64(node, true);

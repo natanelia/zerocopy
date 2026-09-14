@@ -35,38 +35,35 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
   /** @deprecated Arena lifetime is managed by JavaScript reachability. */
   dispose(): void {}
   set(key: string, value: ValueOf<T>): SharedMap<T> {
-    const a = arenaOf(this), root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : a.write(this.valueType, this.root, key, value));
+    const a = this.arena; a.assertWritable();
+    if (a.sameValue(this.root, key, this.valueType, value)) return this;
+    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : this.valueType === 'string' ? a.writeString(this.root, key, value as string) : a.write(this.valueType, this.root, key, value));
     return new SharedMap(this.valueType, root, a.writeSize, a);
   }
-  get(key: string): ValueOf<T> | undefined {
-    const a = arenaOf(this);
-    if (this.valueType === 'number') return a.number(this.root, key) as ValueOf<T> | undefined;
-    const leaf = a.find(this.root, key);
-    return leaf ? a.leafValue(this.valueType, leaf) : undefined;
-  }
-  has(key: string): boolean { return arenaOf(this).find(this.root, key) !== 0; }
+  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType); }
+  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
   delete(key: string): SharedMap<T> {
-    const a = arenaOf(this), root = a.delete(this.root, key);
+    const a = this.arena, root = a.delete(this.root, key);
     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
   }
   setMany(entries: readonly (readonly [string, ValueOf<T>])[]): SharedMap<T> {
     if (!entries.length) return this;
-    const a = arenaOf(this), root = a.bulk(this.valueType, this.root, entries);
+    const a = this.arena, root = a.bulk(this.valueType, this.root, entries);
     return new SharedMap(this.valueType, root, undefined, a);
   }
   getMany(keys: readonly string[]): (ValueOf<T> | undefined)[] { return keys.map(k => this.get(k)); }
   deleteMany(keys: readonly string[]): SharedMap<T> {
-    const a = arenaOf(this); a.assertWritable(); let root = this.root;
+    const a = this.arena; a.assertWritable(); let root = this.root;
     for (const key of keys) root = a.delete(root, key);
     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
   }
   *entries(): Generator<[string, ValueOf<T>]> {
-    const a = arenaOf(this);
+    const a = this.arena;
     for (const leaf of a.leaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)];
   }
-  *keys(): Generator<string> { const a = arenaOf(this); for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
-  *values(): Generator<ValueOf<T>> { const a = arenaOf(this); for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf); }
-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [k, v] of this.entries()) fn(v, k); }
+  *keys(): Generator<string> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
+  *values(): Generator<ValueOf<T>> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf); }
+  forEach(fn: (value: ValueOf<T>, key: string) => void): void { const a = this.arena; for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf)); }
   toWorkerData() { return Object.freeze({ root: this.root, valueType: this.valueType, size: this.size }); }
   static fromWorkerData<T extends string>(root: number, valueType: T, size?: number, source: Arena = current): SharedMap<T> {
     return new SharedMap(valueType, root, size, source);

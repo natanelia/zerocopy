@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-const directory = new URL('./results/', import.meta.url);
+import { resolve, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
+const directory = process.argv[2] ? pathToFileURL(resolve(process.argv[2]) + sep) : new URL('./results/', import.meta.url);
 const inputs = [1, 2, 3].map(round => {
   const path = `readme-libraries-round-${round}.json`, bytes = readFileSync(new URL(path, directory));
   const data = JSON.parse(bytes);
-  assert.equal(data.round, round); assert.equal(data.N, 10000); assert.equal(data.rows.length, 89);
-  assert.equal(new Set(data.rows.map(r => `${r.group}:${r.operation}:${r.kind}`)).size, 89);
+  assert.equal(data.round, round); assert.equal(data.N, 10000); if (!data.caseFilter) assert.equal(data.rows.length, 89);
+  assert.equal(new Set(data.rows.map(r => `${r.group}:${r.operation}:${r.kind}`)).size, data.rows.length);
   for (const row of data.rows) {
     assert.equal(row.samplesMs.length, 15);
     assert(row.samplesMs.every(x => Number.isFinite(x) && x > 0));
@@ -15,7 +17,7 @@ const inputs = [1, 2, 3].map(round => {
 });
 const first = inputs[0].data;
 for (const { data } of inputs) {
-  for (const key of ['engineSHA256', 'wasmSHA256', 'benchmarkSHA256', 'sourceCommit', 'warmups']) assert.equal(data[key], first[key]);
+  for (const key of ['engineSHA256', 'wasmSHA256', 'benchmarkSHA256', 'sourceCommit', 'warmups', 'includeArenaSetup', 'caseFilter']) assert.equal(data[key], first[key]);
   assert.deepEqual(data.runtime, first.runtime);
 }
 const median = xs => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
@@ -34,9 +36,9 @@ for (const row of first.rows) {
   rows.push({ group: row.group, operation: row.operation, operationsPerWorkload: row.operationsPerWorkload, workloadsPerSample: row.workloadsPerSample, ...ms,
     versusImmutable: ms.immutable === undefined ? null : ms.immutable / ms.shared, versusNative: ms.native / ms.shared });
 }
-assert.equal(rows.length, 36);
+if (!first.caseFilter) assert.equal(rows.length, 36);
 const summary = { schema: 1, comparison: 'Zerocopy vs Immutable.js vs native', N: first.N, sourceCommit: first.sourceCommit,
-  measuredAt: inputs.map(x => x.data.measuredAt), runtime: first.runtime, rounds: 3, samplesPerVariant: 45, totalSamples: 4005, warmups: first.warmups,
+  measuredAt: inputs.map(x => x.data.measuredAt), runtime: first.runtime, rounds: 3, samplesPerVariant: 45, totalSamples: first.rows.length * 45, warmups: first.warmups, includeArenaSetup: first.includeArenaSetup ?? true, caseFilter: first.caseFilter ?? null,
   engineSHA256: first.engineSHA256, wasmSHA256: first.wasmSHA256, benchmarkSHA256: first.benchmarkSHA256,
   rawFiles: inputs.map(({ path, sha256 }) => ({ path, sha256 })), rows };
 writeFileSync(new URL('readme-libraries-summary.json', directory), JSON.stringify(summary) + '\n');
@@ -50,7 +52,9 @@ const time = ms => `${ms.toFixed(ms < 0.01 ? 6 : 4)}ms`;
 const ratio = n => `${(n >= 1 ? n : 1 / n).toFixed(2)}x ${n >= 1 ? 'faster' : 'slower'}`;
 const table = [];
 for (const [group, title] of Object.entries(titles)) {
-  const groupRows = rows.filter(r => r.group === group), hasImmutable = groupRows[0].immutable !== undefined;
+  const groupRows = rows.filter(r => r.group === group);
+  if (!groupRows.length) continue;
+  const hasImmutable = groupRows[0].immutable !== undefined;
   table.push(`**${title}**`, hasImmutable ? '| Operation | Shared | Immutable | vs Imm | Native | vs Native |' : '| Operation | Shared | Native | vs Native |',
     hasImmutable ? '|-----------|--------|-----------|--------|--------|-----------|' : '|-----------|--------|--------|-----------|');
   for (const row of groupRows) table.push(hasImmutable

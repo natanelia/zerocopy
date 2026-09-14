@@ -19,21 +19,22 @@ export function attachToBufferCopy(copy: Uint8Array, state: { heapEnd: number })
 export type SharedStackType = import('./types').ValueType;
 export class SharedStack<T extends string = SharedStackType> extends Snapshot {
   readonly head: number;
+  private readonly encodedTop: number;
   readonly size: number;
   readonly valueType: T;
-  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = current) {
-    super(source); this.valueType = type; this.head = head; this.size = checkedSize(size); Object.freeze(this);
+  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = current, encodedTop?: number) {
+    super(source); this.valueType = type; this.head = head; this.size = checkedSize(size); this.encodedTop = encodedTop ?? (head ? source.dv.getFloat64(head + 8, true) : 0); Object.freeze(this);
   }
   push(value: ValueOf<T>): SharedStack<T> {
-    const a = arenaOf(this); a.assertWritable();
-    const size = checkedSize(this.size + 1), head = a.wasm.cons(this.head, a.encode(this.valueType, value)) >>> 0;
-    return new SharedStack(this.valueType, head, size, undefined, a);
+    const a = this.arena; a.assertWritable();
+    const size = checkedSize(this.size + 1), raw = a.encode(this.valueType, value), head = a.wasm.cons(this.head, raw) >>> 0;
+    return new SharedStack(this.valueType, head, size, undefined, a, raw);
   }
   pop(): SharedStack<T> {
     if (!this.size) return this;
-    const a = arenaOf(this); return new SharedStack(this.valueType, a.dv.getUint32(this.head, true), this.size - 1, undefined, a);
+    const a = this.arena; return new SharedStack(this.valueType, a.dv.getUint32(this.head, true), this.size - 1, undefined, a);
   }
-  peek(): ValueOf<T> | undefined { const a = arenaOf(this); return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.head + 8, true)) : undefined; }
+  peek(): ValueOf<T> | undefined { return this.size ? this.arena.decode(this.valueType, this.encodedTop) : undefined; }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ head: this.head, size: this.size, type: this.valueType }); }
   static fromWorkerData<T extends string>(d: { head: number; size: number; type: T }, source: Arena = current): SharedStack<T> { return new SharedStack(d.type, d.head, d.size, undefined, source); }
