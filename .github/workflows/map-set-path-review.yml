@@ -34,15 +34,13 @@ jobs:
           git archive HEAD | tar -x -C "$MAP_SET_BASELINE"
           ln -s "$GITHUB_WORKSPACE/node_modules" "$MAP_SET_BASELINE/node_modules"
           (cd "$MAP_SET_BASELINE" && node scripts/build-wasm.mjs && bun scripts/build-browser.ts)
-      - name: Apply the reviewed runtime changes
+      - name: Apply the reviewed UTF-8 changes
         run: |
           set -euo pipefail
-          echo '2beca1c56ed5bab66f70d39e1ef272482715a45c3183e8db8b20cca99290c1eb  .github/patches/map-set-path.patch' | sha256sum --check
+          echo '2a9559160b0709f076facb1b6586aebfa3179300a11817b9f55df3e815b1975e  .github/patches/map-set-path.patch' | sha256sum --check
           git apply --check --index .github/patches/map-set-path.patch
           git apply --index .github/patches/map-set-path.patch
-          while IFS= read -r path; do
-            case "$path" in arena.ts|persistent-core.as.ts|shared-map.ts) ;; *) echo "Unexpected runtime path: $path"; exit 1 ;; esac
-          done < <(git diff --cached --name-only)
+          test "$(git diff --cached --name-only)" = arena.ts
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run typecheck:redux
       - run: bun run test
@@ -50,29 +48,29 @@ jobs:
       - run: bunx playwright install --with-deps chromium
       - run: bun run test:browser
       - name: Check scalar speed and identical published bytes
-        run: node proofs/run-map-set.mjs proofs/results/map-set-path.json "$MAP_SET_BASELINE"
+        run: node proofs/run-map-set.mjs proofs/results/map-set-utf8.json "$MAP_SET_BASELINE"
       - name: Check Node separately
         env:
           MAP_SET_RUNTIMES: node
-        run: node proofs/run-map-set-cross-runtime.mjs proofs/results/map-set-path-node.json
+        run: node proofs/run-map-set-cross-runtime.mjs proofs/results/map-set-utf8-node.json
       - name: Refresh the original library tables and retained memory
         run: bash proofs/run-hot-path-evidence.sh
       - name: Publish only validated runtime and evidence
         run: |
           set -euo pipefail
-          git add -f proofs/results/map-set-path.json proofs/results/map-set-path-node.json
+          git add -f proofs/results/map-set-utf8.json proofs/results/map-set-utf8-node.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'perf: reduce scalar map path reconstruction and result overhead'
+          git commit -m 'perf: stage Unicode map strings directly in shared writer scratch'
           git push origin HEAD:refs/heads/agent/immutable-performance-proof
           git rev-parse HEAD > /tmp/map-set-published.txt
           git archive --format=tar.gz HEAD > /tmp/map-set-validated-source.tar.gz
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: scalar-map-path-evidence
+          name: scalar-map-utf8-evidence
           path: |
-            proofs/results/map-set-path*
+            proofs/results/map-set-utf8*
             proofs/results/hot-path/
             proofs/results/cold-build/
             /tmp/map-set-published.txt

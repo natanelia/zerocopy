@@ -1,246 +1,48 @@
-diff --git a/arena.ts b/arena.ts
-index 77fc82b..752652c 100644
 --- a/arena.ts
 +++ b/arena.ts
-@@ -301,6 +301,48 @@ export class Arena {
-     this.rememberKey(key, token);
-     return p;
-   }
-+  setNumber(root: number, key: string, value: number, size: number): number {
-+    this.assertWritable();
-+    if (typeof key !== 'string' || typeof value !== 'number') throw new TypeError('Expected a string key and a number value');
-+    let n = key.length;
-+    if (n > 49144) return this.write('number', root, key, value);
-+    for (let i = 0; i < n; i++) {
-+      const c = key.charCodeAt(i);
-+      if (c > 127) {
-+        const bytes = encoder.encode(key); n = bytes.length;
-+        if (n > 49144) return this.write('number', root, key, value);
-+        this.bytes.set(bytes, 16384); break;
-+      }
-+      this.bytes[16384 + i] = c;
-+    }
-+    this.view.setFloat64(16376, value, true);
-+    const result = this.wasm.mapSetNumber(root, n, size), next = result & 0x7fffffff;
-+    this.writeSize = size + (result >>> 31);
-+    if (this.valueMap) this.cachePrimitive(root, next, key, value, 2);
-+    else { this.valueRoot = next; this.valueCode = 2; }
-+    return next;
-+  }
-+  setString(root: number, key: string, value: string, size: number): number {
-+    this.assertWritable();
-+    if (typeof key !== 'string' || typeof value !== 'string') throw new TypeError('Expected a string key and a string value');
-+    const n = key.length, v = value.length;
-+    if (n + v > 49152) return this.write('string', root, key, value);
-+    for (let i = 0; i < n; i++) {
-+      const c = key.charCodeAt(i);
-+      if (c > 127) return this.write('string', root, key, value);
-+      this.bytes[16384 + i] = c;
-+    }
-+    for (let i = 0; i < v; i++) {
-+      const c = value.charCodeAt(i);
-+      if (c > 127) return this.write('string', root, key, value);
-+      this.bytes[16384 + n + i] = c;
-+    }
-+    const result = this.wasm.mapSetBytes(root, n, v, size), next = result & 0x7fffffff;
-+    this.writeSize = size + (result >>> 31);
-+    if (this.valueMap) this.cachePrimitive(root, next, key, value, 1);
+@@ -329,17 +329,43 @@
+     if (n + v > 49152) return this.write('string', root, key, value);
+     for (let i = 0; i < n; i++) {
+       const c = key.charCodeAt(i);
+-      if (c > 127) return this.write('string', root, key, value);
++      if (c > 127) return this.setUTF8(root, key, value, size);
+       this.bytes[16384 + i] = c;
+     }
+     for (let i = 0; i < v; i++) {
+       const c = value.charCodeAt(i);
+-      if (c > 127) return this.write('string', root, key, value);
++      if (c > 127) return this.setUTF8(root, key, value, size);
+       this.bytes[16384 + n + i] = c;
+     }
+     const result = this.wasm.mapSetBytes(root, n, v, size), next = result & 0x7fffffff;
+     this.writeSize = size + (result >>> 31);
+     if (this.valueMap) this.cachePrimitive(root, next, key, value, 1);
 +    else { this.valueRoot = next; this.valueCode = 1; }
 +    return next;
 +  }
-   writeNumber(root: number, key: string, value: number, kind = 0, head = 0, count = 0): number {
-     this.assertWritable();
-     if (typeof key !== 'string' || typeof value !== 'number') throw new TypeError('Expected a string key and a number value');
-diff --git a/persistent-core.as.ts b/persistent-core.as.ts
-index 239c3a3..8777904 100644
---- a/persistent-core.as.ts
-+++ b/persistent-core.as.ts
-@@ -68,9 +68,18 @@ export function mapLeaf(keyLen: u32, valLen: u32): u32 {
-   store<u32>(p, 0); store<u32>(p + 8, keyLen); store<u32>(p + 12, valLen);
-   return p;
- }
-+// Overlapping first/last words cover short keys exactly, without reading past
-+// either key. Keep the bulk comparison for long keys and all collision cases.
-+@inline function equalKeyBytes(a: u32, b: u32, count: u32): bool {
-+  if (count > 16) return memory.compare(a, b, count) == 0;
-+  if (count >= 8) return load<u64>(a) == load<u64>(b) && load<u64>(a + count - 8) == load<u64>(b + count - 8);
-+  if (count >= 4) return load<u32>(a) == load<u32>(b) && load<u32>(a + count - 4) == load<u32>(b + count - 4);
-+  if (count >= 2) return load<u16>(a) == load<u16>(b) && load<u8>(a + count - 1) == load<u8>(b + count - 1);
-+  return !count || load<u8>(a) == load<u8>(b);
-+}
- @inline function sameKey(a: u32, b: u32): bool {
-   const n = load<u32>(a + 8);
--  return load<u32>(a + 4) == load<u32>(b + 4) && n == load<u32>(b + 8) && memory.compare(a + 16, b + 16, n) == 0;
-+  return load<u32>(a + 4) == load<u32>(b + 4) && n == load<u32>(b + 8) && equalKeyBytes(a + 16, b + 16, n);
- }
- function branch(bitmap: u32, size: u32): u32 {
-   const p = heapEnd, end = p + 8 + pc(bitmap) * 4;
-@@ -118,10 +127,14 @@ const OVERLAY_LIMIT: u32 = 8;
- }
- // Flatten a short overlay chain once. Full branches use one contiguous copy.
- // Scratch is private to this synchronous writer; no callback can observe it.
--function fullBranch(root: u32, bitmap: u32, size: u32, digit: u32, child: u32): u32 {
-+function fullBranch(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32): u32 {
-   let base = root, n: u32 = 0;
--  while (tag(base) & OVERLAY) { store<u32>(4096 + n++ * 4, base); base = overlayPrevious(base); }
--  const p = branch(bitmap, size), original = load<u32>(base + 4);
-+  // Resolve size and collect the edits in one pass over the immutable chain.
-+  while (tag(base) & OVERLAY) {
-+    delta += <i32>(tag(base) << 1) >> 26;
-+    store<u32>(4096 + n++ * 4, base); base = overlayPrevious(base);
-+  }
-+  const p = branch(bitmap, (tag(base) >> 2) + delta), original = load<u32>(base + 4);
-   if (bitmap == 65535 && original == bitmap) {
-     copyWords(p + 8, base + 8, 64);
-     while (n) { const patch = load<u32>(4096 + --n * 4); store<u32>(p + 8 + (load<u32>(patch + 4) & 15) * 4, overlayChild(patch)); }
-@@ -136,14 +149,8 @@ function fullBranch(root: u32, bitmap: u32, size: u32, digit: u32, child: u32):
-   while (bits) { const d = <u32>ctz(bits); store<u32>(p + 8 + pos++ * 4, load<u32>(4224 + d * 4)); bits &= bits - 1; }
-   return p;
- }
--function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32, mark: u32 = 0x7fffffff): u32 {
--  if (root >= mark) {
--    if (!(tag(root) & OVERLAY) && load<u32>(root + 4) == bitmap) {
--      store<u32>(root + 8 + pc(bitmap & ((1 << digit) - 1)) * 4, child);
--      store<u32>(root, tag(root) + (delta << 2)); return root;
--    }
--    return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
--  }
-+// Try a compact immutable patch. Failure leaves the original branch unchanged.
-+@inline function tryOverlay(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32): u32 {
-   let depth = tag(root) & OVERLAY ? ((tag(root) >> 21) & 15) : 0;
-   if ((tag(root) & OVERLAY) && (load<u32>(root + 4) & 15) == digit) {
-     const combined = (<i32>(tag(root) << 1) >> 26) + delta;
-@@ -154,7 +161,7 @@ function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32
-     const digits = ((tag(root) & OVERLAY ? load<u32>(root + 4) : 0) << 4) | digit;
-     const p = heapEnd;
-     if (p - anchor > 262140 || p - root > 65532 || (child != 0 && p - child > 508)) {
--      return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
-+      return 0;
-     }
-     const end = p + 12;
-     if (end > capacity) growTo(end);
-@@ -164,7 +171,33 @@ function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32
-     store<u32>(p + 8, ((p - anchor) >> 2) | (bitmap << 16));
-     return p;
-   }
--  return fullBranch(root, bitmap, mapSize(root) + delta, digit, child);
-+  return 0;
-+}
-+
-+function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32, mark: u32 = 0x7fffffff): u32 {
-+  if (root >= mark) {
-+    if (!(tag(root) & OVERLAY) && load<u32>(root + 4) == bitmap) {
-+      store<u32>(root + 8 + pc(bitmap & ((1 << digit) - 1)) * 4, child);
-+      store<u32>(root, tag(root) + (delta << 2)); return root;
++  // Non-ASCII string writes use the same fixed scratch prefix as ASCII.
++  // encodeInto reports UTF-16 units consumed; a partial result uses the
++  // general large-record path. No partially encoded leaf is published.
++  private setUTF8(root: number, key: string, value: string, size: number): number {
++    const k = encoder.encodeInto(key, this.bytes.subarray(16384, HEAP_START));
++    if (k.read !== key.length) return this.write('string', root, key, value);
++    const offset = 16384 + k.written;
++    let valueLength = value.length;
++    if (offset + valueLength > HEAP_START) return this.write('string', root, key, value);
++    for (let i = 0; i < valueLength; i++) {
++      const c = value.charCodeAt(i);
++      if (c > 127) {
++        const v = encoder.encodeInto(value, this.bytes.subarray(offset, HEAP_START));
++        if (v.read !== value.length) return this.write('string', root, key, value);
++        valueLength = v.written; break;
++      }
++      this.bytes[offset + i] = c;
 +    }
-+  } else {
-+    const patch = tryOverlay(root, bitmap, delta, digit, child);
-+    if (patch) return patch;
-+  }
-+  return fullBranch(root, bitmap, delta, digit, child);
-+}
-+// A current writer directory already contains the fully resolved child lanes.
-+// Copy those lanes rather than walking eight old patch records a second time.
-+function replaceKnown(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32, size: u32, lanes: u32): u32 {
-+  const patch = tryOverlay(root, bitmap, delta, digit, child);
-+  if (patch) return patch;
-+  const p = branch(bitmap, size);
-+  if (bitmap == 65535) copyWords(p + 8, lanes, 64);
-+  else {
-+    let bits = bitmap, position: u32 = 0;
-+    while (bits) { const d = <u32>ctz(bits); store<u32>(p + 8 + position++ * 4, load<u32>(lanes + d * 4)); bits &= bits - 1; }
-+  }
-+  return p;
- }
- 
- function mergeHashed(a: u32, b: u32, shift: u32): u32 {
-@@ -215,9 +248,10 @@ export function mapInsert(root: u32, leaf: u32): u32 { return insertAt(materiali
- const WRITE_FIRST: u32 = 12288; // 16 child pointers
- const WRITE_SECOND: u32 = 12352; // 256 child pointers
- const WRITE_VALID: u32 = 13376; // 16 second-level validity masks
-+const WRITE_SIZES: u32 = 13440; // 16 current subtree sizes
- let writerIndexRoot: u32 = 0;
- let writerFirstValid: u32 = 0;
--function mapInsertIndexed(root: u32, leaf: u32, known: u32 = 0xffffffff): u32 {
-+function mapInsertIndexed(root: u32, leaf: u32, known: u32 = 0xffffffff, rootSize: u32 = 0xffffffff): u32 {
-   if (!root || tag(root) == JOURNAL || !isBranch(root)) {
-     writerIndexRoot = 0;
-     return insertAt(materializeJournal(root, 0), leaf, 0, known);
-@@ -229,6 +263,7 @@ function mapInsertIndexed(root: u32, leaf: u32, known: u32 = 0xffffffff): u32 {
-   const hash = load<u32>(leaf + 4), first = hash & 15, bit = <u32>1 << first;
-   const valid = writerFirstValid & bit;
-   const old = valid ? load<u32>(WRITE_FIRST + first * 4) : branchChild(root, first);
-+  const oldSize = valid ? load<u32>(WRITE_SIZES + first * 4) : mapSize(old);
-   let child: u32;
-   if (old && isBranch(old)) {
-     const digit = (hash >> 4) & 15, b = <u32>1 << digit;
-@@ -236,14 +271,21 @@ function mapInsertIndexed(root: u32, leaf: u32, known: u32 = 0xffffffff): u32 {
-     const mask = valid ? load<u32>(WRITE_VALID + first * 4) : 0;
-     const previous = mask & b ? load<u32>(pos) : branchChild(old, digit);
-     const next = insertAt(previous, leaf, 8, known);
--    child = replaceChild(old, branchBitmap(old) | b, <i32>insertedCount, digit, next);
--    store<u32>(pos, next); store<u32>(WRITE_VALID + first * 4, mask | b);
-+    const bitmap = branchBitmap(old) | b, nextMask = mask | b;
-+    store<u32>(pos, next); store<u32>(WRITE_VALID + first * 4, nextMask);
-+    child = (nextMask & bitmap) == bitmap
-+      ? replaceKnown(old, bitmap, <i32>insertedCount, digit, next, oldSize + insertedCount, WRITE_SECOND + first * 64)
-+      : replaceChild(old, bitmap, <i32>insertedCount, digit, next);
-   } else {
-     child = insertAt(old, leaf, 4, known);
-     store<u32>(WRITE_VALID + first * 4, 0);
++    const result = this.wasm.mapSetBytes(root, k.written, valueLength, size), next = result & 0x7fffffff;
++    this.writeSize = size + (result >>> 31);
++    // TextEncoder replaces unmatched surrogates in values as well as keys.
++    // A warm JavaScript cache must agree with an independent byte reader.
++    if (this.valueMap) this.cachePrimitive(root, next, key, normalizeKey(value), 1);
+     else { this.valueRoot = next; this.valueCode = 1; }
+     return next;
    }
--  const next = replaceChild(root, branchBitmap(root) | bit, <i32>insertedCount, first, child);
-   store<u32>(WRITE_FIRST + first * 4, child); writerFirstValid |= bit;
-+  store<u32>(WRITE_SIZES + first * 4, oldSize + insertedCount);
-+  const bitmap = branchBitmap(root) | bit;
-+  const next = (writerFirstValid & bitmap) == bitmap && rootSize != 0xffffffff
-+    ? replaceKnown(root, bitmap, <i32>insertedCount, first, child, rootSize + insertedCount, WRITE_FIRST)
-+    : replaceChild(root, bitmap, <i32>insertedCount, first, child);
-   writerIndexRoot = next; return next;
- }
- 
-@@ -701,7 +743,7 @@ export function stagedWrite(root: u32, keyLen: u32, valueLen: u32, hash: u32, va
-   else if (mode == 1) store<u8>(destination + prefix, <u8>value);
-   else if (prefix) copyBytes(destination + prefix, WRITE_STAGE + keyLen, valueLen);
-   const oldSize = kind == 2 ? 0 : root == writeMapRoot ? writeMapSize : mapSize(root);
--  const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? mapInsertIndexed(root, leaf, previous ? 0 : 1) : mapInsertIndexed(root, leaf);
-+  const next = kind == 2 ? radixInsert(root, leaf) : kind == 1 ? mapInsertIndexed(root, leaf, previous ? 0 : 1, oldSize) : mapInsertIndexed(root, leaf, 0xffffffff, oldSize);
-   store<u32>(0, leaf); store<u32>(16, hash);
-   store<u32>(4, kind == 1 && !previous ? orderCons(order, leaf) : order);
-   const nextSize = kind == 2 ? radixSize(next) : oldSize + insertedCount;
-@@ -773,6 +815,22 @@ export function writeOrderedNumber(root: u32, len: u32, head: u32, count: u32):
-   return stagedWrite(root, len, 8, hashAt(WRITE_STAGE, len), load<f64>(WRITE_STAGE - 8), 0, 1, head, count);
- }
- 
-+// Scalar Map writes need only a root and a one-bit size change. Root pointers
-+// are below 2 GiB, so bit 31 can return the size change without a result buffer.
-+// The old command ABI remains available for ordered maps and generic codecs.
-+@inline function mapSetStaged(root: u32, keyLen: u32, valueLen: u32, numeric: bool, size: u32): u32 {
-+  const leaf = mapLeaf(keyLen, valueLen);
-+  store<u32>(leaf + 4, hashAt(WRITE_STAGE, keyLen));
-+  if (numeric) {
-+    copyBytes(leaf + 16, WRITE_STAGE, keyLen);
-+    store<f64>(leaf + 16 + keyLen, load<f64>(WRITE_STAGE - 8));
-+  } else copyBytes(leaf + 16, WRITE_STAGE, keyLen + valueLen);
-+  const next = mapInsertIndexed(root, leaf, 0xffffffff, size);
-+  return next | (insertedCount << 31);
-+}
-+export function mapSetNumber(root: u32, keyLen: u32, size: u32): u32 { return mapSetStaged(root, keyLen, 8, true, size); }
-+export function mapSetBytes(root: u32, keyLen: u32, valueLen: u32, size: u32): u32 { return mapSetStaged(root, keyLen, valueLen, false, size); }
-+
- // Private bulk builders: only freshly allocated branches can be changed.
- export function radixBuild(input: u32, count: u32): u32 {
-   const mark = heapEnd; let root: u32 = 0;
-diff --git a/shared-map.ts b/shared-map.ts
-index c191ec2..d2bf481 100644
---- a/shared-map.ts
-+++ b/shared-map.ts
-@@ -37,7 +37,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
-   set(key: string, value: ValueOf<T>): SharedMap<T> {
-     const a = this.arena; a.assertWritable();
-     if (a.sameValue(this.root, key, this.valueType, value)) return this;
--    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : this.valueType === 'string' ? a.writeString(this.root, key, value as string) : a.write(this.valueType, this.root, key, value));
-+    const root = (this.valueType === 'number' ? a.setNumber(this.root, key, value as number, this.size) : this.valueType === 'string' ? a.setString(this.root, key, value as string, this.size) : a.write(this.valueType, this.root, key, value));
-     return new SharedMap(this.valueType, root, a.writeSize, a);
-   }
-   get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType); }
