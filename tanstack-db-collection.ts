@@ -12,12 +12,13 @@ type CollectionItem = { id: string; [key: string]: unknown };
  * SharedCollection - A TanStack DB compatible collection using SharedArrayBuffer
  */
 export class SharedCollection<T extends CollectionItem> {
-  private data: SharedMap<'object'>;
+  private readonly data: SharedMap<'object'>;
   readonly id: string;
 
-  constructor(id: string) {
+  constructor(id: string, data: SharedMap<'object'> = new SharedMap('object')) {
     this.id = id;
-    this.data = new SharedMap('object');
+    this.data = data;
+    Object.freeze(this);
   }
 
   get(key: string): T | undefined {
@@ -25,23 +26,17 @@ export class SharedCollection<T extends CollectionItem> {
   }
 
   insert(item: T): SharedCollection<T> {
-    const result = new SharedCollection<T>(this.id);
-    result.data = this.data.set(item.id, item);
-    return result;
+    return new SharedCollection<T>(this.id, this.data.set(item.id, item));
   }
 
   update(key: string, changes: Partial<T>): SharedCollection<T> {
     const existing = this.get(key);
     if (!existing) return this;
-    const result = new SharedCollection<T>(this.id);
-    result.data = this.data.set(key, { ...existing, ...changes });
-    return result;
+    return new SharedCollection<T>(this.id, this.data.set(key, { ...existing, ...changes }));
   }
 
   delete(key: string): SharedCollection<T> {
-    const result = new SharedCollection<T>(this.id);
-    result.data = this.data.delete(key);
-    return result;
+    return new SharedCollection<T>(this.id, this.data.delete(key));
   }
 
   toArray(): T[] {
@@ -58,9 +53,7 @@ export class SharedCollection<T extends CollectionItem> {
   getRoot(): number { return (this.data as any).root; }
 
   static fromRoot<T extends CollectionItem>(id: string, root: number, size: number): SharedCollection<T> {
-    const result = new SharedCollection<T>(id);
-    result.data = new SharedMap('object', root, size);
-    return result;
+    return new SharedCollection<T>(id, new SharedMap('object', root, size));
   }
 }
 

@@ -1,57 +1,20 @@
 import { SharedMap } from './shared-map';
-import { structureRegistry } from './codec.ts';
-
-export class SharedSet<T extends string | number> {
-  private _map: SharedMap<'number'>;
-
+import { Arena, Snapshot, arenaOf } from './arena';
+import { structureRegistry } from './codec';
+import { encodeSetKey, decodeSetKey } from './set-key';
+export class SharedSet<T extends string | number = string | number> extends Snapshot {
+  private readonly _map: SharedMap<'number'>;
   constructor(map?: SharedMap<'number'>) {
-    this._map = map ?? new SharedMap('number');
+    const data = map ?? new SharedMap('number'); super(arenaOf(data)); this._map = data; Object.freeze(this);
   }
-
-  add(value: T): SharedSet<T> {
-    const key = String(value);
-    if (this._map.has(key)) return this;
-    return new SharedSet(this._map.set(key, 0));
-  }
-
-  has(value: T): boolean {
-    return this._map.has(String(value));
-  }
-
-  delete(value: T): SharedSet<T> {
-    const newMap = this._map.delete(String(value));
-    return newMap === this._map ? this : new SharedSet(newMap);
-  }
-
+  add(value: T): SharedSet<T> { const key = encodeSetKey(value); return this._map.has(key) ? this : new SharedSet(this._map.set(key, 0)); }
+  has(value: T): boolean { return this._map.has(encodeSetKey(value)); }
+  delete(value: T): SharedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedSet(map); }
   get size(): number { return this._map.size; }
-
-  *values(): Generator<T> {
-    for (const k of this._map.keys()) yield (typeof k === 'string' && /^\d+$/.test(k) ? Number(k) : k) as T;
-  }
-
-  forEach(fn: (value: T) => void): void {
-    for (const v of this.values()) fn(v);
-  }
-
-  addMany(values: T[]): SharedSet<T> {
-    const entries: [string, number][] = [];
-    for (const v of values) {
-      const k = String(v);
-      if (!this._map.has(k)) entries.push([k, 0]);
-    }
-    return entries.length ? new SharedSet(this._map.setMany(entries)) : this;
-  }
-
-  static fromWorkerData<T extends string | number>(data: { root: number; size: number }): SharedSet<T> {
-    const map = SharedMap.fromWorkerData(data.root, 'number');
-    (map as any)._size = data.size;
-    return new SharedSet(map);
-  }
-
-  toWorkerData(): { root: number; size: number } {
-    return { root: (this._map as any).root, size: this._map.size };
-  }
+  *values(): Generator<T> { for (const key of this._map.keys()) yield decodeSetKey(key) as T; }
+  forEach(fn: (value: T) => void): void { for (const value of this.values()) fn(value); }
+  toWorkerData() { return this._map.toWorkerData(); }
+  addMany(values: readonly T[]): SharedSet<T> { const added = values.filter(value => !this.has(value)); return added.length ? new SharedSet(this._map.setMany(added.map(v => [encodeSetKey(v), 0] as const))) : this; }
+  static fromWorkerData<T extends string | number>(d: { root: number; size: number }, a?: Arena): SharedSet<T> { return new SharedSet(SharedMap.fromWorkerData(d.root, 'number', d.size, a)); }
 }
-
-// Register SharedSet in structure registry for nested type support
-structureRegistry['SharedSet'] = { fromWorkerData: (d: any) => SharedSet.fromWorkerData(d) };
+structureRegistry.SharedSet = { fromWorkerData: (d, a) => SharedSet.fromWorkerData(d, a) };

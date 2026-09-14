@@ -1,0 +1,1 @@
+{"passed":true,"runtime":"v22.23.2","structures":12,"nested":true,"concurrentReadsAtLeast":10000,"largeRetainedSequences":4,"workerSharesBackingMemory":true,"repeatedAttachment":true,"resetKeepsOldSnapshots":true}

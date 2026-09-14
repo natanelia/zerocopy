@@ -1,0 +1,78 @@
+name: Validate scalar map path
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+    paths:
+      - '.github/patches/map-set-path.patch'
+      - '.github/workflows/map-set-path-review.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MAP_SET_BASELINE: /tmp/zerocopy-map-set-before
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Preserve and build the unchanged runtime
+        run: |
+          set -euo pipefail
+          mkdir -p "$MAP_SET_BASELINE"
+          git archive HEAD | tar -x -C "$MAP_SET_BASELINE"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$MAP_SET_BASELINE/node_modules"
+          (cd "$MAP_SET_BASELINE" && node scripts/build-wasm.mjs && bun scripts/build-browser.ts)
+      - name: Apply the reviewed UTF-8 changes
+        run: |
+          set -euo pipefail
+          echo '2a9559160b0709f076facb1b6586aebfa3179300a11817b9f55df3e815b1975e  .github/patches/map-set-path.patch' | sha256sum --check
+          git apply --check --index .github/patches/map-set-path.patch
+          git apply --index .github/patches/map-set-path.patch
+          test "$(git diff --cached --name-only)" = arena.ts
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:redux
+      - run: bun run test
+      - run: node proofs/node-worker.mjs
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test:browser
+      - name: Check scalar speed and identical published bytes
+        run: node proofs/run-map-set.mjs proofs/results/map-set-utf8.json "$MAP_SET_BASELINE"
+      - name: Check Node separately
+        env:
+          MAP_SET_RUNTIMES: node
+        run: node proofs/run-map-set-cross-runtime.mjs proofs/results/map-set-utf8-node.json
+      - name: Refresh the original library tables and retained memory
+        run: bash proofs/run-hot-path-evidence.sh
+      - name: Publish only validated runtime and evidence
+        run: |
+          set -euo pipefail
+          git add -f proofs/results/map-set-utf8.json proofs/results/map-set-utf8-node.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'perf: stage Unicode map strings directly in shared writer scratch'
+          git push origin HEAD:refs/heads/agent/immutable-performance-proof
+          git rev-parse HEAD > /tmp/map-set-published.txt
+          git archive --format=tar.gz HEAD > /tmp/map-set-validated-source.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scalar-map-utf8-evidence
+          path: |
+            proofs/results/map-set-utf8*
+            proofs/results/hot-path/
+            proofs/results/cold-build/
+            /tmp/map-set-published.txt
+            /tmp/map-set-validated-source.tar.gz
+          retention-days: 90

@@ -1,52 +1,23 @@
-import { SharedSortedMap, Comparator, sharedMemory, getAllocState, getBufferCopy, attachToMemory, resetSortedMap } from './shared-sorted-map';
-import { structureRegistry } from './codec.ts';
-
-export { sharedMemory as sortedSetMemory, getAllocState as getSortedSetAllocState, getBufferCopy as getSortedSetBufferCopy, attachToMemory as attachSortedSetToMemory, resetSortedMap as resetSortedSet };
-
-export class SharedSortedSet<T extends string | number> {
-  private _map: SharedSortedMap<'number'>;
-  private comparator?: Comparator<string>;
-
+import { SharedSortedMap, type Comparator } from './shared-sorted-map';
+import { Arena, Snapshot, arenaOf } from './arena';
+import { structureRegistry } from './codec';
+import { encodeSetKey, decodeSetKey } from './set-key';
+export { sharedMemory as sortedSetMemory, getAllocState as getSortedSetAllocState, getBufferCopy as getSortedSetBufferCopy, attachToMemory as attachSortedSetToMemory, resetSortedMap as resetSortedSet } from './shared-sorted-map';
+export class SharedSortedSet<T extends string | number = string | number> extends Snapshot {
+  private readonly _map: SharedSortedMap<'number'>;
+  private readonly comparator?: Comparator<string>;
   constructor(comparator?: Comparator<string>, map?: SharedSortedMap<'number'>) {
-    this.comparator = comparator;
-    this._map = map ?? new SharedSortedMap('number', comparator);
+    const compare = comparator ? (a: string, b: string) => comparator(String(decodeSetKey(a)), String(decodeSetKey(b))) : undefined;
+    const data = map ?? new SharedSortedMap('number', compare);
+    super(arenaOf(data)); this._map = data; this.comparator = comparator; Object.freeze(this);
   }
-
-  add(value: T): SharedSortedSet<T> {
-    const key = String(value);
-    if (this._map.has(key)) return this;
-    return new SharedSortedSet(this.comparator, this._map.set(key, 0));
-  }
-
-  has(value: T): boolean {
-    return this._map.has(String(value));
-  }
-
-  delete(value: T): SharedSortedSet<T> {
-    const newMap = this._map.delete(String(value));
-    return newMap === this._map ? this : new SharedSortedSet(this.comparator, newMap);
-  }
-
+  add(value: T): SharedSortedSet<T> { const key = encodeSetKey(value); return this._map.has(key) ? this : new SharedSortedSet(this.comparator, this._map.set(key, 0)); }
+  has(value: T): boolean { return this._map.has(encodeSetKey(value)); }
+  delete(value: T): SharedSortedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedSortedSet(this.comparator, map); }
   get size(): number { return this._map.size; }
-
-  *values(): Generator<T> {
-    for (const k of this._map.keys()) {
-      yield (typeof k === 'string' && /^-?\d+(\.\d+)?$/.test(k) ? Number(k) : k) as T;
-    }
-  }
-
-  forEach(fn: (value: T) => void): void {
-    for (const v of this.values()) fn(v);
-  }
-
-  toWorkerData(): { root: number; size: number } {
-    return { root: this._map.root, size: this._map.size };
-  }
-
-  static fromWorkerData<T extends string | number>(data: { root: number; size: number }): SharedSortedSet<T> {
-    return new SharedSortedSet(undefined, new SharedSortedMap('number', undefined, data.root, data.size));
-  }
+  *values(): Generator<T> { for (const key of this._map.keys()) yield decodeSetKey(key) as T; }
+  forEach(fn: (value: T) => void): void { for (const value of this.values()) fn(value); }
+  toWorkerData() { return this._map.toWorkerData(); }
+  static fromWorkerData<T extends string | number>(d: { root: number; size: number }, a?: Arena): SharedSortedSet<T> { return new SharedSortedSet(undefined, SharedSortedMap.fromWorkerData({ ...d, valueType: 'number' }, a)); }
 }
-
-// Register SharedSortedSet in structure registry for nested type support
-structureRegistry['SharedSortedSet'] = { fromWorkerData: (d: any) => SharedSortedSet.fromWorkerData(d) };
+structureRegistry.SharedSortedSet = { fromWorkerData: (d, a) => SharedSortedSet.fromWorkerData(d, a) };

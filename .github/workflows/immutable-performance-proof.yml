@@ -1,0 +1,56 @@
+name: Immutable performance proof
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Verify the complete historical raw evidence
+        run: node proofs/restore-local-evidence.mjs
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck
+      - name: Unit and snapshot invariant tests
+        run: bun run test
+      - name: Real Node worker, shared memory, and deterministic allocation
+        run: |
+          node proofs/node-worker.mjs > proofs/results/ci-node-worker.json
+          bun proofs/allocation.ts > proofs/results/ci-allocation.json
+          EXPECT_PASS=1 LABEL=candidate bun proofs/snapshot-regressions.ts > proofs/results/ci-candidate-regressions.json
+      - run: bunx playwright install --with-deps chromium
+      - name: Real browser worker tests
+        run: bun run test:browser
+      - uses: actions/checkout@v4
+        with:
+          ref: 7aea44447177d37a303ab5c1b26d7c5e00e1c1f7
+          path: .proof-baseline
+      - name: Matched compiler comparison with output validation
+        run: |
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          node proofs/run-comparison.mjs .proof-baseline proofs/results/ci.json
+          cp proofs/snapshot-regressions.ts .proof-baseline/proofs/
+          (cd .proof-baseline && LABEL=original bun proofs/snapshot-regressions.ts) > proofs/results/ci-baseline-regressions.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: immutable-performance-evidence
+          path: |
+            proofs/results/ci*.json
+            proofs/results/ci*.partial
+          retention-days: 30

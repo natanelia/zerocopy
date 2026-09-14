@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     browser: {
       enabled: true,
-      provider: playwright(),
+      provider: playwright({ launchOptions: { executablePath: process.env.CHROMIUM_PATH || undefined } }),
       instances: [{ browser: 'chromium' }],
       headless: true,
     },

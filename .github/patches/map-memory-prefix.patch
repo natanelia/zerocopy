@@ -1,0 +1,35 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -554,7 +554,9 @@
+       root = view.getUint32(root + 4, true);
+     }
+     let candidate: number;
+-    if (root === this.valueRoot) {
++    // Historical roots also need prefix reuse after their value cache fills.
++    // The exact-root check below invalidates the directory before any reuse.
++    if (root) {
+       if (this.prefixRoot !== root) {
+         const bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
+         if (!this.prefixChildren || bits !== this.prefixBits) {
+--- a/map-memory.test.ts
++++ b/map-memory.test.ts
+@@ -89,6 +89,19 @@
+     expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(1056);
+     expect(a.valueMap.size).toBeLessThanOrEqual(16384);
+   });
++  test('historical roots reuse prefix indexes beyond the value-cache limit', () => {
++    let base: any = ownerMap();
++    for (let i = 0; i < 20000; i++) base = base.set(`key${i}`, i);
++    const newer = base.set('key0', -1), a: any = arenaOf(base);
++    const before = a.buf.slice();
++    for (let i = 0; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
++    expect(a.prefixRoot).toBe(base.root);
++    expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(16896);
++    expect(newer.get('key0')).toBe(-1);
++    for (let i = 19000; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
++    expect(base.get('key0')).toBe(0);
++    expect(Buffer.compare(Buffer.from(before), Buffer.from(a.buf))).toBe(0);
++  });
+   test('same-prefix and exact-hash collisions retain complete key checks', () => {
+     const encoder = new TextEncoder();
+     expect(hashBytes(encoder.encode('costarring'))).toBe(hashBytes(encoder.encode('liquid')));

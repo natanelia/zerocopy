@@ -1,0 +1,91 @@
+name: Map memory validation
+
+on:
+  push:
+    branches: [agent/immutable-performance-proof]
+    paths: ['.github/patches/map-memory-prefix.patch', '.github/workflows/validate-map-memory.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-publish:
+    if: github.repository == 'natanelia/zerocopy'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Apply the reviewed historical-root prefix fix
+        run: |
+          set -euo pipefail
+          echo '3a95a0f25e6d079781755db43560da444df3d6382e5531e48ddb8216974eaa2c  .github/patches/map-memory-prefix.patch' | sha256sum --check
+          git apply --check --index .github/patches/map-memory-prefix.patch
+          git apply --index .github/patches/map-memory-prefix.patch
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'perf: retain prefix lookup speed for historical map roots'
+          mkdir -p proofs/results/map-memory-checks
+          git rev-parse HEAD > proofs/results/map-memory-checks/measured-source.txt
+          node --input-type=module <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const files = JSON.parse(readFileSync('.github/patches/map-memory-manifest.json', 'utf8'));
+          for (const file of Object.keys(files)) files[file] = createHash('sha256').update(readFileSync(file)).digest('hex');
+          writeFileSync('proofs/results/map-memory-checks/source-manifest.json', JSON.stringify(files, null, 2) + '\n');
+          JS
+      - run: bun install
+      - name: Build all packages and check core and Redux types
+        run: |
+          set -euo pipefail
+          (bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck && bun run typecheck:redux) 2>&1 | tee proofs/results/map-memory-checks/build.log
+      - name: Unit and immutable snapshot tests
+        run: |
+          set -euo pipefail
+          bun run test 2>&1 | tee proofs/results/map-memory-checks/unit.log
+      - run: bunx playwright install --with-deps chromium
+      - name: Chromium and real Node workers
+        run: |
+          set -euo pipefail
+          bun run test:browser 2>&1 | tee proofs/results/map-memory-checks/browser.log
+          node proofs/node-worker.mjs | tee proofs/results/map-memory-checks/node-worker.json
+      - uses: actions/checkout@v4
+        with:
+          ref: 945d0cfd4db6b1baa24114dc5881dfbd5b3c7861
+          path: .proof-before-memory
+          persist-credentials: false
+      - name: Build the separate comparison source
+        working-directory: .proof-before-memory
+        run: bun install && bun run build:wasm && bun run build:browser
+      - name: Compare memory and speed on the same runner
+        run: |
+          set -euo pipefail
+          node proofs/map-memory-guard.mjs .proof-before-memory proofs/results/map-memory 2>&1 | tee proofs/results/map-memory-checks/paired.log
+          bash proofs/run-hot-path-evidence.sh 2>&1 | tee proofs/results/map-memory-checks/libraries.log
+      - name: Publish only the tested source and evidence
+        run: |
+          set -euo pipefail
+          git add proofs/results/map-memory proofs/results/map-memory-checks/source-manifest.json proofs/results/map-memory-checks/measured-source.txt proofs/results/map-memory-checks/node-worker.json proofs/results/hot-path proofs/results/cold-build
+          git commit -m 'test: verify map memory savings and historical-root lookup speed'
+          git push origin HEAD:refs/heads/agent/immutable-performance-proof
+          git rev-parse HEAD > proofs/results/map-memory-checks/published-source.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-memory-evidence
+          path: |
+            proofs/results/map-memory/
+            proofs/results/map-memory-checks/
+            proofs/results/hot-path/
+            proofs/results/cold-build/
+          retention-days: 90

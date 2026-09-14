@@ -405,7 +405,8 @@ const memBuf = new Uint8Array(memory.buffer);
 const encoder = new TextEncoder();
 
 function has(root, key) {
-  const keyEnc = encoder.encode(key);
+  // v2 sets store a type tag so 1 and '1' remain distinct.
+  const keyEnc = encoder.encode((typeof key === 'number' ? 'n:' : 's:') + key);
   memBuf.set(keyEnc, keyBufPtr);
   return wasm.getInfo(root, keyEnc.length) !== 0;
 }
@@ -472,14 +473,16 @@ describe('Seamless Worker API', () => {
     const map = new SharedMap('string').set('key', 'hello');
     const list = new SharedList('number').push(42);
     const set = new SharedSet<string>().add('item');
-    const stack = new SharedStack<'number'>(undefined, 'number').push(99);
-    const queue = new SharedQueue<'string'>(undefined, undefined, 'string').enqueue('first');
+    const stack = new SharedStack('number').push(99);
+    const queue = new SharedQueue('string').enqueue('first');
     
     const data = getWorkerData({ map, list, set, stack, queue });
     
     // Verify serialization works
     expect(data.__shared).toBe(true);
-    expect(data.mapBuffer).toBeInstanceOf(SharedArrayBuffer);
+    expect(data.version).toBe(4);
+    expect(data.arenas.length).toBeGreaterThan(0);
+    expect(data.arenas.every(a => a.copy || a.memory)).toBe(true);
     expect(data.structures.map.type).toBe('SharedMap');
     expect(data.structures.list.type).toBe('SharedList');
     expect(data.structures.set.type).toBe('SharedSet');
