@@ -1,45 +1,267 @@
 # zerocopy
 
-Persistent data structures for JavaScript, backed by shared WebAssembly memory.
-Updates return new frozen collection handles. Existing versions remain readable.
-Node and supported browsers can give read-only worker views access to the same
-backing memory. Bun uses a used-prefix copy by default.
+Zero-copy immutable data structures for multi-threaded JavaScript via SharedArrayBuffer + WASM.
 
-**This v0.2 candidate uses worker format 4 and changes the binary layout and
-memory lifetime rules.** It is not compatible with v0.1 data or earlier
-worker-format-2 or worker-format-3 candidates. Read the migration section before upgrading.
-The performance tables below include gains, remaining regressions, and their
-source measurements.
+## Features
 
-## Example
+- Immutable persistent data structures (Map, Set, List, Stack, Queue, LinkedList, DoublyLinkedList, OrderedMap, OrderedSet, SortedMap, SortedSet, PriorityQueue)
+- WASM-accelerated operations via AssemblyScript
+- SharedArrayBuffer for cross-worker sharing
+- Typed value support: `string`, `number`, `boolean`, `object`
+- **Nested structures**: Any structure can contain other structures (e.g., `SharedMap<'SharedSet<string>'>`)
+- Reference counting with automatic cleanup via FinalizationRegistry
 
-```ts
-import { SharedMap, SharedList } from 'zerocopy';
+## Installation
 
-const first = new SharedMap('number').set('speed', 40);
-const second = first.set('speed', 50);
-console.log(first.get('speed'));  // 40
-console.log(second.get('speed')); // 50
-
-const values = new SharedList('number').pushMany([1, 2, 3]);
-const changed = values.set(1, 20);
-console.log(values.toArray());  // [1, 2, 3]
-console.log(changed.toArray()); // [1, 20, 3]
+```bash
+bun install
+bun run build:wasm
 ```
 
-`toArray()` and entry tuples are detached copies. Changing those containers does
-not edit a collection. The `object` codec stores JSON and returns deeply frozen
-JSON values. It does not preserve prototypes, functions, cycles, or arbitrary
-JavaScript objects. Inserting an object does not freeze the caller's input.
+## Usage
 
-```ts
-const input = { position: { x: 1, y: 2 } };
-const map = new SharedMap('object').set('point', input);
-input.position.x = 99;
-// map.get('point') still contains x: 1.
+```typescript
+import { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue } from 'zerocopy';
+
+// SharedMap - O(log32 n) operations
+const map = new SharedMap('string').set('name', 'Alice');
+map.get('name'); // 'Alice'
+
+// SharedSet - O(log32 n) operations
+const set = new SharedSet<string>().add('a').add('b');
+set.has('a'); // true
+
+// SharedList - O(log32 n) random access
+const list = new SharedList('number').push(1).push(2).push(3);
+list.get(0); // 1
+
+// SharedStack - O(1) LIFO operations
+const stack = new SharedStack('number').push(1).push(2);
+stack.peek(); // 2
+
+// SharedQueue - O(1) FIFO operations
+const queue = new SharedQueue('string').enqueue('first').enqueue('second');
+queue.peek(); // 'first'
+
+// SharedLinkedList - O(1) prepend/removeFirst, O(n) random access
+const ll = new SharedLinkedList('number').append(1).prepend(0).append(2);
+ll.toArray(); // [0, 1, 2]
+
+// SharedDoublyLinkedList - O(1) prepend/append/removeFirst/removeLast
+const dll = new SharedDoublyLinkedList('string').append('b').prepend('a').append('c');
+dll.toArrayReverse(); // ['c', 'b', 'a']
+
+// SharedOrderedMap - O(log32 n) with insertion order iteration
+const om = new SharedOrderedMap('string').set('c', 'C').set('a', 'A').set('b', 'B');
+[...om.keys()]; // ['c', 'a', 'b'] - insertion order preserved
+
+// SharedOrderedSet - O(log32 n) with insertion order iteration
+const os = new SharedOrderedSet<string>().add('z').add('a').add('m');
+[...os.values()]; // ['z', 'a', 'm'] - insertion order preserved
+
+// SharedSortedMap - O(log n) with sorted key iteration
+const sm = new SharedSortedMap('number').set('c', 3).set('a', 1).set('b', 2);
+[...sm.keys()]; // ['a', 'b', 'c'] - sorted order
+
+// SharedSortedSet - O(log n) with sorted value iteration
+const ss = new SharedSortedSet<string>().add('z').add('a').add('m');
+[...ss.values()]; // ['a', 'm', 'z'] - sorted order
+
+// Custom comparator for sorted structures
+const customSorted = new SharedSortedMap('string', (a, b) => b.localeCompare(a));
+customSorted.set('a', 'A').set('c', 'C').set('b', 'B');
+[...customSorted.keys()]; // ['c', 'b', 'a'] - reverse sorted
+
+// SharedPriorityQueue - O(log n) enqueue/dequeue, O(1) peek
+const pq = new SharedPriorityQueue('string')
+  .enqueue('low', 3)
+  .enqueue('high', 1)
+  .enqueue('med', 2);
+pq.peek(); // 'high' - lowest priority first (min-heap)
+pq.peekPriority(); // 1
+
+// Max-heap priority queue
+const maxPq = new SharedPriorityQueue('number', { maxHeap: true })
+  .enqueue(10, 1)
+  .enqueue(30, 3);
+maxPq.peek(); // 30 - highest priority first
+```
+
+## Nested Structures
+
+Any data structure can contain other data structures as values. Use the type string format `'StructureName<innerType>'`:
+
+```typescript
+// Map containing Sets
+const userTags = new SharedMap<'SharedSet<string>'>('SharedSet<string>');
+const tags = new SharedSet<string>().add('admin').add('active');
+const userTags2 = userTags.set('user1', tags);
+userTags2.get('user1')!.has('admin'); // true
+
+// List containing Maps
+const records = new SharedList<'SharedMap<number>'>('SharedMap<number>');
+const record = new SharedMap('number').set('x', 10).set('y', 20);
+const records2 = records.push(record);
+records2.get(0)!.get('x'); // 10
+
+// Deeply nested structures
+const nested = new SharedMap<'SharedMap<SharedList<string>>'>('SharedMap<SharedList<string>>');
+
+// Works with all structures: Stack, Queue, LinkedList, OrderedMap, SortedMap, PriorityQueue, etc.
+const stack = new SharedStack<'SharedSet<number>'>('SharedSet<number>');
+const queue = new SharedQueue<'SharedMap<string>'>('SharedMap<string>');
+```
+
+Nested structures use zero-copy sharing across workers - only pointers are transferred, the actual data stays in SharedArrayBuffer.
+
+## Worker Sharing
+
+### Seamless API (Recommended)
+
+Use `getWorkerData()` and `initWorker()` for easy cross-worker sharing:
+
+```typescript
+// Main thread
+import { SharedMap, SharedList, getWorkerData } from './shared';
+
+const map = new SharedMap('string').set('key', 'value');
+const list = new SharedList('number').push(1).push(2);
+
+worker.postMessage(getWorkerData({ map, list }));
+
+// Worker
+import { initWorker, SharedMap, SharedList } from './shared';
+
+const { map, list } = await initWorker<{
+  map: SharedMap<'string'>;
+  list: SharedList<'number'>;
+}>(workerData);
+
+map.get('key');  // 'value'
+list.get(0);     // 1
+```
+
+## API
+
+### SharedMap<T>
+- `new SharedMap<T>(type)` - Create with value type ('string' | 'number' | 'boolean' | 'object')
+- `set(key, value)` / `get(key)` / `has(key)` / `delete(key)`
+- `setMany(entries)` / `getMany(keys)` / `deleteMany(keys)` - Batch ops
+- `forEach(fn)` / `entries()` / `keys()` / `values()` / `size`
+
+### SharedSet<T>
+- `new SharedSet<T>()` - Create set for string | number
+- `add(value)` / `has(value)` / `delete(value)`
+- `addMany(values)` / `values()` / `forEach(fn)` / `size`
+
+### SharedList<T>
+- `new SharedList<T>(type)` - Create with value type
+- `push(value)` / `pop()` / `get(index)` / `set(index, value)`
+- `forEach(fn)` / `toArray()` / `size`
+
+### SharedStack<T>
+- `new SharedStack<T>(type)` - O(1) LIFO stack
+- `push(value)` / `pop()` / `peek()` / `size` / `isEmpty`
+
+### SharedQueue<T>
+- `new SharedQueue<T>(type)` - O(1) FIFO queue
+- `enqueue(value)` / `dequeue()` / `peek()` / `size` / `isEmpty`
+
+### SharedLinkedList<T>
+- `new SharedLinkedList<T>(type)` - Singly linked list
+- `prepend(value)` / `append(value)` / `removeFirst()`
+- `get(index)` / `getFirst()` / `getLast()`
+- `insertAfter(index, value)` / `removeAfter(index)`
+- `forEach(fn)` / `toArray()` / `size` / `isEmpty`
+
+### SharedDoublyLinkedList<T>
+- `new SharedDoublyLinkedList<T>(type)` - Doubly linked list
+- `prepend(value)` / `append(value)` / `removeFirst()` / `removeLast()`
+- `get(index)` / `getFirst()` / `getLast()`
+- `insertAfter(index, value)` / `insertBefore(index, value)` / `remove(index)`
+- `forEach(fn)` / `forEachReverse(fn)` / `toArray()` / `toArrayReverse()`
+- `size` / `isEmpty`
+
+### SharedOrderedMap<T>
+- `new SharedOrderedMap<T>(type)` - Map with insertion order iteration
+- `set(key, value)` / `get(key)` / `has(key)` / `delete(key)`
+- `forEach(fn)` / `entries()` / `keys()` / `values()` / `size`
+
+### SharedOrderedSet<T>
+- `new SharedOrderedSet<T>()` - Set with insertion order iteration
+- `add(value)` / `has(value)` / `delete(value)`
+- `values()` / `forEach(fn)` / `size`
+
+### SharedSortedMap<T>
+- `new SharedSortedMap<T>(type, comparator?)` - Map with sorted key iteration
+- `set(key, value)` / `get(key)` / `has(key)` / `delete(key)`
+- `forEach(fn)` / `entries()` / `keys()` / `values()` / `size`
+- Optional custom comparator for non-natural ordering
+
+### SharedSortedSet<T>
+- `new SharedSortedSet<T>(comparator?)` - Set with sorted value iteration
+- `add(value)` / `has(value)` / `delete(value)`
+- `values()` / `forEach(fn)` / `size`
+- Optional custom comparator for non-natural ordering
+
+### SharedPriorityQueue<T>
+- `new SharedPriorityQueue<T>(type, options?)` - Binary heap priority queue
+- `enqueue(value, priority)` / `dequeue()` / `peek()` / `peekPriority()`
+- `size` / `isEmpty`
+- Options: `{ maxHeap: true }` for max-heap (default is min-heap)
+
+## Architecture
+
+```
+shared-immutable/
+├── shared.ts              # Unified API with worker support
+├── shared-map.ts          # HAMT-based Map implementation
+├── shared-set.ts          # Set (wraps SharedMap)
+├── shared-list.ts         # Vector trie List implementation
+├── shared-stack.ts        # Linked list Stack
+├── shared-queue.ts        # Linked list Queue
+├── shared-linked-list.ts  # Singly linked list
+├── shared-doubly-linked-list.ts # Doubly linked list
+├── shared-ordered-map.ts  # Insertion-ordered Map
+├── shared-ordered-set.ts  # Insertion-ordered Set
+├── shared-sorted-map.ts   # Sorted Map (Red-Black Tree)
+├── shared-sorted-set.ts   # Sorted Set
+├── types.ts               # Shared type definitions
+├── codec.ts               # Value encoding/decoding
+├── wasm-utils.ts          # WASM loading utilities
+├── shared-map.as.ts       # WASM: HAMT implementation
+├── shared-list.as.ts      # WASM: Vector trie implementation
+├── linked-list.as.ts      # WASM: Linked list for Stack/Queue
+├── singly-linked-list.as.ts   # WASM: Singly linked list
+├── doubly-linked-list.as.ts   # WASM: Doubly linked list
+├── ordered-map.as.ts      # WASM: HAMT + DoublyLinkedList
+├── sorted-tree.as.ts      # WASM: Red-Black Tree
+├── priority-queue.as.ts   # WASM: Binary heap
+└── *.wasm                 # Compiled WASM modules
+```
+
+## Scripts
+
+```bash
+bun test          # Run tests (196 tests)
+bun run bench     # Run benchmarks
+bun run build:wasm # Build WASM modules
 ```
 
 ## Performance
+
+Key characteristics:
+- **SharedMap/Set**: O(log32 n) for all operations
+- **SharedList**: O(log32 n) random access, O(1) amortized push
+- **SharedStack**: O(1) push/pop/peek
+- **SharedQueue**: O(1) enqueue/dequeue/peek (vs O(n) for Array.shift)
+- **SharedOrderedMap/Set**: O(log32 n) operations with insertion order iteration
+- **SharedSortedMap/Set**: O(log n) operations with sorted iteration (Red-Black Tree)
+- **SharedPriorityQueue**: O(log n) enqueue/dequeue, O(1) peek (Binary Heap)
+- **SharedLinkedList**: O(1) prepend/removeFirst, O(n) random access
+- **SharedDoublyLinkedList**: O(1) prepend/append/removeFirst/removeLast, O(n) random access
+
+The main advantage is **cross-worker sharing** via SharedArrayBuffer - native structures cannot be safely shared.
 
 ### Benchmark Results (N=10000)
 
@@ -216,27 +438,6 @@ The fixed-order workloads here differ from the independent-process shuffled
 write suite. Keep both results; do not substitute a favorable row for another
 access pattern. Warm lookup gains are not uncached lookup gains.
 
-### How the fast paths work
-
-Scalar writes use a bounded WASM index for the first two hash digits. It
-reuses resolved child pointers only while updating the exact last writer
-root. Forks, interleaved maps, bulk changes, and deletes invalidate those
-hints. The index uses 1,152 bytes inside the existing scratch prefix. It does
-not allocate extra nodes, store another full map, or change snapshot bytes.
-An allocation failure invalidates the index before a retry can use it.
-
-The paired test checks equal allocated bytes for every sample and an equal
-final payload checksum for every workload and round, with and without the
-index. Thus, this write change preserves the compact node layout and its
-allocation savings. It does not eliminate value encoding, version handles,
-or the work needed to copy changed immutable paths.
-
-Map branches use compact headers and bounded 12-byte immutable branch
-changes. Reader hints and value caches are private and tied to an exact
-root. Cache limits and costs are included in the memory test. ASCII writes
-use scratch storage; Unicode and large values keep the general codec path.
-Vector scans work by block. These optimizations preserve old versions.
-
 ### Evidence
 
 The [recorded summary](proofs/results/map-set-index-summary.json) contains
@@ -314,189 +515,14 @@ that every Shared collection is smaller than every alternative.
 Only directly corresponding Map, OrderedMap, List/Array, and Stack/Array
 representations are measured here. No missing Immutable.js type is invented.
 
-## Collections
+### Reproduce the timing and memory comparisons
 
-| Type | Storage | Main operations |
-|---|---|---|
-| `SharedMap` | 16-way persistent HAMT with compact branch changes | `get`, `has`, `set`, `delete`, `setMany`, `getMany`, `deleteMany` |
-| `SharedSet` | HAMT with tagged keys | `add`, `addMany`, `has`, `delete`, `values`, `forEach` |
-| `SharedList` | 32-way persistent vector with a tail block | `get`, `set`, `push`, `pushMany`, `pop`, `toArray` |
-| `SharedStack` | Persistent cons nodes | `push`, `pop`, `peek` |
-| `SharedQueue` | Persistent vector, tail block, and read offset | `enqueue`, `dequeue`, `peek` |
-| `SharedLinkedList` | Persistent AVL block sequence and tail | `append`, `prepend`, `insertAfter`, `removeAfter`, `removeFirst`, `get` |
-| `SharedDoublyLinkedList` | Persistent AVL block sequence and tail | Sequence operations, `insertBefore`, `remove`, `removeLast`, reverse iteration |
-| `SharedOrderedMap` | HAMT and persistent insertion log | Map operations in insertion order |
-| `SharedOrderedSet` | Ordered map with tagged keys | `add`, `has`, `delete`, iteration in insertion order |
-| `SharedSortedMap` | Compressed radix index and bounded update journal | Map operations in sorted key order |
-| `SharedSortedSet` | Sorted map with tagged keys | `add`, `has`, `delete`, iteration in sorted order |
-| `SharedPriorityQueue` | Persistent leftist heap | `enqueue(value, priority)`, `dequeue`, `peek`, `peekPriority` |
-
-The linked-list interfaces use balanced block trees, not physical linked lists.
-Indexed reads and middle edits use a logarithmic tree path. Tail operations
-avoid that path until the block is full. Vector tree access is O(log32 n).
-Queue dequeue changes only the descriptor. Ordered iteration traverses the
-insertion log and can inspect deleted records and perform key lookups. Hash
-collisions require full-key checks. Radix costs depend on key length and shared
-prefixes. These descriptions exclude encoding and returned JavaScript objects.
-
-Primitive value types are `number`, `string`, and `boolean`. The `object` codec
-uses JSON. Nested type strings select persistent values, for example:
-
-```ts
-const inner = new SharedList('number').pushMany([10, 20]);
-const outer = new SharedMap('SharedList<number>').set('lane', inner);
-console.log(outer.get('lane')?.get(1)); // 20
-```
-
-Sets distinguish numeric and string keys. Sorted collections use their encoded
-key order by default. A custom comparator sorts the returned entries; it does
-not define key equality for lookup. It adds an output array and O(n log n)
-sorting work. Comparators must be pure and consistent. A comparator with mutable
-external state cannot provide stable ordering. Custom comparators cannot be sent
-to workers.
-
-## Workers
-
-Send a completed snapshot with `getWorkerData()`. The transport includes every
-required arena, including nested dependencies. No transfer list is required for
-shared `WebAssembly.Memory`.
-
-```ts
-// Producer
-import { SharedMap, getWorkerData } from 'zerocopy';
-const map = new SharedMap('number').set('answer', 42);
-worker.postMessage(getWorkerData({ map }));
-```
-
-```ts
-// Browser worker
-import { initWorker } from 'zerocopy';
-self.onmessage = async ({ data }) => {
-  const { map } = await initWorker(data);
-  self.postMessage(map.get('answer'));
-};
-```
-
-Node workers use the same payload with `worker_threads`. New snapshots can be
-sent later; old views keep their own roots and arenas. `initWorker()` returns
-read-only attached collections. An update that allocates memory throws. There
-is **one allocating writer per arena**, not a concurrent multi-writer allocator.
-
-In supported Node/browser runtimes, the payload shares memory and does not copy
-the collection nodes. `getWorkerData(structures, { copy: true })` requests a
-used-prefix copy. Bun chooses that fallback by default. Copy mode is not
-zero-copy. String and JSON values still require decoding in the reader.
-
-Browsers need cross-origin isolation for shared memory. Serve the application
-with these headers and configure its external resources accordingly:
-
-```
-Cross-Origin-Opener-Policy: same-origin
-Cross-Origin-Embedder-Policy: require-corp
-```
-
-The `browser` and Node `import` entries use one bundled engine with embedded WASM.
-The Bun entry uses the TypeScript sources and packaged WASM files. The TanStack
-entry shares the bundled engine with the root entry, so arena and class identity
-remain consistent.
-
-## Immutability and memory limits
-
-Published collection handles and decoded JSON values are frozen. Updates write
-only fresh payload nodes. Shared nodes remain unchanged. Allocators, caches, and
-unpublished staging are internal mutable mechanisms. They are not exposed as
-persistent collection APIs.
-
-A raw `SharedArrayBuffer` is still writable by code that holds it. Do not treat
-this library as a security boundary against direct memory writes, raw WASM calls,
-or malformed pointer descriptors. Use trusted producers and the public API.
-
-Memory is append-only within each arena, with a limit below 2 GiB. There is no
-per-node garbage collection or automatic compaction. A live snapshot retains its
-entire arena, including unreachable intermediate nodes and staging bytes. Nested
-values retain their dependent arenas. Queues can retain consumed prefixes.
-Ordered maps can retain deleted insertion records. Use explicit compaction and
-manage arena lifetimes for long-running write workloads.
-
-`resetMap()`, `resetSharedList()`, and the other `reset*()` functions select a new
-default arena for future empty collections. Existing versions stay valid. An
-update to an old collection continues to use that collection's old arena. An old
-arena becomes eligible for JavaScript garbage collection only after all snapshots,
-worker views, payloads, dependent arenas, and module-default references stop
-referencing it. Collection timing is controlled by the runtime.
-
-## Compact live snapshots
-
-`compact(snapshot)` returns an equivalent collection in a fresh writable arena.
-`compactMany({ ... })` compacts a group together and returns a frozen record.
-All 12 collection types and nested collection values are supported. Neither
-function changes or invalidates the sources. String and JSON payload bytes are
-copied without parsing; nested snapshot references are rebuilt for the new arena.
-
-```ts
-import { SharedMap, SharedList, compact, compactMany } from 'zerocopy';
-
-const map = new SharedMap('number').set('answer', 42);
-const list = new SharedList('number').pushMany([1, 2, 3]);
-const packedMap = compact(map);
-const packedGroup = compactMany({ map, list });
-
-console.log(packedMap.get('answer'));         // 42
-console.log(packedGroup.list.toArray());     // [1, 2, 3]
-console.log(map.get('answer'));              // 42; source is unchanged.
-```
-
-Compaction is an explicit copy, not a zero-copy operation. Send the resulting
-snapshot to workers with `getWorkerData()` as usual. Release unused old
-snapshots and worker payloads when their readers finish. A `reset*()` call can
-replace a module's default arena reference, but it does not invalidate old
-snapshots or force garbage collection. Any remaining holder keeps the old arena
-alive. See the retained-memory tables and measurement limits above.
-
-## Migration from v0.1 and older worker formats
-
-Rebuild all application and worker bundles together. Recreate data rather than
-loading old raw roots. Worker format 4 rejects older payloads, including formats 2 and 3. Node layouts, tail descriptors, the ordered-map
-log, the sorted-map index, and the WASM interface have changed.
-
-`dispose()` and `configureAutoGC()` are deprecated no-ops. They must not be used
-as a promise of immediate memory reclamation. Reset no longer invalidates old
-versions. Read-only worker attachment replaces the old shared allocator behavior.
-
-Prefer `getWorkerData()` for transport. Direct low-level readers should obtain
-`getBuffer()` or `sharedMemory.buffer` at the time of use. The legacy exported
-`sharedBuffer` can be stale after memory growth. The legacy scratch-based WASM
-`getInfo` export is only for serialized reader examples, not concurrent use.
-
-## Build and test
+From the project directory, build the library and run the benchmarks:
 
 ```sh
 bun install
 bun run build:wasm
 bun run build:browser
-bun run build:types
-bun run typecheck
-bun run test
-node proofs/node-worker.mjs
-bun proofs/allocation.ts
-bun proofs/revision-memory.ts
-bunx playwright install --with-deps chromium
-bun run test:browser
-```
-
-The [completed validation run](https://github.com/natanelia/zerocopy/actions/runs/34801792862)
-passed 395 unit tests in 21 files, 16 Chromium tests in five files, all builds,
-and core and Redux type checks. The real Node worker checked all 12 collection
-types, nested values, retained sequences, repeated attachment, and at least
-10,000 concurrent retained reads. Ten new writer-index tests cover forks,
-collisions, Unicode, callback reentry, allocation failure, and old bytes.
-These are executable checks, not machine-checked verification of the whole system.
-
-### Reproduce the timing and memory comparisons
-
-Run the build steps above, then run this command from the project directory:
-
-```sh
 bash proofs/run-hot-path-evidence.sh
 ```
 
@@ -523,6 +549,66 @@ It saves all samples, heap measurements, backing-buffer totals, library
 versions, and checksums. Later runtime versions or different hardware can
 produce different results. Keep new runs separate from the recorded summary.
 
+## TanStack DB Integration
+
+SharedArrayBuffer-backed collections compatible with [TanStack DB](https://tanstack.com/db).
+
+### SharedCollection
+
+```typescript
+import { SharedCollection } from 'zerocopy/tanstack';
+
+let col = new SharedCollection<{ id: string; name: string }>('users');
+col = col.insert({ id: '1', name: 'Alice' });
+col = col.update('1', { name: 'Alicia' });
+col.get('1');  // { id: '1', name: 'Alicia' }
+
+// Zero-copy worker transfer
+worker.postMessage({ root: col.getRoot(), size: col.size });
+// Worker: SharedCollection.fromRoot('users', root, size)
+```
+
+### sharedCollectionConfig
+
+Standalone TanStack DB collection with SharedArrayBuffer storage:
+
+```typescript
+import { sharedCollectionConfig } from 'zerocopy/tanstack';
+
+const config = sharedCollectionConfig({
+  id: 'todos',
+  initialData: [{ id: '1', text: 'Test', completed: false }],
+});
+
+// Use with TanStack DB Collection
+const collection = new Collection(config);
+```
+
+### withSharedCache
+
+Wrap any TanStack DB sync provider (e.g., Electric) to add a SharedArrayBuffer cache layer:
+
+```typescript
+import { electricSync } from '@electric-sql/tanstack';
+import { withSharedCache } from 'zerocopy/tanstack';
+
+// Wrap Electric sync with SharedArrayBuffer cache
+const cached = withSharedCache(electricSync({
+  url: 'http://localhost:3000/v1/shape',
+  table: 'todos',
+}).sync);
+
+// Use in TanStack DB
+const collection = new Collection({ id: 'todos', ...cached });
+
+// Fast zero-copy reads (bypasses Electric)
+cached.get('todo-1');
+cached.toArray();
+
+// Share with workers
+worker.postMessage(cached.getSharedState());
+```
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT
