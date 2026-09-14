@@ -1,0 +1,368 @@
+{
+  "measuredAt": "2026-09-14T02:12:43.646Z",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "node": "v22.23.2",
+  "sources": {
+    "before": {
+      "files": [
+        "arena.ts",
+        "benchmark.ts",
+        "codec.ts",
+        "compaction.ts",
+        "doubly-linked-list.as.ts",
+        "linked-list.as.ts",
+        "ordered-map.as.ts",
+        "persistent-core.as.ts",
+        "priority-queue.as.ts",
+        "read-cache.ts",
+        "redux-codec.ts",
+        "redux-heap-codec.ts",
+        "redux.ts",
+        "set-key.ts",
+        "shared-doubly-linked-list.ts",
+        "shared-hash-reader.as.ts",
+        "shared-linked-list.ts",
+        "shared-list.as.ts",
+        "shared-list.ts",
+        "shared-map.as.ts",
+        "shared-map.ts",
+        "shared-ordered-map.ts",
+        "shared-ordered-set.ts",
+        "shared-priority-queue.ts",
+        "shared-queue.ts",
+        "shared-runtime.as.ts",
+        "shared-set.ts",
+        "shared-sorted-map.ts",
+        "shared-sorted-set.ts",
+        "shared-stack.ts",
+        "shared.ts",
+        "singly-linked-list.as.ts",
+        "sorted-tree.as.ts",
+        "tanstack-db-collection.ts",
+        "types.ts",
+        "utf8.ts",
+        "vitest.browser.config.ts",
+        "vitest.config.ts",
+        "wasm-utils.ts"
+      ],
+      "sha256": "79c358040901d591ad28b7555f7fecb86ab195d7a6bdb5d500f388eba5c24726",
+      "wasmSHA256": "5427dfcd346aff4ff2cacf0b62d88022e9f17c2ed018b779dc61bdb7da4894f5"
+    },
+    "current": {
+      "files": [
+        "arena.ts",
+        "benchmark.ts",
+        "codec.ts",
+        "compaction.ts",
+        "doubly-linked-list.as.ts",
+        "linked-list.as.ts",
+        "ordered-map.as.ts",
+        "persistent-core.as.ts",
+        "priority-queue.as.ts",
+        "read-cache.ts",
+        "redux-codec.ts",
+        "redux-heap-codec.ts",
+        "redux.ts",
+        "set-key.ts",
+        "shared-doubly-linked-list.ts",
+        "shared-hash-reader.as.ts",
+        "shared-linked-list.ts",
+        "shared-list.as.ts",
+        "shared-list.ts",
+        "shared-map.as.ts",
+        "shared-map.ts",
+        "shared-ordered-map.ts",
+        "shared-ordered-set.ts",
+        "shared-priority-queue.ts",
+        "shared-queue.ts",
+        "shared-runtime.as.ts",
+        "shared-set.ts",
+        "shared-sorted-map.ts",
+        "shared-sorted-set.ts",
+        "shared-stack.ts",
+        "shared.ts",
+        "singly-linked-list.as.ts",
+        "sorted-tree.as.ts",
+        "tanstack-db-collection.ts",
+        "types.ts",
+        "utf8.ts",
+        "vitest.browser.config.ts",
+        "vitest.config.ts",
+        "wasm-utils.ts"
+      ],
+      "sha256": "f46c7607caaea5e36dfb30fa09a605f1dfbc86b233a9c943b48d7932e3cbe748",
+      "wasmSHA256": "0018dd709f58c31fe13820cc66090e157ba1a9f2605f96ede016dd87b247cdbf"
+    }
+  },
+  "samplesPerTimingCell": 45,
+  "memoryTrials": 3,
+  "speed": [
+    {
+      "suite": "timing",
+      "key": "SharedMap:set",
+      "beforeMs": 3.7499789999999393,
+      "sharedMs": 3.5284239999999727,
+      "immutableMs": 5.538301999999987,
+      "nativeMs": 0.3245719999999892,
+      "versusBefore": 1.0627914899116344,
+      "versusImmutable": 1.5696248523420173,
+      "beforeSpeedupByRound": [
+        1.1581912842374988,
+        1.1354715518737604,
+        0.9037742478746912
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedMap:get",
+      "beforeMs": 0.2577084500000069,
+      "sharedMs": 0.1808642500000019,
+      "immutableMs": 0.8108096499999988,
+      "nativeMs": 0.12382584999999154,
+      "versusBefore": 1.4248722453442526,
+      "versusImmutable": 4.482973556133898,
+      "beforeSpeedupByRound": [
+        1.3921276904702269,
+        1.4293530562448695,
+        1.5166626963485943
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedMap:has",
+      "beforeMs": 0.3725855499999966,
+      "sharedMs": 0.3388783500000045,
+      "immutableMs": 1.2076913500000046,
+      "nativeMs": 0.3299137999999971,
+      "versusBefore": 1.0994669621118955,
+      "versusImmutable": 3.5637902214761983,
+      "beforeSpeedupByRound": [
+        1.1065051819480094,
+        1.069770461293063,
+        1.1357595293027842
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedMap:delete",
+      "beforeMs": 0.006206099999985781,
+      "sharedMs": 0.005970449999995253,
+      "immutableMs": 0.005308899999999994,
+      "nativeMs": 0.10703045000000203,
+      "versusBefore": 1.0394693867280884,
+      "versusImmutable": 0.8891959567543845,
+      "beforeSpeedupByRound": [
+        1.0764396351242125,
+        1.0596672158956877,
+        0.9386074431774397
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedMap:setMany(100)",
+      "beforeMs": 0.06676645000000007,
+      "sharedMs": 0.06566534999999477,
+      "immutableMs": 0.045832100000006905,
+      "nativeMs": 0.09407089999999699,
+      "versusBefore": 1.0167683565229668,
+      "versusImmutable": 0.6979647561462866,
+      "beforeSpeedupByRound": [
+        1.0545081995299121,
+        1.0806497936939365,
+        0.922194882069779
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedOrderedMap:set",
+      "beforeMs": 4.4935450000002675,
+      "sharedMs": 4.349734000000353,
+      "immutableMs": 9.13817999999992,
+      "nativeMs": 0.4188640000002124,
+      "versusBefore": 1.0330620217236048,
+      "versusImmutable": 2.1008595008336552,
+      "beforeSpeedupByRound": [
+        1.16009663803831,
+        0.803249964193169,
+        1.2136937001188812
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedOrderedMap:get",
+      "beforeMs": 0.35404889999999795,
+      "sharedMs": 0.250921100000005,
+      "immutableMs": 1.3274833500000114,
+      "nativeMs": 0.37812324999999875,
+      "versusBefore": 1.410996922937094,
+      "versusImmutable": 5.290441298081289,
+      "beforeSpeedupByRound": [
+        1.2687963646742124,
+        1.2486122545416378,
+        1.4292870114528864
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedOrderedMap:has",
+      "beforeMs": 0.39175930000001247,
+      "sharedMs": 0.3593322499999886,
+      "immutableMs": 1.6389881499999774,
+      "nativeMs": 0.3679738499999985,
+      "versusBefore": 1.0902425262414517,
+      "versusImmutable": 4.5612052633740205,
+      "beforeSpeedupByRound": [
+        1.138298545670285,
+        1.07715500890798,
+        1.0952436426107919
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedOrderedMap:delete",
+      "beforeMs": 0.0057175999999799386,
+      "sharedMs": 0.005770799999982046,
+      "immutableMs": 0.009115049999991243,
+      "nativeMs": 0.08515975000000253,
+      "versusBefore": 0.9907811741868938,
+      "versusImmutable": 1.57951237263804,
+      "beforeSpeedupByRound": [
+        1.0015542812976483,
+        1.003764126093165,
+        1.019508111121855
+      ]
+    },
+    {
+      "suite": "timing",
+      "key": "SharedOrderedMap:forEach",
+      "beforeMs": 1.3905421999999816,
+      "sharedMs": 1.2640968500000327,
+      "immutableMs": 0.17259280000002947,
+      "nativeMs": 0.0834407000000283,
+      "versusBefore": 1.100028213819175,
+      "versusImmutable": 0.1365344751867905,
+      "beforeSpeedupByRound": [
+        1.123568526959238,
+        1.1072700384022451,
+        1.0130917710331913
+      ]
+    },
+    {
+      "suite": "extra",
+      "key": "cold.get",
+      "beforeMs": 2.551688000000013,
+      "sharedMs": 2.0699769999999944,
+      "immutableMs": 0.9187000000000012,
+      "nativeMs": 0.23570100000000593,
+      "versusBefore": 1.2327132137217078,
+      "versusImmutable": 0.4438213564691799,
+      "beforeSpeedupByRound": [
+        1.2539444605616978,
+        1.1575445136798301,
+        1.0831057086789113
+      ]
+    },
+    {
+      "suite": "extra",
+      "key": "beyond-cache.get",
+      "beforeMs": 4.54896500000001,
+      "sharedMs": 4.828516999999977,
+      "immutableMs": 4.636866999999995,
+      "nativeMs": 1.279814999999985,
+      "versusBefore": 0.9421039627695277,
+      "versusImmutable": 0.9603087241900603,
+      "beforeSpeedupByRound": [
+        0.9737968968378511,
+        0.9459347392339867,
+        0.9319729016821772
+      ]
+    },
+    {
+      "suite": "extra",
+      "key": "mixed.set-get-has",
+      "beforeMs": 1.4587060000000065,
+      "sharedMs": 0.8641760000000431,
+      "immutableMs": 0.5268879999999854,
+      "nativeMs": 0.18156499999997777,
+      "versusBefore": 1.687973283220008,
+      "versusImmutable": 0.6096998759511477,
+      "beforeSpeedupByRound": [
+        1.7709158782469687,
+        1.440875628549723,
+        2.7244195667322
+      ]
+    },
+    {
+      "suite": "extra",
+      "key": "forks.get",
+      "beforeMs": 0.3112750000000233,
+      "sharedMs": 0.28316400000005615,
+      "immutableMs": 1.0587659999999914,
+      "nativeMs": 0.4411450000000059,
+      "versusBefore": 1.099274625305341,
+      "versusImmutable": 3.7390558121787425,
+      "beforeSpeedupByRound": [
+        1.1351499092725943,
+        1.0192252082199953,
+        1.0873328143800942
+      ]
+    }
+  ],
+  "memory": [
+    {
+      "name": "Map",
+      "n": 10000,
+      "state": "warm",
+      "before": 4255512,
+      "shared": 2061368,
+      "immutable": 2149928,
+      "native": 941816,
+      "beforeAllocated": 2689112,
+      "sharedAllocated": 979744
+    },
+    {
+      "name": "Map",
+      "n": 100000,
+      "state": "warm",
+      "before": 35410352,
+      "shared": 15487584,
+      "immutable": 20032720,
+      "native": 8473136,
+      "beforeAllocated": 33426440,
+      "sharedAllocated": 14085524
+    },
+    {
+      "name": "Map",
+      "n": 10000,
+      "state": "history",
+      "before": 2963384,
+      "shared": 1105656,
+      "immutable": 2146832,
+      "native": 15165616,
+      "beforeAllocated": 2698536,
+      "sharedAllocated": 982192
+    },
+    {
+      "name": "Map",
+      "n": 10000,
+      "state": "compact",
+      "before": 2206688,
+      "shared": 1725368,
+      "immutable": 2150384,
+      "native": 941816,
+      "beforeAllocated": 528032,
+      "sharedAllocated": 469824
+    },
+    {
+      "name": "OrderedMap",
+      "n": 10000,
+      "state": "warm",
+      "before": 4395704,
+      "shared": 2263768,
+      "immutable": 3072840,
+      "native": 941816,
+      "beforeAllocated": 2841192,
+      "sharedAllocated": 1123208
+    }
+  ]
+}
