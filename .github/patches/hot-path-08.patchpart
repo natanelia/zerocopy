@@ -1,0 +1,64 @@
+-  peek(): ValueOf<T> | undefined { const a = arenaOf(this); return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.root + 8, true)) : undefined; }
+-  peekPriority(): number | undefined { return this.size ? arenaOf(this).dv.getFloat64(this.root, true) : undefined; }
++  peek(): ValueOf<T> | undefined { const a = this.arena; return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.root + 8, true)) : undefined; }
++  peekPriority(): number | undefined { return this.size ? this.arena.dv.getFloat64(this.root, true) : undefined; }
+@@ -49 +49 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
+-    const arena = arenaOf(this), pending = this.root ? [this.root] : [];
++    const arena = this.arena, pending = this.root ? [this.root] : [];
+diff --git a/shared-queue.ts b/shared-queue.ts
+index 99d95fb..e402e96 100644
+--- a/shared-queue.ts
++++ b/shared-queue.ts
+@@ -32 +32 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
+-    const a = arenaOf(this), raw = a.encode(this.valueType, value), end = checkedSize(this.tail + this.size), total = checkedSize(end + 1);
++    const a = this.arena, raw = a.encode(this.valueType, value), end = checkedSize(this.tail + this.size), total = checkedSize(end + 1);
+@@ -40 +40 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
+-    const a = arenaOf(this);
++    const a = this.arena;
+@@ -45 +45 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
+-    const a = arenaOf(this), start = (this.tail + this.size - 1) & ~31;
++    const a = this.arena, start = (this.tail + this.size - 1) & ~31;
+diff --git a/shared-sorted-map.ts b/shared-sorted-map.ts
+index ffa6e5b..f766e19 100644
+--- a/shared-sorted-map.ts
++++ b/shared-sorted-map.ts
+@@ -30 +30,3 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
+-    const a = arenaOf(this), root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 2) : a.write(this.valueType, this.root, key, value, 2));
++    const a = this.arena; a.assertWritable();
++    if (a.sameValue(this.root, key, this.valueType, value, 0, true)) return this;
++    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 2) : this.valueType === 'string' ? a.writeString(this.root, key, value as string, 2) : a.write(this.valueType, this.root, key, value, 2));
+@@ -33,2 +35,2 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
+-  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.radixFind(this.root, key); return leaf ? a.leafValue(this.valueType, leaf) : undefined; }
+-  has(key: string): boolean { return arenaOf(this).radixFind(this.root, key) !== 0; }
++  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 0, true); }
++  has(key: string): boolean { return this.arena.radixFind(this.root, key) !== 0; }
+@@ -36 +38 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
+-    const a = arenaOf(this); a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
++    const a = this.arena; a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
+@@ -39 +41 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
+-  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = arenaOf(this); for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
++  private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
+diff --git a/shared-stack.ts b/shared-stack.ts
+index 4580bd0..b2e2636 100644
+--- a/shared-stack.ts
++++ b/shared-stack.ts
+@@ -21,0 +22 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
++  private readonly encodedTop: number;
+@@ -24,2 +25,2 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
+-  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = current) {
+-    super(source); this.valueType = type; this.head = head; this.size = checkedSize(size); Object.freeze(this);
++  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = current, encodedTop?: number) {
++    super(source); this.valueType = type; this.head = head; this.size = checkedSize(size); this.encodedTop = encodedTop ?? (head ? source.dv.getFloat64(head + 8, true) : 0); Object.freeze(this);
+@@ -28,3 +29,3 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
+-    const a = arenaOf(this); a.assertWritable();
+-    const size = checkedSize(this.size + 1), head = a.wasm.cons(this.head, a.encode(this.valueType, value)) >>> 0;
+-    return new SharedStack(this.valueType, head, size, undefined, a);
++    const a = this.arena; a.assertWritable();
++    const size = checkedSize(this.size + 1), raw = a.encode(this.valueType, value), head = a.wasm.cons(this.head, raw) >>> 0;
++    return new SharedStack(this.valueType, head, size, undefined, a, raw);
+@@ -34 +35 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
+-    const a = arenaOf(this); return new SharedStack(this.valueType, a.dv.getUint32(this.head, true), this.size - 1, undefined, a);
++    const a = this.arena; return new SharedStack(this.valueType, a.dv.getUint32(this.head, true), this.size - 1, undefined, a);
+@@ -36 +37 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
+-  peek(): ValueOf<T> | undefined { const a = arenaOf(this); return this.size ? a.decode(this.valueType, a.dv.getFloat64(this.head + 8, true)) : undefined; }
++  peek(): ValueOf<T> | undefined { return this.size ? this.arena.decode(this.valueType, this.encodedTop) : undefined; }

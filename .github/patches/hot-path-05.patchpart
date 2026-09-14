@@ -1,0 +1,94 @@
++    for (let i = 0; i < kinds.length; i++) {
++      const kind = kinds[(i + trial) % kinds.length];
++      const run = spawnSync(process.execPath, ['--expose-gc', fileURLToPath(import.meta.url), '--case', test.name, kind, test.state, String(test.n)], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
++      if (run.status !== 0) throw new Error(`${test.name}/${kind}/${test.state}: ${run.stderr}\n${run.stdout}`);
++      samples.push({ trial: trial + 1, ...JSON.parse(run.stdout) });
++    }
++    console.error(`memory ${trial + 1}: ${test.name} ${test.n} ${test.state}`);
++  }
++  const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
++  const summary = cases.map(test => {
++    const get = kind => median(samples.filter(r => r.name === test.name && r.kind === kind && r.n === test.n && r.state === test.state).map(r => r.retainedBytes));
++    return { ...test, shared: get('shared'), immutable: get('immutable'), native: get('native') };
++  });
++  const output = process.argv[2] ?? 'proofs/results/library-memory.json';
++  mkdirSync(new URL('results/', import.meta.url), { recursive: true });
++  const bundleFiles = readdirSync(new URL('../dist/', import.meta.url)).filter(name => name.endsWith('.js')).sort();
++  const bundleHash = createHash('sha256');
++  for (const name of bundleFiles) bundleHash.update(name + '\0').update(readFileSync(new URL('../dist/' + name, import.meta.url))).update('\0');
++  const result = { schema: 1, method, measuredAt: new Date().toISOString(), runtime: process.version, cpu: cpus()[0].model, platform: process.platform, arch: process.arch, trials,
++    driverSHA256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
++    immutable: JSON.parse(readFileSync(new URL('../node_modules/immutable/package.json', import.meta.url))).version,
++    bundleFiles, bundleSHA256: bundleHash.digest('hex'), summary, samples };
++  writeFileSync(output, JSON.stringify(result) + '\n');
++  console.log(JSON.stringify(summary, null, 2));
++}
+diff --git a/proofs/readme-libraries.ts b/proofs/readme-libraries.ts
+index 95966b5..2513b9d 100644
+--- a/proofs/readme-libraries.ts
++++ b/proofs/readme-libraries.ts
+@@ -17 +17,3 @@ import { resetSortedMap } from '../shared-sorted-map';
+-const N = 10000;
++const N = Number(process.env.N ?? 10000);
++assert(Number.isInteger(N) && N >= 1000 && N <= 100000);
++const includeArenaSetup = process.env.INCLUDE_ARENA_SETUP !== '0';
+@@ -61 +63 @@ function mapCases(group: string, sharedClass: any, reset: () => void, immutableF
+-        if (isBuild) { if (kind === 'shared') reset(); return build(); }
++        if (isBuild) { if (kind === 'shared' && includeArenaSetup) reset(); return build(); }
+@@ -118 +120 @@ function sequenceCases(group: string, sharedClass: any, reset: () => void, immut
+-        if (isBuild) { if (kind === 'shared') reset(); return build(operation === 'prepend'); }
++        if (isBuild) { if (kind === 'shared' && includeArenaSetup) reset(); return build(operation === 'prepend'); }
+@@ -156 +158 @@ Object.defineProperty(globalThis, '__zerocopyReadmeBenchmarkSink', { value: sink
+-const rowKeys = [...new Set(cases.map(c => `${c.group}:${c.operation}`))];
++const rowKeys = [...new Set(cases.map(c => `${c.group}:${c.operation}`))].filter(key => !process.env.CASE_FILTER || process.env.CASE_FILTER.split(',').includes(key));
+@@ -163 +165 @@ for (const key of rowKeys) {
+-    for (let w = 0; w < warmups; w++) { sink.value = c.run(); c.check(sink.value); }
++    for (let w = 0; w < warmups; w++) { if (!includeArenaSetup && c.kind === 'shared' && c.repeat === 1) c.setup(); sink.value = c.run(); c.check(sink.value); }
+@@ -165,0 +168 @@ for (const key of rowKeys) {
++      if (!includeArenaSetup && c.kind === 'shared' && c.repeat === 1) c.setup();
+@@ -179 +182 @@ const root = new URL('../', import.meta.url);
+-const engineFiles = readdirSync(root).filter(f => /^(arena|codec|compaction|set-key|types|utf8|wasm-utils|shared.*|persistent-core\.as)\.ts$/.test(f) && !f.endsWith('.test.ts')).sort();
++const engineFiles = readdirSync(root).filter(f => /^(arena|read-cache|codec|compaction|set-key|types|utf8|wasm-utils|shared.*|persistent-core\.as)\.ts$/.test(f) && !f.endsWith('.test.ts')).sort();
+@@ -182 +185 @@ for (const file of engineFiles) hash.update(file + '\0').update(readFileSync(new
+-const result = { schema: 1, sourceCommit: process.env.SOURCE_COMMIT ?? 'uncommitted; use engineSHA256', measuredAt: new Date().toISOString(), round, N, warmups,
++const result = { schema: 1, sourceCommit: process.env.SOURCE_COMMIT ?? 'uncommitted; use engineSHA256', measuredAt: new Date().toISOString(), round, N, warmups, includeArenaSetup, caseFilter: process.env.CASE_FILTER ?? null,
+diff --git a/proofs/run-comparison.mjs b/proofs/run-comparison.mjs
+index 07f33eb..705e295 100644
+--- a/proofs/run-comparison.mjs
++++ b/proofs/run-comparison.mjs
+@@ -29 +29 @@ if (baselineEngineSHA256 !== '8dfcd6c936b4875ebfcd6e13dd214d5b84d2d6301f1c5f6c68
+-const engineFiles = readdirSync(root).filter(p => (p === 'persistent-core.as.ts' || p === 'shared-hash-reader.as.ts' || p === 'shared-runtime.as.ts') || p === 'compaction.ts' || p === 'arena.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')).sort();
++const engineFiles = readdirSync(root).filter(p => (p === 'persistent-core.as.ts' || p === 'shared-hash-reader.as.ts' || p === 'shared-runtime.as.ts') || p === 'compaction.ts' || p === 'arena.ts' || p === 'read-cache.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')).sort();
+diff --git a/proofs/run-hot-path-evidence.sh b/proofs/run-hot-path-evidence.sh
+new file mode 100644
+index 0000000..fce0489
+--- /dev/null
++++ b/proofs/run-hot-path-evidence.sh
+@@ -0,0 +1,15 @@
++#!/usr/bin/env bash
++set -euo pipefail
++mkdir -p proofs/results/hot-path proofs/results/cold-build
++export SOURCE_COMMIT="$(git rev-parse HEAD)"
++for round in 1 2 3; do
++  # Persistent operations in an existing arena; fresh arena setup stays outside
++  # the timer. The cold-build comparison below includes that cost explicitly.
++  ROUND="$round" SAMPLES=15 INCLUDE_ARENA_SETUP=0 bun proofs/readme-libraries.ts "proofs/results/hot-path/readme-libraries-round-$round.json"
++  ROUND="$round" SAMPLES=15 INCLUDE_ARENA_SETUP=1 CASE_FILTER='SharedMap:set,SharedList:push,SharedStack:push,SharedQueue:enqueue,SharedLinkedList:append,SharedLinkedList:prepend,SharedDoublyLinkedList:append,SharedDoublyLinkedList:prepend,SharedOrderedMap:set,SharedSortedMap:set' bun proofs/readme-libraries.ts "proofs/results/cold-build/readme-libraries-round-$round.json"
++  ROUND="$round" SAMPLES=15 bun proofs/hot-path-workloads.ts "proofs/results/hot-path/workloads-$round.json"
++done
++node proofs/summarize-readme-libraries.mjs proofs/results/hot-path
++node proofs/summarize-readme-libraries.mjs proofs/results/cold-build
++node proofs/library-memory.mjs proofs/results/hot-path/library-memory.json
++node proofs/node-worker.mjs > proofs/results/hot-path/node-worker.json
+diff --git a/proofs/run-revision.mjs b/proofs/run-revision.mjs
+index 8158390..576581d 100644
+--- a/proofs/run-revision.mjs
++++ b/proofs/run-revision.mjs
+@@ -19 +19 @@ function fingerprint(dir) {
+-  const files = readdirSync(dir).filter(p => p === 'persistent-core.as.ts' || ['arena.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')).sort();
++  const files = readdirSync(dir).filter(p => p === 'persistent-core.as.ts' || ['arena.ts', 'read-cache.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')).sort();
+diff --git a/proofs/summarize-readme-libraries.mjs b/proofs/summarize-readme-libraries.mjs
+index 8d5e912..ac295d9 100644
+--- a/proofs/summarize-readme-libraries.mjs
++++ b/proofs/summarize-readme-libraries.mjs
+@@ -4 +4,3 @@ import { readFileSync, writeFileSync } from 'node:fs';

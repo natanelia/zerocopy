@@ -1,0 +1,104 @@
+@@ -42 +42 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this); a.assertWritable();
++    const a = this.arena; a.assertWritable();
+@@ -54,3 +54,3 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), start = (this.size - 1) & ~31;
+-    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.wasm.vecGet(this.root, this.depth, index);
+-    return a.decode(this.type, raw);
++    const a = this.arena, start = (this.size - 1) & ~31;
++    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.vectorValue(this.root, this.depth, index);
++    return this.type === 'number' ? raw as ValueOf<T> : a.decode(this.type, raw);
+@@ -60 +60 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), raw = a.encode(this.type, value), start = (this.size - 1) & ~31;
++    const a = this.arena, raw = a.encode(this.type, value), start = (this.size - 1) & ~31;
+@@ -66 +66 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), size = this.size - 1;
++    const a = this.arena, size = this.size - 1;
+@@ -77 +77 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), start = (this.size - 1) & ~31;
++    const a = this.arena, start = (this.size - 1) & ~31;
+@@ -81 +81,9 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-  forEach(fn: (value: ValueOf<T>, index: number) => void): void { let i = 0; for (const value of this.values()) fn(value, i++); }
++  forEach(fn: (value: ValueOf<T>, index: number) => void): void {
++    const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
++    for (let first = 0; first < this.size; first += 32) {
++      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
++      const stop = Math.min(this.size, first + 32), view = a.dv;
++      // Shared views remain valid if the callback grows memory or creates forks.
++      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
++    }
++  }
+@@ -83 +91 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), result = new Array<ValueOf<T>>(this.size);
++    const a = this.arena, result = new Array<ValueOf<T>>(this.size);
+diff --git a/shared-map.ts b/shared-map.ts
+index e805bbb..bea48fa 100644
+--- a/shared-map.ts
++++ b/shared-map.ts
+@@ -38 +38,3 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-    const a = arenaOf(this), root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : a.write(this.valueType, this.root, key, value));
++    const a = this.arena; a.assertWritable();
++    if (a.sameValue(this.root, key, this.valueType, value)) return this;
++    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number) : this.valueType === 'string' ? a.writeString(this.root, key, value as string) : a.write(this.valueType, this.root, key, value));
+@@ -41,7 +43,2 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-  get(key: string): ValueOf<T> | undefined {
+-    const a = arenaOf(this);
+-    if (this.valueType === 'number') return a.number(this.root, key) as ValueOf<T> | undefined;
+-    const leaf = a.find(this.root, key);
+-    return leaf ? a.leafValue(this.valueType, leaf) : undefined;
+-  }
+-  has(key: string): boolean { return arenaOf(this).find(this.root, key) !== 0; }
++  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType); }
++  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
+@@ -49 +46 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-    const a = arenaOf(this), root = a.delete(this.root, key);
++    const a = this.arena, root = a.delete(this.root, key);
+@@ -54 +51 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-    const a = arenaOf(this), root = a.bulk(this.valueType, this.root, entries);
++    const a = this.arena, root = a.bulk(this.valueType, this.root, entries);
+@@ -59 +56 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-    const a = arenaOf(this); a.assertWritable(); let root = this.root;
++    const a = this.arena; a.assertWritable(); let root = this.root;
+@@ -64 +61 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-    const a = arenaOf(this);
++    const a = this.arena;
+@@ -67,3 +64,3 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+-  *keys(): Generator<string> { const a = arenaOf(this); for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
+-  *values(): Generator<ValueOf<T>> { const a = arenaOf(this); for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf); }
+-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [k, v] of this.entries()) fn(v, k); }
++  *keys(): Generator<string> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
++  *values(): Generator<ValueOf<T>> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf); }
++  forEach(fn: (value: ValueOf<T>, key: string) => void): void { const a = this.arena; for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf)); }
+diff --git a/shared-ordered-map.ts b/shared-ordered-map.ts
+index 0127261..3171e2e 100644
+--- a/shared-ordered-map.ts
++++ b/shared-ordered-map.ts
+@@ -32,2 +32,4 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
+-    const a = arenaOf(this); checkedSize(this.tail + 1);
+-    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 1, this.head, this.tail) : a.write(this.valueType, this.root, key, value, 1, this.head, this.tail));
++    const a = this.arena; a.assertWritable();
++    if (a.sameValue(this.root, key, this.valueType, value, 4)) return this;
++    checkedSize(this.tail + 1);
++    const root = (this.valueType === 'number' ? a.writeNumber(this.root, key, value as number, 1, this.head, this.tail) : this.valueType === 'string' ? a.writeString(this.root, key, value as string, 1, this.head, this.tail) : a.write(this.valueType, this.root, key, value, 1, this.head, this.tail));
+@@ -36,2 +38,2 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
+-  get(key: string): ValueOf<T> | undefined { const a = arenaOf(this), leaf = a.find(this.root, key); return leaf ? a.leafValue(this.valueType, leaf, 4) : undefined; }
+-  has(key: string): boolean { return arenaOf(this).find(this.root, key) !== 0; }
++  get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 4); }
++  has(key: string): boolean { return this.arena.find(this.root, key) !== 0; }
+@@ -39 +41 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
+-    const a = arenaOf(this); a.assertWritable(); const leaf = a.find(this.root, key); if (!leaf) return this;
++    const a = this.arena; a.assertWritable(); const leaf = a.find(this.root, key); if (!leaf) return this;
+@@ -45 +47 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
+-    const a = arenaOf(this), order: number[] = [], view = a.dv; let p = this.head;
++    const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
+diff --git a/shared-priority-queue.ts b/shared-priority-queue.ts
+index 67af551..93a541b 100644
+--- a/shared-priority-queue.ts
++++ b/shared-priority-queue.ts
+@@ -33 +33 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
+-    const a = arenaOf(this); a.assertWritable(); const size = checkedSize(this.size + 1);
++    const a = this.arena; a.assertWritable(); const size = checkedSize(this.size + 1);
+@@ -39 +39 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
+-    const a = arenaOf(this); a.assertWritable();
++    const a = this.arena; a.assertWritable();
+@@ -42,2 +42,2 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext

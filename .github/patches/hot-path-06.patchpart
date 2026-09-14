@@ -1,0 +1,126 @@
+-const directory = new URL('./results/', import.meta.url);
++import { resolve, sep } from 'node:path';
++import { pathToFileURL } from 'node:url';
++const directory = process.argv[2] ? pathToFileURL(resolve(process.argv[2]) + sep) : new URL('./results/', import.meta.url);
+@@ -8,2 +10,2 @@ const inputs = [1, 2, 3].map(round => {
+-  assert.equal(data.round, round); assert.equal(data.N, 10000); assert.equal(data.rows.length, 89);
+-  assert.equal(new Set(data.rows.map(r => `${r.group}:${r.operation}:${r.kind}`)).size, 89);
++  assert.equal(data.round, round); assert.equal(data.N, 10000); if (!data.caseFilter) assert.equal(data.rows.length, 89);
++  assert.equal(new Set(data.rows.map(r => `${r.group}:${r.operation}:${r.kind}`)).size, data.rows.length);
+@@ -18 +20 @@ for (const { data } of inputs) {
+-  for (const key of ['engineSHA256', 'wasmSHA256', 'benchmarkSHA256', 'sourceCommit', 'warmups']) assert.equal(data[key], first[key]);
++  for (const key of ['engineSHA256', 'wasmSHA256', 'benchmarkSHA256', 'sourceCommit', 'warmups', 'includeArenaSetup', 'caseFilter']) assert.equal(data[key], first[key]);
+@@ -37 +39 @@ for (const row of first.rows) {
+-assert.equal(rows.length, 36);
++if (!first.caseFilter) assert.equal(rows.length, 36);
+@@ -39 +41 @@ const summary = { schema: 1, comparison: 'Zerocopy vs Immutable.js vs native', N
+-  measuredAt: inputs.map(x => x.data.measuredAt), runtime: first.runtime, rounds: 3, samplesPerVariant: 45, totalSamples: 4005, warmups: first.warmups,
++  measuredAt: inputs.map(x => x.data.measuredAt), runtime: first.runtime, rounds: 3, samplesPerVariant: 45, totalSamples: first.rows.length * 45, warmups: first.warmups, includeArenaSetup: first.includeArenaSetup ?? true, caseFilter: first.caseFilter ?? null,
+@@ -53 +55,3 @@ for (const [group, title] of Object.entries(titles)) {
+-  const groupRows = rows.filter(r => r.group === group), hasImmutable = groupRows[0].immutable !== undefined;
++  const groupRows = rows.filter(r => r.group === group);
++  if (!groupRows.length) continue;
++  const hasImmutable = groupRows[0].immutable !== undefined;
+diff --git a/read-cache.ts b/read-cache.ts
+new file mode 100644
+index 0000000..7470c71
+--- /dev/null
++++ b/read-cache.ts
+@@ -0,0 +1,49 @@
++/** Bounded, process-local address cache. Never part of a published snapshot.
++ * The root is part of every hit check. Forks and old versions cannot share a
++ * result merely because their string keys are equal.
++ * Flat words avoid allocating a JavaScript record for each cached key.
++ */
++export class ReadCache {
++  private readonly slots = new Map<string, number>();
++  private words = new Uint32Array(4 * 256);
++  private chars = 0;
++  private readonly values: unknown[] = [];
++  private valueBytes = 0;
++  code(slot: number): number { return this.words[slot + 3]; }
++  value(slot: number): unknown { return this.values[slot >>> 2]; }
++  cacheValue(slot: number, code: number, value: string | number | boolean | undefined): void {
++    const index = slot >>> 2, bytes = typeof value === 'string' ? value.length * 2 : 8;
++    this.valueBytes -= this.words[slot + 3] ? (typeof this.values[index] === 'string' ? (this.values[index] as string).length * 2 : 8) : 0;
++    if (this.valueBytes + bytes > 1048576) {
++      this.values[index] = undefined; this.words[slot + 3] = 0; return;
++    }
++    this.values[index] = value; this.valueBytes += bytes; this.words[slot + 3] = code;
++  }
++  private static readonly MAX_ENTRIES = 16384;
++  private static readonly MAX_CHARS = 131072;
++
++  slot(key: string): number | undefined { return this.slots.get(key); }
++  keyLeaf(slot: number): number { return this.words[slot]; }
++  root(slot: number): number { return this.words[slot + 1]; }
++  leaf(slot: number): number { return this.words[slot + 2]; }
++  update(slot: number, root: number, leaf: number): void {
++    if (this.words[slot + 2] !== leaf) {
++      const index = slot >>> 2;
++      this.valueBytes -= this.words[slot + 3] ? (typeof this.values[index] === 'string' ? (this.values[index] as string).length * 2 : 8) : 0;
++      this.values[index] = undefined; this.words[slot + 3] = 0;
++    }
++    this.words[slot + 1] = root; this.words[slot + 2] = leaf;
++  }
++  remember(key: string, root: number, leaf: number): void {
++    const existing = this.slots.get(key);
++    if (existing !== undefined) { this.update(existing, root, leaf); return; }
++    // Do not let unrelated misses consume the cache's memory budget.
++    if (!leaf || this.slots.size >= ReadCache.MAX_ENTRIES || this.chars + key.length > ReadCache.MAX_CHARS) return;
++    const slot = this.slots.size * 4;
++    if (slot === this.words.length) {
++      const next = new Uint32Array(this.words.length * 2); next.set(this.words); this.words = next;
++    }
++    this.slots.set(key, slot); this.chars += key.length;
++    this.words[slot] = leaf; this.update(slot, root, leaf);
++  }
++}
+diff --git a/shared-doubly-linked-list.ts b/shared-doubly-linked-list.ts
+index 488aed4..202dfcf 100644
+--- a/shared-doubly-linked-list.ts
++++ b/shared-doubly-linked-list.ts
+@@ -32 +32 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
++    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
+@@ -41 +41 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this); a.assertWritable(); const before = this.size - this.tailSize;
++    const a = this.arena; a.assertWritable(); const before = this.size - this.tailSize;
+@@ -47 +47 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
++    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
+@@ -57 +57 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this), before = this.size - this.tailSize;
++    const a = this.arena, before = this.size - this.tailSize;
+@@ -63 +63 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this); let i = 0;
++    const a = this.arena; let i = 0;
+@@ -75 +75 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
+-    const a = arenaOf(this); let i = this.size - 1;
++    const a = this.arena; let i = this.size - 1;
+diff --git a/shared-linked-list.ts b/shared-linked-list.ts
+index 410f438..e8a122a 100644
+--- a/shared-linked-list.ts
++++ b/shared-linked-list.ts
+@@ -32 +32 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
+-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
++    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1), before = this.size - this.tailSize;
+@@ -41 +41 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
+-    const a = arenaOf(this); a.assertWritable(); const before = this.size - this.tailSize;
++    const a = this.arena; a.assertWritable(); const before = this.size - this.tailSize;
+@@ -47 +47 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
+-    const a = arenaOf(this), raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
++    const a = this.arena, raw = a.encode(this.valueType, value), size = checkedSize(this.size + 1);
+@@ -57 +57 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
+-    const a = arenaOf(this), before = this.size - this.tailSize;
++    const a = this.arena, before = this.size - this.tailSize;
+@@ -63 +63 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
+-    const a = arenaOf(this); let i = 0;
++    const a = this.arena; let i = 0;
+diff --git a/shared-list.ts b/shared-list.ts
+index 18a9d90..f2f25b9 100644
+--- a/shared-list.ts
++++ b/shared-list.ts
+@@ -33 +33 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+-    const a = arenaOf(this), raw = a.encode(this.type, value), size = checkedSize(this.size + 1);
++    const a = this.arena, raw = a.encode(this.type, value), size = checkedSize(this.size + 1);
