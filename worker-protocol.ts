@@ -4,7 +4,9 @@ import { getWorkerData, type WorkerData } from './shared';
 
 export type SharedCollection = Parameters<typeof getWorkerData>[0][string];
 export type SharedValue = SharedCollection | Readonly<Record<string, SharedCollection>>;
-export interface SharedSource<T extends SharedValue> {
+/** A self-keyed shape also accepts named interfaces without an index signature. */
+export type SharedShape<T> = SharedCollection | { readonly [K in keyof T]: SharedCollection };
+export interface SharedSource<T extends SharedShape<T>> {
   getSnapshot(): T;
   subscribe(listener: () => void): () => void;
 }
@@ -33,13 +35,13 @@ export interface StateOptions extends SessionOptions {
 export const PROTOCOL = 'zerocopy/session';
 export const WIRE_VERSION = 1;
 export type ArenaWire = WorkerData['arenas'][number];
-export interface Capture<T extends SharedValue = SharedValue> {
+export interface Capture<T extends object = SharedValue> {
   value: T;
   single: boolean;
   data: WorkerData;
   identities: Readonly<Record<string, string>>;
 }
-export interface Frame extends Capture { sequence: number }
+export type Frame = Pick<Capture, 'single' | 'data' | 'identities'> & { sequence: number };
 export type Message = {
   protocol: typeof PROTOCOL;
   version: typeof WIRE_VERSION;
@@ -87,7 +89,7 @@ export function strategy(options: StateOptions): PublishStrategy {
   if (value !== 'microtask' && value !== 'immediate') throw new TypeError('Invalid publish strategy');
   return value;
 }
-export function recordOf(value: SharedValue): { single: boolean; structures: Record<string, SharedCollection> } {
+export function recordOf(value: object): { single: boolean; structures: Record<string, SharedCollection> } {
   if (value instanceof Snapshot) return { single: true, structures: { value: value as SharedCollection } };
   if (!value || typeof value !== 'object' || ![null, Object.prototype].includes(Object.getPrototypeOf(value))) {
     throw new TypeError('Shared state must be a collection or a plain record of collections');
@@ -110,12 +112,12 @@ export function identities(data: WorkerData): Readonly<Record<string, string>> {
   }
   return Object.freeze(result);
 }
-export function capture<T extends SharedValue>(value: T): Capture<T> {
+export function capture<T extends object>(value: T): Capture<T> {
   const { single, structures } = recordOf(value);
   const data = getWorkerData(structures, { copy: false });
   return { value: (single ? value : Object.freeze(structures)) as T, single, data, identities: identities(data) };
 }
-export function same(a: Capture, b: Capture): boolean {
+export function same(a: Pick<Capture, 'single' | 'identities'>, b: Pick<Capture, 'single' | 'identities'>): boolean {
   const keys = Object.keys(a.identities);
   return a.single === b.single && keys.length === Object.keys(b.identities).length && keys.every(key => a.identities[key] === b.identities[key]);
 }

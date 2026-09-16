@@ -65,7 +65,7 @@ describe('shared state and session protocol', () => {
   it('suppresses no-ops, including newly allocated record wrappers', async () => {
     const { state, pair } = await setup({ map: new SharedMap('number').set('a', 1) });
     state.update(current => ({ ...current }));
-    state.update('map', map => map.set('a', 1));
+    state.update('map', map => map); // Same handle, not deep value equality.
     await drain();
     expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1);
   });

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "strict": true, "declaration": false, "declarationMap": false },
+  "include": ["type-tests/worker.consumer.ts"],
+  "exclude": ["node_modules"]
+}

@@ -4,13 +4,13 @@ import {
   capture, same, identities, message, isMessage, listen, reserve, settings, strategy,
   uniqueId, defaultEndpoint, report, errorOf, notify, WIRE_VERSION,
   type Capture, type Frame, type Message, type ArenaWire,
-  type SharedCollection, type SharedValue, type SharedSource, type SharedEndpoint,
+  type SharedCollection, type SharedValue, type SharedShape, type SharedSource, type SharedEndpoint,
   type SessionOptions, type StateOptions,
 } from './worker-protocol';
-export type { SharedCollection, SharedValue, SharedSource, SharedEndpoint, SessionOptions, StateOptions, PublishStrategy } from './worker-protocol';
+export type { SharedCollection, SharedValue, SharedShape, SharedSource, SharedEndpoint, SessionOptions, StateOptions, PublishStrategy } from './worker-protocol';
 
 export interface ConnectOptions { signal?: AbortSignal }
-export interface SharedSession<T extends SharedValue> {
+export interface SharedSession<T extends SharedShape<T>> {
   readonly current: T;
   /** Last published version. Local auto-state updates become visible before publication. */
   readonly version: number;
@@ -24,7 +24,7 @@ export interface SharedSession<T extends SharedValue> {
   subscribe(listener: (snapshot: T, version: number) => void): () => void;
   dispose(): void;
 }
-export interface SharedState<T extends SharedValue> extends SharedSession<T> {
+export interface SharedState<T extends SharedShape<T>> extends SharedSession<T> {
   value: T;
   update(recipe: (current: T) => T): void;
   update<K extends T extends SharedCollection ? never : keyof T>(key: K, recipe: (current: T[K]) => T[K]): void;
@@ -37,7 +37,7 @@ export interface SnapshotStreamOptions {
   emitCurrent?: boolean;
   signal?: AbortSignal;
 }
-export interface SharedReader<T extends SharedValue> {
+export interface SharedReader<T extends SharedShape<T>> {
   readonly current: T;
   readonly version: number;
   readonly closed: boolean;
@@ -58,7 +58,7 @@ interface Peer {
   close(error?: Error, remote?: boolean): void;
 }
 
-class Publisher<T extends SharedValue> implements SharedState<T> {
+class Publisher<T extends SharedShape<T>> implements SharedState<T> {
   private state: Capture<T> | undefined;
   private published: Capture<T> | undefined;
   private sequence = 0;
@@ -91,6 +91,7 @@ class Publisher<T extends SharedValue> implements SharedState<T> {
   private set(next: T): boolean {
     this.assertOpen();
     const captured = capture(next);
+    this.assertOpen();
     if (captured.single !== this.state!.single) throw new TypeError('Cannot change between single-collection and record state');
     if (same(this.state!, captured)) return false;
     this.state = captured; return true;
@@ -127,12 +128,20 @@ class Publisher<T extends SharedValue> implements SharedState<T> {
     this.updating = true;
     let changed = false;
     try {
-      if (typeof keyOrRecipe === 'function' && recipe === undefined) changed = this.set(keyOrRecipe(this.current));
+      const run = (fn: (value: any) => any, current: any) => {
+        const result = fn(current);
+        if (result && typeof result.then === 'function') {
+          Promise.resolve(result).catch(error => report(this.options.onError, error));
+          throw new TypeError('Shared-state recipes must be synchronous');
+        }
+        return result;
+      };
+      if (typeof keyOrRecipe === 'function' && recipe === undefined) changed = this.set(run(keyOrRecipe, this.current));
       else {
         if (this.state!.single || !Object.hasOwn(this.current, keyOrRecipe) || typeof recipe !== 'function') {
           throw new TypeError('update(key, recipe) requires an existing record key');
         }
-        const value = recipe((this.current as any)[keyOrRecipe]);
+        const value = run(recipe, (this.current as any)[keyOrRecipe]);
         changed = this.set({ ...this.current, [keyOrRecipe]: value });
       }
     } finally { this.updating = false; }
@@ -171,10 +180,15 @@ class Publisher<T extends SharedValue> implements SharedState<T> {
     this.assertOpen();
     if (Array.isArray(endpoint)) {
       const added = endpoint.filter(item => !this.peers.has(item));
-      return Promise.all(endpoint.map(item => this.connect(item, options))).then(() => undefined, error => {
+      try {
+        return Promise.all(endpoint.map(item => this.connect(item, options))).then(() => undefined, error => {
+          for (const item of added) this.disconnect(item);
+          throw error;
+        });
+      } catch (error) {
         for (const item of added) this.disconnect(item);
-        throw error;
-      });
+        return Promise.reject(error);
+      }
     }
     const target = endpoint as SharedEndpoint;
     const existing = this.peers.get(target);
@@ -263,12 +277,12 @@ class Publisher<T extends SharedValue> implements SharedState<T> {
   }
 }
 
-export function createSharedState<T extends SharedValue>(initial: T, options: StateOptions = {}): SharedState<T> {
+export function createSharedState<T extends SharedShape<T>>(initial: T, options: StateOptions = {}): SharedState<T> {
   return new Publisher(initial, options).start();
 }
-export function createSharedSession<T extends SharedValue>(input: { source: SharedSource<T> }, options?: StateOptions): SharedSession<T>;
-export function createSharedSession<T extends SharedValue>(input: T, options?: StateOptions): SharedSession<T>;
-export function createSharedSession<T extends SharedValue>(input: T | { source: SharedSource<T> }, options: StateOptions = {}): SharedSession<T> {
+export function createSharedSession<T extends SharedShape<T>>(input: { source: SharedSource<T> }, options?: StateOptions): SharedSession<T>;
+export function createSharedSession<T extends SharedShape<T>>(input: T, options?: StateOptions): SharedSession<T>;
+export function createSharedSession<T extends SharedShape<T>>(input: T | { source: SharedSource<T> }, options: StateOptions = {}): SharedSession<T> {
   const source = (input as { source?: SharedSource<T> }).source;
   if (source && typeof source.getSnapshot === 'function' && typeof source.subscribe === 'function') {
     const session = new Publisher(source.getSnapshot(), options);
@@ -278,7 +292,7 @@ export function createSharedSession<T extends SharedValue>(input: T | { source: 
   return new Publisher(input as T, options).start();
 }
 
-class Reader<T extends SharedValue> implements SharedReader<T> {
+class Reader<T extends SharedShape<T>> implements SharedReader<T> {
   private state?: T;
   private sequence = -1;
   private disposed = false;
@@ -345,7 +359,7 @@ class Reader<T extends SharedValue> implements SharedReader<T> {
   }
 }
 
-export function connectSharedSession<T extends SharedValue>(options: ReaderOptions = {}): Promise<SharedReader<T>> {
+export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOptions = {}): Promise<SharedReader<T>> {
   const config = settings(options);
   const endpoint = options.endpoint ?? defaultEndpoint();
   if (options.signal?.aborted) return Promise.reject(errorOf(options.signal.reason ?? 'Connection aborted'));
@@ -423,11 +437,11 @@ export function connectSharedSession<T extends SharedValue>(options: ReaderOptio
 }
 
 /** One-shot convenience. The returned snapshots retain their arena independently. */
-export async function shareWithWorker<T extends SharedValue>(endpoint: SharedEndpoint, value: T, options: SessionOptions = {}): Promise<void> {
+export async function shareWithWorker<T extends SharedShape<T>>(endpoint: SharedEndpoint, value: T, options: SessionOptions = {}): Promise<void> {
   const session = createSharedSession(value, options);
   try { await session.connect(endpoint); } finally { session.dispose(); }
 }
-export async function receiveShared<T extends SharedValue>(options: ReaderOptions = {}): Promise<T> {
+export async function receiveShared<T extends SharedShape<T>>(options: ReaderOptions = {}): Promise<T> {
   const reader = await connectSharedSession<T>(options);
   const value = reader.current;
   reader.dispose();
