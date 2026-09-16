@@ -124,3 +124,6 @@ export function createZerocopyDevToolsOptions(options: ZerocopyDevToolsOptions =
     },
   };
 }
+
+export { bindRedux, reduxSource } from './worker-redux';
+export type { ReduxSourceStore, BindReduxOptions } from './worker-redux';
