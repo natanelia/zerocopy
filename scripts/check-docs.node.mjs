@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { anchors, checkLinks, numericRows, preservedRows, prose } from './check-docs.mjs';
 
+// Run explicitly with node --test; keep this out of Vitest's *.test.* discovery.
 test('ignores fenced examples but retains surrounding prose', () => {
   assert.equal(prose('one\n```ts\n[bad](missing.md)\n```\ntwo'), 'one\n\n\n\ntwo');
   assert.equal(prose('~~~\n# Hidden\n~~~\n# Visible').includes('Hidden'), false);

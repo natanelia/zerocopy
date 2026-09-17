@@ -29,7 +29,7 @@ jobs:
         env:
           DOCS_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          node --test scripts/check-docs.test.mjs
+          node --test scripts/check-docs.node.mjs
           if [ -n "$DOCS_BASE" ]; then
             node scripts/check-docs.mjs --base "$DOCS_BASE"
           else
