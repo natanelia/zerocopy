@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
@@ -18,7 +23,26 @@ jobs:
       - run: bun run build:wasm
       - run: bun run build:browser && bun run build:types
       - run: bun run typecheck
+      - run: bun run typecheck:redux
       - run: bun run test
+      - name: Check documentation links and recorded data
+        env:
+          DOCS_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --test scripts/check-docs.test.mjs
+          if [ -n "$DOCS_BASE" ]; then
+            node scripts/check-docs.mjs --base "$DOCS_BASE"
+          else
+            node scripts/check-docs.mjs
+          fi
+      - name: Check examples from Markdown
+        run: node scripts/check-doc-examples.mjs
+      - name: Check built Node entry points
+        run: |
+          node proofs/node-worker.mjs
+          node proofs/redux-node.mjs
+      - name: Verify historical evidence
+        run: node proofs/restore-local-evidence.mjs
 
   publish:
     needs: test
