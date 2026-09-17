@@ -6,7 +6,7 @@ Import collections from `zerocopy`. Import optional adapters from `zerocopy/redu
 
 ## Updates and values
 
-Updates return a collection rather than editing the receiver. Keep the result of `set`, `add`, `push`, `pop`, `enqueue`, `dequeue`, and removal methods. `pop()` and `dequeue()` return the remaining collection, not the removed value; call `peek()` first when you need that value.
+Updates return a collection rather than editing the receiver. Keep the result of `set`, `add`, `push`, `pop`, `enqueue`, `dequeue`, and removal methods. `pop()` and `dequeue()` return the remaining collection, not the removed value. Read that value first when needed: use `peek()` for stacks and queues, or `get(list.size - 1)` for a list.
 
 Handles are frozen. Earlier versions remain readable. An update can reuse a handle, but equal content does not guarantee the same handle. Do not use wrapper identity as a general value-equality test.
 
@@ -89,7 +89,7 @@ tags.has('admin');           // true
 
 | Class | Update methods | Read methods and properties |
 | --- | --- | --- |
-| `SharedList<T>` | `push(value)`, `pop()`, `set(index, value)` | `get(index)`, `forEach(fn)`, `toArray()`, `size` |
+| `SharedList<T>` | `push(value)`, `pushMany(values)`, `pop()`, `set(index, value)` | `get(index)`, `values()`, `forEach(fn)`, `toArray()`, `size` |
 | `SharedStack<T>` | `push(value)`, `pop()` | `peek()`, `size`, `isEmpty` |
 | `SharedQueue<T>` | `enqueue(value)`, `dequeue()` | `peek()`, `size`, `isEmpty` |
 
