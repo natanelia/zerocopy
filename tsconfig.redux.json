@@ -3,5 +3,5 @@
     "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler",
     "strict": true, "skipLibCheck": true, "noEmit": true
   },
-  "files": ["proofs/redux-types.ts"]
+  "files": ["proofs/redux-types.ts", "type-tests/typed-redux.ts"]
 }

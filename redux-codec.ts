@@ -6,6 +6,7 @@ import {
 import { Arena, arenaOf } from './arena';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
+import { stringifyJsonObject } from './json-value';
 import { readReduxHeap, restoreReduxHeap } from './redux-heap-codec';
 
 const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
@@ -52,7 +53,7 @@ function setKind(kind: Kind): boolean { return kind === 'SharedSet' || kind === 
 function mapKind(kind: Kind): boolean { return kind === 'SharedMap' || kind === 'SharedOrderedMap' || kind === 'SharedSortedMap'; }
 function checkValueType(type: unknown, depth = 0): asserts type is string {
   if (typeof type !== 'string' || depth > 64) fail('invalid value type');
-  if (['string', 'number', 'boolean', 'object'].includes(type as string)) return;
+  if (['string', 'number', 'boolean', 'object', 'json'].includes(type as string)) return;
   const nested = parseNestedType(type as string);
   if (!nested || !hasOwn(classes, nested.structureType)) fail('invalid nested value type');
   checkValueType(nested!.innerType, depth + 1);
@@ -83,6 +84,7 @@ function checkValue(type: string, value: unknown): void {
       if ((d.valueType ?? d.type) !== nested.innerType) fail('nested value type mismatch');
     }
   } else if (type === 'object') checkJSON(value);
+  else if (type === 'json') stringifyJsonObject(value);
   else if (typeof value !== type) fail(`expected ${type}`);
 }
 
