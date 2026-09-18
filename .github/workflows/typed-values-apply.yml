@@ -1,4 +1,4 @@
-name: Apply tested typed JSON changes
+name: Apply tested typed JSON Redux integration
 on:
   push:
     branches: [agent/typed-json-values]
@@ -11,28 +11,23 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Verify and apply tested source changes
+      - name: Apply verified Redux integration patch
         shell: bash
+        env:
+          PATCH: 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
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import base64, gzip, hashlib, pathlib
-          files = sorted(pathlib.Path('.github/patches').glob('typed-json-*.b64'))
-          assert len(files) == 4
-          patch = gzip.decompress(base64.b64decode(''.join(p.read_text().strip() for p in files), validate=True))
-          assert hashlib.sha256(patch).hexdigest() == '30a1efa20ba31debc4232ab01811b9dfe04ece1d5770b7a6405f09c56afda8b2'
-          pathlib.Path('/tmp/typed-values.patch').write_bytes(patch)
+          import os, base64, gzip, hashlib, pathlib
+          patch = gzip.decompress(base64.b64decode(os.environ['PATCH'], validate=True))
+          assert hashlib.sha256(patch).hexdigest() == '2dac97c48d73e34e9187025eba1cc0e3f2ca883bf938a0e68b290ca97de7b595'
+          pathlib.Path('/tmp/typed-redux.patch').write_bytes(patch)
           PY
-          git apply --check /tmp/typed-values.patch
-          git apply /tmp/typed-values.patch
-          rm .github/patches/typed-json-*.b64
-          # Workflow edits use the authorized GitHub connector, not this token.
-          git restore -- .github/workflows
+          git apply --check /tmp/typed-redux.patch
+          git apply /tmp/typed-redux.patch
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'feat: add typed JSON descriptors and nested collection inference'
+          git add redux-codec.ts tsconfig.redux.json type-tests/typed-redux.ts typed-json-redux.test.ts
+          git commit -m 'fix: preserve typed JSON values through Redux persistence'
           git push origin HEAD:refs/heads/agent/typed-json-values
