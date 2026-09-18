@@ -28,17 +28,22 @@ export { resetSortedSet } from './shared-sorted-set';
 export { resetPriorityQueue } from './shared-priority-queue';
 export type { ValueType } from './shared-map';
 export type { SharedListType } from './shared-list';
+export { json, map, list, stack, queue, linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue, set, orderedSet, sortedSet } from './types';
+export type { DeepReadonly, JsonValue, JsonObject, JsonType, NestedType, ValueOf } from './types';
 
 const constructors = { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
 type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
-export interface WorkerData {
+declare const workerTypes: unique symbol;
+export interface WorkerData<T extends Record<string, SharedStructure> = Record<string, SharedStructure>> {
+  /** Type-only link to the producer; no schema or functions are transported. */
+  readonly [workerTypes]?: T;
   readonly __shared: true;
   readonly version: 4;
   readonly arenas: readonly { readonly id: string; readonly used: number; readonly memory?: WebAssembly.Memory; readonly copy?: Uint8Array }[];
   readonly structures: Readonly<Record<string, { readonly type: string; readonly arena: string; readonly data: any }>>;
 }
 
-export function getWorkerData(structures: Readonly<Record<string, SharedStructure>>, options: { copy?: boolean } = {}): WorkerData {
+export function getWorkerData<T extends Record<string, SharedStructure>>(structures: T, options: { copy?: boolean } = {}): WorkerData<T> {
   const copy = options.copy ?? (typeof Bun !== 'undefined');
   const found = new Map<string, Arena>();
   const collect = (arena: Arena): void => {
@@ -58,7 +63,10 @@ export function getWorkerData(structures: Readonly<Record<string, SharedStructur
   return Object.freeze({ __shared: true, version: FORMAT_VERSION, arenas: Object.freeze(arenas), structures: Object.freeze(serialized) });
 }
 
-export async function initWorker<T extends Record<string, SharedStructure>>(data: WorkerData): Promise<T> {
+export function initWorker<T extends Record<string, SharedStructure>>(data: WorkerData<T>): Promise<Readonly<T>>;
+/** Legacy untyped payloads require the caller to supply the application type. */
+export function initWorker<T extends Record<string, SharedStructure>>(data: WorkerData): Promise<Readonly<T>>;
+export async function initWorker<T extends Record<string, SharedStructure>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
   if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
   const arenas = new Map<string, Arena>();
   for (const source of data.arenas) {
@@ -75,7 +83,7 @@ export async function initWorker<T extends Record<string, SharedStructure>>(data
     if (!arena || !Object.hasOwn(constructors, item.type) || !factory) throw new Error(`Invalid structure: ${name}`);
     result[name] = factory.fromWorkerData(item.data, arena);
   }
-  return Object.freeze(result) as T;
+  return Object.freeze(result) as Readonly<T>;
 }
 
 export { compact, compactMany } from './compaction';

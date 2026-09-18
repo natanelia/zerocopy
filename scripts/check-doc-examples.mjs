@@ -12,6 +12,7 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
   ['README.md', 'map-snapshots', "assert.equal(before.get('lane-1'), 30); assert.equal(after.get('lane-1'), 50); assert.notEqual(before, after);"],
+  ['docs/api.md', 'typed-json', "assert.equal(before.get(lane.id).speedLimit, 50); assert.equal(restored.lanes.get(lane.id).speedLimit, 70); assert.equal(restored.tiles.get('tile-1').get(0).direction, 'forward'); assert(Object.isFrozen(restored.lanes.get(lane.id).centerline[0]));"],
   ['docs/api.md', 'ordered-map', "assert.deepEqual([...labels.keys()], ['c', 'a', 'b']);"],
   ['docs/api.md', 'sorted-map', "assert.deepEqual([...reverse.keys()], ['c', 'b', 'a']);"],
   ['docs/api.md', 'sets', "assert.equal(tags.has('admin'), true); assert.deepEqual([...insertionOrder.values()], ['z', 'a', 'm']); assert.deepEqual([...sorted.values()], ['a', 'm', 'z']);"],

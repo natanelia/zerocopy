@@ -3,6 +3,7 @@ import { decodeUtf8 } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
+import { stringifyJsonObject } from './json-value';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
@@ -188,8 +189,8 @@ export class Arena {
       if (dependency !== this) this.dependencies.set(dependency.id, dependency);
       text = JSON.stringify({ __t: nested.structureType, __i: nested.innerType, __a: dependency.id, __d: value.toWorkerData() });
     } else {
-      if (type !== 'object') throw new TypeError(`Unknown value type: ${type}`);
-      text = JSON.stringify(value);
+      if (type !== 'object' && type !== 'json') throw new TypeError(`Unknown value type: ${type}`);
+      text = type === 'json' ? stringifyJsonObject(value) : JSON.stringify(value);
     }
     if (text === undefined) throw new TypeError('Value is not JSON-serializable');
     return encoder.encode(text);

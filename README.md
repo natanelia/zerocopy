@@ -96,6 +96,8 @@ See [Worker sharing](docs/worker-sharing.md) for complete Node.js examples, brow
 | `SharedSortedMap`, `SharedSortedSet` | Sorted iteration |
 | `SharedPriorityQueue` | Minimum or maximum priority first |
 
+Use [`json<T>()`](docs/api.md#typed-json-objects) for typed plain objects and read-only fields. Compose nested types with helpers such as `list(json<Lane>())`.
+
 The [API guide](docs/api.md) covers all 12 classes, value types, nested collections, and custom ordering. The collection names describe their interfaces, not necessarily their internal storage.
 
 [Redux](docs/redux.md) provides Toolkit middleware options, selectors, DevTools support, and a portable value codec. [TanStack adapters](docs/tanstack.md) provide a collection wrapper and sync-cache helpers, with important limits on pointer-based state. Both are separate package entry points.
