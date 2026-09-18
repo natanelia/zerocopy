@@ -1,0 +1,26 @@
+name: Typed values workspace
+on:
+  push:
+    branches: [agent/typed-json-values]
+    paths: ['.github/workflows/typed-values-workspace.yml']
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install --frozen-lockfile
+      - run: bun run build:wasm
+      - name: Prepare local test workspace
+        run: |
+          tar --exclude=.git --exclude=workspace.tar.gz -czf "$RUNNER_TEMP/workspace.tar.gz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: typed-values-workspace
+          path: ${{ runner.temp }}/workspace.tar.gz
+          retention-days: 1
