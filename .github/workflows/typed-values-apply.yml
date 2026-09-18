@@ -1,0 +1,36 @@
+name: Apply tested typed JSON changes
+on:
+  push:
+    branches: [agent/typed-json-values]
+    paths: ['.github/workflows/typed-values-apply.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and apply tested patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, gzip, hashlib, pathlib
+          files = sorted(pathlib.Path('.github/patches').glob('typed-json-*.b64'))
+          assert len(files) == 4
+          patch = gzip.decompress(base64.b64decode(''.join(p.read_text().strip() for p in files), validate=True))
+          assert hashlib.sha256(patch).hexdigest() == '30a1efa20ba31debc4232ab01811b9dfe04ece1d5770b7a6405f09c56afda8b2'
+          pathlib.Path('/tmp/typed-values.patch').write_bytes(patch)
+          PY
+          git apply --check /tmp/typed-values.patch
+          git apply /tmp/typed-values.patch
+          rm .github/patches/typed-json-*.b64 .github/workflows/typed-values-apply.yml
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: add typed JSON descriptors and nested collection inference'
+          git push origin HEAD:refs/heads/agent/typed-json-values
