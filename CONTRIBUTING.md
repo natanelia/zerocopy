@@ -11,12 +11,14 @@ bun run build:browser
 bun run build:types
 bun run typecheck
 bun run typecheck:redux
+bun run typecheck:values
 bun run test
 node --test scripts/check-docs.node.mjs
 node scripts/check-docs.mjs
 node scripts/check-doc-examples.mjs
 node proofs/node-worker.mjs
 node proofs/redux-node.mjs
+node proofs/typed-json-worker.mjs
 ```
 
 Use `bun run test`, not Bun's separate built-in test runner. The package script runs Vitest. `bun run test:watch` starts watch mode.
