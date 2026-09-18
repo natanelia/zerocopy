@@ -1,21 +1,13 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import ts from 'typescript';
+import { browserExamples, extract } from './doc-examples.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const temporary = mkdtempSync(join(root, '.docs-examples-'));
-
-function extract(file, name, language) {
-  const text = readFileSync(resolve(root, file), 'utf8');
-  const marker = `<!-- example: ${name} -->`;
-  assert.equal(text.split(marker).length, 2, `${file}: expected one ${name} example`);
-  const block = text.slice(text.indexOf(marker) + marker.length).match(/^\s*```(ts|js)\r?\n([\s\S]*?)\r?\n```/);
-  assert.ok(block && block[1] === language, `${file}: missing ${language} fence after ${name}`);
-  return block[2];
-}
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
@@ -43,9 +35,11 @@ try {
     writeFileSync(executable, `import assert from 'node:assert/strict';\n${js}\n${checks}\n`);
     runnable.push([name, executable]);
   }
-  for (const name of ['browser-owner', 'browser-reader']) {
-    const path = join(temporary, `${name}.ts`);
-    writeFileSync(path, extract('docs/worker-sharing.md', name, 'ts')); files.push(path);
+  for (const example of browserExamples) {
+    for (const name of [example.owner, example.reader]) {
+      const path = join(temporary, `${name}.ts`);
+      writeFileSync(path, extract(example.file, name, 'ts')); files.push(path);
+    }
   }
   const program = ts.createProgram(files, {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,

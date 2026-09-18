@@ -51,9 +51,13 @@ Browser applications need cross-origin isolation for shared memory. Configure `C
 
 **main.ts**
 
+<!-- example: readme-browser-owner -->
 ```ts
-import { SharedMap, getWorkerData } from 'zerocopy';
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
 
+const { SharedMap, getWorkerData } = await import('zerocopy');
 const worker = new Worker(new URL('./worker.ts', import.meta.url), {
   type: 'module',
 });
@@ -62,8 +66,11 @@ const limits = new SharedMap('number').set('lane-1', 30);
 worker.postMessage(getWorkerData({ limits }, { copy: false }));
 ```
 
+Use a dynamic import here so the isolation check runs before the library initializes its default arenas. A static import runs before the module body.
+
 **worker.ts**
 
+<!-- example: readme-browser-reader -->
 ```ts
 import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
 

@@ -3,6 +3,7 @@ import { resolve, dirname, extname, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
+/** Omit fenced code while retaining line boundaries for Markdown checks. */
 export function prose(markdown) {
   let fence = null;
   return markdown.split('\n').map(line => {
@@ -16,6 +17,7 @@ export function prose(markdown) {
   }).join('\n');
 }
 
+/** Collect explicit anchors and GitHub-style IDs for ATX headings. */
 export function anchors(markdown) {
   const text = prose(markdown), result = new Set();
   for (const match of text.matchAll(/<(?:a|h[1-6])\b[^>]*\b(?:id|name)=["']([^"']+)["']/gi)) result.add(match[1]);
@@ -29,6 +31,7 @@ export function anchors(markdown) {
   return result;
 }
 
+/** Report broken local paths and Markdown fragments without network requests. */
 export function checkLinks(file, root) {
   const text = prose(readFileSync(file, 'utf8')), errors = [];
   const targets = [...text.matchAll(/\[[^\]\n]*\]\(([^)\n]+)\)/g)].map(match => match[1]);
@@ -53,11 +56,13 @@ export function checkLinks(file, root) {
   return errors;
 }
 
+/** Normalize table spacing without rounding or changing numeric cell text. */
 export function numericRows(markdown) {
   return markdown.split('\n').filter(line => /^\s*\|/.test(line) && line.split('|').some(cell => /^\s*\d/.test(cell)))
     .map(line => line.split('|').map(cell => cell.trim()).join('|'));
 }
 
+/** Find missing numeric rows, including duplicate occurrences, in a revision. */
 export function preservedRows(before, after) {
   const remaining = new Map();
   for (const row of numericRows(after)) remaining.set(row, (remaining.get(row) ?? 0) + 1);
@@ -69,9 +74,13 @@ export function preservedRows(before, after) {
   return { total: numericRows(before).length, missing };
 }
 
+/** Run repository checks; strict preservation requires an explicit base commit. */
 function main() {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const index = process.argv.indexOf('--base');
+  const preserve = process.argv.includes('--preserve');
+  if (preserve && index === -1) throw new Error('--preserve requires --base <commit>');
   const files = git('ls-files', '-z', '*.md').split('\0').filter(Boolean);
   const failures = files.flatMap(file => checkLinks(resolve(root, file), root).map(error => `${file}: ${error}`));
   const readme = readFileSync(resolve(root, 'README.md'), 'utf8');
@@ -82,7 +91,6 @@ function main() {
     const rows = numericRows(region[1]);
     if (groups.length !== 8 || rows.length !== 36) failures.push(`README.md: expected 8 benchmark groups and 36 operation rows; found ${groups.length} and ${rows.length}`);
   }
-  const index = process.argv.indexOf('--base');
   if (index !== -1) {
     const base = process.argv[index + 1];
     if (!/^[a-f\d]{7,40}$/i.test(base ?? '')) throw new Error('--base requires a commit SHA');
@@ -91,7 +99,7 @@ function main() {
     if (result.missing.length) console.log('Changed or removed numerical rows:\n' + result.missing.join('\n'));
     const evidence = git('diff', '--name-only', base, '--', 'proofs/results').trim().split('\n').filter(path => path && !path.endsWith('.md'));
     console.log(`Recorded evidence files changed: ${evidence.length}`);
-    if (process.argv.includes('--preserve') && (result.missing.length || evidence.length)) failures.push('Recorded benchmark data changed');
+    if (preserve && (result.missing.length || evidence.length)) failures.push('Recorded benchmark data changed');
   }
   if (failures.length) throw new Error(failures.join('\n'));
   console.log(`Documentation links and benchmark structure passed (${files.length} Markdown files).`);

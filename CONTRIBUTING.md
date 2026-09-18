@@ -12,6 +12,7 @@ bun run build:types
 bun run typecheck
 bun run typecheck:redux
 bun run test
+node --test scripts/check-docs.node.mjs
 node scripts/check-docs.mjs
 node scripts/check-doc-examples.mjs
 node proofs/node-worker.mjs
@@ -25,6 +26,7 @@ For the browser checks:
 ```sh
 bunx playwright install --with-deps chromium
 bun run test:browser
+node scripts/check-doc-browser.mjs
 ```
 
 For the local browser demo:
@@ -55,9 +57,11 @@ Lead with what a reader needs to do. Use complete imports, name the file in a wo
 
 Keep one source of truth for each topic. Put setup and navigation in the README, detailed contracts in guides, and historical methods in benchmark reports. Do not add delivery notes, generated progress reports, repeated feature claims, or test-count badges to user documentation.
 
-`node scripts/check-docs.mjs` checks local Markdown links, heading targets, and the main benchmark table structure. It does not check external websites. `node scripts/check-docs.mjs --base <commit>` also reports whether numerical README rows were retained from that commit.
+`node scripts/check-docs.mjs` checks local Markdown links, heading targets, and the main benchmark table structure. It does not check external websites. `node scripts/check-docs.mjs --base <commit> --preserve` also rejects changed numerical README rows and recorded evidence files. Pull-request CI uses this strict mode. Omit `--preserve` only for a report without enforcement; strict mode requires a base commit.
 
 `node scripts/check-doc-examples.mjs` extracts marked examples directly from Markdown. It type-checks the TypeScript examples against the built package, executes the collection examples, and runs the documented Node worker pair. Update the example and its expected result together. The check does not execute arbitrary shell fences or browser examples in Node.
+
+`node scripts/check-doc-browser.mjs` runs the README and worker-guide examples in Chromium. It checks the expected worker reply with isolation headers. Without those headers, it checks the documented error, no worker creation, and no library request. Both example checks use the shared extractor in `scripts/doc-examples.mjs`.
 
 ## Benchmark changes
 

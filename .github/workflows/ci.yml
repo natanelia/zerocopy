@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -31,12 +34,16 @@ jobs:
         run: |
           node --test scripts/check-docs.node.mjs
           if [ -n "$DOCS_BASE" ]; then
-            node scripts/check-docs.mjs --base "$DOCS_BASE"
+            node scripts/check-docs.mjs --base "$DOCS_BASE" --preserve
           else
             node scripts/check-docs.mjs
           fi
       - name: Check examples from Markdown
         run: node scripts/check-doc-examples.mjs
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check documented browser workers and isolation guards
+        run: node scripts/check-doc-browser.mjs
       - name: Check built Node entry points
         run: |
           node proofs/node-worker.mjs

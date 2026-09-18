@@ -15,18 +15,17 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Check `crossOriginIsolated` in the application. Review third-party scripts, images, and frames before enabling these headers; resources may need compatible CORS or Cross-Origin-Resource-Policy settings. The [local demo server](../demo/serve.ts) supplies isolation headers.
 
-Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files.
+Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files. Load the library with a dynamic import after the isolation check: a static import initializes its default arenas before the module body runs.
 
 **main.ts**
 
 <!-- example: browser-owner -->
 ```ts
-import { SharedMap, getWorkerData } from 'zerocopy';
-
 if (!crossOriginIsolated) {
   throw new Error('Shared worker memory requires cross-origin isolation');
 }
 
+const { SharedMap, getWorkerData } = await import('zerocopy');
 const worker = new Worker(new URL('./worker.ts', import.meta.url), {
   type: 'module',
 });
@@ -129,4 +128,4 @@ Retained worker views and message payloads can keep full arenas alive. Release t
 
 Custom comparator functions cannot be transported. Strings and JSON still require decoding; some runtimes copy a requested byte range before UTF-8 decoding. Objects returned by decoding are JavaScript values local to the reader, not shared object identities.
 
-For the transport tests, see [`workers.test.ts`](../workers.test.ts), the [Node worker check](../proofs/node-worker.mjs), and the [Chromium tests](../demo/workers.browser.test.ts). The Node examples on this page are also executed by the documentation checks.
+For the transport tests, see [`workers.test.ts`](../workers.test.ts), the [Node worker check](../proofs/node-worker.mjs), and the [Chromium tests](../demo/workers.browser.test.ts). Documentation checks execute the Node pair and both browser examples directly from Markdown. The browser checks cover shared transport with isolation headers and rejection before library loading without those headers.
