@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Verify and apply tested patch
+      - name: Verify and apply tested source changes
         shell: bash
         run: |
           set -euo pipefail
@@ -27,7 +27,9 @@ jobs:
           PY
           git apply --check /tmp/typed-values.patch
           git apply /tmp/typed-values.patch
-          rm .github/patches/typed-json-*.b64 .github/workflows/typed-values-apply.yml
+          rm .github/patches/typed-json-*.b64
+          # Workflow edits use the authorized GitHub connector, not this token.
+          git restore -- .github/workflows
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
