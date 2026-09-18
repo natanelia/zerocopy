@@ -38,3 +38,11 @@ Bun defaults to used-prefix copy transport. Node.js and compatible isolated brow
 Linked-list APIs now use indexed block sequences. Sorted maps no longer use the earlier red-black-tree implementation. Custom comparator functions stay local and cannot be transported to workers. Refer to the current [source map](architecture.md#source-map), not early design reports, for implementation details.
 
 Low-level buffer exports can become stale after memory growth. Prefer the current memory buffer or the public worker transport. Legacy scratch exports and raw pointer constructors are not a concurrent reader protocol.
+
+## Adopt typed JSON values
+
+Existing primitive and `'object'` constructors keep their runtime behavior. Use [`json<T>()`](api.md#typed-json-objects) for checked object fields and deeply read-only results. This opt-in descriptor uses strict JSON compatibility checks; it does not execute `toJSON` methods.
+
+The descriptor adds a `'json'` value-type name, not a new binary record layout. `WorkerData.version` remains 4. Rebuild owner and worker bundles together when adopting this descriptor; old bundles do not expose the new helpers. Do not cast existing `'object'` handles to the new type. Reinsert validated values to apply the strict write checks.
+
+String-form nested collection types no longer resolve to `any`. Previously unchecked invalid calls can now produce compile errors. Fix those calls or use the typed descriptor helpers. `getWorkerData()` carries its producer's types to `initWorker()`, whose returned record is read-only, as it already was at runtime.
