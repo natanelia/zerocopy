@@ -41,8 +41,10 @@ Low-level buffer exports can become stale after memory growth. Prefer the curren
 
 ## Adopt typed JSON values
 
-Existing primitive and `'object'` constructors keep their runtime behavior. Use [`json<T>()`](api.md#typed-json-objects) for checked object fields and deeply read-only results. This opt-in descriptor uses strict JSON compatibility checks; it does not execute `toJSON` methods.
+Existing primitive and `'object'` constructors keep their runtime behavior. Use [`json<T>()`](api.md#typed-json-objects) for compile-time object-field checks and deeply read-only results. The helper returns `'object'` at runtime. It adds no serializer, automatic runtime validation, or new storage type.
 
-The descriptor adds a `'json'` value-type name, not a new binary record layout. `WorkerData.version` remains 4. Rebuild owner and worker bundles together when adopting this descriptor; old bundles do not expose the new helpers. Do not cast existing `'object'` handles to the new type. Reinsert validated values to apply the strict write checks.
+Typed values use the existing object codec and wire version 4. Existing object readers can read these snapshots without a format migration. Consumers need the updated package to use the new TypeScript helpers. Validate unknown data before assigning it an application type; a type assertion does not check or transform existing stored values.
+
+An earlier draft of this change used a separate `'json'` descriptor with strict serialization. That draft-only descriptor has been removed. Re-create draft snapshots and worker payloads from the original application data, and re-export draft persistence data with the updated package. Native JSON rules now apply, including omitted `undefined` properties, non-finite numbers becoming `null`, negative zero becoming zero, and calls to getters or `toJSON`.
 
 String-form nested collection types no longer resolve to `any`. Previously unchecked invalid calls can now produce compile errors. Fix those calls or use the typed descriptor helpers. `getWorkerData()` carries its producer's types to `initWorker()`, whose returned record is read-only, as it already was at runtime.

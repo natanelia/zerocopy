@@ -11,7 +11,7 @@ import type { SharedSortedMap } from './shared-sorted-map';
 import type { SharedSortedSet } from './shared-sorted-set';
 import type { SharedPriorityQueue } from './shared-priority-queue';
 
-export type PrimitiveType = 'string' | 'number' | 'boolean' | 'object' | 'json';
+export type PrimitiveType = 'string' | 'number' | 'boolean' | 'object';
 export type StructureType = 'SharedMap' | 'SharedSet' | 'SharedList' | 'SharedStack' | 'SharedQueue' | 'SharedLinkedList' | 'SharedDoublyLinkedList' | 'SharedOrderedMap' | 'SharedOrderedSet' | 'SharedSortedMap' | 'SharedSortedSet' | 'SharedPriorityQueue';
 export type ValueType = PrimitiveType | `${StructureType}<${string}>`;
 
@@ -37,14 +37,15 @@ type JsonArguments<T> =
 
 declare const descriptorValue: unique symbol;
 type Descriptor<V, Wire extends string> = Wire & { readonly [descriptorValue]: V };
-export type JsonType<T extends object> = Descriptor<DeepReadonly<T>, 'json'>;
+export type JsonType<T extends object> = Descriptor<DeepReadonly<T>, 'object'>;
 
 /**
- * Describe a plain JSON object type. This is a string at runtime, not a schema
- * validator. Writes check JSON compatibility, not application field meanings.
+ * Add a compile-time shape to the existing object codec. Returns 'object' at
+ * runtime; writes use native JSON.stringify without an extra validation pass.
+ * Supply JSON-compatible plain data and validate unknown input before insertion.
  */
 export function json<T>(..._check: JsonArguments<T>): JsonType<Extract<T, object>> {
-  return 'json' as JsonType<Extract<T, object>>;
+  return 'object' as JsonType<Extract<T, object>>;
 }
 
 type Structures<T extends string> = {
@@ -68,7 +69,6 @@ export type ValueOf<T extends string> =
   T extends 'number' ? number :
   T extends 'boolean' ? boolean :
   T extends 'object' ? object :
-  T extends 'json' ? JsonObject | readonly JsonValue[] :
   T extends `${infer S extends StructureType}<${infer I}>` ? Structures<I>[S] :
   never;
 
@@ -114,7 +114,7 @@ function validType(type: string): boolean {
   if (typeof type !== 'string') return false;
   let inner = type;
   for (;;) {
-    if (inner === 'string' || inner === 'number' || inner === 'boolean' || inner === 'object' || inner === 'json') return true;
+    if (inner === 'string' || inner === 'number' || inner === 'boolean' || inner === 'object') return true;
     const info = parseNestedType(inner);
     if (!info) return false;
     if (info.structureType === 'SharedSet' || info.structureType === 'SharedOrderedSet' || info.structureType === 'SharedSortedSet') {

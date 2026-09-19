@@ -1,5 +1,4 @@
 import { decodeUtf8 } from './utf8';
-import { stringifyJsonObject } from './json-value';
 // Shared codec utilities for encoding/decoding values
 import type { ValueOf, PrimitiveType } from './types.ts';
 import { parseNestedType } from './types.ts';
@@ -51,11 +50,6 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
     size: () => 1,
     encode: (v: boolean, buf: Uint8Array, ptr: number) => { buf[ptr] = v ? 1 : 0; return 1; },
     decode: (buf: Uint8Array, ptr: number) => buf[ptr] === 1,
-  },
-  json: {
-    size: (value: object) => strLen(stringifyJsonObject(value)),
-    encode: (value: object, buf: Uint8Array, ptr: number) => encoder.encodeInto(stringifyJsonObject(value), buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => freezeDecoded(JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)))),
   },
   object: {
     size: (v: object) => strLen(JSON.stringify(v)),

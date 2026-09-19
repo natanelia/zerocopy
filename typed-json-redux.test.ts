@@ -5,7 +5,7 @@ import { createZerocopyCodec, createSharedMapValueSelector, setSharedMapValue, z
 
 interface Lane { id: string; speedLimit: number; centerline: number[][] }
 const LaneValue = json<Lane>();
-const lane: Lane = { id: 'lane-1', speedLimit: 50, centerline: [[-0, 1]] };
+const lane: Lane = { id: 'lane-1', speedLimit: 50, centerline: [[103.85, 1.29]] };
 
 describe('typed JSON Redux integration', () => {
   it('preserves typed snapshots in Toolkit reducers and selectors', () => {
@@ -26,7 +26,7 @@ describe('typed JSON Redux integration', () => {
     expect(Object.isFrozen(original?.centerline[0])).toBe(true);
   });
 
-  it('round-trips nested collections and negative zero into writable snapshots', () => {
+  it('round-trips nested collections into writable snapshots through the existing codec', () => {
     const codec = createZerocopyCodec();
     const lanes = new SharedMap(LaneValue).set(lane.id, lane);
     const tiles = new SharedMap(list(LaneValue)).set('tile-1', new SharedList(LaneValue).push(lane));
@@ -37,22 +37,39 @@ describe('typed JSON Redux integration', () => {
     expect(restored.lanes.get(lane.id)).toEqual(lane);
     expect(restored.tiles.get('tile-1')?.get(0)).toEqual(lane);
     expect(restored.heap.peek()).toEqual(lane);
-    expect(Object.is(restored.lanes.get(lane.id)?.centerline[0][0], -0)).toBe(true);
     expect(Object.isFrozen(restored.lanes.get(lane.id)?.centerline[0])).toBe(true);
+    expect(restored.lanes.toWorkerData().valueType).toBe('object');
     const changed = restored.lanes.set(lane.id, { ...lane, speedLimit: 90 });
     expect(changed.get(lane.id)?.speedLimit).toBe(90);
     expect(restored.lanes.get(lane.id)?.speedLimit).toBe(50);
     expect(lanes.get(lane.id)?.speedLimit).toBe(50);
   });
 
-  it.each([['u'], ['n', 'NaN'], ['n', 'Infinity'], ['a', [['h']]]])('rejects invalid imported typed JSON fields: %j', (...encoded) => {
+  it('produces the same persistence envelope as an untyped object collection', () => {
+    const codec = createZerocopyCodec();
+    const typed = new SharedMap(LaneValue).set(lane.id, lane);
+    const legacy = new SharedMap('object').set(lane.id, lane);
+    expect(codec.encode(typed)).toEqual(codec.encode(legacy));
+    expect(codec.stringify(typed)).toBe(codec.stringify(legacy));
+  });
+
+  it('retains native JSON normalization after persistence', () => {
+    const codec = createZerocopyCodec();
+    const input = { ...lane, speedLimit: NaN, centerline: [[-0, Infinity]] };
+    const source = new SharedMap(LaneValue).set(lane.id, input);
+    const restored = codec.parse(codec.stringify(source)) as typeof source;
+    expect(restored.get(lane.id)).toEqual(JSON.parse(JSON.stringify(input)));
+    expect(restored.get(lane.id)?.centerline[0][0]).toBe(0);
+  });
+
+  it.each([['u'], ['n', 'NaN'], ['n', 'Infinity'], ['n', '-0'], ['a', [['h']]]])('keeps existing validation for hand-written object imports: %j', (...encoded) => {
     const badValue = ['o', [['invalid', encoded]]];
-    const envelope = { $zerocopyRedux: 1, value: ['c', 'SharedMap', 'json', null, [['bad', badValue]]] };
+    const envelope = { $zerocopyRedux: 1, value: ['c', 'SharedMap', 'object', null, [['bad', badValue]]] };
     expect(() => createZerocopyCodec().decode(envelope)).toThrow();
   });
 
-  it('rejects primitive roots in hand-written typed JSON imports', () => {
-    const envelope = { $zerocopyRedux: 1, value: ['c', 'SharedMap', 'json', null, [['bad', 42]]] };
-    expect(() => createZerocopyCodec().decode(envelope)).toThrow(/plain objects or arrays/);
+  it('rejects the removed draft json descriptor in persistence data', () => {
+    const envelope = { $zerocopyRedux: 1, value: ['c', 'SharedMap', 'json', null, []] };
+    expect(() => createZerocopyCodec().decode(envelope)).toThrow(/invalid nested value type/);
   });
 });
