@@ -73,7 +73,8 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
       const abort=()=>{endpoint.postMessage(msg(channel,clientId,{kind:'cancel',id:callId}));stop(call.signal?.reason instanceof Error?call.signal.reason:new Error('Task aborted'));};
       pending.set(callId,{resolve,reject,cleanup}); call.signal?.addEventListener('abort',abort,{once:true});
       if(call.timeoutMs!==undefined){if(!Number.isFinite(call.timeoutMs)||call.timeoutMs<=0){stop(new RangeError('timeoutMs must be positive'));return;}timer=setTimeout(()=>{endpoint.postMessage(msg(channel,clientId,{kind:'cancel',id:callId}));stop(new Error('Worker task timed out'));},call.timeoutMs);}
-      endpoint.postMessage(msg(channel,clientId,{kind:'call',id:callId,task,input,revision}));
+      try { endpoint.postMessage(msg(channel,clientId,{kind:'call',id:callId,task,input,revision})); }
+      catch (error) { stop(error instanceof Error ? error : new Error(String(error))); }
     });
   };
   const run=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?(input?:unknown,call?:CallOptions)=>invoke(key,input,call):undefined}) as TaskCalls<T>;
@@ -91,10 +92,9 @@ export function local<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,opt
 
 async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, revision: number | undefined): Promise<S> {
   if (revision === undefined || reader.version >= revision) return reader.current;
-  return new Promise<S>((resolve, reject) => {
-    const off = reader.subscribe(value => { if (reader.version >= revision) { off(); resolve(value); } });
-    if (reader.closed) { off(); reject(new Error('Shared state reader closed')); }
-  });
+  const snapshots = reader.snapshots({ emitCurrent: false });
+  for await (const value of snapshots) if (reader.version >= revision) return value;
+  throw new Error('Shared state reader closed');
 }
 
 export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:ServeOptions={}):Promise<()=>void> {
@@ -103,7 +103,7 @@ export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks
   const remove=listen(endpoint,data=>{
     if(closed||!valid(data,channel))return;
     if(data.kind==='hello'){if(!readers.has(data.client)){readers.set(data.client,connectSharedSession<S>({endpoint,channel:'tasks:'+channel+':'+data.client,timeoutMs:options.timeoutMs,onError:options.onError}));running.set(data.client,new Map());}endpoint.postMessage(msg(channel,data.client,{kind:'ready'}));return;}
-    if(data.kind==='close'){readers.get(data.client)?.then(r=>r.dispose()).catch(()=>{});readers.delete(data.client);running.delete(data.client);return;}
+    if(data.kind==='close'){for(const controller of running.get(data.client)?.values()??[])controller.abort(new Error('Task client closed'));readers.get(data.client)?.then(r=>r.dispose()).catch(()=>{});readers.delete(data.client);running.delete(data.client);return;}
     if(data.kind==='cancel'&&data.id!==undefined){running.get(data.client)?.get(data.id)?.abort(new Error('Task aborted'));return;}
     if(data.kind!=='call'||data.id===undefined||typeof data.task!=='string')return;
     const task=tasks[data.task];if(!task){endpoint.postMessage(msg(channel,data.client,{kind:'error',id:data.id,message:'Unknown task: '+data.task}));return;}
@@ -116,12 +116,33 @@ export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks
 }
 
 export async function pool<T extends TaskSet<any>,S extends SharedShape<S>>(workers:readonly any[]|(()=>any),options:PoolOptions<S>):Promise<PoolExecutor<T>> {
-  const owned=!Array.isArray(workers),size=owned?(options.size??Math.max(1,Math.min(4,typeof navigator==='undefined'?4:navigator.hardwareConcurrency||4)):(workers as readonly any[]).length;
+  const owned=!Array.isArray(workers);
+  const size=owned ? (options.size ?? Math.max(1,Math.min(4,typeof navigator==='undefined'?4:(navigator.hardwareConcurrency||4)))) : (workers as readonly any[]).length;
   if(!Number.isSafeInteger(size)||size<1)throw new RangeError('Pool size must be a positive integer');
-  const resources=owned?Array.from({length:size},()=> (workers as ()=>any)()):workers as readonly any[], executors=resources.map(r=>client<T,S>(r,options,owned));
+  const resources:any[]=[];
+  const executors:(Executor<T> & { readonly _ready: Promise<void> })[]=[];
+  try {
+    if(owned) for(let index=0;index<size;index++) resources.push((workers as ()=>any)());
+    else resources.push(...workers as readonly any[]);
+    for(const resource of resources) executors.push(client<T,S>(resource,options,owned));
+    await Promise.all(executors.map(executor=>executor._ready));
+  } catch(error) {
+    for(const executor of executors) executor.dispose();
+    if(owned) for(const resource of resources.slice(executors.length)){try{resource.terminate?.();}catch{}try{resource.port?.close?.();}catch{}}
+    throw error;
+  }
   const max=options.maxPending??128;let closed=false,cursor=0,active=0;const queue:{run:()=>void;reject:(e:Error)=>void}[]=[];
   const schedule=<R>(op:(e:Executor<T>)=>Promise<R>)=>new Promise<R>((resolve,reject)=>{if(closed){reject(new Error('Worker pool is closed'));return;}if(queue.length>=max){reject(new Error('Worker pool queue overflow'));return;}const item={reject,run:()=>{active++;const e=executors[cursor++%size];op(e).then(resolve,reject).finally(()=>{active--;queue.shift()?.run();});}};active<size?item.run():queue.push(item);});
   const run=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?(input?:unknown,call?:CallOptions)=>schedule(e=>(e.run as any)[key](input,call)):undefined}) as TaskCalls<T>;
-  const map=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?async(inputs:readonly unknown[],call?:CallOptions)=>Promise.all(inputs.map(input=>schedule(e=>(e.run as any)[key](input,call)))):undefined}) as PoolExecutor<T>['map'];
+  const map=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?async(inputs:readonly unknown[],call?:CallOptions&{chunkSize?:number})=>{
+    const results:any[]=new Array(inputs.length);
+    if(!inputs.length)return results;
+    const width=call?.chunkSize??size;
+    if(!Number.isSafeInteger(width)||width<1)throw new RangeError('chunkSize must be a positive integer');
+    let next=0;
+    const feed=async()=>{for(;;){const index=next++;if(index>=inputs.length)return;results[index]=await schedule(e=>(e.run as any)[key](inputs[index],call));}};
+    await Promise.all(Array.from({length:Math.min(width,size,inputs.length)},()=>feed()));
+    return results;
+  }:undefined}) as PoolExecutor<T>['map'];
   return {run,map,size,get closed(){return closed;},dispose(){if(closed)return;closed=true;const error=new Error('Worker pool is closed');for(const q of queue.splice(0))q.reject(error);for(const e of executors)e.dispose();}};
 }
