@@ -16,7 +16,7 @@ export interface PoolOptions<S extends SharedShape<S>> extends ClientOptions<S> 
 
 const PROTOCOL = 'zerocopy/tasks', VERSION = 1;
 let clients = 0;
-type Msg = { protocol: string; version: number; channel: string; client: string; kind: 'hello'|'ready'|'call'|'result'|'error'|'cancel'|'close'; id?: number; task?: string; input?: unknown; value?: unknown; message?: string };
+type Msg = { protocol: string; version: number; channel: string; client: string; kind: 'hello'|'ready'|'call'|'result'|'error'|'cancel'|'close'; id?: number; task?: string; input?: unknown; value?: unknown; message?: string; revision?: number };
 
 function endpointOf(value: any): SharedEndpoint {
   const endpoint = value?.port ?? value;
@@ -89,7 +89,15 @@ export function local<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,opt
   return {run,get closed(){return closed;},dispose(){closed=true;}};
 }
 
-async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, revision: number | undefined): Promise<S> {\n  if (revision === undefined || reader.version >= revision) return reader.current;\n  return new Promise<S>((resolve, reject) => {\n    const off = reader.subscribe(value => { if (reader.version >= revision) { off(); resolve(value); } });\n    if (reader.closed) { off(); reject(new Error('Shared state reader closed')); }\n  });\n}\n\nexport async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:ServeOptions={}):Promise<()=>void> {
+async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, revision: number | undefined): Promise<S> {
+  if (revision === undefined || reader.version >= revision) return reader.current;
+  return new Promise<S>((resolve, reject) => {
+    const off = reader.subscribe(value => { if (reader.version >= revision) { off(); resolve(value); } });
+    if (reader.closed) { off(); reject(new Error('Shared state reader closed')); }
+  });
+}
+
+export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:ServeOptions={}):Promise<()=>void> {
   const endpoint=endpointOf(options.endpoint??globalThis),channel=options.channel??'default';
   const readers=new Map<string,Promise<SharedReader<S>>>(), running=new Map<string,Map<number,AbortController>>(); let closed=false;
   const remove=listen(endpoint,data=>{
