@@ -65,7 +65,7 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
   const invoke = async (task:string,input:unknown,call:CallOptions={}) => {
     if(closed) throw new Error('Worker executor is closed');
     if(call.signal?.aborted) throw call.signal.reason ?? new Error('Task aborted');
-    state.flush(); await stateReady; const callId=++id;
+    const revision=state.flush(); await stateReady; const callId=++id;
     return new Promise<any>((resolve,reject)=>{
       let timer:ReturnType<typeof setTimeout>|undefined;
       const cleanup=()=>{if(timer)clearTimeout(timer);call.signal?.removeEventListener('abort',abort);};
@@ -73,7 +73,7 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
       const abort=()=>{endpoint.postMessage(msg(channel,clientId,{kind:'cancel',id:callId}));stop(call.signal?.reason instanceof Error?call.signal.reason:new Error('Task aborted'));};
       pending.set(callId,{resolve,reject,cleanup}); call.signal?.addEventListener('abort',abort,{once:true});
       if(call.timeoutMs!==undefined){if(!Number.isFinite(call.timeoutMs)||call.timeoutMs<=0){stop(new RangeError('timeoutMs must be positive'));return;}timer=setTimeout(()=>{endpoint.postMessage(msg(channel,clientId,{kind:'cancel',id:callId}));stop(new Error('Worker task timed out'));},call.timeoutMs);}
-      endpoint.postMessage(msg(channel,clientId,{kind:'call',id:callId,task,input}));
+      endpoint.postMessage(msg(channel,clientId,{kind:'call',id:callId,task,input,revision}));
     });
   };
   const run=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?(input?:unknown,call?:CallOptions)=>invoke(key,input,call):undefined}) as TaskCalls<T>;
@@ -89,7 +89,7 @@ export function local<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,opt
   return {run,get closed(){return closed;},dispose(){closed=true;}};
 }
 
-export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:ServeOptions={}):Promise<()=>void> {
+async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, revision: number | undefined): Promise<S> {\n  if (revision === undefined || reader.version >= revision) return reader.current;\n  return new Promise<S>((resolve, reject) => {\n    const off = reader.subscribe(value => { if (reader.version >= revision) { off(); resolve(value); } });\n    if (reader.closed) { off(); reject(new Error('Shared state reader closed')); }\n  });\n}\n\nexport async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:ServeOptions={}):Promise<()=>void> {
   const endpoint=endpointOf(options.endpoint??globalThis),channel=options.channel??'default';
   const readers=new Map<string,Promise<SharedReader<S>>>(), running=new Map<string,Map<number,AbortController>>(); let closed=false;
   const remove=listen(endpoint,data=>{
@@ -100,7 +100,7 @@ export async function serve<T extends TaskSet<S>,S extends SharedShape<S>>(tasks
     if(data.kind!=='call'||data.id===undefined||typeof data.task!=='string')return;
     const task=tasks[data.task];if(!task){endpoint.postMessage(msg(channel,data.client,{kind:'error',id:data.id,message:'Unknown task: '+data.task}));return;}
     const callId=data.id,controller=new AbortController();running.get(data.client)?.set(callId,controller);
-    Promise.resolve(readers.get(data.client)).then(reader=>{if(!reader)throw new Error('Task client has no shared state');const snapshot=reader.current;return task({state:snapshot,signal:controller.signal},data.input);})
+    Promise.resolve(readers.get(data.client)).then(reader=>{if(!reader)throw new Error('Task client has no shared state');return atRevision(reader,data.revision).then(snapshot=>task({state:snapshot,signal:controller.signal},data.input));})
       .then(value=>{if(!closed)endpoint.postMessage(msg(channel,data.client,{kind:'result',id:callId,value}));},error=>{if(!closed)endpoint.postMessage(msg(channel,data.client,{kind:'error',id:callId,message:error instanceof Error?error.message:String(error)}));})
       .finally(()=>running.get(data.client)?.delete(callId));
   },error=>options.onError?.(error));
