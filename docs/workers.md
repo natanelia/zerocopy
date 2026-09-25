@@ -194,3 +194,58 @@ node proofs/worker-sessions.mjs
 bunx playwright install chromium
 bun run test:browser
 ```
+
+## Typed tasks and managed workers
+
+Use tasks when workers need to run code against a consistent immutable snapshot. The same task definitions work locally, in an existing worker, in a managed worker, or in a pool.
+
+```ts
+// tasks.ts
+import type { SharedMap } from 'zerocopy';
+import { defineTasks } from 'zerocopy/worker';
+
+export interface Model { map: SharedMap<'number'> }
+export const tasks = defineTasks<Model>()({
+  get({ state }, key: string) { return state.map.get(key); },
+});
+export type Tasks = typeof tasks;
+```
+
+```ts
+// worker.ts
+import { serve } from 'zerocopy/worker';
+import { tasks } from './tasks';
+await serve(tasks);
+```
+
+```ts
+// main.ts
+import { createState } from 'zerocopy/state';
+import { spawn } from 'zerocopy/worker';
+import type { Tasks } from './tasks';
+
+const state = createState({ map: new SharedMap('number') });
+const compute = await spawn<Tasks>(
+  () => new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' }),
+  { state },
+);
+await compute.run.get('lane-1');
+```
+
+Use `connect(existingWorker, { state })` when the application owns the worker. Disposing a connected executor only detaches zerocopy. Disposing a spawned executor terminates its owned Worker, or closes its owned SharedWorker port. `local(tasks, { state })` keeps the same typed call surface without worker transport.
+
+A pool changes only execution placement:
+
+```ts
+const compute = await pool<Tasks>(
+  () => new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' }),
+  { state, size: 4, maxPending: 128 },
+);
+const values = await compute.map.get(['a', 'b', 'c']);
+```
+
+Calls flush pending state publication before dispatch. The worker captures `reader.current` when it accepts the call, so the task keeps one immutable snapshot even if newer publications arrive while an async task is running. Cancellation is cooperative: `context.signal` aborts when a cancel message can be processed. A synchronous CPU-bound task cannot process cancellation until it yields.
+
+`SharedWorker` is accepted through its `.port`. Browser pages and SharedWorkers can belong to different agent clusters, so use `memory: 'copy'` when shared memory cannot cross that boundary. Copy mode is explicit and can be expensive for large state. There is no silent topology fallback.
+
+Task arguments and ordinary results use structured cloning. Bound zerocopy state uses the existing snapshot transport. For large shared results, keep the result in shared state or return a small identifier rather than nesting collection handles inside arbitrary task results.
