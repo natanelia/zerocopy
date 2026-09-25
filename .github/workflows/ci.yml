@@ -27,6 +27,7 @@ jobs:
       - run: bun run build:browser && bun run build:types
       - run: bun run typecheck
       - run: bun run typecheck:redux
+      - run: bun run typecheck:values
       - run: bun run test
       - name: Check documentation links and recorded data
         env:
@@ -48,6 +49,7 @@ jobs:
         run: |
           node proofs/node-worker.mjs
           node proofs/redux-node.mjs
+          node proofs/typed-json-worker.mjs
       - name: Verify historical evidence
         run: node proofs/restore-local-evidence.mjs
 

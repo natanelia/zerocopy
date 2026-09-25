@@ -18,9 +18,59 @@ Map keys are strings. Set values are strings or numbers. Other collections take 
 | `'number'` | JavaScript number |
 | `'boolean'` | Boolean |
 | `'object'` | JSON data, decoded into deeply frozen values |
+| `json<T>()` | The object codec with TypeScript-checked fields and deeply read-only reads |
 | `'SharedMap<number>'`, for example | A nested shared collection snapshot |
 
 The `'object'` codec is not an arbitrary-object serializer. Functions, prototypes, cycles, and object identity are not preserved as general JavaScript values. Inserting JSON data involves serialization; reading it involves decoding. `toArray()` and entry tuples are detached containers, not shared JavaScript arrays.
+
+## Typed JSON objects
+
+Use `json<T>()` to retain an application's object shape through collection reads, writes, callbacks, and immutable updates. Interfaces do not need an index signature. Nested arrays, tuples, optional fields, and discriminated unions retain their types.
+
+<!-- example: typed-json -->
+```ts
+import { SharedMap, SharedList, json, list, getWorkerData, initWorker } from 'zerocopy';
+
+interface Lane {
+  id: string;
+  speedLimit: number;
+  direction: 'forward' | 'reverse';
+  label?: string;
+  centerline: Array<readonly [number, number]>;
+}
+
+const LaneValue = json<Lane>();
+const lane: Lane = {
+  id: 'lane-1', speedLimit: 50, direction: 'forward',
+  centerline: [[103.85, 1.29]],
+};
+const before = new SharedMap(LaneValue).set(lane.id, lane);
+const after = before.set(lane.id, { ...lane, speedLimit: 70 });
+const tileLanes = new SharedList(LaneValue).push(lane);
+const tiles = new SharedMap(list(LaneValue)).set('tile-1', tileLanes);
+const data = getWorkerData({ lanes: after, tiles });
+const restored = await initWorker(data);
+
+before.get(lane.id)?.speedLimit; // number | undefined; value is 50
+restored.lanes.get(lane.id)?.speedLimit; // number | undefined; value is 70
+restored.tiles.get('tile-1')?.get(0)?.direction; // 'forward' | 'reverse' | undefined
+```
+
+Reads return `DeepReadonly<Lane> | undefined`. TypeScript rejects missing required fields, incorrect field types, and assignments to returned fields or nested arrays. Mutable input objects are accepted and are not frozen. The stored snapshot is independent of later input changes. As with other TypeScript object types, an already assigned value can have extra fields; this is not an exact-object schema.
+
+`json<T>()` returns the existing `'object'` descriptor. Its brand exists only in TypeScript. Typed and untyped object collections use the same native `JSON.stringify`, UTF-8 encoding, JSON decoding, deep freezing, and read cache. There is no additional validation pass or custom serializer on typed writes. Worker data and Redux persistence use the existing object type name.
+
+Supply JSON-compatible plain objects or arrays. Use strings, finite numbers, booleans, nested `null`, and other plain objects or arrays as fields. Omit optional properties instead of storing `undefined`. Do not rely on prototypes, methods, accessors, `toJSON`, or object identity surviving storage. Validate unknown input against an application schema before insertion. The helper does not perform runtime schema or JSON-compatibility validation; for example, TypeScript's `number` also permits `NaN` and infinity.
+
+Native JSON rules apply to unchecked data, just as they do with `'object'`: `undefined` object fields are omitted; non-finite numbers and array holes become `null`; negative zero becomes zero. Getters and `toJSON` can run. Cycles and bigint values throw under normal JSON behavior, and depth limits depend on the JavaScript engine. The type contract does not promise a lossless round trip for these inputs. See the [JSON.stringify specification](https://tc39.es/ecma262/multipage/structured-data.html#sec-json.stringify) for the serialization rules.
+
+JSON objects cannot contain working shared collection handles. Store shared collections as nested collection values instead. Compose descriptors with `list(LaneValue)`, `map(list(LaneValue))`, or the other helpers. Do not build these strings with interpolation: that loses the TypeScript brand.
+
+The value-bearing helpers are `map`, `list`, `stack`, `queue`, `linkedList`, `doublyLinkedList`, `orderedMap`, `sortedMap`, and `priorityQueue`. The `set`, `orderedSet`, and `sortedSet` helpers take only `'string'` or `'number'`. They do not add object-valued sets. Existing strings such as `'SharedList<number>'` now also resolve to typed collections rather than `any`.
+
+The generic type is retained in `WorkerData<T>`, `initWorker()`, `compact()`, and `compactMany()`. A worker message received as `unknown` still needs the application's matching transport type and validation at the message boundary. Type annotations do not validate a different process's input. The legacy `initWorker<T>(untypedData)` form remains available; its explicit type argument is a caller assertion, not a check of the payload.
+
+This feature keeps JSON byte storage. Writes serialize the value; a read cache miss decodes a local, deeply frozen object. It does not provide direct shared-memory field access or binary records. Existing Redux import checks remain in place; they are separate from ordinary collection writes.
 
 ## Maps
 
@@ -118,7 +168,7 @@ Both constructors take a value type. Both provide `prepend(value)`, `append(valu
 
 `SharedLinkedList` also provides `removeAfter(index)`.
 
-`SharedDoublyLinkedList` also provides `removeLast()`, `insertBefore(index, value)`, `remove(index)`, `forEachReverse(fn)`, and `toArrayReverse()`.
+`SharedDoublyLinkedList` also provides `removeLast()`, `insertBefore(index, value)`, `remove(index)`, `forEachReverse(fn)`, `toArrayReverse()`, `size`, and `isEmpty`.
 
 <!-- example: linked-lists -->
 ```ts

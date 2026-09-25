@@ -30,3 +30,7 @@ scripts/
 # Local verification dependencies and temporary checkouts
 .proof-tools/
 .proof-baseline/
+
+# Type-only consumer tests
+type-tests/
+tsconfig.typed-values.json
