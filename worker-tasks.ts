@@ -45,7 +45,7 @@ function sourceOf<S extends SharedShape<S>>(state: S | SharedSource<S>): SharedS
 
 export function defineTasks<S>() { return <T extends TaskSet<S>>(tasks: T): T => Object.freeze({ ...tasks }); }
 
-function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any, options: ClientOptions<S>, owned: boolean): Executor<T> {
+function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any, options: ClientOptions<S>, owned: boolean): Executor<T> & { readonly _ready: Promise<void> } {
   const endpoint = endpointOf(resource), channel = options.channel ?? 'default', clientId = Date.now().toString(36) + '-' + (++clients);
   const state = createSharedSession({ source: sourceOf(options.state) }, { channel: 'tasks:' + channel + ':' + clientId, copy: options.memory === 'copy', timeoutMs: options.timeoutMs, onError: options.onError });
   let closed = false, id = 0, readyResolve!: () => void, readyReject!: (e: Error) => void;
@@ -77,11 +77,11 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
     });
   };
   const run=new Proxy(Object.create(null),{get:(_t,key)=>typeof key==='string'?(input?:unknown,call?:CallOptions)=>invoke(key,input,call):undefined}) as TaskCalls<T>;
-  return {run,get closed(){return closed;},dispose(){if(closed)return;closed=true;try{endpoint.postMessage(msg(channel,clientId,{kind:'close'}));}catch{}remove();state.dispose();const e=new Error('Worker executor is closed');for(const p of pending.values()){p.cleanup();p.reject(e);}pending.clear();if(owned){resource.terminate?.();resource.port?.close?.();}}};
+  return {run,_ready:stateReady,get closed(){return closed;},dispose(){if(closed)return;closed=true;try{endpoint.postMessage(msg(channel,clientId,{kind:'close'}));}catch{}remove();state.dispose();const e=new Error('Worker executor is closed');for(const p of pending.values()){p.cleanup();p.reject(e);}pending.clear();if(owned){resource.terminate?.();resource.port?.close?.();}}};
 }
 
-export async function connect<T extends TaskSet<any>,S extends SharedShape<S>>(endpoint:any,options:ClientOptions<S>):Promise<Executor<T>> { const value=client<T,S>(endpoint,options,false) as Executor<T> & { ready?: Promise<void> }; return value; }
-export async function spawn<T extends TaskSet<any>,S extends SharedShape<S>>(factory:()=>any,options:ClientOptions<S>):Promise<Executor<T>> { const value=client<T,S>(factory(),options,true) as Executor<T> & { ready?: Promise<void> }; return value; }
+export async function connect<T extends TaskSet<any>,S extends SharedShape<S>>(endpoint:any,options:ClientOptions<S>):Promise<Executor<T>> { const value=client<T,S>(endpoint,options,false); await value._ready; return value; }
+export async function spawn<T extends TaskSet<any>,S extends SharedShape<S>>(factory:()=>any,options:ClientOptions<S>):Promise<Executor<T>> { const value=client<T,S>(factory(),options,true); try { await value._ready; return value; } catch (error) { value.dispose(); throw error; } }
 
 export function local<T extends TaskSet<S>,S extends SharedShape<S>>(tasks:T,options:{state:S|SharedSource<S>}):Executor<T> {
   let closed=false; const source=sourceOf(options.state);
