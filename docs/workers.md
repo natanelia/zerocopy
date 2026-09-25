@@ -174,11 +174,13 @@ The connection registry drops memory handles that are absent from its latest ack
 
 Plain `object` values still use the engine's JSON encoding and per-reader decoding. Strings and decoded objects can allocate in each reader. The zero-copy claim concerns the shared collection backing memory, not every JavaScript allocation.
 
-Session messages are for trusted same-application workers. Envelope checks do not authenticate a sender or validate every WASM pointer. The TypeScript reader type is a compile-time contract, not a runtime schema. This implementation does not add concurrent writers, a worker pool, task cancellation, persistence, or atomic shared-control polling.
+Session messages are for trusted same-application workers. Envelope checks do not authenticate a sender or validate every WASM pointer. The TypeScript reader type is a compile-time contract, not a runtime schema. Snapshot sessions do not schedule or cancel tasks. The task executors below add those features and worker pools. Neither layer adds concurrent writers, persistence, or atomic shared-control polling.
 
 ## Verification
 
 `worker.test.ts` covers the deterministic protocol and state transitions. `proofs/worker-sessions.mjs` uses real Node workers and a real Redux Toolkit store. `demo/sessions.browser.test.ts` uses an actual Chromium module worker. `tsconfig.worker.json` checks generated public declarations with strict TypeScript, including named interfaces and invalid API calls.
+
+`proofs/worker-tasks.mjs` tests revision waits, cancellation, cleanup after failed sends or startup, bounded batch feeding, and real Node workers and MessagePorts. `type-tests/worker-tasks.consumer.ts` checks the documented single-type-argument task API against the public declarations. CI runs both in addition to the existing tests.
 
 Run:
 
@@ -191,6 +193,7 @@ bun run typecheck
 bunx tsc --noEmit -p tsconfig.worker.json
 bun run test
 node proofs/worker-sessions.mjs
+node --test proofs/worker-tasks.mjs
 bunx playwright install chromium
 bun run test:browser
 ```
@@ -220,6 +223,7 @@ await serve(tasks);
 
 ```ts
 // main.ts
+import { SharedMap } from 'zerocopy';
 import { createState } from 'zerocopy/state';
 import { spawn } from 'zerocopy/worker';
 import type { Tasks } from './tasks';
@@ -234,9 +238,11 @@ await compute.run.get('lane-1');
 
 Use `connect(existingWorker, { state })` when the application owns the worker. Disposing a connected executor only detaches zerocopy. Disposing a spawned executor terminates its owned Worker, or closes its owned SharedWorker port. `local(tasks, { state })` keeps the same typed call surface without worker transport.
 
-A pool changes only execution placement:
+A pool changes execution placement:
 
 ```ts
+import { pool } from 'zerocopy/worker';
+
 const compute = await pool<Tasks>(
   () => new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' }),
   { state, size: 4, maxPending: 128 },
@@ -244,8 +250,14 @@ const compute = await pool<Tasks>(
 const values = await compute.map.get(['a', 'b', 'c']);
 ```
 
-Calls flush pending state publication before dispatch. The worker captures `reader.current` when it accepts the call, so the task keeps one immutable snapshot even if newer publications arrive while an async task is running. Cancellation is cooperative: `context.signal` aborts when a cancel message can be processed. A synchronous CPU-bound task cannot process cancellation until it yields.
+Before each task is sent, its client synchronously reads and publishes the source's current snapshot. This includes updates whose source notifications are still waiting for a microtask. The worker waits for at least that publication's revision before starting the handler. It can use a newer revision if delivery coalesces updates; this is not exact invocation-time snapshot pinning. Once the handler starts, its snapshot stays fixed across `await` expressions.
 
-`SharedWorker` is accepted through its `.port`. Browser pages and SharedWorkers can belong to different agent clusters, so use `memory: 'copy'` when shared memory cannot cross that boundary. Copy mode is explicit and can be expensive for large state. There is no silent topology fallback.
+A queued pool call reads state when assigned to a worker. A batch can therefore read different revisions when the source changes during execution. Do not assume a whole batch has one pinned snapshot.
+
+`maxPending` limits queued pool calls, not the number of inputs in one batch. It accepts zero to disable waiting for a busy worker. Batch mapping uses a bounded feeder and preserves input order; a large batch does not fill the queue with every input at once. `chunkSize` currently caps that feeder window, up to the pool size. It does not combine payloads into one wire message. Batches still compete with other work and can reject if the shared queue is already full. After an error, the batch stops feeding new inputs; handlers already running are not rolled back.
+
+Cancellation is cooperative: `context.signal` aborts when a cancel message can be processed. A synchronous CPU-bound task cannot process cancellation until it yields. Remote calls reject promptly on cancellation or timeout, but this does not prove the handler has stopped. A pool keeps the worker busy until the actual handler settles. Local handlers receive an aborted signal and must observe it themselves. Neither mode automatically rolls back effects or terminates a worker on timeout.
+
+`SharedWorker` is accepted through its `.port`. Browser pages and SharedWorkers can belong to different agent clusters, so use `memory: 'copy'` when shared memory cannot cross that boundary. Copy mode is explicit and can be expensive for large state. There is no silent topology fallback. When `memory` is omitted, task clients follow the session default: shared memory in Node and supported browsers, used-prefix copies in Bun.
 
 Task arguments and ordinary results use structured cloning. Bound zerocopy state uses the existing snapshot transport. For large shared results, keep the result in shared state or return a small identifier rather than nesting collection handles inside arbitrary task results.
