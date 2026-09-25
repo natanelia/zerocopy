@@ -28,7 +28,9 @@ jobs:
       - run: bun run typecheck
       - run: bun run typecheck:redux
       - run: bun run typecheck:values
-      - run: bun run test
+      - name: Run unit and integration tests
+        shell: bash
+        run: bun run test 2>&1 | tee vitest.log
       - name: Check documentation links and recorded data
         env:
           DOCS_BASE: ${{ github.event.pull_request.base.sha }}
@@ -52,6 +54,16 @@ jobs:
           node proofs/typed-json-worker.mjs
       - name: Verify historical evidence
         run: node proofs/restore-local-evidence.mjs
+      - name: Retain test evidence and portable build
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ github.sha }}
+          path: |
+            vitest.log
+            dist/
+            package.json
+          retention-days: 7
 
   publish:
     needs: test
