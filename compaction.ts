@@ -15,6 +15,7 @@ import { SharedSortedSet } from './shared-sorted-set';
 import { SharedPriorityQueue } from './shared-priority-queue';
 
 const classes = { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
+const classEntries = Object.entries(classes);
 export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
 
 /** Rebuild selected live data in one fresh arena. Never reset or edit a source.
@@ -100,7 +101,7 @@ class Compactor {
   }
   snapshot<T extends Compactable>(source: T): T {
     if (!(source instanceof Snapshot)) throw new TypeError('Expected an immutable shared collection');
-    const kind = Object.entries(classes).find(([, C]) => source instanceof C)?.[0];
+    const kind = classEntries.find(([, C]) => source instanceof C)?.[0];
     if (!kind) throw new TypeError('Unsupported shared collection');
     const a = arenaOf(source);
     // Preserve a local pure comparator. It cannot be serialized to workers.
@@ -157,8 +158,9 @@ class Compactor {
 export function compact<T extends Compactable>(snapshot: T): T { return new Compactor().snapshot(snapshot); }
 
 /** Compact a group together, retaining shared live blobs and nested snapshots. */
-export function compactMany<T extends Record<string, Compactable>>(snapshots: T): Readonly<T> {
+export function compactMany<T extends Record<keyof T, Compactable> & Record<Extract<keyof T, symbol>, never>>(snapshots: T): Readonly<T> {
+  if (Object.getOwnPropertySymbols(snapshots).length) throw new TypeError('Snapshot names must be strings');
   const compactor = new Compactor(), result: Record<string, Compactable> = Object.create(null);
-  for (const [name, snapshot] of Object.entries(snapshots)) result[name] = compactor.snapshot(snapshot);
+  for (const [name, snapshot] of Object.entries(snapshots) as [string, Compactable][]) result[name] = compactor.snapshot(snapshot);
   return Object.freeze(result) as Readonly<T>;
 }

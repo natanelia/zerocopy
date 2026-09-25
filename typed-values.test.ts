@@ -125,7 +125,7 @@ describe('typed JSON values', () => {
 
   test('keeps special keys as data and freezes array values', () => {
     const special = JSON.parse('{"__proto__":{"polluted":true},"constructor":"data"}');
-    const read = new SharedMap(json<Record<string, object | string>>()).set('special', special).get('special')!;
+    const read = new SharedMap(json<Record<string, { polluted: boolean } | string>>()).set('special', special).get('special')!;
     expect(Object.hasOwn(read, '__proto__')).toBe(true);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
     const array = new SharedList(json<Array<{ x: number }>>()).push([{ x: 1 }]).get(0)!;
