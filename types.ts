@@ -20,6 +20,7 @@ type SetStructureType = 'SharedSet' | 'SharedOrderedSet' | 'SharedSortedSet';
 // Interface indirection prevents eager expansion of recursive JSON arrays.
 interface ReadonlyElements<T> extends ReadonlyArray<DeepReadonly<T>> {}
 export type DeepReadonly<T> =
+  T extends string | number | boolean | bigint | symbol | null | undefined ? T :
   T extends readonly unknown[] ? T[number][] extends T ? ReadonlyElements<T[number]> : { readonly [K in keyof T]: DeepReadonly<T[K]> } :
   T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T;
 export type JsonValue = string | number | boolean | null | JsonObject | readonly JsonValue[];
