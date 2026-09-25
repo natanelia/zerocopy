@@ -3,7 +3,7 @@ import { createSharedSession, connectSharedSession, type SharedEndpoint, type Sh
 export interface TaskContext<S> { readonly state: S; readonly signal: AbortSignal }
 export type Task<I = void, O = unknown, S = unknown> = (context: TaskContext<S>, input: I) => O | Promise<O>;
 export type TaskSet<S = unknown> = Record<string, Task<any, any, S>>;
-type Input<F> = F extends (c: any, input: infer I) => any ? I : never;
+type Input<F> = F extends (c: any, ...args: infer A) => any ? A extends [infer I, ...any[]] ? I : void : never;
 type Output<F> = F extends (...a: any[]) => infer O ? Awaited<O> : never;
 export interface CallOptions { signal?: AbortSignal; timeoutMs?: number }
 type Call<F> = [Input<F>] extends [void] ? (input?: void, options?: CallOptions) => Promise<Output<F>> : (input: Input<F>, options?: CallOptions) => Promise<Output<F>>;
