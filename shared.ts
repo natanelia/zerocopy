@@ -31,7 +31,22 @@ export type { SharedListType } from './shared-list';
 export { json, map, list, stack, queue, linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue, set, orderedSet, sortedSet } from './types';
 export type { DeepReadonly, JsonValue, JsonObject, JsonType, NestedType, ValueOf, WireType } from './types';
 
-const constructors = { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
+// The registry checks class identity, not its generic value parameter.
+// Explicit erasure avoids InstanceType inferring string (whose ValueOf is never).
+const constructors = {
+  SharedMap: SharedMap<any>,
+  SharedList: SharedList<any>,
+  SharedSet: SharedSet<string | number>,
+  SharedStack: SharedStack<any>,
+  SharedQueue: SharedQueue<any>,
+  SharedLinkedList: SharedLinkedList<any>,
+  SharedDoublyLinkedList: SharedDoublyLinkedList<any>,
+  SharedOrderedMap: SharedOrderedMap<any>,
+  SharedOrderedSet: SharedOrderedSet<string | number>,
+  SharedSortedMap: SharedSortedMap<any>,
+  SharedSortedSet: SharedSortedSet<string | number>,
+  SharedPriorityQueue: SharedPriorityQueue<any>,
+};
 const constructorEntries = Object.entries(constructors);
 export type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
 // Named interfaces do not need a string index signature. Symbol keys cannot be

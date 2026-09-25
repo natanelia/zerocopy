@@ -14,7 +14,22 @@ import { SharedSortedMap } from './shared-sorted-map';
 import { SharedSortedSet } from './shared-sorted-set';
 import { SharedPriorityQueue } from './shared-priority-queue';
 
-const classes = { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
+// The registry checks class identity, not its generic value parameter.
+// Explicit erasure avoids InstanceType inferring string (whose ValueOf is never).
+const classes = {
+  SharedMap: SharedMap<any>,
+  SharedList: SharedList<any>,
+  SharedSet: SharedSet<string | number>,
+  SharedStack: SharedStack<any>,
+  SharedQueue: SharedQueue<any>,
+  SharedLinkedList: SharedLinkedList<any>,
+  SharedDoublyLinkedList: SharedDoublyLinkedList<any>,
+  SharedOrderedMap: SharedOrderedMap<any>,
+  SharedOrderedSet: SharedOrderedSet<string | number>,
+  SharedSortedMap: SharedSortedMap<any>,
+  SharedSortedSet: SharedSortedSet<string | number>,
+  SharedPriorityQueue: SharedPriorityQueue<any>,
+};
 const classEntries = Object.entries(classes);
 export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
 
