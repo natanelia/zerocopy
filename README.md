@@ -340,7 +340,7 @@ Build, read, peek, and scan rows process 10,000 items unless stated otherwise. R
 | prepend | 5.4781ms | 9.2912ms | 1.70x faster |
 | append | 1.3051ms | 0.0465ms | 28.08x slower |
 | get(0-99) | 0.006275ms | 0.000666ms | 9.43x slower |
-| removeFirst | 0.003049ms | 0.0393ms | 12.24x faster |
+| removeFirst | 0.003049ms | 0.0393ms | 12.89x faster |
 
 **SharedDoublyLinkedList vs Native Array**
 | Operation | Shared | Native | vs Native |
