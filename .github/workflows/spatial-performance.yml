@@ -3,7 +3,7 @@ on:
   push:
     branches: [agent/perf-spatial-box]
   pull_request:
-    paths: ['numeric-spatial*', 'proofs/spatial*', '.github/workflows/spatial-performance.yml']
+    paths: ['numeric-spatial*', 'proofs/spatial*', 'type-tests/numeric-spatial*', '.github/workflows/spatial-performance.yml']
 permissions:
   contents: read
 jobs:
@@ -26,8 +26,8 @@ jobs:
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bunx tsc --noEmit -p tsconfig.numeric.json
       - run: bun run test
-      - run: node proofs/spatial-benchmark.mjs
-      - run: bun proofs/spatial-benchmark.mjs
+      - run: PERF_GATE=1 node proofs/spatial-benchmark.mjs
+      - run: PERF_GATE=1 bun proofs/spatial-benchmark.mjs
       - run: PERF_GATE=1 node proofs/numeric-benchmark.mjs
       - uses: actions/upload-artifact@v4
         if: always()
