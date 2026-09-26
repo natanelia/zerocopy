@@ -2,7 +2,7 @@
 
 ## Rejected: fused spatial SIMD
 
-After accepting numeric range counts, two point-in-box kernels were tested on the existing interleaved f64 list layout. No new storage format or precision change was required. These experiments are not in the production PR.
+After accepting numeric range counts, two point-in-box kernels were tested on the existing interleaved f64 list layout. No new storage format or precision change was required. These explicit SIMD experiments are not in either production PR.
 
 The first kernel handled one point per vector and reduced its mask per point. It improved x64 but its Node ARM64 gain over the branchless scalar kernel was only about 4.4% at 131,072 points. This failed the chosen 5% minimum gain. Evidence: [run 36250673684](https://github.com/natanelia/zerocopy/actions/runs/36250673684).
 
@@ -10,12 +10,12 @@ The second kernel loaded two points, separated x/y values in SIMD registers, and
 
 Evidence: [run 36250995680](https://github.com/natanelia/zerocopy/actions/runs/36250995680), [ARM64 raw samples](https://github.com/natanelia/zerocopy/actions/runs/36250995680/artifacts/10908922186), candidate `c1834fe5dd1e04f8fd9034f98fcd7f8e362d99aa` on `agent/perf-spatial-box`.
 
-The bulk operation itself was faster than per-element JavaScript iteration. That is separate from SIMD. This experiment does not establish a portable SIMD win, so no spatial SIMD PR was opened. The accepted range-count API remains the only production change from this series. Typed columns, new hashes, and index redesigns have not been implemented or benchmarked in this series.
+The bulk operation itself was faster than per-element JavaScript iteration. That is separate from SIMD. No spatial SIMD PR was opened. A subsequent scalar bulk candidate passed its own full-API gate and is documented in `spatial-bulk-performance.md`. This does not reverse the rejection of the explicit spatial SIMD variants. Typed columns, new hashes, and index redesigns have not been implemented or benchmarked in this series.
 
 ## Browser verification
 
-Chromium and Firefox passed main-thread numeric checks, worker snapshot checks, and the forced scalar fallback. WebKit passed 350 main-thread numeric checks before a worker failed with `RangeError: Out of memory` while importing the existing transport. The worker had not imported the numeric module or attached its snapshot. Evidence: [run 36250949893](https://github.com/natanelia/zerocopy/actions/runs/36250949893).
+In [range proof run 36251387725](https://github.com/natanelia/zerocopy/actions/runs/36251387725), Chromium 153.0.8010.12, Firefox 155.0, and WebKit 26.6 each passed 350 main-thread range cases with normal module selection and 350 with forced scalar fallback. Chromium and Firefox also passed actual browser-worker reads and snapshot/growth checks under both selection modes.
 
-The browser proof now builds unmodified main at `75e3626ccc6400d1ae195aefdd3526906622009e` as a control. Each case uses a new browser process. All three engines must pass main-thread numeric checks with normal selection and forced scalar fallback. Candidate worker checks must pass wherever the exact baseline works. Only an exact WebKit out-of-memory error during existing transport import, reproduced on that baseline, is recorded as a baseline limitation rather than a new kernel failure. Other errors fail the proof. A baseline-limited worker result is not reported as a worker pass.
+WebKit worker transport is not a pass. The proof built unmodified main at `75e3626ccc6400d1ae195aefdd3526906622009e` as a control. Fresh browser processes reproduced `RangeError: Out of memory` during `worker-import-existing` on both baseline and candidate, before numeric import or snapshot attachment. Only that exact baseline-reproduced failure is recorded as an existing limitation; unexpected failures fail the proof.
 
-The raw `numeric-browsers.json` artifact records each case, engine version, candidate commit, baseline commit, and any allocation failure. Consult the current workflow for the outcome of the new control run. This PR does not change the existing eager arena initialization or maximum memory size to work around browser limits.
+The raw [numeric browser artifact](https://github.com/natanelia/zerocopy/actions/runs/36251387725/artifacts/10909755732) records individual case results, versions, commits, and allocation-error phases. Neither PR changes eager arena initialization or maximum memory size to work around the existing limitation. Playwright WebKit validation is not a claim of testing Safari on Apple hardware.
