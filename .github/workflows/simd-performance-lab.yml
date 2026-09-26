@@ -2,9 +2,7 @@ name: SIMD performance lab
 on:
   push:
     branches: [agent/simd-performance-lab]
-    paths:
-      - 'proofs/simd/**'
-      - '.github/workflows/simd-performance-lab.yml'
+    paths: ['proofs/simd/**', '.github/workflows/simd-performance-lab.yml']
 permissions:
   contents: read
 concurrency:
@@ -29,11 +27,13 @@ jobs:
         with:
           bun-version: '1.4.2'
       - run: bun install
-      - name: Build, verify, and compare isolated variants
-        run: node proofs/simd/lab.mjs
+      - name: Build, verify, and compare isolated variants and public APIs
+        run: node proofs/simd/refined.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: simd-experiments-${{ runner.arch }}
           path: .simd-lab/
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 14
