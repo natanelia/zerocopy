@@ -36,3 +36,4 @@ export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f6
   const treeSize = (size - 1) & ~31;
   return (treeSize ? treeCount(root, depth, treeSize, lo, hi) : 0) + spanCount(tail, size - treeSize, lo, hi);
 }
+export { countPointsInBox } from './numeric-spatial.as';
