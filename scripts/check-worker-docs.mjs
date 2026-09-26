@@ -12,6 +12,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const temporary = mkdtempSync(join(root, '.worker-docs-'));
 const guide = 'docs/workers.md';
 const cases = [
+  { name: 'direct', file: 'README.md', marker: 'readme-direct-owner', expected: [[30], [50]], workers: 1, direct: true },
   { name: 'quickstart', file: 'README.md', marker: 'dx-main', expected: [[30], [50]], workers: 1 },
   { name: 'local', file: guide, marker: 'dx-local', expected: [[30], [50]], workers: 0 },
   { name: 'connect', file: guide, marker: 'dx-connect', expected: [[30]], workers: 1 },
@@ -39,6 +40,12 @@ function compile(source, extension, browser = false) {
 
 /** Materialize exactly the files a reader copies, not parallel hand-written fixtures. */
 function sourcesFor(example) {
+  if (example.direct) {
+    return new Map([
+      ['main.ts', extract(example.file, example.marker, 'ts')],
+      ['state.worker.ts', extract('README.md', 'readme-direct-reader', 'ts')],
+    ]);
+  }
   const sources = new Map([
     ['tasks.ts', extract('README.md', 'dx-tasks', 'ts')],
     ['main.ts', extract(example.file, example.marker, 'ts')],
@@ -46,6 +53,20 @@ function sourcesFor(example) {
   if (example.worker) sources.set(example.worker[0], extract(guide, example.worker[1], 'ts'));
   else if (example.name !== 'local') sources.set('limits.worker.ts', extract('README.md', 'dx-worker', 'ts'));
   return sources;
+}
+
+/** Keep direct data access ahead of the optional task example, without a hidden task setup. */
+function checkDirectReadFraming() {
+  const readme = readFileSync(join(root, 'README.md'), 'utf8');
+  const direct = readme.indexOf('<!-- example: readme-direct-owner -->');
+  const tasks = readme.indexOf('<!-- example: dx-tasks -->');
+  assert.ok(direct >= 0 && tasks > direct, 'The README must show direct reads before task setup');
+  const sources = sourcesFor(cases.find(example => example.direct));
+  assert.equal(sources.size, 2, 'Direct reads need only an owner and a reader');
+  for (const source of sources.values()) {
+    assert.doesNotMatch(source, /\b(?:defineTasks|serve|spawn|pool|local)\s*(?:<[^>]*>)?\s*\(/,
+      'The direct-read quickstart must not require task APIs');
+  }
 }
 
 /** Strictly check all TypeScript samples, including intentional negative call-site checks. */
@@ -105,8 +126,11 @@ async function checkBrowser() {
   for (const example of cases) {
     for (const [file, source] of sourcesFor(example)) {
       const js = compile(source, 'js', true);
-      routes.set(`/${example.name}/${file.replace(/\.ts$/, '.js')}`,
-        js + (file === 'main.ts' ? '\nglobalThis.__docDone = true;\n' : ''));
+      const tail = file === 'main.ts'
+        ? (example.direct ? '\nglobalThis.__docDispose = () => { state.dispose(); worker.terminate(); };\n' : '')
+          + '\nglobalThis.__docDone = true;\n'
+        : '';
+      routes.set(`/${example.name}/${file.replace(/\.ts$/, '.js')}`, js + tail);
     }
   }
   for (const name of readdirSync(join(root, 'dist'))) {
@@ -138,9 +162,12 @@ async function checkBrowser() {
 
     async function checkPage(context, example, isolated) {
       const page = await context.newPage();
-      const requests = [], errors = [];
+      const requests = [], errors = [], readerLogs = [];
       page.setDefaultTimeout(20000);
       page.on('pageerror', error => errors.push(error.message));
+      page.on('console', message => {
+        if (example.direct && message.location().url.endsWith('/state.worker.js')) readerLogs.push(message.text());
+      });
       page.on('request', request => {
         if (new URL(request.url()).pathname.startsWith('/dist/')) requests.push(request.url());
       });
@@ -149,11 +176,22 @@ async function checkBrowser() {
         globalThis.__docLogs = [];
         globalThis.__docWorkers = 0;
         globalThis.__docSharedWorkers = 0;
+        globalThis.__docTaskFrames = 0;
         const log = console.log.bind(console);
         console.log = (...args) => { globalThis.__docLogs.push(args); log(...args); };
         const WorkerClass = globalThis.Worker;
         globalThis.Worker = class extends WorkerClass {
-          constructor(...args) { super(...args); globalThis.__docWorkers++; }
+          constructor(...args) {
+            super(...args);
+            globalThis.__docWorkers++;
+            this.addEventListener('message', event => {
+              if (event.data?.protocol === 'zerocopy/tasks') globalThis.__docTaskFrames++;
+            });
+          }
+          postMessage(...args) {
+            if (args[0]?.protocol === 'zerocopy/tasks') globalThis.__docTaskFrames++;
+            return super.postMessage(...args);
+          }
         };
         if (typeof SharedWorker !== 'undefined') {
           const SharedWorkerClass = globalThis.SharedWorker;
@@ -163,6 +201,11 @@ async function checkBrowser() {
         }
       });
       const rejected = isolated ? null : page.waitForEvent('pageerror');
+      const readerComplete = example.direct && isolated ? page.waitForEvent('console', {
+        predicate: message => message.location().url.endsWith('/state.worker.js') && message.text() === 'Worker retained: 30',
+      }) : null;
+      // Observe the timeout even when an earlier assertion prevents awaiting it.
+      readerComplete?.catch(() => {});
       await page.goto(`${origin}/${example.name}/${isolated ? 'isolated' : 'plain'}`);
       assert.equal(await page.evaluate(() => crossOriginIsolated), isolated);
       if (!isolated) {
@@ -171,10 +214,17 @@ async function checkBrowser() {
         assert.equal(await page.evaluate(() => globalThis.__docWorkers + globalThis.__docSharedWorkers), 0);
       } else {
         await page.waitForFunction(() => globalThis.__docDone);
+        if (readerComplete) {
+          await readerComplete;
+          assert.deepEqual(readerLogs, ['Worker initial: 30', 'Worker current: 50', 'Worker retained: 30']);
+          assert.equal(await page.evaluate(() => globalThis.__docTaskFrames), 0,
+            'Direct state reads must not use task messages');
+        }
         assert.deepEqual(errors, [], `${example.name}: unexpected page errors`);
         assert.deepEqual(await page.evaluate(() => globalThis.__docLogs), example.expected);
         assert.equal(await page.evaluate(() => globalThis.__docWorkers), example.workers);
         assert.equal(await page.evaluate(() => globalThis.__docSharedWorkers), example.name === 'shared' ? 1 : 0);
+        if (example.direct) await page.evaluate(() => globalThis.__docDispose());
       }
       await page.close();
     }
@@ -205,6 +255,7 @@ async function checkBrowser() {
 }
 
 try {
+  checkDirectReadFraming();
   checkTypes();
   checkNode();
   if (!process.argv.includes('--node-only')) await checkBrowser();
