@@ -51,7 +51,7 @@ The first read is the initial snapshot and can return `undefined`; the subscript
 
 ## Update one root or a group
 
-Within the owner's setup above, either form returns a new immutable state:
+Within the owner's setup above, both forms install new immutable collection handles. The recipe returns the new handle or record; `update()` itself returns `void`:
 
 ```ts
 shared.update('limits', limits => limits.set('lane-1', 50));
