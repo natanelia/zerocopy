@@ -52,6 +52,9 @@ jobs:
         run: bunx playwright install --with-deps chromium
       - name: Check documented browser workers and isolation guards
         run: node scripts/check-doc-browser.mjs
+      - name: Check typed task examples from Markdown
+        shell: bash
+        run: node scripts/check-worker-docs.mjs 2>&1 | tee worker-docs.log
       - name: Check built Node entry points
         run: |
           node proofs/node-worker.mjs
@@ -67,6 +70,7 @@ jobs:
           path: |
             vitest.log
             worker-tasks.log
+            worker-docs.log
             dist/
             package.json
           retention-days: 7

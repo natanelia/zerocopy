@@ -1,10 +1,99 @@
 # zerocopy
 
-Immutable collections for JavaScript workers, backed by shared WebAssembly memory.
+Typed tasks over shared immutable collections. Use the same handlers on the main thread, in individual workers, or in a worker pool.
 
-[Documentation](docs/README.md) · [API](docs/api.md) · [Workers](docs/worker-sharing.md) · [Benchmarks](#performance) · [Contributing](CONTRIBUTING.md)
+[Quickstart](#run-a-typed-task) · [Workers and pools](docs/workers.md) · [State sessions](docs/worker-sessions.md) · [Collection API](docs/api.md) · [Documentation](docs/README.md) · [Benchmarks](#performance)
 
-Create a new version without changing the old one. Send a snapshot to a worker without copying its collection storage.
+Keep large collections in shared WebAssembly memory. Send small task inputs, read collections synchronously inside the worker, and get a typed result. Update the owner state without writing a new message protocol.
+
+## Run a typed task
+
+Use the [built source package](#build-from-source) and a TypeScript-aware worker bundler. Browser shared memory requires cross-origin isolation: serve the page with `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. See [browser setup](docs/workers.md#browser-setup) for worker scripts and third-party resources.
+
+These are three files in the same directory.
+
+**tasks.ts** — ordinary handlers with typed inputs and results:
+
+<!-- example: dx-tasks -->
+```ts
+import type { SharedMap } from 'zerocopy';
+import { defineTasks } from 'zerocopy/worker';
+
+export interface Model { limits: SharedMap<'number'> }
+export const tasks = defineTasks<Model>()({
+  speedLimit({ state }, laneId: string) {
+    return state.limits.get(laneId);
+  },
+});
+export type Tasks = typeof tasks;
+```
+
+**limits.worker.ts** — expose those handlers:
+
+<!-- example: dx-worker -->
+```ts
+import { serve } from 'zerocopy/worker';
+import { tasks } from './tasks';
+
+await serve(tasks);
+```
+
+**main.ts** — call, update, call again:
+
+<!-- example: dx-main -->
+```ts
+import type { Tasks } from './tasks';
+
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
+const { SharedMap } = await import('zerocopy');
+const { createState } = await import('zerocopy/state');
+const { spawn } = await import('zerocopy/worker');
+
+const state = createState({
+  limits: new SharedMap('number').set('lane-1', 30),
+});
+try {
+  const compute = await spawn<Tasks>(
+    () => new Worker(new URL('./limits.worker.ts', import.meta.url), {
+      type: 'module',
+    }),
+    { state },
+  );
+  try {
+    console.log(await compute.run.speedLimit('lane-1')); // 30
+    state.update('limits', limits => limits.set('lane-1', 50));
+    console.log(await compute.run.speedLimit('lane-1')); // 50
+  } finally {
+    compute.dispose(); // Disconnect and terminate the owned worker.
+  }
+} finally {
+  state.dispose();
+}
+```
+
+The task result is `Promise<number | undefined>`. No application `postMessage()` handler, manual `publish()`, or serialization call is needed between the update and task call. `limits.get()` inside the task is a local collection read, not another RPC.
+
+The dynamic imports let the isolation check run before default arenas are initialized. Task arguments and ordinary results still use structured cloning. Shared transport avoids copying collection storage; it does not mean zero execution overhead.
+
+## Same tasks, different execution
+
+| Start with | Use | Guide |
+| --- | --- | --- |
+| Main-thread execution | `local(tasks, { state })` | [Run locally](docs/workers.md#start-on-the-main-thread) |
+| A new dedicated worker | `spawn<Tasks>(factory, { state })` | [Quickstart](#run-a-typed-task) |
+| Your existing workers | `connect<Tasks>(worker, { state })` | [Connect an existing worker](docs/workers.md#connect-an-existing-worker) |
+| Several separate workers | One executor per worker | [Independent workers](docs/workers.md#several-independent-workers) |
+| Many jobs | `pool<Tasks>(factoryOrWorkers, { state })` | [Worker pool](docs/workers.md#use-a-worker-pool) |
+| Your own message channel | `connect<Tasks>(port, { state })` | [MessagePort integration](docs/workers.md#keep-an-existing-message-protocol) |
+| SharedWorker connections | Explicit copy mode and a server per port | [SharedWorker limits and setup](docs/workers.md#connect-a-sharedworker) |
+
+The [worker guide](docs/workers.md) includes complete replacement entry files, error handling, cancellation, and ownership rules. For live notifications without a task system, use [state sessions](docs/worker-sessions.md). For an existing RPC system, keep [manual snapshot transport](docs/worker-sharing.md).
+
+## Immutable by default
+
+Create a new version without changing the old one. Keep the return value from each collection update.
 
 <!-- example: map-snapshots -->
 ```ts
@@ -17,23 +106,24 @@ before.get('lane-1'); // 30
 after.get('lane-1');  // 50
 ```
 
-Every update returns a collection. Keep that return value; `before.set(...)` does not change `before`.
+`before.set(...)` does not mutate `before`. A state holder stores the current immutable handles; it does not turn the collections into mutable shared objects.
 
 ## When to use it
 
-Use zerocopy when workers need to read large collections while the owner keeps earlier snapshots or creates new versions. It provides maps, sets, lists, queues, ordered collections, and nested collections through one transport API.
+Use zerocopy when workers need to read large collections while the owner retains snapshots or creates new versions. There is **one allocating writer per arena**. Remote readers cannot allocate in the owner's arena. Strings and JSON values still need encoding and decoding. Bun defaults to copy transport.
 
-There is **one allocating writer per arena**. Workers attach read-only views. This is not a concurrent mutable map, and shared memory does not make JavaScript objects directly shareable. Strings and JSON values still need encoding and decoding. Bun uses a copy fallback by default.
+A task waits for at least its requested revision, not an exact invocation-time snapshot. A running handler retains one snapshot, but a pool batch can use different revisions. See [consistency](docs/workers.md#consistency).
 
-For small, single-threaded data, a native `Map` or array is often simpler and faster. See the measurements below, including cold starts and slower workloads.
+For small, single-threaded data, a native `Map` or array is often simpler and faster. The benchmark tables below include slower workloads and cold starts; they do not measure task-dispatch or pool overhead.
 
 ## Build from source
 
-These docs describe the source in this repository. To use that version, build a local package with Bun and Node.js:
+These docs describe this source revision, not an assumed npm release. While PR #6 is open, check out `agent/worker-dx-api` to use the task API:
 
 ```sh
 git clone https://github.com/natanelia/zerocopy.git
 cd zerocopy
+git switch agent/worker-dx-api
 bun install
 bun run build:wasm
 bun run build:browser
@@ -41,11 +131,42 @@ bun run build:types
 npm pack --ignore-scripts
 ```
 
-Install the resulting `zerocopy-0.2.0.tgz` in your application with `npm install /path/to/zerocopy-0.2.0.tgz`. The package includes the JavaScript bundle, embedded WASM, TypeScript declarations, and Bun source entry points. An installed package does not need an application-side AssemblyScript build.
+Install the resulting `zerocopy-0.2.0.tgz` in your application with `npm install /path/to/zerocopy-0.2.0.tgz`. After the task API is merged, the default branch also includes it. The package contains the JavaScript bundles, embedded WASM, TypeScript declarations, and Bun source entry points. Applications do not need an AssemblyScript build.
 
-The checked build uses Bun 1.4.2 and Node.js 22. See [Contributing](CONTRIBUTING.md) for tests and the local browser demo.
+The repository's CI uses Bun 1.4.2 and Node.js 22. See [Contributing](CONTRIBUTING.md) for build and test commands.
+
+## Collections and integrations
+
+| Collection | Use |
+| --- | --- |
+| `SharedMap`, `SharedSet` | Key lookup and membership |
+| `SharedList` | Indexed sequence |
+| `SharedStack`, `SharedQueue` | Last-in-first-out and first-in-first-out access |
+| `SharedLinkedList`, `SharedDoublyLinkedList` | Indexed insertion and removal, with linked-list-style APIs |
+| `SharedOrderedMap`, `SharedOrderedSet` | Insertion-order iteration |
+| `SharedSortedMap`, `SharedSortedSet` | Sorted iteration |
+| `SharedPriorityQueue` | Minimum or maximum priority first |
+
+Use [`json<T>()`](docs/api.md#typed-json-objects) for typed plain objects and read-only fields. Compose nested types with helpers such as `list(json<Lane>())`.
+
+The [API guide](docs/api.md) covers all 12 classes, value types, nested collections, and custom ordering. The collection names describe their interfaces, not necessarily their internal storage.
+
+[Redux](docs/redux.md) provides Toolkit middleware options, selectors, DevTools support, and a portable value codec. [TanStack adapters](docs/tanstack.md) provide a collection wrapper and sync-cache helpers, with important limits on pointer-based state. Both are separate package entry points.
+
+## Memory and ownership
+
+Storage is append-only. Old snapshots, worker views, nested collections, transport payloads, and default arena references can keep an entire arena alive. There is no per-node garbage collection.
+
+Use `compact()` or `compactMany()` at a controlled application boundary to copy live data into a new writable arena. Keep the result and release old holders. Compaction costs time and can temporarily keep both arenas in memory. Collection-level `dispose()` and `configureAutoGC()` are deprecated no-ops. Executor and session `dispose()` methods are different: they disconnect listeners and release owned resources.
+
+See [Architecture and memory](docs/architecture.md) for the source map and lifetime model. Existing users should read [Migration to v0.2](docs/migration.md) before mixing producer and worker builds.
 
 ## Share a snapshot
+
+Already own the protocol? Keep the low-level API. This is an alternative to the task API above.
+
+<details>
+<summary>Manual browser transport example</summary>
 
 Browser applications need cross-origin isolation for shared memory. Configure `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, and check `crossOriginIsolated` before using shared transport.
 
@@ -84,31 +205,8 @@ The message carries memory handles and snapshot descriptors. The worker reads th
 
 See [Worker sharing](docs/worker-sharing.md) for complete Node.js examples, browser setup, copy mode, and ownership rules.
 
-## Collections and integrations
 
-| Collection | Use |
-| --- | --- |
-| `SharedMap`, `SharedSet` | Key lookup and membership |
-| `SharedList` | Indexed sequence |
-| `SharedStack`, `SharedQueue` | Last-in-first-out and first-in-first-out access |
-| `SharedLinkedList`, `SharedDoublyLinkedList` | Indexed insertion and removal, with linked-list-style APIs |
-| `SharedOrderedMap`, `SharedOrderedSet` | Insertion-order iteration |
-| `SharedSortedMap`, `SharedSortedSet` | Sorted iteration |
-| `SharedPriorityQueue` | Minimum or maximum priority first |
-
-Use [`json<T>()`](docs/api.md#typed-json-objects) for typed plain objects and read-only fields. Compose nested types with helpers such as `list(json<Lane>())`.
-
-The [API guide](docs/api.md) covers all 12 classes, value types, nested collections, and custom ordering. The collection names describe their interfaces, not necessarily their internal storage.
-
-[Redux](docs/redux.md) provides Toolkit middleware options, selectors, DevTools support, and a portable value codec. [TanStack adapters](docs/tanstack.md) provide a collection wrapper and sync-cache helpers, with important limits on pointer-based state. Both are separate package entry points.
-
-## Memory and ownership
-
-Storage is append-only. Old snapshots, worker views, nested collections, transport payloads, and default arena references can keep an entire arena alive. There is no per-node garbage collection.
-
-Use `compact()` or `compactMany()` at a controlled application boundary to copy live data into a new writable arena. Keep the result and release old holders. Compaction costs time and can temporarily keep both arenas in memory. `dispose()` and `configureAutoGC()` are deprecated no-ops.
-
-See [Architecture and memory](docs/architecture.md) for the source map and lifetime model. Existing users should read [Migration to v0.2](docs/migration.md) before mixing producer and worker builds.
+</details>
 
 ## Performance
 
