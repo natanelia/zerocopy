@@ -30,10 +30,24 @@ jobs:
       - run: node proofs/numeric-worker.mjs
       - run: PERF_GATE=1 node proofs/numeric-benchmark.mjs
       - run: PERF_GATE=1 bun proofs/numeric-benchmark.mjs
+      - name: Check out the exact transport baseline
+        if: runner.arch == 'X64'
+        uses: actions/checkout@v4
+        with:
+          ref: 75e3626ccc6400d1ae195aefdd3526906622009e
+          path: .numeric-baseline
+          persist-credentials: false
+      - name: Build the unmodified transport baseline
+        if: runner.arch == 'X64'
+        run: |
+          ln -s "$GITHUB_WORKSPACE/node_modules" .numeric-baseline/node_modules
+          cd .numeric-baseline
+          bun run build:wasm
+          bun run build:browser
       - name: Install browser engines
         if: runner.arch == 'X64'
-        run: bunx playwright install --with-deps chromium firefox webkit
-      - name: Verify browser modules, fallback, and worker snapshots
+        run: bunx playwright install --with-deps chromium firefox webkit > /tmp/numeric-browser-install.log 2>&1 || { cat /tmp/numeric-browser-install.log; exit 1; }
+      - name: Verify browser kernels and compare transport against pinned main
         if: runner.arch == 'X64'
         run: node proofs/numeric-browser.mjs
       - uses: actions/upload-artifact@v4
