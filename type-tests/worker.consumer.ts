@@ -37,3 +37,24 @@ async function consumers(browser: Worker, node: NodeWorker, port: MessagePort, n
 }
 void consumers;
 shared.dispose(); session.dispose(); single.dispose(); bound.dispose();
+
+import { defineTasks, local, type TaskContext } from 'zerocopy/worker';
+import { createState, type StateOf } from 'zerocopy/state';
+
+const dxState = createState(initial);
+type DxState = StateOf<typeof dxState>;
+const tasks = defineTasks<DxState>()({
+  count({ state }: TaskContext<DxState>, input: { key: string }) {
+    return state.map.get(input.key) ?? 0;
+  },
+  size({ state }: TaskContext<DxState>) { return state.list.size; },
+});
+const localTasks = local(tasks, { state: dxState });
+const countPromise: Promise<number> = localTasks.run.count({ key: 'x' });
+const sizePromise: Promise<number> = localTasks.run.size();
+void countPromise; void sizePromise;
+// @ts-expect-error Missing required task input.
+localTasks.run.count();
+// @ts-expect-error Wrong task input shape.
+localTasks.run.count({ key: 1 });
+localTasks.dispose(); dxState.dispose();

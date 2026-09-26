@@ -1,10 +1,90 @@
 # zerocopy
 
-Immutable collections for JavaScript workers, backed by shared WebAssembly memory.
+Immutable collections with direct, synchronous reads on the main thread and in connected workers, backed by shared WebAssembly memory.
 
-[Documentation](docs/README.md) · [API](docs/api.md) · [Workers](docs/worker-sharing.md) · [Benchmarks](#performance) · [Contributing](CONTRIBUTING.md)
+[Direct-read quickstart](#read-shared-state-directly) · [State sessions](docs/worker-sessions.md) · [Optional tasks and pools](#run-a-typed-task) · [Collection API](docs/api.md) · [Documentation](docs/README.md) · [Benchmarks](#performance)
 
-Create a new version without changing the old one. Send a snapshot to a worker without copying its collection storage.
+**Reading shared state does not require tasks or RPC.** Use collection methods such as `.get()` directly. After a worker connects, its reads are local and synchronous; they do not send a request to the owner. Sessions deliver new snapshots. Tasks are an optional way to schedule calculations, not a requirement for data access.
+
+## Read shared state directly
+
+Use the [built source package](#build-from-source) and a TypeScript-aware worker bundler. Browser shared memory requires cross-origin isolation: serve the page with `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. See [browser setup](docs/workers.md#browser-setup) for worker scripts and third-party resources.
+
+These are two files in the same directory. No task definition or task server is needed.
+
+**main.ts** — own the state, read it directly, and connect a worker:
+
+<!-- example: readme-direct-owner -->
+```ts
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
+const { SharedMap } = await import('zerocopy');
+const { createState } = await import('zerocopy/state');
+
+const state = createState({
+  limits: new SharedMap('number').set('lane-1', 30),
+});
+console.log(state.current.limits.get('lane-1')); // 30; no task or await.
+
+const worker = new Worker(new URL('./state.worker.ts', import.meta.url), {
+  type: 'module',
+});
+await state.connect(worker); // Attach the worker's initial snapshot once.
+
+state.update('limits', limits => limits.set('lane-1', 50));
+console.log(state.current.limits.get('lane-1')); // 50 immediately on the owner.
+// New snapshots are published automatically. Worker delivery is asynchronous.
+
+// At application teardown: state.dispose(); worker.terminate();
+```
+
+**state.worker.ts** — connect once, then read directly:
+
+<!-- example: readme-direct-reader -->
+```ts
+import type { SharedMap } from 'zerocopy';
+import { connectSharedSession } from 'zerocopy/worker';
+
+type Model = { limits: SharedMap<'number'> };
+const shared = await connectSharedSession<Model>(); // Initial connection only.
+
+const initial = shared.current;
+console.log('Worker initial:', initial.limits.get('lane-1')); // 30
+
+// Subscribe only when you need to react to new snapshots.
+shared.subscribe(snapshot => {
+  console.log('Worker current:', snapshot.limits.get('lane-1')); // 50
+  console.log('Worker retained:', initial.limits.get('lane-1')); // Still 30
+});
+
+// Elsewhere in this worker: shared.current.limits.get('lane-1').
+// Every get() is a local synchronous read. No task or per-read message.
+// At worker teardown: shared.dispose();
+```
+
+The `await` is for initial attachment, not for each read. You can read outside a subscription or task. On the owner, `state.current` changes synchronously. In a worker, `shared.current` is the newest snapshot that worker has received; it can lag behind the owner. Captured snapshots, such as `initial`, do not change when a newer snapshot arrives.
+
+For several dedicated workers, use `await state.connect([workerA, workerB])`. Each worker connects with `connectSharedSession()` and reads locally. No worker pool or task scheduler is required. A browser `SharedWorker` has a different sharing boundary; see [SharedWorker setup and explicit copying](docs/workers.md#connect-a-sharedworker) instead of assuming the dedicated-worker example applies unchanged.
+
+The dynamic imports let the isolation check run before default arenas are initialized. Shared transport avoids copying collection backing bytes. It does not eliminate connection messages, snapshot publication, decoding, or other execution costs.
+
+## Choose the layer you need
+
+| Need | Use | What happens |
+| --- | --- | --- |
+| Read a value already available on this thread | `state.current.limits.get(id)` or `snapshot.limits.get(id)` | Synchronous local collection access; no task or per-read message |
+| Make new snapshots available in workers | `state.connect(worker)` and `connectSharedSession()` | A session publishes and receives snapshots; reads stay local |
+| Ask another thread to run a calculation | Optional `spawn()`, `connect()`, or `pool()` task executors | A task message runs a handler and returns a Promise |
+| Keep your own transport | `getWorkerData()` and `initWorker()` | Attach snapshots through your existing messages or RPC |
+
+**Collections provide data access. Sessions deliver snapshots. Tasks schedule work.** Use tasks for whole calculations, such as route assessment or geometry processing, rather than wrapping each collection lookup in a remote call. The task executor function `connect()` is different from the state holder's `state.connect(worker)` method.
+
+See [state sessions](docs/worker-sessions.md) for direct worker reads, publication, and subscriptions. Use the [task guide](docs/workers.md) only when you also need its execution and scheduling features.
+
+## Immutable by default
+
+Create a new version without changing the old one. Keep the return value from each collection update. Collections also work without a state holder or any worker:
 
 <!-- example: map-snapshots -->
 ```ts
@@ -17,23 +97,114 @@ before.get('lane-1'); // 30
 after.get('lane-1');  // 50
 ```
 
-Every update returns a collection. Keep that return value; `before.set(...)` does not change `before`.
+`before.set(...)` does not mutate `before`. A state holder stores the current immutable handles; it does not turn the collections into mutable shared objects.
+
+## Run a typed task
+
+**Optional: use this layer to request work on another thread, not to access shared values.** A remote task call sends messages and returns a Promise. Prefer a direct `.get()` when the calling thread already has the collection. Inside a task, collection reads are still local.
+
+<details>
+<summary>Task setup example: the smallest request/response call</summary>
+
+This small lookup demonstrates the task call mechanism, not the recommended way to read each value. For application work, replace the handler with a complete calculation. These three files are a separate example from the direct-read quickstart above. They require the same browser setup.
+
+**tasks.ts** — ordinary handlers with typed inputs and results:
+
+<!-- example: dx-tasks -->
+```ts
+import type { SharedMap } from 'zerocopy';
+import { defineTasks } from 'zerocopy/worker';
+
+export interface Model { limits: SharedMap<'number'> }
+export const tasks = defineTasks<Model>()({
+  speedLimit({ state }, laneId: string) {
+    return state.limits.get(laneId);
+  },
+});
+export type Tasks = typeof tasks;
+```
+
+**limits.worker.ts** — expose those handlers:
+
+<!-- example: dx-worker -->
+```ts
+import { serve } from 'zerocopy/worker';
+import { tasks } from './tasks';
+
+await serve(tasks);
+```
+
+**main.ts** — call, update, call again:
+
+<!-- example: dx-main -->
+```ts
+import type { Tasks } from './tasks';
+
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
+const { SharedMap } = await import('zerocopy');
+const { createState } = await import('zerocopy/state');
+const { spawn } = await import('zerocopy/worker');
+
+const state = createState({
+  limits: new SharedMap('number').set('lane-1', 30),
+});
+try {
+  const compute = await spawn<Tasks>(
+    () => new Worker(new URL('./limits.worker.ts', import.meta.url), {
+      type: 'module',
+    }),
+    { state },
+  );
+  try {
+    console.log(await compute.run.speedLimit('lane-1')); // 30
+    state.update('limits', limits => limits.set('lane-1', 50));
+    console.log(await compute.run.speedLimit('lane-1')); // 50
+  } finally {
+    compute.dispose(); // Disconnect and terminate the owned worker.
+  }
+} finally {
+  state.dispose();
+}
+```
+
+The task result is `Promise<number | undefined>`. The executor handles task messages and publication. `limits.get()` inside the task is a local collection read, not another RPC. Task arguments and ordinary results still use structured cloning.
+
+</details>
+
+## Same tasks, different execution
+
+These choices apply only when you use the optional task API. Direct collection reads do not need an executor, including on the main thread.
+
+| Start with | Use | Guide |
+| --- | --- | --- |
+| Tasks on the main thread | `local(tasks, { state })` | [Run tasks locally](docs/workers.md#start-on-the-main-thread) |
+| Tasks in a new dedicated worker | `spawn<Tasks>(factory, { state })` | [Task setup](#run-a-typed-task) |
+| Tasks in your existing workers | `connect<Tasks>(worker, { state })` | [Connect an existing worker](docs/workers.md#connect-an-existing-worker) |
+| Tasks in several separate workers | One executor per worker | [Independent workers](docs/workers.md#several-independent-workers) |
+| Many jobs | `pool<Tasks>(factoryOrWorkers, { state })` | [Worker pool](docs/workers.md#use-a-worker-pool) |
+| Tasks on your own message channel | `connect<Tasks>(port, { state })` | [MessagePort integration](docs/workers.md#keep-an-existing-message-protocol) |
+| SharedWorker task connections | Explicit copy mode and a server per port | [SharedWorker limits and setup](docs/workers.md#connect-a-sharedworker) |
+
+The [task guide](docs/workers.md) includes complete replacement entry files, error handling, cancellation, and ownership rules. It is separate from [direct reads and state sessions](docs/worker-sessions.md) and [manual snapshot transport](docs/worker-sharing.md).
 
 ## When to use it
 
-Use zerocopy when workers need to read large collections while the owner keeps earlier snapshots or creates new versions. It provides maps, sets, lists, queues, ordered collections, and nested collections through one transport API.
+Use zerocopy when workers need to read large collections while the owner retains snapshots or creates new versions. There is **one allocating writer per arena**. Remote readers cannot allocate in the owner's arena. Strings and JSON values still need encoding and decoding. Bun defaults to copy transport.
 
-There is **one allocating writer per arena**. Workers attach read-only views. This is not a concurrent mutable map, and shared memory does not make JavaScript objects directly shareable. Strings and JSON values still need encoding and decoding. Bun uses a copy fallback by default.
+When you use the optional task API, a task waits for at least its requested revision, not an exact invocation-time snapshot. A running handler retains one snapshot, but a pool batch can use different revisions. See [task consistency](docs/workers.md#consistency).
 
-For small, single-threaded data, a native `Map` or array is often simpler and faster. See the measurements below, including cold starts and slower workloads.
+For small, single-threaded data, a native `Map` or array is often simpler and faster. The benchmark tables below include slower workloads and cold starts; they do not measure task-dispatch or pool overhead.
 
 ## Build from source
 
-These docs describe the source in this repository. To use that version, build a local package with Bun and Node.js:
+These docs describe this source revision, not an assumed npm release. While PR #6 is open, check out `agent/worker-dx-api` for the APIs and examples shown here:
 
 ```sh
 git clone https://github.com/natanelia/zerocopy.git
 cd zerocopy
+git switch agent/worker-dx-api
 bun install
 bun run build:wasm
 bun run build:browser
@@ -41,11 +212,42 @@ bun run build:types
 npm pack --ignore-scripts
 ```
 
-Install the resulting `zerocopy-0.2.0.tgz` in your application with `npm install /path/to/zerocopy-0.2.0.tgz`. The package includes the JavaScript bundle, embedded WASM, TypeScript declarations, and Bun source entry points. An installed package does not need an application-side AssemblyScript build.
+Install the resulting `zerocopy-0.2.0.tgz` in your application with `npm install /path/to/zerocopy-0.2.0.tgz`. After the task API is merged, the default branch also includes it. The package contains the JavaScript bundles, embedded WASM, TypeScript declarations, and Bun source entry points. Applications do not need an AssemblyScript build.
 
-The checked build uses Bun 1.4.2 and Node.js 22. See [Contributing](CONTRIBUTING.md) for tests and the local browser demo.
+The repository's CI uses Bun 1.4.2 and Node.js 22. See [Contributing](CONTRIBUTING.md) for build and test commands.
+
+## Collections and integrations
+
+| Collection | Use |
+| --- | --- |
+| `SharedMap`, `SharedSet` | Key lookup and membership |
+| `SharedList` | Indexed sequence |
+| `SharedStack`, `SharedQueue` | Last-in-first-out and first-in-first-out access |
+| `SharedLinkedList`, `SharedDoublyLinkedList` | Indexed insertion and removal, with linked-list-style APIs |
+| `SharedOrderedMap`, `SharedOrderedSet` | Insertion-order iteration |
+| `SharedSortedMap`, `SharedSortedSet` | Sorted iteration |
+| `SharedPriorityQueue` | Minimum or maximum priority first |
+
+Use [`json<T>()`](docs/api.md#typed-json-objects) for typed plain objects and read-only fields. Compose nested types with helpers such as `list(json<Lane>())`.
+
+The [API guide](docs/api.md) covers all 12 classes, value types, nested collections, and custom ordering. The collection names describe their interfaces, not necessarily their internal storage.
+
+[Redux](docs/redux.md) provides Toolkit middleware options, selectors, DevTools support, and a portable value codec. [TanStack adapters](docs/tanstack.md) provide a collection wrapper and sync-cache helpers, with important limits on pointer-based state. Both are separate package entry points.
+
+## Memory and ownership
+
+Storage is append-only. Old snapshots, worker views, nested collections, transport payloads, and default arena references can keep an entire arena alive. There is no per-node garbage collection.
+
+Use `compact()` or `compactMany()` at a controlled application boundary to copy live data into a new writable arena. Keep the result and release old holders. Compaction costs time and can temporarily keep both arenas in memory. Collection-level `dispose()` and `configureAutoGC()` are deprecated no-ops. Executor and session `dispose()` methods are different: they disconnect listeners and release owned resources.
+
+See [Architecture and memory](docs/architecture.md) for the source map and lifetime model. Existing users should read [Migration to v0.2](docs/migration.md) before mixing producer and worker builds.
 
 ## Share a snapshot
+
+Already own the protocol? Keep the low-level API. Use it to attach collections for direct reads through your existing messages, without a state session or task executor.
+
+<details>
+<summary>Manual browser transport example</summary>
 
 Browser applications need cross-origin isolation for shared memory. Configure `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, and check `crossOriginIsolated` before using shared transport.
 
@@ -84,31 +286,8 @@ The message carries memory handles and snapshot descriptors. The worker reads th
 
 See [Worker sharing](docs/worker-sharing.md) for complete Node.js examples, browser setup, copy mode, and ownership rules.
 
-## Collections and integrations
 
-| Collection | Use |
-| --- | --- |
-| `SharedMap`, `SharedSet` | Key lookup and membership |
-| `SharedList` | Indexed sequence |
-| `SharedStack`, `SharedQueue` | Last-in-first-out and first-in-first-out access |
-| `SharedLinkedList`, `SharedDoublyLinkedList` | Indexed insertion and removal, with linked-list-style APIs |
-| `SharedOrderedMap`, `SharedOrderedSet` | Insertion-order iteration |
-| `SharedSortedMap`, `SharedSortedSet` | Sorted iteration |
-| `SharedPriorityQueue` | Minimum or maximum priority first |
-
-Use [`json<T>()`](docs/api.md#typed-json-objects) for typed plain objects and read-only fields. Compose nested types with helpers such as `list(json<Lane>())`.
-
-The [API guide](docs/api.md) covers all 12 classes, value types, nested collections, and custom ordering. The collection names describe their interfaces, not necessarily their internal storage.
-
-[Redux](docs/redux.md) provides Toolkit middleware options, selectors, DevTools support, and a portable value codec. [TanStack adapters](docs/tanstack.md) provide a collection wrapper and sync-cache helpers, with important limits on pointer-based state. Both are separate package entry points.
-
-## Memory and ownership
-
-Storage is append-only. Old snapshots, worker views, nested collections, transport payloads, and default arena references can keep an entire arena alive. There is no per-node garbage collection.
-
-Use `compact()` or `compactMany()` at a controlled application boundary to copy live data into a new writable arena. Keep the result and release old holders. Compaction costs time and can temporarily keep both arenas in memory. `dispose()` and `configureAutoGC()` are deprecated no-ops.
-
-See [Architecture and memory](docs/architecture.md) for the source map and lifetime model. Existing users should read [Migration to v0.2](docs/migration.md) before mixing producer and worker builds.
+</details>
 
 ## Performance
 
