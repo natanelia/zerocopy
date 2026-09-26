@@ -3,7 +3,7 @@ on:
   push:
     branches: [agent/perf-numeric-range]
   pull_request:
-    paths: ['numeric*', 'proofs/numeric*', 'scripts/build-wasm.mjs', 'scripts/build-browser.ts', '.github/workflows/numeric-performance.yml']
+    paths: ['numeric*', 'proofs/numeric*', 'type-tests/numeric*', 'tsconfig.numeric.json', 'scripts/build-wasm.mjs', 'scripts/build-browser.ts', '.github/workflows/numeric-performance.yml']
 permissions:
   contents: read
 jobs:
@@ -25,10 +25,17 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run typecheck:redux && bun run typecheck:values
+      - run: bunx tsc --noEmit -p tsconfig.numeric.json
       - run: bun run test
       - run: node proofs/numeric-worker.mjs
       - run: PERF_GATE=1 node proofs/numeric-benchmark.mjs
-      - run: bun proofs/numeric-benchmark.mjs
+      - run: PERF_GATE=1 bun proofs/numeric-benchmark.mjs
+      - name: Install browser engines
+        if: runner.arch == 'X64'
+        run: bunx playwright install --with-deps chromium firefox webkit
+      - name: Verify browser modules, fallback, and worker snapshots
+        if: runner.arch == 'X64'
+        run: node proofs/numeric-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
