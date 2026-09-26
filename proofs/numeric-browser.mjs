@@ -3,14 +3,26 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { chromium, firefox, webkit } from 'playwright';
 
-const workerSource = `import { initWorker } from '/dist/shared.js';
-import { countInRange } from '/dist/numeric.js';
-let list;
+// Import the existing transport first. Check its scalar read before loading
+// numeric code, so allocation or transport failures have an exact phase.
+const workerSource = `let list;
 onmessage = async ({ data }) => {
+  let phase = 'import-existing-transport';
   try {
-    if (data.__shared) { ({ list } = await initWorker(data)); postMessage('ready'); }
-    else postMessage(countInRange(list, -Infinity, Infinity));
-  } catch (error) { postMessage({ error: String(error) }); }
+    if (data.__shared) {
+      const { initWorker } = await import('/dist/shared.js');
+      phase = 'attach-existing-snapshot';
+      ({ list } = await initWorker(data)); postMessage('ready');
+    } else if (data === 'baseline') {
+      phase = 'existing-forEach'; let count = 0;
+      list.forEach(value => { count += Number(value >= -Infinity && value <= Infinity); });
+      postMessage(count);
+    } else {
+      phase = 'import-numeric';
+      const { countInRange } = await import('/dist/numeric.js');
+      phase = 'execute-numeric'; postMessage(countInRange(list, -Infinity, Infinity));
+    }
+  } catch (error) { postMessage({ error: phase + ': ' + String(error) + '\\n' + error.stack }); }
 };`;
 const server = createServer(async (request, response) => {
   response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -33,6 +45,7 @@ try {
       for (const fallback of [false, true]) {
         const page = await browser.newPage();
         const errors = []; page.on('pageerror', error => errors.push(String(error)));
+        page.on('console', message => console.log('BROWSER-STAGE', name, fallback, message.text()));
         await page.goto(origin);
         const result = await page.evaluate(async fallback => {
           if (!crossOriginIsolated) throw new Error('Expected cross-origin isolation');
@@ -52,6 +65,7 @@ try {
               checks++;
             }
           }
+          console.log('main-thread kernel checks passed', checks);
           let list = new SharedList('number').pushMany(Array.from({ length: 33 }, () => 1));
           const old = list, data = getWorkerData({ list }, { copy: false });
           const worker = new Worker('/worker.mjs', { type: 'module' });
@@ -64,12 +78,17 @@ try {
               worker.addEventListener('message', message); worker.addEventListener('error', error);
             });
           }
+          async function ask(command) { const response = receive(); worker.postMessage(command); return response; }
           try {
-            const ready = receive(); worker.postMessage(data);
-            if (await ready !== 'ready') throw new Error('Worker did not attach');
-            const response = receive(); worker.postMessage('read');
+            if (await ask(data) !== 'ready') throw new Error('Worker did not attach');
+            console.log('existing worker snapshot attached');
+            if (await ask('baseline') !== 33) throw new Error('Existing worker forEach failed');
+            console.log('existing worker forEach passed');
+            if (await ask('numeric') !== 33) throw new Error('Worker numeric read failed');
+            const response = ask('numeric');
             list = list.pushMany(Array.from({ length: 32768 }, () => 1)).set(0, 99);
             if (await response !== 33 || countInRange(old, 0, 2) !== 33 || countInRange(list, 99, 99) !== 1) throw new Error('Snapshot isolation failure');
+            if (await ask('numeric') !== 33) throw new Error('Worker snapshot changed after growth');
           } finally { worker.terminate(); }
           return { checks, fallback, isolated: crossOriginIsolated };
         }, fallback);
