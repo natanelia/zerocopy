@@ -18,6 +18,6 @@
     "noEmit": true,
     "types": ["bun-types"]
   },
-  "include": ["shared.ts", "shared-*.ts", "worker.ts", "worker-protocol.ts", "worker-redux.ts", "redux.ts", "tanstack-db-collection.ts", "types.ts", "codec.ts", "wasm-utils.ts"],
+  "include": ["shared.ts", "shared-*.ts", "worker.ts", "worker-protocol.ts", "worker-redux.ts", "redux.ts", "tanstack-db-collection.ts", "types.ts", "codec.ts", "wasm-utils.ts", "numeric.ts"],
   "exclude": ["node_modules", "dist", "*.test.ts", "*.as.ts", "demo", "demo-app", "benchmark.ts"]
 }
