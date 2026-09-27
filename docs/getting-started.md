@@ -8,10 +8,10 @@ This example reads `30`, changes the owner state to `50`, and receives the updat
 
 ## Install the source package
 
-These examples describe the source in this branch. They do not assume that the same API is published on npm. While PR #6 is open, build its `agent/worker-dx-api` branch:
+These examples describe the source in this repository. They do not assume that the same API is published on npm. Build the current `main` branch:
 
 ```sh
-git clone --branch agent/worker-dx-api https://github.com/natanelia/zerocopy.git
+git clone --branch main https://github.com/natanelia/zerocopy.git
 cd zerocopy
 bun install
 bun run build:wasm
