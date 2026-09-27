@@ -31,12 +31,19 @@ jobs:
       - name: Exact differential tests and paired Bun benchmark
         if: ${{ !cancelled() }}
         run: PERF_GATE=1 bun proofs/geometry-bbox.mjs
+      - name: Install browser engines
+        if: matrix.os == 'ubuntu-latest'
+        run: bunx playwright install --with-deps chromium firefox webkit > /tmp/geometry-browser-install.log 2>&1 || { tail -80 /tmp/geometry-browser-install.log; exit 1; }
+      - name: Exact browser checks with normal and forced scalar selection
+        if: matrix.os == 'ubuntu-latest'
+        run: node proofs/geometry-browsers.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: geometry-bbox-${{ runner.arch }}
           path: |
             proofs/results/geometry-bbox-*.json
+            proofs/results/geometry-browsers.json
             geometry-kernels*.wat
           retention-days: 30
           if-no-files-found: warn
