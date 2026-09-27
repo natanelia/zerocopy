@@ -4,15 +4,22 @@
  */
 export const ATTEMPT_PARAMETER = '__zerocopy_isolation';
 
+function canHandleNavigation(worker, url) {
+  return worker?.scriptURL === url.href &&
+    (worker.state === 'activating' || worker.state === 'activated');
+}
 function hasControl(container, url) {
-  return container.controller?.scriptURL === url.href && container.controller.state === 'activated';
+  return canHandleNavigation(container.controller, url);
 }
 
 /** Wait for a matching active registration, not a claim on this old document.
  * An active service worker handles the next in-scope navigation. Some WebKit
- * tabs cannot be claimed after a concurrent install, but can navigate into the
- * active registration. Only the new document's crossOriginIsolated is success.
- * https://developer.mozilla.org/en-US/docs/Web/API/Clients/claim
+ * tabs can keep an old 'activating' state after a concurrent install. An active
+ * slot is already eligible for navigation; the browser's Handle Fetch algorithm
+ * waits for activation before dispatch. Do not duplicate that wait in the old
+ * document. Installing/waiting slots are not eligible. Only the new document's
+ * crossOriginIsolated is success, not an active registration or controller.
+ * https://w3c.github.io/ServiceWorker/#on-fetch-request
  */
 function waitForActive(environment, url, scope, timeoutMs) {
   const container = environment.navigator.serviceWorker;
@@ -47,7 +54,7 @@ function waitForActive(environment, url, scope, timeoutMs) {
       if (container.controller?.scriptURL === url.href) watch(container.controller);
       for (const worker of workers) if (worker?.scriptURL === url.href) watch(worker);
       const active = registration?.active;
-      if (active?.scriptURL === url.href && active.state === 'activated') finish();
+      if (canHandleNavigation(active, url)) finish();
     }
     function adopt(value, allowEmpty = false) {
       const workers = [value?.installing, value?.waiting, value?.active];
@@ -100,7 +107,7 @@ function waitForActive(environment, url, scope, timeoutMs) {
       if (adopt(existing)) { refresh(); return; }
       const value = await container.register(url, { scope: scope.href, updateViaCache: 'none' });
       // A successful register() may return before updatefound fills the slots.
-      // An empty registration is not success: only a matching activated worker
+      // An empty registration is not success: only a matching active worker
       // permits navigation, and the new page still checks crossOriginIsolated.
       if (!finished && !adopt(value, true)) throw new Error('The browser returned an unexpected demo registration.');
       refresh();

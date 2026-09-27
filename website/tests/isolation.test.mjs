@@ -93,10 +93,13 @@ test('activation can precede registration resolution in another tab', async () =
   const pending = s.run(); await tick(); s.claim(); assert.equal(await pending, 'reloading');
   release(s.registration); await tick(); s.clean(); assert.equal(s.navigations.length, 1);
 });
-test('a controller still activating is not enough; wait for its activated state', async () => {
+test('a matching activating controller permits navigation, not shared-memory readiness', async () => {
   const s = setup(); const pending = s.run(); await tick();
   s.worker.state = 'activating'; s.container.controller = s.worker; s.container.emit('controllerchange');
-  assert.equal(s.navigations.length, 0); s.worker.change('activated'); assert.equal(await pending, 'reloading'); s.clean();
+  assert.equal(await pending, 'reloading');
+  assert.equal(s.environment.crossOriginIsolated, false);
+  await assert.rejects(s.run(), /Automatic reloads have stopped/);
+  assert.equal(s.navigations.length, 1); s.clean();
 });
 test('an already active worker allows one navigation into its scope', async () => {
   const s = setup(); s.registration.installing = null; s.registration.active = s.worker; s.worker.state = 'activated';
@@ -122,9 +125,20 @@ test('a blocked registration has a deadline; late completion cannot reload', asy
   await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
   release(s.registration); s.claim(); await tick(); assert.equal(s.navigations.length, 0); s.clean();
 });
-test('a worker stuck activating times out without navigation', async () => {
+test('the active slot permits navigation while activating, without a later state event', async () => {
   const s = setup(); s.registration.installing = null; s.registration.active = s.worker; s.worker.state = 'activating';
-  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean(); assert.equal(s.navigations.length, 0);
+  assert.equal(await s.run(), 'reloading');
+  assert.equal(s.navigations.length, 1); assert.equal(s.container.controller, null);
+  assert.equal(s.environment.crossOriginIsolated, false); s.clean();
+});
+test('an installing or waiting worker alone cannot handle the next navigation', async () => {
+  for (const state of ['installing', 'installed']) {
+    const s = setup(); s.worker.state = state;
+    s.registration.installing = state === 'installing' ? s.worker : null;
+    s.registration.waiting = state === 'installed' ? s.worker : null;
+    await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/);
+    assert.equal(s.navigations.length, 0); s.clean();
+  }
 });
 test('unrelated controller changes do not trigger a reload or unregister other workers', async () => {
   const s = setup(); const other = new Worker(); other.scriptURL = new URL('../unrelated.js', route).href; other.state = 'activated';
@@ -313,4 +327,19 @@ test('a late refresh after the deadline cannot navigate or leave another timer',
   s.registration.active = s.worker; s.worker.state = 'activated';
   release(s.registration); await tick();
   assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0); s.clean();
+});
+
+
+test('a fresh cross-tab wrapper with an activating active worker permits one navigation', async () => {
+  const s = setup(); s.registration.installing = null;
+  let current = s.registration;
+  s.container.getRegistration = async () => current;
+  const pending = s.run({ timeoutMs: 1000 }); await tick();
+  const replacement = new Events(); s.worker.state = 'activating';
+  Object.assign(replacement, { scope: route, installing: null, waiting: null, active: s.worker });
+  current = replacement;
+  assert.equal(await pending, 'reloading');
+  assert.equal(s.navigations.length, 1);
+  assert.equal(s.environment.crossOriginIsolated, false);
+  assert.equal(replacement.listenerCount, 0); s.clean();
 });
