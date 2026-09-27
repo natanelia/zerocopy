@@ -23,4 +23,6 @@ jobs:
       - run: npm --prefix website install --ignore-scripts --no-package-lock
       - run: bunx playwright install --with-deps webkit
       - run: node website/build.mjs
+      - name: Trace the allocation failure
+        run: node website/tests/memory-diagnose.mjs
       - run: node website/tests/memory-browser.mjs
