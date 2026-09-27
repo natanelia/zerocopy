@@ -1,3 +1,4 @@
+import { memoryDescriptor } from './memory';
 import { ReadCache } from './read-cache';
 import { decodeUtf8 } from './utf8';
 import { loadWasm } from './wasm-utils';
@@ -135,8 +136,7 @@ export class Arena {
   private readonly scalarView = new DataView(this.scalar.buffer);
 
   constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean } = {}) {
-    const initial = Math.max(2, Math.ceil((options.copy?.byteLength ?? HEAP_START) / 65536));
-    this.memory = options.memory ?? new WebAssembly.Memory({ initial, maximum: 65536, shared: true });
+    this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);

@@ -32,7 +32,9 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: npm --prefix website install --ignore-scripts --no-package-lock
-      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Check lazy memory allocation
+        run: node --test proofs/memory-startup.mjs
       - name: Check deployment safety
         run: node --test website/tests/preview.test.mjs
       - name: Check root-hosted site
@@ -42,6 +44,7 @@ jobs:
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
       - name: Build and check GitHub Pages subpath
         env:
           SITE_BASE: /zerocopy/
@@ -52,6 +55,7 @@ jobs:
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
       - name: Retain site and visual evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -73,6 +77,7 @@ jobs:
           node website/build.mjs
           node --test website/tests/*.test.mjs
           node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
       - name: Retain publishable output
         uses: actions/upload-artifact@v4
         with:

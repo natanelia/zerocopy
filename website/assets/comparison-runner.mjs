@@ -73,6 +73,8 @@ self.onmessage = async ({ data }) => {
       construction = { nativeBuildMs, sharedBuildMs: performance.now() - start };
       groups = Object.fromEntries(['shared', 'native'].map(path => [path, Array.from({ length: READER_COUNT }, () => new Peer(new URL('./comparison-reader.mjs', import.meta.url)))]));
       await Promise.all(Object.values(groups).flat().map(peer => peer.request('ping')));
+      // Load the engine only in shared readers, before publication is timed.
+      await Promise.all(groups.shared.map(peer => peer.request('prepare-shared')));
       publication = await publish('load');
     } else {
       if (!groups) throw new Error('Load the comparison first');

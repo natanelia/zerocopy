@@ -1,14 +1,14 @@
-import { initWorker } from '../library/shared.js';
 import { RPC, nativeView, sharedView, appendNative, search, summarizeEvents } from './explorer-core.mjs';
 import { reply, failure } from './explorer-peer.mjs';
-let snapshot, columns, busy = false;
+let snapshot, columns, sharedAPI, busy = false;
 self.onmessage = async ({ data }) => {
   if (data?.protocol !== RPC) return;
   if (busy) { failure(data.id, new Error('A reader operation is already running')); return; }
   busy = true;
   try {
+    if (data.type === 'prepare-shared') { sharedAPI = await import('../library/shared.js'); reply(data.id, true); return; }
     if (data.type === 'ping') { reply(data.id, true); return; }
-    if (data.type === 'shared') { snapshot = await initWorker(data.payload); columns = undefined; reply(data.id, true); return; }
+    if (data.type === 'shared') { sharedAPI ??= await import('../library/shared.js'); snapshot = await sharedAPI.initWorker(data.payload); columns = undefined; reply(data.id, true); return; }
     if (data.type === 'native') { nativeView(data.columns); columns = data.columns; snapshot = undefined; reply(data.id, true); return; }
     if (data.type === 'append') { appendNative(columns, data.columns); reply(data.id, true); return; }
     if (data.type !== 'query') throw new Error('Unknown comparison operation');
