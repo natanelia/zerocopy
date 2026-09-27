@@ -12,7 +12,22 @@ const demos = [
   ['lab/', 'run-benchmark'], ['playground/', 'start-playground'],
 ];
 async function ready(page, id) {
-  await page.locator('#capability[data-state="ready"]').waitFor();
+  await page.locator('#capability[data-state="ready"], #capability[data-state="blocked"]').waitFor();
+  const state = await page.evaluate(async () => {
+    const worker = value => value && ({ url: value.scriptURL, state: value.state });
+    return {
+      url: location.href,
+      isolated: crossOriginIsolated,
+      visible: document.visibilityState,
+      phase: document.querySelector('#capability')?.dataset.state,
+      message: document.querySelector('#capability-text')?.textContent,
+      controller: worker(navigator.serviceWorker.controller),
+      registrations: (await navigator.serviceWorker.getRegistrations()).map(value => ({
+        scope: value.scope, active: worker(value.active), waiting: worker(value.waiting), installing: worker(value.installing),
+      })),
+    };
+  });
+  assert.equal(state.phase, 'ready', `Automatic setup failed: ${JSON.stringify(state)}`);
   await page.evaluate(() => globalThis.__zcDocumentReported);
   assert.equal(await page.evaluate(() => crossOriginIsolated), true);
   assert.equal(await page.locator('#' + id).isEnabled(), true);
@@ -100,7 +115,13 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         const pair = await Promise.all([tabs.newPage(), tabs.newPage()]);
         const histories = await Promise.all(pair.map(navigations));
         for (const tab of pair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
-        await Promise.all(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'compare-start'); }));
+        const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'compare-start'); }));
+        for (let index = 0; index < starts.length; index++) {
+          if (starts[index].status === 'rejected') {
+            console.error(`Concurrent tab ${index}:`, JSON.stringify(histories[index].trace));
+            throw starts[index].reason;
+          }
+        }
         assert.ok(histories.every(history => history.length >= 1 && history.length <= 2)); await tabs.close();
 
         // Inject a policy/registration error once. Retry is a recovery action, not a first-visit gate.
