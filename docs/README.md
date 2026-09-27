@@ -1,37 +1,28 @@
 # Documentation
 
-Start with the [direct-read quickstart](../README.md#read-shared-state-directly). It reads shared state on the main thread and in a connected worker, then publishes an update. **Tasks are not required for reads.** Use the source package from the same revision as these docs; see [installation](../README.md#build-from-source).
+Start with the [two-file quickstart](getting-started.md). It shares state with a dedicated worker and uses direct, synchronous reads on both threads.
 
-## Choose your starting point
+## Choose your next step
 
-| You need | Start here |
+| You need | Guide |
 | --- | --- |
-| Direct, synchronous collection reads | [README quickstart](../README.md#read-shared-state-directly) and [Collection API](api.md) |
-| Make new snapshots available in workers | [Automatic state sessions](worker-sessions.md) |
-| Shared collections in your existing RPC/messages | [Manual snapshot transport](worker-sharing.md) |
-| Optional calculation requests or job scheduling | [Typed tasks and worker setups](workers.md) |
+| Installation and your first worker | [Get started](getting-started.md) |
+| Maps, lists, sets, typed objects, or nesting | [Collection API](api.md) |
+| Automatic updates, subscriptions, or streams | [State sessions](worker-sessions.md) |
+| Work in an existing messaging or RPC system | [Manual snapshot transport](worker-sharing.md) |
+| Run calculations through typed task calls | [Task quickstart](task-quickstart.md) |
+| Existing workers, pools, ports, or SharedWorker connections | [Task execution guide](workers.md) |
+| Redux Toolkit, selectors, or DevTools | [Redux](redux.md) |
+| TanStack collection and sync-cache helpers | [TanStack adapters](tanstack.md) |
 
-Collections provide data access. Sessions deliver snapshots. Tasks schedule work. A state holder's `state.connect(worker)` makes its snapshots available in a worker; it is not the task executor function `connect()`.
+Collections provide data access. Sessions deliver new snapshots. Tasks are an optional way to schedule work; they are not required for a read.
 
-The optional [task guide](workers.md) reuses one task definition for local execution, owned workers, borrowed workers, independent workers, pools, and dedicated MessagePorts. It also shows SharedWorker connections with explicit copy transport and Node worker setup. Use that layer for calculations, not as a required wrapper around each value read.
+## Understand the guarantees
 
-## Reference and integration
+[Memory and ownership](architecture.md) covers one-writer arenas, retained snapshots, and compaction. [Task consistency](workers.md#consistency) and [cancellation](workers.md#cancellation-timeouts-and-cleanup) explain what remote calls guarantee. Existing users should read [Migration to v0.2](migration.md).
 
-| Guide | Contents |
-| --- | --- |
-| [Collection API](api.md) | All collection classes, typed JSON, immutable updates, and nesting |
-| [State sessions](worker-sessions.md) | Direct worker reads, publication, subscriptions, streams, Redux sources, and cleanup |
-| [Optional task API reference](workers.md#api-reference) | Task definitions, executor options, server setup, and call options |
-| [Redux](redux.md) | Toolkit, selectors, DevTools, and portable state |
-| [TanStack adapters](tanstack.md) | Collection and sync-cache helpers, including current limits |
-| [Architecture and memory](architecture.md) | Source layout, storage, ownership, and compaction |
-| [Migration to v0.2](migration.md) | Lifetime changes and incompatible worker formats |
-| [Contributing](../CONTRIBUTING.md) | Build, test, documentation checks, and benchmark changes |
+## Inspect the evidence
 
-## Guarantees before optimization
+The [benchmark report](benchmarks.md) retains all timing and memory tables, including slower results and reproduction commands. It measures collection workloads, not task or pool overhead. [Earlier reports](../proofs/README.md) and [recorded evidence](../proofs/results/README.md) keep their own source identifiers and methods.
 
-A worker reads its latest received snapshot, which can lag behind the owner. A retained snapshot does not change when a new one arrives. Shared backing bytes do not imply zero allocation or concurrent writers. See [state publication and delivery](worker-sessions.md#publication-and-delivery-are-separate) and [memory and ownership](architecture.md).
-
-When using tasks, also read [task consistency](workers.md#consistency), [cancellation and cleanup](workers.md#cancellation-timeouts-and-cleanup), and [transport costs](workers.md#cost-and-limits). Tasks do not guarantee exact invocation-time snapshots.
-
-Performance results stay in the [README](../README.md#performance). The [benchmark reports](../proofs/README.md) and [recorded evidence](../proofs/results/README.md) retain the methods and source identifiers needed to reproduce earlier experiments. Collection benchmarks are not measurements of task or pool overhead.
+The examples are extracted from Markdown and checked against the built package. See [Contributing](../CONTRIBUTING.md) for build and test commands.

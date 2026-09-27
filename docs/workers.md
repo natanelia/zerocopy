@@ -1,10 +1,10 @@
 # Typed tasks: local, workers, and pools
 
-[Documentation](README.md) · [Quickstart](../README.md#run-a-typed-task) · [State sessions](worker-sessions.md) · [Manual transport](worker-sharing.md)
+[Documentation](README.md) · [Task quickstart](task-quickstart.md) · [State sessions](worker-sessions.md) · [Manual transport](worker-sharing.md)
 
 Define a task once. Call it locally, connect it to an existing worker, or run it in a pool. Its inputs and results keep their TypeScript types. Inside a worker, collection reads are synchronous local reads—not one RPC per `get()`.
 
-Start with the three-file [README quickstart](../README.md#run-a-typed-task). It reads a speed limit of `30`, updates the state, and reads `50`. You do not write a message handler or call `publish()` between those operations.
+Start with the three-file [task quickstart](task-quickstart.md). It reads a speed limit of `30`, updates the state, and reads `50`. You do not write a message handler or call `publish()` between those operations.
 
 The examples below reuse `tasks.ts` and `limits.worker.ts` from that quickstart. Each `main.ts` block replaces the quickstart's `main.ts`; do not append them to one file. Each example creates and cleans up its own resources.
 
@@ -326,7 +326,7 @@ Copy transport copies used arena bytes for each sent snapshot. It can be expensi
 
 ## Node.js workers
 
-No browser headers are needed. Save these two files together in an application with the [built package](../README.md#build-from-source), then run `node main.mjs`.
+No browser headers are needed. Save these two files together in an application with the [built package](getting-started.md#install-the-source-package), then run `node main.mjs`.
 
 **limits.worker.mjs**
 
@@ -443,7 +443,7 @@ Use `try/finally`, as above. Dispose an executor before terminating a borrowed w
 
 Shared transport avoids copying collection backing bytes between compatible threads. It does not eliminate task messages, Promises, root descriptors, or JS allocation. Session updates currently reconstruct read-only arenas and WASM instances. JSON/string encoding and decoding can allocate, and ordinary task results are cloned.
 
-`memory: 'share'` requests shared transport. `memory: 'copy'` requests used-prefix copies. When omitted, task clients follow session defaults: shared in Node and supported browsers, copies in Bun. No measured near-zero task or pool overhead is claimed. The [README benchmarks](../README.md#performance) measure collection workloads, not this task API.
+`memory: 'share'` requests shared transport. `memory: 'copy'` requests used-prefix copies. When omitted, task clients follow session defaults: shared in Node and supported browsers, copies in Bun. No measured near-zero task or pool overhead is claimed. The [collection benchmarks](benchmarks.md) measure collection workloads, not this task API.
 
 Task messages are for trusted same-application peers. Type parameters and protocol IDs are not authentication or validation of unknown input. Custom comparator functions cannot cross the worker boundary. Returned shared collection instances are not automatically reconstructed from task results; return small results, or use a separate snapshot session for large collection output.
 

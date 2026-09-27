@@ -129,3 +129,38 @@ Retained worker views and message payloads can keep full arenas alive. Release t
 Custom comparator functions cannot be transported. Strings and JSON still require decoding; some runtimes copy a requested byte range before UTF-8 decoding. Objects returned by decoding are JavaScript values local to the reader, not shared object identities.
 
 For the transport tests, see [`workers.test.ts`](../workers.test.ts), the [Node worker check](../proofs/node-worker.mjs), and the [Chromium tests](../demo/workers.browser.test.ts). Documentation checks execute the Node pair and both browser examples directly from Markdown. The browser checks cover shared transport with isolation headers and rejection before library loading without those headers.
+
+## Minimal browser pair
+
+This shorter pair sends one snapshot and returns one value. It uses the same [browser setup](#browser-setup) as the example above. Use a [state session](worker-sessions.md) instead when workers need later updates automatically.
+
+**main.ts**
+
+<!-- example: readme-browser-owner -->
+```ts
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
+
+const { SharedMap, getWorkerData } = await import('zerocopy');
+const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+  type: 'module',
+});
+const limits = new SharedMap('number').set('lane-1', 30);
+
+worker.postMessage(getWorkerData({ limits }, { copy: false }));
+```
+
+**worker.ts**
+
+<!-- example: readme-browser-reader -->
+```ts
+import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
+
+self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
+  const { limits } = await initWorker<{ limits: SharedMap<'number'> }>(event.data);
+  self.postMessage(limits.get('lane-1'));
+});
+```
+
+The worker posts `30` to the owner. Add your application's error and result handlers as needed. Terminate the worker when it is no longer needed. `getWorkerData()` and `initWorker()` control attachment; the later `.get()` is a local read.

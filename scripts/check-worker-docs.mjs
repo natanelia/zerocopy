@@ -11,9 +11,11 @@ import { extract } from './doc-examples.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const temporary = mkdtempSync(join(root, '.worker-docs-'));
 const guide = 'docs/workers.md';
+const quickstart = 'docs/getting-started.md';
+const taskQuickstart = 'docs/task-quickstart.md';
 const cases = [
-  { name: 'direct', file: 'README.md', marker: 'readme-direct-owner', expected: [[30], [50]], workers: 1, direct: true },
-  { name: 'quickstart', file: 'README.md', marker: 'dx-main', expected: [[30], [50]], workers: 1 },
+  { name: 'direct', file: quickstart, marker: 'readme-direct-owner', expected: [[30], [50]], workers: 1, direct: true },
+  { name: 'quickstart', file: taskQuickstart, marker: 'dx-main', expected: [[30], [50]], workers: 1 },
   { name: 'local', file: guide, marker: 'dx-local', expected: [[30], [50]], workers: 0 },
   { name: 'connect', file: guide, marker: 'dx-connect', expected: [[30]], workers: 1 },
   { name: 'individual', file: guide, marker: 'dx-individual', expected: [[[50, 50]]], workers: 2 },
@@ -43,27 +45,30 @@ function sourcesFor(example) {
   if (example.direct) {
     return new Map([
       ['main.ts', extract(example.file, example.marker, 'ts')],
-      ['state.worker.ts', extract('README.md', 'readme-direct-reader', 'ts')],
+      ['state.worker.ts', extract(quickstart, 'readme-direct-reader', 'ts')],
     ]);
   }
   const sources = new Map([
-    ['tasks.ts', extract('README.md', 'dx-tasks', 'ts')],
+    ['tasks.ts', extract(taskQuickstart, 'dx-tasks', 'ts')],
     ['main.ts', extract(example.file, example.marker, 'ts')],
   ]);
   if (example.worker) sources.set(example.worker[0], extract(guide, example.worker[1], 'ts'));
-  else if (example.name !== 'local') sources.set('limits.worker.ts', extract('README.md', 'dx-worker', 'ts'));
+  else if (example.name !== 'local') sources.set('limits.worker.ts', extract(taskQuickstart, 'dx-worker', 'ts'));
   return sources;
 }
 
 /** Keep direct data access ahead of the optional task example, without a hidden task setup. */
 function checkDirectReadFraming() {
   const readme = readFileSync(join(root, 'README.md'), 'utf8');
-  const direct = readme.indexOf('<!-- example: readme-direct-owner -->');
-  const tasks = readme.indexOf('<!-- example: dx-tasks -->');
-  assert.ok(direct >= 0 && tasks > direct, 'The README must show direct reads before task setup');
+  const direct = readme.indexOf('<!-- example: readme-sharing-preview -->');
+  const tasks = readme.indexOf('docs/workers.md');
+  assert.ok(direct >= 0 && tasks > direct, 'The README must show direct reads before optional task guidance');
+  const preview = extract('README.md', 'readme-sharing-preview', 'ts');
+  assert.match(preview, /state\.connect\(worker\)/);
+  assert.match(preview, /shared\.current\.limits\.get\(/);
   const sources = sourcesFor(cases.find(example => example.direct));
   assert.equal(sources.size, 2, 'Direct reads need only an owner and a reader');
-  for (const source of sources.values()) {
+  for (const source of [preview, ...sources.values()]) {
     assert.doesNotMatch(source, /\b(?:defineTasks|serve|spawn|pool|local)\s*(?:<[^>]*>)?\s*\(/,
       'The direct-read quickstart must not require task APIs');
   }
@@ -71,7 +76,20 @@ function checkDirectReadFraming() {
 
 /** Strictly check all TypeScript samples, including intentional negative call-site checks. */
 function checkTypes() {
-  const paths = [];
+  // The README labels its short code as a preview. Supply its omitted setup
+  // for type checking; the complete quickstart files are executed unchanged.
+  const previewPath = join(temporary, 'readme-preview.ts');
+  writeFileSync(previewPath, `
+import type { SharedMap } from 'zerocopy';
+import { connectSharedSession, type SharedState } from 'zerocopy/worker';
+type Model = { limits: SharedMap<'number'> };
+declare const state: SharedState<Model>;
+declare const worker: Worker;
+${extract('README.md', 'readme-sharing-preview', 'ts')}
+const checked: number | undefined = speedLimit;
+void checked;
+`);
+  const paths = [previewPath];
   for (const example of [...cases, { name: 'type-errors', file: guide, marker: 'dx-type-errors' }]) {
     const directory = join(temporary, example.name);
     mkdirSync(directory);
