@@ -1,0 +1,36 @@
+name: Geometry simplify proof
+on:
+  push:
+    branches: ['agent/geometry-simplify']
+  pull_request:
+    paths: ['geometry-simplify*', 'simplify-*', 'proofs/geometry-simplify*', '.github/workflows/geometry-simplify.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:geometry && bun run test
+      - run: PERF_GATE=1 node proofs/geometry-simplify.mjs
+      - if: ${{ !cancelled() }}
+        run: PERF_GATE=1 bun proofs/geometry-simplify.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-simplify-${{ runner.arch }}
+          path: |
+            proofs/results/geometry-simplify-*.json
+            simplify-kernels*.wat
+          retention-days: 30
