@@ -13,15 +13,24 @@ const demos = [
 ];
 async function ready(page, id) {
   await page.locator('#capability[data-state="ready"]').waitFor();
+  await page.evaluate(() => globalThis.__zcDocumentReported);
   assert.equal(await page.evaluate(() => crossOriginIsolated), true);
   assert.equal(await page.locator('#' + id).isEnabled(), true);
   assert.equal(await page.locator('#enable-isolation').isHidden(), true);
   assert.equal(await page.locator('#capability-help').isHidden(), true);
   assert.equal(new URL(page.url()).searchParams.has(ATTEMPT_PARAMETER), false);
 }
-function navigations(page) {
+async function navigations(page) {
   const urls = [];
-  page.on('request', request => { if (request.isNavigationRequest() && request.frame() === page.mainFrame()) urls.push(request.url()); });
+  // Count executed documents, not network requests. A service worker can fetch
+  // a navigation response, and a browser can retry a provisional request before
+  // it commits a document. Neither is an extra application reload.
+  await page.exposeBinding('__zcDocumentStart', ({ frame }, url) => {
+    if (frame === page.mainFrame() && url !== 'about:blank') urls.push(url);
+  });
+  await page.addInitScript(() => {
+    globalThis.__zcDocumentReported = globalThis.__zcDocumentStart(location.href);
+  });
   return urls;
 }
 for (const [name, engine] of Object.entries({ chromium, webkit })) {
@@ -36,7 +45,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         const context = await browser.newContext();
         const page = await context.newPage(); page.setDefaultTimeout(25000);
         page.on('pageerror', error => errors.push(error.message));
-        const visits = navigations(page), requests = [], workers = [];
+        const visits = await navigations(page), requests = [], workers = [];
         page.on('request', request => requests.push(request.url()));
         page.on('worker', worker => workers.push(worker.url()));
         await page.goto(origin + base);
@@ -47,7 +56,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
           await page.goto(url, { waitUntil: 'commit' });
           await ready(page, id);
           assert.equal(page.url(), url, 'Keep the original query and fragment');
-          assert.equal(visits.length, isolated ? 1 : 2, `${name}: first visit to ${route}`);
+          assert.equal(visits.length, isolated ? 1 : 2, `${name}: first visit to ${route}: ${JSON.stringify(visits)}`);
           if (!isolated) assert.equal(await page.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + route + 'isolation-sw.js');
           visits.length = 0;
           await page.reload({ waitUntil: 'commit' }); await ready(page, id);
@@ -72,14 +81,14 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
           for (const key of ['localStorage', 'sessionStorage']) Object.defineProperty(globalThis, key, { get() { throw new Error('Storage blocked by test'); } });
         });
         const p = await storage.newPage(); p.setDefaultTimeout(25000); p.on('pageerror', error => errors.push(error.message));
-        const storageVisits = navigations(p);
+        const storageVisits = await navigations(p);
         await p.goto(origin + base + 'compare/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'compare-start');
         assert.equal(storageVisits.length, 2); await storage.close();
 
         // Two tabs can install/claim concurrently. Neither may loop or need a click.
         const tabs = await browser.newContext();
         const pair = await Promise.all([tabs.newPage(), tabs.newPage()]);
-        const histories = pair.map(navigations);
+        const histories = await Promise.all(pair.map(navigations));
         for (const tab of pair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         await Promise.all(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'compare-start'); }));
         assert.ok(histories.every(history => history.length >= 1 && history.length <= 2)); await tabs.close();
@@ -94,7 +103,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
             return register(...args);
           };
         });
-        const f = await failure.newPage(); f.setDefaultTimeout(25000); const failedVisits = navigations(f);
+        const f = await failure.newPage(); f.setDefaultTimeout(25000); const failedVisits = await navigations(f);
         f.on('pageerror', error => errors.push(error.message));
         await f.goto(origin + base + 'compare/'); await f.locator('#capability[data-state="blocked"]').waitFor();
         assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#compare-start').isDisabled(), true);
@@ -106,7 +115,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         // Actual success above uses the unmodified browser security properties.
         const denied = await browser.newContext();
         await denied.addInitScript(() => Object.defineProperty(globalThis, 'crossOriginIsolated', { get: () => false }));
-        const d = await denied.newPage(); d.setDefaultTimeout(25000); const deniedVisits = navigations(d);
+        const d = await denied.newPage(); d.setDefaultTimeout(25000); const deniedVisits = await navigations(d);
         d.on('pageerror', error => errors.push(error.message));
         await d.goto(origin + base + 'compare/', { waitUntil: 'commit' });
         await d.locator('#capability[data-state="blocked"]').waitFor();
