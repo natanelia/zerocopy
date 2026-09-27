@@ -1,14 +1,20 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-let current = new Arena();
-export let sharedMemory = current.memory;
-export let sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer;
-function publishCurrent(): void { sharedMemory = current.memory; sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer; }
+// Registering a collection must not allocate an unused writer in every reader.
+let current: Arena | undefined;
+/** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+export let sharedMemory: WebAssembly.Memory;
+export let sharedBuffer: SharedArrayBuffer;
+function publishCurrent(): void { sharedMemory = current!.memory; sharedBuffer = current!.memory.buffer as unknown as SharedArrayBuffer; }
+function defaultArena(): Arena {
+  if (!current) { current = new Arena(); publishCurrent(); }
+  return current;
+}
 export function resetSharedList(): void { current = new Arena(); publishCurrent(); }
-export function getAllocState() { return current.state(); }
-export function getBufferCopy(): Uint8Array { return current.copy(); }
-export function getBuffer(): SharedArrayBuffer { return current.memory.buffer as unknown as SharedArrayBuffer; }
+export function getAllocState() { return defaultArena().state(); }
+export function getBufferCopy(): Uint8Array { return defaultArena().copy(); }
+export function getBuffer(): SharedArrayBuffer { return defaultArena().memory.buffer as unknown as SharedArrayBuffer; }
 export function attachToMemory(memory: WebAssembly.Memory, state?: { heapEnd: number }): void {
   current = new Arena({ memory, used: state?.heapEnd, readOnly: true }); publishCurrent();
 }
@@ -17,14 +23,14 @@ export function attachToBufferCopy(copy: Uint8Array, state: { heapEnd: number })
 }
 
 export type SharedListType = import('./types').ValueType;
-export function syncBuffer(): void { current.refresh(); }
+export function syncBuffer(): void { defaultArena().refresh(); }
 export class SharedList<T extends string = SharedListType> extends Snapshot {
   readonly root: number;
   readonly type: T;
   readonly size: number;
   readonly depth: number;
   readonly tail: number;
-  constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = current, tail = 0) {
+  constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = defaultArena(), tail = 0) {
     super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); this.tail = tail; Object.freeze(this);
   }
   /** @deprecated Arena lifetime is managed by JavaScript reachability. */
@@ -98,7 +104,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     return result;
   }
   toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }
-  static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = current): SharedList<T> {
+  static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = defaultArena()): SharedList<T> {
     return new SharedList(d.type, d.root, d.depth, d.size, source, d.tail);
   }
 }

@@ -116,3 +116,5 @@ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<
 }
 
 export { compact, compactMany } from './compaction';
+
+export { configureMemory } from './memory';

@@ -31,32 +31,33 @@ Use `json<T>()` to retain an application's object shape through collection reads
 ```ts
 import { SharedMap, SharedList, json, list, getWorkerData, initWorker } from 'zerocopy';
 
-interface Lane {
+interface Product {
   id: string;
-  speedLimit: number;
-  direction: 'forward' | 'reverse';
-  label?: string;
-  centerline: Array<readonly [number, number]>;
+  name: string;
+  stock: number;
+  category: 'electronics' | 'home';
+  description?: string;
+  variants: Array<{ color: string; sizes: string[] }>;
 }
 
-const LaneValue = json<Lane>();
-const lane: Lane = {
-  id: 'lane-1', speedLimit: 50, direction: 'forward',
-  centerline: [[103.85, 1.29]],
+const ProductValue = json<Product>();
+const product: Product = {
+  id: 'headphones', name: 'Wireless headphones', stock: 12,
+  category: 'electronics', variants: [{ color: 'black', sizes: ['standard'] }],
 };
-const before = new SharedMap(LaneValue).set(lane.id, lane);
-const after = before.set(lane.id, { ...lane, speedLimit: 70 });
-const tileLanes = new SharedList(LaneValue).push(lane);
-const tiles = new SharedMap(list(LaneValue)).set('tile-1', tileLanes);
-const data = getWorkerData({ lanes: after, tiles });
+const before = new SharedMap(ProductValue).set(product.id, product);
+const after = before.set(product.id, { ...product, stock: 0 });
+const featured = new SharedList(ProductValue).push(product);
+const categories = new SharedMap(list(ProductValue)).set('electronics', featured);
+const data = getWorkerData({ products: after, categories });
 const restored = await initWorker(data);
 
-before.get(lane.id)?.speedLimit; // number | undefined; value is 50
-restored.lanes.get(lane.id)?.speedLimit; // number | undefined; value is 70
-restored.tiles.get('tile-1')?.get(0)?.direction; // 'forward' | 'reverse' | undefined
+before.get(product.id)?.stock; // number | undefined; value is 12
+restored.products.get(product.id)?.stock; // number | undefined; value is 0
+restored.categories.get('electronics')?.get(0)?.category; // 'electronics' | 'home' | undefined
 ```
 
-Reads return `DeepReadonly<Lane> | undefined`. TypeScript rejects missing required fields, incorrect field types, and assignments to returned fields or nested arrays. Mutable input objects are accepted and are not frozen. The stored snapshot is independent of later input changes. As with other TypeScript object types, an already assigned value can have extra fields; this is not an exact-object schema.
+Reads return `DeepReadonly<Product> | undefined`. TypeScript rejects missing required fields, incorrect field types, and assignments to returned fields or nested arrays. Mutable input objects are accepted and are not frozen. The stored snapshot is independent of later input changes. As with other TypeScript object types, an already assigned value can have extra fields; this is not an exact-object schema.
 
 `json<T>()` returns the existing `'object'` descriptor. Its brand exists only in TypeScript. Typed and untyped object collections use the same native `JSON.stringify`, UTF-8 encoding, JSON decoding, deep freezing, and read cache. There is no additional validation pass or custom serializer on typed writes. Worker data and Redux persistence use the existing object type name.
 
@@ -64,7 +65,7 @@ Supply JSON-compatible plain objects or arrays. Use strings, finite numbers, boo
 
 Native JSON rules apply to unchecked data, just as they do with `'object'`: `undefined` object fields are omitted; non-finite numbers and array holes become `null`; negative zero becomes zero. Getters and `toJSON` can run. Cycles and bigint values throw under normal JSON behavior, and depth limits depend on the JavaScript engine. The type contract does not promise a lossless round trip for these inputs. See the [JSON.stringify specification](https://tc39.es/ecma262/multipage/structured-data.html#sec-json.stringify) for the serialization rules.
 
-JSON objects cannot contain working shared collection handles. Store shared collections as nested collection values instead. Compose descriptors with `list(LaneValue)`, `map(list(LaneValue))`, or the other helpers. Do not build these strings with interpolation: that loses the TypeScript brand.
+JSON objects cannot contain working shared collection handles. Store shared collections as nested collection values instead. Compose descriptors with `list(ProductValue)`, `map(list(ProductValue))`, or the other helpers. Do not build these strings with interpolation: that loses the TypeScript brand.
 
 The value-bearing helpers are `map`, `list`, `stack`, `queue`, `linkedList`, `doublyLinkedList`, `orderedMap`, `sortedMap`, and `priorityQueue`. The `set`, `orderedSet`, and `sortedSet` helpers take only `'string'` or `'number'`. They do not add object-valued sets. Existing strings such as `'SharedList<number>'` now also resolve to typed collections rather than `any`.
 

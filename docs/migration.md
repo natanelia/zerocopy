@@ -9,7 +9,7 @@ The persistent engine changes memory lifetime and binary representation. Treat t
 Assign the result of every update:
 
 ```ts
-map = map.set('lane-1', 30);
+map = map.set('headphones', 12);
 queue = queue.dequeue();
 ```
 
@@ -51,13 +51,13 @@ String-form nested collection types no longer resolve to `any`. Previously unche
 
 ### Stricter shapes and descriptor composition
 
-`json()` without an argument now defaults to `JsonObject | readonly JsonValue[]`, rather than leaving the shape unspecified. Use `json<Lane>()` for application-field completion, or `json<Record<string, JsonValue>>()` for a general JSON dictionary. Recursive object and union shapes are supported; fixed and variadic tuples retain their positions in read types.
+`json()` without an argument now defaults to `JsonObject | readonly JsonValue[]`, rather than leaving the shape unspecified. Use `json<Product>()` for application-field completion, or `json<Record<string, JsonValue>>()` for a general JSON dictionary. Recursive object and union shapes are supported; fixed and variadic tuples retain their positions in read types.
 
 Declared `any` fields, including optional ones, are rejected with `exactOptionalPropertyTypes` both enabled and disabled. Broad `object` and `{}` shapes, `unknown`, methods, bigint, symbol fields, non-JSON containers, and `never` are not valid typed descriptors. Replace broad fields with a concrete JSON shape or `JsonValue`; the legacy `'object'` descriptor remains available with its existing contract.
 
 Required `undefined` fields, undefined array elements, extra array properties, and optional tuple slots do not preserve their declared shape under JSON serialization. Model tuple alternatives as a union of complete tuples, or use an explicit `null` element. Ordinary optional object properties remain supported; omit them instead of assigning `undefined`. TypeScript cannot check finite numbers, array density, hidden prototypes, or runtime input from another process. Application validation is still required at those boundaries.
 
-Helper results preserve their exact wire literal as well as application types. For example, `list(json<Lane>())` is assignable to `'SharedList<object>'`, and `WireType<typeof descriptor>` extracts a descriptor's exact runtime string. Keep the branded value when constructing collections: widening it to a wire literal intentionally loses the application's field information. Invalid literal descriptors and unsupported set leaves are rejected by helper types and by the shared runtime parser. Parsed descriptor metadata is immutable; its cache is bounded by both entry count and key length.
+Helper results preserve their exact wire literal as well as application types. For example, `list(json<Product>())` is assignable to `'SharedList<object>'`, and `WireType<typeof descriptor>` extracts a descriptor's exact runtime string. Keep the branded value when constructing collections: widening it to a wire literal intentionally loses the application's field information. Invalid literal descriptors and unsupported set leaves are rejected by helper types and by the shared runtime parser. Parsed descriptor metadata is immutable; its cache is bounded by both entry count and key length.
 
 ### Named worker-state interfaces
 

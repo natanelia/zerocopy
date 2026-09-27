@@ -18,18 +18,18 @@ import {
   setSharedMapValue,
 } from 'zerocopy/redux';
 
-const mapSlice = createSlice({
-  name: 'map',
+const catalogSlice = createSlice({
+  name: 'catalog',
   initialState: () => ({
-    speedLimits: compact(new SharedMap('number')),
+    stock: compact(new SharedMap('number')),
     selectedId: null as string | null,
   }),
   reducers: {
-    speedChanged(state, action: PayloadAction<{ id: string; speed: number }>) {
-      state.speedLimits = setSharedMapValue(
-        state.speedLimits,
+    stockChanged(state, action: PayloadAction<{ id: string; quantity: number }>) {
+      state.stock = setSharedMapValue(
+        state.stock,
         action.payload.id,
-        action.payload.speed,
+        action.payload.quantity,
       );
     },
     selectionChanged(state, action: PayloadAction<string | null>) {
@@ -39,7 +39,7 @@ const mapSlice = createSlice({
 });
 
 export const store = configureStore({
-  reducer: { map: mapSlice.reducer },
+  reducer: { catalog: catalogSlice.reducer },
   middleware: getDefaultMiddleware => getDefaultMiddleware(zerocopyMiddlewareOptions),
   devTools: createZerocopyDevToolsOptions(),
 });
@@ -49,7 +49,7 @@ export type RootState = ReturnType<typeof store.getState>;
 The initial `compact()` gives the store a separate arena lifetime. It allocates a new arena. Ordinary updates are also valid:
 
 ```ts
-state.speedLimits = state.speedLimits.set(id, speed);
+state.stock = state.stock.set(id, quantity);
 ```
 
 `setSharedMapValue()` is an optional no-op guard. It keeps the same map when an existing value passes `Object.is`. For object values, supply a pure domain comparison when equal content should count as a no-op. The helper works with Immer's mapped `Draft` type without an application cast. The core `.set()` method has no general equal-content identity guarantee.
@@ -71,7 +71,7 @@ Passing a middleware check does not make `JSON.stringify()` save collection valu
 Selecting a collection handle works with reference comparison:
 
 ```ts
-const speedLimits = useSelector((state: RootState) => state.map.speedLimits);
+const stock = useSelector((state: RootState) => state.catalog.stock);
 ```
 
 Use a selector instance for an individual map entry:
@@ -79,9 +79,9 @@ Use a selector instance for an individual map entry:
 ```ts
 import { createSharedMapValueSelector } from 'zerocopy/redux';
 
-export const selectCurrentSpeed = createSharedMapValueSelector(
-  (state: RootState) => state.map.speedLimits,
-  state => state.map.selectedId ?? '',
+export const selectCurrentStock = createSharedMapValueSelector(
+  (state: RootState) => state.catalog.stock,
+  state => state.catalog.selectedId ?? '',
 );
 ```
 
@@ -136,12 +136,12 @@ Send snapshots outside reducers, for example in listener middleware:
 ```ts
 import { getWorkerData } from 'zerocopy';
 
-worker.postMessage(getWorkerData({ speedLimits: store.getState().map.speedLimits }));
+worker.postMessage(getWorkerData({ stock: store.getState().catalog.stock }));
 ```
 
 Do not put raw `WebAssembly.Memory`, `SharedArrayBuffer`, or worker objects in Redux actions. Attach snapshots with `initWorker()`. Include an application revision or request ID and discard stale results.
 
-An attached snapshot is suitable for read-only UI state, but reducers cannot allocate updates in its arena. Use `compact()` for an independent writable copy. Worker sharing does not make reducers asynchronous or remove geometry-calculation costs. Browser headers and runtime differences are covered in [Worker sharing](worker-sharing.md).
+An attached snapshot is suitable for read-only UI state, but reducers cannot allocate updates in its arena. Use `compact()` for an independent writable copy. Worker sharing does not make reducers asynchronous or remove catalog-filtering costs. Browser headers and runtime differences are covered in [Worker sharing](worker-sharing.md).
 
 ## Memory and long editing sessions
 

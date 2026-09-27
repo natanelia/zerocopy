@@ -14,16 +14,16 @@ const guide = 'docs/workers.md';
 const quickstart = 'docs/getting-started.md';
 const taskQuickstart = 'docs/task-quickstart.md';
 const cases = [
-  { name: 'direct', file: quickstart, marker: 'readme-direct-owner', expected: [[30], [50]], workers: 1, direct: true },
-  { name: 'quickstart', file: taskQuickstart, marker: 'dx-main', expected: [[30], [50]], workers: 1 },
-  { name: 'local', file: guide, marker: 'dx-local', expected: [[30], [50]], workers: 0 },
-  { name: 'connect', file: guide, marker: 'dx-connect', expected: [[30]], workers: 1 },
-  { name: 'individual', file: guide, marker: 'dx-individual', expected: [[[50, 50]]], workers: 2 },
-  { name: 'pool', file: guide, marker: 'dx-pool', expected: [[[1000, 30, 50]]], workers: 4 },
-  { name: 'port', file: guide, marker: 'dx-port-main', expected: [[30]], workers: 1,
+  { name: 'direct', file: quickstart, marker: 'readme-direct-owner', expected: [[10000], [10001]], workers: 1, direct: true },
+  { name: 'quickstart', file: taskQuickstart, marker: 'dx-main', expected: [[['headphones', 'keyboard']], [['keyboard']]], workers: 1 },
+  { name: 'local', file: guide, marker: 'dx-local', expected: [[['headphones', 'keyboard']], [['keyboard']]], workers: 0 },
+  { name: 'connect', file: guide, marker: 'dx-connect', expected: [[['headphones', 'keyboard']]], workers: 1 },
+  { name: 'individual', file: guide, marker: 'dx-individual', expected: [[[['keyboard'], ['keyboard']]]], workers: 2 },
+  { name: 'pool', file: guide, marker: 'dx-pool', expected: [[[1000, ['headphones'], ['keyboard']]]], workers: 4 },
+  { name: 'port', file: guide, marker: 'dx-port-main', expected: [[['headphones', 'keyboard']]], workers: 1,
     worker: ['integrated.worker.ts', 'dx-port-worker'] },
-  { name: 'shared', file: guide, marker: 'dx-shared-main', expected: [[30], [50]], workers: 0,
-    worker: ['limits.shared-worker.ts', 'dx-shared-worker'] },
+  { name: 'shared', file: guide, marker: 'dx-shared-main', expected: [[['headphones', 'keyboard']], [['keyboard']]], workers: 0,
+    worker: ['catalog.shared-worker.ts', 'dx-shared-worker'] },
 ];
 
 /** Keep application logic intact; change only module URLs for the test environment. */
@@ -53,7 +53,7 @@ function sourcesFor(example) {
     ['main.ts', extract(example.file, example.marker, 'ts')],
   ]);
   if (example.worker) sources.set(example.worker[0], extract(guide, example.worker[1], 'ts'));
-  else if (example.name !== 'local') sources.set('limits.worker.ts', extract(taskQuickstart, 'dx-worker', 'ts'));
+  else if (example.name !== 'local') sources.set('catalog.worker.ts', extract(taskQuickstart, 'dx-worker', 'ts'));
   return sources;
 }
 
@@ -65,7 +65,7 @@ function checkDirectReadFraming() {
   assert.ok(direct >= 0 && tasks > direct, 'The README must show direct reads before optional task guidance');
   const preview = extract('README.md', 'readme-sharing-preview', 'ts');
   assert.match(preview, /state\.connect\(worker\)/);
-  assert.match(preview, /shared\.current\.limits\.get\(/);
+  assert.match(preview, /shared\.current\.events\.get\(/);
   const sources = sourcesFor(cases.find(example => example.direct));
   assert.equal(sources.size, 2, 'Direct reads need only an owner and a reader');
   for (const source of [preview, ...sources.values()]) {
@@ -80,13 +80,13 @@ function checkTypes() {
   // for type checking; the complete quickstart files are executed unchanged.
   const previewPath = join(temporary, 'readme-preview.ts');
   writeFileSync(previewPath, `
-import type { SharedMap } from 'zerocopy';
+import type { SharedList } from 'zerocopy';
 import { connectSharedSession, type SharedState } from 'zerocopy/worker';
-type Model = { limits: SharedMap<'number'> };
+type Model = { events: SharedList<'string'> };
 declare const state: SharedState<Model>;
 declare const worker: Worker;
 ${extract('README.md', 'readme-sharing-preview', 'ts')}
-const checked: number | undefined = speedLimit;
+const checked: string | undefined = event;
 void checked;
 `);
   const paths = [previewPath];
@@ -113,7 +113,7 @@ void checked;
 }
 
 /** Execute the documented local code and the real Node Worker pair. */
-function checkNode() {
+async function checkNode() {
   const localDirectory = join(temporary, 'local');
   for (const [file, source] of sourcesFor(cases.find(example => example.name === 'local'))) {
     writeFileSync(join(localDirectory, file.replace(/\.ts$/, '.mjs')), compile(source, 'mjs'));
@@ -123,17 +123,29 @@ function checkNode() {
   const localOutput = execFileSync(process.execPath, ['--input-type=module', '-e',
     `globalThis.crossOriginIsolated = true; await import(${JSON.stringify(localURL)});`],
   { cwd: root, encoding: 'utf8', timeout: 30000 });
-  assert.equal(localOutput.trim(), '30\n50');
+  assert.equal(localOutput.trim(), "[ 'headphones', 'keyboard' ]\n[ 'keyboard' ]");
   console.log('Passed: documented local execution and immediate update.');
+
+  const { tasks } = await import(pathToFileURL(join(localDirectory, 'tasks.mjs')).href);
+  const { SharedMap } = await import('zerocopy');
+  const stock = new SharedMap('number').set('headphones', 12).set('keyboard', 8).set('mouse', 0);
+  const context = { state: { stock }, signal: new AbortController().signal };
+  assert.deepEqual(tasks.findAvailable(context, ['mouse', 'missing', 'keyboard', 'headphones']), ['keyboard', 'headphones']);
+  assert.deepEqual(tasks.findAvailable(context, []), []);
+  const soldOut = { ...context, state: { stock: stock.set('headphones', 0) } };
+  assert.deepEqual(tasks.findAvailable(soldOut, ['headphones', 'keyboard']), ['keyboard']);
+  assert.deepEqual(tasks.findAvailable(context, ['headphones']), ['headphones']);
+  console.log('Passed: documented catalog filter excludes sold-out/missing products and retains old snapshots.');
+
 
   const nodeDirectory = join(temporary, 'node');
   mkdirSync(nodeDirectory);
   writeFileSync(join(nodeDirectory, 'main.mjs'), extract(guide, 'dx-node-main', 'js'));
-  writeFileSync(join(nodeDirectory, 'limits.worker.mjs'), extract(guide, 'dx-node-worker', 'js'));
+  writeFileSync(join(nodeDirectory, 'catalog.worker.mjs'), extract(guide, 'dx-node-worker', 'js'));
   const nodeOutput = execFileSync(process.execPath, [join(nodeDirectory, 'main.mjs')], {
     cwd: root, encoding: 'utf8', timeout: 30000,
   });
-  assert.equal(nodeOutput.trim(), '30\n50');
+  assert.equal(nodeOutput.trim(), "[ 'headphones', 'keyboard' ]\n[ 'keyboard' ]");
   console.log('Passed: documented Node Worker pair and immediate update.');
 }
 
@@ -220,7 +232,7 @@ async function checkBrowser() {
       });
       const rejected = isolated ? null : page.waitForEvent('pageerror');
       const readerComplete = example.direct && isolated ? page.waitForEvent('console', {
-        predicate: message => message.location().url.endsWith('/state.worker.js') && message.text() === 'Worker retained: 30',
+        predicate: message => message.location().url.endsWith('/state.worker.js') && message.text() === 'Worker retained: 10000',
       }) : null;
       // Observe the timeout even when an earlier assertion prevents awaiting it.
       readerComplete?.catch(() => {});
@@ -234,7 +246,7 @@ async function checkBrowser() {
         await page.waitForFunction(() => globalThis.__docDone);
         if (readerComplete) {
           await readerComplete;
-          assert.deepEqual(readerLogs, ['Worker initial: 30', 'Worker current: 50', 'Worker retained: 30']);
+          assert.deepEqual(readerLogs, ['Worker initial: 10000', 'Worker current: 10001', 'Worker retained: 10000']);
           assert.equal(await page.evaluate(() => globalThis.__docTaskFrames), 0,
             'Direct state reads must not use task messages');
         }
@@ -275,7 +287,7 @@ async function checkBrowser() {
 try {
   checkDirectReadFraming();
   checkTypes();
-  checkNode();
+  await checkNode();
   if (!process.argv.includes('--node-only')) await checkBrowser();
 } finally {
   rmSync(temporary, { recursive: true, force: true });

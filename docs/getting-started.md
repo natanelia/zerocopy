@@ -4,14 +4,14 @@
 
 Create state on the main thread. Connect a dedicated worker. Both threads can then read their collection snapshots directly.
 
-This example reads `30`, changes the owner state to `50`, and receives the update in the worker. The worker's earlier snapshot still reads `30`. No task definition or task server is needed.
+The first snapshot contains 10,000 event messages. The owner appends a timeout while a worker retains the earlier view. No task definition or task server is needed. This is a connection lesson; the [log explorer](../website/content/log-explorer.md) builds a complete investigation UI, and [other use cases](use-cases.md) apply the same pattern elsewhere.
 
 ## Install the source package
 
-These examples describe the source in this branch. They do not assume that the same API is published on npm. While PR #6 is open, build its `agent/worker-dx-api` branch:
+These examples describe the source in this repository. They do not assume that the same API is published on npm. Build the current `main` branch:
 
 ```sh
-git clone --branch agent/worker-dx-api https://github.com/natanelia/zerocopy.git
+git clone --branch main https://github.com/natanelia/zerocopy.git
 cd zerocopy
 bun install
 bun run build:wasm
@@ -39,7 +39,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Apply the policies to the page and worker scripts. Third-party resources must also satisfy the embedder policy. See [browser setup](workers.md#browser-setup) for the details.
 
-The main-thread example checks `crossOriginIsolated` before loading the library. Keep the dynamic imports after that check: the current entry points create default shared-memory arenas when imported. Copy transport does not remove that requirement.
+The main-thread example checks `crossOriginIsolated` before loading the library. Keep the dynamic imports after that check so unsupported browsers receive a clear error before setup. Default arenas are allocated on first collection use, not on import. Copy transport does not remove that requirement.
 
 For Node.js, use `parentPort` instead of a browser worker endpoint. The [Node guide](workers.md#nodejs-workers) has a complete example without browser headers.
 
@@ -54,21 +54,24 @@ Save the files in the same directory. Load `main.ts` through your application's 
 if (!crossOriginIsolated) {
   throw new Error('Shared worker memory requires cross-origin isolation');
 }
-const { SharedMap } = await import('zerocopy');
+const { SharedList } = await import('zerocopy');
 const { createState } = await import('zerocopy/state');
 
-const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
-});
-console.log(state.current.limits.get('lane-1')); // 30; no task or await.
+let events = new SharedList('string');
+for (let index = 0; index < 10_000; index++) {
+  events = events.push(`Request completed #${index}`);
+}
+const state = createState({ events });
+console.log(state.current.events.size); // 10000; a synchronous local read.
 
 const worker = new Worker(new URL('./state.worker.ts', import.meta.url), {
   type: 'module',
 });
 await state.connect(worker); // Attach the worker's initial snapshot once.
 
-state.update('limits', limits => limits.set('lane-1', 50));
-console.log(state.current.limits.get('lane-1')); // 50 immediately on the owner.
+// A new event arrives. The earlier snapshot stays unchanged.
+state.update('events', events => events.push('Upstream timeout'));
+console.log(state.current.events.size); // 10001 immediately on the owner.
 // New snapshots are published automatically. Worker delivery is asynchronous.
 
 // At application teardown: state.dispose(); worker.terminate();
@@ -78,31 +81,31 @@ console.log(state.current.limits.get('lane-1')); // 50 immediately on the owner.
 
 <!-- example: readme-direct-reader -->
 ```ts
-import type { SharedMap } from 'zerocopy';
+import type { SharedList } from 'zerocopy';
 import { connectSharedSession } from 'zerocopy/worker';
 
-type Model = { limits: SharedMap<'number'> };
+type Model = { events: SharedList<'string'> };
 const shared = await connectSharedSession<Model>(); // Initial connection only.
 
 const initial = shared.current;
-console.log('Worker initial:', initial.limits.get('lane-1')); // 30
+console.log('Worker initial:', initial.events.size); // 10000
 
 // Subscribe only when you need to react to new snapshots.
 shared.subscribe(snapshot => {
-  console.log('Worker current:', snapshot.limits.get('lane-1')); // 50
-  console.log('Worker retained:', initial.limits.get('lane-1')); // Still 30
+  console.log('Worker current:', snapshot.events.size); // 10001
+  console.log('Worker retained:', initial.events.size); // Still 10000
 });
 
-// Elsewhere in this worker: shared.current.limits.get('lane-1').
+// Elsewhere in this worker: shared.current.events.get(42).
 // Every get() is a local synchronous read. No task or per-read message.
 // At worker teardown: shared.dispose();
 ```
 
-The owner logs `30`, then `50`. The worker logs its initial value `30`, the received value `50`, and the retained value `30`.
+The owner logs `10000`, then `10001`. The worker sees the updated length after publication, but its retained snapshot still has 10,000 messages.
 
 ## Read whenever you need a value
 
-On the owner, use `state.current.limits.get(id)`. In the worker, use `shared.current.limits.get(id)`. These reads do not send messages. A subscription is only needed to react when a new snapshot arrives.
+On the owner, use `state.current.events.get(index)`. In the worker, use `shared.current.events.get(index)`. These reads do not send messages. A subscription is only needed to react when a new snapshot arrives.
 
 `state.current` changes synchronously on the owner. `shared.current` is the latest snapshot received by that worker, so it can lag behind the owner. Capture `shared.current` once when a calculation needs one stable snapshot.
 
