@@ -72,3 +72,41 @@ test('strict CLI rejects changed rows and evidence, not documentation edits', ()
     assert.match(noBase.stderr, /--preserve requires --base/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+// Relocation must preserve the strict check, not make removed or changed data pass.
+test('strict CLI checks relocated benchmark reports against old and new layouts', () => {
+  const root = mkdtempSync(join(tmpdir(), 'zerocopy-doc-relocation-'));
+  try {
+    mkdirSync(join(root, 'scripts'));
+    mkdirSync(join(root, 'docs'));
+    copyFileSync(new URL('./check-docs.mjs', import.meta.url), join(root, 'scripts/check-docs.mjs'));
+    const report = '# Benchmarks\n<!-- library-timing-tables:start -->\n' +
+      Array.from({ length: 8 }, (_, group) => `**Shared${group}**\n` +
+        Array.from({ length: group < 4 ? 5 : 4 }, (_, row) => `| op${group}-${row} | 1.000ms |`).join('\n')).join('\n') +
+      '\n<!-- library-timing-tables:end -->\n';
+    const readme = join(root, 'README.md'), destination = join(root, 'docs/benchmarks.md');
+    const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', timeout: 10000 });
+    const commit = message => git('-c', 'user.name=Docs test', '-c', 'user.email=docs@example.invalid',
+      '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', message);
+    writeFileSync(readme, report);
+    git('init', '--quiet'); git('add', '.'); commit('old layout');
+    let base = git('rev-parse', 'HEAD').trim();
+    const strict = () => spawnSync(process.execPath,
+      ['scripts/check-docs.mjs', '--base', base, '--preserve'], { cwd: root, encoding: 'utf8', timeout: 10000 });
+    writeFileSync(destination, report);
+    writeFileSync(readme, '# Product\n[Benchmarks](docs/benchmarks.md)\n');
+    git('add', '.');
+    assert.equal(strict().status, 0, 'unchanged rows can move to the report');
+    writeFileSync(destination, report.replace('1.000ms', '1.001ms'));
+    assert.equal(strict().status, 1, 'relocation must not hide a changed value');
+    writeFileSync(destination, report.replace('<!-- library-timing-tables:end -->', ''));
+    assert.equal(strict().status, 1, 'the report must retain its benchmark structure');
+    rmSync(destination);
+    assert.equal(strict().status, 1, 'removing the report must fail');
+    writeFileSync(destination, report);
+    git('add', '.'); commit('new layout'); base = git('rev-parse', 'HEAD').trim();
+    assert.equal(strict().status, 0, 'a base that already has the report is supported');
+    writeFileSync(destination, report.replace('1.000ms', '1.001ms'));
+    assert.equal(strict().status, 1, 'changed measurements fail in the new layout too');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

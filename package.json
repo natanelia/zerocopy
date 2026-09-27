@@ -6,10 +6,36 @@
   "main": "./dist/shared.js",
   "types": "./dist/types/shared.d.ts",
   "exports": {
-    ".": { "types": "./dist/types/shared.d.ts", "browser": "./dist/shared.js", "bun": "./shared.ts", "import": "./dist/shared.js" },
-    "./worker": { "types": "./dist/types/worker.d.ts", "browser": "./dist/worker.js", "bun": "./worker.ts", "import": "./dist/worker.js" },
-    "./redux": { "types": "./dist/types/redux.d.ts", "browser": "./dist/redux.js", "bun": "./redux.ts", "import": "./dist/redux.js" },
-    "./tanstack": { "types": "./dist/types/tanstack-db-collection.d.ts", "browser": "./dist/tanstack-db-collection.js", "bun": "./tanstack-db-collection.ts", "import": "./dist/tanstack-db-collection.js" }
+    ".": {
+      "types": "./dist/types/shared.d.ts",
+      "browser": "./dist/shared.js",
+      "bun": "./shared.ts",
+      "import": "./dist/shared.js"
+    },
+    "./worker": {
+      "types": "./dist/types/worker.d.ts",
+      "browser": "./dist/worker.js",
+      "bun": "./worker.ts",
+      "import": "./dist/worker.js"
+    },
+    "./redux": {
+      "types": "./dist/types/redux.d.ts",
+      "browser": "./dist/redux.js",
+      "bun": "./redux.ts",
+      "import": "./dist/redux.js"
+    },
+    "./tanstack": {
+      "types": "./dist/types/tanstack-db-collection.d.ts",
+      "browser": "./dist/tanstack-db-collection.js",
+      "bun": "./tanstack-db-collection.ts",
+      "import": "./dist/tanstack-db-collection.js"
+    },
+    "./state": {
+      "types": "./dist/types/state.d.ts",
+      "browser": "./dist/state.js",
+      "bun": "./state.ts",
+      "import": "./dist/state.js"
+    }
   },
   "scripts": {
     "build:wasm": "node scripts/build-wasm.mjs",
@@ -29,13 +55,33 @@
     "proof:compare": "node proofs/run-comparison.mjs",
     "build:types": "tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types"
   },
-  "keywords": ["immutable", "shared", "wasm", "sharedarraybuffer", "worker", "hamt", "persistent", "data-structures", "tanstack-db", "bun", "redux", "redux-toolkit"],
+  "keywords": [
+    "immutable",
+    "shared",
+    "wasm",
+    "sharedarraybuffer",
+    "worker",
+    "hamt",
+    "persistent",
+    "data-structures",
+    "tanstack-db",
+    "bun",
+    "redux",
+    "redux-toolkit"
+  ],
   "author": "natanelia",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/natanelia/zerocopy.git" },
-  "bugs": { "url": "https://github.com/natanelia/zerocopy/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natanelia/zerocopy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/natanelia/zerocopy/issues"
+  },
   "homepage": "https://github.com/natanelia/zerocopy#readme",
-  "engines": { "bun": ">=1.0.0" },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
   "devDependencies": {
     "@reduxjs/toolkit": "2.12.0",
     "@redux-devtools/instrument": "3.0.0",
@@ -52,6 +98,12 @@
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   },
-  "peerDependencies": { "@tanstack/db": ">=0.5.0" },
-  "peerDependenciesMeta": { "@tanstack/db": { "optional": true } }
+  "peerDependencies": {
+    "@tanstack/db": ">=0.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/db": {
+      "optional": true
+    }
+  }
 }

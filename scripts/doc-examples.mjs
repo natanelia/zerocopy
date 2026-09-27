@@ -16,6 +16,6 @@ export function extract(file, name, language) {
 }
 
 export const browserExamples = [
-  { name: 'readme', file: 'README.md', owner: 'readme-browser-owner', reader: 'readme-browser-reader', expected: 30 },
+  { name: 'readme', file: 'docs/worker-sharing.md', owner: 'readme-browser-owner', reader: 'readme-browser-reader', expected: 30 },
   { name: 'guide', file: 'docs/worker-sharing.md', owner: 'browser-owner', reader: 'browser-reader', expected: { ok: true, value: 30 } },
 ];
