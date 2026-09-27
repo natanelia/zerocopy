@@ -3,18 +3,9 @@
  * COOP/COEP: https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated
  */
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
-// A second tab can arrive after activation's claim completed. Only an in-scope
-// window can request another claim. The browser still enforces control policy.
-self.addEventListener('message', event => {
-  if (event.data?.type !== 'zerocopy-isolation:claim' || event.data.version !== 1 || event.source?.type !== 'window') return;
-  const scope = new URL(self.registration.scope);
-  let source;
-  try { source = new URL(event.source.url); } catch { return; }
-  if (source.origin !== scope.origin || !source.pathname.startsWith(scope.pathname)) return;
-  // Failure remains visible in the page's bounded wait for controllerchange.
-  event.waitUntil(self.clients.claim().catch(() => {}));
-});
+// Immediate claim is best effort. The page also navigates once after activation,
+// so a late tab can become controlled without a successful claim on its old page.
+self.addEventListener('activate', event => event.waitUntil(self.clients.claim().catch(() => {})));
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (new URL(request.url).origin !== self.location.origin) return;

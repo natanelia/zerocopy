@@ -45,13 +45,14 @@ test('server isolation is ready without registration or navigation', async () =>
   const s = setup(); s.environment.crossOriginIsolated = true;
   assert.equal(await s.run(), 'ready'); assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 0); s.clean();
 });
-test('a first visit automatically registers, waits for activation and claim, then navigates once', async () => {
+test('a first visit waits for an active registration, then navigates once without needing a claim', async () => {
   const s = setup(); const pending = s.run(); await tick();
   assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0);
   assert.equal(s.calls[0][0].href, workerURL.href);
   assert.deepEqual(s.calls[0][1], { scope: route, updateViaCache: 'none' });
-  s.worker.change('activated'); assert.equal(s.navigations.length, 0, 'Activation alone does not mean this page is controlled');
-  s.claim(); assert.equal(await pending, 'reloading');
+  s.registration.installing = null; s.registration.active = s.worker; s.worker.change('activated');
+  assert.equal(await pending, 'reloading');
+  assert.equal(s.container.controller, null, 'No claim is required for the next navigation');
   const target = new URL(s.navigations[0]);
   assert.equal(target.searchParams.get(ATTEMPT_PARAMETER), '1');
   assert.equal(target.searchParams.get('query'), 'timeout'); assert.equal(target.searchParams.get('count'), '1000'); assert.equal(target.hash, '#results');
@@ -97,9 +98,9 @@ test('a controller still activating is not enough; wait for its activated state'
   s.worker.state = 'activating'; s.container.controller = s.worker; s.container.emit('controllerchange');
   assert.equal(s.navigations.length, 0); s.worker.change('activated'); assert.equal(await pending, 'reloading'); s.clean();
 });
-test('an already active worker still has to claim the new page', async () => {
+test('an already active worker allows one navigation into its scope', async () => {
   const s = setup(); s.registration.installing = null; s.registration.active = s.worker; s.worker.state = 'activated';
-  const pending = s.run(); await tick(); assert.equal(s.navigations.length, 0); s.claim(); await pending; s.clean();
+  assert.equal(await s.run(), 'reloading'); assert.equal(s.navigations.length, 1); assert.equal(s.container.controller, null); s.clean();
 });
 test('registration failure, including synchronous rejection, cleans up without a navigation', async () => {
   for (const register of [() => { throw new Error('Policy blocked'); }, () => Promise.reject(new Error('Policy blocked'))]) {
@@ -121,8 +122,8 @@ test('a blocked registration has a deadline; late completion cannot reload', asy
   await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
   release(s.registration); s.claim(); await tick(); assert.equal(s.navigations.length, 0); s.clean();
 });
-test('an active worker that never claims the page also times out', async () => {
-  const s = setup(); s.registration.installing = null; s.registration.active = s.worker; s.worker.state = 'activated';
+test('a worker stuck activating times out without navigation', async () => {
+  const s = setup(); s.registration.installing = null; s.registration.active = s.worker; s.worker.state = 'activating';
   await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean(); assert.equal(s.navigations.length, 0);
 });
 test('unrelated controller changes do not trigger a reload or unregister other workers', async () => {
@@ -151,15 +152,14 @@ test('a throwing service-worker getter rejects without navigation or leaked reso
 });
 
 
-test('reuse an exact installation from another tab and request control without a new registration', async () => {
+test('reuse an exact active installation from another tab without registering or claiming', async () => {
   const s = setup(); s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
   s.container.getRegistration = async scope => { assert.equal(scope, route); return s.registration; };
-  const pending = s.run(); await tick();
-  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 0);
-  assert.deepEqual(s.worker.messages, [{ type: 'zerocopy-isolation:claim', version: 1 }]);
+  assert.equal(await s.run(), 'reloading');
+  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 1);
+  assert.equal(s.container.controller, null); assert.deepEqual(s.worker.messages, []);
   s.container.emit('controllerchange'); s.registration.emit('updatefound');
-  assert.equal(s.worker.messages.length, 1, 'Do not repeatedly ask the same active worker to claim');
-  s.claim(); assert.equal(await pending, 'reloading'); s.clean();
+  assert.equal(s.navigations.length, 1); s.clean();
 });
 test('a rejected registration job can use a matching installation completed by another tab', async () => {
   const s = setup(); let reads = 0;
@@ -168,16 +168,16 @@ test('a rejected registration job can use a matching installation completed by a
     s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
     throw new Error('Concurrent registration rejected');
   };
-  const pending = s.run(); await tick();
-  assert.equal(reads, 2); assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0);
-  s.claim(); assert.equal(await pending, 'reloading'); assert.equal(s.navigations.length, 1); s.clean();
+  assert.equal(await s.run(), 'reloading');
+  assert.equal(reads, 2); assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 1);
+  assert.equal(s.container.controller, null); s.clean();
 });
-test('a matching installation still in progress is reused until it activates and controls this page', async () => {
+test('a matching installation in progress is reused until activation', async () => {
   const s = setup(); s.container.getRegistration = async () => s.registration;
   const pending = s.run(); await tick(); assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 0);
   s.registration.installing = null; s.registration.active = s.worker; s.worker.change('activated');
-  assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0);
-  s.claim(); await pending; s.clean();
+  assert.equal(await pending, 'reloading');
+  assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 1); s.clean();
 });
 test('another script or broader registration must not hide the original registration error', async () => {
   for (const mismatch of ['script', 'scope', 'redundant']) {
@@ -211,43 +211,34 @@ test('a late recovery lookup after registration failure must not claim or naviga
   release(s.registration); s.claim(); await tick();
   assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
 });
-test('a claim request is not success: a reused active worker still needs to control the page', async () => {
+test('an active registration alone does not enable shared memory after the navigation', async () => {
   const s = setup(); s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
   s.container.getRegistration = async () => s.registration;
-  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/);
-  assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0); s.clean();
+  assert.equal(await s.run(), 'reloading');
+  assert.equal(s.environment.crossOriginIsolated, false);
+  await assert.rejects(s.run(), /Automatic reloads have stopped/);
+  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 1); s.clean();
 });
-
 
 function workerHarness() {
   const handlers = new Map(); let claims = 0;
   const self = {
-    registration: { scope: route }, location: { origin: new URL(route).origin },
     addEventListener: (name, handler) => handlers.set(name, handler),
+    skipWaiting: async () => {},
     clients: { claim: async () => { claims++; } },
   };
   runInNewContext(readFileSync(new URL('../assets/isolation-sw.js', import.meta.url), 'utf8'), { self, URL });
-  async function message(source, data = { type: 'zerocopy-isolation:claim', version: 1 }) {
-    const work = []; handlers.get('message')({ source, data, waitUntil: value => work.push(value) });
+  async function activate() {
+    const work = []; handlers.get('activate')({ waitUntil: value => work.push(value) });
     await Promise.all(work);
   }
-  return { self, message, claims: () => claims };
+  return { self, activate, handlers, claims: () => claims };
 }
-test('the setup worker accepts a control request only from an in-scope window', async () => {
-  const h = workerHarness();
-  await h.message({ type: 'window', url: route + '?q=timeout#main' });
-  assert.equal(h.claims(), 1);
+test('the setup worker attempts immediate control on activation without a message protocol', async () => {
+  const h = workerHarness(); await h.activate();
+  assert.equal(h.claims(), 1); assert.equal(h.handlers.has('message'), false);
 });
-test('unrelated windows, workers, and malformed messages cannot request a claim', async () => {
-  const h = workerHarness();
-  for (const source of [null, { type: 'worker', url: route }, { type: 'window', url: 'invalid url' },
-    { type: 'window', url: 'https://other.example/compare/' }, { type: 'window', url: route.replace('/compare/', '/comparison/') },
-    { type: 'window', url: new URL('../docs/', route).href }]) await h.message(source);
-  for (const data of [null, {}, { type: 'zerocopy-isolation:claim', version: 2 }, { type: 'other', version: 1 }])
-    await h.message({ type: 'window', url: route }, data);
-  assert.equal(h.claims(), 0);
-});
-test('a rejected browser claim does not produce an unhandled worker rejection', async () => {
+test('a denied claim does not block activation; navigation can still use the active registration', async () => {
   const h = workerHarness(); h.self.clients.claim = () => Promise.reject(new Error('Browser denied claim'));
-  await h.message({ type: 'window', url: route });
+  await h.activate();
 });

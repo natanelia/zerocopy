@@ -8,13 +8,18 @@ function hasControl(container, url) {
   return container.controller?.scriptURL === url.href && container.controller.state === 'activated';
 }
 
-/** Registration, installation, activation AND claim share one bounded deadline. */
-function waitForControl(environment, url, scope, timeoutMs) {
+/** Wait for a matching active registration, not a claim on this old document.
+ * An active service worker handles the next in-scope navigation. Some WebKit
+ * tabs cannot be claimed after a concurrent install, but can navigate into the
+ * active registration. Only the new document's crossOriginIsolated is success.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Clients/claim
+ */
+function waitForActive(environment, url, scope, timeoutMs) {
   const container = environment.navigator.serviceWorker;
   if (hasControl(container, url)) return Promise.resolve();
   return new Promise((resolve, reject) => {
     let finished = false, registration;
-    const watched = new Set(), claimRequested = new Set();
+    const watched = new Set();
     const cleanup = () => {
       environment.clearTimeout(timer);
       container.removeEventListener('controllerchange', check);
@@ -36,13 +41,7 @@ function waitForControl(environment, url, scope, timeoutMs) {
       watch(container.controller);
       watch(registration?.installing); watch(registration?.waiting); watch(registration?.active);
       const active = registration?.active;
-      if (active?.scriptURL === url.href && active.state === 'activated' && !claimRequested.has(active)) {
-        // Another tab may have activated this worker before our page existed.
-        // Ask it to claim again; only a real controllerchange permits navigation.
-        claimRequested.add(active);
-        try { active.postMessage({ type: 'zerocopy-isolation:claim', version: 1 }); }
-        catch (error) { finish(error); }
-      }
+      if (active?.scriptURL === url.href && active.state === 'activated') finish();
     }
     function adopt(value) {
       const workers = [value?.installing, value?.waiting, value?.active];
@@ -114,7 +113,7 @@ export async function prepareIsolation({
   const url = new URL(workerURL), scope = new URL('./', url);
   if (url.origin !== page.origin || !page.pathname.startsWith(scope.pathname)) throw new Error('The setup worker must be inside this demo’s origin and path.');
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new Error('The setup timeout must be positive.');
-  await waitForControl(environment, url, scope, timeoutMs);
+  await waitForActive(environment, url, scope, timeoutMs);
   // Preserve current search and fragment, even if they changed while installing.
   const target = new URL(environment.location.href);
   if (target.origin !== page.origin || target.pathname !== page.pathname) throw new Error('The page changed during setup. Open the demo again.');
