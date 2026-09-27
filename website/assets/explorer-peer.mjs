@@ -12,7 +12,7 @@ export class Peer {
       this.pending.delete(data.id); clearTimeout(item.timer);
       data.error ? item.reject(new Error(data.error)) : item.resolve(data.value);
     };
-    this.worker.onerror = event => this.fail(new Error(event.message || 'Worker script could not load. Check the isolation headers.'), onFatal);
+    this.worker.onerror = event => this.fail(new Error(event.message || `Worker script could not load (${url.pathname}). Check the isolation headers.`), onFatal);
     this.worker.onmessageerror = () => this.fail(new Error('Unreadable worker response'), onFatal);
   }
   request(type, body = {}, timeoutMs = 60_000) {

@@ -40,6 +40,25 @@ The immutable contract applies to supported collection APIs. Allocation scratch,
 
 The current transport format is **4**. Producer and reader must use compatible bundles. A descriptor needs both its matching arena and the correct collection layout. A numerical root alone is not a portable reference or a saved collection.
 
+## Memory initialization and limits
+
+Importing the collection, state, or worker entry point does not allocate a default arena. A collection type creates its default arena when first used. Read-only workers attach the supplied memory without allocating an unused writer for each registered type.
+
+A new writable arena starts with **128 KiB** of backing memory and has a default maximum of **256 MiB**. The maximum is a growth ceiling, not the initial buffer size. Some browser engines reserve address space for that ceiling at creation. Requesting many large ceilings can therefore fail even for small datasets.
+
+Applications that need a different ceiling can configure future arenas in each allocating thread:
+
+```ts
+import { configureMemory, SharedList } from 'zerocopy';
+
+configureMemory({ maximumBytes: 512 * 1024 * 1024 });
+const events = new SharedList('number');
+```
+
+Call `configureMemory()` before that thread creates its collections. It does not resize existing arenas or change attached memory. The limit must be a whole number of 64 KiB pages, from 128 KiB through `0x7fff0000` bytes. Higher ceilings can still fail under browser or operating-system limits. Read-only copy attachments allocate only enough pages for the received snapshot.
+
+The source-module legacy `sharedMemory` and `sharedBuffer` bindings are populated on first collection use, explicit reset, or attachment. Use collection handles and the transport APIs instead of reading those bindings before initialization.
+
 ## Arena lifetime
 
 Arenas are append-only and have an allocation ceiling below 2 GiB. There is no per-node reclamation. Retaining a single snapshot can retain the full arena, including unreachable intermediate nodes. Nested dependencies can retain other arenas. Queues can retain consumed prefixes, and ordered collections can retain old log entries.

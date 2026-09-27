@@ -39,7 +39,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Apply the policies to the page and worker scripts. Third-party resources must also satisfy the embedder policy. See [browser setup](workers.md#browser-setup) for the details.
 
-The main-thread example checks `crossOriginIsolated` before loading the library. Keep the dynamic imports after that check: the current entry points create default shared-memory arenas when imported. Copy transport does not remove that requirement.
+The main-thread example checks `crossOriginIsolated` before loading the library. Keep the dynamic imports after that check so unsupported browsers receive a clear error before setup. Default arenas are allocated on first collection use, not on import. Copy transport does not remove that requirement.
 
 For Node.js, use `parentPort` instead of a browser worker endpoint. The [Node guide](workers.md#nodejs-workers) has a complete example without browser headers.
 
