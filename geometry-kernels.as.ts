@@ -21,15 +21,34 @@ export function bboxXY(root: u32, depth: u32, tail: u32, size: u32): void {
     for (let base: u32 = 0; base < size; base += 32) {
       const p = xyLeaf(root, depth, tail, size, base), take = min(<u32>32, size - base);
       if (take == 32) {
-        // Four independent CONTIGUOUS groups, then a left-to-right reduction.
-        // This retains the earliest equal extremum, including its zero sign.
-        // NaN values cannot enter any accumulator because pmin/pmax select the
-        // second operand only on a strict comparison. No repair scan is needed.
+        // Four contiguous point groups, reduced in their original order.
+        // Strict pseudo-min/max excludes NaN and retains the first zero sign.
+        // Full leaves use fixed load offsets; tails stay within visible bytes.
         let l0 = lowInitial, l1 = lowInitial, l2 = lowInitial, l3 = lowInitial;
         let h0 = highInitial, h1 = highInitial, h2 = highInitial, h3 = highInitial;
-        for (let offset: u32 = 0; offset < 64; offset += 16) {
-          const a = v128.load(p + offset), b = v128.load(p + offset + 64);
-          const c = v128.load(p + offset + 128), d = v128.load(p + offset + 192);
+        {
+          const a = v128.load(p), b = v128.load(p + 64), c = v128.load(p + 128), d = v128.load(p + 192);
+          l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
+          l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
+          l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
+          l3 = f64x2.pmin(l3, d); h3 = f64x2.pmax(h3, d);
+        }
+        {
+          const a = v128.load(p + 16), b = v128.load(p + 80), c = v128.load(p + 144), d = v128.load(p + 208);
+          l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
+          l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
+          l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
+          l3 = f64x2.pmin(l3, d); h3 = f64x2.pmax(h3, d);
+        }
+        {
+          const a = v128.load(p + 32), b = v128.load(p + 96), c = v128.load(p + 160), d = v128.load(p + 224);
+          l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
+          l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
+          l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
+          l3 = f64x2.pmin(l3, d); h3 = f64x2.pmax(h3, d);
+        }
+        {
+          const a = v128.load(p + 48), b = v128.load(p + 112), c = v128.load(p + 176), d = v128.load(p + 240);
           l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
           l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
           l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
