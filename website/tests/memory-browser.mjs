@@ -27,6 +27,7 @@ try {
     try {
       page = await context.newPage(); page.setDefaultTimeout(90000);
       page.on('pageerror', error => errors.push(error.stack || error.message));
+      page.on('console', message => { if (message.type() === 'error') console.error(message.text()); });
       await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}compare/`);
       if (!isolated) {
         assert.equal(await page.locator('#compare-start').isDisabled(), true);

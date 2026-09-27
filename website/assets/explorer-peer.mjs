@@ -2,7 +2,14 @@ import { RPC } from './explorer-core.mjs';
 /** A small application protocol for whole operations. Never used for per-field reads. */
 export class Peer {
   constructor(url, onStatus = () => {}, onFatal = () => {}) {
-    this.worker = new Worker(url, { type: 'module' });
+    // WebKit does not reliably apply a page's service worker to nested-worker
+    // entry requests. A local module wrapper inherits the parent's isolation.
+    // Its only import is the same trusted, absolute module URL used normally.
+    this.moduleURL = typeof document === 'undefined'
+      ? URL.createObjectURL(new Blob([`import ${JSON.stringify(url.href)};`], { type: 'text/javascript' }))
+      : undefined;
+    try { this.worker = new Worker(this.moduleURL ?? url, { type: 'module' }); }
+    catch (error) { if (this.moduleURL) URL.revokeObjectURL(this.moduleURL); throw error; }
     this.onFatal = onFatal; this.pending = new Map(); this.sequence = 0; this.closed = false;
     this.worker.onmessage = ({ data }) => {
       if (data?.protocol !== RPC) return;
@@ -29,6 +36,7 @@ export class Peer {
   close(error = new Error('Worker connection closed')) {
     if (this.closed) return;
     this.closed = true; this.worker.terminate();
+    if (this.moduleURL) { URL.revokeObjectURL(this.moduleURL); this.moduleURL = undefined; }
     for (const item of this.pending.values()) { clearTimeout(item.timer); item.reject(error); }
     this.pending.clear();
   }
