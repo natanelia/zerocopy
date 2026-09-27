@@ -111,9 +111,11 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         assert.equal(storageVisits.length, 2); await storage.close();
 
         // Two tabs can install/claim concurrently. Neither may loop or need a click.
-        for (let round = 0; round < 3; round++) {
+        for (let round = 0; round < 10; round++) {
         const tabs = await browser.newContext();
-        const pair = await Promise.all([tabs.newPage(), tabs.newPage()]);
+        // Finish creating the browser views before racing application navigation.
+        // Registration, activation and automatic navigation remain concurrent.
+        const pair = [await tabs.newPage(), await tabs.newPage()];
         const histories = await Promise.all(pair.map(navigations));
         for (const tab of pair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'compare-start'); }));
