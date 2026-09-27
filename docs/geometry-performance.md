@@ -57,7 +57,7 @@ The API prototype prepares closed finite ring snapshots and returns ascending ma
 
 On the ARM64 proof, **9,595 exact comparisons and 529,790 point queries** passed. Scalar Wasm, SIMD Wasm, the public API, Turf boolean membership, Turf collection selection, and an independent BigInt oracle for integer-coordinate cases agreed. Cases include convex/concave rings, holes, repeated vertices, exact edge/vertex queries, near-edge floating-point queries, and memory boundaries. The robust fallback was exercised.
 
-The candidate still lost on large polygons. For four selections of 8,192 interior points against a 256-edge polygon under Node ARM64, the Turf-indices path took **27.491706 ms**, versus **32.519481 ms** for the new public API. Bun ARM64 also lost: **27.549007 ms** versus **29.562402 ms**. Exact equality passed; speed did not.
+The candidate still lost on large polygons. For four selections of 8,192 interior points against a 256-edge polygon under Node ARM64, the Turf-indices path took **27.491713 ms**, versus **32.519475 ms** for the new public API. Bun ARM64 also lost: **27.549010 ms** versus **29.562405 ms**. Exact equality passed; speed did not.
 
 The Turf benchmark returns equivalent point indices rather than a complete GeoJSON result. Its wrapper uses flatMap and does not provide prepared bounds, so this is not a claim of optimal Turf execution. Losing even under this comparison is sufficient to reject this candidate. Polygon preparation is reported separately and is excluded from repeated-query timing. No polygon API or robust-predicates runtime dependency is shipped in the accepted bounds PR.
 
@@ -69,7 +69,7 @@ The prototype returns retained vertex indices. It keeps scalar arithmetic groupi
 
 The proof passed **47,490 exact comparisons from 2,048 seeds** plus boundary/adversarial cases. It checks repeated points, signed zero, tiny/large finite coordinates, degenerate endpoints, threshold equality, partial leaves, and end-of-memory access. This is pure planar Douglas-Peucker validation, not equivalence to the entire Turf simplify pipeline with coordinate cleaning, radial prepass, polygon repair, or GeoJSON output.
 
-The first SIMD version regressed on smooth lines under Bun x64. Vector argmax accumulation and a later short-section scalar path with conditional lane transfers did not remove that regression. In the last Bun x64 run, four simplifications of a 16,384-point road-like line took **21.217652 ms** with scalar Wasm versus **25.077399 ms** with the hybrid SIMD path, about **18.2% more time**. Node wins do not justify shipping a cross-runtime regression. No simplification API is included in the accepted PR.
+The first SIMD version regressed on smooth lines under Bun x64. Vector argmax accumulation and a later short-section scalar path with conditional lane transfers did not remove that regression. In the last Bun x64 run, four simplifications of a 16,384-point road-like line took **21.217654 ms** with scalar Wasm versus **25.077398 ms** with the hybrid SIMD path, about **18.2% more time**. Node wins do not justify shipping a cross-runtime regression. No simplification API is included in the accepted PR.
 
 ## Scope of the PR
 
