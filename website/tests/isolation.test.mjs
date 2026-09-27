@@ -220,25 +220,42 @@ test('an active registration alone does not enable shared memory after the navig
   assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 1); s.clean();
 });
 
-function workerHarness() {
-  const handlers = new Map(); let claims = 0;
+function workerHarness(claim = async () => {}) {
+  const handlers = new Map(); let claims = 0, skips = 0;
   const self = {
     addEventListener: (name, handler) => handlers.set(name, handler),
-    skipWaiting: async () => {},
-    clients: { claim: async () => { claims++; } },
+    skipWaiting: async () => { skips++; },
+    clients: { claim: () => { claims++; return claim(); } },
   };
   runInNewContext(readFileSync(new URL('../assets/isolation-sw.js', import.meta.url), 'utf8'), { self, URL });
-  async function activate() {
-    const work = []; handlers.get('activate')({ waitUntil: value => work.push(value) });
-    await Promise.all(work);
+  function dispatch(name) {
+    const work = [];
+    handlers.get(name)?.({ waitUntil: value => work.push(value) });
+    return work;
   }
-  return { self, activate, handlers, claims: () => claims };
+  return { dispatch, handlers, claims: () => claims, skips: () => skips };
 }
-test('the setup worker attempts immediate control on activation without a message protocol', async () => {
-  const h = workerHarness(); await h.activate();
-  assert.equal(h.claims(), 1); assert.equal(h.handlers.has('message'), false);
+test('installation skips waiting; activation does not claim existing pages or extend its lifetime', async () => {
+  const h = workerHarness();
+  await Promise.all(h.dispatch('install'));
+  assert.equal(h.skips(), 1);
+  assert.deepEqual(h.dispatch('activate'), []);
+  assert.equal(h.claims(), 0);
+  assert.equal(h.handlers.has('fetch'), true);
+  assert.equal(h.handlers.has('message'), false);
 });
-test('a denied claim does not block activation; navigation can still use the active registration', async () => {
-  const h = workerHarness(); h.self.clients.claim = () => Promise.reject(new Error('Browser denied claim'));
-  await h.activate();
+test('activation cannot be stalled by a pending, rejected, or throwing page claim', async () => {
+  for (const claim of [
+    () => new Promise(() => {}),
+    () => Promise.reject(new Error('Browser denied claim')),
+    () => { throw new Error('Browser cannot claim this document'); },
+  ]) {
+    const h = workerHarness(claim);
+    // Regression: catch() handled rejected claims but not a never-settled
+    // claim promise. Do not couple activation to either kind of claim.
+    const extensions = h.dispatch('activate');
+    assert.equal(h.claims(), 0, 'A fresh navigation makes claiming unnecessary');
+    assert.equal(extensions.length, 0, 'No waitUntil promise may keep the worker activating');
+    await Promise.all(extensions);
+  }
 });

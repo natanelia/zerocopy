@@ -3,9 +3,10 @@
  * COOP/COEP: https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated
  */
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
-// Immediate claim is best effort. The page also navigates once after activation,
-// so a late tab can become controlled without a successful claim on its old page.
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim().catch(() => {})));
+// Do not claim existing documents. They need a navigation to receive COOP/COEP
+// anyway. Waiting for clients.claim() here can leave WebKit stuck activating
+// when two tabs open together. Activation has no asynchronous work; the next
+// in-scope navigation selects this registration without a claim.
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (new URL(request.url).origin !== self.location.origin) return;
