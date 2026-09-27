@@ -1,6 +1,6 @@
-# Analysis & filtering
+# Product catalogs & filtering
 
-A dashboard can ask several questions of one dataset. Workers can read shared collections while the owner publishes new input versions.
+A catalog page shows stock, search results, and recommendations from the same product data. A large catalog can use workers for filtering without copying the dataset into every worker.
 
 This is an implementation pattern, not a measured application speedup.
 
@@ -8,18 +8,18 @@ This is an implementation pattern, not a measured application speedup.
 
 Put the large collections in bound state. Pass small query parameters to an optional task: a threshold, selected IDs, or a range. Return the small result.
 
-For example, a task can count speed-limit records above a threshold:
+For example, a stock dashboard can count available products that need restocking. The threshold is the only task argument; the catalog stays in bound state:
 
 ```ts
 import type { SharedMap } from 'zerocopy';
 import { defineTasks } from 'zerocopy/worker';
 
-type Model = { limits: SharedMap<'number'> };
+type Model = { stock: SharedMap<'number'> };
 export const tasks = defineTasks<Model>()({
-  countAbove({ state }, threshold: number) {
+  countLowStock({ state }, threshold: number) {
     let count = 0;
-    state.limits.forEach(value => {
-      if (value > threshold) count++;
+    state.stock.forEach(value => {
+      if (value > 0 && value <= threshold) count++;
     });
     return count;
   },
@@ -27,6 +27,14 @@ export const tasks = defineTasks<Model>()({
 ```
 
 The collection scan runs inside the worker. Individual reads do not cause remote calls. Connect this task with the [task quickstart](../../docs/task-quickstart.md), or keep your existing scheduler and use a [state session](../../docs/worker-sessions.md).
+
+## From in stock to sold out
+
+The [quickstart](../../docs/getting-started.md) follows one product: headphones with 12 units in stock. The owner applies an inventory update to zero. The UI can immediately show **Sold out**. A connected worker receives the new snapshot asynchronously, while its retained first snapshot still reads 12.
+
+Use direct reads for product cards. Use the [catalog filter task](../../docs/task-quickstart.md) when background work is useful. It filters candidate product IDs in one call, excludes missing or sold-out products, and returns the available IDs.
+
+These examples model a local catalog view, not a checkout system. The server remains responsible for stock validation and reservations. A snapshot can be old; zerocopy does not prevent overselling or coordinate purchases across customers.
 
 ## Use a pool for independent work
 

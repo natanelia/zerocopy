@@ -11,11 +11,11 @@ A collection update returns a new handle:
 ```ts
 import { SharedMap } from 'zerocopy';
 
-const before = new SharedMap('number').set('lane-1', 30);
-const after = before.set('lane-1', 50);
+const before = new SharedMap('string').set('document-1', 'Draft title');
+const after = before.set('document-1', 'Updated title');
 
-before.get('lane-1'); // 30
-after.get('lane-1'); // 50
+before.get('document-1'); // 'Draft title'
+after.get('document-1'); // 'Updated title'
 ```
 
 A worker holding the earlier snapshot can complete its check. The owner can keep editing. The [playground](../README.md#playground) makes this visible with actual shared memory.

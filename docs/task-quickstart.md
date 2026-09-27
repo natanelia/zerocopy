@@ -4,7 +4,9 @@
 
 Use tasks to ask a worker to run a calculation and return a result. Tasks are not required to read a shared value. A direct `.get()` on an attached collection is synchronous and local.
 
-This small lookup demonstrates request/response mechanics. In an application, use tasks for whole calculations, such as route assessment, rather than wrapping each lookup in a remote call.
+A catalog worker filters a group of candidate products. Headphones and a keyboard start in stock; a mouse is sold out. After a stock update, the same filter returns only the keyboard.
+
+The small dataset makes the result easy to check. Keep small filters on the main thread; use a worker when the real calculation is large enough to justify dispatch.
 
 Follow the [source installation and browser setup](getting-started.md) first. These are three files in the same directory.
 
@@ -17,10 +19,10 @@ Follow the [source installation and browser setup](getting-started.md) first. Th
 import type { SharedMap } from 'zerocopy';
 import { defineTasks } from 'zerocopy/worker';
 
-export interface Model { limits: SharedMap<'number'> }
+export interface Model { stock: SharedMap<'number'> }
 export const tasks = defineTasks<Model>()({
-  speedLimit({ state }, laneId: string) {
-    return state.limits.get(laneId);
+  findAvailable({ state }, productIds: readonly string[]) {
+    return productIds.filter(id => (state.stock.get(id) ?? 0) > 0);
   },
 });
 export type Tasks = typeof tasks;
@@ -28,7 +30,7 @@ export type Tasks = typeof tasks;
 
 ## Expose it in the worker
 
-**limits.worker.ts**
+**catalog.worker.ts**
 
 <!-- example: dx-worker -->
 ```ts
@@ -54,19 +56,20 @@ const { createState } = await import('zerocopy/state');
 const { spawn } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 try {
   const compute = await spawn<Tasks>(
-    () => new Worker(new URL('./limits.worker.ts', import.meta.url), {
+    () => new Worker(new URL('./catalog.worker.ts', import.meta.url), {
       type: 'module',
     }),
     { state },
   );
   try {
-    console.log(await compute.run.speedLimit('lane-1')); // 30
-    state.update('limits', limits => limits.set('lane-1', 50));
-    console.log(await compute.run.speedLimit('lane-1')); // 50
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
+    state.update('stock', stock => stock.set('headphones', 0));
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['keyboard']
   } finally {
     compute.dispose(); // Disconnect and terminate the owned worker.
   }
@@ -75,10 +78,10 @@ try {
 }
 ```
 
-The result is `Promise<number | undefined>`. This example reads `30`, updates the owner state, then reads `50`. The task client handles publication before dispatch; you do not write an application message protocol.
+The result is `Promise<string[]>`. The first result is `['headphones', 'keyboard']`. After the headphones sell out, it is `['keyboard']`. Missing products and zero stock are excluded. The task client handles publication before dispatch; you do not write an application message protocol.
 
 A task waits for at least the publication it requests. It can use a newer snapshot if delivery coalesces updates. Once the handler starts, its snapshot stays fixed. This is not exact invocation-time snapshot pinning.
 
 `spawn()` owns the worker it creates. The example disposes the executor before the state, including after a failed call. Task arguments and ordinary results use structured cloning.
 
-Reuse `tasks.ts` and `limits.worker.ts` with the [local, existing-worker, and pool examples](workers.md). That guide also covers cancellation, shared ports, and the full API contract.
+Reuse `tasks.ts` and `catalog.worker.ts` with the [local, existing-worker, and pool examples](workers.md). That guide also covers cancellation, shared ports, and the full API contract.

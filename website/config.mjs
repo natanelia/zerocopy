@@ -12,9 +12,9 @@ export const pages = [
   { source: 'docs/architecture.md', slug: 'memory', title: 'Memory & ownership', group: 'Go deeper', description: 'Understand storage, retained snapshots, and explicit compaction.' },
   { source: 'docs/benchmarks.md', slug: 'benchmarks', title: 'Recorded benchmarks', group: 'Go deeper', description: 'All recorded results, slower workloads, and methods. No selected-only results.' },
   { source: 'docs/migration.md', slug: 'migration', title: 'Migration', group: 'Go deeper', description: 'Format and lifetime changes for existing users.' },
+  { source: 'website/content/analytics.md', slug: 'analytics', title: 'Product catalogs & filtering', group: 'Use cases', description: 'Read stock directly and filter a large catalog in workers.' },
   { source: 'website/content/maps.md', slug: 'maps', title: 'Maps & spatial tools', group: 'Use cases', description: 'Keep the map editable while workers inspect its data.' },
   { source: 'website/content/editors.md', slug: 'editors', title: 'Editors & history', group: 'Use cases', description: 'Read an earlier version without stopping new edits.' },
-  { source: 'website/content/analytics.md', slug: 'analytics', title: 'Analysis & filtering', group: 'Use cases', description: 'Share a working dataset across independent calculations.' },
 ];
 export const repository = 'https://github.com/natanelia/zerocopy';
 /** Restrict a deployment prefix to clean URL path segments. */

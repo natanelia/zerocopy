@@ -32,8 +32,8 @@ const worker = new Worker(new URL('./worker.ts', import.meta.url), {
 worker.addEventListener('message', event => console.log(event.data));
 worker.addEventListener('error', event => console.error(event.message));
 
-const limits = new SharedMap('number').set('lane-1', 30);
-worker.postMessage(getWorkerData({ limits }, { copy: false }));
+const stock = new SharedMap('number').set('headphones', 12);
+worker.postMessage(getWorkerData({ stock }, { copy: false }));
 // Terminate the worker when the application no longer needs it.
 ```
 
@@ -45,8 +45,8 @@ import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
 
 self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
   try {
-    const { limits } = await initWorker<{ limits: SharedMap<'number'> }>(event.data);
-    self.postMessage({ ok: true, value: limits.get('lane-1') });
+    const { stock } = await initWorker<{ stock: SharedMap<'number'> }>(event.data);
+    self.postMessage({ ok: true, value: stock.get('headphones') });
   } catch (error) {
     self.postMessage({ ok: false, error: String(error) });
   }
@@ -67,14 +67,14 @@ import { Worker } from 'node:worker_threads';
 import { once } from 'node:events';
 import { SharedMap, getWorkerData } from 'zerocopy';
 
-const limits = new SharedMap('number').set('lane-1', 30);
+const stock = new SharedMap('number').set('headphones', 12);
 const worker = new Worker(new URL('./worker.mjs', import.meta.url), {
-  workerData: getWorkerData({ limits }, { copy: false }),
+  workerData: getWorkerData({ stock }, { copy: false }),
 });
 
 try {
   const [value] = await once(worker, 'message');
-  console.log(value); // 30
+  console.log(value); // 12
 } finally {
   await worker.terminate();
 }
@@ -88,8 +88,8 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { initWorker } from 'zerocopy';
 
 if (!parentPort) throw new Error('Run this file as a Node worker');
-const { limits } = await initWorker(workerData);
-parentPort.postMessage(limits.get('lane-1'));
+const { stock } = await initWorker(workerData);
+parentPort.postMessage(stock.get('headphones'));
 ```
 
 ## API
@@ -146,9 +146,9 @@ const { SharedMap, getWorkerData } = await import('zerocopy');
 const worker = new Worker(new URL('./worker.ts', import.meta.url), {
   type: 'module',
 });
-const limits = new SharedMap('number').set('lane-1', 30);
+const stock = new SharedMap('number').set('headphones', 12);
 
-worker.postMessage(getWorkerData({ limits }, { copy: false }));
+worker.postMessage(getWorkerData({ stock }, { copy: false }));
 ```
 
 **worker.ts**
@@ -158,9 +158,9 @@ worker.postMessage(getWorkerData({ limits }, { copy: false }));
 import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
 
 self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
-  const { limits } = await initWorker<{ limits: SharedMap<'number'> }>(event.data);
-  self.postMessage(limits.get('lane-1'));
+  const { stock } = await initWorker<{ stock: SharedMap<'number'> }>(event.data);
+  self.postMessage(stock.get('headphones'));
 });
 ```
 
-The worker posts `30` to the owner. Add your application's error and result handlers as needed. Terminate the worker when it is no longer needed. `getWorkerData()` and `initWorker()` control attachment; the later `.get()` is a local read.
+The worker posts `12` to the owner. Add your application's error and result handlers as needed. Terminate the worker when it is no longer needed. `getWorkerData()` and `initWorker()` control attachment; the later `.get()` is a local read.

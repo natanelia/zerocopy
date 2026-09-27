@@ -54,14 +54,14 @@ An arena becomes eligible for garbage collection only when every holder releases
 ```ts
 import { SharedMap, compact, compactMany } from 'zerocopy';
 
-const original = new SharedMap('number').set('lane-1', 30);
+const original = new SharedMap('number').set('headphones', 12);
 const owned = compact(original);
-const updated = owned.set('lane-1', 50);
+const updated = owned.set('headphones', 0);
 const group = compactMany({ original, updated });
 
-original.get('lane-1');       // 30
-owned.get('lane-1');          // 30
-group.updated.get('lane-1');  // 50
+original.get('headphones');       // 12
+owned.get('headphones');          // 12
+group.updated.get('headphones');  // 0
 ```
 
 Compaction copies live data into a fresh writable arena. Group compaction can retain shared live blobs and nested snapshots within the copied group. The source remains valid. Compaction can temporarily retain both arenas and requires CPU time, so do not put it on every Redux dispatch or frame.

@@ -12,16 +12,16 @@ Put the large, shareable collections in the data layer. Keep small UI state, suc
 
 The main thread owns the editable collections. Dedicated workers receive snapshots and run independent checks. Results can be small: invalid lane IDs, counts, or route warnings.
 
-Start with the [direct-read quickstart](../../docs/getting-started.md). Inside its connected worker, a complete calculation can read one captured snapshot:
+Use the connection pattern from the [direct-read quickstart](../../docs/getting-started.md), but supply a map-specific state such as `{ features: SharedMap<...> }`. Inside that connected worker:
 
 ```ts
-// Inside the connected worker from the quickstart.
+// With map-specific state containing a features collection.
 const snapshot = shared.current;
-const laneIds = ['lane-1', 'lane-2'];
+const featureIds = ['road-1', 'road-2'];
 const unknown: string[] = [];
 
-for (const id of laneIds) {
-  if (snapshot.limits.get(id) === undefined) unknown.push(id);
+for (const id of featureIds) {
+  if (!snapshot.features.has(id)) unknown.push(id);
 }
 ```
 

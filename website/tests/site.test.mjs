@@ -86,3 +86,16 @@ test('demo workers and all runtime modules stay inside the opt-in isolation scop
     assert.equal(readFileSync(join(out, route, 'library/shared.js'), 'utf8'), readFileSync(join(out, 'library/shared.js'), 'utf8'));
   }
 });
+
+
+test('public examples use product stock rather than speed limits', () => {
+  for (const file of files(out).filter(file => /\.(html|md)$/.test(file))) {
+    assert.doesNotMatch(readFileSync(file, 'utf8'), /speed[ -]?limit|km\/h|lane-1|limits\.worker/i, file);
+  }
+  const home = readFileSync(join(out, 'index.html'), 'utf8');
+  assert.match(home, /headphones/);
+  assert.match(home, /Sold out/);
+  const playground = readFileSync(join(out, 'playground/index.html'), 'utf8');
+  assert.match(playground, /Headphones in stock/);
+  assert.match(playground, /id="stock"[^>]*step="1"[^>]*value="0"/);
+});

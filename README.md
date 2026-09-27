@@ -4,7 +4,7 @@
 
 **Shared, immutable collections for JavaScript and TypeScript.** Let your UI and workers read the same collection storage, without cloning the dataset for each worker.
 
-Connect a worker. Read a value. Keep working.
+Connect a worker. Read product stock. Keep working.
 
 <!-- example: readme-sharing-preview -->
 ```ts
@@ -13,7 +13,7 @@ await state.connect(worker);
 
 // Inside the worker
 const shared = await connectSharedSession<Model>();
-const speedLimit = shared.current.limits.get('lane-1');
+const quantity = shared.current.stock.get('headphones');
 ```
 
 That `.get()` is a synchronous local read—not a task, message, or RPC. This is the API after setup; the [quickstart](docs/getting-started.md) has the complete files.
@@ -30,7 +30,7 @@ Moving a calculation to a worker should not require sending another full copy of
 
 **Keep your existing stack.** Use your own workers and message channels. Connect an existing store. Add typed tasks or a worker pool only when you need scheduling.
 
-Built for data-heavy maps, editors, and analysis tools where the UI and background work need access to the same changing dataset.
+Built for large product catalogs, editors, maps, and analysis tools where the UI and background work need access to the same changing dataset.
 
 ## New version. Same simple API.
 
@@ -40,11 +40,11 @@ A collection works on its own. No state holder or task system is required.
 ```ts
 import { SharedMap } from 'zerocopy';
 
-const before = new SharedMap('number').set('lane-1', 30);
-const after = before.set('lane-1', 50);
+const before = new SharedMap('number').set('headphones', 12);
+const after = before.set('headphones', 0);
 
-before.get('lane-1'); // 30 — the earlier snapshot stays unchanged.
-after.get('lane-1');  // 50 — use the new version when you are ready.
+before.get('headphones'); // 12 — the earlier view still shows stock.
+after.get('headphones');  // 0 — the new view shows the product is sold out.
 ```
 
 Keep the return value from each update. Share the versions your workers need; do not rewrite your reads around remote calls.
@@ -65,7 +65,7 @@ The [collection API](docs/api.md) includes maps, sets, lists, stacks, queues, or
 **Ready to try it?** [Build the source package and connect your first worker](docs/getting-started.md). Browser setup and cleanup are included. These docs describe the source in this branch, not an assumed npm release.
 
 <a id="run-a-typed-task"></a>
-Tasks are an optional execution layer. Use them for a route assessment or geometry calculation—not to wrap each `.get()`. The [task guide](docs/workers.md) covers existing workers, independent workers, pools, MessagePorts, SharedWorker connections, and Node.js.
+Tasks are an optional execution layer. Use them for catalog filtering or a background calculation—not to wrap each `.get()`. The [task guide](docs/workers.md) covers existing workers, independent workers, pools, MessagePorts, SharedWorker connections, and Node.js.
 
 <a id="performance"></a>
 <a id="memory-shared-vs-immutablejs-vs-native"></a>

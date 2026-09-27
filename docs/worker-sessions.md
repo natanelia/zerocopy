@@ -21,9 +21,9 @@ const { createState } = await import('zerocopy/state');
 const worker = new Worker(new URL('./state.worker.ts', import.meta.url), {
   type: 'module',
 });
-const shared = createState({ limits: new SharedMap('number') });
+const shared = createState({ stock: new SharedMap('number') });
 await shared.connect(worker);
-shared.update('limits', limits => limits.set('lane-1', 30));
+shared.update('stock', stock => stock.set('headphones', 12));
 // The changed snapshot is published at the next microtask.
 // At application teardown: shared.dispose(); worker.terminate();
 ```
@@ -34,11 +34,11 @@ shared.update('limits', limits => limits.set('lane-1', 30));
 import type { SharedMap } from 'zerocopy';
 import { connectSharedSession } from 'zerocopy/worker';
 
-type Model = { limits: SharedMap<'number'> };
+type Model = { stock: SharedMap<'number'> };
 const shared = await connectSharedSession<Model>();
-console.log(shared.current.limits.get('lane-1'));
+console.log(shared.current.stock.get('headphones'));
 const unsubscribe = shared.subscribe((snapshot, version) => {
-  console.log(version, snapshot.limits.get('lane-1'));
+  console.log(version, snapshot.stock.get('headphones'));
 });
 // At teardown: unsubscribe(); shared.dispose();
 ```
@@ -54,16 +54,16 @@ The first read is the initial snapshot and can return `undefined`; the subscript
 Within the owner's setup above, both forms install new immutable collection handles. The recipe returns the new handle or record; `update()` itself returns `void`:
 
 ```ts
-shared.update('limits', limits => limits.set('lane-1', 50));
+shared.update('stock', stock => stock.set('headphones', 0));
 shared.update(current => ({
   ...current,
-  limits: current.limits.set('lane-1', 60).set('lane-2', 40),
+  stock: current.stock.set('headphones', 6).set('keyboard', 8),
 }));
 ```
 
 A record update publishes the complete root group. Earlier snapshots remain readable. The outer record is copied and frozen; the caller's record is not frozen. Recipes must be synchronous and must not call `update()` recursively.
 
-A single collection also works: `createState(new SharedMap('number'))`. Update it with `shared.update(map => map.set('lane-1', 30))` or assign a new collection to `shared.value`. Keyed updates apply only to record state.
+A single collection also works: `createState(new SharedMap('number'))`. Update it with `shared.update(map => map.set('headphones', 12))` or assign a new collection to `shared.value`. Keyed updates apply only to record state.
 
 ## Redux and other stores
 
@@ -74,7 +74,7 @@ import { bindRedux } from 'zerocopy/redux';
 
 const shared = bindRedux(store, {
   workers,
-  select: state => ({ limits: state.limits, routes: state.routes }),
+  select: state => ({ stock: state.stock, products: state.products }),
 });
 await shared.ready;
 // Existing dispatches publish changed selected snapshots.

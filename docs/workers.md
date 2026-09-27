@@ -4,9 +4,9 @@
 
 Define a task once. Call it locally, connect it to an existing worker, or run it in a pool. Its inputs and results keep their TypeScript types. Inside a worker, collection reads are synchronous local reads—not one RPC per `get()`.
 
-Start with the three-file [task quickstart](task-quickstart.md). It reads a speed limit of `30`, updates the state, and reads `50`. You do not write a message handler or call `publish()` between those operations.
+Start with the three-file [task quickstart](task-quickstart.md). It filters in-stock products, marks the headphones as sold out, and filters again. You do not write a message handler or call `publish()` between those operations.
 
-The examples below reuse `tasks.ts` and `limits.worker.ts` from that quickstart. Each `main.ts` block replaces the quickstart's `main.ts`; do not append them to one file. Each example creates and cleans up its own resources.
+The examples below reuse `tasks.ts` and `catalog.worker.ts` from that quickstart. Each `main.ts` block replaces the quickstart's `main.ts`; do not append them to one file. Each example creates and cleans up its own resources.
 
 ## Choose how much zerocopy manages
 
@@ -33,7 +33,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Third-party resources must also satisfy the embedder policy. Check `crossOriginIsolated` before importing the library. Its current entry points initialize default shared-memory arenas during module loading, even for `local()`. Copy mode is not a fallback for a browser that cannot create shared WASM memory.
 
-The examples use dynamic imports after that check. `import type` is safe before the check because it is removed from JavaScript. Use a TypeScript-aware worker bundler. Keep `new Worker(new URL('./limits.worker.ts', import.meta.url), { type: 'module' })` inside the factory so the bundler can identify the worker entry. See [Vite's worker documentation](https://vite.dev/guide/features#web-workers) and the [browser transport guide](worker-sharing.md#browser-setup).
+The examples use dynamic imports after that check. `import type` is safe before the check because it is removed from JavaScript. Use a TypeScript-aware worker bundler. Keep `new Worker(new URL('./catalog.worker.ts', import.meta.url), { type: 'module' })` inside the factory so the bundler can identify the worker entry. See [Vite's worker documentation](https://vite.dev/guide/features#web-workers) and the [browser transport guide](worker-sharing.md#browser-setup).
 
 ## Start on the main thread
 
@@ -54,20 +54,21 @@ const { local } = await import('zerocopy/worker');
 const { tasks } = await import('./tasks');
 
 const state = createState<Model>({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 const compute = local(tasks, { state });
 try {
-  console.log(await compute.run.speedLimit('lane-1')); // 30
-  state.update('limits', limits => limits.set('lane-1', 50));
-  console.log(await compute.run.speedLimit('lane-1')); // 50
+  console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
+  state.update('stock', stock => stock.set('headphones', 0));
+  console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['keyboard']
 } finally {
   compute.dispose();
   state.dispose();
 }
 ```
 
-For direct synchronous access, use `state.current.limits.get('lane-1')`. The task layer is optional.
+For direct synchronous access, use `state.current.stock.get('headphones')`. The task layer is optional.
 
 ## Connect an existing worker
 
@@ -87,15 +88,16 @@ const { createState } = await import('zerocopy/state');
 const { connect } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
-const worker = new Worker(new URL('./limits.worker.ts', import.meta.url), {
+const worker = new Worker(new URL('./catalog.worker.ts', import.meta.url), {
   type: 'module',
 });
 try {
   const compute = await connect<Tasks>(worker, { state });
   try {
-    console.log(await compute.run.speedLimit('lane-1')); // 30
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
   } finally {
     compute.dispose(); // Detach zerocopy; do not terminate this worker.
   }
@@ -126,23 +128,24 @@ const { createState } = await import('zerocopy/state');
 const { spawn } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 const clients: Executor<Tasks>[] = [];
 const createWorker = () => new Worker(
-  new URL('./limits.worker.ts', import.meta.url), { type: 'module' },
+  new URL('./catalog.worker.ts', import.meta.url), { type: 'module' },
 );
 try {
-  const routing = await spawn<Tasks>(createWorker, { state });
-  clients.push(routing);
-  const validation = await spawn<Tasks>(createWorker, { state });
-  clients.push(validation);
-  state.update('limits', limits => limits.set('lane-1', 50));
+  const search = await spawn<Tasks>(createWorker, { state });
+  clients.push(search);
+  const recommendations = await spawn<Tasks>(createWorker, { state });
+  clients.push(recommendations);
+  state.update('stock', stock => stock.set('headphones', 0));
   const results = await Promise.all([
-    routing.run.speedLimit('lane-1'),
-    validation.run.speedLimit('lane-1'),
+    search.run.findAvailable(['headphones', 'keyboard', 'mouse']),
+    recommendations.run.findAvailable(['headphones', 'keyboard', 'mouse']),
   ]);
-  console.log(results); // [50, 50]
+  console.log(results); // [['keyboard'], ['keyboard']]
 } finally {
   for (const client of clients) client.dispose();
   state.dispose();
@@ -169,19 +172,24 @@ const { createState } = await import('zerocopy/state');
 const { pool } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30).set('lane-2', 50),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 try {
   const compute = await pool<Tasks>(
-    () => new Worker(new URL('./limits.worker.ts', import.meta.url), {
+    () => new Worker(new URL('./catalog.worker.ts', import.meta.url), {
       type: 'module',
     }),
     { state, size: 4, maxPending: 32 },
   );
   try {
-    const ids = Array.from({ length: 1000 }, (_, i) => `lane-${i % 2 + 1}`);
-    const values = await compute.map.speedLimit(ids);
-    console.log([values.length, values[0], values[999]]); // [1000, 30, 50]
+    // Each job filters a candidate group, not one remote lookup per product.
+    const groups = Array.from({ length: 1000 }, (_, i) =>
+      i % 2 === 0 ? ['headphones', 'mouse'] : ['keyboard', 'mouse'],
+    );
+    const matches = await compute.map.findAvailable(groups);
+    console.log([matches.length, matches[0], matches[999]]);
+    // [1000, ['headphones'], ['keyboard']]
   } finally {
     compute.dispose(); // Terminate all four owned workers.
   }
@@ -212,7 +220,7 @@ import { tasks } from './tasks';
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 scope.addEventListener('message', (event: MessageEvent) => {
-  if (event.data?.type !== 'attach-limits') return;
+  if (event.data?.type !== 'attach-catalog') return;
   const port: MessagePort = event.data.port;
   void serve(tasks, { endpoint: port }).catch(error => {
     console.error(error);
@@ -235,17 +243,18 @@ const { createState } = await import('zerocopy/state');
 const { connect } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 const worker = new Worker(new URL('./integrated.worker.ts', import.meta.url), {
   type: 'module',
 });
 const { port1, port2 } = new MessageChannel();
 try {
-  worker.postMessage({ type: 'attach-limits', port: port2 }, [port2]);
+  worker.postMessage({ type: 'attach-catalog', port: port2 }, [port2]);
   const compute = await connect<Tasks>(port1, { state });
   try {
-    console.log(await compute.run.speedLimit('lane-1')); // 30
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
   } finally {
     compute.dispose();
   }
@@ -266,7 +275,7 @@ A page and its SharedWorker are in different agent clusters. Shared backing memo
 
 This is a shared worker **instance with client-bound state**, not one automatically merged model across tabs. Two tabs can supply different collections to the same task definitions. The current API does not provide `serveShared()` or a worker-owned singleton state service.
 
-**limits.shared-worker.ts**
+**catalog.shared-worker.ts**
 
 <!-- example: dx-shared-worker -->
 ```ts
@@ -301,19 +310,20 @@ const { createState } = await import('zerocopy/state');
 const { spawn } = await import('zerocopy/worker');
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 try {
   const compute = await spawn<Tasks>(
-    () => new SharedWorker(new URL('./limits.shared-worker.ts', import.meta.url), {
-      type: 'module', name: 'limits-v1',
+    () => new SharedWorker(new URL('./catalog.shared-worker.ts', import.meta.url), {
+      type: 'module', name: 'catalog-v1',
     }),
     { state, memory: 'copy' },
   );
   try {
-    console.log(await compute.run.speedLimit('lane-1')); // 30
-    state.update('limits', limits => limits.set('lane-1', 50));
-    console.log(await compute.run.speedLimit('lane-1')); // 50
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
+    state.update('stock', stock => stock.set('headphones', 0));
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['keyboard']
   } finally {
     compute.dispose(); // Close this client's port, not other tabs' ports.
   }
@@ -328,7 +338,7 @@ Copy transport copies used arena bytes for each sent snapshot. It can be expensi
 
 No browser headers are needed. Save these two files together in an application with the [built package](getting-started.md#install-the-source-package), then run `node main.mjs`.
 
-**limits.worker.mjs**
+**catalog.worker.mjs**
 
 <!-- example: dx-node-worker -->
 ```js
@@ -337,7 +347,9 @@ import { defineTasks, serve } from 'zerocopy/worker';
 
 if (!parentPort) throw new Error('Run this file as a Node worker');
 const tasks = defineTasks()({
-  speedLimit({ state }, laneId) { return state.limits.get(laneId); },
+  findAvailable({ state }, productIds) {
+    return productIds.filter(id => (state.stock.get(id) ?? 0) > 0);
+  },
 });
 await serve(tasks, { endpoint: parentPort });
 ```
@@ -352,17 +364,18 @@ import { createState } from 'zerocopy/state';
 import { spawn } from 'zerocopy/worker';
 
 const state = createState({
-  limits: new SharedMap('number').set('lane-1', 30),
+  stock: new SharedMap('number')
+    .set('headphones', 12).set('keyboard', 8).set('mouse', 0),
 });
 try {
   const compute = await spawn(
-    () => new Worker(new URL('./limits.worker.mjs', import.meta.url)),
+    () => new Worker(new URL('./catalog.worker.mjs', import.meta.url)),
     { state },
   );
   try {
-    console.log(await compute.run.speedLimit('lane-1')); // 30
-    state.update('limits', limits => limits.set('lane-1', 50));
-    console.log(await compute.run.speedLimit('lane-1')); // 50
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['headphones', 'keyboard']
+    state.update('stock', stock => stock.set('headphones', 0));
+    console.log(await compute.run.findAvailable(['headphones', 'keyboard', 'mouse'])); // ['keyboard']
   } finally {
     compute.dispose();
   }
@@ -386,15 +399,15 @@ import { createState } from 'zerocopy/state';
 import { local } from 'zerocopy/worker';
 import { tasks } from './tasks';
 
-const state = createState({ limits: new SharedMap('number') });
+const state = createState({ stock: new SharedMap('number') });
 const compute = local(tasks, { state });
-const result: Promise<number | undefined> = compute.run.speedLimit('lane-1');
-// @ts-expect-error Lane IDs are strings.
-compute.run.speedLimit(123);
+const result: Promise<string[]> = compute.run.findAvailable(['headphones', 'keyboard', 'mouse']);
+// @ts-expect-error Product IDs must be an array of strings.
+compute.run.findAvailable([123]);
 // @ts-expect-error This task does not exist.
-compute.run.missingTask('lane-1');
-// @ts-expect-error The limits map stores numbers.
-state.update('limits', limits => limits.set('lane-1', 'fast'));
+compute.run.missingTask('headphones');
+// @ts-expect-error The stock map stores numbers.
+state.update('stock', stock => stock.set('headphones', 'many'));
 void result;
 compute.dispose();
 state.dispose();
@@ -406,7 +419,7 @@ Use [`json<T>()`](api.md#typed-json-objects) for typed object values. It retains
 
 A task client accepts a collection record or a source with `getSnapshot()` and `subscribe(listener)`. `subscribe` must return an unsubscribe function. No new store is required.
 
-For Redux, pass `reduxSource(store, state => ({ limits: state.limits }))` from `zerocopy/redux` as the executor's `state`. Keep ordinary UI state out of that selection. For continuous publication without tasks, use [`bindRedux()`](worker-sessions.md#redux-and-other-stores).
+For Redux, pass `reduxSource(store, state => ({ stock: state.stock }))` from `zerocopy/redux` as the executor's `state`. Keep ordinary UI state out of that selection. For continuous publication without tasks, use [`bindRedux()`](worker-sessions.md#redux-and-other-stores).
 
 Before a remote task is sent, the client reads `getSnapshot()` again. An update whose store notification is still pending is therefore included. This does not change how reducers run or permit concurrent writers.
 

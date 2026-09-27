@@ -8,7 +8,7 @@ A worker should not need a remote call for every value. With zerocopy, each conn
 
 **Sessions distribute snapshots.** A state holder tracks the current collection handles. A session makes new snapshots available to connected workers.
 
-**Tasks schedule calculations.** They are optional. Use them to run a whole route assessment or filter, not to turn each `.get()` into a remote request.
+**Tasks schedule calculations.** They are optional. Use them to run a whole catalog filter or analysis, not to turn each `.get()` into a remote request.
 
 [Watch actual snapshots in the playground](../README.md#playground).
 
@@ -18,8 +18,8 @@ After the [initial connection](../../docs/getting-started.md), a worker can capt
 
 ```ts
 const snapshot = shared.current;
-const first = snapshot.limits.get('lane-1');
-const second = snapshot.limits.get('lane-2');
+const first = snapshot.stock.get('headphones');
+const second = snapshot.stock.get('keyboard');
 ```
 
 This is an excerpt inside an already connected worker. No request goes to the owner for either lookup. The library may still decode a string or JSON value locally.

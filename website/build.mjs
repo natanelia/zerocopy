@@ -45,8 +45,8 @@ function writePage(route, title, description, body, script) {
 }
 writePage('', 'Share your data. Not copies.', 'Shared immutable collections for JavaScript and TypeScript. Direct reads across workers, stable snapshots, and optional task pools.', home(base), 'home.mjs');
 writePage('lab/', 'Benchmark lab', 'Compare shared snapshots and structured-cloned maps in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
-writePage('playground/', 'Snapshot playground', 'Make an edit and watch a real worker keep an earlier immutable snapshot.', playground(base), 'playground.mjs');
-writePage('use-cases/', 'Built for shared work', 'Application patterns for data-heavy maps, editors, and analysis tools.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Keep large inputs available to the UI and workers. Start with the access pattern—not a new framework.</p></div>${useCaseCards(base)}<p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
+writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
+writePage('use-cases/', 'Built for shared work', 'Application patterns for large product catalogs, editors, and maps.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Keep large inputs available to the UI and workers. Start with the access pattern—not a new framework.</p></div>${useCaseCards(base)}<p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const { html, toc } = renderMarkdown(source, page.source, routes, base);
