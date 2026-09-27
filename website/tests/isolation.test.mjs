@@ -138,3 +138,10 @@ test('changes to queries during setup survive; a route change cancels the reload
   const changed = setup(); const cancelled = changed.run(); await tick(); changed.environment.location.href = new URL('../docs/', route).href; changed.claim();
   await assert.rejects(cancelled, /page changed/); assert.equal(changed.navigations.length, 0); changed.clean();
 });
+
+test('a throwing service-worker getter rejects without navigation or leaked resources', async () => {
+  const s = setup();
+  Object.defineProperty(s.environment.navigator, 'serviceWorker', { get() { throw new Error('Service workers blocked by policy'); } });
+  await assert.rejects(s.run(), /blocked by policy/);
+  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+});

@@ -22,15 +22,25 @@ async function ready(page, id) {
 }
 async function navigations(page) {
   const urls = [];
-  // Count executed documents, not network requests. A service worker can fetch
-  // a navigation response, and a browser can retry a provisional request before
-  // it commits a document. Neither is an extra application reload.
-  await page.exposeBinding('__zcDocumentStart', ({ frame }, url) => {
-    if (frame === page.mainFrame() && url !== 'about:blank') urls.push(url);
+  // WebKit may initialize a provisional global while swapping into an isolated
+  // process. Count parsed documents, not requests or those initial globals.
+  // The test-only trace records both stages to diagnose unexpected reloads.
+  const trace = [];
+  await page.exposeBinding('__zcDocumentStart', ({ frame }, data) => {
+    if (frame !== page.mainFrame()) return;
+    trace.push(data);
+    if (data.phase === 'parsed') urls.push(data.href);
   });
   await page.addInitScript(() => {
-    globalThis.__zcDocumentReported = globalThis.__zcDocumentStart(location.href);
+    const initial = { href: location.href, documentURL: document.URL, state: document.readyState, timeOrigin: performance.timeOrigin };
+    void globalThis.__zcDocumentStart({ ...initial, phase: 'created' });
+    globalThis.__zcDocumentReported = new Promise(resolve => {
+      document.addEventListener('DOMContentLoaded', () => {
+        globalThis.__zcDocumentStart({ ...initial, phase: 'parsed' }).then(resolve);
+      }, { once: true });
+    });
   });
+  Object.defineProperty(urls, 'trace', { value: trace });
   return urls;
 }
 for (const [name, engine] of Object.entries({ chromium, webkit })) {
@@ -56,7 +66,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
           await page.goto(url, { waitUntil: 'commit' });
           await ready(page, id);
           assert.equal(page.url(), url, 'Keep the original query and fragment');
-          assert.equal(visits.length, isolated ? 1 : 2, `${name}: first visit to ${route}: ${JSON.stringify(visits)}`);
+          assert.equal(visits.length, isolated ? 1 : 2, `${name}: first visit to ${route}: ${JSON.stringify(visits)}; trace: ${JSON.stringify(visits.trace)}`);
           if (!isolated) assert.equal(await page.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + route + 'isolation-sw.js');
           visits.length = 0;
           await page.reload({ waitUntil: 'commit' }); await ready(page, id);
@@ -106,10 +116,29 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         const f = await failure.newPage(); f.setDefaultTimeout(25000); const failedVisits = await navigations(f);
         f.on('pageerror', error => errors.push(error.message));
         await f.goto(origin + base + 'compare/'); await f.locator('#capability[data-state="blocked"]').waitFor();
+        await f.evaluate(() => globalThis.__zcDocumentReported);
         assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#compare-start').isDisabled(), true);
         assert.match(await f.locator('#capability-text').innerText(), /Registration blocked by test/);
         await f.getByRole('button', { name: 'Retry setup', exact: true }).click(); await ready(f, 'compare-start');
         assert.equal(failedVisits.length, 2); await failure.close();
+
+        // Some embedded browsers throw on access, rather than hide the API.
+        // The error UI must not read it again without protection.
+        const restricted = await browser.newContext();
+        await restricted.addInitScript(() => Object.defineProperty(navigator, 'serviceWorker', {
+          get() { throw new Error('Service workers blocked by policy'); },
+        }));
+        const r = await restricted.newPage(); r.setDefaultTimeout(25000);
+        r.on('pageerror', error => errors.push(error.message));
+        const restrictedVisits = await navigations(r);
+        await r.goto(origin + base + 'compare/');
+        await r.locator('#capability[data-state="blocked"]').waitFor();
+        await r.evaluate(() => globalThis.__zcDocumentReported);
+        assert.match(await r.locator('#capability-text').innerText(), /blocked by policy/);
+        assert.equal(await r.locator('#compare-start').isDisabled(), true);
+        assert.equal(await r.locator('#enable-isolation').isHidden(), true);
+        assert.equal(await r.locator('#capability-help').isVisible(), true);
+        assert.equal(restrictedVisits.length, 1); await restricted.close();
 
         // Simulate a browser that stays non-isolated after successful installation.
         // Actual success above uses the unmodified browser security properties.
@@ -119,10 +148,12 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         d.on('pageerror', error => errors.push(error.message));
         await d.goto(origin + base + 'compare/', { waitUntil: 'commit' });
         await d.locator('#capability[data-state="blocked"]').waitFor();
+        await d.evaluate(() => globalThis.__zcDocumentReported);
         assert.match(await d.locator('#capability-text').innerText(), /Automatic reloads have stopped/);
         assert.equal(await d.locator('#compare-start').isDisabled(), true);
         await d.waitForTimeout(300); assert.equal(deniedVisits.length, 2, 'A failed setup must not loop');
         await d.reload(); await d.locator('#capability[data-state="blocked"]').waitFor();
+        await d.evaluate(() => globalThis.__zcDocumentReported);
         assert.equal(deniedVisits.length, 3, 'Even a manual reload must not restart the automatic loop');
         await denied.close();
         console.log(`Passed: ${name}, blocked storage, concurrent tabs, failed registration/retry, and failed-isolation reload guard.`);

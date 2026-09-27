@@ -24,7 +24,12 @@ export function checkCapability(onReady) {
       panel.dataset.state = 'blocked'; panel.setAttribute('aria-busy', 'false');
       text.textContent = error instanceof Error ? error.message : 'Could not prepare this demo.';
       help.hidden = false;
-      button.hidden = !globalThis.isSecureContext || !navigator.serviceWorker || typeof WebAssembly === 'undefined' || !!globalThis.crossOriginIsolated;
+      button.hidden = true;
+      // Access itself can throw in a sandbox or a restrictive privacy mode.
+      // Keep the original setup error visible instead of failing again here.
+      try {
+        button.hidden = !globalThis.isSecureContext || !navigator.serviceWorker || typeof WebAssembly === 'undefined' || !!globalThis.crossOriginIsolated;
+      } catch { /* This browser cannot retry service-worker setup. */ }
       button.disabled = false;
     } finally { running = false; }
   }
