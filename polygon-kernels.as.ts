@@ -1,19 +1,18 @@
-import { xyLeaf } from './geometry-kernels';
+import { xyLeaf } from './geometry-kernels.as';
 @external('predicates', 'orient2d')
 declare function orient2d(ax: f64, ay: f64, bx: f64, by: f64, cx: f64, cy: f64): f64;
 export { xyLeaf };
 
-// Match the translated-coordinate orientation used by Turf's predicate.
-// The filter is conservative; uncertain, subnormal, and overflowing products
-// use robust-predicates. There is no fixed coordinate epsilon.
+// A conservative determinant error filter, not a coordinate epsilon.
+// Uncertain/subnormal/overflowing products use the independent robust routine.
 @inline
 function orientation(u1: f64, v1: f64, u2: f64, v2: f64): f64 {
-  const left = u2 * v1, right = u1 * v2, det = left - right;
-  const sum = abs(left) + abs(right);
+  const left = u2 * v1, right = u1 * v2, det = left - right, sum = abs(left) + abs(right);
   if (sum > 1e-280 && sum < 1e280 && abs(det) > sum * 1e-15) return det;
+  // Match the translated-coordinate predicate used by point-in-polygon-hao.
   return orient2d(u1, u2, v1, v2, 0, 0);
 }
-// 0: no crossing, 1: crossing, 2: boundary. Uses a half-open vertex rule.
+// 0 outside, 1 crossing, 2 boundary. Half-open vertex rule.
 @inline
 function edgePoint(ax: f64, ay: f64, bx: f64, by: f64, x: f64, y: f64): u32 {
   const u1 = ax - x, v1 = ay - y, u2 = bx - x, v2 = by - y;
@@ -23,8 +22,7 @@ function edgePoint(ax: f64, ay: f64, bx: f64, by: f64, x: f64, y: f64): u32 {
   if (det == 0) return 2;
   return <u32>((det > 0 && v2 > 0 && v1 <= 0) || (det < 0 && v2 <= 0 && v1 > 0));
 }
-
-// The low 16 bits are crossings; the high 16 bits are boundary matches.
+// Low 16 bits: crossings. High 16 bits: boundary matches.
 function edgeMask(p: u32, count: u32, active: u32, ax: f64, ay: f64, bx: f64, by: f64): u32 {
   let crossings: u32 = 0, boundary: u32 = 0, i: u32 = 0;
   if (ASC_FEATURE_SIMD) {
@@ -39,8 +37,7 @@ function edgeMask(p: u32, count: u32, active: u32, ax: f64, ay: f64, bx: f64, by
       const horizontalHit = v128.and(horizontal, v128.or(v128.and(f64x2.le(u2, zero), f64x2.ge(u1, zero)), v128.and(f64x2.le(u1, zero), f64x2.ge(u2, zero))));
       const eligible = v128.andnot(v128.or(v128.and(f64x2.ge(v2, zero), f64x2.le(v1, zero)), v128.and(f64x2.le(v2, zero), f64x2.ge(v1, zero))), horizontal);
       const eligibleBits = <u32>i64x2.bitmask(eligible) & enabled;
-      let bound = <u32>i64x2.bitmask(horizontalHit) & enabled;
-      let cross: u32 = 0;
+      let bound = <u32>i64x2.bitmask(horizontalHit) & enabled, cross: u32 = 0;
       if (eligibleBits) {
         const left = f64x2.mul(u2, v1), right = f64x2.mul(u1, v2), det = f64x2.sub(left, right);
         const sum = f64x2.add(f64x2.abs(left), f64x2.abs(right));
@@ -67,7 +64,6 @@ function edgeMask(p: u32, count: u32, active: u32, ax: f64, ay: f64, bx: f64, by
   }
   return crossings | (boundary << 16);
 }
-
 export function boxMaskXY(p: u32, count: u32, lx: f64, ly: f64, hx: f64, hy: f64): u32 {
   if (count > 16) unreachable();
   let mask: u32 = 0;
@@ -77,11 +73,9 @@ export function boxMaskXY(p: u32, count: u32, lx: f64, ly: f64, hx: f64, hy: f64
   }
   return mask;
 }
-
 export function ringMaskXY(p: u32, count: u32, active: u32, root: u32, depth: u32, tail: u32, size: u32): u32 {
   if (count > 16 || size < 8 || (size & 1)) unreachable();
-  let crossings: u32 = 0, boundary: u32 = 0;
-  let node = xyLeaf(root, depth, tail, size, 0);
+  let crossings: u32 = 0, boundary: u32 = 0, node = xyLeaf(root, depth, tail, size, 0);
   let ax = load<f64>(node), ay = load<f64>(node + 8);
   for (let at: u32 = 2; at < size; at += 2) {
     if (!active) break;
@@ -93,9 +87,7 @@ export function ringMaskXY(p: u32, count: u32, active: u32, root: u32, depth: u3
   }
   return crossings | (boundary << 16);
 }
-
-// Different arenas need no copy or multi-memory feature. Pass one query point
-// by value and scan the ring in its own arena. This path is deliberately scalar.
+// Cross-arena fallback passes query coordinates by value, without shared writes.
 export function ringPointXY(root: u32, depth: u32, tail: u32, size: u32, x: f64, y: f64): u32 {
   if (size < 8 || (size & 1)) unreachable();
   let node = xyLeaf(root, depth, tail, size, 0), parity: u32 = 0;
