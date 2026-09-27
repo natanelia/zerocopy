@@ -14,7 +14,7 @@ function waitForControl(environment, url, scope, timeoutMs) {
   if (hasControl(container, url)) return Promise.resolve();
   return new Promise((resolve, reject) => {
     let finished = false, registration;
-    const watched = new Set();
+    const watched = new Set(), claimRequested = new Set();
     const cleanup = () => {
       environment.clearTimeout(timer);
       container.removeEventListener('controllerchange', check);
@@ -35,6 +35,28 @@ function waitForControl(environment, url, scope, timeoutMs) {
       if (hasControl(container, url)) { finish(); return; }
       watch(container.controller);
       watch(registration?.installing); watch(registration?.waiting); watch(registration?.active);
+      const active = registration?.active;
+      if (active?.scriptURL === url.href && active.state === 'activated' && !claimRequested.has(active)) {
+        // Another tab may have activated this worker before our page existed.
+        // Ask it to claim again; only a real controllerchange permits navigation.
+        claimRequested.add(active);
+        try { active.postMessage({ type: 'zerocopy-isolation:claim', version: 1 }); }
+        catch (error) { finish(error); }
+      }
+    }
+    function adopt(value) {
+      const workers = [value?.installing, value?.waiting, value?.active];
+      if (finished || value?.scope !== scope.href ||
+          !workers.some(worker => worker?.scriptURL === url.href && worker.state !== 'redundant')) return false;
+      registration?.removeEventListener('updatefound', check);
+      registration = value; registration.addEventListener('updatefound', check); check();
+      return true;
+    }
+    async function existingRegistration() {
+      // getRegistration can return a broader-scope worker. adopt requires an
+      // exact scope and script match, and never removes another registration.
+      try { return await container.getRegistration(scope.href); }
+      catch { return undefined; }
     }
     function changed(event) {
       check();
@@ -46,11 +68,21 @@ function waitForControl(environment, url, scope, timeoutMs) {
     }
     const timer = environment.setTimeout(() => finish(new Error('Demo setup timed out. Check your connection and try again.')), timeoutMs);
     container.addEventListener('controllerchange', check);
-    // Also catches synchronous policy errors. Ignore a late registration after timeout.
-    Promise.resolve().then(() => container.register(url, { scope: scope.href, updateViaCache: 'none' })).then(value => {
+    // Reuse another tab's installation before starting a competing job. A
+    // rejected job may still have a matching installation created by that tab.
+    // Recheck once on failure; do not retry arbitrary policy or network errors.
+    Promise.resolve().then(async () => {
+      const existing = await existingRegistration();
+      if (finished || adopt(existing)) return;
+      const value = await container.register(url, { scope: scope.href, updateViaCache: 'none' });
+      if (!finished && !adopt(value)) throw new Error('The browser returned an unexpected demo registration.');
+    }).catch(async error => {
       if (finished) return;
-      registration = value; registration.addEventListener('updatefound', check); check();
-    }).catch(finish);
+      check();
+      if (finished) return;
+      const existing = await existingRegistration();
+      if (!finished && !adopt(existing)) finish(error);
+    });
     check();
   });
 }

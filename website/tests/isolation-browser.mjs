@@ -111,6 +111,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         assert.equal(storageVisits.length, 2); await storage.close();
 
         // Two tabs can install/claim concurrently. Neither may loop or need a click.
+        for (let round = 0; round < 3; round++) {
         const tabs = await browser.newContext();
         const pair = await Promise.all([tabs.newPage(), tabs.newPage()]);
         const histories = await Promise.all(pair.map(navigations));
@@ -123,6 +124,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
           }
         }
         assert.ok(histories.every(history => history.length >= 1 && history.length <= 2)); await tabs.close();
+        }
 
         // Inject a policy/registration error once. Retry is a recovery action, not a first-visit gate.
         const failure = await browser.newContext();

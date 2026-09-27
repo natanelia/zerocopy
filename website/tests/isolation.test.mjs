@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { ATTEMPT_PARAMETER, prepareIsolation } from '../assets/isolation.mjs';
 
 const route = 'https://example.test/zerocopy/previews/pr-10/test/compare/';
@@ -14,12 +16,14 @@ class Events extends EventTarget {
 }
 class Worker extends Events {
   state = 'installing'; scriptURL = workerURL.href;
+  messages = [];
+  postMessage(data) { this.messages.push(data); }
   change(state) { this.state = state; this.emit('statechange'); }
 }
 function setup(href = route + '?query=timeout&count=1000#results') {
   const worker = new Worker(), registration = new Events(), container = new Events();
   const calls = [], navigations = [], timers = new Set();
-  Object.assign(registration, { installing: worker, waiting: null, active: null });
+  Object.assign(registration, { scope: route, installing: worker, waiting: null, active: null });
   Object.assign(container, { controller: null, register: async (...args) => { calls.push(args); return registration; } });
   const environment = {
     isSecureContext: true, crossOriginIsolated: false, SharedArrayBuffer, WebAssembly,
@@ -144,4 +148,106 @@ test('a throwing service-worker getter rejects without navigation or leaked reso
   Object.defineProperty(s.environment.navigator, 'serviceWorker', { get() { throw new Error('Service workers blocked by policy'); } });
   await assert.rejects(s.run(), /blocked by policy/);
   assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+});
+
+
+test('reuse an exact installation from another tab and request control without a new registration', async () => {
+  const s = setup(); s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
+  s.container.getRegistration = async scope => { assert.equal(scope, route); return s.registration; };
+  const pending = s.run(); await tick();
+  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 0);
+  assert.deepEqual(s.worker.messages, [{ type: 'zerocopy-isolation:claim', version: 1 }]);
+  s.container.emit('controllerchange'); s.registration.emit('updatefound');
+  assert.equal(s.worker.messages.length, 1, 'Do not repeatedly ask the same active worker to claim');
+  s.claim(); assert.equal(await pending, 'reloading'); s.clean();
+});
+test('a rejected registration job can use a matching installation completed by another tab', async () => {
+  const s = setup(); let reads = 0;
+  s.container.getRegistration = async () => ++reads === 1 ? undefined : s.registration;
+  s.container.register = async () => {
+    s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
+    throw new Error('Concurrent registration rejected');
+  };
+  const pending = s.run(); await tick();
+  assert.equal(reads, 2); assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0);
+  s.claim(); assert.equal(await pending, 'reloading'); assert.equal(s.navigations.length, 1); s.clean();
+});
+test('a matching installation still in progress is reused until it activates and controls this page', async () => {
+  const s = setup(); s.container.getRegistration = async () => s.registration;
+  const pending = s.run(); await tick(); assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 0);
+  s.registration.installing = null; s.registration.active = s.worker; s.worker.change('activated');
+  assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0);
+  s.claim(); await pending; s.clean();
+});
+test('another script or broader registration must not hide the original registration error', async () => {
+  for (const mismatch of ['script', 'scope', 'redundant']) {
+    const s = setup(); s.container.getRegistration = async () => s.registration;
+    if (mismatch === 'script') s.worker.scriptURL = new URL('unrelated.js', route).href;
+    if (mismatch === 'scope') s.registration.scope = new URL('../', route).href;
+    if (mismatch === 'redundant') s.worker.state = 'redundant';
+    s.container.register = () => { throw new Error('Original registration error'); };
+    await assert.rejects(s.run(), /Original registration error/);
+    assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+  }
+});
+test('failed registration lookup preserves the registration error', async () => {
+  const s = setup(); s.container.getRegistration = () => Promise.reject(new Error('Lookup blocked'));
+  s.container.register = () => Promise.reject(new Error('Registration blocked'));
+  await assert.rejects(s.run(), /Registration blocked/); s.clean(); assert.equal(s.navigations.length, 0);
+});
+test('a late registration lookup after the deadline must neither register nor claim nor navigate', async () => {
+  const s = setup(); let release;
+  s.container.getRegistration = () => new Promise(resolve => { release = resolve; });
+  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
+  s.worker.state = 'activated'; s.registration.active = s.worker; s.registration.installing = null;
+  release(s.registration); await tick();
+  assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+});
+test('a late recovery lookup after registration failure must not claim or navigate', async () => {
+  const s = setup(); let release, reads = 0;
+  s.container.getRegistration = () => ++reads === 1 ? Promise.resolve(undefined) : new Promise(resolve => { release = resolve; });
+  s.container.register = () => Promise.reject(new Error('Concurrent registration rejected'));
+  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
+  release(s.registration); s.claim(); await tick();
+  assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+});
+test('a claim request is not success: a reused active worker still needs to control the page', async () => {
+  const s = setup(); s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
+  s.container.getRegistration = async () => s.registration;
+  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/);
+  assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 1); assert.equal(s.navigations.length, 0); s.clean();
+});
+
+
+function workerHarness() {
+  const handlers = new Map(); let claims = 0;
+  const self = {
+    registration: { scope: route }, location: { origin: new URL(route).origin },
+    addEventListener: (name, handler) => handlers.set(name, handler),
+    clients: { claim: async () => { claims++; } },
+  };
+  runInNewContext(readFileSync(new URL('../assets/isolation-sw.js', import.meta.url), 'utf8'), { self, URL });
+  async function message(source, data = { type: 'zerocopy-isolation:claim', version: 1 }) {
+    const work = []; handlers.get('message')({ source, data, waitUntil: value => work.push(value) });
+    await Promise.all(work);
+  }
+  return { self, message, claims: () => claims };
+}
+test('the setup worker accepts a control request only from an in-scope window', async () => {
+  const h = workerHarness();
+  await h.message({ type: 'window', url: route + '?q=timeout#main' });
+  assert.equal(h.claims(), 1);
+});
+test('unrelated windows, workers, and malformed messages cannot request a claim', async () => {
+  const h = workerHarness();
+  for (const source of [null, { type: 'worker', url: route }, { type: 'window', url: 'invalid url' },
+    { type: 'window', url: 'https://other.example/compare/' }, { type: 'window', url: route.replace('/compare/', '/comparison/') },
+    { type: 'window', url: new URL('../docs/', route).href }]) await h.message(source);
+  for (const data of [null, {}, { type: 'zerocopy-isolation:claim', version: 2 }, { type: 'other', version: 1 }])
+    await h.message({ type: 'window', url: route }, data);
+  assert.equal(h.claims(), 0);
+});
+test('a rejected browser claim does not produce an unhandled worker rejection', async () => {
+  const h = workerHarness(); h.self.clients.claim = () => Promise.reject(new Error('Browser denied claim'));
+  await h.message({ type: 'window', url: route });
 });
