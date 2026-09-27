@@ -74,3 +74,15 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
   assert.ok(!home.includes('<script src="https://'));
 });
+
+test('demo workers and all runtime modules stay inside the opt-in isolation scope', () => {
+  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs']]) {
+    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
+    assert.ok(html.includes(`src="${meta.base}${route}/assets/main.mjs"`));
+    assert.ok(!html.includes(`src="${meta.base}assets/main.mjs"`));
+    assert.ok(existsSync(join(out, route, 'assets', worker)));
+    assert.ok(existsSync(join(out, route, 'isolation-sw.js')));
+    assert.equal(readFileSync(join(out, route, 'library/shared.js'), 'utf8'), readFileSync(join(out, 'library/shared.js'), 'utf8'));
+  }
+});

@@ -21,10 +21,26 @@ for (const file of readdirSync(join(root, 'dist'))) if (file.endsWith('.js')) cp
 const routes = new Map(pages.map(page => [page.source, `docs/${page.slug}/`]));
 routes.set('README.md', ''); routes.set('docs/README.md', 'docs/getting-started/');
 routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
+// A controlled page is not sufficient: dedicated worker entry URLs and their
+// dependencies must also be inside the opt-in service worker's demo scope.
+const demoScripts = new Map([
+  ['lab/', ['main.mjs', 'capability.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs']],
+  ['playground/', ['main.mjs', 'capability.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
+]);
+for (const [route, scripts] of demoScripts) {
+  mkdirSync(join(out, route, 'assets'), { recursive: true });
+  for (const file of scripts) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
+  cpSync(join(out, 'library'), join(out, route, 'library'), { recursive: true });
+}
 const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
-  writeFileSync(join(destination, 'index.html'), shell({ title, description, body, script, base, route, version, sha, origin }));
+  let html = shell({ title, description, body, script, base, route, version, sha, origin });
+  if (demoScripts.has(route)) {
+    // Keep both main.mjs references identical so it registers each UI handler once.
+    html = html.replaceAll(`src="${base}assets/`, `src="${base}${route}assets/`);
+  }
+  writeFileSync(join(destination, 'index.html'), html);
   siteRoutes.push(route);
 }
 writePage('', 'Share your data. Not copies.', 'Shared immutable collections for JavaScript and TypeScript. Direct reads across workers, stable snapshots, and optional task pools.', home(base), 'home.mjs');

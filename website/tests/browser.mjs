@@ -61,12 +61,26 @@ try {
   try {
     const ctx = await browser.newContext(); const p = activePage = await ctx.newPage(); p.setDefaultTimeout(25000);
     const staticOrigin = `http://127.0.0.1:${staticServer.address().port}`;
+    p.on('pageerror', error => errors.push(error.message));
+    p.on('requestfailed', request => console.error('Static-host request failed:', request.url(), request.failure()?.errorText));
     await p.goto(staticOrigin + base + 'lab/'); assert.equal(await p.locator('#run-benchmark').isDisabled(), true);
     await p.locator('#enable-isolation').click();
     await p.waitForFunction(() => crossOriginIsolated && !document.querySelector('#run-benchmark').disabled);
     await p.locator('#entries').selectOption('1000'); await p.locator('#readers').selectOption('1'); await p.locator('#run-benchmark').click();
     await p.waitForFunction(() => document.querySelector('#benchmark-status').textContent.startsWith('Complete.'));
-    await ctx.close(); console.log('Passed: static host without headers → explicit scoped isolation → actual shared-memory benchmark.');
+    await p.goto(staticOrigin + base + 'playground/');
+    assert.equal(await p.locator('#start-playground').isDisabled(), true, 'Lab isolation must not silently cover the playground');
+    await p.locator('#enable-isolation').click();
+    await p.waitForFunction(() => crossOriginIsolated && !document.querySelector('#start-playground').disabled);
+    await p.locator('#start-playground').click();
+    await p.waitForFunction(() => document.querySelector('#reader-value').textContent.includes('30'));
+    await p.locator('#speed').fill('90'); await p.locator('#apply-edit').click();
+    await p.waitForFunction(() => document.querySelector('#reader-value').textContent.includes('90'));
+    assert.match(await p.locator('#retained-value').innerText(), /30/);
+    await p.locator('#stop-playground').click();
+    await p.goto(staticOrigin + base + 'docs/getting-started/');
+    assert.equal(await p.evaluate(() => navigator.serviceWorker.controller), null, 'Demo isolation must not control the docs');
+    await ctx.close(); console.log('Passed: static host without headers → two independent scoped isolation flows → actual benchmark and snapshot updates.');
   } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
   assert.deepEqual(errors, []);
 } catch (error) {

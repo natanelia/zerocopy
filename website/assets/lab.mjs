@@ -53,7 +53,7 @@ document.querySelector('#benchmark-form').addEventListener('submit', event => {
       if (data.type === 'result') { finish(); show(data.result); progress.hidden = true; }
       if (data.type === 'error') fail(`Run failed: ${data.message}`);
     };
-    worker.onerror = event => { if (worker === currentWorker) fail(`Worker failed: ${event.message}`); };
+    worker.onerror = event => { if (worker === currentWorker) fail(`Worker failed: ${event.message ?? 'Unable to load the worker. Check isolation headers and worker script access.'}`); };
     worker.onmessageerror = () => { if (worker === currentWorker) fail('Worker returned an unreadable message.'); };
     watchdog = setTimeout(() => fail('Run exceeded the two-minute limit. Use fewer entries or readers.'), 120000);
     worker.postMessage({ type: 'run', config: { entries: Number(document.querySelector('#entries').value), readers: Number(document.querySelector('#readers').value) }, source: document.body.dataset.source });
