@@ -18,10 +18,11 @@ function waitForActive(environment, url, scope, timeoutMs) {
   const container = environment.navigator.serviceWorker;
   if (hasControl(container, url)) return Promise.resolve();
   return new Promise((resolve, reject) => {
-    let finished = false, registration;
+    let finished = false, registration, refreshTimer;
     const watched = new Set();
     const cleanup = () => {
       environment.clearTimeout(timer);
+      if (refreshTimer !== undefined) environment.clearTimeout(refreshTimer);
       container.removeEventListener('controllerchange', check);
       registration?.removeEventListener('updatefound', check);
       for (const worker of watched) worker.removeEventListener('statechange', changed);
@@ -38,18 +39,41 @@ function waitForActive(environment, url, scope, timeoutMs) {
     function check() {
       if (finished) return;
       if (hasControl(container, url)) { finish(); return; }
-      watch(container.controller);
-      watch(registration?.installing); watch(registration?.waiting); watch(registration?.active);
+      const workers = [registration?.installing, registration?.waiting, registration?.active];
+      if (workers.some(worker => worker && worker.state !== 'redundant') &&
+          !workers.some(worker => worker?.scriptURL === url.href && worker.state !== 'redundant')) {
+        finish(new Error('The browser returned an unexpected demo registration.')); return;
+      }
+      if (container.controller?.scriptURL === url.href) watch(container.controller);
+      for (const worker of workers) if (worker?.scriptURL === url.href) watch(worker);
       const active = registration?.active;
       if (active?.scriptURL === url.href && active.state === 'activated') finish();
     }
-    function adopt(value) {
+    function adopt(value, allowEmpty = false) {
       const workers = [value?.installing, value?.waiting, value?.active];
+      const empty = workers.every(worker => !worker);
       if (finished || value?.scope !== scope.href ||
+          !(allowEmpty && empty) &&
           !workers.some(worker => worker?.scriptURL === url.href && worker.state !== 'redundant')) return false;
       registration?.removeEventListener('updatefound', check);
       registration = value; registration.addEventListener('updatefound', check); check();
       return true;
+    }
+    function refresh() {
+      if (finished || refreshTimer !== undefined || typeof container.getRegistration !== 'function') return;
+      // During concurrent installation WebKit can return an exact-scope
+      // registration before its worker slots are populated. Events remain the
+      // fast path. Refresh the registration until the same bounded deadline in
+      // case another process updates a different registration wrapper.
+      refreshTimer = environment.setTimeout(async () => {
+        const value = await existingRegistration();
+        environment.clearTimeout(refreshTimer); refreshTimer = undefined;
+        if (finished) return;
+        if (value?.scope === scope.href) {
+          if (!adopt(value, true)) { finish(new Error('The browser returned an unexpected demo registration.')); return; }
+        }
+        check(); refresh();
+      }, 100);
     }
     async function existingRegistration() {
       // getRegistration can return a broader-scope worker. adopt requires an
@@ -72,15 +96,21 @@ function waitForActive(environment, url, scope, timeoutMs) {
     // Recheck once on failure; do not retry arbitrary policy or network errors.
     Promise.resolve().then(async () => {
       const existing = await existingRegistration();
-      if (finished || adopt(existing)) return;
+      if (finished) return;
+      if (adopt(existing)) { refresh(); return; }
       const value = await container.register(url, { scope: scope.href, updateViaCache: 'none' });
-      if (!finished && !adopt(value)) throw new Error('The browser returned an unexpected demo registration.');
+      // A successful register() may return before updatefound fills the slots.
+      // An empty registration is not success: only a matching activated worker
+      // permits navigation, and the new page still checks crossOriginIsolated.
+      if (!finished && !adopt(value, true)) throw new Error('The browser returned an unexpected demo registration.');
+      refresh();
     }).catch(async error => {
       if (finished) return;
       check();
       if (finished) return;
       const existing = await existingRegistration();
-      if (!finished && !adopt(existing)) finish(error);
+      if (finished) return;
+      if (adopt(existing)) refresh(); else finish(error);
     });
     check();
   });

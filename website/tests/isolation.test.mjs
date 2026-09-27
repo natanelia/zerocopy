@@ -259,3 +259,58 @@ test('activation cannot be stalled by a pending, rejected, or throwing page clai
     await Promise.all(extensions);
   }
 });
+
+
+test('a successful empty registration waits for updatefound and activation', async () => {
+  const s = setup(); s.registration.installing = null;
+  const pending = s.run(); await tick();
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0);
+  s.registration.installing = s.worker; s.registration.emit('updatefound');
+  assert.equal(s.navigations.length, 0);
+  s.registration.installing = null; s.registration.active = s.worker; s.worker.change('activated');
+  assert.equal(await pending, 'reloading'); assert.equal(s.navigations.length, 1); s.clean();
+});
+test('an empty existing registration triggers only one registration job', async () => {
+  const s = setup(); s.registration.installing = null;
+  s.container.getRegistration = async () => s.registration;
+  const pending = s.run(); await tick();
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0);
+  s.registration.active = s.worker; s.worker.state = 'activated'; s.registration.emit('updatefound');
+  assert.equal(await pending, 'reloading'); assert.equal(s.calls.length, 1); s.clean();
+});
+test('refresh observes activation through a different wrapper without any state event', async () => {
+  const s = setup(); s.registration.installing = null;
+  let current = s.registration, reads = 0;
+  s.container.getRegistration = async () => { reads++; return current; };
+  const pending = s.run({ timeoutMs: 1000 }); await tick();
+  const replacement = new Events(); s.worker.state = 'activated';
+  Object.assign(replacement, { scope: route, installing: null, waiting: null, active: s.worker });
+  current = replacement; // A different process supplies a fresh wrapper; no event arrives here.
+  assert.equal(await pending, 'reloading');
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1); assert.ok(reads >= 2);
+  assert.equal(replacement.listenerCount, 0); s.clean();
+});
+test('an empty registration cannot enable the demo and has a bounded lifetime', async () => {
+  const s = setup(); s.registration.installing = null;
+  s.container.getRegistration = async () => s.registration;
+  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/);
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0); s.clean();
+  s.registration.active = s.worker; s.worker.change('activated'); s.registration.emit('updatefound');
+  await tick(); assert.equal(s.navigations.length, 0); s.clean();
+});
+test('a different script appearing in an empty registration is rejected without navigation', async () => {
+  const s = setup(); s.registration.installing = null;
+  const pending = s.run(); await tick();
+  const other = new Worker(); other.scriptURL = new URL('unrelated.js', route).href;
+  s.registration.installing = other; s.registration.emit('updatefound');
+  await assert.rejects(pending, /unexpected demo registration/);
+  assert.equal(s.navigations.length, 0); assert.equal(other.listenerCount, 0); s.clean();
+});
+test('a late refresh after the deadline cannot navigate or leave another timer', async () => {
+  const s = setup(); s.registration.installing = null; let release, reads = 0;
+  s.container.getRegistration = () => ++reads === 1 ? Promise.resolve(s.registration) : new Promise(resolve => { release = resolve; });
+  await assert.rejects(s.run({ timeoutMs: 150 }), /timed out/); s.clean();
+  s.registration.active = s.worker; s.worker.state = 'activated';
+  release(s.registration); await tick();
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 0); s.clean();
+});
