@@ -108,3 +108,13 @@ The native baseline uses incremental deltas by default. Full snapshot replicatio
 The transport counter reports logical event deliveries to worker replicas. It does not measure bytes, retained heap, or result-message traffic. Shared mode still sends descriptors, allocates wrappers, and decodes strings. Timing reports show publication/attachment and query completion separately. Owner construction and append work, startup, and DOM rendering are not included. Concurrent timings can be affected by CPU contention; use the rotated three-architecture benchmark for controlled samples.
 
 A single active operation and one latest pending query bound work. Live ingestion waits for previous work to finish. The session stops at 200,000 events. Stop terminates the coordinator and nested readers, clears the displayed results, and drops references without promising forced garbage collection.
+
+## Memory startup regression
+
+The comparison is tested in real Chromium and Playwright WebKit, including 1,000-event startup, 100,000-event loading, Stop/restart, and no-header hosting. This is engine coverage, not a claim of testing every iPhone model. Preview publication waits for the WebKit check.
+
+The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
+
+Nested demo workers use a small local ES module wrapper. This lets them inherit the parent worker's isolation on WebKit while importing the original worker module. The wrapper URL is released with the worker. Hosts with a custom Content Security Policy must permit `blob:` in `worker-src` for these nested demos.
+
+`node --test proofs/memory-startup.mjs` checks allocation counts in fresh workers, bounded defaults, configuration, read-only copies, growth, reset, and retained snapshots. `node website/tests/memory-browser.mjs` runs the browser regression.

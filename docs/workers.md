@@ -31,7 +31,7 @@ Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp
 ```
 
-Third-party resources must also satisfy the embedder policy. Check `crossOriginIsolated` before importing the library. Its current entry points initialize default shared-memory arenas during module loading, even for `local()`. Copy mode is not a fallback for a browser that cannot create shared WASM memory.
+Third-party resources must also satisfy the embedder policy. Check `crossOriginIsolated` before importing the library. Default arenas are now allocated on first collection use, not on import. Collection construction still requires shared WASM memory. Copy mode is not a fallback for a browser that cannot create shared WASM memory.
 
 The examples use dynamic imports after that check. `import type` is safe before the check because it is removed from JavaScript. Use a TypeScript-aware worker bundler. Keep `new Worker(new URL('./catalog.worker.ts', import.meta.url), { type: 'module' })` inside the factory so the bundler can identify the worker entry. See [Vite's worker documentation](https://vite.dev/guide/features#web-workers) and the [browser transport guide](worker-sharing.md#browser-setup).
 

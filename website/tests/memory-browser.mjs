@@ -53,7 +53,7 @@ try {
         assert.equal(libraryRequests, 0, 'Native readers must not depend on the WASM engine');
         await context.unroute('**/library/**');
       }
-      for (const size of (isolated ? ['1000', '100000', '1000'] : ['1000'])) {
+      for (const size of ['1000', '100000', '1000']) {
         await page.locator('#compare-size').selectOption(size);
         await page.locator('#compare-start').click(); await complete(Number(size));
         await page.locator('#compare-freeze').click(); await complete(Number(size));

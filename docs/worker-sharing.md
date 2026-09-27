@@ -15,7 +15,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Check `crossOriginIsolated` in the application. Review third-party scripts, images, and frames before enabling these headers; resources may need compatible CORS or Cross-Origin-Resource-Policy settings. The [local demo server](../demo/serve.ts) supplies isolation headers.
 
-Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files. Load the library with a dynamic import after the isolation check: a static import initializes its default arenas before the module body runs.
+Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files. Load the library with a dynamic import after the isolation check so unsupported browsers receive a clear error before setup. Default arenas are allocated on first collection use, not on import.
 
 **main.ts**
 
