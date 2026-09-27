@@ -53,6 +53,11 @@ try {
   }
   await mobile.goto(origin + base); await mobile.screenshot({ path: screenshots + '/home-mobile.png', fullPage: true });
   await mobile.getByRole('button', { name: 'Menu', exact: true }).click(); assert.equal(await mobile.locator('#mobile-nav').isVisible(), true);
+  await mobile.setViewportSize({ width: 1200, height: 900 });
+  await mobile.locator('#mobile-nav').waitFor({ state: 'hidden' });
+  assert.equal(await mobile.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
+  await mobile.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await mobile.locator('#mobile-nav').isVisible(), false);
   const noJs = await browser.newContext({ javaScriptEnabled: false }); const plain = await noJs.newPage();
   await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap')); await noJs.close();
   await context.close();

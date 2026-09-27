@@ -57,6 +57,15 @@ document.querySelector('.menu-toggle').addEventListener('click', event => {
   const nav = document.querySelector('#mobile-nav'); nav.hidden = !nav.hidden;
   event.currentTarget.setAttribute('aria-expanded', String(!nav.hidden));
 });
+// A menu opened on a narrow screen must not cover the desktop after a resize.
+const mobileWidth = matchMedia('(max-width: 850px)');
+function resetDesktopMenu() {
+  if (mobileWidth.matches) return;
+  document.querySelector('#mobile-nav').hidden = true;
+  document.querySelector('.menu-toggle').setAttribute('aria-expanded', 'false');
+}
+mobileWidth.addEventListener('change', resetDesktopMenu);
+resetDesktopMenu();
 document.addEventListener('click', async event => {
   const button = event.target.closest('.copy-code, .copy-page');
   if (!button) return;
