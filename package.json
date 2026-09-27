@@ -38,8 +38,11 @@
   "bugs": { "url": "https://github.com/natanelia/zerocopy/issues" },
   "homepage": "https://github.com/natanelia/zerocopy#readme",
   "engines": { "bun": ">=1.0.0" },
+  "dependencies": { "robust-predicates": "3.0.3" },
   "devDependencies": {
     "@turf/bbox": "7.4.0",
+    "@turf/boolean-point-in-polygon": "7.4.0",
+    "@turf/points-within-polygon": "7.4.0",
     "@reduxjs/toolkit": "2.12.0",
     "@redux-devtools/instrument": "3.0.0",
     "@vitest/browser": "4.1.11",
