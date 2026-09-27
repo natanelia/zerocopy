@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createPreview } from '../serve.mjs';
@@ -10,9 +10,10 @@ const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM
 const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
 const errors = [];
+let activePage;
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1024 }, reducedMotion: 'reduce' });
-  const page = await context.newPage(); page.setDefaultTimeout(20000); page.on('pageerror', error => errors.push(error.message));
+  const page = activePage = await context.newPage(); page.setDefaultTimeout(20000); page.on('pageerror', error => errors.push(error.message));
   const requested = []; page.on('request', request => requested.push(request.url()));
   await page.goto(origin + base); await page.locator('.reader-node').first().waitFor();
   assert.equal(await page.locator('.reader-node').count(), 3);
@@ -41,6 +42,7 @@ try {
   const downloadPromise = page.waitForEvent('download'); await page.locator('#export-results').click(); const download = await downloadPromise;
   const raw = JSON.parse(readFileSync(await download.path(), 'utf8')); assert.equal(raw.samples.shared.length, 7); assert.equal(raw.samples.native.length, 7); assert.equal(raw.raw.length, 14);
   for (const sample of raw.raw) for (const reader of sample.readers) assert.equal(reader.checksum, 499500);
+  writeFileSync(screenshots + '/benchmark-samples.json', JSON.stringify(raw, null, 2));
   await page.screenshot({ path: screenshots + '/lab-desktop.png', fullPage: true });
   await page.locator('#entries').selectOption('50000'); await page.getByRole('button', { name: 'Run benchmark' }).click(); await page.getByRole('button', { name: 'Stop run' }).click();
   assert.match(await page.locator('#benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#export-results').isDisabled(), true);
@@ -57,7 +59,7 @@ try {
   console.log('Passed: desktop/mobile layout, lazy runtime, navigation, safe search, no-JS docs, actual worker snapshots, live benchmark checksums/export, and cancellation.');
   const staticServer = createPreview({ base, isolated: false }); staticServer.listen(0, '127.0.0.1'); await once(staticServer, 'listening');
   try {
-    const ctx = await browser.newContext(); const p = await ctx.newPage(); p.setDefaultTimeout(25000);
+    const ctx = await browser.newContext(); const p = activePage = await ctx.newPage(); p.setDefaultTimeout(25000);
     const staticOrigin = `http://127.0.0.1:${staticServer.address().port}`;
     await p.goto(staticOrigin + base + 'lab/'); assert.equal(await p.locator('#run-benchmark').isDisabled(), true);
     await p.locator('#enable-isolation').click();
@@ -67,4 +69,11 @@ try {
     await ctx.close(); console.log('Passed: static host without headers → explicit scoped isolation → actual shared-memory benchmark.');
   } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
   assert.deepEqual(errors, []);
+} catch (error) {
+  if (activePage && !activePage.isClosed()) {
+    console.error('Failure at', activePage.url());
+    console.error(await activePage.locator('body').innerText().catch(() => 'Page unavailable'));
+    await activePage.screenshot({ path: screenshots + '/failure.png', fullPage: true }).catch(() => {});
+  }
+  throw error;
 } finally { await browser.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }

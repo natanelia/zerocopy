@@ -46,6 +46,7 @@ document.querySelector('.search-close').addEventListener('click', () => dialog.c
 dialog.addEventListener('click', event => { if (event.target === dialog) { const box = dialog.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close(); } });
 input.addEventListener('input', search);
 dialog.addEventListener('keydown', event => {
+  if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
   const links = [...resultList.querySelectorAll('a')];
   const index = links.indexOf(document.activeElement);
   if (event.key === 'ArrowDown' && links.length) { event.preventDefault(); links[(index + 1) % links.length].focus(); }

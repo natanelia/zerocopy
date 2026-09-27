@@ -46,13 +46,15 @@ document.querySelector('#benchmark-form').addEventListener('submit', event => {
   document.querySelectorAll('#benchmark-form select').forEach(input => input.disabled = true);
   try {
     worker = new Worker(new URL('./bench-runner.mjs', import.meta.url), { type: 'module' });
+    const currentWorker = worker;
     worker.onmessage = ({ data }) => {
+      if (worker !== currentWorker) return;
       if (data.type === 'status') { status.textContent = data.message; progress.max = data.total ?? 18; progress.value = data.completed; }
       if (data.type === 'result') { finish(); show(data.result); progress.hidden = true; }
       if (data.type === 'error') fail(`Run failed: ${data.message}`);
     };
-    worker.onerror = event => fail(`Worker failed: ${event.message}`);
-    worker.onmessageerror = () => fail('Worker returned an unreadable message.');
+    worker.onerror = event => { if (worker === currentWorker) fail(`Worker failed: ${event.message}`); };
+    worker.onmessageerror = () => { if (worker === currentWorker) fail('Worker returned an unreadable message.'); };
     watchdog = setTimeout(() => fail('Run exceeded the two-minute limit. Use fewer entries or readers.'), 120000);
     worker.postMessage({ type: 'run', config: { entries: Number(document.querySelector('#entries').value), readers: Number(document.querySelector('#readers').value) }, source: document.body.dataset.source });
   } catch (error) { fail(`Could not start: ${error.message}`); }

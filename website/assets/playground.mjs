@@ -28,12 +28,14 @@ start.addEventListener('click', async () => {
     value('owner-value', 30);
     worker = new Worker(new URL('./snapshot-worker.mjs', import.meta.url), { type: 'module' });
     worker.onmessage = ({ data }) => {
+      if (currentGeneration !== generation) return;
       if (data.type === 'error') { entry(`Error: ${data.message}`); disconnect(); return; }
       if (data.type !== 'snapshot') return;
       value('reader-value', data.current); value('retained-value', data.retained);
       entry(`Worker received v${data.version}: current ${data.current}; first snapshot ${data.retained}.`);
     };
-    worker.onerror = error => { entry(`Worker error: ${error.message}`); disconnect(); };
+    worker.onerror = error => { if (currentGeneration !== generation) return; entry(`Worker error: ${error.message}`); disconnect(); };
+    worker.onmessageerror = () => { if (currentGeneration !== generation) return; entry('Worker returned an unreadable message.'); disconnect(); };
     await state.connect(worker);
     if (currentGeneration !== generation) return;
     pending = false; apply.disabled = false; stop.disabled = false; speed.disabled = false;
