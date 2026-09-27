@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { basePath } from '../config.mjs';
+import { basePath, pages } from '../config.mjs';
 import { highlight, renderMarkdown } from '../render.mjs';
 import { expectedChecksum, orderFor, summarize, validateConfig, verifyChecksums } from '../assets/bench-core.mjs';
 const out = fileURLToPath(new URL('../_site/', import.meta.url));
@@ -62,7 +62,7 @@ test('all static pages have metadata, one main heading, and functioning internal
 });
 test('docs are prerendered and search points to generated pages', () => {
   const index = JSON.parse(readFileSync(join(out, 'search.json'), 'utf8'));
-  assert.equal(index.length, 15);
+  assert.equal(index.length, pages.length);
   for (const page of index) { assert.ok(existsSync(join(out, page.route, 'index.html'))); assert.ok(page.text.length > 100); }
   assert.ok(readFileSync(join(out, 'docs/collections/index.html'), 'utf8').includes('SharedMap'));
 });
@@ -76,7 +76,7 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
 });
 
 test('demo workers and all runtime modules stay inside the opt-in isolation scope', () => {
-  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs']]) {
+  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['investigation-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
     assert.ok(html.includes(`src="${meta.base}${route}/assets/main.mjs"`));
@@ -88,14 +88,40 @@ test('demo workers and all runtime modules stay inside the opt-in isolation scop
 });
 
 
-test('public examples use product stock rather than speed limits', () => {
+test('public examples avoid HD map defaults while the catalog remains a separate tutorial', () => {
   for (const file of files(out).filter(file => /\.(html|md)$/.test(file))) {
     assert.doesNotMatch(readFileSync(file, 'utf8'), /speed[ -]?limit|km\/h|lane-1|limits\.worker/i, file);
   }
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.match(home, /headphones/);
-  assert.match(home, /Sold out/);
+  assert.match(home, /log explorer/i);
+  assert.doesNotMatch(home, /headphones/);
   const playground = readFileSync(join(out, 'playground/index.html'), 'utf8');
   assert.match(playground, /Headphones in stock/);
   assert.match(playground, /id="stock"[^>]*step="1"[^>]*value="0"/);
+});
+
+
+test('the product has broad use cases and the log explorer is only one example', () => {
+  const home = readFileSync(join(out, 'index.html'), 'utf8');
+  assert.match(home, /One dataset/);
+  for (const slug of ['log-explorer', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) {
+    assert.ok(home.includes(`docs/${slug}/`), slug);
+  }
+  const cases = readFileSync(join(out, 'docs/use-cases/index.html'), 'utf8');
+  assert.match(cases, /not a log engine/);
+  assert.match(cases, /simpler alternative/);
+  assert.match(cases, /Persistence/);
+  const explorer = readFileSync(join(out, 'explorer/index.html'), 'utf8');
+  assert.match(explorer, /ONE EXAMPLE. MANY APPLICATIONS./);
+  assert.match(explorer, /100,000/);
+  assert.match(explorer, /Freeze investigation/);
+  assert.match(explorer, /No upload/);
+});
+
+test('investigation benchmark compares incremental replicas rather than a full-copy straw man', () => {
+  const html = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
+  assert.match(html, /only the delta/);
+  assert.match(html, /One data owner/);
+  assert.match(html, /No stored scores/);
+  assert.match(html, /independent native-array reference/);
 });

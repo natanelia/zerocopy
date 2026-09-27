@@ -11,7 +11,8 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
-  ['README.md', 'map-snapshots', "assert.equal(before.get('headphones'), 12); assert.equal(after.get('headphones'), 0); assert.notEqual(before, after);"],
+  ['README.md', 'map-snapshots', "assert.equal(before.size, 1); assert.equal(after.size, 2); assert.equal(after.get(1), 'Upstream timeout'); assert.notEqual(before, after);"],
+  ['website/content/log-explorer.md', 'log-columns', "assert.equal(before.message.get(1), 'Upstream timeout'); assert.equal(before.message.size, 2); assert.equal(next.message.size, 3); assert.equal(next.level.size, next.message.size);"],
   ['docs/api.md', 'typed-json', "assert.equal(before.get(product.id).stock, 12); assert.equal(restored.products.get(product.id).stock, 0); assert.equal(restored.categories.get('electronics').get(0).category, 'electronics'); assert(Object.isFrozen(restored.products.get(product.id).variants[0].sizes));"],
   ['docs/api.md', 'ordered-map', "assert.deepEqual([...labels.keys()], ['c', 'a', 'b']);"],
   ['docs/api.md', 'sorted-map', "assert.deepEqual([...reverse.keys()], ['c', 'b', 'a']);"],

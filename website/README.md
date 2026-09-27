@@ -26,6 +26,18 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
 
+## Log explorer
+
+At `/explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
+
+The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs, simulations, and scientific/spatial tools.
+
+## Investigation benchmark
+
+At `/investigation-benchmark/`, compare shared snapshots, two native-array replicas with incremental updates, and one native-data-owning worker. Measure initial sharing, a query on attached data, and append + publish + query separately. Native replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
+
+Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The existing Map transport lab remains available unchanged. For append-only arrays, native designs can also retain an earlier view by length.
+
 ## Playground
 
 At `/playground/`, start a real dedicated worker and update the owner state. The worker's latest snapshot changes; its retained initial snapshot does not. All collection reads use the actual library, with shared transport explicitly selected. Small worker reports exist only to display the result.
@@ -46,7 +58,7 @@ All pages are prerendered HTML. The docs remain readable without JavaScript. Sea
 
 For a host with response-header configuration, deploy `_site/` and apply its `_headers` file or equivalent settings. Use `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The preview server does this automatically.
 
-GitHub Pages does not provide application-controlled response headers. The lab and playground therefore offer an explicit **Enable shared memory & reload** action. It registers a network-only service worker scoped to the current demo path. The worker adds isolation headers to same-origin responses and performs no caching. Activation causes one user-requested reload, not a loop. Unsupported browsers keep the demo disabled and show the requirement. No silent copy fallback is used.
+GitHub Pages does not provide application-controlled response headers. The live demos therefore offer an explicit **Enable shared memory & reload** action. It registers a network-only service worker scoped to the current demo path. The worker adds isolation headers to same-origin responses and performs no caching. Activation causes one user-requested reload, not a loop. Unsupported browsers keep the demo disabled and show the requirement. No silent copy fallback is used.
 
 Test this hosting path with `SITE_ISOLATED=false node website/serve.mjs`. Server headers remain the preferred deployment method.
 
@@ -61,6 +73,7 @@ The build also provides local search, a 404 page, raw Markdown downloads, `llms.
 ```sh
 node --test website/tests/*.test.mjs
 node website/tests/browser.mjs
+node website/tests/explorer-browser.mjs
 ```
 
 Build first. Browser tests use the root Playwright dependency and Chromium. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.

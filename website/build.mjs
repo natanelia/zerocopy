@@ -5,6 +5,8 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { pages, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
+import { explorer } from './explorer-template.mjs';
+import { investigationBenchmark } from './explorer-benchmark-template.mjs';
 import { shell, home, docsLayout, lab, playground, useCaseCards } from './templates.mjs';
 
 const here = fileURLToPath(new URL('.', import.meta.url)), root = resolve(here, '..');
@@ -25,6 +27,8 @@ routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
 // dependencies must also be inside the opt-in service worker's demo scope.
 const demoScripts = new Map([
   ['lab/', ['main.mjs', 'capability.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs']],
+  ['explorer/', ['main.mjs', 'capability.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs']],
+  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
   ['playground/', ['main.mjs', 'capability.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 for (const [route, scripts] of demoScripts) {
@@ -44,9 +48,11 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', 'Share your data. Not copies.', 'Shared immutable collections for JavaScript and TypeScript. Direct reads across workers, stable snapshots, and optional task pools.', home(base), 'home.mjs');
+writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base), 'explorer.mjs');
+writePage('investigation-benchmark/', 'Compare three investigation architectures', 'Measure shared snapshots, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
 writePage('lab/', 'Benchmark lab', 'Compare shared snapshots and structured-cloned maps in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
-writePage('use-cases/', 'Built for shared work', 'Application patterns for large product catalogs, editors, and maps.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Keep large inputs available to the UI and workers. Start with the access pattern—not a new framework.</p></div>${useCaseCards(base)}<p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
+writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Logs are one example, not the product. Use zerocopy wherever several threads need local reads of large, versioned collections.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const { html, toc } = renderMarkdown(source, page.source, routes, base);
@@ -57,7 +63,7 @@ for (const page of pages) {
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
 writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, base, pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', description: 'Find your way back to the zerocopy docs.', base, version, sha, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
-for (const route of ['lab', 'playground']) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
+for (const route of ['lab', 'playground', 'explorer', 'investigation-benchmark']) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');
 writeFileSync(join(out, '_headers'), '/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Resource-Policy: same-origin\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n');
 writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\n${origin ? `Sitemap: ${origin}${base}sitemap.xml\n` : ''}`);

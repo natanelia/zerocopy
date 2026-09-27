@@ -4,7 +4,7 @@
 
 Create state on the main thread. Connect a dedicated worker. Both threads can then read their collection snapshots directly.
 
-A product catalog starts with 12 headphones in stock. An inventory update marks them as sold out. The UI reads `0`, while a worker can still read `12` from its earlier snapshot. No task definition or task server is needed.
+The first snapshot contains 10,000 event messages. The owner appends a timeout while a worker retains the earlier view. No task definition or task server is needed. This is a connection lesson; the [log explorer](../website/content/log-explorer.md) builds a complete investigation UI, and [other use cases](use-cases.md) apply the same pattern elsewhere.
 
 ## Install the source package
 
@@ -54,22 +54,24 @@ Save the files in the same directory. Load `main.ts` through your application's 
 if (!crossOriginIsolated) {
   throw new Error('Shared worker memory requires cross-origin isolation');
 }
-const { SharedMap } = await import('zerocopy');
+const { SharedList } = await import('zerocopy');
 const { createState } = await import('zerocopy/state');
 
-const state = createState({
-  stock: new SharedMap('number').set('headphones', 12),
-});
-console.log(state.current.stock.get('headphones')); // 12; no task or await.
+let events = new SharedList('string');
+for (let index = 0; index < 10_000; index++) {
+  events = events.push(`Request completed #${index}`);
+}
+const state = createState({ events });
+console.log(state.current.events.size); // 10000; a synchronous local read.
 
 const worker = new Worker(new URL('./state.worker.ts', import.meta.url), {
   type: 'module',
 });
 await state.connect(worker); // Attach the worker's initial snapshot once.
 
-// An inventory update says the headphones are sold out.
-state.update('stock', stock => stock.set('headphones', 0));
-console.log(state.current.stock.get('headphones')); // 0 immediately on the owner.
+// A new event arrives. The earlier snapshot stays unchanged.
+state.update('events', events => events.push('Upstream timeout'));
+console.log(state.current.events.size); // 10001 immediately on the owner.
 // New snapshots are published automatically. Worker delivery is asynchronous.
 
 // At application teardown: state.dispose(); worker.terminate();
@@ -79,33 +81,31 @@ console.log(state.current.stock.get('headphones')); // 0 immediately on the owne
 
 <!-- example: readme-direct-reader -->
 ```ts
-import type { SharedMap } from 'zerocopy';
+import type { SharedList } from 'zerocopy';
 import { connectSharedSession } from 'zerocopy/worker';
 
-type Model = { stock: SharedMap<'number'> };
+type Model = { events: SharedList<'string'> };
 const shared = await connectSharedSession<Model>(); // Initial connection only.
 
 const initial = shared.current;
-console.log('Worker initial:', initial.stock.get('headphones')); // 12
+console.log('Worker initial:', initial.events.size); // 10000
 
 // Subscribe only when you need to react to new snapshots.
 shared.subscribe(snapshot => {
-  console.log('Worker current:', snapshot.stock.get('headphones')); // 0
-  console.log('Worker retained:', initial.stock.get('headphones')); // Still 12
+  console.log('Worker current:', snapshot.events.size); // 10001
+  console.log('Worker retained:', initial.events.size); // Still 10000
 });
 
-// Elsewhere in this worker: shared.current.stock.get('headphones').
+// Elsewhere in this worker: shared.current.events.get(42).
 // Every get() is a local synchronous read. No task or per-read message.
 // At worker teardown: shared.dispose();
 ```
 
-The owner logs `12`, then `0`. The worker logs its initial stock `12`, the received stock `0`, and the retained stock `12`.
-
-This is a local catalog view. A server must still validate stock and reserve items at checkout; a browser snapshot is not an inventory transaction.
+The owner logs `10000`, then `10001`. The worker sees the updated length after publication, but its retained snapshot still has 10,000 messages.
 
 ## Read whenever you need a value
 
-On the owner, use `state.current.stock.get(id)`. In the worker, use `shared.current.stock.get(id)`. These reads do not send messages. A subscription is only needed to react when a new snapshot arrives.
+On the owner, use `state.current.events.get(index)`. In the worker, use `shared.current.events.get(index)`. These reads do not send messages. A subscription is only needed to react when a new snapshot arrives.
 
 `state.current` changes synchronously on the owner. `shared.current` is the latest snapshot received by that worker, so it can lag behind the owner. Capture `shared.current` once when a calculation needs one stable snapshot.
 

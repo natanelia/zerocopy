@@ -53,7 +53,7 @@ export function renderMarkdown(source, file, routes, base) {
       '#memory-shared-vs-immutablejs-vs-native': 'docs/benchmarks/#memory-shared-vs-immutablejs-vs-native',
       '#reproduce-the-timing-and-memory-comparisons': 'docs/benchmarks/#reproduce-the-timing-and-memory-comparisons',
     }[fragment] : undefined;
-    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'lab/' }[fragment] : undefined;
+    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'lab/', '#log-explorer': 'explorer/', '#investigation-benchmark': 'investigation-benchmark/' }[fragment] : undefined;
     const route = routes.get(resolved);
     const target = demo ? base + demo : legacy ? base + legacy : route !== undefined ? base + route + fragment : repository + '/blob/main/' + resolved + fragment;
     return `href="${escape(target)}"`;

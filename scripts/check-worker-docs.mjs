@@ -14,7 +14,7 @@ const guide = 'docs/workers.md';
 const quickstart = 'docs/getting-started.md';
 const taskQuickstart = 'docs/task-quickstart.md';
 const cases = [
-  { name: 'direct', file: quickstart, marker: 'readme-direct-owner', expected: [[12], [0]], workers: 1, direct: true },
+  { name: 'direct', file: quickstart, marker: 'readme-direct-owner', expected: [[10000], [10001]], workers: 1, direct: true },
   { name: 'quickstart', file: taskQuickstart, marker: 'dx-main', expected: [[['headphones', 'keyboard']], [['keyboard']]], workers: 1 },
   { name: 'local', file: guide, marker: 'dx-local', expected: [[['headphones', 'keyboard']], [['keyboard']]], workers: 0 },
   { name: 'connect', file: guide, marker: 'dx-connect', expected: [[['headphones', 'keyboard']]], workers: 1 },
@@ -65,7 +65,7 @@ function checkDirectReadFraming() {
   assert.ok(direct >= 0 && tasks > direct, 'The README must show direct reads before optional task guidance');
   const preview = extract('README.md', 'readme-sharing-preview', 'ts');
   assert.match(preview, /state\.connect\(worker\)/);
-  assert.match(preview, /shared\.current\.stock\.get\(/);
+  assert.match(preview, /shared\.current\.events\.get\(/);
   const sources = sourcesFor(cases.find(example => example.direct));
   assert.equal(sources.size, 2, 'Direct reads need only an owner and a reader');
   for (const source of [preview, ...sources.values()]) {
@@ -80,13 +80,13 @@ function checkTypes() {
   // for type checking; the complete quickstart files are executed unchanged.
   const previewPath = join(temporary, 'readme-preview.ts');
   writeFileSync(previewPath, `
-import type { SharedMap } from 'zerocopy';
+import type { SharedList } from 'zerocopy';
 import { connectSharedSession, type SharedState } from 'zerocopy/worker';
-type Model = { stock: SharedMap<'number'> };
+type Model = { events: SharedList<'string'> };
 declare const state: SharedState<Model>;
 declare const worker: Worker;
 ${extract('README.md', 'readme-sharing-preview', 'ts')}
-const checked: number | undefined = quantity;
+const checked: string | undefined = event;
 void checked;
 `);
   const paths = [previewPath];
@@ -232,7 +232,7 @@ async function checkBrowser() {
       });
       const rejected = isolated ? null : page.waitForEvent('pageerror');
       const readerComplete = example.direct && isolated ? page.waitForEvent('console', {
-        predicate: message => message.location().url.endsWith('/state.worker.js') && message.text() === 'Worker retained: 12',
+        predicate: message => message.location().url.endsWith('/state.worker.js') && message.text() === 'Worker retained: 10000',
       }) : null;
       // Observe the timeout even when an earlier assertion prevents awaiting it.
       readerComplete?.catch(() => {});
@@ -246,7 +246,7 @@ async function checkBrowser() {
         await page.waitForFunction(() => globalThis.__docDone);
         if (readerComplete) {
           await readerComplete;
-          assert.deepEqual(readerLogs, ['Worker initial: 12', 'Worker current: 0', 'Worker retained: 12']);
+          assert.deepEqual(readerLogs, ['Worker initial: 10000', 'Worker current: 10001', 'Worker retained: 10000']);
           assert.equal(await page.evaluate(() => globalThis.__docTaskFrames), 0,
             'Direct state reads must not use task messages');
         }

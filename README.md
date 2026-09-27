@@ -4,7 +4,7 @@
 
 **Shared, immutable collections for JavaScript and TypeScript.** Let your UI and workers read the same collection storage, without cloning the dataset for each worker.
 
-Connect a worker. Read product stock. Keep working.
+Connect a worker. Read locally. Keep working.
 
 <!-- example: readme-sharing-preview -->
 ```ts
@@ -13,7 +13,7 @@ await state.connect(worker);
 
 // Inside the worker
 const shared = await connectSharedSession<Model>();
-const quantity = shared.current.stock.get('headphones');
+const event = shared.current.events.get(42);
 ```
 
 That `.get()` is a synchronous local read—not a task, message, or RPC. This is the API after setup; the [quickstart](docs/getting-started.md) has the complete files.
@@ -30,7 +30,26 @@ Moving a calculation to a worker should not require sending another full copy of
 
 **Keep your existing stack.** Use your own workers and message channels. Connect an existing store. Add typed tasks or a worker pool only when you need scheduling.
 
-Built for large product catalogs, editors, maps, and analysis tools where the UI and background work need access to the same changing dataset.
+Built for applications where several threads need the same large, changing dataset. Not tied to one domain.
+
+## What could you build?
+
+| Application | Share the input with… |
+| --- | --- |
+| Log and trace explorers | Search, timeline, and summary workers while new events arrive. |
+| Document and design editors | Layout, validation, and export without stopping edits. |
+| Large tables and dashboards | Independent filters, grouped summaries, and charts. |
+| Large product catalogs | Facets, search, and availability calculations. |
+| Graphs and developer tools | Traversal, layout, and dependency analysis. |
+| Simulation tools | Analysis and visualization of published world snapshots. |
+
+[Compare use cases and alternatives](docs/use-cases.md). These are application patterns, not claimed customer deployments.
+
+### See the pattern in action
+
+The **[live log explorer](website/README.md#log-explorer)** searches and summarizes 100,000 generated events with real workers. Freeze an investigation while ingestion continues. The UI still reads records directly. Logs are the demonstration—not the boundary of the library.
+
+[Read its architecture](website/content/log-explorer.md) or [compare three worker designs](website/README.md#investigation-benchmark). The same shared-snapshot pattern applies to the applications above.
 
 ## New version. Same simple API.
 
@@ -38,13 +57,13 @@ A collection works on its own. No state holder or task system is required.
 
 <!-- example: map-snapshots -->
 ```ts
-import { SharedMap } from 'zerocopy';
+import { SharedList } from 'zerocopy';
 
-const before = new SharedMap('number').set('headphones', 12);
-const after = before.set('headphones', 0);
+const before = new SharedList('string').push('Request completed');
+const after = before.push('Upstream timeout');
 
-before.get('headphones'); // 12 — the earlier view still shows stock.
-after.get('headphones');  // 0 — the new view shows the product is sold out.
+before.size; // 1 — an earlier investigation keeps its input.
+after.size;  // 2 — the live view includes the new event.
 ```
 
 Keep the return value from each update. Share the versions your workers need; do not rewrite your reads around remote calls.
