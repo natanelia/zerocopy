@@ -12,66 +12,40 @@ export function xyLeaf(root: u32, depth: u32, tail: u32, size: u32, index: u32):
   for (let d = depth; d > 0; d--) node = load<u32>(node + ((index >> (d * 5)) & 31) * 4);
   return node;
 }
-// Independent extrema chains preserve all nonzero extrema. For signed-zero
-// ties, recover the first zero in input order. Skip zero-free groups with SIMD.
-function restoreZeroSigns(root: u32, depth: u32, tail: u32, size: u32): void {
-  let need: u32 = <u32>(minX == 0 || maxX == 0) | (<u32>(minY == 0 || maxY == 0) << 1);
-  if (!need) return;
-  const zero = f64x2.splat(0);
-  let wanted = i64x2.replace_lane(i64x2.splat((need & 1) ? -1 : 0), 1, (need & 2) ? -1 : 0);
-  for (let base: u32 = 0; base < size; base += 32) {
-    const p = xyLeaf(root, depth, tail, size, base), end = p + min(<u32>32, size - base) * 8;
-    let q = p;
-    while (q < end) {
-      const groupEnd = min(q + 64, end);
-      if (end - q >= 64) {
-        const a = f64x2.eq(v128.load(q), zero), b = f64x2.eq(v128.load(q + 16), zero);
-        const c = f64x2.eq(v128.load(q + 32), zero), d = f64x2.eq(v128.load(q + 48), zero);
-        // We only need presence, not a lane bitmask. This avoids costly mask
-        // extraction on ARM while preserving the exact same candidate groups.
-        if (!v128.any_true(v128.and(v128.or(v128.or(a, b), v128.or(c, d)), wanted))) { q += 64; continue; }
-      }
-      for (; q < groupEnd; q += 16) {
-        if (need & 1) {
-          const x = load<f64>(q);
-          if (x == 0) { if (minX == 0) minX = x; if (maxX == 0) maxX = x; need &= ~1; }
-        }
-        if (need & 2) {
-          const y = load<f64>(q + 8);
-          if (y == 0) { if (minY == 0) minY = y; if (maxY == 0) maxY = y; need &= ~2; }
-        }
-        if (!need) return;
-      }
-      wanted = i64x2.replace_lane(i64x2.splat((need & 1) ? -1 : 0), 1, (need & 2) ? -1 : 0);
-    }
-  }
-}
 export function bboxXY(root: u32, depth: u32, tail: u32, size: u32): void {
   if (size & 1) unreachable();
   minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
   if (ASC_FEATURE_SIMD) {
-    let l0 = f64x2.splat(Infinity), l1 = l0, l2 = l0, l3 = l0;
-    let h0 = f64x2.splat(-Infinity), h1 = h0, h2 = h0, h3 = h0;
+    const lowInitial = f64x2.splat(Infinity), highInitial = f64x2.splat(-Infinity);
+    let lower = lowInitial, upper = highInitial;
     for (let base: u32 = 0; base < size; base += 32) {
-      const p = xyLeaf(root, depth, tail, size, base), end = p + min(<u32>32, size - base) * 8;
-      let q = p;
-      for (; end - q >= 64; q += 64) {
-        const a = v128.load(q), b = v128.load(q + 16), c = v128.load(q + 32), d = v128.load(q + 48);
-        l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
-        l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
-        l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
-        l3 = f64x2.pmin(l3, d); h3 = f64x2.pmax(h3, d);
-      }
-      for (; q < end; q += 16) {
-        const value = v128.load(q);
-        l0 = f64x2.pmin(l0, value); h0 = f64x2.pmax(h0, value);
+      const p = xyLeaf(root, depth, tail, size, base), take = min(<u32>32, size - base);
+      if (take == 32) {
+        // Four independent CONTIGUOUS groups, then a left-to-right reduction.
+        // This retains the earliest equal extremum, including its zero sign.
+        // NaN values cannot enter any accumulator because pmin/pmax select the
+        // second operand only on a strict comparison. No repair scan is needed.
+        let l0 = lowInitial, l1 = lowInitial, l2 = lowInitial, l3 = lowInitial;
+        let h0 = highInitial, h1 = highInitial, h2 = highInitial, h3 = highInitial;
+        for (let offset: u32 = 0; offset < 64; offset += 16) {
+          const a = v128.load(p + offset), b = v128.load(p + offset + 64);
+          const c = v128.load(p + offset + 128), d = v128.load(p + offset + 192);
+          l0 = f64x2.pmin(l0, a); h0 = f64x2.pmax(h0, a);
+          l1 = f64x2.pmin(l1, b); h1 = f64x2.pmax(h1, b);
+          l2 = f64x2.pmin(l2, c); h2 = f64x2.pmax(h2, c);
+          l3 = f64x2.pmin(l3, d); h3 = f64x2.pmax(h3, d);
+        }
+        lower = f64x2.pmin(lower, f64x2.pmin(f64x2.pmin(l0, l1), f64x2.pmin(l2, l3)));
+        upper = f64x2.pmax(upper, f64x2.pmax(f64x2.pmax(h0, h1), f64x2.pmax(h2, h3)));
+      } else {
+        for (let q = p, end = p + take * 8; q < end; q += 16) {
+          const value = v128.load(q);
+          lower = f64x2.pmin(lower, value); upper = f64x2.pmax(upper, value);
+        }
       }
     }
-    const lower = f64x2.pmin(f64x2.pmin(l0, l1), f64x2.pmin(l2, l3));
-    const upper = f64x2.pmax(f64x2.pmax(h0, h1), f64x2.pmax(h2, h3));
     minX = f64x2.extract_lane(lower, 0); minY = f64x2.extract_lane(lower, 1);
     maxX = f64x2.extract_lane(upper, 0); maxY = f64x2.extract_lane(upper, 1);
-    restoreZeroSigns(root, depth, tail, size);
   } else {
     let lx: f64 = Infinity, ly: f64 = Infinity, hx: f64 = -Infinity, hy: f64 = -Infinity;
     for (let base: u32 = 0; base < size; base += 32) {
