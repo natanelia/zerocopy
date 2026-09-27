@@ -75,7 +75,7 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
   assert.ok(!home.includes('<script src="https://'));
 });
 
-test('demo workers and all runtime modules stay inside the opt-in isolation scope', () => {
+test('demo workers and all runtime modules stay inside the automatic isolation scope', () => {
   for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['investigation-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
@@ -83,6 +83,9 @@ test('demo workers and all runtime modules stay inside the opt-in isolation scop
     assert.ok(!html.includes(`src="${meta.base}assets/main.mjs"`));
     assert.ok(existsSync(join(out, route, 'assets', worker)));
     assert.ok(existsSync(join(out, route, 'isolation-sw.js')));
+    assert.ok(existsSync(join(out, route, 'assets/isolation.mjs')));
+    assert.ok(!html.includes('Enable shared memory &amp; reload'));
+    assert.ok(!html.includes('Enable shared memory & reload'));
     assert.equal(readFileSync(join(out, route, 'library/shared.js'), 'utf8'), readFileSync(join(out, 'library/shared.js'), 'utf8'));
   }
 });

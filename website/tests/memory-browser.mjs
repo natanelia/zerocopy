@@ -30,8 +30,6 @@ try {
       page.on('console', message => { if (message.type() === 'error') console.error(message.text()); });
       await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}compare/`);
       if (!isolated) {
-        assert.equal(await page.locator('#compare-start').isDisabled(), true);
-        await page.locator('#enable-isolation').click();
         await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#compare-start').disabled);
       }
       assert.equal(await page.evaluate(() => crossOriginIsolated), true);
@@ -83,7 +81,6 @@ try {
       // Verify the four-path controlled benchmark under both hosting policies.
       await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}investigation-benchmark/`);
       if (!isolated) {
-        await page.locator('#enable-isolation').click();
         await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#run-investigation-bench').disabled);
       }
       await page.locator('#investigation-size').selectOption('1000'); await page.locator('#run-investigation-bench').click();

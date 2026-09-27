@@ -1,4 +1,4 @@
-/* Opt-in, network-only isolation for this demo's path. No cache or telemetry.
+/* Automatic, network-only isolation for this demo's path. No cache or telemetry.
  * Server headers are preferred. This fallback lets static hosts serve demos.
  * COOP/COEP: https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated
  */

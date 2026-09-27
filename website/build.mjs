@@ -36,13 +36,13 @@ const routes = new Map(pages.map(page => [page.source, `docs/${page.slug}/`]));
 routes.set('README.md', ''); routes.set('docs/README.md', 'docs/getting-started/');
 routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
 // A controlled page is not sufficient: dedicated worker entry URLs and their
-// dependencies must also be inside the opt-in service worker's demo scope.
+// dependencies must also be inside the service worker's demo scope.
 const demoScripts = new Map([
-  ['compare/', ['main.mjs', 'capability.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
-  ['lab/', ['main.mjs', 'capability.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs']],
-  ['explorer/', ['main.mjs', 'capability.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'immutable-storage.mjs']],
-  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
-  ['playground/', ['main.mjs', 'capability.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
+  ['compare/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
+  ['lab/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs']],
+  ['explorer/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'immutable-storage.mjs']],
+  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
+  ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });

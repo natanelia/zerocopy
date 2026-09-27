@@ -58,7 +58,13 @@ All pages are prerendered HTML. The docs remain readable without JavaScript. Sea
 
 For a host with response-header configuration, deploy `_site/` and apply its `_headers` file or equivalent settings. Use `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The preview server does this automatically.
 
-GitHub Pages does not provide application-controlled response headers. The live demos therefore offer an explicit **Enable shared memory & reload** action. It registers a network-only service worker scoped to the current demo path. The worker adds isolation headers to same-origin responses and performs no caching. Activation causes one user-requested reload, not a loop. Unsupported browsers keep the demo disabled and show the requirement. No silent copy fallback is used.
+Shared memory requires HTTPS (or localhost) and cross-origin isolation. This is a browser security rule, not a permission prompt. A host that sends COOP/COEP headers makes a demo ready on the first response: no service worker and no reload are needed. The generated `_headers` file is suitable for hosts that support that format; GitHub Pages does not apply it.
+
+On GitHub Pages, each demo prepares itself automatically. It registers a network-only service worker scoped to that demo path and waits until that worker controls the page. The worker adds isolation headers to same-origin responses without caching data. A first visit then refreshes once. Return visits normally need no setup refresh. The comparison still waits for **Load all three paths**; setup does not allocate datasets or start benchmarks.
+
+A temporary `__zerocopy_isolation` query marker limits setup to one automatic navigation, even when cookies or browser storage are blocked. The marker is removed after success; other query parameters and the fragment are retained. A failed attempt does not reload repeatedly. **Retry setup** appears only after failure when another attempt could help. Registration, activation, and page control share a 12-second deadline. Late completion after a timeout cannot trigger a reload. Unknown or unrelated service workers are not removed.
+
+The homepage and guides do not register the worker and remain outside the demo scopes. Insecure pages, unsupported browsers, and blocked setup retain readable documentation and a clear error. There is no silent copy fallback. Run `node --test website/tests/isolation.test.mjs` for state-machine tests and `node website/tests/isolation-browser.mjs` for Chromium/WebKit first-visit, return-visit, storage-blocked, failed-setup, and no-reload-loop tests.
 
 Test this hosting path with `SITE_ISOLATED=false node website/serve.mjs`. Server headers remain the preferred deployment method.
 
@@ -72,6 +78,7 @@ The build also provides local search, a 404 page, raw Markdown downloads, `llms.
 
 ```sh
 node --test website/tests/*.test.mjs
+node website/tests/isolation-browser.mjs
 node website/tests/browser.mjs
 node website/tests/explorer-browser.mjs
 node website/tests/comparison-browser.mjs

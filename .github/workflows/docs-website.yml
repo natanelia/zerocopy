@@ -41,6 +41,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/comparison-browser.mjs
@@ -52,6 +53,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/comparison-browser.mjs
@@ -76,6 +78,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/isolation-browser.mjs
           node website/tests/comparison-browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/memory-browser.mjs

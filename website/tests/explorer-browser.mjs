@@ -99,8 +99,6 @@ try {
     page = await ctx.newPage(); page.setDefaultTimeout(60_000); page.on('pageerror', error => errors.push(error.message));
     for (const [route, runId, sizeId, statusId] of [['explorer/', 'load-logs', 'log-size', 'view-count'], ['investigation-benchmark/', 'run-investigation-bench', 'investigation-size', 'investigation-bench-status']]) {
       await page.goto(staticOrigin + base + route);
-      assert.equal(await page.locator('#' + runId).isDisabled(), true);
-      await page.locator('#enable-isolation').click();
       await page.waitForFunction(id => crossOriginIsolated && !document.getElementById(id).disabled, runId);
       await page.locator('#' + sizeId).selectOption('1000'); await page.locator('#' + runId).click();
       if (route === 'explorer/') { await count(statusId, 1000); await page.locator('#reset-logs').click(); }

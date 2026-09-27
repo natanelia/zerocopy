@@ -76,8 +76,8 @@ try {
   try {
     const ctx = await browser.newContext(); page = await ctx.newPage(); page.setDefaultTimeout(90000); page.on('pageerror', error => errors.push(error.message));
     const host = `http://127.0.0.1:${plain.address().port}`;
-    await page.goto(host + base + 'compare/'); assert.equal(await page.locator('#compare-start').isDisabled(), true);
-    await page.locator('#enable-isolation').click(); await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#compare-start').disabled);
+    await page.goto(host + base + 'compare/');
+    await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#compare-start').disabled);
     await page.locator('#compare-size').selectOption('1000'); await page.locator('#compare-start').click(); await complete(1000); await page.locator('#compare-stop').click();
     await page.goto(host + base + 'docs/getting-started/'); assert.equal(await page.evaluate(() => navigator.serviceWorker.controller), null);
     await ctx.close();

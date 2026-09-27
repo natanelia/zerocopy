@@ -1,37 +1,33 @@
-/** Enable demos only after a real capability check; never silently copy instead. */
+import { prepareIsolation } from './isolation.mjs';
+
+/** Prepare automatically, but never silently copy or start a heavy demo. */
 export function checkCapability(onReady) {
   const panel = document.querySelector('#capability');
   const text = document.querySelector('#capability-text');
   const button = document.querySelector('#enable-isolation');
-  if (globalThis.crossOriginIsolated && typeof SharedArrayBuffer !== 'undefined' && typeof WebAssembly !== 'undefined') {
-    text.textContent = 'Shared memory is available. This demo runs locally.';
-    panel.dataset.state = 'ready'; onReady(); return;
-  }
-  panel.dataset.state = 'blocked';
-  text.textContent = 'Shared memory needs a secure, cross-origin-isolated page.';
-  document.querySelector('#capability-help').hidden = false;
-  if (!globalThis.isSecureContext || !('serviceWorker' in navigator)) return;
-  button.hidden = false;
-  button.addEventListener('click', async () => {
-    button.disabled = true; text.textContent = 'Enabling isolation for this demo…';
+  const help = document.querySelector('#capability-help');
+  let running = false, ready = false;
+  async function start(retry = false) {
+    if (running || ready) return;
+    running = true;
+    panel.dataset.state = 'preparing'; panel.setAttribute('aria-busy', 'true');
+    text.textContent = 'Preparing this demo…';
+    button.hidden = true; button.disabled = true; help.hidden = true;
     try {
-      const registration = await navigator.serviceWorker.register(new URL('isolation-sw.js', location.href), { scope: './' });
-      const worker = registration.installing ?? registration.waiting ?? registration.active;
-      if (!worker) throw new Error('No service worker was installed');
-      if (worker.state !== 'activated') await new Promise((resolve, reject) => {
-        const clean = () => { clearTimeout(timer); worker.removeEventListener('statechange', changed); };
-        const changed = () => {
-          if (worker.state === 'activated') { clean(); resolve(); }
-          else if (worker.state === 'redundant') { clean(); reject(new Error('Service worker installation failed')); }
-        };
-        const timer = setTimeout(() => { clean(); reject(new Error('Service worker activation timed out')); }, 10000);
-        worker.addEventListener('statechange', changed); changed();
-      });
-      // This explicit user action causes one reload. There is no reload loop.
-      location.reload();
+      const result = await prepareIsolation({ retry });
+      if (result === 'reloading') { text.textContent = 'Finishing setup…'; return; }
+      ready = true;
+      panel.dataset.state = 'ready'; panel.setAttribute('aria-busy', 'false');
+      text.textContent = 'Shared memory is ready. This demo runs locally.';
+      onReady();
     } catch (error) {
-      text.textContent = `Could not enable shared memory: ${error.message}. Use a host with COOP/COEP headers.`;
+      panel.dataset.state = 'blocked'; panel.setAttribute('aria-busy', 'false');
+      text.textContent = error instanceof Error ? error.message : 'Could not prepare this demo.';
+      help.hidden = false;
+      button.hidden = !globalThis.isSecureContext || !navigator.serviceWorker || typeof WebAssembly === 'undefined' || !!globalThis.crossOriginIsolated;
       button.disabled = false;
-    }
-  });
+    } finally { running = false; }
+  }
+  button.addEventListener('click', () => { void start(true); });
+  void start();
 }

@@ -52,7 +52,7 @@ export function docsLayout(page, html, toc, pages, base, sha) {
 }
 
 export function isolationNotice() {
-  return `<div class="capability-notice" id="capability" role="status"><span class="status-dot"></span><span id="capability-text">Checking shared-memory support…</span><button id="enable-isolation" hidden>Enable shared memory & reload</button></div><p class="capability-help" id="capability-help" hidden>On hosts without isolation headers, this installs a same-origin service worker for this demo path, then reloads once. It does not cache requests. The rest of the docs work without it.</p>`;
+  return `<div class="capability-notice" id="capability" role="status"><span class="status-dot"></span><span id="capability-text">Preparing this demo…</span><button id="enable-isolation" hidden type="button">Retry setup</button></div><p class="capability-help" id="capability-help" hidden>Setup normally runs automatically. This host may need one page refresh to enable shared memory. If your browser blocks service workers or isolation, open this page in a full browser or use a host with COOP/COEP headers. Documentation stays available; there is no copy-mode fallback.</p>`;
 }
 
 export function lab(base) {
