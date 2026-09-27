@@ -18,15 +18,18 @@ function restoreZeroSigns(root: u32, depth: u32, tail: u32, size: u32): void {
   let need: u32 = <u32>(minX == 0 || maxX == 0) | (<u32>(minY == 0 || maxY == 0) << 1);
   if (!need) return;
   const zero = f64x2.splat(0);
+  let wanted = i64x2.replace_lane(i64x2.splat((need & 1) ? -1 : 0), 1, (need & 2) ? -1 : 0);
   for (let base: u32 = 0; base < size; base += 32) {
     const p = xyLeaf(root, depth, tail, size, base), end = p + min(<u32>32, size - base) * 8;
     let q = p;
     while (q < end) {
-      let groupEnd = min(q + 64, end);
+      const groupEnd = min(q + 64, end);
       if (end - q >= 64) {
         const a = f64x2.eq(v128.load(q), zero), b = f64x2.eq(v128.load(q + 16), zero);
         const c = f64x2.eq(v128.load(q + 32), zero), d = f64x2.eq(v128.load(q + 48), zero);
-        if (!(<u32>i64x2.bitmask(v128.or(v128.or(a, b), v128.or(c, d))) & need)) { q += 64; continue; }
+        // We only need presence, not a lane bitmask. This avoids costly mask
+        // extraction on ARM while preserving the exact same candidate groups.
+        if (!v128.any_true(v128.and(v128.or(v128.or(a, b), v128.or(c, d)), wanted))) { q += 64; continue; }
       }
       for (; q < groupEnd; q += 16) {
         if (need & 1) {
@@ -39,6 +42,7 @@ function restoreZeroSigns(root: u32, depth: u32, tail: u32, size: u32): void {
         }
         if (!need) return;
       }
+      wanted = i64x2.replace_lane(i64x2.splat((need & 1) ? -1 : 0), 1, (need & 2) ? -1 : 0);
     }
   }
 }
