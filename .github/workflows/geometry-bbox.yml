@@ -1,0 +1,42 @@
+name: Geometry bbox proof
+on:
+  push:
+    branches: ['agent/geometry-*']
+  pull_request:
+    paths: ['geometry*', 'proofs/geometry*', 'scripts/build-*', 'package.json', 'tsconfig*', 'type-tests/geometry*', '.github/workflows/geometry-bbox.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:geometry
+      - run: bun run test
+      - name: Exact differential tests and paired Node benchmark
+        run: PERF_GATE=1 node proofs/geometry-bbox.mjs
+      - name: Exact differential tests and paired Bun benchmark
+        if: ${{ !cancelled() }}
+        run: PERF_GATE=1 bun proofs/geometry-bbox.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-bbox-${{ runner.arch }}
+          path: |
+            proofs/results/geometry-bbox-*.json
+            geometry-kernels*.wat
+          retention-days: 30
+          if-no-files-found: warn
