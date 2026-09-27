@@ -1,0 +1,261 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8f2"><title>Collections &amp; types · zerocopy</title><meta name="description" content="Maps, lists, sets, typed JSON, and nested collections."><meta property="og:title" content="Collections &amp; types · zerocopy"><meta property="og:description" content="Maps, lists, sets, typed JSON, and nested collections."><meta property="og:type" content="website"><link rel="canonical" href="https://natanelia.github.io/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/collections/"><link rel="icon" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/assets/site.css"><script type="module" src="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/assets/main.mjs"></script><meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/assets/comparison.css"></head><body data-base="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/" data-source="0513a1378814df9ea82ee220d1ac4ae9c674a862"><a class="skip" href="#main">Skip to content</a>
+  <aside class="preview-banner">PR #10 preview · 268d08d · Not a release · <a href="https://github.com/natanelia/zerocopy/pull/10">Return to PR</a></aside><header class="site-header"><a class="wordmark" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/" aria-label="zerocopy home"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/" aria-current="page">Documentation</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/use-cases/" >Use cases</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/lab/" >Benchmark lab</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="https://github.com/natanelia/zerocopy">GitHub <span aria-hidden="true">↗</span></a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/">Documentation</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/use-cases/">Use cases</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/playground/">Small snapshot example</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/lab/">Benchmark lab</a><a href="https://github.com/natanelia/zerocopy">GitHub</a></nav>
+  <div class="docs-layout"><aside class="docs-sidebar" aria-label="Documentation"><p class="eyebrow">DOCUMENTATION</p><div class="sidebar-group"><h2>Start here</h2><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/" >Get started</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/mental-model/" >How sharing works</a></div><div class="sidebar-group"><h2>Build with it</h2><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/collections/" aria-current="page">Collections &amp; types</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/sessions/" >State &amp; subscriptions</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/transport/" >Your own transport</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/tasks/" >Optional tasks</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/workers/" >Workers &amp; pools</a></div><div class="sidebar-group"><h2>Integrations</h2><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/redux/" >Redux</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/tanstack/" >TanStack</a></div><div class="sidebar-group"><h2>Go deeper</h2><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/memory/" >Memory &amp; ownership</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/benchmarks/" >Recorded benchmarks</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/migration/" >Migration</a></div><div class="sidebar-group"><h2>Use cases</h2><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/use-cases/" >Choose a use case</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/log-explorer/" >Live log explorer</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/data-tables/" >Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/graphs/" >Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/simulations/" >Simulation &amp; world state</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/analytics/" >Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/maps/" >Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/editors/" >Editors &amp; history</a></div><a class="sidebar-lab" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/lab/">↗ Benchmark lab</a></aside><main class="doc-main" id="main"><details class="mobile-docs-menu"><summary>Browse documentation</summary><nav aria-label="All documentation"><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/mental-model/">How sharing works</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/collections/">Collections &amp; types</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/sessions/">State &amp; subscriptions</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/transport/">Your own transport</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/tasks/">Optional tasks</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/workers/">Workers &amp; pools</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/redux/">Redux</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/tanstack/">TanStack</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/memory/">Memory &amp; ownership</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/benchmarks/">Recorded benchmarks</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/migration/">Migration</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/use-cases/">Choose a use case</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/log-explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/data-tables/">Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/graphs/">Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/simulations/">Simulation &amp; world state</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/analytics/">Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/maps/">Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/editors/">Editors &amp; history</a></nav></details><div class="doc-breadcrumb">Build with it <span>/</span> Collections &amp; types</div><h1>Collections &amp; types</h1><p class="doc-description">Maps, lists, sets, typed JSON, and nested collections.</p><div class="doc-meta"><span>Source documentation</span><a href="https://github.com/natanelia/zerocopy/blob/0513a1378814df9ea82ee220d1ac4ae9c674a862/docs/api.md">View source ↗</a><button class="copy-page" data-markdown="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/markdown/collections.md">Copy Markdown</button></div><article class="prose"><p><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/">Documentation</a> · <a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/transport/">Worker sharing</a> · <a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/memory/">Memory</a></p>
+<p>Import collections from <code>zerocopy</code>. Import optional adapters from <code>zerocopy/redux</code> or <code>zerocopy/tanstack</code>.</p>
+<h2 id="updates-and-values">Updates and values<a class="heading-link" href="#updates-and-values" aria-label="Link to Updates and values">#</a></h2>
+<p>Updates return a collection rather than editing the receiver. Keep the result of <code>set</code>, <code>add</code>, <code>push</code>, <code>pop</code>, <code>enqueue</code>, <code>dequeue</code>, and removal methods. <code>pop()</code> and <code>dequeue()</code> return the remaining collection, not the removed value. Read that value first when needed: use <code>peek()</code> for stacks and queues, or <code>get(list.size - 1)</code> for a list.</p>
+<p>Handles are frozen. Earlier versions remain readable. An update can reuse a handle, but equal content does not guarantee the same handle. Do not use wrapper identity as a general value-equality test.</p>
+<p>Map keys are strings. Set values are strings or numbers. Other collections take a value-type string:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Stored value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&#39;string&#39;</code></td>
+<td>UTF-8 text</td>
+</tr>
+<tr>
+<td><code>&#39;number&#39;</code></td>
+<td>JavaScript number</td>
+</tr>
+<tr>
+<td><code>&#39;boolean&#39;</code></td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td><code>&#39;object&#39;</code></td>
+<td>JSON data, decoded into deeply frozen values</td>
+</tr>
+<tr>
+<td><code>json&lt;T&gt;()</code></td>
+<td>The object codec with TypeScript-checked fields and deeply read-only reads</td>
+</tr>
+<tr>
+<td><code>&#39;SharedMap&lt;number&gt;&#39;</code>, for example</td>
+<td>A nested shared collection snapshot</td>
+</tr>
+</tbody></table></div>
+<p>The <code>&#39;object&#39;</code> codec is not an arbitrary-object serializer. Functions, prototypes, cycles, and object identity are not preserved as general JavaScript values. Inserting JSON data involves serialization; reading it involves decoding. <code>toArray()</code> and entry tuples are detached containers, not shared JavaScript arrays.</p>
+<h2 id="typed-json-objects">Typed JSON objects<a class="heading-link" href="#typed-json-objects" aria-label="Link to Typed JSON objects">#</a></h2>
+<p>Use <code>json&lt;T&gt;()</code> to retain an application&#39;s object shape through collection reads, writes, callbacks, and immutable updates. Interfaces do not need an index signature. Nested arrays, tuples, optional fields, and discriminated unions retain their types.</p>
+<!-- example: typed-json -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedMap, SharedList, json, list, getWorkerData, initWorker } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">interface</span> Product {
+  id: <span class="kw">string</span>;
+  name: <span class="kw">string</span>;
+  stock: <span class="kw">number</span>;
+  category: <span class="str">&#39;electronics&#39;</span> | <span class="str">&#39;home&#39;</span>;
+  description?: <span class="kw">string</span>;
+  variants: Array&lt;{ color: <span class="kw">string</span>; sizes: <span class="kw">string</span>[] }&gt;;
+}
+
+<span class="kw">const</span> ProductValue = json&lt;Product&gt;();
+<span class="kw">const</span> product: Product = {
+  id: <span class="str">&#39;headphones&#39;</span>, name: <span class="str">&#39;Wireless headphones&#39;</span>, stock: <span class="num">12</span>,
+  category: <span class="str">&#39;electronics&#39;</span>, variants: [{ color: <span class="str">&#39;black&#39;</span>, sizes: [<span class="str">&#39;standard&#39;</span>] }],
+};
+<span class="kw">const</span> before = <span class="kw">new</span> SharedMap(ProductValue).<span class="kw">set</span>(product.id, product);
+<span class="kw">const</span> after = before.<span class="kw">set</span>(product.id, { ...product, stock: <span class="num">0</span> });
+<span class="kw">const</span> featured = <span class="kw">new</span> SharedList(ProductValue).push(product);
+<span class="kw">const</span> categories = <span class="kw">new</span> SharedMap(list(ProductValue)).<span class="kw">set</span>(<span class="str">&#39;electronics&#39;</span>, featured);
+<span class="kw">const</span> data = getWorkerData({ products: after, categories });
+<span class="kw">const</span> restored = <span class="kw">await</span> initWorker(data);
+
+before.<span class="kw">get</span>(product.id)?.stock; <span class="comment">// number | undefined; value is 12</span>
+restored.products.<span class="kw">get</span>(product.id)?.stock; <span class="comment">// number | undefined; value is 0</span>
+restored.categories.<span class="kw">get</span>(<span class="str">&#39;electronics&#39;</span>)?.<span class="kw">get</span>(<span class="num">0</span>)?.category; <span class="comment">// &#39;electronics&#39; | &#39;home&#39; | undefined</span></code></pre></div>
+<p>Reads return <code>DeepReadonly&lt;Product&gt; | undefined</code>. TypeScript rejects missing required fields, incorrect field types, and assignments to returned fields or nested arrays. Mutable input objects are accepted and are not frozen. The stored snapshot is independent of later input changes. As with other TypeScript object types, an already assigned value can have extra fields; this is not an exact-object schema.</p>
+<p><code>json&lt;T&gt;()</code> returns the existing <code>&#39;object&#39;</code> descriptor. Its brand exists only in TypeScript. Typed and untyped object collections use the same native <code>JSON.stringify</code>, UTF-8 encoding, JSON decoding, deep freezing, and read cache. There is no additional validation pass or custom serializer on typed writes. Worker data and Redux persistence use the existing object type name.</p>
+<p>Supply JSON-compatible plain objects or arrays. Use strings, finite numbers, booleans, nested <code>null</code>, and other plain objects or arrays as fields. Omit optional properties instead of storing <code>undefined</code>. Do not rely on prototypes, methods, accessors, <code>toJSON</code>, or object identity surviving storage. Validate unknown input against an application schema before insertion. The helper does not perform runtime schema or JSON-compatibility validation; for example, TypeScript&#39;s <code>number</code> also permits <code>NaN</code> and infinity.</p>
+<p>Native JSON rules apply to unchecked data, just as they do with <code>&#39;object&#39;</code>: <code>undefined</code> object fields are omitted; non-finite numbers and array holes become <code>null</code>; negative zero becomes zero. Getters and <code>toJSON</code> can run. Cycles and bigint values throw under normal JSON behavior, and depth limits depend on the JavaScript engine. The type contract does not promise a lossless round trip for these inputs. See the <a href="https://tc39.es/ecma262/multipage/structured-data.html#sec-json.stringify">JSON.stringify specification</a> for the serialization rules.</p>
+<p>JSON objects cannot contain working shared collection handles. Store shared collections as nested collection values instead. Compose descriptors with <code>list(ProductValue)</code>, <code>map(list(ProductValue))</code>, or the other helpers. Do not build these strings with interpolation: that loses the TypeScript brand.</p>
+<p>The value-bearing helpers are <code>map</code>, <code>list</code>, <code>stack</code>, <code>queue</code>, <code>linkedList</code>, <code>doublyLinkedList</code>, <code>orderedMap</code>, <code>sortedMap</code>, and <code>priorityQueue</code>. The <code>set</code>, <code>orderedSet</code>, and <code>sortedSet</code> helpers take only <code>&#39;string&#39;</code> or <code>&#39;number&#39;</code>. They do not add object-valued sets. Existing strings such as <code>&#39;SharedList&lt;number&gt;&#39;</code> now also resolve to typed collections rather than <code>any</code>.</p>
+<p>The generic type is retained in <code>WorkerData&lt;T&gt;</code>, <code>initWorker()</code>, <code>compact()</code>, and <code>compactMany()</code>. A worker message received as <code>unknown</code> still needs the application&#39;s matching transport type and validation at the message boundary. Type annotations do not validate a different process&#39;s input. The legacy <code>initWorker&lt;T&gt;(untypedData)</code> form remains available; its explicit type argument is a caller assertion, not a check of the payload.</p>
+<p>This feature keeps JSON byte storage. Writes serialize the value; a read cache miss decodes a local, deeply frozen object. It does not provide direct shared-memory field access or binary records. Existing Redux import checks remain in place; they are separate from ordinary collection writes.</p>
+<h2 id="maps">Maps<a class="heading-link" href="#maps" aria-label="Link to Maps">#</a></h2>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Constructor</th>
+<th>Iteration order</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SharedMap&lt;T&gt;</code></td>
+<td><code>new SharedMap(type)</code></td>
+<td>Unspecified</td>
+</tr>
+<tr>
+<td><code>SharedOrderedMap&lt;T&gt;</code></td>
+<td><code>new SharedOrderedMap(type)</code></td>
+<td>Insertion order</td>
+</tr>
+<tr>
+<td><code>SharedSortedMap&lt;T&gt;</code></td>
+<td><code>new SharedSortedMap(type, comparator?)</code></td>
+<td>Sorted keys</td>
+</tr>
+</tbody></table></div>
+<p>All three provide <code>set(key, value)</code>, <code>get(key)</code>, <code>has(key)</code>, <code>delete(key)</code>, <code>entries()</code>, <code>keys()</code>, <code>values()</code>, <code>forEach(fn)</code>, and <code>size</code>. Map callbacks receive <code>(value, key)</code>.</p>
+<p><code>SharedMap</code> also provides <code>setMany(entries)</code>, <code>getMany(keys)</code>, and <code>deleteMany(keys)</code> for batch work. Missing keys return <code>undefined</code> from <code>get</code>.</p>
+<!-- example: ordered-map -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedOrderedMap } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> labels = <span class="kw">new</span> SharedOrderedMap(<span class="str">&#39;string&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;c&#39;</span>, <span class="str">&#39;C&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;a&#39;</span>, <span class="str">&#39;A&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;b&#39;</span>, <span class="str">&#39;B&#39;</span>);
+
+[...labels.keys()]; <span class="comment">// [&#39;c&#39;, &#39;a&#39;, &#39;b&#39;]</span></code></pre></div>
+<h3 id="custom-ordering">Custom ordering<a class="heading-link" href="#custom-ordering" aria-label="Link to Custom ordering">#</a></h3>
+<p>A comparator receives string keys and returns a negative number, zero, or a positive number. It must be pure and consistent. Custom ordering sorts entries locally during iteration. It is not a custom shared-memory tree ordering, and comparator functions cannot be sent to workers.</p>
+<!-- example: sorted-map -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedSortedMap } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> reverse = <span class="kw">new</span> SharedSortedMap(<span class="str">&#39;string&#39;</span>, (a, b) =&gt; b.localeCompare(a))
+  .<span class="kw">set</span>(<span class="str">&#39;a&#39;</span>, <span class="str">&#39;A&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;c&#39;</span>, <span class="str">&#39;C&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;b&#39;</span>, <span class="str">&#39;B&#39;</span>);
+
+[...reverse.keys()]; <span class="comment">// [&#39;c&#39;, &#39;b&#39;, &#39;a&#39;]</span></code></pre></div>
+<h2 id="sets">Sets<a class="heading-link" href="#sets" aria-label="Link to Sets">#</a></h2>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Constructor</th>
+<th>Iteration order</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SharedSet&lt;T&gt;</code></td>
+<td><code>new SharedSet&lt;string&gt;()</code></td>
+<td>Unspecified</td>
+</tr>
+<tr>
+<td><code>SharedOrderedSet&lt;T&gt;</code></td>
+<td><code>new SharedOrderedSet&lt;string&gt;()</code></td>
+<td>Insertion order</td>
+</tr>
+<tr>
+<td><code>SharedSortedSet&lt;T&gt;</code></td>
+<td><code>new SharedSortedSet&lt;string&gt;(comparator?)</code></td>
+<td>Sorted values</td>
+</tr>
+</tbody></table></div>
+<p>Set type parameters are value types such as <code>string</code> or <code>number</code>, not the value-type strings used by maps. Sets provide <code>add(value)</code>, <code>has(value)</code>, <code>delete(value)</code>, <code>values()</code>, <code>forEach(fn)</code>, and <code>size</code>. <code>SharedSet</code> also provides <code>addMany(values)</code>.</p>
+<!-- example: sets -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedSet, SharedOrderedSet, SharedSortedSet } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> tags = <span class="kw">new</span> SharedSet&lt;<span class="kw">string</span>&gt;().add(<span class="str">&#39;admin&#39;</span>).add(<span class="str">&#39;active&#39;</span>);
+<span class="kw">const</span> insertionOrder = <span class="kw">new</span> SharedOrderedSet&lt;<span class="kw">string</span>&gt;().add(<span class="str">&#39;z&#39;</span>).add(<span class="str">&#39;a&#39;</span>).add(<span class="str">&#39;m&#39;</span>);
+<span class="kw">const</span> sorted = <span class="kw">new</span> SharedSortedSet&lt;<span class="kw">string</span>&gt;().add(<span class="str">&#39;z&#39;</span>).add(<span class="str">&#39;a&#39;</span>).add(<span class="str">&#39;m&#39;</span>);
+
+tags.has(<span class="str">&#39;admin&#39;</span>);           <span class="comment">// true</span>
+[...insertionOrder.values()]; <span class="comment">// [&#39;z&#39;, &#39;a&#39;, &#39;m&#39;]</span>
+[...sorted.values()];         <span class="comment">// [&#39;a&#39;, &#39;m&#39;, &#39;z&#39;]</span></code></pre></div>
+<h2 id="lists-stacks-and-queues">Lists, stacks, and queues<a class="heading-link" href="#lists-stacks-and-queues" aria-label="Link to Lists, stacks, and queues">#</a></h2>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Update methods</th>
+<th>Read methods and properties</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SharedList&lt;T&gt;</code></td>
+<td><code>push(value)</code>, <code>pushMany(values)</code>, <code>pop()</code>, <code>set(index, value)</code></td>
+<td><code>get(index)</code>, <code>values()</code>, <code>forEach(fn)</code>, <code>toArray()</code>, <code>size</code></td>
+</tr>
+<tr>
+<td><code>SharedStack&lt;T&gt;</code></td>
+<td><code>push(value)</code>, <code>pop()</code></td>
+<td><code>peek()</code>, <code>size</code>, <code>isEmpty</code></td>
+</tr>
+<tr>
+<td><code>SharedQueue&lt;T&gt;</code></td>
+<td><code>enqueue(value)</code>, <code>dequeue()</code></td>
+<td><code>peek()</code>, <code>size</code>, <code>isEmpty</code></td>
+</tr>
+</tbody></table></div>
+<p>Construct these with a value type, for example <code>new SharedList(&#39;number&#39;)</code>. List indexes start at zero. Stack and queue <code>peek()</code> return <code>undefined</code> when empty.</p>
+<!-- example: sequences -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedList, SharedStack, SharedQueue } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> list = <span class="kw">new</span> SharedList(<span class="str">&#39;number&#39;</span>).push(<span class="num">1</span>).push(<span class="num">2</span>).push(<span class="num">3</span>);
+<span class="kw">const</span> stack = <span class="kw">new</span> SharedStack(<span class="str">&#39;number&#39;</span>).push(<span class="num">1</span>).push(<span class="num">2</span>);
+<span class="kw">const</span> queue = <span class="kw">new</span> SharedQueue(<span class="str">&#39;string&#39;</span>).enqueue(<span class="str">&#39;first&#39;</span>).enqueue(<span class="str">&#39;second&#39;</span>);
+<span class="kw">const</span> remaining = queue.dequeue();
+
+list.<span class="kw">get</span>(<span class="num">0</span>);      <span class="comment">// 1</span>
+stack.peek();     <span class="comment">// 2</span>
+queue.peek();     <span class="comment">// &#39;first&#39;</span>
+remaining.peek(); <span class="comment">// &#39;second&#39;</span></code></pre></div>
+<h2 id="linked-list-interfaces">Linked-list interfaces<a class="heading-link" href="#linked-list-interfaces" aria-label="Link to Linked-list interfaces">#</a></h2>
+<p>These classes use indexed block sequences internally. Their names describe the public operations, not physical next/previous links or constant-time bounds for every end operation.</p>
+<p>Both constructors take a value type. Both provide <code>prepend(value)</code>, <code>append(value)</code>, <code>removeFirst()</code>, <code>get(index)</code>, <code>getFirst()</code>, <code>getLast()</code>, <code>insertAfter(index, value)</code>, <code>forEach(fn)</code>, <code>toArray()</code>, <code>size</code>, and <code>isEmpty</code>.</p>
+<p><code>SharedLinkedList</code> also provides <code>removeAfter(index)</code>.</p>
+<p><code>SharedDoublyLinkedList</code> also provides <code>removeLast()</code>, <code>insertBefore(index, value)</code>, <code>remove(index)</code>, <code>forEachReverse(fn)</code>, <code>toArrayReverse()</code>, <code>size</code>, and <code>isEmpty</code>.</p>
+<!-- example: linked-lists -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedLinkedList, SharedDoublyLinkedList } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> numbers = <span class="kw">new</span> SharedLinkedList(<span class="str">&#39;number&#39;</span>).append(<span class="num">1</span>).prepend(<span class="num">0</span>).append(<span class="num">2</span>);
+<span class="kw">const</span> letters = <span class="kw">new</span> SharedDoublyLinkedList(<span class="str">&#39;string&#39;</span>)
+  .append(<span class="str">&#39;b&#39;</span>).prepend(<span class="str">&#39;a&#39;</span>).append(<span class="str">&#39;c&#39;</span>);
+
+numbers.toArray();         <span class="comment">// [0, 1, 2]</span>
+letters.toArrayReverse();  <span class="comment">// [&#39;c&#39;, &#39;b&#39;, &#39;a&#39;]</span></code></pre></div>
+<h2 id="priority-queues">Priority queues<a class="heading-link" href="#priority-queues" aria-label="Link to Priority queues">#</a></h2>
+<p><code>new SharedPriorityQueue(type, options?)</code> creates a minimum-priority queue by default. Use <code>{ maxHeap: true }</code> to remove maximum priorities first.</p>
+<p>Methods are <code>enqueue(value, priority)</code>, <code>dequeue()</code>, <code>peek()</code>, and <code>peekPriority()</code>. Properties are <code>size</code> and <code>isEmpty</code>. <code>peek()</code> reads the value, while <code>peekPriority()</code> reads its numeric priority. Do not assume insertion-order stability for equal priorities.</p>
+<!-- example: priority-queues -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedPriorityQueue } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> pending = <span class="kw">new</span> SharedPriorityQueue(<span class="str">&#39;string&#39;</span>)
+  .enqueue(<span class="str">&#39;low&#39;</span>, <span class="num">3</span>)
+  .enqueue(<span class="str">&#39;high&#39;</span>, <span class="num">1</span>)
+  .enqueue(<span class="str">&#39;medium&#39;</span>, <span class="num">2</span>);
+<span class="kw">const</span> largest = <span class="kw">new</span> SharedPriorityQueue(<span class="str">&#39;number&#39;</span>, { maxHeap: <span class="kw">true</span> })
+  .enqueue(<span class="num">10</span>, <span class="num">1</span>)
+  .enqueue(<span class="num">30</span>, <span class="num">3</span>);
+
+pending.peek();         <span class="comment">// &#39;high&#39;</span>
+pending.peekPriority(); <span class="comment">// 1</span>
+largest.peek();         <span class="comment">// 30</span></code></pre></div>
+<h2 id="nested-collections">Nested collections<a class="heading-link" href="#nested-collections" aria-label="Link to Nested collections">#</a></h2>
+<p>Value-bearing collections accept a type string of the form <code>&#39;StructureName&lt;innerType&gt;&#39;</code>. Sets themselves still contain only string or number values.</p>
+<!-- example: nested-collections -->
+<div class="code-block"><div class="code-label"><span>ts</span><button type="button" class="copy-code" aria-label="Copy ts code">Copy</button></div><pre tabindex="0"><code><span class="kw">import</span> { SharedMap, SharedSet, SharedList, SharedStack, SharedQueue } <span class="kw">from</span> <span class="str">&#39;zerocopy&#39;</span>;
+
+<span class="kw">const</span> tags = <span class="kw">new</span> SharedSet&lt;<span class="kw">string</span>&gt;().add(<span class="str">&#39;admin&#39;</span>).add(<span class="str">&#39;active&#39;</span>);
+<span class="kw">const</span> users = <span class="kw">new</span> SharedMap&lt;<span class="str">&#39;SharedSet&lt;string&gt;&#39;</span>&gt;(<span class="str">&#39;SharedSet&lt;string&gt;&#39;</span>)
+  .<span class="kw">set</span>(<span class="str">&#39;user-1&#39;</span>, tags);
+
+<span class="kw">const</span> record = <span class="kw">new</span> SharedMap(<span class="str">&#39;number&#39;</span>).<span class="kw">set</span>(<span class="str">&#39;x&#39;</span>, <span class="num">10</span>).<span class="kw">set</span>(<span class="str">&#39;y&#39;</span>, <span class="num">20</span>);
+<span class="kw">const</span> records = <span class="kw">new</span> SharedList&lt;<span class="str">&#39;SharedMap&lt;number&gt;&#39;</span>&gt;(<span class="str">&#39;SharedMap&lt;number&gt;&#39;</span>)
+  .push(record);
+
+<span class="kw">const</span> nested = <span class="kw">new</span> SharedMap&lt;<span class="str">&#39;SharedMap&lt;SharedList&lt;string&gt;&gt;&#39;</span>&gt;(
+  <span class="str">&#39;SharedMap&lt;SharedList&lt;string&gt;&gt;&#39;</span>,
+);
+<span class="kw">const</span> stack = <span class="kw">new</span> SharedStack&lt;<span class="str">&#39;SharedSet&lt;number&gt;&#39;</span>&gt;(<span class="str">&#39;SharedSet&lt;number&gt;&#39;</span>);
+<span class="kw">const</span> queue = <span class="kw">new</span> SharedQueue&lt;<span class="str">&#39;SharedMap&lt;string&gt;&#39;</span>&gt;(<span class="str">&#39;SharedMap&lt;string&gt;&#39;</span>);
+
+users.<span class="kw">get</span>(<span class="str">&#39;user-1&#39;</span>)!.has(<span class="str">&#39;admin&#39;</span>); <span class="comment">// true</span>
+records.<span class="kw">get</span>(<span class="num">0</span>)!.<span class="kw">get</span>(<span class="str">&#39;x&#39;</span>);         <span class="comment">// 10</span></code></pre></div>
+<p>A parent stores the nested snapshot, not a live reference to a variable. Updating <code>tags</code> later does not change <code>users</code>. Set the new nested snapshot into a new parent version to publish it.</p>
+<p><code>getWorkerData()</code> includes the dependent arenas needed by nested collections. Do not send a bare root pointer. See <a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/transport/">Worker sharing</a>.</p>
+<h2 id="compaction-and-low-level-methods">Compaction and low-level methods<a class="heading-link" href="#compaction-and-low-level-methods" aria-label="Link to Compaction and low-level methods">#</a></h2>
+<p><code>compact(snapshot)</code> returns the same collection type in a fresh writable arena. <code>compactMany({ map, list })</code> compacts a group together and returns a frozen record of new snapshots. Both copy live storage; neither changes the source snapshots.</p>
+<p>Use <code>getWorkerData()</code> and <code>initWorker()</code> for transport. Per-class <code>toWorkerData()</code> and <code>fromWorkerData()</code> describe a snapshot but do not, by themselves, establish its memory or ownership. Reset functions select new default arenas for future collections; they do not erase existing snapshots. See <a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/memory/">Architecture and memory</a>.</p>
+</article><div class="doc-bottom"><span>Found something unclear?</span><a href="https://github.com/natanelia/zerocopy/issues/new">Improve this guide ↗</a></div></main><aside class="doc-toc" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p><a href="#updates-and-values">Updates and values</a><a href="#typed-json-objects">Typed JSON objects</a><a href="#maps">Maps</a><a href="#sets">Sets</a><a href="#lists-stacks-and-queues">Lists, stacks, and queues</a><a href="#linked-list-interfaces">Linked-list interfaces</a><a href="#priority-queues">Priority queues</a><a href="#nested-collections">Nested collections</a><a href="#compaction-and-low-level-methods">Compaction and low-level methods</a><a class="toc-help" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/playground/">Try a real snapshot →</a></aside></div>
+  <footer class="site-footer"><div><a class="wordmark" href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy.</span></a><p>Share your data. Keep your options.</p></div><div class="footer-links"><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/docs/memory/">Know the trade-offs</a><a href="https://github.com/natanelia/zerocopy/issues">Feedback <span aria-hidden="true">↗</span></a><a href="https://github.com/natanelia/zerocopy/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v0.2.0 · <a href="https://github.com/natanelia/zerocopy/commit/0513a1378814df9ea82ee220d1ac4ae9c674a862">0513a13</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off"><p id="search-status" role="status">Type a topic to find a guide.</p><div id="search-results"></div></dialog><div class="toast" role="status" aria-live="polite"></div>
+  </body></html>

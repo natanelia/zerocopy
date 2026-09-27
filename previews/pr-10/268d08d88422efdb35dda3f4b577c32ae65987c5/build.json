@@ -1,0 +1,39 @@
+{
+  "sourceCommit": "0513a1378814df9ea82ee220d1ac4ae9c674a862",
+  "version": "0.2.0",
+  "base": "/zerocopy/previews/pr-10/268d08d88422efdb35dda3f4b577c32ae65987c5/",
+  "preview": {
+    "number": 10,
+    "headCommit": "268d08d88422efdb35dda3f4b577c32ae65987c5"
+  },
+  "pages": [
+    "",
+    "compare/",
+    "explorer/",
+    "investigation-benchmark/",
+    "lab/",
+    "playground/",
+    "use-cases/",
+    "docs/getting-started/",
+    "docs/mental-model/",
+    "docs/collections/",
+    "docs/sessions/",
+    "docs/transport/",
+    "docs/tasks/",
+    "docs/workers/",
+    "docs/redux/",
+    "docs/tanstack/",
+    "docs/memory/",
+    "docs/benchmarks/",
+    "docs/migration/",
+    "docs/use-cases/",
+    "docs/log-explorer/",
+    "docs/data-tables/",
+    "docs/graphs/",
+    "docs/simulations/",
+    "docs/analytics/",
+    "docs/maps/",
+    "docs/editors/"
+  ],
+  "librarySHA256": "bf84c6a9af51d664d499063d5adbb529b25687864a1009d806b461360edabf53"
+}
