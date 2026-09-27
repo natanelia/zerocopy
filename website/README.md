@@ -74,17 +74,37 @@ The build also provides local search, a 404 page, raw Markdown downloads, `llms.
 node --test website/tests/*.test.mjs
 node website/tests/browser.mjs
 node website/tests/explorer-browser.mjs
+node website/tests/comparison-browser.mjs
 ```
 
 Build first. Browser tests use the root Playwright dependency and Chromium. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
 
 CI uploads the static output, test logs, and desktop/mobile screenshots. Existing library and Markdown checks remain separate and unchanged.
 
-## Publish
+## Automatic PR previews
 
-The `Documentation website` workflow builds and checks pull requests without publishing them. A push to `main` can deploy to GitHub Pages after one-time repository setup:
+The `Documentation website` workflow now publishes tested **same-repository PRs** to GitHub Pages. Each preview has its own path:
 
-1. Set **Settings → Pages → Source** to **GitHub Actions**.
-2. Set the repository Actions variable **DOCS_PAGES** to **true**.
+```text
+/zerocopy/previews/pr-<number>/<head-commit>/
+```
 
-Then merge the site PR or run the workflow manually on `main`. The deploy job requires `pages: write` and `id-token: write`, and uses the `github-pages` environment. Without that variable, CI still produces a downloadable, tested static site. The workflow does not publish an npm package or change a custom domain.
+The workflow creates or updates one bot comment with links to the homepage, live comparison, explorer, and benchmark. The comment names both the PR head and the tested merge commit. It says **Preview ready** only after the public `build.json` matches the tested build. Failed or stale builds do not claim a working link. Closing a PR removes its preview files; reopening it builds a new preview.
+
+The `gh-pages` branch stores static output only. It is separate from source branches. Updates preserve other previews and the production site. Git updates are non-forced and retry conflicts. Commit-specific URLs prevent old service workers or cached scripts from running under a new preview. Previews have a visible banner and `noindex` metadata.
+
+GitHub Pages uses **Deploy from a branch → gh-pages → / (root)**. This repository's preview branch enables that source. On another repository, select those settings once. No Vercel account or hosting secret is required. The workflow explicitly requests a Pages build because a `GITHUB_TOKEN` push alone does not start one.
+
+Build jobs have read permission only. Publishing is a separate runner with scoped `contents`, `pages`, and PR-comment write permissions. It publishes only same-repository PRs, never external forks, and does not use `pull_request_target`. The publisher does not execute files from the generated artifact. It validates the PR/head identity, UTF-8 static file types, paths, size limits, and symlinks. Source contributors with repository write access are trusted; preview HTML still runs publicly and must not contain private data.
+
+Production root publication remains opt-in: set the repository Actions variable **DOCS_PAGES=true**, then push or dispatch on `main`. It uses the same branch publisher and preserves `previews/`. Do not switch Pages to GitHub Actions while using this branch-based preview workflow. Custom-domain deployment needs a matching base/origin configuration. The workflow does not publish npm or merge PRs.
+
+## Side-by-side comparison
+
+The `/compare/` route runs **with and without zerocopy** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to both views.
+
+The native baseline uses incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. Both can retain this append-only stream: shared immutable roots on one side, a native prefix length on the other. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
+
+The transport counter reports logical event deliveries to worker replicas. It does not measure bytes, retained heap, or result-message traffic. Shared mode still sends descriptors, allocates wrappers, and decodes strings. Timing reports show publication/attachment and query completion separately. Owner construction and append work, startup, and DOM rendering are not included. Concurrent timings can be affected by CPU contention; use the rotated three-architecture benchmark for controlled samples.
+
+A single active operation and one latest pending query bound work. Live ingestion waits for previous work to finish. The session stops at 200,000 events. Stop terminates the coordinator and nested readers, clears the displayed results, and drops references without promising forced garbage collection.

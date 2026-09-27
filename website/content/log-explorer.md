@@ -92,3 +92,7 @@ For append-only arrays, an earlier view can also be retained by a length boundar
 ## Apply the pattern elsewhere
 
 Replace events with document nodes, table rows, product records, or graph edges. The ownership model remains: one producer publishes immutable versions; multiple components read locally. See [all use cases and alternatives](../../docs/use-cases.md), not just this example.
+
+## Watch both implementations
+
+Open the [with/without comparison](../README.md#side-by-side-comparison) to apply the same controls to shared snapshots and native replicas. The native baseline sends incremental deltas by default. Both answers are independently checked. Transport counters count logical event copies, not memory bytes. Use the [investigation benchmark](../README.md#investigation-benchmark) for rotated timing samples.
