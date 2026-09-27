@@ -65,20 +65,24 @@ try {
   console.log('Passed: 100,000-event explorer, reference checks, pagination, frozen/live divergence, filters, restarts, and stop during startup.');
 
   await page.goto(origin + base + 'investigation-benchmark/');
-  await page.locator('#investigation-size').selectOption('1000'); await page.locator('#run-investigation-bench').click();
+  for (const size of ['1000', '10000', '100000']) {
+  await page.locator('#investigation-size').selectOption(size); await page.locator('#run-investigation-bench').click();
   await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120_000 });
-  assert.equal(await page.locator('.architecture-result').count(), 3); assert.equal(await page.locator('.architecture-result .result-row').count(), 9);
+  assert.equal(await page.locator('.architecture-result').count(), 3); assert.equal(await page.locator('.architecture-result .result-row').count(), 12);
   const download = page.waitForEvent('download'); await page.locator('#export-investigation-bench').click();
   const raw = JSON.parse(readFileSync(await (await download).path(), 'utf8'));
-  assert.equal(raw.schema, 'zerocopy-investigation-benchmark/v1'); assert.equal(raw.raw.length, 21);
-  assert.deepEqual(Object.keys(raw.samples).sort(), ['centralized', 'replicated', 'shared']);
+  assert.equal(raw.schema, 'zerocopy-investigation-benchmark/v2'); assert.equal(raw.raw.length, 28);
+  assert.deepEqual(Object.keys(raw.samples).sort(), ['centralized', 'immutable', 'replicated', 'shared']);
   for (const path of Object.values(raw.samples)) for (const values of Object.values(path)) { assert.equal(values.length, 7); assert.ok(values.every(n => Number.isFinite(n) && n >= 0)); }
+  assert.equal(raw.dependencies.immutable, metadata.dependencies.immutable);
+  writeFileSync(artifacts + `/investigation-benchmark-${size}.json`, JSON.stringify(raw, null, 2));
   writeFileSync(artifacts + '/investigation-benchmark.json', JSON.stringify(raw, null, 2));
+  }
   await page.screenshot({ path: artifacts + '/investigation-benchmark.png', fullPage: true });
   await page.locator('#investigation-size').selectOption('100000'); await page.locator('#run-investigation-bench').click(); await page.locator('#stop-investigation-bench').click();
   await page.waitForFunction(() => !document.querySelector('#run-investigation-bench').disabled);
   assert.match(await page.locator('#investigation-bench-status').innerText(), /Stopped/); assert.equal(await page.locator('#export-investigation-bench').isDisabled(), true);
-  console.log('Passed: three-architecture benchmark, full reference verification, all samples exported, and early cancellation.');
+  console.log('Passed: four-architecture benchmark at all three sizes, full reference verification, all samples exported, and early cancellation.');
 
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of ['explorer/', 'investigation-benchmark/', 'use-cases/', 'docs/use-cases/']) {

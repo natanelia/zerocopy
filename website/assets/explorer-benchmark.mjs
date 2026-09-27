@@ -10,7 +10,7 @@ function show(value) {
     const section = document.createElement('section'); section.className = 'architecture-result';
     const title = document.createElement('h2'); title.textContent = heading; section.append(title);
     const max = Math.max(.001, ...Object.values(value.summary).map(path => path[phase].median));
-    for (const [path, label] of [['shared', 'zerocopy · shared snapshots'], ['replicated', 'Native arrays · incremental replicas'], ['centralized', 'Native arrays · one owner']]) {
+    for (const [path, label] of [['shared', 'zerocopy · shared snapshots'], ['immutable', 'Immutable.js Lists · incremental replicas'], ['replicated', 'Native arrays · incremental replicas'], ['centralized', 'Native arrays · one owner']]) {
       const row = document.createElement('div'); row.className = 'result-row'; const summary = value.summary[path][phase];
       const header = document.createElement('div'), name = document.createElement('span'), time = document.createElement('strong');
       name.textContent = label; time.textContent = `${summary.median.toFixed(2)} ms`; header.append(name, time);
@@ -21,7 +21,7 @@ function show(value) {
     }
     $('investigation-bench-results').append(section);
   }
-  const construction = document.createElement('p'); construction.textContent = `Separate input setup: native ${value.construction.nativeBuildMs.toFixed(2)} ms; shared ${value.construction.sharedBuildMs.toFixed(2)} ms (persistent construction and cooperative yields). Not included in the bars. Lower phase times are better; results apply only to this workload.`;
+  const construction = document.createElement('p'); construction.textContent = `Separate input setup: native generation ${value.construction.nativeBuildMs.toFixed(2)} ms; Immutable.js ${value.dependencies.immutable} List construction ${value.construction.immutableBuildMs.toFixed(2)} ms; shared ${value.construction.sharedBuildMs.toFixed(2)} ms (persistent construction and cooperative yields). Not included in the bars. Lower phase times are better; results apply only to this workload.`;
   $('investigation-bench-results').append(construction);
   $('investigation-bench-status').textContent = 'Complete. All rows, counts, timelines, and summaries match the reference.';
   $('export-investigation-bench').disabled = false;

@@ -1,3 +1,4 @@
+import { PATHS } from './comparison-core.mjs';
 import { checkCapability } from './capability.mjs';
 import { Peer } from './explorer-peer.mjs';
 import { SERVICES, LEVELS, PAGE_SIZE, MAX_EVENTS, BUCKETS } from './explorer-core.mjs';
@@ -22,10 +23,10 @@ function stop(message = 'Stopped. Workers terminated and snapshot references rel
   peer?.close(); peer = undefined; last = undefined; loaded = false; busy = false; offset = 0; timeRange = {};
   $('compare-status').textContent = message; $('compare-stream').textContent = 'Start live events';
   $('compare-clear').hidden = true;
-  $('compare-freeze').textContent = 'Freeze both views'; $('compare-view').textContent = 'Following live data';
+  $('compare-freeze').textContent = 'Freeze all views'; $('compare-view').textContent = 'Following live data';
   $('compare-parity').textContent = 'No active comparison.'; $('compare-parity').removeAttribute('data-verified');
   for (const id of ['compare-live', 'compare-count']) { $(id).textContent = '—'; $(id).dataset.count = '0'; }
-  for (const path of ['shared', 'native']) {
+  for (const path of PATHS) {
     $(`lane-${path}`).setAttribute('aria-busy', 'false'); $(`phase-${path}`).textContent = 'Stopped';
     for (const field of ['matches', 'query', 'publish', 'copies']) $(`${field}-${path}`).textContent = '—';
     $(`rows-${path}`).replaceChildren(); $(`timeline-${path}`).replaceChildren(); $(`detail-${path}`).textContent = 'No retained result.';
@@ -56,7 +57,7 @@ function showLane(path, result) {
   const maximum = Math.max(1, ...result.summary.errors);
   result.summary.errors.forEach((count, index) => {
     const button = document.createElement('button'); button.type = 'button'; button.style.setProperty('--height', `${Math.max(2, count / maximum * 100)}%`);
-    const label = `Bucket ${index + 1}: ${number(count)} errors. Filter both views.`;
+    const label = `Bucket ${index + 1}: ${number(count)} errors. Filter all views.`;
     button.title = label; button.setAttribute('aria-label', label);
     button.addEventListener('click', () => {
       const step = (result.summary.end - result.summary.begin) / BUCKETS;
@@ -66,7 +67,7 @@ function showLane(path, result) {
   });
 }
 function inspect(index) {
-  for (const path of ['shared', 'native']) {
+  for (const path of PATHS) {
     const row = last?.results[path].rows.find(row => row.index === index);
     $(`detail-${path}`).textContent = row ? JSON.stringify({ ...row, service: SERVICES[row.service], level: LEVELS[row.level] }, null, 2) : 'No selected event.';
   }
@@ -75,14 +76,14 @@ function render(value) {
   last = value;
   for (const [id, count] of [['compare-live', value.liveCount], ['compare-count', value.viewCount]]) { $(id).textContent = number(count); $(id).dataset.count = String(count); }
   $('compare-view').textContent = value.frozen ? `Frozen at v${value.viewRevision}` : `Following live v${value.viewRevision}`;
-  $('compare-freeze').textContent = value.frozen ? 'Return both to live' : 'Freeze both views';
+  $('compare-freeze').textContent = value.frozen ? 'Return all to live' : 'Freeze all views';
   $('compare-parity').textContent = 'Same answer verified: result page, matches, errors, services, latency totals, and all timeline buckets.';
   $('compare-parity').dataset.verified = 'true';
-  for (const path of ['shared', 'native']) showLane(path, value.results[path]);
+  for (const path of PATHS) showLane(path, value.results[path]);
   if (value.results.shared.rows.length) inspect(value.results.shared.rows[0].index);
-  else for (const path of ['shared', 'native']) $(`detail-${path}`).textContent = 'No matching event.';
-  $('compare-page').textContent = `${number(offset + (value.results.shared.rows.length ? 1 : 0))}–${number(offset + value.results.shared.rows.length)} of ${number(value.results.shared.search.total)} matches on both sides`;
-  $('compare-construction').textContent = `Initial construction: shared ${ms(value.construction.sharedBuildMs)}; native ${ms(value.construction.nativeBuildMs)}. Shared includes cooperative build yields. These are not equal-operation timings.`;
+  else for (const path of PATHS) $(`detail-${path}`).textContent = 'No matching event.';
+  $('compare-page').textContent = `${number(offset + (value.results.shared.rows.length ? 1 : 0))}–${number(offset + value.results.shared.rows.length)} of ${number(value.results.shared.search.total)} matches on all three paths`;
+  $('compare-construction').textContent = `Input generation: ${ms(value.construction.nativeBuildMs)}. Immutable.js ${value.dependencies.immutable} List construction from that input: ${ms(value.construction.immutableBuildMs)}. Shared generation + construction + cooperative yields: ${ms(value.construction.sharedBuildMs)}. These are not equal-operation timings.`;
 }
 function scheduleStream() {
   clearTimeout(timer);
@@ -92,7 +93,7 @@ function scheduleStream() {
 }
 function enqueue(type, extra = {}) {
   const job = { type, extra, query: query(), intent: ++intent };
-  $('compare-parity').removeAttribute('data-verified'); $('compare-parity').textContent = 'Updating both views…';
+  $('compare-parity').removeAttribute('data-verified'); $('compare-parity').textContent = 'Updating all views…';
   if (busy) { queued = job; return; }
   void execute(job);
 }
@@ -103,7 +104,7 @@ async function execute(job) {
     const answer = await peer.request(job.type, { ...job.extra, query: job.query });
     if (current !== generation) return;
     loaded = true;
-    if (job.intent === intent) { render(answer); $('compare-status').textContent = 'Complete. Both paths ran real work; all outputs match.'; }
+    if (job.intent === intent) { render(answer); $('compare-status').textContent = 'Complete. All three paths ran real work; all outputs match.'; }
   } catch (error) { if (current === generation) stop(`Comparison stopped: ${error.message}`); }
   finally {
     if (current === generation) {
@@ -133,7 +134,7 @@ $('compare-next').addEventListener('click', () => { offset += PAGE_SIZE; enqueue
 $('compare-stop').addEventListener('click', () => stop());
 $('compare-export').addEventListener('click', () => {
   if (!last) return;
-  const result = { schema: 'zerocopy-live-comparison/v1', sourceCommit: document.body.dataset.source, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, ...last };
+  const result = { schema: 'zerocopy-live-comparison/v2', sourceCommit: document.body.dataset.source, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, ...last };
   const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'zerocopy-live-comparison.json'; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 });

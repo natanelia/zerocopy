@@ -1,9 +1,10 @@
 import { FIELDS, MAX_EVENTS, normalizeQuery, validateColumns } from './explorer-core.mjs';
 
+export const PATHS = ['shared', 'immutable', 'native'];
 export const READER_COUNT = 2;
 export const COMPARISON_MODES = ['incremental', 'full'];
 export function validateMode(mode) {
-  if (!COMPARISON_MODES.includes(mode)) throw new RangeError('Choose incremental or full native replication');
+  if (!COMPARISON_MODES.includes(mode)) throw new RangeError('Choose incremental or full replica updates');
   return mode;
 }
 /** Counts logical event deliveries, not serialized bytes or retained heap. */
@@ -13,6 +14,7 @@ export function transferCounts({ total, appended = 0, initial = false, mode = 'i
   if (appended > total) throw new RangeError('Appended count exceeds the dataset');
   return {
     shared: { clonedEvents: 0, publishedSnapshots: frozen ? 0 : READER_COUNT },
+    immutable: { clonedEvents: (initial || mode === 'full' ? total : appended) * READER_COUNT, publishedSnapshots: READER_COUNT },
     native: { clonedEvents: (initial || mode === 'full' ? total : appended) * READER_COUNT, publishedSnapshots: READER_COUNT },
   };
 }

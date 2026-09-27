@@ -24,22 +24,31 @@ rmSync(out, { recursive: true, force: true }); mkdirSync(out, { recursive: true 
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
 mkdirSync(join(out, 'library'));
 for (const file of readdirSync(join(root, 'dist'))) if (file.endsWith('.js')) cpSync(join(root, 'dist', file), join(out, 'library', file));
+// Keep the upstream dependency pinned, local, licensed, and inside demo scopes.
+const immutablePackage = JSON.parse(readFileSync(join(root, 'node_modules/immutable/package.json'), 'utf8'));
+const pinnedImmutable = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).devDependencies.immutable;
+if (immutablePackage.version !== pinnedImmutable) throw new Error('Install the pinned Immutable.js version before building');
+mkdirSync(join(out, 'vendor'));
+cpSync(join(root, 'node_modules/immutable/dist/immutable.es.js'), join(out, 'vendor/immutable.mjs'));
+cpSync(join(root, 'node_modules/immutable/LICENSE'), join(out, 'vendor/immutable-LICENSE.txt'));
+writeFileSync(join(out, 'vendor/version.mjs'), `export const immutableVersion = ${JSON.stringify(immutablePackage.version)};\n`);
 const routes = new Map(pages.map(page => [page.source, `docs/${page.slug}/`]));
 routes.set('README.md', ''); routes.set('docs/README.md', 'docs/getting-started/');
 routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
 // A controlled page is not sufficient: dedicated worker entry URLs and their
 // dependencies must also be inside the opt-in service worker's demo scope.
 const demoScripts = new Map([
-  ['compare/', ['main.mjs', 'capability.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
+  ['compare/', ['main.mjs', 'capability.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
   ['lab/', ['main.mjs', 'capability.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs']],
-  ['explorer/', ['main.mjs', 'capability.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs']],
-  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
+  ['explorer/', ['main.mjs', 'capability.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'immutable-storage.mjs']],
+  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
   ['playground/', ['main.mjs', 'capability.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
   for (const file of scripts) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
   cpSync(join(out, 'library'), join(out, route, 'library'), { recursive: true });
+  if (scripts.includes('immutable-storage.mjs')) cpSync(join(out, 'vendor'), join(out, route, 'vendor'), { recursive: true });
 }
 const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
@@ -58,9 +67,9 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', 'Share your data. Not copies.', 'Shared immutable collections for JavaScript and TypeScript. Direct reads across workers, stable snapshots, and optional task pools.', home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
-writePage('compare/', 'With and without zerocopy', 'Run shared snapshots and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
-writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Watch this workload with and without zerocopy →</a></p><div class="explorer-setup">`), 'explorer.mjs');
-writePage('investigation-benchmark/', 'Compare three investigation architectures', 'Measure shared snapshots, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
+writePage('compare/', 'zerocopy vs Immutable.js vs native', 'Run shared snapshots, Immutable.js Lists, and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
+writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Compare zerocopy, Immutable.js, and native arrays →</a></p><div class="explorer-setup">`), 'explorer.mjs');
+writePage('investigation-benchmark/', 'Compare four investigation architectures', 'Measure shared snapshots, Immutable.js Lists, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
 writePage('lab/', 'Benchmark lab', 'Compare shared snapshots and structured-cloned maps in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
 writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Logs are one example, not the product. Use zerocopy wherever several threads need local reads of large, versioned collections.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
@@ -72,7 +81,7 @@ for (const page of pages) {
   search.push({ title: page.title, description: page.description, route: `docs/${page.slug}/`, text: source.replace(/<!--.*?-->/gs, '').replace(/[`#*]/g, '').slice(0, 28000) });
 }
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
-writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
+writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', description: 'Find your way back to the zerocopy docs.', base, version, sha, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
 for (const route of ['lab', 'playground', 'explorer', 'investigation-benchmark', 'compare']) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');

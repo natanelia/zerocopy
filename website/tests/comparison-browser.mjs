@@ -18,7 +18,7 @@ async function complete(count) {
 }
 async function match(expected) {
   await page.waitForFunction(expected => document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false' && document.querySelector('#compare-parity').dataset.verified === 'true' && Number(document.querySelector('#matches-shared').textContent.replaceAll(',', '')) === expected, expected);
-  assert.equal(Number((await page.locator('#matches-native').innerText()).replaceAll(',', '')), expected);
+  for (const path of ['immutable', 'native']) assert.equal(Number((await page.locator(`#matches-${path}`).innerText()).replaceAll(',', '')), expected);
 }
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, reducedMotion: 'reduce' });
@@ -26,17 +26,17 @@ try {
   await page.goto(origin + base + 'compare/');
   assert.equal(await page.locator('#compare-mode').inputValue(), 'incremental');
   await page.locator('#compare-start').click(); await complete(100000);
-  assert.equal(await page.locator('#copies-shared').innerText(), '0'); assert.equal(await page.locator('#copies-native').innerText(), '200,000');
+  assert.equal(await page.locator('#copies-shared').innerText(), '0'); assert.equal(await page.locator('#copies-native').innerText(), '200,000'); assert.equal(await page.locator('#copies-immutable').innerText(), '200,000');
   assert.equal(await page.locator('#rows-shared tr').count(), 50); assert.equal(await page.locator('#timeline-native button').count(), 60);
   const expected = reference(generateColumns(0, 100000), { term: 'timeout', level: 2 });
   await page.locator('#compare-term').fill('timeout'); await page.locator('#compare-level').selectOption('2'); await page.locator('#compare-query').click(); await match(expected.search.total);
-  for (const path of ['shared', 'native']) assert.deepEqual(await page.locator(`#rows-${path} tr`).evaluateAll(rows => rows.map(row => Number(row.dataset.index))), expected.search.indices);
+  for (const path of ['shared', 'immutable', 'native']) assert.deepEqual(await page.locator(`#rows-${path} tr`).evaluateAll(rows => rows.map(row => Number(row.dataset.index))), expected.search.indices);
   await page.locator('#compare-freeze').click(); await complete(100000);
   assert.match(await page.locator('#compare-view').innerText(), /Frozen/);
   await page.locator('#compare-append').click();
   await page.waitForFunction(() => document.querySelector('#compare-live').dataset.count === '102000' && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false');
   assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '100000');
-  assert.equal(await page.locator('#copies-native').innerText(), '204,000'); assert.equal(await page.locator('#copies-shared').innerText(), '0');
+  assert.equal(await page.locator('#copies-native').innerText(), '204,000'); assert.equal(await page.locator('#copies-immutable').innerText(), '204,000'); assert.equal(await page.locator('#copies-shared').innerText(), '0');
   await match(expected.search.total);
   await page.screenshot({ path: artifacts + '/comparison-desktop.png', fullPage: true });
   await page.locator('#compare-next').click(); await complete(100000);
@@ -49,22 +49,29 @@ try {
   await page.locator('#compare-freeze').click(); await complete(102000);
   const download = page.waitForEvent('download'); await page.locator('#compare-export').click();
   const raw = JSON.parse(readFileSync(await (await download).path(), 'utf8'));
-  assert.equal(raw.schema, 'zerocopy-live-comparison/v1'); assert.equal(raw.verified, true);
-  for (const path of ['shared', 'native']) for (const key of ['queryMs', 'publishMs']) assert.ok(Number.isFinite(raw.results[path][key]) && raw.results[path][key] >= 0);
+  assert.equal(raw.schema, 'zerocopy-live-comparison/v2'); assert.equal(raw.verified, true); assert.equal(raw.dependencies.immutable, meta.dependencies.immutable);
+  assert.deepEqual(raw.results.immutable.rows, raw.results.native.rows); assert.deepEqual(raw.results.immutable.summary, raw.results.shared.summary);
+  for (const path of ['shared', 'immutable', 'native']) for (const key of ['queryMs', 'publishMs']) assert.ok(Number.isFinite(raw.results[path][key]) && raw.results[path][key] >= 0);
   writeFileSync(artifacts + '/comparison.json', JSON.stringify(raw, null, 2));
   await page.locator('#compare-stream').click(); await page.waitForFunction(() => Number(document.querySelector('#compare-live').dataset.count) >= 104000);
   await page.locator('#compare-stop').click(); assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '0');
   assert.equal(await page.locator('#compare-export').isDisabled(), true);
   await page.locator('#compare-mode').selectOption('full'); await page.locator('#compare-size').selectOption('1000');
   await page.locator('#compare-start').click(); await complete(1000); await page.locator('#compare-append').click(); await complete(3000);
-  assert.equal(await page.locator('#copies-native').innerText(), '8,000'); // 2 * 1000 initially + 2 * 3000 now.
+  assert.equal(await page.locator('#copies-immutable').innerText(), '8,000'); assert.equal(await page.locator('#copies-native').innerText(), '8,000'); // 2 * 1000 initially + 2 * 3000 now.
+  await page.locator('#compare-freeze').click(); await complete(3000);
+  await page.locator('#compare-append').click();
+  await page.waitForFunction(() => document.querySelector('#compare-live').dataset.count === '5000' && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false');
+  assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '3000');
+  assert.equal(await page.locator('#copies-immutable').innerText(), '18,000');
+  await page.locator('#compare-freeze').click(); await complete(5000);
   await page.locator('#compare-stop').click(); await page.locator('#compare-size').selectOption('100000'); await page.locator('#compare-start').click(); await page.locator('#compare-stop').click();
   assert.equal(await page.locator('#compare-start').isDisabled(), false);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#compare-size').selectOption('1000'); await page.locator('#compare-start').click(); await complete(1000);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   await page.screenshot({ path: artifacts + '/comparison-mobile.png', fullPage: true }); await page.locator('#compare-stop').click(); await context.close();
-  console.log('Passed: real comparison, 100,000 events, exact outputs, incremental and full-copy counters, retained native/shared views, stream, export, latest query, stop, mobile.');
+  console.log('Passed: real comparison, 100,000 events, exact outputs, incremental and full-copy counters, retained native/Immutable.js/shared views, stream, export, latest query, stop, mobile.');
   const plain = createPreview({ base, isolated: false }); plain.listen(0, '127.0.0.1'); await once(plain, 'listening');
   try {
     const ctx = await browser.newContext(); page = await ctx.newPage(); page.setDefaultTimeout(90000); page.on('pageerror', error => errors.push(error.message));

@@ -48,9 +48,22 @@ try {
             await peer.request('append', { columns: generateColumns(1000, 2000) });
             const answer = await peer.request('query', { role: 'search', count: 3000, query: {} });
             if (answer.search.total !== 3000) throw new Error('Native reader returned the wrong count');
+            await peer.request('prepare-immutable');
+            await peer.request('immutable-init', { columns: generateColumns(0, 1000) });
+            await peer.request('retain', { enabled: true });
+            await peer.request('immutable-append', { columns: generateColumns(1000, 2000) });
+            const frozen = await peer.request('query', { role: 'search', count: 1000, query: {} });
+            if (frozen.search.total !== 1000) throw new Error('Immutable.js lost its retained root');
+            // Full replacement must also preserve the frozen root.
+            await peer.request('immutable-init', { columns: generateColumns(0, 5000) });
+            const replaced = await peer.request('query', { role: 'search', count: 1000, query: {} });
+            if (replaced.search.total !== 1000) throw new Error('Full replication lost the retained root');
+            await peer.request('retain', { enabled: false });
+            const live = await peer.request('query', { role: 'search', count: 5000, query: {} });
+            if (live.search.total !== 5000) throw new Error('Immutable.js did not resume live');
           } finally { peer.close(); }
         });
-        assert.equal(libraryRequests, 0, 'Native readers must not depend on the WASM engine');
+        assert.equal(libraryRequests, 0, 'Native and Immutable.js readers must not depend on the WASM engine');
         await context.unroute('**/library/**');
       }
       for (const size of ['1000', '100000', '1000']) {
@@ -60,11 +73,22 @@ try {
         await page.locator('#compare-append').click();
         await page.waitForFunction(count => document.querySelector('#compare-live').dataset.count === String(count) && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false', Number(size) + 2000);
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), size);
+        assert.equal(await page.locator('#copies-immutable').innerText(), await page.locator('#copies-native').innerText());
+        assert.equal(await page.locator('#matches-immutable').innerText(), await page.locator('#matches-native').innerText());
         await page.locator('#compare-freeze').click(); await complete(Number(size) + 2000);
         await page.locator('#compare-stop').click();
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '0');
         console.log(`Passed: ${engine} ${size} events, freeze/append/resume, Stop/restart (${isolated ? 'headers' : 'service-worker isolation'}).`);
       }
+      // Verify the four-path controlled benchmark under both hosting policies.
+      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}investigation-benchmark/`);
+      if (!isolated) {
+        await page.locator('#enable-isolation').click();
+        await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#run-investigation-bench').disabled);
+      }
+      await page.locator('#investigation-size').selectOption('1000'); await page.locator('#run-investigation-bench').click();
+      await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120000 });
+      assert.equal(await page.locator('.architecture-result .result-row').count(), 12);
     } finally {
       await context.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
     }

@@ -34,7 +34,7 @@ The application caps a session at 200,000 events. Stop and navigation terminate 
 
 ## Investigation benchmark
 
-At `/investigation-benchmark/`, compare shared snapshots, two native-array replicas with incremental updates, and one native-data-owning worker. Measure initial sharing, a query on attached data, and append + publish + query separately. Native replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
+At `/investigation-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
 
 Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The existing Map transport lab remains available unchanged. For append-only arrays, native designs can also retain an earlier view by length.
 
@@ -66,7 +66,7 @@ Test this hosting path with `SITE_ISOLATED=false node website/serve.mjs`. Server
 
 `SITE_BASE=/zerocopy/` builds for a repository subpath. It defaults to `/`. Set `SITE_ORIGIN=https://natanelia.github.io` for canonical URLs and a sitemap. `SITE_COMMIT` or `GITHUB_SHA` records the actual build source; local builds use Git HEAD. Do not label an unverified npm version as the installed release.
 
-The build also provides local search, a 404 page, raw Markdown downloads, `llms.txt`, and a build manifest. All fonts use system stacks. No analytics, remote fonts, or third-party runtime scripts are loaded.
+The build also provides local search, a 404 page, raw Markdown downloads, `llms.txt`, and a build manifest. All fonts use system stacks. No analytics, remote fonts, or remote runtime scripts are loaded. Immutable.js is served locally for the demos.
 
 ## Tests
 
@@ -75,9 +75,10 @@ node --test website/tests/*.test.mjs
 node website/tests/browser.mjs
 node website/tests/explorer-browser.mjs
 node website/tests/comparison-browser.mjs
+node website/tests/memory-browser.mjs
 ```
 
-Build first. Browser tests use the root Playwright dependency and Chromium. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
+Build first. Browser tests use the root Playwright dependency with Chromium and WebKit. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
 
 CI uploads the static output, test logs, and desktop/mobile screenshots. Existing library and Markdown checks remain separate and unchanged.
 
@@ -101,11 +102,11 @@ Production root publication remains opt-in: set the repository Actions variable 
 
 ## Side-by-side comparison
 
-The `/compare/` route runs **with and without zerocopy** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to both views.
+The `/compare/` route runs **zerocopy, Immutable.js, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all three views.
 
-The native baseline uses incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. Both can retain this append-only stream: shared immutable roots on one side, a native prefix length on the other. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
+Both replica baselines use incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. All three can retain this append-only stream: zerocopy and Immutable.js keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
 
-The transport counter reports logical event deliveries to worker replicas. It does not measure bytes, retained heap, or result-message traffic. Shared mode still sends descriptors, allocates wrappers, and decodes strings. Timing reports show publication/attachment and query completion separately. Owner construction and append work, startup, and DOM rendering are not included. Concurrent timings can be affected by CPU contention; use the rotated three-architecture benchmark for controlled samples.
+The transport counter reports logical event deliveries to worker replicas. It does not measure bytes, retained heap, or result-message traffic. Shared mode still sends descriptors, allocates wrappers, and decodes strings. Timing reports show publication/attachment and query completion separately. Owner construction and append work, startup, and DOM rendering are not included. Concurrent timings can be affected by CPU contention; use the rotated four-architecture benchmark for controlled samples.
 
 A single active operation and one latest pending query bound work. Live ingestion waits for previous work to finish. The session stops at 200,000 events. Stop terminates the coordinator and nested readers, clears the displayed results, and drops references without promising forced garbage collection.
 
@@ -113,8 +114,20 @@ A single active operation and one latest pending query bound work. Live ingestio
 
 The comparison is tested in real Chromium and Playwright WebKit, including 1,000-event startup, 100,000-event loading, Stop/restart, and no-header hosting. This is engine coverage, not a claim of testing every iPhone model. Preview publication waits for the WebKit check.
 
-The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
+The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native and Immutable.js comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
 
 Nested demo workers use a small local ES module wrapper. This lets them inherit the parent worker's isolation on WebKit while importing the original worker module. The wrapper URL is released with the worker. Hosts with a custom Content Security Policy must permit `blob:` in `worker-src` for these nested demos.
 
 `node --test proofs/memory-startup.mjs` checks allocation counts in fresh workers, bounded defaults, configuration, read-only copies, growth, reset, and retained snapshots. `node website/tests/memory-browser.mjs` runs the browser regression.
+
+## Immutable.js comparison
+
+The build copies the root package's exact pinned `immutable` dependency, upstream ESM distribution, and MIT license into the site. The version is included in `build.json` and both raw exports. There is no CDN dependency and no handwritten substitute for Immutable.js. The package is used only by the demos, not by the zerocopy runtime.
+
+All three live implementations use five columns of primitive values. Immutable.js uses one `List` per column, `withMutations` for batch appends, and direct `get` calls during queries. The owner and both readers hold real Lists. The frozen view retains actual roots, including when a full replica replacement arrives. No full `toJS()` or array conversion occurs during a query.
+
+Immutable.js shares structure between versions within a worker, not the JavaScript heap between workers. Publication encodes the initial columns, or only the appended suffix, with `toArray()`. It then structured-clones those columns and reconstructs or appends Lists in each reader. Encoding and reconstruction are included in publish time. The copy counter counts event deliveries, not retained nodes, bytes, or memory savings.
+
+The controlled investigation benchmark has four paths: shared snapshots, Immutable.js incremental replicas, native incremental replicas, and one native data owner. It keeps two warm-ups, seven measured samples, rotated path order, separate phase timings, and independent output checks. Immutable.js owner appends and delta encoding are included in the update phase. Initial input generation and List construction are reported separately.
+
+Exports use `zerocopy-live-comparison/v2` and `zerocopy-investigation-benchmark/v2`. The controlled benchmark retains 28 measured path records. Historical benchmark files are unchanged. Tests cover seeded random columns, Unicode messages, tree-size boundaries, exact rows and aggregates, retained roots, both replication modes, and Chromium/WebKit isolation and restart flows.

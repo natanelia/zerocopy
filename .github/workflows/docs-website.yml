@@ -77,6 +77,7 @@ jobs:
           node website/build.mjs
           node --test website/tests/*.test.mjs
           node website/tests/comparison-browser.mjs
+          node website/tests/explorer-browser.mjs
           node website/tests/memory-browser.mjs
       - name: Retain publishable output
         uses: actions/upload-artifact@v4
