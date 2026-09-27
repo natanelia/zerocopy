@@ -1,12 +1,10 @@
-// Read-only kernels. No allocator, imported callbacks, or writes to arena memory.
-// Results live in instance-local globals, never in the writer's shared scratch.
+// Read-only kernels. Results use instance-local globals, never arena scratch.
 let minX: f64 = Infinity, minY: f64 = Infinity;
 let maxX: f64 = -Infinity, maxY: f64 = -Infinity;
 export function bboxMinX(): f64 { return minX; }
 export function bboxMinY(): f64 { return minY; }
 export function bboxMaxX(): f64 { return maxX; }
 export function bboxMaxY(): f64 { return maxY; }
-
 @inline
 export function xyLeaf(root: u32, depth: u32, tail: u32, size: u32, index: u32): u32 {
   if (index >= ((size - 1) & ~31)) return tail;
@@ -14,29 +12,36 @@ export function xyLeaf(root: u32, depth: u32, tail: u32, size: u32, index: u32):
   for (let d = depth; d > 0; d--) node = load<u32>(node + ((index >> (d * 5)) & 31) * 4);
   return node;
 }
-
-// Combining independent extrema chains can change which signed zero wins a
-// tie. Only when zero is an extremum, locate its first occurrence per axis.
-// This preserves the scalar/Turf Object.is result without slowing usual bounds.
+// Independent extrema chains preserve all nonzero extrema. For signed-zero
+// ties, recover the first zero in input order. Skip zero-free groups with SIMD.
 function restoreZeroSigns(root: u32, depth: u32, tail: u32, size: u32): void {
-  let needX = minX == 0 || maxX == 0, needY = minY == 0 || maxY == 0;
-  if (!needX && !needY) return;
+  let need: u32 = <u32>(minX == 0 || maxX == 0) | (<u32>(minY == 0 || maxY == 0) << 1);
+  if (!need) return;
+  const zero = f64x2.splat(0);
   for (let base: u32 = 0; base < size; base += 32) {
     const p = xyLeaf(root, depth, tail, size, base), end = p + min(<u32>32, size - base) * 8;
-    for (let q = p; q < end; q += 16) {
-      if (needX) {
-        const x = load<f64>(q);
-        if (x == 0) { if (minX == 0) minX = x; if (maxX == 0) maxX = x; needX = false; }
+    let q = p;
+    while (q < end) {
+      let groupEnd = min(q + 64, end);
+      if (end - q >= 64) {
+        const a = f64x2.eq(v128.load(q), zero), b = f64x2.eq(v128.load(q + 16), zero);
+        const c = f64x2.eq(v128.load(q + 32), zero), d = f64x2.eq(v128.load(q + 48), zero);
+        if (!(<u32>i64x2.bitmask(v128.or(v128.or(a, b), v128.or(c, d))) & need)) { q += 64; continue; }
       }
-      if (needY) {
-        const y = load<f64>(q + 8);
-        if (y == 0) { if (minY == 0) minY = y; if (maxY == 0) maxY = y; needY = false; }
+      for (; q < groupEnd; q += 16) {
+        if (need & 1) {
+          const x = load<f64>(q);
+          if (x == 0) { if (minX == 0) minX = x; if (maxX == 0) maxX = x; need &= ~1; }
+        }
+        if (need & 2) {
+          const y = load<f64>(q + 8);
+          if (y == 0) { if (minY == 0) minY = y; if (maxY == 0) maxY = y; need &= ~2; }
+        }
+        if (!need) return;
       }
-      if (!needX && !needY) return;
     }
   }
 }
-
 export function bboxXY(root: u32, depth: u32, tail: u32, size: u32): void {
   if (size & 1) unreachable();
   minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
@@ -58,7 +63,6 @@ export function bboxXY(root: u32, depth: u32, tail: u32, size: u32): void {
         l0 = f64x2.pmin(l0, value); h0 = f64x2.pmax(h0, value);
       }
     }
-    // pmin/pmax ignore a NaN in the second operand. Initial extrema are not NaN.
     const lower = f64x2.pmin(f64x2.pmin(l0, l1), f64x2.pmin(l2, l3));
     const upper = f64x2.pmax(f64x2.pmax(h0, h1), f64x2.pmax(h2, h3));
     minX = f64x2.extract_lane(lower, 0); minY = f64x2.extract_lane(lower, 1);
