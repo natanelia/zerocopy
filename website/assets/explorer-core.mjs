@@ -89,7 +89,21 @@ export function rowAt(view, index) {
   integer(index, 0, view.length - 1, 'Selected row');
   return { index, ...Object.fromEntries(FIELDS.map(field => [field, view.get(field, index)])) };
 }
-export const yieldToEvents = () => new Promise(resolve => setTimeout(resolve, 0));
+/** A real task-queue yield without nested-timer clamping. Used by every path.
+ * A fresh channel avoids starving another port by refilling one port's queue.
+ * Close both endpoints before resuming; idle pages retain no scheduler handles.
+ */
+export function yieldToEvents() {
+  if (typeof MessageChannel !== 'function') return new Promise(resolve => setTimeout(resolve, 0));
+  return new Promise((resolve, reject) => {
+    const { port1, port2 } = new MessageChannel();
+    const close = () => { port1.close(); port2.close(); };
+    port1.onmessage = () => { close(); resolve(); };
+    port1.onmessageerror = () => { close(); reject(new Error('Task-queue yield failed')); };
+    try { port2.postMessage(null); }
+    catch (error) { close(); reject(error); }
+  });
+}
 /** Periodic task-queue yields allow cancellation. A Promise-only yield would not. */
 async function checkpoint(index, cancelled) {
   if ((index & 4095) !== 0) return;

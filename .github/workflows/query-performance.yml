@@ -1,0 +1,51 @@
+name: Query performance audit
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: query-perf-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: node website/build.mjs
+      - name: Verify list cursors, string bounds, old snapshots, and task cancellation
+        run: node --test proofs/list-query.mjs website/tests/query-scheduling.test.mjs
+      - name: Build the unchanged merged baseline
+        run: |
+          git worktree add --detach .proof-baseline f3ba7a494b77c4b2e46540a599d98440c629cb5a
+          ln -s ../node_modules .proof-baseline/node_modules
+          ln -s ../../website/node_modules .proof-baseline/website/node_modules
+          cd .proof-baseline
+          bun run build:wasm && bun run build:browser && bun run build:types
+          node website/build.mjs
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Compare original, scheduler-only control, and optimized code
+        env:
+          QUERY_BASE_COMMIT: f3ba7a494b77c4b2e46540a599d98440c629cb5a
+          QUERY_HEAD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node website/tests/query-performance-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: query-performance-${{ github.sha }}
+          path: website/artifacts/query-performance.json
+          if-no-files-found: warn
+          retention-days: 30
