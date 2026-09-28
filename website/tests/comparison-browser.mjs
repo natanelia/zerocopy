@@ -16,6 +16,18 @@ let page; const errors = [];
 async function complete(count) {
   await page.waitForFunction(count => document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false' && document.querySelector('#compare-parity').dataset.verified === 'true' && Number(document.querySelector('#compare-count').dataset.count) === count, count);
 }
+async function freezeAndWait(count, frozen) {
+  const before = Number(await page.locator('#comparison-workspace').getAttribute('data-completed-operation') ?? 0);
+  await page.locator('#compare-freeze').click();
+  await page.waitForFunction(before => {
+    const workspace = document.querySelector('#comparison-workspace');
+    return workspace.getAttribute('aria-busy') === 'false' &&
+      Number(workspace.dataset.completedOperation ?? 0) > before &&
+      document.querySelector('#compare-parity').dataset.verified === 'true';
+  }, before);
+  assert.equal(await page.locator('#comparison-workspace').getAttribute('data-frozen'), String(frozen));
+  assert.equal(await page.locator('#compare-count').getAttribute('data-count'), String(count));
+}
 async function match(expected) {
   await page.waitForFunction(expected => document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false' && document.querySelector('#compare-parity').dataset.verified === 'true' && Number(document.querySelector('#matches-shared').textContent.replaceAll(',', '')) === expected, expected);
   for (const path of ['immutable', 'native']) assert.equal(Number((await page.locator(`#matches-${path}`).innerText()).replaceAll(',', '')), expected);
@@ -31,7 +43,7 @@ try {
   const expected = reference(generateColumns(0, 100000), { term: 'timeout', level: 2 });
   await page.locator('#compare-term').fill('timeout'); await page.locator('#compare-level').selectOption('2'); await page.locator('#compare-query').click(); await match(expected.search.total);
   for (const path of ['shared', 'immutable', 'native']) assert.deepEqual(await page.locator(`#rows-${path} tr`).evaluateAll(rows => rows.map(row => Number(row.dataset.index))), expected.search.indices);
-  await page.locator('#compare-freeze').click(); await complete(100000);
+  await freezeAndWait(100000, true);
   assert.match(await page.locator('#compare-view').innerText(), /Frozen/);
   await page.locator('#compare-append').click();
   await page.waitForFunction(() => document.querySelector('#compare-live').dataset.count === '102000' && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false');
@@ -46,7 +58,7 @@ try {
   assert.equal(await page.locator('#rows-shared img').count(), 0);
   await page.locator('#compare-term').fill('retry'); await page.locator('#compare-query').click();
   await page.locator('#compare-term').fill('timeout'); await page.locator('#compare-query').click(); await match(expected.search.total);
-  await page.locator('#compare-freeze').click(); await complete(102000);
+  await freezeAndWait(102000, false);
   const download = page.waitForEvent('download'); await page.locator('#compare-export').click();
   const raw = JSON.parse(readFileSync(await (await download).path(), 'utf8'));
   assert.equal(raw.schema, 'zerocopy-live-comparison/v2'); assert.equal(raw.verified, true); assert.equal(raw.dependencies.immutable, meta.dependencies.immutable);
@@ -59,12 +71,12 @@ try {
   await page.locator('#compare-mode').selectOption('full'); await page.locator('#compare-size').selectOption('1000');
   await page.locator('#compare-start').click(); await complete(1000); await page.locator('#compare-append').click(); await complete(3000);
   assert.equal(await page.locator('#copies-immutable').innerText(), '8,000'); assert.equal(await page.locator('#copies-native').innerText(), '8,000'); // 2 * 1000 initially + 2 * 3000 now.
-  await page.locator('#compare-freeze').click(); await complete(3000);
+  await freezeAndWait(3000, true);
   await page.locator('#compare-append').click();
   await page.waitForFunction(() => document.querySelector('#compare-live').dataset.count === '5000' && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false');
   assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '3000');
   assert.equal(await page.locator('#copies-immutable').innerText(), '18,000');
-  await page.locator('#compare-freeze').click(); await complete(5000);
+  await freezeAndWait(5000, false);
   await page.locator('#compare-stop').click(); await page.locator('#compare-size').selectOption('100000'); await page.locator('#compare-start').click(); await page.locator('#compare-stop').click();
   assert.equal(await page.locator('#compare-start').isDisabled(), false);
   await page.setViewportSize({ width: 390, height: 844 });

@@ -11,13 +11,24 @@ const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.
 const browser = await ({ chromium, webkit }[engine]).launch({ headless: true });
 let page;
 const errors = [];
-async function complete(count) {
-  await page.waitForFunction(() =>
-    document.querySelector('#compare-parity').dataset.verified === 'true' ||
-    (!document.querySelector('#compare-start').disabled && /(?:error|stopped|failed|memory)/i.test(document.querySelector('#compare-status').textContent)));
+async function action(selector, count, frozen, liveCount = count) {
+  const before = Number(await page.locator('#comparison-workspace').getAttribute('data-completed-operation') ?? 0);
+  await page.locator(selector).click();
+  await page.waitForFunction(before => {
+    const workspace = document.querySelector('#comparison-workspace');
+    return (workspace.getAttribute('aria-busy') === 'false' &&
+      Number(workspace.dataset.completedOperation ?? 0) > before &&
+      document.querySelector('#compare-parity').dataset.verified === 'true') ||
+      (!document.querySelector('#compare-start').disabled &&
+        /(?:error|stopped|failed|memory)/i.test(document.querySelector('#compare-status').textContent));
+  }, before);
   const status = await page.locator('#compare-status').innerText();
   assert.equal(await page.locator('#compare-parity').getAttribute('data-verified'), 'true', `${engine} ${count}: ${status}`);
+  assert.ok(Number(await page.locator('#comparison-workspace').getAttribute('data-completed-operation')) > before, 'Each action must produce a new verified result');
+  assert.equal(await page.locator('#comparison-workspace').getAttribute('aria-busy'), 'false');
+  assert.equal(await page.locator('#comparison-workspace').getAttribute('data-frozen'), String(frozen));
   assert.equal(await page.locator('#compare-count').getAttribute('data-count'), String(count));
+  assert.equal(await page.locator('#compare-live').getAttribute('data-count'), String(liveCount));
 }
 try {
   for (const isolated of [true, false]) {
@@ -66,14 +77,13 @@ try {
       }
       for (const size of ['1000', '100000', '1000']) {
         await page.locator('#compare-size').selectOption(size);
-        await page.locator('#compare-start').click(); await complete(Number(size));
-        await page.locator('#compare-freeze').click(); await complete(Number(size));
-        await page.locator('#compare-append').click();
-        await page.waitForFunction(count => document.querySelector('#compare-live').dataset.count === String(count) && document.querySelector('#comparison-workspace').getAttribute('aria-busy') === 'false', Number(size) + 2000);
+        await action('#compare-start', Number(size), false);
+        await action('#compare-freeze', Number(size), true);
+        await action('#compare-append', Number(size), true, Number(size) + 2000);
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), size);
         assert.equal(await page.locator('#copies-immutable').innerText(), await page.locator('#copies-native').innerText());
         assert.equal(await page.locator('#matches-immutable').innerText(), await page.locator('#matches-native').innerText());
-        await page.locator('#compare-freeze').click(); await complete(Number(size) + 2000);
+        await action('#compare-freeze', Number(size) + 2000, false);
         await page.locator('#compare-stop').click();
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '0');
         console.log(`Passed: ${engine} ${size} events, freeze/append/resume, Stop/restart (${isolated ? 'headers' : 'service-worker isolation'}).`);

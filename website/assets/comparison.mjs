@@ -25,6 +25,8 @@ function stop(message = 'Stopped. Workers terminated and snapshot references rel
   $('compare-clear').hidden = true;
   $('compare-freeze').textContent = 'Freeze all views'; $('compare-view').textContent = 'Following live data';
   $('compare-parity').textContent = 'No active comparison.'; $('compare-parity').removeAttribute('data-verified');
+  delete $('comparison-workspace').dataset.completedOperation;
+  delete $('comparison-workspace').dataset.frozen;
   for (const id of ['compare-live', 'compare-count']) { $(id).textContent = '—'; $(id).dataset.count = '0'; }
   for (const path of PATHS) {
     $(`lane-${path}`).setAttribute('aria-busy', 'false'); $(`phase-${path}`).textContent = 'Stopped';
@@ -84,6 +86,10 @@ function render(value) {
   else for (const path of PATHS) $(`detail-${path}`).textContent = 'No matching event.';
   $('compare-page').textContent = `${number(offset + (value.results.shared.rows.length ? 1 : 0))}–${number(offset + value.results.shared.rows.length)} of ${number(value.results.shared.search.total)} matches on all three paths`;
   $('compare-construction').textContent = `Input generation: ${ms(value.construction.nativeBuildMs)}. Immutable.js ${value.dependencies.immutable} List construction from that input: ${ms(value.construction.immutableBuildMs)}. Shared generation + construction + cooperative yields: ${ms(value.construction.sharedBuildMs)}. These are not equal-operation timings.`;
+  // A completion marker identifies this verified result, not a previous one.
+  // Freeze can leave all counts unchanged; parity alone cannot identify it.
+  $('comparison-workspace').dataset.completedOperation = String(value.operation);
+  $('comparison-workspace').dataset.frozen = String(value.frozen);
 }
 function scheduleStream() {
   clearTimeout(timer);
