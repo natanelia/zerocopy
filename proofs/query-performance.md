@@ -100,7 +100,7 @@ per run, `by-query.json`, and `summary.json`. The workflow also uploads its log.
 Correctness checks run independently of timing:
 
 ```sh
-node --test proofs/list-query.mjs proofs/list-codecs.mjs proofs/query-control.test.mjs
+node --test proofs/list-query.mjs proofs/list-codecs.mjs proofs/query-control-checks.mjs
 node --test website/tests/task-yield.test.mjs
 ```
 

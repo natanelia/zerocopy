@@ -27,7 +27,7 @@ jobs:
       - run: npm --prefix website install --ignore-scripts --no-package-lock
       - run: bunx playwright install --with-deps chromium webkit
       - name: Verify cached snapshots and string bounds
-        run: node --test proofs/list-query.mjs proofs/list-codecs.mjs proofs/query-control.test.mjs
+        run: node --test proofs/list-query.mjs proofs/list-codecs.mjs proofs/query-control-checks.mjs
       - name: Build the unchanged main baseline
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
