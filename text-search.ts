@@ -6,10 +6,19 @@ export interface TextSearchOptions {
   readonly caseSensitive?: boolean;
 }
 
+/** A query plan may test one half-leaf in WASM. The low 16 bits mark
+ * matches; high bits request exact Unicode fallback for the corresponding row.
+ * @internal */
+export interface CompiledStringSearch {
+  (raw: number): boolean;
+  readonly block16?: (address: number, count: number) => number;
+  readonly fallback?: (raw: number) => boolean;
+}
+
 /** Compile a predicate over immutable, length-prefixed UTF-8 string addresses.
  * Only query-sized state is allocated. No decoded dataset or result cache is kept.
  * @internal */
-export function compileStringSearch(arena: Arena, term: string, options: TextSearchOptions = {}): (raw: number) => boolean {
+export function compileStringSearch(arena: Arena, term: string, options: TextSearchOptions = {}): CompiledStringSearch {
   if (typeof term !== 'string') throw new TypeError('Search text must be a string');
   if (options === null || typeof options !== 'object') throw new TypeError('Expected text search options');
   const sensitive = options.caseSensitive ?? true;
@@ -45,10 +54,15 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
     }
     const [q0,q1,q2,q3] = packed, [m0,m1,m2,m3] = masks;
     const scan = arena.wasm.textContains16;
-    return raw => {
+    const test = (raw: number) => {
       const result = scan(raw, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
       return result < 0 ? fallback(raw) : result !== 0;
     };
+    const scanBlock = arena.wasm.textContainsBlock16;
+    return Object.assign(test, {
+      block16: (address: number, count: number) => scanBlock(address, count, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive),
+      fallback,
+    });
   }
   // A bounded Horspool search skips impossible starts. Compare four bytes at a
   // time against masks derived from the query: only its ASCII letters may fold.

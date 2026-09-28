@@ -22,7 +22,7 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bunx tsc --noEmit -p tsconfig.text-search.json
-      - run: node --test proofs/text-search.mjs proofs/text-kernel.mjs
+      - run: node --test proofs/text-search.mjs proofs/text-kernel.mjs proofs/text-batch.mjs
       - run: npm --prefix website install --ignore-scripts --no-package-lock
       - run: bunx playwright install --with-deps chromium webkit
       - name: Build the previous PR13 version

@@ -85,6 +85,27 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     if (this.type !== 'string') throw new TypeError('Text search requires a string list');
     const a = this.arena, match = compileStringSearch(a, term, options), view = a.dv;
     const { size, root, depth, tail } = this;
+    // Amortize the JS/WASM call across at most 16 adjacent immutable values.
+    // Only two bit masks are cached, not strings or an index of the dataset.
+    if (match.block16) {
+      const scanBlock = match.block16, fallback = match.fallback!;
+      let block = -1, address = 0, flags = 0;
+      return index => {
+        if (!validIndex(index, size)) return false;
+        const nextBlock = index >>> 4;
+        if (nextBlock !== block) {
+          const first = nextBlock * 16;
+          const leaf = (first >>> 5) === ((size - 1) >>> 5)
+            ? tail : a.wasm.vecLeaf(root, depth, first) >>> 0;
+          address = leaf + (first & 31) * 8;
+          flags = scanBlock(address, Math.min(16, size - first));
+          block = nextBlock;
+        }
+        const bit = 1 << (index & 15);
+        return (flags & bit) !== 0 || ((flags >>> 16) & bit) !== 0
+          && fallback(view.getFloat64(address + (index & 15) * 8, true));
+      };
+    }
     let block = -1, address = 0;
     return index => {
       if (!validIndex(index, size)) return false;

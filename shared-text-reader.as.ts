@@ -58,3 +58,19 @@ export function textContains16(raw: u32, size: u32, q0: u32, q1: u32, q2: u32, q
   }
   return 0;
 }
+
+/** Test at most 16 raw string addresses in an immutable vector leaf.
+ * One bit per row marks a match, plus one bit per row for Unicode fallback.
+ * This amortizes JS/WASM entry without a result buffer or shared-memory writes.
+ */
+export function textContainsBlock16(address: u32, count: u32, size: u32, q0: u32, q1: u32, q2: u32, q3: u32, m0: u32, m1: u32, m2: u32, m3: u32, insensitive: bool): u32 {
+  if (!count || count > 16 || !size || size > 16) return 0;
+  let flags: u32 = 0;
+  for (let i: u32 = 0; i < count; i++) {
+    const raw = <u32>load<f64>(address + i * 8);
+    const result = textContains16(raw, size, q0, q1, q2, q3, m0, m1, m2, m3, insensitive);
+    if (result > 0) flags |= <u32>1 << i;
+    else if (result < 0) flags |= <u32>1 << (i + 16);
+  }
+  return flags;
+}
