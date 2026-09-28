@@ -34,3 +34,6 @@ proofs/results/*.partial
 # CI-only baseline and evidence
 .proof-baseline/
 proofs/results/ci*.json
+
+# Browser query proof output
+proofs/query-results/

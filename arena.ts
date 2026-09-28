@@ -132,6 +132,23 @@ export class Arena {
   private objectBytes = 0;
   private stringBytes = 0;
   private readonly strings = new Map<number, string>();
+  // A tiny direct-mapped front cache accelerates repeated dictionary values.
+  // Collisions fall back to the bounded Map, so unrelated strings are not lost.
+  private stringSlots: Uint32Array | undefined;
+  private stringValues: (string | undefined)[] | undefined;
+  private cacheStringSlot(ptr: number, value: string): void {
+    this.stringSlots ??= new Uint32Array(64);
+    this.stringValues ??= new Array(64);
+    const slot = (ptr >>> 3) & 63;
+    this.stringSlots[slot] = ptr; this.stringValues[slot] = value;
+  }
+  private cachedString(ptr: number): string | undefined {
+    const slot = (ptr >>> 3) & 63;
+    if (this.stringSlots?.[slot] === ptr) return this.stringValues![slot];
+    const value = this.strings.get(ptr);
+    if (value !== undefined) this.cacheStringSlot(ptr, value);
+    return value;
+  }
   // Dictionary reuse is bounded and arena-local. Only immutable string payloads
   // are interned, never JSON objects or data from another allocation lifetime.
   private readonly stringPointers = new Map<string, number>();
@@ -221,16 +238,18 @@ export class Arena {
     // Cache hits refer to immutable bytes. Do not refresh the memory buffer or
     // reread a string header for every occurrence of the same dictionary value.
     if (type === 'string') {
-      const cached = this.strings.get(raw + 4);
+      const ptr = raw + 4, cached = this.cachedString(ptr);
       if (cached !== undefined) return cached;
+      this.refresh();
+      return this.readString(ptr, this.view.getUint32(raw, true));
     }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
   decodeAt(type: string, ptr: number, len: number): any {
+    if (type === 'string') return this.string(ptr, len);
     this.refresh();
     if (type === 'number') return this.view.getFloat64(ptr, true);
     if (type === 'boolean') return this.bytes[ptr] !== 0;
-    if (type === 'string') return this.string(ptr, len);
     if (this.objects.has(ptr)) return this.objects.get(ptr);
     const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
@@ -247,9 +266,14 @@ export class Arena {
   }
   string(ptr: number, len: number): string {
     if (!len) return '';
-    const cached = this.strings.get(ptr);
+    const cached = this.cachedString(ptr);
     if (cached !== undefined) return cached;
     this.refresh();
+    return this.readString(ptr, len);
+  }
+  /** Decode a cache miss after the caller refreshed the shared byte view. */
+  private readString(ptr: number, len: number): string {
+    if (!len) return '';
     let value = '';
     if (len <= 32) {
       for (let i = 0; i < len; i++) {
@@ -259,7 +283,7 @@ export class Arena {
       }
     } else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
     // Empty byte ranges can share an address with a following allocation.
-    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
+    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; this.cacheStringSlot(ptr, value); }
     return value;
   }
   private rememberKey(key: string, token: KeyToken): KeyToken {

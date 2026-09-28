@@ -4,7 +4,7 @@ Run after `bun install`, `bun run build:wasm`, `bun run build:browser`, and
 `bunx playwright install --with-deps chromium`:
 
 ```sh
-node --test proofs/list-read-performance.test.mjs website/tests/task-yield.test.mjs
+node --test proofs/list-read-performance.mjs proofs/string-read-cache.mjs website/tests/task-yield.test.mjs
 node proofs/query-performance.mjs
 ```
 
@@ -22,6 +22,9 @@ Three variants separate the causes of a speed change:
 The library uses per-list leaf locality rather than one arena cache shared by
 interleaved columns. A bounded, arena-local string dictionary reuses immutable
 UTF-8 payloads, and decoded-string hits avoid repeated memory-buffer checks.
+A 64-slot front cache accelerates repeated decoded strings; collisions retain
+the bounded backing cache. Misses refresh and decode once, not through repeated
+cache and buffer checks.
 Unique or large strings can exceed the dictionary budget and take the uncached
 path. This is not an unlimited decoded copy of the dataset.
 
@@ -44,3 +47,8 @@ presented as a zerocopy-only speedup. Collection construction and worker startup
 remain outside the query phases. The workload is append-only and has repeated
 messages; it is not proof of a universal win on arbitrary unique strings, small
 collections, every browser, or every device. This is not a memory benchmark.
+
+`read-kernels.json` separately measures numeric, repeated-string, and unique-string
+scans. It uses a fresh browser context per implementation, five warmups, eleven
+samples, and exact checksums. This exposes cases where Immutable.js remains
+faster rather than presenting the repeated-message workload as universal.

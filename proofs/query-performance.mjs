@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { measureReadKernels } from './read-kernels.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const baseline = process.env.PERF_BASE ?? 'f3ba7a494b77c4b2e46540a599d98440c629cb5a';
 assert.match(baseline, /^[a-f0-9]{40}$/);
@@ -22,7 +23,7 @@ let browser, server;
 const runs = [];
 const median = values => {
   assert.ok(values.length > 0, 'A median needs at least one sample');
-  const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(sorted.length / 2);
+  const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(values.length / 2);
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 };
 try {
@@ -117,6 +118,8 @@ try {
     });
     assert.match(cancelled, /cancelled/);
   } finally { await cancellationContext.close(); }
+  const kernels = await measureReadKernels(browser, `http://127.0.0.1:${server.address().port}`);
+  writeFileSync(join(artifacts, 'read-kernels.json'), JSON.stringify(kernels, null, 2) + '\n');
   const table = [];
   for (const entries of [1000, 10000, 100000]) for (const variant of ['legacy', 'control', 'candidate']) {
     const selected = runs.filter(run => run.entries === entries && run.variant === variant);
@@ -138,7 +141,7 @@ try {
         sharedUpdateMs: median(select('shared').map(row => row.updateMs)), immutableUpdateMs: median(select('immutable').map(row => row.updateMs)) });
     }
   }
-  const report = { schema: 'zerocopy-query-performance/v1', baseline, commit, browser: browser.version(), dependency, table, byQuery,
+  const report = { schema: 'zerocopy-query-performance/v1', baseline, commit, browser: browser.version(), dependency, table, byQuery, kernels,
     method: 'Same data, independent answer oracle, same Immutable.js, two warmups and seven samples per run. Legacy retains old timers/scalar appends. Control changes common task yields and uses the existing bulk append API but keeps the old library. Candidate adds per-list leaf cache and bounded arena string interning. Three independently initialized repetitions at 100000 events; rotated order. No timing samples removed. Raw JSON is retained. Smaller workloads are smoke measurements, not speed gates.' };
   writeFileSync(join(artifacts, 'summary.json'), JSON.stringify(report, null, 2) + '\n');
   const lines = ['# Query and update performance', '', `Baseline: \`${baseline}\` · Candidate: \`${commit}\` · Chromium ${browser.version()} · Immutable.js ${dependency}`, '',
