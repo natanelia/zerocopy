@@ -1,0 +1,42 @@
+name: Query performance
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: node website/build.mjs
+      - name: Snapshot, interning, and shared-reader regression tests
+        run: node --test proofs/list-query-regression.mjs
+      - name: Build the pinned merged baseline without changing its code
+        run: |
+          git worktree add --detach .proof-baseline f3ba7a494b77c4b2e46540a599d98440c629cb5a
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          ln -s "$PWD/website/node_modules" .proof-baseline/website/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser && SITE_COMMIT=f3ba7a494b77c4b2e46540a599d98440c629cb5a node website/build.mjs)
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Compare real browser worker pipelines on the same machine
+        run: node proofs/query-performance.mjs .proof-baseline proofs/results/query-performance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: query-performance-${{ github.sha }}
+          path: proofs/results/query-performance.json
+          retention-days: 14

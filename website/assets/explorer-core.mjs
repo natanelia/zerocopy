@@ -89,7 +89,30 @@ export function rowAt(view, index) {
   integer(index, 0, view.length - 1, 'Selected row');
   return { index, ...Object.fromEntries(FIELDS.map(field => [field, view.get(field, index)])) };
 }
-export const yieldToEvents = () => new Promise(resolve => setTimeout(resolve, 0));
+// A posted message yields to the task queue without nested-timer clamping.
+// All implementations use this same scheduler and the same checkpoints.
+let yieldChannel, yieldWaiters = [];
+export function yieldToEvents() {
+  if (typeof MessageChannel === 'undefined') return new Promise(resolve => setTimeout(resolve, 0));
+  if (!yieldChannel) {
+    yieldChannel = new MessageChannel();
+    yieldChannel.port1.onmessage = () => {
+      const waiters = yieldWaiters;
+      yieldWaiters = [];
+      yieldChannel.port1.unref?.(); // Idle Node tests must be able to exit.
+      for (const resolve of waiters) resolve();
+    };
+    yieldChannel.port1.unref?.();
+    yieldChannel.port2.unref?.();
+  }
+  return new Promise(resolve => {
+    yieldWaiters.push(resolve);
+    if (yieldWaiters.length === 1) {
+      yieldChannel.port1.ref?.();
+      yieldChannel.port2.postMessage(null);
+    }
+  });
+}
 /** Periodic task-queue yields allow cancellation. A Promise-only yield would not. */
 async function checkpoint(index, cancelled) {
   if ((index & 4095) !== 0) return;
