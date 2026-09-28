@@ -40,11 +40,15 @@ jobs:
       - name: Build the candidate
         run: node website/build.mjs
       - name: Measure original, equal-scheduler baseline, and candidate
-        run: node proofs/query-performance.mjs
+        run: |
+          node --check proofs/query-performance.mjs
+          node proofs/query-performance.mjs 2>&1 | tee query-performance.log
       - name: Retain every measured sample
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: query-performance-${{ github.sha }}
-          path: proofs/results/query-performance/
+          path: |
+            proofs/results/query-performance/
+            query-performance.log
           retention-days: 14
