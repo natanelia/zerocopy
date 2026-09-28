@@ -23,3 +23,16 @@ test('unrelated predicate or data changes cannot be credited to the engine', () 
 test('unknown formats fail instead of silently constructing a misleading control', () => {
   assert.throws(() => matchScheduler('export const changed = 1;', candidate), /Unknown scheduler layout/);
 });
+
+test('the pre-text adapter control installs only optional query binding', async () => {
+  const { addTextMatcherAdapter } = await import('./query-control.mjs');
+  const previous = candidate
+    .replace(",\n    compileTextSearch: typeof columns.message.compileTextSearch === 'function'\n      ? term => columns.message.compileTextSearch(term, { caseSensitive: false }) : undefined", '')
+    .replace('matches(view, index, query, containsText)', 'matches(view, index, query)')
+    .replace("(containsText ? containsText(index) : view.get('message', index).toLowerCase().includes(query.term))", "view.get('message', index).toLowerCase().includes(query.term)")
+    .replaceAll('\n  const containsText = query.term ? view.compileTextSearch?.(query.term) : undefined;', '')
+    .replaceAll('!matches(view, index, query, containsText)', '!matches(view, index, query)');
+  assert.equal(addTextMatcherAdapter(previous), candidate);
+  assert.equal(matchScheduler(previous,candidate), candidate);
+  assert.throws(()=>matchScheduler(previous.replace('time >= query.to','time > query.to'),candidate),/outside the scheduler/);
+});

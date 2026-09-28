@@ -64,7 +64,9 @@ export function sharedView(columns) {
   const length = columns.time.size;
   integer(length, 0, MAX_EVENTS, 'Column length');
   if (!FIELDS.every(field => columns[field].size === length)) throw new Error('Shared column lengths do not match');
-  return { length, get: (field, index) => columns[field].get(index) };
+  return { length, get: (field, index) => columns[field].get(index),
+    compileTextSearch: typeof columns.message.compileTextSearch === 'function'
+      ? term => columns.message.compileTextSearch(term, { caseSensitive: false }) : undefined };
 }
 export function normalizeQuery(input = {}) {
   if (!input || typeof input !== 'object') throw new TypeError('Expected a query');
@@ -77,13 +79,13 @@ export function normalizeQuery(input = {}) {
   if ((from !== null && !Number.isFinite(from)) || (to !== null && !Number.isFinite(to)) || (from !== null && to !== null && from > to)) throw new RangeError('Invalid time range');
   return { term: term.trim().toLowerCase(), service, level, offset, limit, from, to };
 }
-export function matches(view, index, query) {
+export function matches(view, index, query, containsText) {
   if (query.service !== -1 && view.get('service', index) !== query.service) return false;
   if (query.level !== -1 && view.get('level', index) !== query.level) return false;
   const time = view.get('time', index);
   if (query.from !== null && time < query.from) return false;
   if (query.to !== null && time >= query.to) return false;
-  return !query.term || view.get('message', index).toLowerCase().includes(query.term);
+  return !query.term || (containsText ? containsText(index) : view.get('message', index).toLowerCase().includes(query.term));
 }
 export function rowAt(view, index) {
   integer(index, 0, view.length - 1, 'Selected row');
@@ -125,10 +127,11 @@ async function checkpoint(index, cancelled) {
 }
 export async function search(view, input, cancelled = () => false) {
   const query = normalizeQuery(input), indices = [];
+  const containsText = query.term ? view.compileTextSearch?.(query.term) : undefined;
   let total = 0, checksum = 0;
   for (let index = view.length - 1; index >= 0; index--) {
     if ((index & 4095) === 0) await checkpoint(index, cancelled);
-    if (!matches(view, index, query)) continue;
+    if (!matches(view, index, query, containsText)) continue;
     checksum = (checksum + index) >>> 0;
     if (total >= query.offset && indices.length < query.limit) indices.push(index);
     total++;
@@ -137,13 +140,14 @@ export async function search(view, input, cancelled = () => false) {
 }
 export async function summarizeEvents(view, input, cancelled = () => false) {
   const query = normalizeQuery(input);
+  const containsText = query.term ? view.compileTextSearch?.(query.term) : undefined;
   const begin = view.length ? view.get('time', 0) : START_TIME;
   const end = view.length ? view.get('time', view.length - 1) + STEP_MS : begin + 1;
   const counts = Array(BUCKETS).fill(0), errors = Array(BUCKETS).fill(0), services = Array(SERVICES.length).fill(0);
   let total = 0, errorCount = 0, latencySum = 0, checksum = 0;
   for (let index = 0; index < view.length; index++) {
     if ((index & 4095) === 0) await checkpoint(index, cancelled);
-    if (!matches(view, index, query)) continue;
+    if (!matches(view, index, query, containsText)) continue;
     const bucket = Math.min(BUCKETS - 1, Math.floor((view.get('time', index) - begin) / (end - begin) * BUCKETS));
     counts[bucket]++; services[view.get('service', index)]++;
     const isError = view.get('level', index) === 2;

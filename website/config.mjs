@@ -3,6 +3,7 @@ export const pages = [
   { source: 'docs/getting-started.md', slug: 'getting-started', title: 'Get started', group: 'Start here', description: 'Share state with a worker. Read it directly on both threads.' },
   { source: 'website/content/mental-model.md', slug: 'mental-model', title: 'How sharing works', group: 'Start here', description: 'One writer, immutable snapshots, and local reads. A model you can reason about.' },
   { source: 'docs/api.md', slug: 'collections', title: 'Collections & types', group: 'Build with it', description: 'Maps, lists, sets, typed JSON, and nested collections.' },
+  { source: 'docs/text-search.md', slug: 'text-search', title: 'Search shared text', group: 'Build with it', description: 'Match UTF-8 text locally without decoding every row. Exact literal search and stable snapshots.' },
   { source: 'docs/worker-sessions.md', slug: 'sessions', title: 'State & subscriptions', group: 'Build with it', description: 'Connect workers and publish new snapshots without a task system.' },
   { source: 'docs/worker-sharing.md', slug: 'transport', title: 'Your own transport', group: 'Build with it', description: 'Use shared snapshots with an existing message protocol.' },
   { source: 'docs/task-quickstart.md', slug: 'tasks', title: 'Optional tasks', group: 'Build with it', description: 'Schedule a whole calculation. Keep individual reads local.' },

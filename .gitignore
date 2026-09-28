@@ -35,3 +35,6 @@ proofs/results/*.partial
 .proof-baseline/
 proofs/results/ci*.json
 proofs/results/query-performance/
+
+.text-search-baseline/
+proofs/results/text-search/

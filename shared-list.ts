@@ -1,6 +1,7 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
+import { compileStringSearch, type TextSearchOptions } from './text-search';
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
 /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
@@ -74,6 +75,26 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
     const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
+  }
+  /** Compile a literal substring predicate bound to this immutable snapshot.
+   * Valid indices match like get(index).includes(term), or lowercase/includes
+   * when caseSensitive is false. Invalid indices return false. The predicate
+   * reads locally, works on read-only attachments, and is not transferable.
+   */
+  compileTextSearch(this: SharedList<'string'>, term: string, options?: TextSearchOptions): (index: number) => boolean {
+    if (this.type !== 'string') throw new TypeError('Text search requires a string list');
+    const a = this.arena, match = compileStringSearch(a, term, options), view = a.dv;
+    const { size, root, depth, tail } = this;
+    let block = -1, address = 0;
+    return index => {
+      if (!validIndex(index, size)) return false;
+      const nextBlock = index >>> 5;
+      if (nextBlock !== block) {
+        address = nextBlock === ((size - 1) >>> 5) ? tail : a.wasm.vecLeaf(root, depth, index) >>> 0;
+        block = nextBlock;
+      }
+      return match(view.getFloat64(address + (index & 31) * 8, true));
+    };
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;
