@@ -1,3 +1,0 @@
-User-agent: *
-Disallow: /
-Sitemap: https://natanelia.github.io/zerocopy/previews/pr-13/e01085dda9d35e460d4ae93111c62a79b0a5e1e8/sitemap.xml
