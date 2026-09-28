@@ -33,6 +33,23 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
   const needle = new TextEncoder().encode(query);
   const bytes = arena.buf, view = arena.dv;
   const length = needle.length;
+  // Short queries stay in WASM for the whole byte scan. Repeated JS accesses
+  // to shared bytes are disproportionately costly in some browser engines.
+  // Packed query words are call arguments, never shared allocator scratch.
+  if (length <= 16) {
+    const packed = new Uint32Array(4), masks = new Uint32Array(4);
+    for (let i = 0; i < length; i++) {
+      const code = needle[i], shift = (i & 3) * 8;
+      packed[i >>> 2] |= code << shift;
+      if (!sensitive && code >= 97 && code <= 122) masks[i >>> 2] |= 32 << shift;
+    }
+    const [q0,q1,q2,q3] = packed, [m0,m1,m2,m3] = masks;
+    const scan = arena.wasm.textContains16;
+    return raw => {
+      const result = scan(raw, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
+      return result < 0 ? fallback(raw) : result !== 0;
+    };
+  }
   // A bounded Horspool search skips impossible starts. Compare four bytes at a
   // time against masks derived from the query: only its ASCII letters may fold.
   if (length <= 32) {

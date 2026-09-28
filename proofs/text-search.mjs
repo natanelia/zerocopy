@@ -54,9 +54,10 @@ if (!isMainThread) {
   });
   test('query compilation never materializes an ASCII dataset or writes into a reader arena', async () => {
     resetSharedList();
-    const list = new SharedList('string').pushMany(Array.from({length:4097},(_,i)=>`Request completed with id=${i}`));
+    const list = new SharedList('string').pushMany(Array.from({length:4097},(_,i)=>`Request completed successfully with result=200 and id=${i}`));
     const { list: attached } = await initWorker(getWorkerData({ list }, { copy:false }));
-    // Decode is an internal test seam, not a public data-view escape hatch.
+    // Long unique strings must not reach TextDecoder, including after the
+    // existing decoded-string cache limit. No reader memory may be written.
     const memory = getWorkerData({ list: attached }, { copy: false }).arenas[0];
     const before = new Uint8Array(memory.memory.buffer, 0, memory.used).slice();
     const decoder = TextDecoder.prototype.decode;
@@ -64,7 +65,7 @@ if (!isMainThread) {
     try {
     for (const term of ['request','missing','ID=40','=', 'completed','']) {
       const match = attached.compileTextSearch(term,{caseSensitive:false});
-      for(let i=0;i<list.size;i++) assert.equal(match(i),`Request completed with id=${i}`.toLowerCase().includes(term.toLowerCase()));
+      for(let i=0;i<list.size;i++) assert.equal(match(i),`Request completed successfully with result=200 and id=${i}`.toLowerCase().includes(term.toLowerCase()));
     }
     } finally { TextDecoder.prototype.decode = decoder; }
     assert.deepEqual(new Uint8Array(memory.memory.buffer, 0, memory.used), before);

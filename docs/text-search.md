@@ -55,7 +55,7 @@ Compile a new predicate when the query or snapshot changes. Release old predicat
 
 ## Performance boundaries
 
-Short needles use a bounded byte-skip search and masked four-byte comparisons. ASCII case-insensitive matches avoid creating JavaScript strings. Failed ASCII searches check for non-ASCII bytes before returning false: Unicode can lowercase to ASCII, such as the Kelvin sign becoming `k`.
+Needles up to 16 bytes use a scratch-free WASM scan with word-level candidate detection. Query words are passed as function arguments; readers never write search scratch into the owner's memory. Needles from 17 to 32 bytes use a bounded byte-skip search with masked four-byte comparisons. ASCII case-insensitive matches avoid creating JavaScript strings. Failed ASCII searches check for non-ASCII bytes before returning false: Unicode can lowercase to ASCII, such as the Kelvin sign becoming `k`.
 
 Well-formed case-sensitive text can also use UTF-8 matching. Cases that need Unicode lowercase conversion or UTF-16 surrogate semantics use the existing JavaScript decoding path. Longer needles use a linear KMP scan. The search does not change the storage format or allocate writer scratch space.
 
