@@ -1,6 +1,8 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
+// WASM stores numbers little-endian. Keep a DataView fallback on other hosts.
+const littleEndian = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
 /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
@@ -34,7 +36,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   // must not evict one another from the arena's single vector cursor.
   #readBlock = -1;
   #readAddress = 0;
-  #readView: DataView | undefined;
+  #readView: Float64Array | DataView | undefined;
   constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = defaultArena(), tail = 0) {
     super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); this.tail = tail; Object.freeze(this);
   }
@@ -65,13 +67,20 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     const block = index >>> 5;
     if (block !== this.#readBlock) {
       const a = this.arena, start = (this.size - 1) & ~31;
-      this.#readAddress = index >= start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
-      this.#readView = a.dv;
+      const address = index >= start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+      // Every pointer in this immutable root predates its first read. A view
+      // covering it once remains sufficient even when the writer grows memory.
+      this.#readView ??= littleEndian ? new Float64Array(a.buf.buffer) : a.dv;
+      const length = Math.min(32, this.size - (block << 5));
+      if ((address & 7) || address < 65536 || address + length * 8 > this.#readView.byteLength) throw new RangeError('Invalid list leaf');
+      this.#readAddress = littleEndian ? address >>> 3 : address;
       this.#readBlock = block;
     }
     // Published leaves never change. Growing shared memory does not detach
     // an old view, so this cursor remains valid until a different block is read.
-    const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
+    const raw = littleEndian
+      ? (this.#readView as Float64Array)[this.#readAddress + (index & 31)]
+      : (this.#readView as DataView).getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {

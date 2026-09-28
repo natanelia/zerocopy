@@ -144,3 +144,40 @@ test('a real worker can keep old read cursors while the owner grows memory and p
     assert.deepEqual(await response, ['verified']);
   } finally { await worker.terminate(); }
 });
+
+
+test('native numeric reads reject malformed leaf addresses rather than returning undefined', () => {
+  resetSharedList();
+  const list = new SharedList('number').push(7), data = list.toWorkerData();
+  for (const tail of [data.tail + 1, 0, 0x7ffffff8]) {
+    assert.throws(() => SharedList.fromWorkerData({ ...data, tail }).get(0), /Invalid list leaf/);
+  }
+});
+
+test('the explicit little-endian fallback reads the same published bytes', { timeout: 20000 }, async () => {
+  const library = new URL('../dist/shared.js', import.meta.url).href;
+  const worker = new Worker(new URL('data:text/javascript,' + encodeURIComponent(`
+    import { parentPort } from 'node:worker_threads';
+    import assert from 'node:assert/strict';
+    const NativeUint16Array = globalThis.Uint16Array;
+    let probes = 0;
+    // Force only the platform probe to choose DataView. Do not modify the
+    // stored bytes or the read algorithm. This is not a big-endian host claim.
+    globalThis.Uint16Array = class extends NativeUint16Array {
+      constructor(input) { super(input); if (Array.isArray(input) && input.length === 1 && input[0] === 1) { probes++; this[0] = 256; } }
+    };
+    const { SharedList } = await import(${JSON.stringify(library)});
+    globalThis.Uint16Array = NativeUint16Array;
+    assert.equal(probes, 1);
+    const values = Array.from({ length: 32769 }, (_, i) => i + .125);
+    values[0] = -0; values[31] = NaN; values[32] = Infinity;
+    const list = new SharedList('number').pushMany(values);
+    for (let i = 0; i < values.length; i++) assert.ok(Object.is(list.get(i), values[i]));
+    const next = list.pushMany(Array(100000).fill(7));
+    for (let i = values.length - 1; i >= 0; i--) assert.ok(Object.is(list.get(i), values[i]));
+    assert.equal(next.get(next.size - 1), 7);
+    parentPort.postMessage('verified');
+  `)));
+  try { assert.deepEqual(await once(worker, 'message'), ['verified']); }
+  finally { await worker.terminate(); }
+});
