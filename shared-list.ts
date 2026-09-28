@@ -62,17 +62,18 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const block = index >>> 5;
-    if (block !== this.#readBlock) {
-      const a = this.arena, start = (this.size - 1) & ~31;
-      this.#readAddress = index >= start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
-      this.#readView = a.dv;
-      this.#readBlock = block;
-    }
+    if ((index >>> 5) !== this.#readBlock) this.#readLeaf(index);
     // Published leaves never move or change. Shared-memory growth does not
     // detach the old view; each new block refreshes before reading new addresses.
     const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
+  }
+  // Keep pointer traversal off the small, frequently inlined get() path.
+  #readLeaf(index: number): void {
+    const a = this.arena, start = (this.size - 1) & ~31;
+    this.#readAddress = index >= start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+    this.#readView = a.dv;
+    this.#readBlock = index >>> 5;
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;

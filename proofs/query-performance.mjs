@@ -69,14 +69,14 @@ try {
             const page = await context.newPage();
             const errors = []; page.on('pageerror', error => errors.push(error.message));
             await page.goto(`http://127.0.0.1:${server.address().port}/`);
-            const result = await page.evaluate(async ({ variant, entries }) => {
+            const result = await page.evaluate(async ({ variant, entries, source }) => {
               if (!crossOriginIsolated) throw Error('The proof must use actual shared memory');
               const prefix = `/${variant}/investigation-benchmark/assets/`;
               const { Peer } = await import(prefix + 'explorer-peer.mjs');
               const peer = new Peer(new URL(prefix + 'explorer-bench-runner.mjs', location.href));
-              try { return await peer.request('run', { entries, source: variant }, 120000); }
+              try { return await peer.request('run', { entries, source }, 120000); }
               finally { peer.close(); }
-            }, { variant, entries });
+            }, { variant, entries, source: variant === 'candidate' ? record.candidate.commit : record.base.commit });
             assert.deepEqual(errors, []); assert.equal(result.raw.length, 28);
             for (const row of result.raw) for (const phase of ['initialMs', 'queryMs', 'updateMs']) assert.ok(Number.isFinite(row[phase]) && row[phase] >= 0);
             record.runs.push({ engine, browserVersion: browser.version(), entries, repetition, variant, result }); save();
