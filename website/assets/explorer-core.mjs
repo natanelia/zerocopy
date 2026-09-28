@@ -1,3 +1,5 @@
+import { yieldToEvents } from './task-yield.mjs';
+export { yieldToEvents } from './task-yield.mjs';
 /** Deterministic sample data and bounded operations. No library or DOM dependency. */
 export const SERVICES = ['gateway', 'accounts', 'payments', 'notifications'];
 export const LEVELS = ['info', 'warn', 'error'];
@@ -89,7 +91,6 @@ export function rowAt(view, index) {
   integer(index, 0, view.length - 1, 'Selected row');
   return { index, ...Object.fromEntries(FIELDS.map(field => [field, view.get(field, index)])) };
 }
-export const yieldToEvents = () => new Promise(resolve => setTimeout(resolve, 0));
 /** Periodic task-queue yields allow cancellation. A Promise-only yield would not. */
 async function checkpoint(index, cancelled) {
   if ((index & 4095) !== 0) return;

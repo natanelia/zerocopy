@@ -132,6 +132,10 @@ export class Arena {
   private objectBytes = 0;
   private stringBytes = 0;
   private readonly strings = new Map<number, string>();
+  // Dictionary reuse is bounded and arena-local. Only immutable string payloads
+  // are interned, never JSON objects or data from another allocation lifetime.
+  private readonly stringPointers = new Map<string, number>();
+  private internedStringChars = 0;
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
@@ -198,14 +202,28 @@ export class Arena {
     this.assertWritable();
     if (type === 'number') { if (typeof value !== 'number') throw new TypeError('Expected a number'); return value; }
     if (type === 'boolean') { if (typeof value !== 'boolean') throw new TypeError('Expected a boolean'); return value ? 1 : 0; }
+    if (type === 'string') {
+      if (typeof value !== 'string') throw new TypeError('Expected a string');
+      const existing = this.stringPointers.get(value);
+      if (existing !== undefined) return existing;
+    }
     const bytes = this.prepare(type, value);
     const p = this.alloc(4 + bytes.length);
     this.view.setUint32(p, bytes.length, true); this.bytes.set(bytes, p + 4);
+    if (type === 'string' && this.stringPointers.size < 2048 && this.internedStringChars + value.length <= 131072) {
+      this.stringPointers.set(value, p); this.internedStringChars += value.length;
+    }
     return p;
   }
   decode(type: string, raw: number): any {
     if (type === 'number') return raw;
     if (type === 'boolean') return raw !== 0;
+    // Cache hits refer to immutable bytes. Do not refresh the memory buffer or
+    // reread a string header for every occurrence of the same dictionary value.
+    if (type === 'string') {
+      const cached = this.strings.get(raw + 4);
+      if (cached !== undefined) return cached;
+    }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
   decodeAt(type: string, ptr: number, len: number): any {

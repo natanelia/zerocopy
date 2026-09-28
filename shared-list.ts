@@ -30,6 +30,11 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   readonly size: number;
   readonly depth: number;
   readonly tail: number;
+  // Per-snapshot locality: interleaved columns must not evict one another from
+  // an arena-wide cache. These private fields are local, never serialized.
+  #readBlock = -1;
+  #readAddress = 0;
+  #readView: DataView | undefined;
   constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = defaultArena(), tail = 0) {
     super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); this.tail = tail; Object.freeze(this);
   }
@@ -57,8 +62,16 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const a = this.arena, start = (this.size - 1) & ~31;
-    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.vectorValue(this.root, this.depth, index);
+    const a = this.arena, block = index >>> 5;
+    if (block !== this.#readBlock) {
+      this.#readAddress = block === ((this.size - 1) >>> 5)
+        ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+      this.#readView = a.dv;
+      this.#readBlock = block;
+    }
+    // Published leaves never change. A shared view of an existing leaf remains
+    // valid after memory grows; a newly visited leaf refreshes the arena view.
+    const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : a.decode(this.type, raw);
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {

@@ -1,0 +1,40 @@
+name: Query and update performance
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: query-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: node --test proofs/list-read-performance.test.mjs website/tests/task-yield.test.mjs
+      - run: bunx playwright install --with-deps chromium
+      - name: Compare original, common-scheduler control, and optimized library
+        run: node proofs/query-performance.mjs
+      - name: Retain every sample and summary
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: query-performance-${{ github.sha }}
+          path: proofs/query-results/
+          retention-days: 14
+      - name: Report measured results
+        if: success()
+        run: cat proofs/query-results/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
