@@ -57,3 +57,35 @@ test('half-leaf predicates remain exact for sparse, reverse, and interleaved que
     }
   }
 });
+
+
+test('seeded full-range Unicode needles match JavaScript on retained shared and copied views', async () => {
+  let seed = 0xf00d, checks = 0;
+  const next = () => { seed = Math.imul(seed, 1664525) + 1013904223; return seed >>> 0; };
+  const alphabet = ['A', 'Z', 'i', 'k', '[', '{', '^', '~', '\0', 'K', 'İ', 'Σ', 'ς', 'ß', 'é', '中', '😀', '\ud800', '\udfff'];
+  for (let trial = 0; trial < 12; trial++) {
+    resetSharedList();
+    const input = Array.from({ length: 65 + trial }, () =>
+      Array.from({ length: next() % 150 }, () => next() % 3
+        ? alphabet[next() % alphabet.length] : String.fromCodePoint(next() % 0x110000)).join(''));
+    const original = new SharedList('string').pushMany(input);
+    const { text } = await initWorker(getWorkerData({ text: original }, { copy: trial % 2 === 0 }));
+    // get() defines the public contract: encoding replaces unpaired surrogates.
+    const values = text.toArray();
+    const terms = ['request', 'k', 'i', 's', 'σ', 'ς', '😀', '\ud83d', '\ude00'];
+    for (let j = 0; j < 100; j++) {
+      const value = values[next() % values.length], start = next() % (value.length + 1);
+      terms.push(value.slice(start, start + next() % 100));
+    }
+    for (const term of terms) for (const caseSensitive of [true, false]) {
+      const query = caseSensitive ? term : term.toLowerCase();
+      const contains = text.compileTextSearch(term, { caseSensitive });
+      for (let i = values.length - 1; i >= 0; i--) {
+        assert.equal(contains(i), (caseSensitive ? values[i] : values[i].toLowerCase()).includes(query),
+          JSON.stringify({ trial, term, index: i, caseSensitive }));
+        checks++;
+      }
+    }
+  }
+  assert.equal(checks, 184428);
+});
