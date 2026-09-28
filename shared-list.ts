@@ -30,6 +30,11 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   readonly size: number;
   readonly depth: number;
   readonly tail: number;
+  // A leaf belongs to this immutable snapshot, not the arena shared by all
+  // columns. Private fields remain mutable when the public handle is frozen.
+  #readBlock = -1;
+  #readAddress = 0;
+  #readView: DataView | undefined;
   constructor(type: T, root = 0, depth = 0, size = 0, source: Arena = defaultArena(), tail = 0) {
     super(source); this.type = type; this.root = root; this.depth = depth; this.size = checkedSize(size); this.tail = tail; Object.freeze(this);
   }
@@ -57,9 +62,18 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    const a = this.arena, start = (this.size - 1) & ~31;
-    const raw = index >= start ? a.dv.getFloat64(this.tail + (index - start) * 8, true) : a.vectorValue(this.root, this.depth, index);
-    return this.type === 'number' ? raw as ValueOf<T> : a.decode(this.type, raw);
+    const block = index >>> 5;
+    if (block !== this.#readBlock) {
+      const a = this.arena;
+      this.#readAddress = block === ((this.size - 1) >>> 5)
+        ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+      // Published addresses never move. Shared memory growth does not detach
+      // this view; every byte reachable from this snapshot already exists.
+      this.#readView ??= a.dv;
+      this.#readBlock = block;
+    }
+    const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
+    return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;

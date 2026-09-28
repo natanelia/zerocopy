@@ -89,7 +89,33 @@ export function rowAt(view, index) {
   integer(index, 0, view.length - 1, 'Selected row');
   return { index, ...Object.fromEntries(FIELDS.map(field => [field, view.get(field, index)])) };
 }
-export const yieldToEvents = () => new Promise(resolve => setTimeout(resolve, 0));
+// Yield a real task, not a microtask. Chained setTimeout(0) calls acquire a
+// minimum delay in browsers and can dominate the measurement. This scheduler
+// is shared by native, Immutable.js, and zerocopy paths with the same frequency.
+let yieldChannel;
+const yieldQueue = [];
+export function yieldToEvents() {
+  if (typeof globalThis.scheduler?.yield === 'function') return globalThis.scheduler.yield();
+  // Node has a task scheduler without a browser's timer clamp.
+  if (typeof globalThis.setImmediate === 'function') return new Promise(resolve => globalThis.setImmediate(resolve));
+  if (typeof MessageChannel === 'undefined') return new Promise(resolve => setTimeout(resolve, 0));
+  if (!yieldChannel) {
+    yieldChannel = new MessageChannel();
+    yieldChannel.port1.onmessage = () => {
+      const resolve = yieldQueue.shift();
+      if (!yieldQueue.length) {
+        // Node's optional methods let its test process exit after the work.
+        yieldChannel.port1.unref?.(); yieldChannel.port2.unref?.();
+      }
+      resolve();
+    };
+  }
+  return new Promise(resolve => {
+    yieldQueue.push(resolve);
+    yieldChannel.port1.ref?.(); yieldChannel.port2.ref?.();
+    yieldChannel.port2.postMessage(null);
+  });
+}
 /** Periodic task-queue yields allow cancellation. A Promise-only yield would not. */
 async function checkpoint(index, cancelled) {
   if ((index & 4095) !== 0) return;

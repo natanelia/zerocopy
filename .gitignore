@@ -34,3 +34,4 @@ proofs/results/*.partial
 # CI-only baseline and evidence
 .proof-baseline/
 proofs/results/ci*.json
+proofs/results/query-performance/

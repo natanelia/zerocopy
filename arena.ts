@@ -132,6 +132,10 @@ export class Arena {
   private objectBytes = 0;
   private stringBytes = 0;
   private readonly strings = new Map<number, string>();
+  // Arena-local interning shares immutable string bytes, not writable state.
+  // Bound both the number of keys and their retained UTF-16/UTF-8 storage.
+  private internedStrings: Map<string, number> | undefined;
+  private internedStringBytes = 0;
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
@@ -198,14 +202,29 @@ export class Arena {
     this.assertWritable();
     if (type === 'number') { if (typeof value !== 'number') throw new TypeError('Expected a number'); return value; }
     if (type === 'boolean') { if (typeof value !== 'boolean') throw new TypeError('Expected a boolean'); return value ? 1 : 0; }
+    if (type === 'string') {
+      const cached = this.internedStrings?.get(value);
+      if (cached !== undefined) return cached;
+    }
     const bytes = this.prepare(type, value);
     const p = this.alloc(4 + bytes.length);
     this.view.setUint32(p, bytes.length, true); this.bytes.set(bytes, p + 4);
+    if (type === 'string' && (this.internedStrings?.size ?? 0) < 2048) {
+      const retained = value.length * 2 + bytes.length;
+      if (this.internedStringBytes + retained <= 262144) {
+        (this.internedStrings ??= new Map()).set(value, p);
+        this.internedStringBytes += retained;
+      }
+    }
     return p;
   }
   decode(type: string, raw: number): any {
     if (type === 'number') return raw;
     if (type === 'boolean') return raw !== 0;
+    if (type === 'string') {
+      const cached = this.strings.get(raw + 4);
+      if (cached !== undefined) return cached;
+    }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
   decodeAt(type: string, ptr: number, len: number): any {
