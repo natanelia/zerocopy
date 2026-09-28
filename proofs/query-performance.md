@@ -42,7 +42,7 @@ removed and no artificial delay is added to a competing implementation.
 
 The native and Immutable.js storage implementations, query predicates, reference
 logic, and existing historical benchmark records are unchanged. The new task
-yield avoids timer minimum delays for **every** architecture; it must not be
+yield avoids timer minimum delays where message tasks run promptly for **every** architecture; it must not be
 presented as a zerocopy-only speedup. Collection construction and worker startup
 remain outside the query phases. The workload is append-only and has repeated
 messages; it is not proof of a universal win on arbitrary unique strings, small
@@ -52,3 +52,9 @@ collections, every browser, or every device. This is not a memory benchmark.
 scans. It uses a fresh browser context per implementation, five warmups, eleven
 samples, and exact checksums. This exposes cases where Immutable.js remains
 faster rather than presenting the repeated-message workload as universal.
+
+Browser task yields race a local MessagePort task with a zero-delay timer. The
+first task completes the yield. The timer keeps nested workers making progress
+when port delivery stalls, and late port events are matched by ID rather than
+settling a later request. Both paths yield to actual tasks, not just microtasks.
+The same fallback applies to every compared storage implementation.
