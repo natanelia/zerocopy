@@ -1,4 +1,4 @@
-/** Before/after browser proof against the pinned, merged main build.
+/** Before/after browser proof against the actual PR base (manual run: current main).
  * The matched control uses the new scheduler and public bulk caller but keeps
  * the original library. This separates engine work from caller improvements.
  * All samples, including unique-text losses, are retained.
@@ -10,6 +10,7 @@ import { cpSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync }
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
+import { matchScheduler } from './query-control.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const baseRoot = resolve(root, '.proof-baseline/website/_site');
 const currentRoot = resolve(root, 'website/_site');
@@ -18,11 +19,8 @@ const out = resolve(root, 'proofs/results/query-performance'); mkdirSync(out, { 
 cpSync(baseRoot, matchedRoot, { recursive: true });
 const originalCore = readFileSync(resolve(baseRoot, 'assets/explorer-core.mjs'), 'utf8');
 const currentCore = readFileSync(resolve(currentRoot, 'assets/explorer-core.mjs'), 'utf8');
-const start = currentCore.indexOf('// Yield a real task'), end = currentCore.indexOf('/** Periodic task-queue yields');
-assert.ok(start >= 0 && end > start);
+const matchedCore = matchScheduler(originalCore, currentCore);
 const currentStorage = readFileSync(resolve(currentRoot, 'assets/explorer-storage.mjs'), 'utf8');
-const oldYield = 'export const yieldToEvents = () => new Promise(resolve => setTimeout(resolve, 0));';
-assert.ok(originalCore.includes(oldYield), 'Revisit the control when the base scheduler changes');
 function replaceCore(dir) {
   for (const item of readdirSync(dir, { withFileTypes: true })) {
     const path = resolve(dir, item.name);
@@ -31,7 +29,7 @@ function replaceCore(dir) {
     else if (item.name === 'explorer-core.mjs') {
       const text = readFileSync(path, 'utf8');
       assert.equal(text, originalCore, 'Every baseline scope must have identical query code');
-      writeFileSync(path, text.replace(oldYield, currentCore.slice(start, end)));
+      writeFileSync(path, matchedCore);
     }
   }
 }
