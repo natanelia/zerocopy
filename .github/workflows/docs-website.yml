@@ -19,6 +19,7 @@ jobs:
   build:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +42,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
           node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
@@ -53,6 +55,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
           node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
@@ -78,6 +81,7 @@ jobs:
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
           node website/tests/isolation-browser.mjs
           node website/tests/comparison-browser.mjs
           node website/tests/explorer-browser.mjs

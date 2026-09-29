@@ -1,0 +1,51 @@
+name: Text search performance
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bunx tsc --noEmit -p tsconfig.text-search.json
+      - run: node --test proofs/text-search.mjs proofs/text-kernel.mjs proofs/text-batch.mjs
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Build the previous PR13 version
+        env:
+          BASE: 4f092a3aa1a3bd9ec98a456091e72e33e6428999
+        run: |
+          git merge-base --is-ancestor "$BASE" HEAD
+          mkdir -p .text-search-baseline
+          git archive "$BASE" | tar -x -C .text-search-baseline
+          ln -s "$PWD/node_modules" .text-search-baseline/node_modules
+          ln -s "$PWD/website/node_modules" .text-search-baseline/website/node_modules
+          (cd .text-search-baseline && bun run build:wasm && bun run build:browser && SITE_COMMIT="$BASE" node website/build.mjs)
+      - run: node website/build.mjs
+      - name: Check Unicode and decoder-free reads in both engines
+        run: node proofs/text-search-browser.mjs
+      - name: Measure text hits, misses and Unicode against prior code and Immutable.js
+        shell: bash
+        run: node proofs/text-search-performance.mjs 2>&1 | tee text-search-performance.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: text-search-${{ github.sha }}
+          path: |
+            proofs/results/text-search/
+            text-search-performance.log
+          retention-days: 14

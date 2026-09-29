@@ -17,7 +17,9 @@ function hasControl(container, url) {
  * tabs can keep an old 'activating' state after a concurrent install. An active
  * slot is already eligible for navigation; the browser's Handle Fetch algorithm
  * waits for activation before dispatch. Do not duplicate that wait in the old
- * document. Installing/waiting slots are not eligible. Only the new document's
+ * document. An activated worker is eligible even if a stale WebKit wrapper still
+ * exposes it in an installing/waiting slot. Workers that are only installing or
+ * installed are never eligible. Only the new document's
  * crossOriginIsolated is success, not an active registration or controller.
  * https://w3c.github.io/ServiceWorker/#on-fetch-request
  */
@@ -54,7 +56,12 @@ function waitForActive(environment, url, scope, timeoutMs) {
       if (container.controller?.scriptURL === url.href) watch(container.controller);
       for (const worker of workers) if (worker?.scriptURL === url.href) watch(worker);
       const active = registration?.active;
-      if (canHandleNavigation(active, url)) finish();
+      // WebKit can update the worker's state without moving it between the
+      // registration wrapper's slots. The spec sets the active registration
+      // before setting its worker to 'activated', so that state also proves
+      // activation completed. Do not accept 'activating' in a stale slot.
+      const activated = workers.some(worker => worker?.scriptURL === url.href && worker.state === 'activated');
+      if (canHandleNavigation(active, url) || activated) finish();
     }
     function adopt(value, allowEmpty = false) {
       const workers = [value?.installing, value?.waiting, value?.active];
