@@ -1,0 +1,340 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8f2"><title>Memory comparison · zerocopy</title><meta name="description" content="Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM."><meta property="og:title" content="Memory comparison · zerocopy"><meta property="og:description" content="Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM."><meta property="og:type" content="website"><link rel="canonical" href="https://natanelia.github.io/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory-comparison/"><link rel="icon" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/site.css"><script type="module" src="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/main.mjs"></script><link rel="stylesheet" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-charts.css"><meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/comparison.css"></head><body data-base="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/" data-source="b9ca635feeb700d2d4daf6e0b79b254f4988a533"><a class="skip" href="#main">Skip to content</a>
+  <aside class="preview-banner">PR #13 preview · 163b230 · Not a release · <a href="https://github.com/natanelia/zerocopy/pull/13">Return to PR</a></aside><header class="site-header"><a class="wordmark" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/" aria-label="zerocopy home"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/getting-started/" aria-current="page">Documentation</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/use-cases/" >Use cases</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/lab/" >Benchmark lab</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="https://github.com/natanelia/zerocopy">GitHub <span aria-hidden="true">↗</span></a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/getting-started/">Documentation</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/use-cases/">Use cases</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/playground/">Small snapshot example</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/lab/">Benchmark lab</a><a href="https://github.com/natanelia/zerocopy">GitHub</a></nav>
+  <div class="docs-layout"><aside class="docs-sidebar" aria-label="Documentation"><p class="eyebrow">DOCUMENTATION</p><div class="sidebar-group"><h2>Start here</h2><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/getting-started/" >Get started</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/mental-model/" >How sharing works</a></div><div class="sidebar-group"><h2>Build with it</h2><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/collections/" >Collections &amp; types</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/text-search/" >Search shared text</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/sessions/" >State &amp; subscriptions</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/transport/" >Your own transport</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/tasks/" >Optional tasks</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/workers/" >Workers &amp; pools</a></div><div class="sidebar-group"><h2>Integrations</h2><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/redux/" >Redux</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/tanstack/" >TanStack</a></div><div class="sidebar-group"><h2>Go deeper</h2><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory/" >Memory &amp; ownership</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory-comparison/" aria-current="page">Memory comparison</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/benchmarks/" >Recorded benchmarks</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/migration/" >Migration</a></div><div class="sidebar-group"><h2>Use cases</h2><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/use-cases/" >Choose a use case</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/log-explorer/" >Live log explorer</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/data-tables/" >Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/graphs/" >Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/simulations/" >Simulation &amp; world state</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/analytics/" >Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/maps/" >Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/editors/" >Editors &amp; history</a></div><a class="sidebar-lab" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/lab/">↗ Benchmark lab</a></aside><main class="doc-main" id="main"><details class="mobile-docs-menu"><summary>Browse documentation</summary><nav aria-label="All documentation"><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/mental-model/">How sharing works</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/collections/">Collections &amp; types</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/text-search/">Search shared text</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/sessions/">State &amp; subscriptions</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/transport/">Your own transport</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/tasks/">Optional tasks</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/workers/">Workers &amp; pools</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/redux/">Redux</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/tanstack/">TanStack</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory/">Memory &amp; ownership</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory-comparison/">Memory comparison</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/benchmarks/">Recorded benchmarks</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/migration/">Migration</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/use-cases/">Choose a use case</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/log-explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/data-tables/">Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/graphs/">Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/simulations/">Simulation &amp; world state</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/analytics/">Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/maps/">Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/editors/">Editors &amp; history</a></nav></details><div class="doc-breadcrumb">Go deeper <span>/</span> Memory comparison</div><h1>Memory comparison</h1><p class="doc-description">Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM.</p><div class="doc-meta"><span>Source documentation</span><a href="https://github.com/natanelia/zerocopy/blob/b9ca635feeb700d2d4daf6e0b79b254f4988a533/docs/memory-comparison.md">View source ↗</a><button class="copy-page" data-markdown="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/markdown/memory-comparison.md">Copy Markdown</button></div><article class="prose"><p>Memory is part of the performance result. A copy counter is not a memory measurement. Passing a startup test is not a memory comparison.</p>
+<p>These are <strong>recorded Node.js worker measurements</strong>, not live measurements of your browser. The speed comparison uses Chromium and WebKit. Do not combine these memory figures with those timings as one browser result. Browser and physical iPhone RAM remain unmeasured here.</p>
+<h2 id="retained-data-memory">Retained data memory<a class="heading-link" href="#retained-data-memory" aria-label="Link to Retained data memory">#</a></h2>
+<p>100,000 initial events. One data owner and two reader workers for Shared, Immutable.js and Native replicas. The one-owner control uses one native data owner with no reader replicas. All paths also have a small controller thread. Values are <strong>MiB</strong>, where 1 MiB = 1,048,576 bytes. Lower is better.</p>
+
+<figure class="memory-figure" id="memory-retained" data-memory-chart="retained" data-memory-maximum="52428800" aria-labelledby="memory-retained-title">
+    <figcaption><strong class="memory-chart-title" id="memory-retained-title">Less data memory across two readers</strong><span class="memory-caption">Unique messages · 100,000 events · after queries</span><span class="memory-scope">Recorded Node.js · MiB · lower is better</span></figcaption>
+    <div class="memory-groups "><div class="memory-group"><p class="memory-group-title">Retained data memory</p><div role="list" aria-label="Retained data memory in MiB"><div class="memory-bar" role="listitem" data-memory-kind="shared" data-memory-bytes="9482568">
+    <div class="memory-bar-label"><span>zerocopy</span><strong>9.04 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-shared" style="width:18.086563110351562%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="immutable" data-memory-bytes="46183264">
+    <div class="memory-bar-label"><span>Immutable.js</span><strong>44.04 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-immutable" style="width:88.08758544921875%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="native" data-memory-bytes="34987232">
+    <div class="memory-bar-label"><span>Native replicas</span><strong>33.37 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-native" style="width:66.73284912109375%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="centralized" data-memory-bytes="14761560">
+    <div class="memory-bar-label"><span>One native owner</span><strong>14.08 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-centralized" style="width:28.155441284179688%"></span></div>
+  </div></div><div class="memory-scale" aria-hidden="true"><span>0</span><span>25</span><span>50 MiB</span></div></div></div>
+    <p class="memory-note">Shared WASM capacity is counted once. Includes caches and spare capacity; excludes the empty-worker baseline. Replicated paths: one owner + two readers. One native owner: no reader replicas.</p>
+    <details class="memory-values"><summary>Exact values and trial range</summary><p>Median and observed min–max of three fresh processes. These ranges are not confidence intervals.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Less data memory across two readers data"><table><thead><tr><th scope="col">Design · readers</th><th scope="col">Median (MiB)</th><th scope="col">Trial range (MiB)</th></tr></thead><tbody><tr><th scope="row">zerocopy · 2 readers</th><td>9.04</td><td>9.04–9.04</td></tr><tr><th scope="row">Immutable.js · 2 readers</th><td>44.04</td><td>43.78–44.15</td></tr><tr><th scope="row">Native replicas · 2 readers</th><td>33.37</td><td>33.36–33.37</td></tr><tr><th scope="row">One native owner · 0 readers</th><td>14.08</td><td>14.05–14.08</td></tr></tbody></table></div></details>
+    <p class="memory-source">29 September 2026 · Node v22.16.0 · Linux x64 · 3 trials per case. Not browser RAM.<br><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-retained.svg">Open SVG</a> · <a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-chart-data.json" download>Download chart data</a></p>
+  </figure>
+
+
+<p>The table shows memory after two identical <code>request</code> search/summary operations. <code>vs Imm</code> means Immutable.js / Shared, and <code>vs Native</code> means native replicas / Shared. These are memory ratios, not speed ratios.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th align="right">Shared</th>
+<th align="right">Immutable.js</th>
+<th align="right">vs Imm</th>
+<th align="right">Native replicas</th>
+<th align="right">vs Native</th>
+<th align="right">One native owner</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Repeated messages</td>
+<td align="right">4.68</td>
+<td align="right">34.13</td>
+<td align="right">7.30x</td>
+<td align="right">23.36</td>
+<td align="right">5.00x</td>
+<td align="right">6.07</td>
+</tr>
+<tr>
+<td>Unique messages</td>
+<td align="right">9.04</td>
+<td align="right">44.04</td>
+<td align="right">4.87x</td>
+<td align="right">33.37</td>
+<td align="right">3.69x</td>
+<td align="right">14.08</td>
+</tr>
+<tr>
+<td>Unique messages, 20% Unicode prefix</td>
+<td align="right">9.70</td>
+<td align="right">46.50</td>
+<td align="right">4.80x</td>
+<td align="right">35.87</td>
+<td align="right">3.70x</td>
+<td align="right">14.88</td>
+</tr>
+</tbody></table></div>
+<p>This metric includes JavaScript objects, strings, read caches, tracked buffers, and the full current shared WASM buffer. It counts that WASM buffer <strong>once</strong>, not once per reader. It includes spare buffer space and arena history that is not reclaimed. It excludes the empty, imported worker baseline.</p>
+<h2 id="count-all-memory-parts">Count all memory parts<a class="heading-link" href="#count-all-memory-parts" aria-label="Link to Count all memory parts">#</a></h2>
+<p>For each architecture, the proof uses a fresh OS process. That process contains the controller, one owner, and every reader. It takes a baseline after imports and worker connections, before data loading. At each later sample, work and publication have stopped. Every thread runs four garbage-collection passes.</p>
+<div class="code-block"><div class="code-label"><span>text</span><button type="button" class="copy-code" aria-label="Copy text code">Copy</button></div><pre tabindex="0"><code>Retained data memory =
+  sum of post-GC JavaScript heap changes in all threads
+  + sum of tracked ArrayBuffer changes in all threads
+  + current capacity of each unique shared WASM memory, counted once</code></pre></div>
+<p>The proof records <code>external</code>, <code>arrayBuffers</code>, <code>heapUsed</code>, and RSS separately. It does not add <code>external</code> to <code>arrayBuffers</code>: that would count some memory twice. RSS is process-wide, so it is read once, not summed across workers. A separate calibration checks that this Node build tracks ordinary ArrayBuffers but does not already include shared WASM capacity in <code>arrayBuffers</code>. A changed accounting result fails the proof rather than silently changing the total.</p>
+<p>Shared memory breakdown, after queries, in MiB:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th align="right">JS heap increase, all threads</th>
+<th align="right">Unique WASM capacity</th>
+<th align="right">Arena allocation pointer, including header</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Repeated messages</td>
+<td align="right">0.55</td>
+<td align="right">4.12</td>
+<td align="right">4.06</td>
+</tr>
+<tr>
+<td>Unique messages</td>
+<td align="right">0.73</td>
+<td align="right">8.31</td>
+<td align="right">8.25</td>
+</tr>
+<tr>
+<td>Unique messages, 20% Unicode prefix</td>
+<td align="right">1.26</td>
+<td align="right">8.44</td>
+<td align="right">8.40</td>
+</tr>
+</tbody></table></div>
+<p>Tracked auxiliary buffer changes are also in the totals. They are less than 0.001 MiB for these shared cases. The allocation pointer includes the 64 KiB arena header; it is not a measure of live payload only. The buffer capacity is the value added to the retained-memory total.</p>
+<p>The configured maximum growth limit is <strong>not</strong> used memory. The proof counts <code>memory.buffer.byteLength</code>, not the configured maximum. It also does not claim to measure reserved virtual address space.</p>
+<h2 id="more-readers">More readers<a class="heading-link" href="#more-readers" aria-label="Link to More readers">#</a></h2>
+<p>Unique-message fixture, 100,000 events, after queries. All values are MiB. Zero readers means that the owner performs both calculations itself.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Readers</th>
+<th align="right">Shared</th>
+<th align="right">Immutable.js</th>
+<th align="right">Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td align="right">8.85</td>
+<td align="right">17.55</td>
+<td align="right">14.05</td>
+</tr>
+<tr>
+<td>2</td>
+<td align="right">9.04</td>
+<td align="right">44.04</td>
+<td align="right">33.37</td>
+</tr>
+<tr>
+<td>4</td>
+<td align="right">9.37</td>
+<td align="right">70.73</td>
+<td align="right">54.29</td>
+</tr>
+</tbody></table></div>
+
+<figure class="memory-figure" id="memory-readers" data-memory-chart="readers" data-memory-maximum="83886080" aria-labelledby="memory-readers-title">
+    <figcaption><strong class="memory-chart-title" id="memory-readers-title">More readers, little extra shared data memory</strong><span class="memory-caption">Unique messages · 100,000 events · retained data memory</span><span class="memory-scope">Recorded Node.js · MiB · lower is better</span></figcaption>
+    <div class="memory-groups memory-reader-groups"><div class="memory-group"><p class="memory-group-title">0 reader workers</p><div role="list" aria-label="0 reader workers in MiB"><div class="memory-bar" role="listitem" data-memory-kind="shared" data-memory-bytes="9275152">
+    <div class="memory-bar-label"><span>zerocopy</span><strong>8.85 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-shared" style="width:11.056842803955078%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="immutable" data-memory-bytes="18405928">
+    <div class="memory-bar-label"><span>Immutable.js</span><strong>17.55 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-immutable" style="width:21.94157600402832%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="native" data-memory-bytes="14736912">
+    <div class="memory-bar-label"><span>Native replicas</span><strong>14.05 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-native" style="width:17.567768096923828%"></span></div>
+  </div></div><div class="memory-scale" aria-hidden="true"><span>0</span><span>40</span><span>80 MiB</span></div></div><div class="memory-group"><p class="memory-group-title">2 reader workers</p><div role="list" aria-label="2 reader workers in MiB"><div class="memory-bar" role="listitem" data-memory-kind="shared" data-memory-bytes="9482568">
+    <div class="memory-bar-label"><span>zerocopy</span><strong>9.04 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-shared" style="width:11.304101943969727%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="immutable" data-memory-bytes="46183264">
+    <div class="memory-bar-label"><span>Immutable.js</span><strong>44.04 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-immutable" style="width:55.054740905761726%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="native" data-memory-bytes="34987232">
+    <div class="memory-bar-label"><span>Native replicas</span><strong>33.37 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-native" style="width:41.708030700683594%"></span></div>
+  </div></div><div class="memory-scale" aria-hidden="true"><span>0</span><span>40</span><span>80 MiB</span></div></div><div class="memory-group"><p class="memory-group-title">4 reader workers</p><div role="list" aria-label="4 reader workers in MiB"><div class="memory-bar" role="listitem" data-memory-kind="shared" data-memory-bytes="9822536">
+    <div class="memory-bar-label"><span>zerocopy</span><strong>9.37 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-shared" style="width:11.709375381469727%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="immutable" data-memory-bytes="74162160">
+    <div class="memory-bar-label"><span>Immutable.js</span><strong>70.73 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-immutable" style="width:88.40818405151367%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="native" data-memory-bytes="56926080">
+    <div class="memory-bar-label"><span>Native replicas</span><strong>54.29 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-native" style="width:67.86117553710938%"></span></div>
+  </div></div><div class="memory-scale" aria-hidden="true"><span>0</span><span>40</span><span>80 MiB</span></div></div></div>
+    <p class="memory-note">Only 0, 2 and 4 reader workers were measured. The owner handles both calculations when there are no readers.</p>
+    <details class="memory-values"><summary>Exact values and trial range</summary><p>Median and observed min–max of three fresh processes. These ranges are not confidence intervals.</p><div class="table-scroll" tabindex="0" role="region" aria-label="More readers, little extra shared data memory data"><table><thead><tr><th scope="col">Design · readers</th><th scope="col">Median (MiB)</th><th scope="col">Trial range (MiB)</th></tr></thead><tbody><tr><th scope="row">zerocopy · 0 readers</th><td>8.85</td><td>8.84–8.85</td></tr><tr><th scope="row">Immutable.js · 0 readers</th><td>17.55</td><td>17.21–17.59</td></tr><tr><th scope="row">Native replicas · 0 readers</th><td>14.05</td><td>14.05–14.05</td></tr><tr><th scope="row">zerocopy · 2 readers</th><td>9.04</td><td>9.04–9.04</td></tr><tr><th scope="row">Immutable.js · 2 readers</th><td>44.04</td><td>43.78–44.15</td></tr><tr><th scope="row">Native replicas · 2 readers</th><td>33.37</td><td>33.36–33.37</td></tr><tr><th scope="row">zerocopy · 4 readers</th><td>9.37</td><td>9.37–9.37</td></tr><tr><th scope="row">Immutable.js · 4 readers</th><td>70.73</td><td>70.16–71.01</td></tr><tr><th scope="row">Native replicas · 4 readers</th><td>54.29</td><td>54.29–54.29</td></tr></tbody></table></div></details>
+    <p class="memory-source">29 September 2026 · Node v22.16.0 · Linux x64 · 3 trials per case. Not browser RAM.<br><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-readers.svg">Open SVG</a> · <a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-chart-data.json" download>Download chart data</a></p>
+  </figure>
+
+
+<p>The shared buffer remains the same size when more readers attach. Per-reader wrappers, compiled code and read caches still have a cost. The measured JavaScript cost grows; it is not zero. The native and Immutable.js designs retain separate data structures in each reader.</p>
+<h2 id="updates-and-old-snapshots">Updates and old snapshots<a class="heading-link" href="#updates-and-old-snapshots" aria-label="Link to Updates and old snapshots">#</a></h2>
+<p>Unique-message fixture. Two readers for replicated/shared designs. All values are MiB.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>State</th>
+<th align="right">Events</th>
+<th align="right">Shared</th>
+<th align="right">Immutable.js</th>
+<th align="right">Native replicas</th>
+<th align="right">One native owner</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Loaded, before queries</td>
+<td align="right">100,000</td>
+<td align="right">8.76</td>
+<td align="right">43.81</td>
+<td align="right">33.20</td>
+<td align="right">15.76</td>
+</tr>
+<tr>
+<td>After two queries</td>
+<td align="right">100,000</td>
+<td align="right">9.04</td>
+<td align="right">44.04</td>
+<td align="right">33.37</td>
+<td align="right">14.08</td>
+</tr>
+<tr>
+<td>Appended; old snapshot retained</td>
+<td align="right">102,000</td>
+<td align="right">9.29</td>
+<td align="right">45.19</td>
+<td align="right">38.05</td>
+<td align="right">14.65</td>
+</tr>
+<tr>
+<td>Old snapshot released; query live</td>
+<td align="right">102,000</td>
+<td align="right">9.33</td>
+<td align="right">45.23</td>
+<td align="right">38.10</td>
+<td align="right">14.71</td>
+</tr>
+<tr>
+<td>20 more batches; latest view only</td>
+<td align="right">142,000</td>
+<td align="right">12.53</td>
+<td align="right">62.10</td>
+<td align="right">47.52</td>
+<td align="right">20.74</td>
+</tr>
+</tbody></table></div>
+<p>Shared and Immutable.js retain actual old roots. The native append-only design retains a prefix length over its existing arrays. It is not charged for a needless full snapshot copy. Every old and live query is checked against an independent reference.</p>
+<p>Dropping a shared root does not shrink its arena. The allocation and capacity figures remain unchanged between the retain and release stages. Small changes in JavaScript heap include cache state and measurement noise; they are not a leak diagnosis. No compaction runs in this workload. This benchmark does not test arbitrary edits, unbounded history, or long production sessions.</p>
+<h2 id="total-process-ram-is-a-different-metric">Total process RAM is a different metric<a class="heading-link" href="#total-process-ram-is-a-different-metric" aria-label="Link to Total process RAM is a different metric">#</a></h2>
+<p>Post-query <strong>RSS</strong>, in MiB. This is the whole Node process, including runtime code, all worker threads, heap pages, native allocations and shared backing. The startup baseline is not subtracted here. RSS can include free pages that the allocator has not returned to the operating system.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th align="right">Shared</th>
+<th align="right">Immutable.js</th>
+<th align="right">Native replicas</th>
+<th align="right">One native owner</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Repeated messages</td>
+<td align="right">84.92</td>
+<td align="right">164.63</td>
+<td align="right">121.57</td>
+<td align="right">66.48</td>
+</tr>
+<tr>
+<td>Unique messages</td>
+<td align="right">99.82</td>
+<td align="right">189.98</td>
+<td align="right">141.09</td>
+<td align="right">92.23</td>
+</tr>
+<tr>
+<td>Unique messages, 20% Unicode prefix</td>
+<td align="right">100.88</td>
+<td align="right">198.61</td>
+<td align="right">147.04</td>
+<td align="right">95.93</td>
+</tr>
+</tbody></table></div>
+
+<figure class="memory-figure" id="memory-rss" data-memory-chart="rss" data-memory-maximum="209715200" aria-labelledby="memory-rss-title">
+    <figcaption><strong class="memory-chart-title" id="memory-rss-title">The whole process tells a different story</strong><span class="memory-caption">Unique messages · 100,000 events · after queries</span><span class="memory-scope">Recorded Node.js · MiB · lower is better</span></figcaption>
+    <div class="memory-groups "><div class="memory-group"><p class="memory-group-title">Total process RAM (RSS)</p><div role="list" aria-label="Total process RAM (RSS) in MiB"><div class="memory-bar" role="listitem" data-memory-kind="shared" data-memory-bytes="104669184">
+    <div class="memory-bar-label"><span>zerocopy</span><strong>99.82 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-shared" style="width:49.91015625%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="immutable" data-memory-bytes="199213056">
+    <div class="memory-bar-label"><span>Immutable.js</span><strong>189.98 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-immutable" style="width:94.9921875%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="native" data-memory-bytes="147939328">
+    <div class="memory-bar-label"><span>Native replicas</span><strong>141.09 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-native" style="width:70.54296875%"></span></div>
+  </div><div class="memory-bar" role="listitem" data-memory-kind="centralized" data-memory-bytes="96714752">
+    <div class="memory-bar-label"><span>One native owner</span><strong>92.23 <small>MiB</small></strong></div>
+    <div class="memory-track" aria-hidden="true"><span class="memory-fill memory-centralized" style="width:46.1171875%"></span></div>
+  </div></div><div class="memory-scale" aria-hidden="true"><span>0</span><span>100</span><span>200 MiB</span></div></div></div>
+    <p class="memory-note">Absolute resident set size (RSS), including workers and runtime overhead. One native owner uses the least RSS in this run. Replicated paths: one owner + two readers. One native owner: no reader replicas.</p>
+    <details class="memory-values"><summary>Exact values and trial range</summary><p>Median and observed min–max of three fresh processes. These ranges are not confidence intervals.</p><div class="table-scroll" tabindex="0" role="region" aria-label="The whole process tells a different story data"><table><thead><tr><th scope="col">Design · readers</th><th scope="col">Median (MiB)</th><th scope="col">Trial range (MiB)</th></tr></thead><tbody><tr><th scope="row">zerocopy · 2 readers</th><td>99.82</td><td>99.79–99.96</td></tr><tr><th scope="row">Immutable.js · 2 readers</th><td>189.98</td><td>188.70–194.44</td></tr><tr><th scope="row">Native replicas · 2 readers</th><td>141.09</td><td>139.82–141.74</td></tr><tr><th scope="row">One native owner · 0 readers</th><td>92.23</td><td>91.41–93.04</td></tr></tbody></table></div></details>
+    <p class="memory-source">29 September 2026 · Node v22.16.0 · Linux x64 · 3 trials per case. Not browser RAM.<br><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-rss.svg">Open SVG</a> · <a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/assets/memory-chart-data.json" download>Download chart data</a></p>
+  </figure>
+
+
+<p>The one-native-owner design has the lowest total process RAM in these samples, even though its retained data memory is higher than Shared. This is an important control: avoiding extra workers can save memory. Shared data is not automatically the smallest complete application.</p>
+<p>Process high-water RSS through the final 142,000-event stream stage, in MiB:</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th align="right">Shared</th>
+<th align="right">Immutable.js</th>
+<th align="right">Native replicas</th>
+<th align="right">One native owner</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Repeated messages</td>
+<td align="right">92.06</td>
+<td align="right">210.50</td>
+<td align="right">157.20</td>
+<td align="right">89.25</td>
+</tr>
+<tr>
+<td>Unique messages</td>
+<td align="right">108.62</td>
+<td align="right">226.45</td>
+<td align="right">184.98</td>
+<td align="right">103.62</td>
+</tr>
+<tr>
+<td>Unique messages, 20% Unicode prefix</td>
+<td align="right">117.14</td>
+<td align="right">227.86</td>
+<td align="right">190.22</td>
+<td align="right">104.82</td>
+</tr>
+</tbody></table></div>
+<p>These are OS high-water readings from the <strong>forced-GC experiment</strong>. They include startup, data construction, transfer, queries and updates through that stage. They are not a prediction of a production application&#39;s peak. Full before/after counters and the final worker-stop sample remain in each raw run file.</p>
+<h2 id="method-and-limits">Method and limits<a class="heading-link" href="#method-and-limits" aria-label="Link to Method and limits">#</a></h2>
+<p>Local profiling run measured on 2026-09-29 in an isolated Linux x64 environment, v22.16.0, V8 12.4.254.21-node.26, AMD EPYC 9V74 80-Core Processor. Immutable.js is pinned to 5.1.9. Each table cell is the median of three fresh-process trials. The complete matrix has <strong>90 runs and 450 state samples</strong>: three text fixtures, zero/two/four readers for each collection design, and the one-native-owner control. Architecture order rotates between trials. No samples were removed.</p>
+<p>The runtime is the exact CI-built library. Module and driver hashes are recorded in the raw summary. The proof reuses the website&#39;s storage adapters, query functions, batching and 4,096-index task yields. Owner-to-reader transport uses real Node MessagePorts. Search readers return indices; the owner materializes the visible page, as in the browser benchmark. The separate proof controller is not a DOM renderer.</p>
+<p>All paths use the same five columns and input values. Unique messages add an event ID. The Unicode case adds <code>追跡 </code> to every fifth unique message. Immutable.js uses upstream Lists and <code>withMutations</code>; native and Immutable.js readers receive incremental updates. Query preparation and result objects are allowed to allocate normally. The reference dataset is held in the supervising process, outside the measured process. It is not an extra data copy charged to any architecture.</p>
+<p>The data-memory comparison is <strong>not</strong> a total JavaScript-engine or browser-memory metric. It does not include every C++ allocation. The separate RSS measurements include more costs, but are platform- and allocator-dependent. These are not universal percentages. They also do not establish a memory improvement over the earlier text-search implementation; they compare the current architectures.</p>
+<h2 id="reproduce-and-inspect">Reproduce and inspect<a class="heading-link" href="#reproduce-and-inspect" aria-label="Link to Reproduce and inspect">#</a></h2>
+<div class="code-block"><div class="code-label"><span>sh</span><button type="button" class="copy-code" aria-label="Copy sh code">Copy</button></div><pre tabindex="0"><code>bun install
+bun run build:wasm &amp;&amp; bun run build:browser
+node --test proofs/investigation-memory-checks.mjs
+node proofs/investigation-memory.mjs</code></pre></div>
+<p>Results are saved under <code>proofs/results/investigation-memory/</code>. Each run retains the baseline, each thread&#39;s counters, unique arena IDs and capacities, checked query outputs, all lifecycle samples, process RSS, and the stop sample. <code>summary.json</code> contains all grouped medians, environment details and source hashes. The <strong>Investigation memory comparison</strong> CI workflow retains these files for 90 days and imposes no “Shared must win” threshold.</p>
+<p>The tables on the website are recorded results, not a live browser RAM meter. They do not change when you change the live demo&#39;s event count. Read <a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/benchmarks/">the historical collection benchmarks</a> for the earlier single-thread measurements and compaction cases; those records are unchanged.</p>
+</article><div class="doc-bottom"><span>Found something unclear?</span><a href="https://github.com/natanelia/zerocopy/issues/new">Improve this guide ↗</a></div></main><aside class="doc-toc" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p><a href="#retained-data-memory">Retained data memory</a><a href="#count-all-memory-parts">Count all memory parts</a><a href="#more-readers">More readers</a><a href="#updates-and-old-snapshots">Updates and old snapshots</a><a href="#total-process-ram-is-a-different-metric">Total process RAM is a different metric</a><a href="#method-and-limits">Method and limits</a><a href="#reproduce-and-inspect">Reproduce and inspect</a><a class="toc-help" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/playground/">Try a real snapshot →</a></aside></div>
+  <footer class="site-footer"><div><a class="wordmark" href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy.</span></a><p>Share your data. Keep your options.</p></div><div class="footer-links"><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-13/163b230c43d1d20842a38c27d5a697c5d1c45499/docs/memory/">Know the trade-offs</a><a href="https://github.com/natanelia/zerocopy/issues">Feedback <span aria-hidden="true">↗</span></a><a href="https://github.com/natanelia/zerocopy/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v0.2.0 · <a href="https://github.com/natanelia/zerocopy/commit/b9ca635feeb700d2d4daf6e0b79b254f4988a533">b9ca635</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off"><p id="search-status" role="status">Type a topic to find a guide.</p><div id="search-results"></div></dialog><div class="toast" role="status" aria-live="polite"></div>
+  </body></html>
