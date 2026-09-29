@@ -138,3 +138,18 @@ Immutable.js shares structure between versions within a worker, not the JavaScri
 The controlled investigation benchmark has four paths: shared snapshots, Immutable.js incremental replicas, native incremental replicas, and one native data owner. It keeps two warm-ups, seven measured samples, rotated path order, separate phase timings, and independent output checks. Immutable.js owner appends and delta encoding are included in the update phase. Initial input generation and List construction are reported separately.
 
 Exports use `zerocopy-live-comparison/v2` and `zerocopy-investigation-benchmark/v2`. The controlled benchmark retains 28 measured path records. Historical benchmark files are unchanged. Tests cover seeded random columns, Unicode messages, tree-size boundaries, exact rows and aggregates, retained roots, both replication modes, and Chromium/WebKit isolation and restart flows.
+
+### Query scheduling and batch updates
+
+All investigation paths yield to the task queue at the same 4,096-index checkpoints.
+They use `scheduler.yield()` when available, or a reusable `MessageChannel`.
+The older `setTimeout(0)` chain acquired browser minimum delays; those delays were
+not collection work. New exports identify the scheduling method. Do not compare
+new timings directly with historical timer-based scores as library-only speedups.
+The before/after proof includes a baseline with the same new scheduler to isolate
+the collection changes. Historical JSON results remain unchanged.
+
+The shared owner now calls public `SharedList.pushMany()` once per column and batch,
+just as the Immutable.js owner batches with `withMutations`. Query work, generated
+values, independent reference checks, worker counts, and retained versions remain
+the same. See `proofs/query-performance.mjs` and the Query performance workflow.

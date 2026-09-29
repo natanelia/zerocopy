@@ -36,7 +36,9 @@ jobs:
       - name: Verify task lifecycle with real Node workers
         shell: bash
         run: node --test proofs/worker-tasks.mjs 2>&1 | tee worker-tasks.log
-      - name: Verify list query caches and retained snapshots
+      - name: Verify list queries and bounded string reuse
+        run: node --test proofs/list-query.mjs
+      - name: Verify additional list pipeline regressions
         run: node --test proofs/list-query-regression.mjs
       - name: Verify lazy memory allocation
         run: node --test proofs/memory-startup.mjs

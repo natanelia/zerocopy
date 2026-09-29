@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { pages, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
 import { comparison } from './comparison-template.mjs';
+import { injectMemoryCharts, writeMemoryChartAssets } from './memory-charts.mjs';
 import { explorer } from './explorer-template.mjs';
 import { investigationBenchmark } from './explorer-benchmark-template.mjs';
 import { shell, home, docsLayout, lab, playground, useCaseCards } from './templates.mjs';
@@ -22,6 +23,7 @@ const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 if (!readdirSync(join(root, 'dist')).includes('shared.js')) throw new Error('Build the library with build:wasm and build:browser first');
 rmSync(out, { recursive: true, force: true }); mkdirSync(out, { recursive: true });
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
+writeMemoryChartAssets(join(out, 'assets'));
 mkdirSync(join(out, 'library'));
 for (const file of readdirSync(join(root, 'dist'))) if (file.endsWith('.js')) cpSync(join(root, 'dist', file), join(out, 'library', file));
 // Keep the upstream dependency pinned, local, licensed, and inside demo scopes.
@@ -54,6 +56,9 @@ const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
   let html = shell({ title, description, body, script, base, route, version, sha, origin });
+  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/'].includes(route)) {
+    html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
+  }
   if (preview) {
     html = html.replace('</head>', `<meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
     html = html.replace('<header class="site-header">', `<aside class="preview-banner">PR #${preview.number} preview · ${preview.headCommit.slice(0, 7)} · Not a release · <a href="${repository}/pull/${preview.number}">Return to PR</a></aside><header class="site-header">`);
@@ -75,7 +80,9 @@ writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and
 writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Logs are one example, not the product. Use zerocopy wherever several threads need local reads of large, versioned collections.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
-  const { html, toc } = renderMarkdown(source, page.source, routes, base);
+  const rendered = renderMarkdown(source, page.source, routes, base);
+  const html = page.slug === 'memory-comparison' ? injectMemoryCharts(rendered.html, base) : rendered.html;
+  const { toc } = rendered;
   writePage(`docs/${page.slug}/`, page.title, page.description, docsLayout(page, html, toc, pages, base, sha));
   mkdirSync(join(out, 'markdown'), { recursive: true }); writeFileSync(join(out, 'markdown', `${page.slug}.md`), source);
   search.push({ title: page.title, description: page.description, route: `docs/${page.slug}/`, text: source.replace(/<!--.*?-->/gs, '').replace(/[`#*]/g, '').slice(0, 28000) });

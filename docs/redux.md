@@ -1,8 +1,8 @@
 # Redux support
 
-[Documentation](README.md) · [Compatibility notes](redux-compatibility.md) · [Worker sharing](worker-sharing.md)
+[Documentation](README.md) · [Compatibility notes](redux-compatibility.md) · [Selectors and checkpoints](redux-checkpoints.md) · [Worker sharing](worker-sharing.md)
 
-`zerocopy/redux` integrates immutable collection handles with Redux Toolkit. It provides middleware options, selectors, DevTools configuration, and a portable value codec. The adapter has no runtime dependency on Redux, React, or Immer.
+`zerocopy/redux` integrates immutable collection handles with Redux Toolkit. It provides middleware options, selectors, DevTools configuration, a portable value codec, and trusted binary checkpoints. The adapter has no runtime dependency on Redux, React, or Immer.
 
 ## Configure a store
 
@@ -58,11 +58,11 @@ Keep selections, panel settings, and request status in plain state. Use shared c
 
 ## Middleware behavior
 
-`zerocopyMiddlewareOptions` changes the serializability check's predicates and keeps the other default Toolkit middleware. Unsupported Dates, functions, promises, and other values outside collections are still reported. A global `serializableCheck: false` or blanket ignored state path is not required.
+`zerocopyMiddlewareOptions` changes the serializability check's predicates and keeps the other default Toolkit middleware. Its immutability predicate follows Toolkit's primitive/frozen-object policy. `zerocopySerializableCheck` and `zerocopyImmutableCheck` are also available separately. Unsupported Dates, functions, promises, and other values outside collections are still reported. A global `serializableCheck: false` or blanket ignored state path is not required.
 
 A supported frozen collection is treated as an atomic value. The check does not iterate entries, decode all values, or inspect WASM memory on dispatch. This is constant work per handle, not per entry, and relies on the immutable API contract.
 
-`isSharedCollection()` recognizes the 12 built-in classes with their private arena brand. Prototype-only fakes, arbitrary subclasses, root descriptors, and collections with non-serializable custom comparators are not accepted. Primitive and object payloads retain the collection codec's rules.
+`isSharedCollection()` recognizes the 12 built-in classes with their private arena brand. Prototype-only fakes, arbitrary subclasses, and root descriptors are not accepted. The serializability check also rejects collections with non-serializable custom comparators. Primitive and object payloads retain the collection codec's rules.
 
 Passing a middleware check does not make `JSON.stringify()` save collection values. A root, size, and type cannot restore a collection after reload. Use the portable codec below for that purpose.
 
@@ -87,15 +87,27 @@ export const selectCurrentStock = createSharedMapValueSelector(
 
 Object decoding uses a bounded cache. A raw `.get()` outside that cache can return a different frozen object reference. This helper retains one result by arena identity, value type, and immutable leaf identity, so unrelated map updates can reuse the selected value.
 
-Use one selector per component or fixed selection. For an ID prop, create it with `useMemo` and `[id]`. Do not create it on every render or share one single-result cache across many row IDs. Replacing the selected entry or compacting the arena can produce a new reference even when contents are equal.
+Use one selector per component or fixed selection. For an ID prop, `createSharedMapEntrySelector()` accepts additional arguments while keeping the same one-result cache:
 
-A selector retains its last arena and value. Release unused selector instances when a workspace closes.
+```ts
+import { createSharedMapEntrySelector } from 'zerocopy/redux';
+
+const selectStockById = createSharedMapEntrySelector(
+  (state: RootState) => state.catalog.stock,
+  (_state: RootState, id: string) => id,
+);
+const quantity = selectStockById(store.getState(), 'product-123');
+```
+
+Do not create a selector on every render or share one single-result cache across many row IDs. Replacing the selected entry or compacting the arena can produce a new reference even when contents are equal. Argument-aware declarations require TypeScript 5.4 or newer.
+
+A selector retains its last arena and value. Release unused selector instances when a workspace closes. All selector reads are local and synchronous.
 
 ## DevTools: summaries or portable values
 
-`createZerocopyDevToolsOptions()` defaults to `mode: 'summary'` and `maxAge: 50`. The monitor receives collection type, size, arena identity, and snapshot metadata, not every entity. Actual Redux state remains unchanged. In-page history can still read retained snapshots. **Summary output is for display, not backup or rehydration.**
+`createZerocopyDevToolsOptions()` defaults to `mode: 'summary'` and `maxAge: 50`. The monitor receives collection type, size, and value type, not every entity. The sanitizer does not execute ordinary getters. Actual Redux state remains unchanged. In-page history can still read retained snapshots. **Summary output is for display, not backup or rehydration.**
 
-The history cursor does not automatically move to a new action while an older state is selected. Normal DevTools controls apply; `COMMIT` makes the selected state the new history base.
+Summary mode explicitly enables pause, lock, jump, skip, reorder, and dispatch. Import, export, persistence, and generated tests are disabled because summaries cannot reconstruct state. The history cursor does not automatically move to a new action while an older state is selected. Normal DevTools controls apply; `COMMIT` makes the selected state the new history base.
 
 For value export and restore:
 
@@ -103,9 +115,11 @@ For value export and restore:
 const devTools = createZerocopyDevToolsOptions({ mode: 'portable', maxAge: 30 });
 ```
 
-Portable mode provides JSAN replacer and reviver hooks. Restored collections are writable and do not depend on an old pointer registry. It escapes zerocopy's reserved marker in ordinary records. Plain `$jsan` keys have a separate restriction in the current adapter; read the [compatibility notes](redux-compatibility.md#jsans-reserved-property).
+Portable mode provides JSAN replacer, reviver, and serialization options together. Keep those options intact; do not replace `serialize.options` with `true`. Restored collections are writable and do not depend on an old pointer registry. Literal `$jsan`, `$zerocopyRedux`, and `$zerocopyReduxText` fields round-trip through an escaped transport. Read the [compatibility notes](redux-compatibility.md#jsans-reserved-property) for details.
 
 Portable mode walks values and allocates encoded JavaScript data. It is not zero-copy and can be expensive for large maps or long histories. Use summaries for routine large-map development and export values when needed. `maxAge` limits retained actions, not arena bytes.
+
+`createZerocopyDevTools` aliases `createZerocopyDevToolsOptions`. `sanitizeZerocopyState` and `summarizeZerocopyState` expose the same display-only operation.
 
 ## Save and restore application state
 
@@ -129,6 +143,8 @@ Repeated references are encoded by value. Object aliases, wrapper identity, cros
 
 Default codec limits are 128 nesting levels, 1,000,000 visited values, 1,000,000 items per collection/record, and 64 Mi UTF-16 code units of text. They are validation limits, not a small-memory guarantee. Encoding creates output before the final text-length check. Use lower application limits for untrusted imports. Failed imports do not reset arenas or invalidate existing Redux state.
 
+For trusted, same-binary-format snapshots, `encodeZerocopyState()` and `serializeZerocopyState()` provide complete compacted binary checkpoints. These are separate from the logical codec and need temporary copies. Their envelope checks are not a hostile WASM graph validator. Read [Selectors and checkpoints](redux-checkpoints.md) before using them.
+
 ## Workers and ownership
 
 Send snapshots outside reducers, for example in listener middleware:
@@ -141,7 +157,7 @@ worker.postMessage(getWorkerData({ stock: store.getState().catalog.stock }));
 
 Do not put raw `WebAssembly.Memory`, `SharedArrayBuffer`, or worker objects in Redux actions. Attach snapshots with `initWorker()`. Include an application revision or request ID and discard stale results.
 
-An attached snapshot is suitable for read-only UI state, but reducers cannot allocate updates in its arena. Use `compact()` for an independent writable copy. Worker sharing does not make reducers asynchronous or remove catalog-filtering costs. Browser headers and runtime differences are covered in [Worker sharing](worker-sharing.md).
+An attached snapshot is suitable for read-only UI state, but reducers cannot allocate updates in its arena. Use `compact()` for an independent writable copy. Worker sharing does not make reducers asynchronous or remove catalog-filtering costs. Browser headers and runtime differences are covered in [Worker sharing](worker-sharing.md). The `bindRedux()` and `reduxSource()` session helpers remain exported from `zerocopy/redux`.
 
 ## Memory and long editing sessions
 
@@ -151,7 +167,7 @@ Compact live state at a controlled boundary, keep the result, and release old ho
 
 ## Tests and upstream contracts
 
-The [contributor commands](../CONTRIBUTING.md#set-up-and-test) build the package, run core and Redux type checks, and execute integration tests. [`redux.test.ts`](../redux.test.ts) covers Toolkit, Immer, old states, codecs, workers, and selectors. [`redux-regression.test.ts`](../redux-regression.test.ts) covers codec limits, imports, heap restore, and JSAN. Browser tests cover Chromium, module workers, and React-Redux rendering.
+The [contributor commands](../CONTRIBUTING.md#set-up-and-test) build the package, run core and Redux type checks, and execute integration tests. [`redux.test.ts`](../redux.test.ts) covers Toolkit, Immer, old states, codecs, workers, and selectors. [`redux-regression.test.ts`](../redux-regression.test.ts) covers codec limits, imports, heap restore, and JSAN. The additional checkpoint, JSAN, and Toolkit suites run with `bun run test:redux`. Browser tests cover Chromium, module workers, and React-Redux rendering.
 
 These checks use the DevTools instrument and JSAN libraries, not the installed browser extension UI. The public-consumer type checks use generated declarations. There is no separate measured Redux performance claim.
 

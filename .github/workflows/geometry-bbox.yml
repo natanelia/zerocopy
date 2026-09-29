@@ -1,0 +1,47 @@
+name: Geometry scalar bounds proof
+on:
+  push:
+    branches: ['agent/geometry-bbox-bulk']
+  pull_request:
+    paths: ['geometry*', 'proofs/geometry*', 'scripts/build-*', 'package.json', 'tsconfig*', 'type-tests/geometry*', '.github/workflows/geometry-bbox.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:geometry && bun run typecheck:redux && bun run typecheck:values
+      - run: bun run test
+      - name: Exact differential tests and Node bulk benchmark
+        run: PERF_GATE=1 node proofs/geometry-bbox.mjs
+      - name: Exact differential tests and Bun bulk benchmark
+        run: PERF_GATE=1 bun proofs/geometry-bbox.mjs
+      - name: Install browser engines
+        if: matrix.os == 'ubuntu-latest'
+        run: bunx playwright install --with-deps chromium firefox webkit > /tmp/geometry-browser-install.log 2>&1 || { tail -80 /tmp/geometry-browser-install.log; exit 1; }
+      - name: Exact browser and retained-snapshot checks
+        if: matrix.os == 'ubuntu-latest'
+        run: node proofs/geometry-browsers.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-bbox-bulk-${{ runner.arch }}
+          path: |
+            proofs/results/geometry-bbox-bulk-*.json
+            proofs/results/geometry-browsers.json
+            geometry-kernels.wat
+          retention-days: 30
+          if-no-files-found: warn

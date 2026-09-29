@@ -1,5 +1,5 @@
 import { SharedList, getWorkerData } from '../library/shared.js';
-import { FIELDS, MAX_EVENTS, sharedView, validateColumns, generateColumns, yieldToEvents } from './explorer-core.mjs';
+import { FIELDS, generateColumns, yieldToEvents, validateColumns, sharedView, MAX_EVENTS } from './explorer-core.mjs';
 export function emptyShared() {
   return Object.fromEntries(FIELDS.map(field => [field, new SharedList(field === 'message' ? 'string' : 'number')]));
 }
@@ -7,11 +7,7 @@ export function appendShared(snapshot, delta) {
   const { length } = sharedView(snapshot);
   validateColumns(delta);
   if (length + delta.time.length > MAX_EVENTS) throw new RangeError('Event capacity reached');
-  const next = { ...snapshot };
-  for (const field of FIELDS) {
-    next[field] = next[field].pushMany(delta[field]);
-  }
-  return next;
+  return Object.fromEntries(FIELDS.map(field => [field, snapshot[field].pushMany(delta[field])]));
 }
 export async function buildShared(count, progress = () => {}) {
   let snapshot = emptyShared();

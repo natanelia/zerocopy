@@ -1,6 +1,7 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
+import { compileStringSearch, type TextSearchOptions } from './text-search';
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
 /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
@@ -30,8 +31,8 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   readonly size: number;
   readonly depth: number;
   readonly tail: number;
-  // A collection-local cursor prevents alternating column reads from evicting
-  // each other in the arena cache. Private slots remain mutable on frozen roots.
+  // A leaf belongs to this immutable snapshot, not the arena shared by all
+  // columns. Private fields remain mutable when the public handle is frozen.
   #readBlock = -1;
   #readAddress = 0;
   #readView: DataView | undefined;
@@ -62,18 +63,59 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
-    if ((index >>> 5) !== this.#readBlock) this.#readLeaf(index);
-    // Published leaves never move or change. Shared-memory growth does not
-    // detach the old view; each new block refreshes before reading new addresses.
+    const block = index >>> 5;
+    if (block !== this.#readBlock) {
+      const a = this.arena;
+      this.#readAddress = block === ((this.size - 1) >>> 5)
+        ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+      // Published addresses never move. Shared memory growth does not detach
+      // this view; every byte reachable from this snapshot already exists.
+      this.#readView ??= a.dv;
+      this.#readBlock = block;
+    }
     const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
   }
-  // Keep pointer traversal off the small, frequently inlined get() path.
-  #readLeaf(index: number): void {
-    const a = this.arena, start = (this.size - 1) & ~31;
-    this.#readAddress = index >= start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
-    this.#readView = a.dv;
-    this.#readBlock = index >>> 5;
+  /** Compile a literal substring predicate bound to this immutable snapshot.
+   * Valid indices match like get(index).includes(term), or lowercase/includes
+   * when caseSensitive is false. Invalid indices return false. The predicate
+   * reads locally, works on read-only attachments, and is not transferable.
+   */
+  compileTextSearch(this: SharedList<'string'>, term: string, options?: TextSearchOptions): (index: number) => boolean {
+    if (this.type !== 'string') throw new TypeError('Text search requires a string list');
+    const a = this.arena, match = compileStringSearch(a, term, options), view = a.dv;
+    const { size, root, depth, tail } = this;
+    // Amortize the JS/WASM call across at most 16 adjacent immutable values.
+    // Only two bit masks are cached, not strings or an index of the dataset.
+    if (match.block16) {
+      const scanBlock = match.block16, fallback = match.fallback!;
+      let block = -1, address = 0, flags = 0;
+      return index => {
+        if (!validIndex(index, size)) return false;
+        const nextBlock = index >>> 4;
+        if (nextBlock !== block) {
+          const first = nextBlock * 16;
+          const leaf = (first >>> 5) === ((size - 1) >>> 5)
+            ? tail : a.wasm.vecLeaf(root, depth, first) >>> 0;
+          address = leaf + (first & 31) * 8;
+          flags = scanBlock(address, Math.min(16, size - first));
+          block = nextBlock;
+        }
+        const bit = 1 << (index & 15);
+        return (flags & bit) !== 0 || ((flags >>> 16) & bit) !== 0
+          && fallback(view.getFloat64(address + (index & 15) * 8, true));
+      };
+    }
+    let block = -1, address = 0;
+    return index => {
+      if (!validIndex(index, size)) return false;
+      const nextBlock = index >>> 5;
+      if (nextBlock !== block) {
+        address = nextBlock === ((size - 1) >>> 5) ? tail : a.wasm.vecLeaf(root, depth, index) >>> 0;
+        block = nextBlock;
+      }
+      return match(view.getFloat64(address + (index & 31) * 8, true));
+    };
   }
   set(index: number, value: ValueOf<T>): SharedList<T> {
     if (!validIndex(index, this.size)) return this;
