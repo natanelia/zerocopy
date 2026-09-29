@@ -108,7 +108,7 @@ The data-memory comparison is **not** a total JavaScript-engine or browser-memor
 ```sh
 bun install
 bun run build:wasm && bun run build:browser
-node --test proofs/investigation-memory.test.mjs
+node --test proofs/investigation-memory-checks.mjs
 node proofs/investigation-memory.mjs
 ```
 

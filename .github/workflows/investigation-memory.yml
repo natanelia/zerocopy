@@ -20,7 +20,7 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser
       - name: Check accounting, worker parity, and retained snapshots
-        run: node --test proofs/investigation-memory.test.mjs
+        run: node --test proofs/investigation-memory-checks.mjs
       - name: Measure every architecture in fresh processes
         run: node proofs/investigation-memory.mjs
       - uses: actions/upload-artifact@v4
