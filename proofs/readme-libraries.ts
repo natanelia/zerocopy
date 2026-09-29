@@ -14,7 +14,9 @@ import { resetDoublyLinkedList } from '../shared-doubly-linked-list';
 import { resetOrderedMap } from '../shared-ordered-map';
 import { resetSortedMap } from '../shared-sorted-map';
 
-const N = 10000;
+const N = Number(process.env.N ?? 10000);
+assert(Number.isInteger(N) && N >= 1000 && N <= 100000);
+const includeArenaSetup = process.env.INCLUDE_ARENA_SETUP !== '0';
 const samples = Number(process.env.SAMPLES ?? 15), warmups = 10;
 const round = Number(process.env.ROUND ?? 1);
 assert(Number.isInteger(samples) && samples > 0 && samples <= 100);
@@ -58,7 +60,7 @@ function mapCases(group: string, sharedClass: any, reset: () => void, immutableF
     cases.push({ group, operation, kind, count: operation === 'delete' ? 10 : operation === 'setMany(100)' ? 100 : N, repeat: isBuild ? 1 : 20,
       setup() { if (kind === 'shared') reset(); if (!isBuild) { base = build(); checkMap(base, expected); } },
       run() {
-        if (isBuild) { if (kind === 'shared') reset(); return build(); }
+        if (isBuild) { if (kind === 'shared' && includeArenaSetup) reset(); return build(); }
         if (operation === 'get') { let total = 0; for (const key of queryKeys) { const v = base.get(key); total += sorted ? v : v.length; } return total; }
         if (operation === 'has') { let total = 0; for (const key of queryKeys) total += Number(base.has(key)); return total; }
         if (operation === 'forEach') { let total = 0; base.forEach(() => { total++; }); return total; }
@@ -115,7 +117,7 @@ function sequenceCases(group: string, sharedClass: any, reset: () => void, immut
     cases.push({ group, operation, count, kind, repeat: isBuild ? 1 : 20,
       setup() { if (kind === 'shared') reset(); if (!isBuild) { base = build(); checkSequence(base, original); } },
       run() {
-        if (isBuild) { if (kind === 'shared') reset(); return build(operation === 'prepend'); }
+        if (isBuild) { if (kind === 'shared' && includeArenaSetup) reset(); return build(operation === 'prepend'); }
         if (operation.startsWith('get')) { let total = 0; for (let i = readStart; i < readStart + readCount; i++) total += kind === 'native' ? base[i] : base.get(i); return total; }
         if (isPeek) { let total = 0; for (let i = 0; i < N; i++) total += kind === 'native' ? base[isStack ? N - 1 : 0] : base.peek(); return total; }
         if (operation === 'forEach') { let total = 0; base.forEach((v: number) => { total += v; }); return total; }
@@ -153,16 +155,17 @@ const rows: any[] = [];
 const sink = { value: undefined as any };
 // Observable return values prevent the unused read expressions in benchmark.ts.
 Object.defineProperty(globalThis, '__zerocopyReadmeBenchmarkSink', { value: sink, configurable: true });
-const rowKeys = [...new Set(cases.map(c => `${c.group}:${c.operation}`))];
+const rowKeys = [...new Set(cases.map(c => `${c.group}:${c.operation}`))].filter(key => !process.env.CASE_FILTER || process.env.CASE_FILTER.split(',').includes(key));
 for (const key of rowKeys) {
   const variants = cases.filter(c => `${c.group}:${c.operation}` === key);
   const rotation = (round - 1) % variants.length;
   for (let index = 0; index < variants.length; index++) {
     const c = variants[(index + rotation) % variants.length];
     c.setup();
-    for (let w = 0; w < warmups; w++) { sink.value = c.run(); c.check(sink.value); }
+    for (let w = 0; w < warmups; w++) { if (!includeArenaSetup && c.kind === 'shared' && c.repeat === 1) c.setup(); sink.value = c.run(); c.check(sink.value); }
     const times: number[] = [];
     for (let s = 0; s < samples; s++) {
+      if (!includeArenaSetup && c.kind === 'shared' && c.repeat === 1) c.setup();
       const start = performance.now();
       for (let i = 0; i < c.repeat; i++) sink.value = c.run();
       times.push((performance.now() - start) / c.repeat);
@@ -176,10 +179,10 @@ for (const key of rowKeys) {
   }
 }
 const root = new URL('../', import.meta.url);
-const engineFiles = readdirSync(root).filter(f => /^(arena|codec|compaction|set-key|types|utf8|wasm-utils|shared.*|persistent-core\.as)\.ts$/.test(f) && !f.endsWith('.test.ts')).sort();
+const engineFiles = readdirSync(root).filter(f => /^(arena|read-cache|codec|compaction|set-key|types|utf8|wasm-utils|shared.*|persistent-core\.as)\.ts$/.test(f) && !f.endsWith('.test.ts')).sort();
 const hash = createHash('sha256');
 for (const file of engineFiles) hash.update(file + '\0').update(readFileSync(new URL(file, root))).update('\0');
-const result = { schema: 1, sourceCommit: process.env.SOURCE_COMMIT ?? 'uncommitted; use engineSHA256', measuredAt: new Date().toISOString(), round, N, warmups,
+const result = { schema: 1, sourceCommit: process.env.SOURCE_COMMIT ?? 'uncommitted; use engineSHA256', measuredAt: new Date().toISOString(), round, N, warmups, includeArenaSetup, caseFilter: process.env.CASE_FILTER ?? null,
   runtime: { bun: Bun.version, platform: process.platform, arch: process.arch, cpu: cpus()[0].model, immutable: JSON.parse(readFileSync(new URL('node_modules/immutable/package.json', root), 'utf8')).version, assemblyscript: JSON.parse(readFileSync(new URL('node_modules/assemblyscript/package.json', root), 'utf8')).version },
   engineFiles, engineSHA256: hash.digest('hex'), wasmSHA256: createHash('sha256').update(readFileSync(new URL('persistent-core.wasm', root))).digest('hex'), benchmarkSHA256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'), rows };
 const output = process.argv[2] ?? `proofs/results/readme-libraries-round-${round}.json`;

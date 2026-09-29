@@ -1,6 +1,6 @@
-# Redux additions in PR #2
+# Redux selectors and binary checkpoints
 
-PR #2 targets PR #1's branch and preserves its logical persistence codec, Redux helpers, regression tests, and browser tests. The original lifetime warning applied to the old main branch, not this immutable engine. No old-state auto-disposal workaround is required.
+These additions preserve the logical persistence codec, Redux helpers, regression tests, and browser tests. The original lifetime warning applied to the old v0.1 engine, not the current immutable engine. No old-state auto-disposal workaround is required. Start with the [Redux guide](redux.md).
 
 ## Development checks
 
@@ -23,11 +23,11 @@ Tests use real JSAN and Redux DevTools instrumentation. They cover export/import
 ```ts
 import { createSharedMapEntrySelector } from 'zerocopy/redux';
 
-const selectWay = createSharedMapEntrySelector(
-  (state: RootState) => state.map.ways,
+const selectStock = createSharedMapEntrySelector(
+  (state: RootState) => state.catalog.stock,
   (_state: RootState, id: string) => id,
 );
-const way = selectWay(store.getState(), 'way-123');
+const quantity = selectStock(store.getState(), 'product-123');
 ```
 
 Create one selector per component or independent key stream. It caches one result by arena object, immutable leaf address, and value type. An unrelated edit retains the selected object reference even after the bounded JSON decode cache fills. A changed entry or new arena invalidates it. The existing state-only `createSharedMapValueSelector` remains available. These selectors are synchronous.
@@ -61,4 +61,4 @@ Limits do not guarantee a peak-memory budget. Compaction, base64, and import rec
 
 ## Verification
 
-Run `bun run test:redux` for all Redux unit and integration files. The stacked-PR workflow also builds WASM and browser exports, generates declarations, compiles strict consumers, runs the complete suite, executes actual Node workers and Chromium/React tests, and checks the npm package file list. It does not publish or merge the package.
+Run `bun run test:redux` for all Redux unit and integration files. The Redux integration workflow also builds WASM and browser exports, generates declarations, compiles strict consumers, runs the complete suite, executes actual Node workers and Chromium/React tests, and checks the npm package file list. It does not publish or merge the package.

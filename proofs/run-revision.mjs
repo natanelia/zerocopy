@@ -16,7 +16,7 @@ const run = (command, args, cwd, env = {}) => {
   if (p.status !== 0) throw Error(`${command} failed: ${p.stdout}\n${p.stderr}`); return p.stdout;
 };
 function fingerprint(dir) {
-  const files = readdirSync(dir).filter(p => p === 'persistent-core.as.ts' || ['arena.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')).sort();
+  const files = readdirSync(dir).filter(p => p === 'persistent-core.as.ts' || ['arena.ts', 'read-cache.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')).sort();
   const hash = createHash('sha256'); for (const f of files) hash.update(f + '\0').update(readFileSync(join(dir, f))).update('\0');
   return { files, sha256: hash.digest('hex') };
 }

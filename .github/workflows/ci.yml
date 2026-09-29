@@ -6,11 +6,19 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
@@ -18,7 +26,62 @@ jobs:
       - run: bun run build:wasm
       - run: bun run build:browser && bun run build:types
       - run: bun run typecheck
-      - run: bun run test
+      - run: bun run typecheck:redux
+      - run: bun run typecheck:values
+      - name: Check public worker task declarations
+        run: bunx tsc --noEmit -p tsconfig.worker.json
+      - name: Run unit and integration tests
+        shell: bash
+        run: bun run test 2>&1 | tee vitest.log
+      - name: Verify task lifecycle with real Node workers
+        shell: bash
+        run: node --test proofs/worker-tasks.mjs 2>&1 | tee worker-tasks.log
+      - name: Verify list queries and bounded string reuse
+        run: node --test proofs/list-query.mjs
+      - name: Verify lazy memory allocation
+        run: node --test proofs/memory-startup.mjs
+      - name: Check documentation links and recorded data
+        env:
+          DOCS_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --test scripts/check-docs.node.mjs
+          if [ -n "$DOCS_BASE" ]; then
+            node scripts/check-docs.mjs --base "$DOCS_BASE" --preserve
+          else
+            node scripts/check-docs.mjs
+          fi
+      - name: Check examples from Markdown
+        run: node scripts/check-doc-examples.mjs
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check documented browser workers and isolation guards
+        run: node scripts/check-doc-browser.mjs
+      - name: Check typed task examples from Markdown
+        shell: bash
+        run: node scripts/check-worker-docs.mjs 2>&1 | tee worker-docs.log
+      - name: Check built Node entry points
+        run: |
+          node proofs/node-worker.mjs
+          node proofs/redux-node.mjs
+          node proofs/typed-json-worker.mjs
+      - name: Verify historical evidence
+        run: node proofs/restore-local-evidence.mjs
+      - name: Archive tested source
+        if: ${{ !cancelled() }}
+        run: git archive --format=tar HEAD > tested-source.tar
+      - name: Retain test evidence and portable build
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ github.sha }}
+          path: |
+            vitest.log
+            worker-tasks.log
+            worker-docs.log
+            dist/
+            package.json
+            tested-source.tar
+          retention-days: 7
 
   publish:
     needs: test

@@ -1,0 +1,48 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -329,17 +329,43 @@
+     if (n + v > 49152) return this.write('string', root, key, value);
+     for (let i = 0; i < n; i++) {
+       const c = key.charCodeAt(i);
+-      if (c > 127) return this.write('string', root, key, value);
++      if (c > 127) return this.setUTF8(root, key, value, size);
+       this.bytes[16384 + i] = c;
+     }
+     for (let i = 0; i < v; i++) {
+       const c = value.charCodeAt(i);
+-      if (c > 127) return this.write('string', root, key, value);
++      if (c > 127) return this.setUTF8(root, key, value, size);
+       this.bytes[16384 + n + i] = c;
+     }
+     const result = this.wasm.mapSetBytes(root, n, v, size), next = result & 0x7fffffff;
+     this.writeSize = size + (result >>> 31);
+     if (this.valueMap) this.cachePrimitive(root, next, key, value, 1);
++    else { this.valueRoot = next; this.valueCode = 1; }
++    return next;
++  }
++  // Non-ASCII string writes use the same fixed scratch prefix as ASCII.
++  // encodeInto reports UTF-16 units consumed; a partial result uses the
++  // general large-record path. No partially encoded leaf is published.
++  private setUTF8(root: number, key: string, value: string, size: number): number {
++    const k = encoder.encodeInto(key, this.bytes.subarray(16384, HEAP_START));
++    if (k.read !== key.length) return this.write('string', root, key, value);
++    const offset = 16384 + k.written;
++    let valueLength = value.length;
++    if (offset + valueLength > HEAP_START) return this.write('string', root, key, value);
++    for (let i = 0; i < valueLength; i++) {
++      const c = value.charCodeAt(i);
++      if (c > 127) {
++        const v = encoder.encodeInto(value, this.bytes.subarray(offset, HEAP_START));
++        if (v.read !== value.length) return this.write('string', root, key, value);
++        valueLength = v.written; break;
++      }
++      this.bytes[offset + i] = c;
++    }
++    const result = this.wasm.mapSetBytes(root, k.written, valueLength, size), next = result & 0x7fffffff;
++    this.writeSize = size + (result >>> 31);
++    // TextEncoder replaces unmatched surrogates in values as well as keys.
++    // A warm JavaScript cache must agree with an independent byte reader.
++    if (this.valueMap) this.cachePrimitive(root, next, key, normalizeKey(value), 1);
+     else { this.valueRoot = next; this.valueCode = 1; }
+     return next;
+   }

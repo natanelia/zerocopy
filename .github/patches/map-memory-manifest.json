@@ -1,0 +1,14 @@
+{
+  "persistent-core.as.ts": "ae72253bb3a699cc68e33bc2af1e1da8f47cbff98fb72fbefd688f39fe9c42c8",
+  "arena.ts": "7ea03bedb101e0ce5ba20a63829dbbd5301c065d2d06cee821b2583ca3c03d0e",
+  "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+  "shared-runtime.as.ts": "cb5e7d50a842650e9e28e67267fc6f9f00613e40d6cdd9a12f4caea8c36b64d1",
+  "shared-map.ts": "751a724b98bc44af82f968de3a1bcfebcb7313f389bc7ad2629dcc814899e73e",
+  "shared-ordered-map.ts": "879fdaceb5081b652cddec6a0cc0c45dc34650bca30e92e0c50b61482d293eca",
+  "shared.ts": "b70a1f60286b7ce7a307e20f4068a3ca6eb1fe6ab38e6dc7cf56ebd230d6a61e",
+  "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32",
+  "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+  "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+  "map-memory.test.ts": "a55b82149356f69996d47a0b63874e6ee3c8314804e206f7ed8740144bc503a3",
+  "proofs/map-memory-guard.mjs": "75a8c5bb3dbf0d4dc99bf44b5421a7eeb9c4bd23e72ca1830ec35407b3a23538"
+}

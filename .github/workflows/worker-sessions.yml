@@ -1,0 +1,26 @@
+name: Worker sessions
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  worker-sessions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:redux && bunx tsc --noEmit -p tsconfig.worker.json
+      - run: bun run test
+      - run: node proofs/worker-sessions.mjs
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test:browser
+      - run: npm pack --dry-run

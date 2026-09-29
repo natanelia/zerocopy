@@ -26,7 +26,7 @@ for (const file of baselineFiles) baseHash.update(file + '\0').update(readFileSy
 const baselineEngineSHA256 = baseHash.digest('hex');
 if (baselineEngineSHA256 !== '8dfcd6c936b4875ebfcd6e13dd214d5b84d2d6301f1c5f6c68704a2f357352fa') throw Error('Baseline source does not match the pinned commit');
 
-const engineFiles = readdirSync(root).filter(p => (p === 'persistent-core.as.ts' || p === 'shared-hash-reader.as.ts' || p === 'shared-runtime.as.ts') || p === 'compaction.ts' || p === 'arena.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')).sort();
+const engineFiles = readdirSync(root).filter(p => (p === 'persistent-core.as.ts' || p === 'shared-hash-reader.as.ts' || p === 'shared-runtime.as.ts') || p === 'compaction.ts' || p === 'arena.ts' || p === 'read-cache.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')).sort();
 const hash = createHash('sha256');
 for (const file of engineFiles) hash.update(file + '\0').update(readFileSync(join(root, file))).update('\0');
 const candidateEngineSHA256 = hash.digest('hex');

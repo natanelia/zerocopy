@@ -1,0 +1,56 @@
+name: Query performance
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Verify cached snapshots and string bounds
+        run: node --test proofs/list-query.mjs proofs/list-codecs.mjs proofs/query-control-checks.mjs
+      - name: Build the unchanged main baseline
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          BASE="${BASE:-$(git rev-parse origin/main)}"
+          git cat-file -e "$BASE^{commit}"
+          mkdir -p .proof-baseline
+          git archive "$BASE" | tar -x -C .proof-baseline
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          ln -s "$PWD/website/node_modules" .proof-baseline/website/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser && SITE_COMMIT="$BASE" node website/build.mjs)
+      - name: Build the candidate
+        run: node website/build.mjs
+      - name: Measure original, equal-scheduler baseline, and candidate
+        run: |
+          node --check proofs/query-performance.mjs
+          node proofs/query-performance.mjs 2>&1 | tee query-performance.log
+      - name: Retain every measured sample
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: query-performance-${{ github.sha }}
+          path: |
+            proofs/results/query-performance/
+            query-performance.log
+          retention-days: 14

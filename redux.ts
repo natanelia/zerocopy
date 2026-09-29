@@ -101,3 +101,6 @@ export function createZerocopyDevToolsOptions(options: ZerocopyDevToolsOptions =
   return { maxAge, serialize: createPortableSerialization(options.codec ?? createZerocopyCodec()) };
 }
 export const createZerocopyDevTools = createZerocopyDevToolsOptions;
+
+export { bindRedux, reduxSource } from './worker-redux';
+export type { ReduxSourceStore, BindReduxOptions } from './worker-redux';

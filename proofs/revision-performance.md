@@ -1,38 +1,16 @@
 # Revision-to-revision performance
 
-This report preserves the previous README's revision-to-revision comparison.
-It compares Zerocopy revisions, not Zerocopy against Immutable.js or native
-collections. The main README uses the original library-comparison format.
+This experiment compares zerocopy revisions, not zerocopy with Immutable.js or native collections. The [README](../README.md#performance) contains the library comparison.
 
-These figures come from the completed [GitHub Actions run on September 13, 2026](https://github.com/natanelia/zerocopy/actions/runs/34764774485).
-The measured code is commit [`6e0510c`](https://github.com/natanelia/zerocopy/commit/6e0510c66e3cee0dc7762d71256800c41207e161),
-which uses worker format 3. These are CI results, not a mixture of the earlier
-local measurements and new CI measurements.
+Results come from the [September 13, 2026 Actions run](https://github.com/natanelia/zerocopy/actions/runs/34764774485). The measured revision is [`6e0510c`](https://github.com/natanelia/zerocopy/commit/6e0510c66e3cee0dc7762d71256800c41207e161), which used worker format 3. These CI results are separate from the initial local experiment.
 
-The main improvements include **18.97x faster bulk vector creation**, **2.77x
-faster scalar vector append**, and **1.67x faster map lookup** against the matched
-original in this run. Indexed reads through the two linked-list interfaces are
-**74.07x and 37.90x faster**. Those indexed-read gains compare block trees with
-the original physical linked lists; they do not describe every sequence operation.
+## Method and references
 
-### Method and reference versions
+The runner used Bun 1.4.2, AssemblyScript 0.28.20, Linux x64, and an AMD EPYC 7763 processor. Each operation ran in a separate process. Variant order rotated across three rounds, with 20 warm-ups and 15 measured samples per process. Each entry is the median of 45 samples per operation and variant. Output checks ran outside timing.
 
-The runner used **Bun 1.4.2**, **AssemblyScript 0.28.20**, Linux x64, and an
-AMD EPYC 7763 processor. Each operation ran in a separate process. The driver
-rotated the variant order across three rounds. Each process used 20 warm-ups
-and 15 measured samples. Each table entry is the median of **45 samples per
-operation per variant**. Output checks ran outside the timed sections.
+The matched original is [`7aea444`](https://github.com/natanelia/zerocopy/commit/7aea44447177d37a303ab5c1b26d7c5e00e1c1f7), rebuilt with the revision's compiler and flags. The previous implementation, labeled `previous PR` in the recorded tables, is [`59bd5ad`](https://github.com/natanelia/zerocopy/commit/59bd5ad9f84358f828968910c66b9a2e80c0673d). The raw record also includes the original source with its original flags; the matched build was not always faster than that build.
 
-The matched original is commit [`7aea444`](https://github.com/natanelia/zerocopy/commit/7aea44447177d37a303ab5c1b26d7c5e00e1c1f7),
-rebuilt with the same AssemblyScript compiler and build flags as the revision.
-The previous PR is commit [`59bd5ad`](https://github.com/natanelia/zerocopy/commit/59bd5ad9f84358f828968910c66b9a2e80c0673d).
-The raw record also includes the original build with its original flags.
-The matched build is not always faster than that original build.
-
-**Ratio = reference median / revision median. Above 1.00x is faster; below
-1.00x is slower.** Times are for the complete workload in each row, not one
-operation. Differences near 1.00x are not established improvements. No confidence
-intervals or application-level speed guarantees are claimed.
+Ratios are reference median divided by revision median. Above 1.00x is faster; below 1.00x is slower. Times cover full workloads, not individual calls. Differences near 1.00x are not established improvements; no confidence intervals or application-level guarantees are claimed.
 
 | Workload | Revision time (ms) | vs matched original | vs previous PR |
 |---|---:|---:|---:|
@@ -51,13 +29,11 @@ intervals or application-level speed guarantees are claimed.
 | Queue build (4,096 numbers) | 0.2813 | 1.02x | 4.30x |
 | Stack build (4,096 numbers) | 0.2391 | 1.24x | 1.06x |
 
-Map lookup in this table uses keys written during setup. The cold-read workload
-below measures a different access pattern. Both results matter.
+Linked-list indexed-read gains compare block trees with physical linked lists. They do not describe every sequence operation. Map lookup uses keys written during setup; the cold-read case below is a different workload.
 
-### Complete write-and-read workloads
+## Complete write-and-read workloads
 
-These tests include iteration or reads after writes. They use the same compiler
-settings and sample counts. They expose costs that write-only timing can miss.
+These cases include reads or iteration after writes, with the same compiler settings and sample counts.
 
 | Workload | Revision time (ms) | vs matched original | vs previous PR |
 |---|---:|---:|---:|
@@ -68,42 +44,22 @@ settings and sample counts. They expose costs that write-only timing can miss.
 | Object-map writes and reads (512) | 1.1767 | 0.79x | 0.92x |
 | Complete queue fill and drain (4,096) | 0.4689 | 0.90x | 3.04x |
 
-**Remaining regressions are not hidden.** In this CI run, ordered-map writes
-are about 25% slower than the matched original. Ordered-map writes plus a scan
-are about 30% slower. Object-map writes plus reads are about 27% slower.
-Doubly linked-list append, cold map reads, and a full queue cycle also trail
-the matched original. Priority insertion and object writes plus reads trail
-the previous PR in this run. The original also has separate snapshot-correctness
-failures; passing these timing checks does not establish equivalent immutability.
+Ordered-map writes are about 25% slower than the matched original, writes plus scan about 30% slower, and object-map writes plus reads about 27% slower. Doubly linked-list append, cold map reads, and a full queue cycle also trail the matched original. Priority insertion and object writes plus reads trail the previous implementation.
 
-These are small Bun workloads on one runner. They do not measure browser
-performance, main-thread latency, worker transfer time, concurrent write
-throughput, or every key distribution. Re-run them on the target runtime and
-workload. All four variants disable the original automatic-GC mechanism because
-it can invalidate retained snapshots. See the [snapshot counterexamples](snapshot-regressions.ts).
+The original has separate snapshot-correctness failures. Timings do not establish equivalent immutability. All four variants disable the original automatic-GC mechanism because it can invalidate retained snapshots; see the [counterexamples](snapshot-regressions.ts).
 
-### What reduces the work
+These small Bun workloads on one runner do not measure browser performance, main-thread latency, worker-transfer time, concurrent write throughput, or every key distribution. Re-run them on the target runtime and workload.
 
-Tail blocks avoid a tree-path copy on most appends. A numeric append to a
-non-full tail at the allocation boundary needs eight new payload bytes.
-Old snapshots keep their original visible lengths. A fork or an intervening
-allocation copies the visible tail instead. A full tail still needs index work.
+## Implementation at the measured revision
 
-Bulk vector input becomes the stored value blocks instead of a second staging
-copy. Linked-list interfaces use blocks of up to 32 values. Numeric map writes
-use a compact WASM command buffer, and the HAMT has 16-way branches. Ordered
-maps use a persistent insertion log. Default sorted maps use a compressed radix
-index with a bounded journal of up to four pending updates. These changes do not
-remove encoding, decoding, returned-object allocation, or all update costs.
+Tail blocks avoid a tree-path copy on most appends. A numeric append to a non-full tail at the allocation boundary needs eight new payload bytes. Old snapshots retain their visible lengths. A fork or intervening allocation copies the visible tail; a full tail still requires index work.
 
-### Evidence
+Bulk vector input becomes stored value blocks rather than a second staging copy. Linked-list interfaces use blocks of up to 32 values. Numeric map writes use a compact WASM command buffer, and the HAMT uses 16-way branches. Ordered maps use a persistent insertion log. Default sorted maps use a compressed radix index with a bounded journal of up to four pending updates. Encoding, decoding, handle allocation, and other update costs remain.
 
-The [recorded CI summary](results/readme-ci-summary.json) preserves exact
-medians, ratios, allocation measurements, environment details, and checksums.
-The [raw CI artifact](https://github.com/natanelia/zerocopy/actions/runs/34764774485/artifacts/10319983686)
-contains all timing samples, worker results, and allocation records. GitHub's
-artifact retention ends on October 13, 2026; the committed summary remains.
-See the [reproduction commands](../README.md#reproduce-the-revision-to-revision-comparison).
-The [earlier performance report](README.md)
-and its `local.json` results describe the initial implementation, not this revision.
+## Evidence and reproduction
 
+The [CI summary](results/readme-ci-summary.json) records exact medians, ratios, allocations, environment details, and checksums. The [raw artifact](https://github.com/natanelia/zerocopy/actions/runs/34764774485/artifacts/10319983686) holds all timing samples, worker results, and allocation records. Its recorded retention end is October 13, 2026; the committed summary remains.
+
+Use the [revision driver](run-revision.mjs) with the pinned source checkouts and the commands in the [revision workflow](../.github/workflows/performance-revision.yml). Build all compared engines with matching dependencies. Keep new output separate from the recorded summary.
+
+The [initial performance report](README.md#initial-persistent-engine-experiment) and `results/local.json` describe the earlier implementation, not this revision.

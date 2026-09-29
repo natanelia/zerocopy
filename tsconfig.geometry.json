@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler", "strict": true, "noEmit": true, "skipLibCheck": true, "noUncheckedIndexedAccess": true, "exactOptionalPropertyTypes": true, "types": [] },
+  "files": ["type-tests/geometry-public.ts"]
+}

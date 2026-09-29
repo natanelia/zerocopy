@@ -30,3 +30,10 @@ scripts/
 # Local verification dependencies and temporary checkouts
 .proof-tools/
 .proof-baseline/
+
+# Type-only consumer tests
+type-tests/
+tsconfig.typed-values.json
+
+# Documentation site is not part of the library package.
+website/
