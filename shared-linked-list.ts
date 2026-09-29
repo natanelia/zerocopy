@@ -1,14 +1,20 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-let current = new Arena();
-export let sharedMemory = current.memory;
-export let sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer;
-function publishCurrent(): void { sharedMemory = current.memory; sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer; }
+// Registering a collection must not allocate an unused writer in every reader.
+let current: Arena | undefined;
+/** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+export let sharedMemory: WebAssembly.Memory;
+export let sharedBuffer: SharedArrayBuffer;
+function publishCurrent(): void { sharedMemory = current!.memory; sharedBuffer = current!.memory.buffer as unknown as SharedArrayBuffer; }
+function defaultArena(): Arena {
+  if (!current) { current = new Arena(); publishCurrent(); }
+  return current;
+}
 export function resetLinkedList(): void { current = new Arena(); publishCurrent(); }
-export function getAllocState() { return current.state(); }
-export function getBufferCopy(): Uint8Array { return current.copy(); }
-export function getBuffer(): SharedArrayBuffer { return current.memory.buffer as unknown as SharedArrayBuffer; }
+export function getAllocState() { return defaultArena().state(); }
+export function getBufferCopy(): Uint8Array { return defaultArena().copy(); }
+export function getBuffer(): SharedArrayBuffer { return defaultArena().memory.buffer as unknown as SharedArrayBuffer; }
 export function attachToMemory(memory: WebAssembly.Memory, state?: { heapEnd: number }): void {
   current = new Arena({ memory, used: state?.heapEnd, readOnly: true }); publishCurrent();
 }
@@ -24,7 +30,7 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
   readonly tailSize: number;
   readonly size: number;
   readonly valueType: T;
-  constructor(type: T, head = 0, tail = 0, size = 0, source: Arena = current, tailSize = 0) {
+  constructor(type: T, head = 0, tail = 0, size = 0, source: Arena = defaultArena(), tailSize = 0) {
     super(source); this.valueType = type; this.head = head; this.tail = tail; this.size = checkedSize(size); this.tailSize = tailSize; Object.freeze(this);
   }
   private insert(index: number, value: ValueOf<T>): SharedLinkedList<T> {
@@ -67,7 +73,7 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
   toArray(): ValueOf<T>[] { const result: ValueOf<T>[] = []; this.forEach(value => result.push(value)); return result; }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ head: this.head, tail: this.tail, tailSize: this.tailSize, size: this.size, type: this.valueType }); }
-  static fromWorkerData<T extends string>(d: { head: number; tail: number; tailSize: number; size: number; type: T }, source: Arena = current): SharedLinkedList<T> { return new SharedLinkedList(d.type, d.head, d.tail, d.size, source, d.tailSize); }
+  static fromWorkerData<T extends string>(d: { head: number; tail: number; tailSize: number; size: number; type: T }, source: Arena = defaultArena()): SharedLinkedList<T> { return new SharedLinkedList(d.type, d.head, d.tail, d.size, source, d.tailSize); }
   removeAfter(index: number): SharedLinkedList<T> { return validIndex(index, this.size - 1) ? this.removeAt(index + 1) : this; }
 }
 structureRegistry.SharedLinkedList = { fromWorkerData: (d, a) => SharedLinkedList.fromWorkerData(d, a) };

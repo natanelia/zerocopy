@@ -1,0 +1,131 @@
+name: Documentation website
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, closed]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Check lazy memory allocation
+        run: node --test proofs/memory-startup.mjs
+      - name: Check deployment safety
+        run: node --test website/tests/preview.test.mjs
+      - name: Check root-hosted site
+        run: |
+          node website/build.mjs
+          node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
+          node website/tests/isolation-browser.mjs
+          node website/tests/browser.mjs
+          node website/tests/explorer-browser.mjs
+          node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
+      - name: Build and check GitHub Pages subpath
+        env:
+          SITE_BASE: /zerocopy/
+          SITE_ORIGIN: https://natanelia.github.io
+        run: |
+          node website/build.mjs
+          node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
+          node website/tests/isolation-browser.mjs
+          node website/tests/browser.mjs
+          node website/tests/explorer-browser.mjs
+          node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
+      - name: Retain site and visual evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerocopy-website-${{ github.sha }}
+          path: |
+            website/_site/
+            website/artifacts/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Build and check commit-specific PR preview
+        if: github.event_name == 'pull_request'
+        env:
+          SITE_BASE: /zerocopy/previews/pr-${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.sha }}/
+          SITE_PREVIEW_PR: ${{ github.event.pull_request.number }}
+          SITE_HEAD_COMMIT: ${{ github.event.pull_request.head.sha }}
+          SITE_ORIGIN: https://natanelia.github.io
+        run: |
+          node website/build.mjs
+          node --test website/tests/*.test.mjs
+          node website/tests/memory-charts-browser.mjs
+          node website/tests/isolation-browser.mjs
+          node website/tests/comparison-browser.mjs
+          node website/tests/explorer-browser.mjs
+          node website/tests/memory-browser.mjs
+      - name: Retain publishable output
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-publishable
+          path: website/_site/
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error
+
+  publish:
+    # Never expose a write token to fork code or a PR build job.
+    if: >-
+      always() && !cancelled() &&
+      ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository &&
+        (needs.build.result == 'success' || github.event.action == 'closed')) ||
+       (github.ref == 'refs/heads/main' && vars.DOCS_PAGES == 'true' && needs.build.result == 'success'))
+    needs: build
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Only same-repository code reaches this job. Never pull_request_target.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          sparse-checkout: website/ci
+      - uses: actions/download-artifact@v4
+        if: github.event.action != 'closed'
+        with:
+          name: docs-publishable
+          path: preview-site
+      - name: Publish tested files and update the PR link
+        id: preview
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { publish } = require('./website/ci/preview.cjs');
+            await publish({ github, context, core });

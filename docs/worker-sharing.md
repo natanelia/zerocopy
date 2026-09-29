@@ -15,7 +15,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 Check `crossOriginIsolated` in the application. Review third-party scripts, images, and frames before enabling these headers; resources may need compatible CORS or Cross-Origin-Resource-Policy settings. The [local demo server](../demo/serve.ts) supplies isolation headers.
 
-Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files. Load the library with a dynamic import after the isolation check: a static import initializes its default arenas before the module body runs.
+Use a bundler that supports TypeScript module workers and `new URL(..., import.meta.url)`. Build the package first. These are two separate files. Load the library with a dynamic import after the isolation check so unsupported browsers receive a clear error before setup. Default arenas are allocated on first collection use, not on import.
 
 **main.ts**
 
@@ -32,8 +32,8 @@ const worker = new Worker(new URL('./worker.ts', import.meta.url), {
 worker.addEventListener('message', event => console.log(event.data));
 worker.addEventListener('error', event => console.error(event.message));
 
-const limits = new SharedMap('number').set('lane-1', 30);
-worker.postMessage(getWorkerData({ limits }, { copy: false }));
+const stock = new SharedMap('number').set('headphones', 12);
+worker.postMessage(getWorkerData({ stock }, { copy: false }));
 // Terminate the worker when the application no longer needs it.
 ```
 
@@ -45,8 +45,8 @@ import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
 
 self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
   try {
-    const { limits } = await initWorker<{ limits: SharedMap<'number'> }>(event.data);
-    self.postMessage({ ok: true, value: limits.get('lane-1') });
+    const { stock } = await initWorker<{ stock: SharedMap<'number'> }>(event.data);
+    self.postMessage({ ok: true, value: stock.get('headphones') });
   } catch (error) {
     self.postMessage({ ok: false, error: String(error) });
   }
@@ -67,14 +67,14 @@ import { Worker } from 'node:worker_threads';
 import { once } from 'node:events';
 import { SharedMap, getWorkerData } from 'zerocopy';
 
-const limits = new SharedMap('number').set('lane-1', 30);
+const stock = new SharedMap('number').set('headphones', 12);
 const worker = new Worker(new URL('./worker.mjs', import.meta.url), {
-  workerData: getWorkerData({ limits }, { copy: false }),
+  workerData: getWorkerData({ stock }, { copy: false }),
 });
 
 try {
   const [value] = await once(worker, 'message');
-  console.log(value); // 30
+  console.log(value); // 12
 } finally {
   await worker.terminate();
 }
@@ -88,8 +88,8 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { initWorker } from 'zerocopy';
 
 if (!parentPort) throw new Error('Run this file as a Node worker');
-const { limits } = await initWorker(workerData);
-parentPort.postMessage(limits.get('lane-1'));
+const { stock } = await initWorker(workerData);
+parentPort.postMessage(stock.get('headphones'));
 ```
 
 ## API
@@ -129,3 +129,38 @@ Retained worker views and message payloads can keep full arenas alive. Release t
 Custom comparator functions cannot be transported. Strings and JSON still require decoding; some runtimes copy a requested byte range before UTF-8 decoding. Objects returned by decoding are JavaScript values local to the reader, not shared object identities.
 
 For the transport tests, see [`workers.test.ts`](../workers.test.ts), the [Node worker check](../proofs/node-worker.mjs), and the [Chromium tests](../demo/workers.browser.test.ts). Documentation checks execute the Node pair and both browser examples directly from Markdown. The browser checks cover shared transport with isolation headers and rejection before library loading without those headers.
+
+## Minimal browser pair
+
+This shorter pair sends one snapshot and returns one value. It uses the same [browser setup](#browser-setup) as the example above. Use a [state session](worker-sessions.md) instead when workers need later updates automatically.
+
+**main.ts**
+
+<!-- example: readme-browser-owner -->
+```ts
+if (!crossOriginIsolated) {
+  throw new Error('Shared worker memory requires cross-origin isolation');
+}
+
+const { SharedMap, getWorkerData } = await import('zerocopy');
+const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+  type: 'module',
+});
+const stock = new SharedMap('number').set('headphones', 12);
+
+worker.postMessage(getWorkerData({ stock }, { copy: false }));
+```
+
+**worker.ts**
+
+<!-- example: readme-browser-reader -->
+```ts
+import { initWorker, type SharedMap, type WorkerData } from 'zerocopy';
+
+self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
+  const { stock } = await initWorker<{ stock: SharedMap<'number'> }>(event.data);
+  self.postMessage(stock.get('headphones'));
+});
+```
+
+The worker posts `12` to the owner. Add your application's error and result handlers as needed. Terminate the worker when it is no longer needed. `getWorkerData()` and `initWorker()` control attachment; the later `.get()` is a local read.

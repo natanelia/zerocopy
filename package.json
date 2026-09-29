@@ -10,6 +10,8 @@
     "./worker": { "types": "./dist/types/worker.d.ts", "browser": "./dist/worker.js", "bun": "./worker.ts", "import": "./dist/worker.js" },
     "./redux": { "types": "./dist/types/redux.d.ts", "browser": "./dist/redux.js", "bun": "./redux.ts", "import": "./dist/redux.js" },
     "./tanstack": { "types": "./dist/types/tanstack-db-collection.d.ts", "browser": "./dist/tanstack-db-collection.js", "bun": "./tanstack-db-collection.ts", "import": "./dist/tanstack-db-collection.js" },
+    "./numeric": { "types": "./dist/types/numeric.d.ts", "browser": "./dist/numeric.js", "bun": "./numeric.ts", "import": "./dist/numeric.js" },
+    "./state": { "types": "./dist/types/state.d.ts", "browser": "./dist/state.js", "bun": "./state.ts", "import": "./dist/state.js" },
     "./geometry": { "types": "./dist/types/geometry.d.ts", "browser": "./dist/geometry.js", "bun": "./geometry.ts", "import": "./dist/geometry.js" }
   },
   "scripts": {

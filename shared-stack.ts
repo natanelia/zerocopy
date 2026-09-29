@@ -1,14 +1,20 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-let current = new Arena();
-export let sharedMemory = current.memory;
-export let sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer;
-function publishCurrent(): void { sharedMemory = current.memory; sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer; }
+// Registering a collection must not allocate an unused writer in every reader.
+let current: Arena | undefined;
+/** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+export let sharedMemory: WebAssembly.Memory;
+export let sharedBuffer: SharedArrayBuffer;
+function publishCurrent(): void { sharedMemory = current!.memory; sharedBuffer = current!.memory.buffer as unknown as SharedArrayBuffer; }
+function defaultArena(): Arena {
+  if (!current) { current = new Arena(); publishCurrent(); }
+  return current;
+}
 export function resetStack(): void { current = new Arena(); publishCurrent(); }
-export function getAllocState() { return current.state(); }
-export function getBufferCopy(): Uint8Array { return current.copy(); }
-export function getBuffer(): SharedArrayBuffer { return current.memory.buffer as unknown as SharedArrayBuffer; }
+export function getAllocState() { return defaultArena().state(); }
+export function getBufferCopy(): Uint8Array { return defaultArena().copy(); }
+export function getBuffer(): SharedArrayBuffer { return defaultArena().memory.buffer as unknown as SharedArrayBuffer; }
 export function attachToMemory(memory: WebAssembly.Memory, state?: { heapEnd: number }): void {
   current = new Arena({ memory, used: state?.heapEnd, readOnly: true }); publishCurrent();
 }
@@ -22,7 +28,7 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
   private readonly encodedTop: number;
   readonly size: number;
   readonly valueType: T;
-  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = current, encodedTop?: number) {
+  constructor(type: T, head = 0, size = 0, _top?: ValueOf<T>, source: Arena = defaultArena(), encodedTop?: number) {
     super(source); this.valueType = type; this.head = head; this.size = checkedSize(size); this.encodedTop = encodedTop ?? (head ? source.dv.getFloat64(head + 8, true) : 0); Object.freeze(this);
   }
   push(value: ValueOf<T>): SharedStack<T> {
@@ -37,6 +43,6 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
   peek(): ValueOf<T> | undefined { return this.size ? this.arena.decode(this.valueType, this.encodedTop) : undefined; }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ head: this.head, size: this.size, type: this.valueType }); }
-  static fromWorkerData<T extends string>(d: { head: number; size: number; type: T }, source: Arena = current): SharedStack<T> { return new SharedStack(d.type, d.head, d.size, undefined, source); }
+  static fromWorkerData<T extends string>(d: { head: number; size: number; type: T }, source: Arena = defaultArena()): SharedStack<T> { return new SharedStack(d.type, d.head, d.size, undefined, source); }
 }
 structureRegistry.SharedStack = { fromWorkerData: (d, a) => SharedStack.fromWorkerData(d, a) };

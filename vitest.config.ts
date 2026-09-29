@@ -12,6 +12,8 @@ export default defineConfig({
     teardownTimeout: 1000,
     minWorkers: 1,
     maxWorkers: 4,
-    exclude: ['**/node_modules/**', '**/demo/**'],
+    // The website uses node:test against a generated site, in its own CI job.
+    // Do not discover those suites before the site's build dependencies exist.
+    exclude: ['**/node_modules/**', '**/demo/**', '**/website/**'],
   },
 });

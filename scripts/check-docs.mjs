@@ -83,19 +83,24 @@ function main() {
   if (preserve && index === -1) throw new Error('--preserve requires --base <commit>');
   const files = git('ls-files', '-z', '*.md').split('\0').filter(Boolean);
   const failures = files.flatMap(file => checkLinks(resolve(root, file), root).map(error => `${file}: ${error}`));
-  const readme = readFileSync(resolve(root, 'README.md'), 'utf8');
-  const region = readme.match(/<!-- library-timing-tables:start -->([\s\S]*?)<!-- library-timing-tables:end -->/);
-  if (!region) failures.push('README.md: missing benchmark markers');
+  // Older revisions store the report in README.md. New revisions keep the
+  // same measurements in a dedicated report, not in the product introduction.
+  const reportPath = existsSync(resolve(root, 'docs/benchmarks.md')) ? 'docs/benchmarks.md' : 'README.md';
+  const report = readFileSync(resolve(root, reportPath), 'utf8');
+  const region = report.match(/<!-- library-timing-tables:start -->([\s\S]*?)<!-- library-timing-tables:end -->/);
+  if (!region) failures.push(`${reportPath}: missing benchmark markers`);
   else {
     const groups = region[1].match(/^\*\*Shared.*\*\*$/gm) ?? [];
     const rows = numericRows(region[1]);
-    if (groups.length !== 8 || rows.length !== 36) failures.push(`README.md: expected 8 benchmark groups and 36 operation rows; found ${groups.length} and ${rows.length}`);
+    if (groups.length !== 8 || rows.length !== 36) failures.push(`${reportPath}: expected 8 benchmark groups and 36 operation rows; found ${groups.length} and ${rows.length}`);
   }
   if (index !== -1) {
     const base = process.argv[index + 1];
     if (!/^[a-f\d]{7,40}$/i.test(base ?? '')) throw new Error('--base requires a commit SHA');
-    const result = preservedRows(git('show', `${base}:README.md`), readme);
-    console.log(`README benchmark rows unchanged: ${result.total - result.missing.length}/${result.total}`);
+    const basePath = git('ls-tree', '--name-only', base, '--', 'docs/benchmarks.md').trim()
+      ? 'docs/benchmarks.md' : 'README.md';
+    const result = preservedRows(git('show', `${base}:${basePath}`), report);
+    console.log(`Recorded benchmark rows unchanged: ${result.total - result.missing.length}/${result.total}`);
     if (result.missing.length) console.log('Changed or removed numerical rows:\n' + result.missing.join('\n'));
     const evidence = git('diff', '--name-only', base, '--', 'proofs/results').trim().split('\n').filter(path => path && !path.endsWith('.md'));
     console.log(`Recorded evidence files changed: ${evidence.length}`);

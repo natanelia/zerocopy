@@ -34,3 +34,10 @@ proofs/results/*.partial
 # CI-only baseline and evidence
 .proof-baseline/
 proofs/results/ci*.json
+proofs/results/query-performance/
+
+.text-search-baseline/
+proofs/results/text-search/
+
+# Whole-worker memory comparison outputs
+proofs/results/investigation-memory/
