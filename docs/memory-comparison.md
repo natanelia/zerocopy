@@ -8,6 +8,10 @@ These are **recorded Node.js worker measurements**, not live measurements of you
 
 100,000 initial events. One data owner and two reader workers for Shared, Immutable.js and Native replicas. The one-owner control uses one native data owner with no reader replicas. All paths also have a small controller thread. Values are **MiB**, where 1 MiB = 1,048,576 bytes. Lower is better.
 
+<!-- memory-chart:retained -->
+![Retained data memory for 100,000 unique messages: zerocopy 9.04 MiB, Immutable.js 44.04, native replicas 33.37, one native owner 14.08. Node.js, not browser memory.](assets/memory-retained.svg)
+<!-- /memory-chart -->
+
 The table shows memory after two identical `request` search/summary operations. `vs Imm` means Immutable.js / Shared, and `vs Native` means native replicas / Shared. These are memory ratios, not speed ratios.
 
 | Input | Shared | Immutable.js | vs Imm | Native replicas | vs Native | One native owner |
@@ -53,6 +57,10 @@ Unique-message fixture, 100,000 events, after queries. All values are MiB. Zero 
 | 2 | 9.04 | 44.04 | 33.37 |
 | 4 | 9.37 | 70.73 | 54.29 |
 
+<!-- memory-chart:readers -->
+![Retained data memory at 0, 2 and 4 readers: zerocopy 8.85, 9.04, 9.37 MiB; Immutable.js 17.55, 44.04, 70.73; native 14.05, 33.37, 54.29. Three trials per case.](assets/memory-readers.svg)
+<!-- /memory-chart -->
+
 The shared buffer remains the same size when more readers attach. Per-reader wrappers, compiled code and read caches still have a cost. The measured JavaScript cost grows; it is not zero. The native and Immutable.js designs retain separate data structures in each reader.
 
 ## Updates and old snapshots
@@ -80,6 +88,10 @@ Post-query **RSS**, in MiB. This is the whole Node process, including runtime co
 | Repeated messages | 84.92 | 164.63 | 121.57 | 66.48 |
 | Unique messages | 99.82 | 189.98 | 141.09 | 92.23 |
 | Unique messages, 20% Unicode prefix | 100.88 | 198.61 | 147.04 | 95.93 |
+
+<!-- memory-chart:rss -->
+![Whole-process RSS for unique messages: zerocopy 99.82 MiB, Immutable.js 189.98, native replicas 141.09, one native owner 92.23. Node.js, not browser RAM.](assets/memory-rss.svg)
+<!-- /memory-chart -->
 
 The one-native-owner design has the lowest total process RAM in these samples, even though its retained data memory is higher than Shared. This is an important control: avoiding extra workers can save memory. Shared data is not automatically the smallest complete application.
 

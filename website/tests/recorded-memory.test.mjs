@@ -6,7 +6,9 @@ import { pages } from '../config.mjs';
 test('memory tables disclose Node, units, fixed workload, and shared backing accounting',()=>{
   const html=recordedMemory('/zerocopy/');
   for(const text of ['Node.js','MiB','100,000','counted once','not measurements of this device','One native owner','RSS'])assert.ok(html.includes(text),text);
-  assert.equal((html.match(/scope="row"/g)||[]).length,3);
+  const table=html.match(/aria-label="Recorded worker memory comparison">([\s\S]*?)<\/table>/)[1];
+  assert.equal((table.match(/scope="row"/g)||[]).length,3);
+  assert.equal((html.match(/data-memory-chart=/g)||[]).length,2);
   assert.ok(html.includes('/zerocopy/docs/memory-comparison/'));
 });
 test('both comparison pages include the recorded table and its documentation route',()=>{
