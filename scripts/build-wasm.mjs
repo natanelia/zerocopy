@@ -8,3 +8,5 @@ for (const name of ['shared-map', 'shared-list', 'linked-list', 'singly-linked-l
 for (const simd of [false, true]) {
   execFileSync(process.execPath, ['node_modules/assemblyscript/bin/asc.js', 'numeric-kernels.as.ts', '-o', `numeric-kernels${simd ? '-simd' : ''}.wasm`, ...flags, ...(simd ? ['--enable', 'simd'] : [])], { stdio: 'inherit' });
 }
+// Optional read-only geometry module. Rejected SIMD experiments are not shipped.
+execFileSync(process.execPath, ['node_modules/assemblyscript/bin/asc.js', 'geometry-kernels.as.ts', '-o', 'geometry-kernels.wasm', '--textFile', 'geometry-kernels.wat', ...flags], { stdio: 'inherit' });
