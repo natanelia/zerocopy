@@ -30,6 +30,12 @@
       "bun": "./tanstack-db-collection.ts",
       "import": "./dist/tanstack-db-collection.js"
     },
+    "./numeric": {
+      "types": "./dist/types/numeric.d.ts",
+      "browser": "./dist/numeric.js",
+      "bun": "./numeric.ts",
+      "import": "./dist/numeric.js"
+    },
     "./state": {
       "types": "./dist/types/state.d.ts",
       "browser": "./dist/state.js",
