@@ -1,0 +1,32 @@
+name: Investigation memory comparison
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser
+      - name: Check accounting, worker parity, and retained snapshots
+        run: node --test proofs/investigation-memory.test.mjs
+      - name: Measure every architecture in fresh processes
+        run: node proofs/investigation-memory.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: investigation-memory-${{ github.sha }}
+          path: proofs/results/investigation-memory/
+          retention-days: 90
+          if-no-files-found: error

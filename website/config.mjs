@@ -11,6 +11,7 @@ export const pages = [
   { source: 'docs/redux.md', slug: 'redux', title: 'Redux', group: 'Integrations', description: 'Keep your store. Share selected collections with workers.' },
   { source: 'docs/tanstack.md', slug: 'tanstack', title: 'TanStack', group: 'Integrations', description: 'Collection wrappers and cache helpers, with their current limits.' },
   { source: 'docs/architecture.md', slug: 'memory', title: 'Memory & ownership', group: 'Go deeper', description: 'Understand storage, retained snapshots, and explicit compaction.' },
+  { source: 'docs/memory-comparison.md', slug: 'memory-comparison', title: 'Memory comparison', group: 'Go deeper', description: 'Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM.' },
   { source: 'docs/benchmarks.md', slug: 'benchmarks', title: 'Recorded benchmarks', group: 'Go deeper', description: 'All recorded results, slower workloads, and methods. No selected-only results.' },
   { source: 'docs/migration.md', slug: 'migration', title: 'Migration', group: 'Go deeper', description: 'Format and lifetime changes for existing users.' },
   { source: 'docs/use-cases.md', slug: 'use-cases', title: 'Choose a use case', group: 'Use cases', description: 'Where sharing helps, where it does not, and which alternatives to consider.' },
