@@ -9,5 +9,5 @@
     "skipLibCheck": false,
     "noEmit": true
   },
-  "files": ["type-tests/numeric-public.ts"]
+  "files": ["type-tests/numeric-public.ts", "type-tests/numeric-spatial-public.ts"]
 }
