@@ -1,14 +1,20 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-let current = new Arena();
-export let sharedMemory = current.memory;
-export let sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer;
-function publishCurrent(): void { sharedMemory = current.memory; sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer; }
+// Registering a collection must not allocate an unused writer in every reader.
+let current: Arena | undefined;
+/** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+export let sharedMemory: WebAssembly.Memory;
+export let sharedBuffer: SharedArrayBuffer;
+function publishCurrent(): void { sharedMemory = current!.memory; sharedBuffer = current!.memory.buffer as unknown as SharedArrayBuffer; }
+function defaultArena(): Arena {
+  if (!current) { current = new Arena(); publishCurrent(); }
+  return current;
+}
 export function resetOrderedMap(): void { current = new Arena(); publishCurrent(); }
-export function getAllocState() { return current.state(); }
-export function getBufferCopy(): Uint8Array { return current.copy(); }
-export function getBuffer(): SharedArrayBuffer { return current.memory.buffer as unknown as SharedArrayBuffer; }
+export function getAllocState() { return defaultArena().state(); }
+export function getBufferCopy(): Uint8Array { return defaultArena().copy(); }
+export function getBuffer(): SharedArrayBuffer { return defaultArena().memory.buffer as unknown as SharedArrayBuffer; }
 export function attachToMemory(memory: WebAssembly.Memory, state?: { heapEnd: number }): void {
   current = new Arena({ memory, used: state?.heapEnd, readOnly: true }); publishCurrent();
 }
@@ -25,7 +31,7 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
   readonly size: number;
   readonly valueType: T;
   readonly orderStable: boolean;
-  constructor(type: T, root = 0, head = 0, tail = 0, _size: number | undefined = undefined, source: Arena = current, orderStable = root === 0 && head === 0) {
+  constructor(type: T, root = 0, head = 0, tail = 0, _size: number | undefined = undefined, source: Arena = defaultArena(), orderStable = root === 0 && head === 0) {
     super(source); this.valueType = type; this.root = root; this.head = head; this.tail = tail; this.size = _size ?? source.wasm.mapSize(root); this.orderStable = orderStable; Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedOrderedMap<T> {
@@ -58,6 +64,6 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
   *values(): Generator<ValueOf<T>> { for (const [, value] of this.entries()) yield value; }
   forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [key, value] of this.entries()) fn(value, key); }
   toWorkerData() { return Object.freeze({ root: this.root, head: this.head, tail: this.tail, size: this.size, valueType: this.valueType, orderStable: this.orderStable }); }
-  static fromWorkerData<T extends string>(d: { root: number; head: number; tail: number; size: number; valueType: T; orderStable?: boolean }, source: Arena = current): SharedOrderedMap<T> { return new SharedOrderedMap(d.valueType, d.root, d.head, d.tail, d.size, source, d.orderStable ?? false); }
+  static fromWorkerData<T extends string>(d: { root: number; head: number; tail: number; size: number; valueType: T; orderStable?: boolean }, source: Arena = defaultArena()): SharedOrderedMap<T> { return new SharedOrderedMap(d.valueType, d.root, d.head, d.tail, d.size, source, d.orderStable ?? false); }
 }
 structureRegistry.SharedOrderedMap = { fromWorkerData: (d, a) => SharedOrderedMap.fromWorkerData(d, a) };

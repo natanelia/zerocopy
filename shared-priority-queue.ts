@@ -1,14 +1,20 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-let current = new Arena();
-export let sharedMemory = current.memory;
-export let sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer;
-function publishCurrent(): void { sharedMemory = current.memory; sharedBuffer = current.memory.buffer as unknown as SharedArrayBuffer; }
+// Registering a collection must not allocate an unused writer in every reader.
+let current: Arena | undefined;
+/** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+export let sharedMemory: WebAssembly.Memory;
+export let sharedBuffer: SharedArrayBuffer;
+function publishCurrent(): void { sharedMemory = current!.memory; sharedBuffer = current!.memory.buffer as unknown as SharedArrayBuffer; }
+function defaultArena(): Arena {
+  if (!current) { current = new Arena(); publishCurrent(); }
+  return current;
+}
 export function resetPriorityQueue(): void { current = new Arena(); publishCurrent(); }
-export function getAllocState() { return current.state(); }
-export function getBufferCopy(): Uint8Array { return current.copy(); }
-export function getBuffer(): SharedArrayBuffer { return current.memory.buffer as unknown as SharedArrayBuffer; }
+export function getAllocState() { return defaultArena().state(); }
+export function getBufferCopy(): Uint8Array { return defaultArena().copy(); }
+export function getBuffer(): SharedArrayBuffer { return defaultArena().memory.buffer as unknown as SharedArrayBuffer; }
 export function attachToMemory(memory: WebAssembly.Memory, state?: { heapEnd: number }): void {
   current = new Arena({ memory, used: state?.heapEnd, readOnly: true }); publishCurrent();
 }
@@ -22,7 +28,7 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
   readonly size: number;
   readonly valueType: T;
   readonly isMaxHeap: boolean;
-  constructor(type: T, options?: { maxHeap?: boolean } | { root: number; size: number; isMaxHeap: boolean }, source: Arena = current) {
+  constructor(type: T, options?: { maxHeap?: boolean } | { root: number; size: number; isMaxHeap: boolean }, source: Arena = defaultArena()) {
     super(source); this.valueType = type;
     if (options && 'root' in options) { this.root = options.root; this.size = options.size; this.isMaxHeap = options.isMaxHeap; }
     else { this.root = 0; this.size = 0; this.isMaxHeap = options && 'maxHeap' in options ? options.maxHeap ?? false : false; }
@@ -59,6 +65,6 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
   }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ root: this.root, size: this.size, type: this.valueType, isMaxHeap: this.isMaxHeap }); }
-  static fromWorkerData<T extends string>(d: { root: number; size: number; type: T; isMaxHeap: boolean }, source: Arena = current): SharedPriorityQueue<T> { return new SharedPriorityQueue(d.type, d, source); }
+  static fromWorkerData<T extends string>(d: { root: number; size: number; type: T; isMaxHeap: boolean }, source: Arena = defaultArena()): SharedPriorityQueue<T> { return new SharedPriorityQueue(d.type, d, source); }
 }
 structureRegistry.SharedPriorityQueue = { fromWorkerData: (d, a) => SharedPriorityQueue.fromWorkerData(d, a) };

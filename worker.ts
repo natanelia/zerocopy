@@ -447,3 +447,6 @@ export async function receiveShared<T extends SharedShape<T>>(options: ReaderOpt
   reader.dispose();
   return value;
 }
+
+export { defineTasks, connect, spawn, local, serve, pool } from './worker-tasks';
+export type { Task, TaskContext, TaskSet, TaskCalls, CallOptions, Executor, PoolExecutor, ClientOptions, ServeOptions, PoolOptions } from './worker-tasks';

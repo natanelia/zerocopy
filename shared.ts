@@ -28,6 +28,7 @@ export { resetSortedSet } from './shared-sorted-set';
 export { resetPriorityQueue } from './shared-priority-queue';
 export type { ValueType } from './shared-map';
 export type { SharedListType } from './shared-list';
+export type { TextSearchOptions } from './text-search';
 export { json, map, list, stack, queue, linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue, set, orderedSet, sortedSet } from './types';
 export type { DeepReadonly, JsonValue, JsonObject, JsonType, NestedType, ValueOf, WireType } from './types';
 
@@ -116,3 +117,5 @@ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<
 }
 
 export { compact, compactMany } from './compaction';
+
+export { configureMemory } from './memory';

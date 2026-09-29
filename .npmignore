@@ -34,3 +34,6 @@ scripts/
 # Type-only consumer tests
 type-tests/
 tsconfig.typed-values.json
+
+# Documentation site is not part of the library package.
+website/
