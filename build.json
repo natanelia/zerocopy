@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "b997be2fc4b3123a668a573b9949ef77589a75b8",
+  "sourceCommit": "3f301ea5baf2fa997c4e8a1fe32730b66565f4e6",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9"
