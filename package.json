@@ -52,6 +52,7 @@
     "assemblyscript": "0.28.20",
     "bun-types": "1.4.2",
     "immutable": "5.1.9",
+    "immer": "11.1.21",
     "jsan": "3.1.14",
     "playwright": "1.63.0",
     "react": "19.2.0",

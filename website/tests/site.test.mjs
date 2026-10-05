@@ -18,7 +18,10 @@ test('summarizes every sample without mutating inputs', () => {
   const samples = [7, 2, 4, 3, 5, 1, 6];
   assert.deepEqual(summarize(samples), { median: 4, p25: 2.5, p75: 5.5, min: 1, max: 7 });
   assert.equal(samples[0], 7); assert.throws(() => summarize([])); assert.throws(() => summarize([NaN]));
-  assert.deepEqual(orderFor(0), ['shared', 'native']); assert.deepEqual(orderFor(1), ['native', 'shared']);
+  assert.deepEqual(orderFor(0), ['shared', 'immutable', 'immer']);
+  assert.deepEqual(orderFor(1), ['immutable', 'immer', 'shared']);
+  assert.deepEqual(orderFor(2), ['immer', 'shared', 'immutable']);
+  assert.deepEqual(orderFor(3), orderFor(0));
 });
 test('checks each reader rather than only a combined checksum', () => {
   assert.equal(expectedChecksum(1000), 499500);
@@ -72,6 +75,10 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
   assert.ok(home.includes('Conceptual storage model. Not a memory measurement.'));
   const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
+  assert.match(lab, /Immutable\.js Map/); assert.match(lab, /Immer Map/);
+  assert.doesNotMatch(lab, /Structured-cloned Map|Native Map can win/);
+  for (const file of ['immutable.mjs', 'immer.mjs', 'immutable-LICENSE.txt', 'immer-LICENSE.txt']) assert.ok(existsSync(join(out, 'lab/vendor', file)), file);
+  assert.equal(meta.dependencies.immer, JSON.parse(readFileSync(new URL('../../package.json', import.meta.url))).devDependencies.immer);
   assert.ok(!home.includes('<script src="https://'));
 });
 

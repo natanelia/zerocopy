@@ -36,7 +36,7 @@ The application caps a session at 200,000 events. Stop and navigation terminate 
 
 At `/investigation-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
 
-Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The existing Map transport lab remains available unchanged. For append-only arrays, native designs can also retain an earlier view by length.
+Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
 ## Playground
 
@@ -46,11 +46,13 @@ The demo is opt-in. Disconnect and page navigation remove the session and termin
 
 ## Benchmark lab
 
-At `/lab/`, a dedicated coordinator builds deterministic numeric maps, starts one to four reader workers, and measures fan-out plus a full lookup pass. It compares `getWorkerData(..., { copy: false })` plus `initWorker()` with a structured-cloned native Map.
+At `/lab/`, a dedicated coordinator builds deterministic string-keyed numeric maps, starts one to four reader workers, and measures full-snapshot fan-out plus a lookup for every key. The three paths use real zerocopy `SharedMap`, Immutable.js `Map`, and Immer-managed `Map` implementations.
 
-Each path gets two warm-ups and seven samples, in alternating order. Every reader checksum is verified. Bars show the median; text shows the interquartile range. Construction is reported separately, with its different update semantics stated. Worker creation and module loading are outside timing. Per-publication shared attachment is included.
+Each path gets two warm-ups and seven samples, in rotating order. Every reader checksum is verified. Bars show the median; text shows the interquartile range. Worker creation and library loading are outside timing. Every publication includes zerocopy descriptor creation and shared attachment, Immutable.js entry encoding plus structured cloning and Map reconstruction, or Immer Map structured cloning and replica freezing.
 
-Native Map can win. The lab does not measure memory, pure transfer time, persistent edit workloads, or overall application performance. Raw JSON includes all samples, environment information, workload settings, method, and build commit. Nothing is uploaded.
+Construction is reported separately: zerocopy uses persistent sets, Immutable.js uses `withMutations`, and Immer uses one `produce` batch with `enableMapSet` and default auto-freezing. These setup costs are not an equivalent immutable-update comparison. Snapshots do not change during the measured publication trials.
+
+Any path can win. The lab does not measure memory, pure transfer time, persistent edit workloads, or overall application performance. Raw JSON uses schema `zerocopy-browser-benchmark/v2` and includes all 21 measured samples, environment information, workload settings, method, dependency versions, and build commit. Both upstream libraries are pinned, licensed, and served locally inside the lab's isolation scope. Neither is a zerocopy runtime dependency. Nothing is uploaded.
 
 ## Static hosting and isolation
 

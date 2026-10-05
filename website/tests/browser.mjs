@@ -49,9 +49,15 @@ try {
   await page.getByRole('button', { name: 'Disconnect', exact: true }).click();
   await page.goto(origin + base + 'lab/'); await page.locator('#entries').selectOption('1000');
   await page.getByRole('button', { name: 'Run benchmark' }).click(); await page.waitForFunction(() => document.querySelector('#benchmark-status').textContent.startsWith('Complete.'));
-  assert.equal(await page.locator('.result-row').count(), 2); assert.match(await page.locator('#benchmark-detail').innerText(), /checksums passed/);
+  assert.equal(await page.locator('.result-row').count(), 3); assert.match(await page.locator('#benchmark-detail').innerText(), /checksums passed/);
+  assert.match(await page.locator('#benchmark-chart').innerText(), /Immutable\.js Map/);
+  assert.match(await page.locator('#benchmark-chart').innerText(), /Immer Map/);
   const downloadPromise = page.waitForEvent('download'); await page.locator('#export-results').click(); const download = await downloadPromise;
-  const raw = JSON.parse(readFileSync(await download.path(), 'utf8')); assert.equal(raw.samples.shared.length, 7); assert.equal(raw.samples.native.length, 7); assert.equal(raw.raw.length, 14);
+  const raw = JSON.parse(readFileSync(await download.path(), 'utf8'));
+  assert.equal(raw.schema, 'zerocopy-browser-benchmark/v2');
+  assert.deepEqual(Object.keys(raw.samples), ['shared', 'immutable', 'immer']);
+  for (const path of ['shared', 'immutable', 'immer']) { assert.equal(raw.samples[path].length, 7); assert.ok(Number.isFinite(raw.construction[path + 'Ms'])); }
+  assert.ok(raw.dependencies.immutable); assert.ok(raw.dependencies.immer); assert.equal(raw.raw.length, 21);
   for (const sample of raw.raw) for (const reader of sample.readers) assert.equal(reader.checksum, 499500);
   writeFileSync(screenshots + '/benchmark-samples.json', JSON.stringify(raw, null, 2));
   await page.screenshot({ path: screenshots + '/lab-desktop.png', fullPage: true });
