@@ -91,6 +91,8 @@ The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 
 
 The consumer check installs the tarball in a temporary application outside the repository. It checks all public Node and Bun entry points, retained immutable snapshots, the real Node worker proof, and TypeScript imports. It also rejects development files and missing exported declarations.
 
+Successful `main` CI runs retain an `npm-package-<commit>` artifact after the builds, type checks, tests, and consumer checks pass. A release can publish that exact archive with `npm publish /path/to/zerocopy-<version>.tgz --access public`. Archive publication does not rerun source lifecycle scripts: use only the artifact from a successful CI run for the intended source commit, never an unvalidated archive. This is an alternative when the local test runner cannot complete.
+
 For the first release, authenticate with `npm login`, verify the intended account with `npm whoami`, and publish the validated current version with `npm publish --access public`. Complete npm's account verification and two-factor authentication if requested. A registry 404 does not guarantee that npm will allow a particular package name.
 
 After the package exists, configure its npm **Trusted Publisher** for GitHub Actions:

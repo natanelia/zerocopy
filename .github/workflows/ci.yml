@@ -28,6 +28,7 @@ jobs:
       - run: bun run typecheck
       - run: bun run typecheck:redux
       - run: bun run typecheck:values
+      - run: bun run typecheck:geometry
       - name: Check public worker task declarations
         run: bunx tsc --noEmit -p tsconfig.worker.json
       - name: Run unit and integration tests
@@ -70,6 +71,19 @@ jobs:
         run: bun run check:package
       - name: Verify historical evidence
         run: node proofs/restore-local-evidence.mjs
+      - name: Pack the validated release archive
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-package"
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/npm-package"
+      - name: Retain the validated npm package
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package-${{ github.sha }}
+          path: ${{ runner.temp }}/npm-package/*.tgz
+          retention-days: 7
+          if-no-files-found: error
       - name: Archive tested source
         if: ${{ !cancelled() }}
         run: git archive --format=tar HEAD > tested-source.tar
