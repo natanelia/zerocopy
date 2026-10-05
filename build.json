@@ -1,8 +1,9 @@
 {
-  "sourceCommit": "3f301ea5baf2fa997c4e8a1fe32730b66565f4e6",
+  "sourceCommit": "4ebf6878b691a55a8110dd3cbc4effe1563a6f53",
   "version": "0.2.1",
   "dependencies": {
-    "immutable": "5.1.9"
+    "immutable": "5.1.9",
+    "immer": "11.1.21"
   },
   "base": "/zerocopy/",
   "pages": [

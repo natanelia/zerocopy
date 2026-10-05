@@ -109,6 +109,12 @@ function waitForActive(environment, url, scope, timeoutMs) {
     // rejected job may still have a matching installation created by that tab.
     // Recheck once on failure; do not retry arbitrary policy or network errors.
     Promise.resolve().then(async () => {
+      // ready is an independent activation signal when WebKit's registration
+      // slots or lifecycle events are stale after another tab installs. Do not
+      // await it: it may never settle, or resolve for a broader registration.
+      // adopt still requires our exact scope/script and a navigation-capable
+      // worker; the shared deadline and finished guard also apply here.
+      container.ready?.then(value => adopt(value), finish);
       const existing = await existingRegistration();
       if (finished) return;
       if (adopt(existing)) { refresh(); return; }
