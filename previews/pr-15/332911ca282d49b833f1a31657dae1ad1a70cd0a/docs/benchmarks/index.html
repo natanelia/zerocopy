@@ -1,0 +1,748 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8f2"><title>Recorded benchmarks · zerocopy</title><meta name="description" content="All recorded results, slower workloads, and methods. No selected-only results."><meta property="og:title" content="Recorded benchmarks · zerocopy"><meta property="og:description" content="All recorded results, slower workloads, and methods. No selected-only results."><meta property="og:type" content="website"><link rel="canonical" href="https://natanelia.github.io/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/benchmarks/"><meta property="og:url" content="https://natanelia.github.io/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/benchmarks/"><meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/assets/site.css"><script type="module" src="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/assets/main.mjs"></script><link rel="stylesheet" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/assets/comparison.css"></head><body data-base="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/" data-source="321a9ff5759089b40811bc77528af95a1bfe28c3"><a class="skip" href="#main">Skip to content</a>
+  <aside class="preview-banner">PR #15 preview · 332911c · Not a release · <a href="https://github.com/natanelia/zerocopy/pull/15">Return to PR</a></aside><header class="site-header"><a class="wordmark" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/" aria-label="zerocopy home"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/" aria-current="page">Documentation</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/use-cases/" >Use cases</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/lab/" >Benchmark lab</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="https://github.com/natanelia/zerocopy">GitHub <span aria-hidden="true">↗</span></a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/">Documentation</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/use-cases/">Use cases</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/playground/">Small snapshot example</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/lab/">Benchmark lab</a><a href="https://github.com/natanelia/zerocopy">GitHub</a></nav>
+  <div class="docs-layout"><aside class="docs-sidebar" aria-label="Documentation"><p class="eyebrow">DOCUMENTATION</p><div class="sidebar-group"><h2>Start here</h2><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/" >Get started with shared state and Web Workers</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/mental-model/" >How sharing works</a></div><div class="sidebar-group"><h2>Build with it</h2><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/collections/" >Immutable collections API &amp; types</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/text-search/" >Search shared text</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/sessions/" >State &amp; subscriptions</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/transport/" >Your own transport</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/tasks/" >Optional tasks</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/workers/" >Worker tasks &amp; pools</a></div><div class="sidebar-group"><h2>Integrations</h2><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/redux/" >Redux &amp; Redux Toolkit integration</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/tanstack/" >TanStack DB integration</a></div><div class="sidebar-group"><h2>Go deeper</h2><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/memory/" >Memory &amp; ownership</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/memory-comparison/" >Memory comparison</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/benchmarks/" aria-current="page">Recorded benchmarks</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/migration/" >Migration</a></div><div class="sidebar-group"><h2>Use cases</h2><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/use-cases/" >Choose a use case</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/log-explorer/" >Live log explorer</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/data-tables/" >Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/graphs/" >Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/simulations/" >Simulation &amp; world state</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/analytics/" >Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/maps/" >Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/editors/" >Editors &amp; history</a></div><a class="sidebar-lab" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/lab/">↗ Benchmark lab</a></aside><main class="doc-main" id="main"><details class="mobile-docs-menu"><summary>Browse documentation</summary><nav aria-label="All documentation"><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/">Get started with shared state and Web Workers</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/mental-model/">How sharing works</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/collections/">Immutable collections API &amp; types</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/text-search/">Search shared text</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/sessions/">State &amp; subscriptions</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/transport/">Your own transport</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/tasks/">Optional tasks</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/workers/">Worker tasks &amp; pools</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/redux/">Redux &amp; Redux Toolkit integration</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/tanstack/">TanStack DB integration</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/memory/">Memory &amp; ownership</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/memory-comparison/">Memory comparison</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/benchmarks/">Recorded benchmarks</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/migration/">Migration</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/use-cases/">Choose a use case</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/log-explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/data-tables/">Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/graphs/">Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/simulations/">Simulation &amp; world state</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/analytics/">Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/maps/">Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/editors/">Editors &amp; history</a></nav></details><div class="doc-breadcrumb">Go deeper <span>/</span> Recorded benchmarks</div><h1>Recorded benchmarks</h1><p class="doc-description">All recorded results, slower workloads, and methods. No selected-only results.</p><div class="doc-meta"><span>Source documentation</span><a href="https://github.com/natanelia/zerocopy/blob/321a9ff5759089b40811bc77528af95a1bfe28c3/docs/benchmarks.md">View source ↗</a><button class="copy-page" data-markdown="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/markdown/benchmarks.md">Copy Markdown</button></div><article class="prose"><p><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/">README</a> · <a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/">Documentation</a></p>
+<p>Historical collection measurements, including slower workloads, memory costs, and reproduction commands. These are not measurements of task dispatch or worker-pool overhead.</p>
+<h2 id="performance">Performance<a class="heading-link" href="#performance" aria-label="Link to Performance">#</a></h2>
+<p><strong>Zerocopy vs Immutable.js vs native collections.</strong> <code>Shared</code> means zerocopy. Times cover complete workloads, not single calls. Lower times are better. Ratios compare Shared with the named reference.</p>
+<p>Measured on September 14, 2026, in the <a href="https://github.com/natanelia/zerocopy/actions/runs/34801792862">GitHub validation run</a>. The runner used Bun 1.4.2, Immutable.js 5.1.9, AssemblyScript 0.28.20, Linux x64, and an AMD EPYC 7763 processor. Each result is the median of 45 samples across three process rounds, with ten warm-ups per case and rotated library order. Results and retained bases are checked outside timing.</p>
+<p><strong>The first tables exclude arena creation and use repeated reads.</strong> Every build creates a fresh collection through individual persistent updates. First-use results below include arena creation. Native builds use a fresh mutable Map or Array. Updates to an existing native collection include one copy per workload to preserve its base, then apply changes to that copy. Shared and Immutable.js return new versions at each scalar update.</p>
+<p>Build, read, peek, and scan rows process 10,000 items unless stated otherwise. Removal rows apply ten removals to a 10,000-item base. <code>setMany(100)</code> changes 100 entries; Immutable.js uses persistent <code>set</code>, not <code>withMutations</code>. <code>enq+deq(100)</code> performs 100 enqueue/dequeue pairs. Linked-list indexed reads cover 100 positions; front/back reads cover 50 each. Map and ordered-map values are strings. Sequence and sorted-map values are numbers. Sorted keys use a fixed shuffled insertion order; native sorted iteration includes sorting.</p>
+<h3 id="benchmark-results-n10000">Benchmark Results (N=10000)<a class="heading-link" href="#benchmark-results-n10000" aria-label="Link to Benchmark Results (N=10000)">#</a></h3>
+<!-- library-timing-tables:start -->
+<p><strong>SharedMap vs Immutable.Map vs Native Map</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Immutable</th>
+<th>vs Imm</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>set</td>
+<td>3.8413ms</td>
+<td>5.6149ms</td>
+<td>1.46x faster</td>
+<td>0.4119ms</td>
+<td>9.33x slower</td>
+</tr>
+<tr>
+<td>get</td>
+<td>0.2339ms</td>
+<td>0.9340ms</td>
+<td>3.99x faster</td>
+<td>0.1553ms</td>
+<td>1.51x slower</td>
+</tr>
+<tr>
+<td>has</td>
+<td>0.5369ms</td>
+<td>1.2964ms</td>
+<td>2.41x faster</td>
+<td>0.4811ms</td>
+<td>1.12x slower</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>0.006908ms</td>
+<td>0.006835ms</td>
+<td>1.01x slower</td>
+<td>0.1233ms</td>
+<td>17.84x faster</td>
+</tr>
+<tr>
+<td>setMany(100)</td>
+<td>0.0746ms</td>
+<td>0.0569ms</td>
+<td>1.31x slower</td>
+<td>0.1094ms</td>
+<td>1.47x faster</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedList vs Immutable.List vs Native Array</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Immutable</th>
+<th>vs Imm</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>push</td>
+<td>0.7539ms</td>
+<td>1.5979ms</td>
+<td>2.12x faster</td>
+<td>0.0521ms</td>
+<td>14.47x slower</td>
+</tr>
+<tr>
+<td>get</td>
+<td>0.1263ms</td>
+<td>0.1030ms</td>
+<td>1.23x slower</td>
+<td>0.0381ms</td>
+<td>3.32x slower</td>
+</tr>
+<tr>
+<td>pop</td>
+<td>0.000648ms</td>
+<td>0.003137ms</td>
+<td>4.84x faster</td>
+<td>0.0392ms</td>
+<td>60.58x faster</td>
+</tr>
+<tr>
+<td>forEach</td>
+<td>0.0549ms</td>
+<td>0.1764ms</td>
+<td>3.21x faster</td>
+<td>0.0240ms</td>
+<td>2.29x slower</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedStack vs Immutable.Stack vs Native Array</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Immutable</th>
+<th>vs Imm</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>push</td>
+<td>1.0043ms</td>
+<td>0.2010ms</td>
+<td>5.00x slower</td>
+<td>0.0611ms</td>
+<td>16.45x slower</td>
+</tr>
+<tr>
+<td>peek</td>
+<td>0.1310ms</td>
+<td>0.1313ms</td>
+<td>1.00x faster</td>
+<td>0.1144ms</td>
+<td>1.15x slower</td>
+</tr>
+<tr>
+<td>pop</td>
+<td>0.000732ms</td>
+<td>0.001400ms</td>
+<td>1.91x faster</td>
+<td>0.0373ms</td>
+<td>50.94x faster</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedQueue vs Native Array</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>enqueue</td>
+<td>1.2133ms</td>
+<td>0.0482ms</td>
+<td>25.17x slower</td>
+</tr>
+<tr>
+<td>peek</td>
+<td>0.2426ms</td>
+<td>0.0661ms</td>
+<td>3.67x slower</td>
+</tr>
+<tr>
+<td>dequeue</td>
+<td>0.000509ms</td>
+<td>0.0359ms</td>
+<td>70.45x faster</td>
+</tr>
+<tr>
+<td>enq+deq(100)</td>
+<td>0.0116ms</td>
+<td>0.0425ms</td>
+<td>3.65x faster</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedLinkedList vs Native Array</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>prepend</td>
+<td>5.4781ms</td>
+<td>9.2912ms</td>
+<td>1.70x faster</td>
+</tr>
+<tr>
+<td>append</td>
+<td>1.3051ms</td>
+<td>0.0465ms</td>
+<td>28.08x slower</td>
+</tr>
+<tr>
+<td>get(0-99)</td>
+<td>0.006275ms</td>
+<td>0.000666ms</td>
+<td>9.43x slower</td>
+</tr>
+<tr>
+<td>removeFirst</td>
+<td>0.003049ms</td>
+<td>0.0393ms</td>
+<td>12.89x faster</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedDoublyLinkedList vs Native Array</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>prepend</td>
+<td>5.8770ms</td>
+<td>9.3235ms</td>
+<td>1.59x faster</td>
+</tr>
+<tr>
+<td>append</td>
+<td>1.3110ms</td>
+<td>0.0538ms</td>
+<td>24.39x slower</td>
+</tr>
+<tr>
+<td>get(front)</td>
+<td>0.005538ms</td>
+<td>0.000344ms</td>
+<td>16.12x slower</td>
+</tr>
+<tr>
+<td>get(back)</td>
+<td>0.005599ms</td>
+<td>0.000343ms</td>
+<td>16.34x slower</td>
+</tr>
+<tr>
+<td>removeFirst</td>
+<td>0.003077ms</td>
+<td>0.0376ms</td>
+<td>12.24x faster</td>
+</tr>
+<tr>
+<td>removeLast</td>
+<td>0.000863ms</td>
+<td>0.0259ms</td>
+<td>29.99x faster</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedOrderedMap vs Immutable.OrderedMap vs Native Map</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Immutable</th>
+<th>vs Imm</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>set</td>
+<td>6.3215ms</td>
+<td>10.2688ms</td>
+<td>1.62x faster</td>
+<td>0.7616ms</td>
+<td>8.30x slower</td>
+</tr>
+<tr>
+<td>get</td>
+<td>0.4301ms</td>
+<td>1.6793ms</td>
+<td>3.90x faster</td>
+<td>0.6198ms</td>
+<td>1.44x faster</td>
+</tr>
+<tr>
+<td>has</td>
+<td>0.5580ms</td>
+<td>1.9326ms</td>
+<td>3.46x faster</td>
+<td>0.5494ms</td>
+<td>1.02x slower</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>0.006266ms</td>
+<td>0.0104ms</td>
+<td>1.65x faster</td>
+<td>0.0776ms</td>
+<td>12.38x faster</td>
+</tr>
+<tr>
+<td>forEach</td>
+<td>1.5027ms</td>
+<td>0.2105ms</td>
+<td>7.14x slower</td>
+<td>0.0998ms</td>
+<td>15.06x slower</td>
+</tr>
+</tbody></table></div>
+<p><strong>SharedSortedMap vs Native Map</strong></p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Shared</th>
+<th>Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>set</td>
+<td>6.6242ms</td>
+<td>0.6876ms</td>
+<td>9.63x slower</td>
+</tr>
+<tr>
+<td>get</td>
+<td>0.7011ms</td>
+<td>0.4880ms</td>
+<td>1.44x slower</td>
+</tr>
+<tr>
+<td>has</td>
+<td>0.6468ms</td>
+<td>0.4476ms</td>
+<td>1.45x slower</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>0.006447ms</td>
+<td>0.0729ms</td>
+<td>11.32x faster</td>
+</tr>
+<tr>
+<td>keys(sorted)</td>
+<td>2.4290ms</td>
+<td>0.9531ms</td>
+<td>2.55x slower</td>
+</tr>
+</tbody></table></div>
+<!-- library-timing-tables:end -->
+
+<p>The string <code>SharedMap.set</code> workload is 1.46x faster than Immutable.js in this run. Results near 1.00x are not established improvements. These are Bun microbenchmarks, not application, browser, or worker-transfer speed guarantees.</p>
+<h3 id="first-use-builds-including-arena-creation">First-use builds, including arena creation<a class="heading-link" href="#first-use-builds-including-arena-creation" aria-label="Link to First-use builds, including arena creation">#</a></h3>
+<p>This table includes Shared arena reset, new WebAssembly memory, and WASM instance creation inside the timed workload. Inputs and sample counts are the same as above. Immutable.js and native collections have no equivalent arena initialization cost.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Workload</th>
+<th align="right">Shared</th>
+<th align="right">Immutable</th>
+<th>vs Imm</th>
+<th align="right">Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SharedMap.set</td>
+<td align="right">9.3940ms</td>
+<td align="right">5.8996ms</td>
+<td>1.59x slower</td>
+<td align="right">0.4128ms</td>
+<td>22.75x slower</td>
+</tr>
+<tr>
+<td>SharedList.push</td>
+<td align="right">6.9694ms</td>
+<td align="right">1.6735ms</td>
+<td>4.16x slower</td>
+<td align="right">0.0940ms</td>
+<td>74.18x slower</td>
+</tr>
+<tr>
+<td>SharedStack.push</td>
+<td align="right">6.6314ms</td>
+<td align="right">0.1973ms</td>
+<td>33.61x slower</td>
+<td align="right">0.0840ms</td>
+<td>78.96x slower</td>
+</tr>
+<tr>
+<td>SharedQueue.enqueue</td>
+<td align="right">7.0335ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">0.0492ms</td>
+<td>143.07x slower</td>
+</tr>
+<tr>
+<td>SharedLinkedList.prepend</td>
+<td align="right">11.3363ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">9.3290ms</td>
+<td>1.22x slower</td>
+</tr>
+<tr>
+<td>SharedLinkedList.append</td>
+<td align="right">8.1099ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">0.0453ms</td>
+<td>179.09x slower</td>
+</tr>
+<tr>
+<td>SharedDoublyLinkedList.prepend</td>
+<td align="right">11.7740ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">9.1520ms</td>
+<td>1.29x slower</td>
+</tr>
+<tr>
+<td>SharedDoublyLinkedList.append</td>
+<td align="right">8.1714ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">0.0371ms</td>
+<td>220.26x slower</td>
+</tr>
+<tr>
+<td>SharedOrderedMap.set</td>
+<td align="right">12.2661ms</td>
+<td align="right">10.0788ms</td>
+<td>1.22x slower</td>
+<td align="right">0.7581ms</td>
+<td>16.18x slower</td>
+</tr>
+<tr>
+<td>SharedSortedMap.set</td>
+<td align="right">11.5702ms</td>
+<td align="right">N/A</td>
+<td>N/A</td>
+<td align="right">0.6686ms</td>
+<td>17.31x slower</td>
+</tr>
+</tbody></table></div>
+<h3 id="scalar-map-writes-across-different-keys">Scalar map writes across different keys<a class="heading-link" href="#scalar-map-writes-across-different-keys" aria-label="Link to Scalar map writes across different keys">#</a></h3>
+<p>These tests call ordinary <code>set</code> for every update. They do not use a bulk builder, <code>withMutations</code>, or repeated changes to a few keys. The insert order is a fixed shuffle. Overwrite rows change 1,000 distinct keys in a 10,000-item base. The long-prefix case uses a shared 128-character key prefix. The fork row creates 64 separate snapshots from one base; native copies once per fork. All returned versions are immediately readable and shareable.</p>
+<p>Each workload and library runs in an independent process for each round. There are 45 timed samples per cell. Setup and full output checks are outside timing, except arena creation in the explicitly marked first-use row.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Workload</th>
+<th align="right">Shared</th>
+<th align="right">Immutable</th>
+<th>vs Imm</th>
+<th align="right">Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Insert 10,000 new string values; shuffled keys</td>
+<td align="right">3.4796ms</td>
+<td align="right">6.9285ms</td>
+<td>1.99x faster</td>
+<td align="right">0.3104ms</td>
+<td>11.21x slower</td>
+</tr>
+<tr>
+<td>Insert 10,000 new numeric values; shuffled keys</td>
+<td align="right">2.6059ms</td>
+<td align="right">6.3545ms</td>
+<td>2.44x faster</td>
+<td align="right">0.3160ms</td>
+<td>8.25x slower</td>
+</tr>
+<tr>
+<td>Insert 10,000 Unicode keys and values</td>
+<td align="right">8.7007ms</td>
+<td align="right">6.7029ms</td>
+<td>1.30x slower</td>
+<td align="right">0.3389ms</td>
+<td>25.68x slower</td>
+</tr>
+<tr>
+<td>Insert 10,000 keys with a long shared prefix</td>
+<td align="right">7.5466ms</td>
+<td align="right">20.2847ms</td>
+<td>2.69x faster</td>
+<td align="right">0.3452ms</td>
+<td>21.86x slower</td>
+</tr>
+<tr>
+<td>Change 1,000 distinct string entries</td>
+<td align="right">0.3678ms</td>
+<td align="right">0.6531ms</td>
+<td>1.78x faster</td>
+<td align="right">0.1198ms</td>
+<td>3.07x slower</td>
+</tr>
+<tr>
+<td>Change 1,000 distinct numeric entries</td>
+<td align="right">0.3335ms</td>
+<td align="right">0.8786ms</td>
+<td>2.63x faster</td>
+<td align="right">0.0963ms</td>
+<td>3.46x slower</td>
+</tr>
+<tr>
+<td>Change 1,000 numeric entries after a full read</td>
+<td align="right">0.4374ms</td>
+<td align="right">0.6407ms</td>
+<td>1.46x faster</td>
+<td align="right">0.1059ms</td>
+<td>4.13x slower</td>
+</tr>
+<tr>
+<td>64 independent updates from one retained base</td>
+<td align="right">0.0599ms</td>
+<td align="right">0.0443ms</td>
+<td>1.35x slower</td>
+<td align="right">9.6084ms</td>
+<td>160.32x faster</td>
+</tr>
+<tr>
+<td>1,000 changed set/get/has sequences</td>
+<td align="right">0.5443ms</td>
+<td align="right">0.8430ms</td>
+<td>1.55x faster</td>
+<td align="right">0.1466ms</td>
+<td>3.71x slower</td>
+</tr>
+<tr>
+<td>Insert 10,000 strings including arena creation</td>
+<td align="right">3.7682ms</td>
+<td align="right">7.1686ms</td>
+<td>1.90x faster</td>
+<td align="right">0.3706ms</td>
+<td>10.17x slower</td>
+</tr>
+</tbody></table></div>
+<p>Numeric insertion and dispersed numeric overwrites exceed 2x Immutable.js in this run. String insertion reaches 1.99x. Unicode construction and independent forks are slower than Immutable.js. There is no general 2x scalar-write advantage.</p>
+<h3 id="cold-reads-larger-key-sets-and-mixed-updates">Cold reads, larger key sets, and mixed updates<a class="heading-link" href="#cold-reads-larger-key-sets-and-mixed-updates" aria-label="Link to Cold reads, larger key sets, and mixed updates">#</a></h3>
+<p>A repeated read can use a bounded process-local cache. The first-read case attaches an empty read cache before each timed scan. The 32,768-key case exceeds the value-cache entry limit. The mixed case changes a key, reads its new value, and checks membership 1,024 times. The final case alternates reads between two retained snapshots. Each cell has 45 samples.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Workload</th>
+<th align="right">Shared</th>
+<th align="right">Immutable</th>
+<th>vs Imm</th>
+<th align="right">Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>First read of 10,000 numeric keys</td>
+<td align="right">2.5339ms</td>
+<td align="right">1.1957ms</td>
+<td>2.12x slower</td>
+<td align="right">0.3142ms</td>
+<td>8.07x slower</td>
+</tr>
+<tr>
+<td>Read 32,768 numeric keys</td>
+<td align="right">5.1745ms</td>
+<td align="right">5.5349ms</td>
+<td>1.07x faster</td>
+<td align="right">1.2018ms</td>
+<td>4.31x slower</td>
+</tr>
+<tr>
+<td>1,024 set/get/has sequences</td>
+<td align="right">0.8499ms</td>
+<td align="right">0.6452ms</td>
+<td>1.32x slower</td>
+<td align="right">0.4404ms</td>
+<td>1.93x slower</td>
+</tr>
+<tr>
+<td>10,000 reads alternating two snapshots</td>
+<td align="right">0.5495ms</td>
+<td align="right">1.4999ms</td>
+<td>2.73x faster</td>
+<td align="right">0.6843ms</td>
+<td>1.25x faster</td>
+</tr>
+</tbody></table></div>
+<p>These fixed-order workloads differ from the independent-process shuffled write suite. Warm lookup gains are not uncached lookup gains; the mixed-update rows measure different access patterns.</p>
+<h3 id="evidence">Evidence<a class="heading-link" href="#evidence" aria-label="Link to Evidence">#</a></h3>
+<p>The <a href="https://github.com/natanelia/zerocopy/blob/main/proofs/results/map-set-index-summary.json">recorded summary</a> contains scalar-write medians, memory results, source and driver checksums, and test counts. The <a href="https://github.com/natanelia/zerocopy/actions/runs/34801792862/artifacts/10330799515">raw archive</a> contains 1,800 paired scalar-write timing samples, 4,005 original-table samples, 1,080 first-use samples, 540 extra read-workload samples, 108 isolated memory measurements, and test logs. Artifact retention ends on December 13, 2026.</p>
+<p>The <a href="https://github.com/natanelia/zerocopy/blob/main/proofs/map-set-performance.md">scalar-write report</a> explains the comparison with the same engine without the writer index. <a href="https://github.com/natanelia/zerocopy/blob/main/proofs/README.md">Earlier experiments</a> retain their own source versions, raw data, and results; they are not measurements of the current source.</p>
+<h2 id="memory-shared-vs-immutablejs-vs-native">Memory: Shared vs Immutable.js vs native<a class="heading-link" href="#memory-shared-vs-immutablejs-vs-native" aria-label="Link to Memory: Shared vs Immutable.js vs native">#</a></h2>
+<p>Lower memory is better. One MiB is 1,048,576 bytes. These measurements use the same validated source and runner as the speed tables. They compare libraries, not different zerocopy releases.</p>
+<p>The metric is <strong>incremental post-GC V8 heap use plus full retained backing buffers</strong>. It includes Shared&#39;s JavaScript keys, values, caches, wrappers, auxiliary buffers, and unused space in active WASM memory. It is not a comparison of Shared payload bytes with another library&#39;s complete storage.</p>
+<p>Node.js v22.23.2 runs each library, type, size, and scenario in an isolated process with <code>--expose-gc</code>. Results are medians of three independent processes. Library imports, warm-up, and empty default arenas precede the heap baseline. Startup, code memory, total process RSS, and peak temporary memory are excluded.</p>
+<h3 id="one-retained-collection-after-reads">One retained collection after reads<a class="heading-link" href="#one-retained-collection-after-reads" aria-label="Link to One retained collection after reads">#</a></h3>
+<p>Maps use string keys and string values. Lists and stacks use numbers. Construction uses scalar writes. All values are checked before measurement, so Shared&#39;s read-cache cost is included. Only the latest handle is retained, but Shared arenas still contain allocated intermediate nodes.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Collection and workload</th>
+<th align="right">Shared</th>
+<th align="right">Immutable</th>
+<th>vs Imm</th>
+<th align="right">Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Map, 10,000 items</td>
+<td align="right">1.966 MiB</td>
+<td align="right">2.050 MiB</td>
+<td>4.1% less</td>
+<td align="right">0.898 MiB</td>
+<td>118.9% more</td>
+</tr>
+<tr>
+<td>List, 10,000 items</td>
+<td align="right">0.297 MiB</td>
+<td align="right">0.258 MiB</td>
+<td>15.3% more</td>
+<td align="right">0.079 MiB</td>
+<td>274.5% more</td>
+</tr>
+<tr>
+<td>Stack, 10,000 items</td>
+<td align="right">0.292 MiB</td>
+<td align="right">0.409 MiB</td>
+<td>28.6% less</td>
+<td align="right">0.078 MiB</td>
+<td>272.9% more</td>
+</tr>
+<tr>
+<td>OrderedMap, 10,000 items</td>
+<td align="right">2.159 MiB</td>
+<td align="right">2.938 MiB</td>
+<td>26.5% less</td>
+<td align="right">0.898 MiB</td>
+<td>140.4% more</td>
+</tr>
+<tr>
+<td>Map, 100,000 items</td>
+<td align="right">14.770 MiB</td>
+<td align="right">19.104 MiB</td>
+<td>22.7% less</td>
+<td align="right">8.081 MiB</td>
+<td>82.8% more</td>
+</tr>
+<tr>
+<td>List, 100,000 items</td>
+<td align="right">1.922 MiB</td>
+<td align="right">1.994 MiB</td>
+<td>3.6% less</td>
+<td align="right">0.876 MiB</td>
+<td>119.3% more</td>
+</tr>
+<tr>
+<td>Stack, 100,000 items</td>
+<td align="right">1.669 MiB</td>
+<td align="right">3.843 MiB</td>
+<td>56.6% less</td>
+<td align="right">0.875 MiB</td>
+<td>90.6% more</td>
+</tr>
+<tr>
+<td>OrderedMap, 100,000 items</td>
+<td align="right">16.276 MiB</td>
+<td align="right">27.210 MiB</td>
+<td>40.2% less</td>
+<td align="right">8.081 MiB</td>
+<td>101.4% more</td>
+</tr>
+</tbody></table></div>
+<p>The 10,000-item map uses 4.1% less than Immutable.js in this run, while the 100,000-item map uses 22.7% less. Treat the small difference at 10,000 items with care because heap measurements vary. Shared still uses more memory than native Map. The writer index adds no reserved backing memory: its scratch area fits in the prefix already reserved by each arena.</p>
+<h3 id="compacted-collections-and-retained-history">Compacted collections and retained history<a class="heading-link" href="#compacted-collections-and-retained-history" aria-label="Link to Compacted collections and retained history">#</a></h3>
+<p>Compacted rows rebuild Shared&#39;s live data in a fresh arena. The source and its default arena reference are released, then all live values are checked again. The other libraries use their normal GC-managed representations. Compaction time and peak memory while both arenas coexist are not included in retained size.</p>
+<p>History rows keep 32 snapshots of a 10,000-key map while changing one key. Shared and Immutable.js retain versions; native Map retains 31 shallow copies plus its original. Only the changed key is checked in these history cases. Their cache state differs from the full-read cases above.</p>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Collection and workload</th>
+<th align="right">Shared</th>
+<th align="right">Immutable</th>
+<th>vs Imm</th>
+<th align="right">Native</th>
+<th>vs Native</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Map, 10,000 items; Shared compacted</td>
+<td align="right">1.645 MiB</td>
+<td align="right">2.051 MiB</td>
+<td>19.8% less</td>
+<td align="right">0.898 MiB</td>
+<td>83.2% more</td>
+</tr>
+<tr>
+<td>Map, 10,000 items; 32 snapshots</td>
+<td align="right">1.054 MiB</td>
+<td align="right">2.048 MiB</td>
+<td>48.5% less</td>
+<td align="right">14.463 MiB</td>
+<td>92.7% less</td>
+</tr>
+<tr>
+<td>OrderedMap, 10,000 items; Shared compacted</td>
+<td align="right">1.747 MiB</td>
+<td align="right">2.938 MiB</td>
+<td>40.6% less</td>
+<td align="right">0.898 MiB</td>
+<td>94.5% more</td>
+</tr>
+<tr>
+<td>OrderedMap, 10,000 items; 32 snapshots</td>
+<td align="right">1.248 MiB</td>
+<td align="right">2.912 MiB</td>
+<td>57.1% less</td>
+<td align="right">14.463 MiB</td>
+<td>91.4% less</td>
+</tr>
+</tbody></table></div>
+<p>Compaction is explicit, not automatic reclamation. Old snapshots, workers, payloads, nested values, or default references can keep the source arena alive. An arena reserves at least 128 KiB. The tables do not imply that every Shared collection is smaller than every alternative. Only directly corresponding Map, OrderedMap, List/Array, and Stack/Array representations are measured here. Missing Immutable.js types are not substituted with unrelated types.</p>
+<h3 id="reproduce-the-timing-and-memory-comparisons">Reproduce the timing and memory comparisons<a class="heading-link" href="#reproduce-the-timing-and-memory-comparisons" aria-label="Link to Reproduce the timing and memory comparisons">#</a></h3>
+<p>From the project directory:</p>
+<div class="code-block"><div class="code-label"><span>sh</span><button type="button" class="copy-code" aria-label="Copy sh code">Copy</button></div><pre tabindex="0"><code>bun install
+bun run build:wasm
+bun run build:browser
+bash proofs/run-hot-path-evidence.sh</code></pre></div>
+<p>This records the eight timing tables for initialized arenas, first-use builds with arena creation, cold and mixed reads, and the three-library memory comparison. All variants retain the same inputs and validate their results. Raw JSON and generated tables are written below <code>proofs/results/hot-path/</code> and <code>proofs/results/cold-build/</code>.</p>
+<p>Run the independent-process scalar-write comparison:</p>
+<div class="code-block"><div class="code-label"><span>sh</span><button type="button" class="copy-code" aria-label="Copy sh code">Copy</button></div><pre tabindex="0"><code>node proofs/run-map-set.mjs proofs/results/map-set.json</code></pre></div>
+<p>Run only the memory comparison after the portable build:</p>
+<div class="code-block"><div class="code-label"><span>sh</span><button type="button" class="copy-code" aria-label="Copy sh code">Copy</button></div><pre tabindex="0"><code>node proofs/library-memory.mjs proofs/results/library-memory.json</code></pre></div>
+<p>The driver starts isolated child processes with explicit garbage collection. It saves samples, heap measurements, backing-buffer totals, library versions, and checksums. Later runtimes or different hardware can produce different results. Keep new runs separate from the recorded summary.</p>
+</article><div class="doc-bottom"><span>Found something unclear?</span><a href="https://github.com/natanelia/zerocopy/issues/new">Improve this guide ↗</a></div></main><aside class="doc-toc" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p><a href="#performance">Performance</a><a href="#memory-shared-vs-immutablejs-vs-native">Memory: Shared vs Immutable.js vs native</a><a class="toc-help" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/playground/">Try a real snapshot →</a></aside></div>
+  <footer class="site-footer"><div><a class="wordmark" href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy.</span></a><p>Share your data. Keep your options.</p></div><div class="footer-links"><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-15/332911ca282d49b833f1a31657dae1ad1a70cd0a/docs/memory/">Know the trade-offs</a><a href="https://github.com/natanelia/zerocopy/issues">Feedback <span aria-hidden="true">↗</span></a><a href="https://github.com/natanelia/zerocopy/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v0.2.1 · <a href="https://github.com/natanelia/zerocopy/commit/321a9ff5759089b40811bc77528af95a1bfe28c3">321a9ff</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off"><p id="search-status" role="status">Type a topic to find a guide.</p><div id="search-results"></div></dialog><div class="toast" role="status" aria-live="polite"></div>
+  </body></html>
