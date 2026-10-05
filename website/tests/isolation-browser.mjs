@@ -110,6 +110,34 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         await p.goto(origin + base + 'compare/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'compare-start');
         assert.equal(storageVisits.length, 2); await storage.close();
 
+        // Keep register()/getRegistration() views empty after a real install.
+        // Readiness must recover from stale cross-process registration slots,
+        // but only an actually isolated new document may enable the demo.
+        const stale = await browser.newContext();
+        await stale.addInitScript(() => {
+          const container = navigator.serviceWorker;
+          for (const method of ['register', 'getRegistration']) {
+            const original = container[method].bind(container);
+            container[method] = async (...args) => {
+              const value = await original(...args);
+              return value && Object.assign(new EventTarget(), {
+                scope: value.scope, installing: null, waiting: null, active: null,
+              });
+            };
+          }
+        });
+        const stalePair = [await stale.newPage(), await stale.newPage()];
+        const staleHistories = await Promise.all(stalePair.map(navigations));
+        for (const tab of stalePair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
+        await Promise.all(stalePair.map(async tab => {
+          await tab.goto(origin + base + 'compare/?stale-registration=1#main', { waitUntil: 'commit' });
+          await ready(tab, 'compare-start');
+          assert.equal(new URL(tab.url()).searchParams.get('stale-registration'), '1');
+          assert.equal(new URL(tab.url()).hash, '#main');
+        }));
+        assert.ok(staleHistories.every(history => history.length >= 1 && history.length <= 2));
+        await stale.close();
+
         // Two tabs can install/claim concurrently. Neither may loop or need a click.
         for (let round = 0; round < 10; round++) {
         const tabs = await browser.newContext();
@@ -181,7 +209,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         await d.evaluate(() => globalThis.__zcDocumentReported);
         assert.equal(deniedVisits.length, 3, 'Even a manual reload must not restart the automatic loop');
         await denied.close();
-        console.log(`Passed: ${name}, blocked storage, concurrent tabs, failed registration/retry, and failed-isolation reload guard.`);
+        console.log(`Passed: ${name}, blocked storage, stale registration views, concurrent tabs, failed registration/retry, and failed-isolation reload guard.`);
       } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
     }
     assert.deepEqual(errors, []);

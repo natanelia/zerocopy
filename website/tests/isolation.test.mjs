@@ -343,3 +343,45 @@ test('a fresh cross-tab wrapper with an activating active worker permits one nav
   assert.equal(s.environment.crossOriginIsolated, false);
   assert.equal(replacement.listenerCount, 0); s.clean();
 });
+
+test('readiness can recover a stale empty or installing registration without lifecycle events', async () => {
+  for (const empty of [true, false]) {
+    const s = setup(); if (empty) s.registration.installing = null;
+    s.container.getRegistration = async () => s.registration;
+    let release;
+    s.container.ready = new Promise(resolve => { release = resolve; });
+    const pending = s.run(); await tick();
+    assert.equal(s.navigations.length, 0);
+    const active = new Worker(); active.state = 'activated';
+    const fresh = Object.assign(new Events(), { scope: route, installing: null, waiting: null, active });
+    release(fresh);
+    assert.equal(await pending, 'reloading');
+    assert.equal(s.navigations.length, 1); assert.equal(s.container.controller, null);
+    assert.equal(s.environment.crossOriginIsolated, false);
+    await assert.rejects(s.run(), /Automatic reloads have stopped/);
+    assert.equal(active.listenerCount, 0); assert.equal(fresh.listenerCount, 0); s.clean();
+  }
+});
+test('readiness for a broader scope or another script cannot authorize a navigation', async () => {
+  for (const mismatch of ['scope', 'script']) {
+    const s = setup(); s.registration.installing = null;
+    const active = new Worker(); active.state = 'activated';
+    if (mismatch === 'script') active.scriptURL = new URL('other.js', route).href;
+    s.container.ready = Promise.resolve(Object.assign(new Events(), {
+      scope: mismatch === 'scope' ? new URL('../', route).href : route,
+      installing: null, waiting: null, active,
+    }));
+    await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/);
+    assert.equal(s.navigations.length, 0); assert.equal(active.listenerCount, 0); s.clean();
+  }
+});
+test('readiness after the deadline cannot navigate or attach listeners', async () => {
+  const s = setup(); let release;
+  s.container.ready = new Promise(resolve => { release = resolve; });
+  await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
+  const active = new Worker(); active.state = 'activated';
+  const fresh = Object.assign(new Events(), { scope: route, installing: null, waiting: null, active });
+  release(fresh); await tick();
+  assert.equal(s.navigations.length, 0); assert.equal(active.listenerCount, 0);
+  assert.equal(fresh.listenerCount, 0); s.clean();
+});
