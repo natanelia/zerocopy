@@ -8,7 +8,7 @@ A catalog worker filters a group of candidate products. Headphones and a keyboar
 
 The small dataset makes the result easy to check. Keep small filters on the main thread; use a worker when the real calculation is large enough to justify dispatch.
 
-Follow the [source installation and browser setup](getting-started.md) first. These are three files in the same directory.
+Follow the [package installation and browser setup](getting-started.md) first. These are three files in the same directory.
 
 ## Define the task
 

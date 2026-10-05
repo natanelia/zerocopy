@@ -1,8 +1,18 @@
-# zerocopy
+# zerocopy: Zero-copy immutable collections for JavaScript and TypeScript
 
 ## Share your data. Not copies.
 
 **Shared, immutable collections for JavaScript and TypeScript.** Let your UI and workers read the same collection storage, without cloning the dataset for each worker.
+
+zerocopy uses SharedArrayBuffer and WebAssembly to share persistent maps, lists, and sets across Web Workers and Node.js worker threads. Each thread reads locally; updates create immutable snapshots.
+
+**[Documentation website](https://natanelia.github.io/zerocopy/)** · [Online quickstart](https://natanelia.github.io/zerocopy/docs/getting-started/) · [Live comparison](https://natanelia.github.io/zerocopy/compare/)
+
+Install the [npm package](https://www.npmjs.com/package/zerocopy):
+
+```sh
+npm install zerocopy
+```
 
 Connect a worker. Read locally. Keep working.
 
@@ -81,7 +91,7 @@ The [collection API](docs/api.md) includes maps, sets, lists, stacks, queues, or
 
 <a id="read-shared-state-directly"></a>
 <a id="build-from-source"></a>
-**Ready to try it?** [Build the source package and connect your first worker](docs/getting-started.md). Browser setup and cleanup are included. These docs describe the source in this branch, not an assumed npm release.
+**Ready to try it?** [Install zerocopy and connect your first worker](docs/getting-started.md). Browser setup and cleanup are included. The first npm release is `zerocopy@0.2.0`; source-build instructions remain available for unreleased changes.
 
 <a id="run-a-typed-task"></a>
 Tasks are an optional execution layer. Use them for catalog filtering or a background calculation—not to wrap each `.get()`. The [task guide](docs/workers.md) covers existing workers, independent workers, pools, MessagePorts, SharedWorker connections, and Node.js.

@@ -80,8 +80,28 @@ After all builds and tests pass:
 ```sh
 npm pack --dry-run
 npm pack --ignore-scripts
+bun run check:package
 ```
 
 Inspect the package contents and use the local archive in a consumer test. These commands do not publish a package. Do not change dependency versions, publish releases, or combine unrelated runtime refactors with a documentation patch.
+
+## npm releases
+
+The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 or newer for local checks. `npm publish --access public` runs `prepublishOnly`: WASM, portable JavaScript, declarations, type checks, the test suite, the Redux proof, and the packed-package consumer check. Do not bypass this gate with `--ignore-scripts` when publishing.
+
+The consumer check installs the tarball in a temporary application outside the repository. It checks all public Node and Bun entry points, retained immutable snapshots, the real Node worker proof, and TypeScript imports. It also rejects development files and missing exported declarations.
+
+For the first release, authenticate with `npm login`, verify the intended account with `npm whoami`, and publish the validated current version with `npm publish --access public`. Complete npm's account verification and two-factor authentication if requested. A registry 404 does not guarantee that npm will allow a particular package name.
+
+After the package exists, configure its npm **Trusted Publisher** for GitHub Actions:
+
+- Owner: `natanelia`
+- Repository: `zerocopy`
+- Workflow filename: `npm-publish.yml`
+- Environment: leave blank; the workflow does not declare an environment.
+
+The **Publish npm package** workflow uses Node.js 24 with npm's OIDC support and publishes provenance without a stored `NPM_TOKEN`. Future releases use a new `package.json` version and a matching `v<version>` tag. Tag creation and pushing are separate release actions. Manual dispatch on `main` is also available. Tags that do not match the package version fail. Already-published versions fail visibly; publishing is no longer attempted on every `main` push, and errors are not suppressed.
+
+Until the trusted publisher is configured, the Actions publish step cannot authenticate. Do not commit credentials or paste tokens into issues or agent conversations. Registry publication is immutable: confirm the package version and validated contents before a release.
 
 A useful bug report includes the runtime version, transport mode, a small reproduction, and whether the problem affects a retained old snapshot. For performance reports, include the workload and raw samples, not only a ratio.

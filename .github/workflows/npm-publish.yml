@@ -1,0 +1,40 @@
+name: Publish npm package
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Check release tag matches package version
+        env:
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          node --input-type=module -e "import { readFileSync } from 'node:fs'; const { version } = JSON.parse(readFileSync('package.json')); if (process.env.RELEASE_REF.startsWith('refs/tags/') && process.env.RELEASE_REF !== 'refs/tags/v' + version) throw new Error('Release tag must match package.json version');"
+      - run: bun install
+      - name: Build, validate, and publish through npm trusted publishing
+        # npm prepublishOnly runs builds, type checks, tests, and a tarball consumer check.
+        # Configure natanelia/zerocopy + npm-publish.yml as the npm trusted publisher.
+        run: npm publish --access public --provenance

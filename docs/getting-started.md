@@ -6,9 +6,21 @@ Create state on the main thread. Connect a dedicated worker. Both threads can th
 
 The first snapshot contains 10,000 event messages. The owner appends a timeout while a worker retains the earlier view. No task definition or task server is needed. This is a connection lesson; the [log explorer](../website/content/log-explorer.md) builds a complete investigation UI, and [other use cases](use-cases.md) apply the same pattern elsewhere.
 
-## Install the source package
+## Install zerocopy
 
-These examples describe the source in this repository. They do not assume that the same API is published on npm. Build the current `main` branch:
+Install the [npm package](https://www.npmjs.com/package/zerocopy) in your application:
+
+```sh
+npm install zerocopy
+```
+
+The first published version is `0.2.0`. To pin that release, use `npm install zerocopy@0.2.0`.
+
+The package includes JavaScript bundles, embedded WASM, and TypeScript declarations. Your application does not need Bun or an AssemblyScript build when using the JavaScript entry points in Node.js or a browser bundler. Bun uses the included TypeScript source and WASM files.
+
+### Install the source package
+
+To try unreleased changes, build the current `main` branch instead:
 
 ```sh
 git clone --branch main https://github.com/natanelia/zerocopy.git
@@ -20,13 +32,13 @@ bun run build:types
 npm pack --ignore-scripts
 ```
 
-Install the resulting `zerocopy-0.2.0.tgz` in your application:
+Install the resulting `zerocopy-0.2.1.tgz` in your application:
 
 ```sh
-npm install /path/to/zerocopy-0.2.0.tgz
+npm install /path/to/zerocopy-0.2.1.tgz
 ```
 
-The package includes JavaScript bundles, embedded WASM, and TypeScript declarations. Your application does not need an AssemblyScript build. The repository's CI uses Bun 1.4.2 and Node.js 22.
+The repository's CI uses Bun 1.4.2 and Node.js 22.
 
 ## Set up the browser
 

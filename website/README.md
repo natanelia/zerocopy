@@ -105,7 +105,25 @@ GitHub Pages uses **Deploy from a branch → gh-pages → / (root)**. This repos
 
 Build jobs have read permission only. Publishing is a separate runner with scoped `contents`, `pages`, and PR-comment write permissions. It publishes only same-repository PRs, never external forks, and does not use `pull_request_target`. The publisher does not execute files from the generated artifact. It validates the PR/head identity, UTF-8 static file types, paths, size limits, and symlinks. Source contributors with repository write access are trusted; preview HTML still runs publicly and must not contain private data.
 
-Production root publication remains opt-in: set the repository Actions variable **DOCS_PAGES=true**, then push or dispatch on `main`. It uses the same branch publisher and preserves `previews/`. Do not switch Pages to GitHub Actions while using this branch-based preview workflow. Custom-domain deployment needs a matching base/origin configuration. The workflow does not publish npm or merge PRs.
+Tested `main` builds publish the production documentation by default. Set the repository Actions variable **DOCS_PAGES=false** to pause production publication explicitly. An unset variable no longer leaves the root serving the non-indexable PR-preview placeholder. Publication uses the same branch publisher and preserves `previews/`. Do not switch Pages to GitHub Actions while using this branch-based preview workflow. Custom-domain deployment needs a matching base/origin configuration. The workflow does not publish npm or merge PRs.
+
+## Search indexing and repository discovery
+
+Production URL: `https://natanelia.github.io/zerocopy/`.
+Sitemap: `https://natanelia.github.io/zerocopy/sitemap.xml`.
+
+Production guides contain static HTML, unique titles and descriptions, canonical URLs, and Open Graph metadata. The sitemap lists only production pages. PR previews and the 404 page carry `noindex,nofollow`; previews do not generate a sitemap. Crawlers may fetch previews so they can see the exclusion directive.
+
+GitHub Pages project sites cannot control the host's `/robots.txt` from a repository subdirectory. `/zerocopy/robots.txt` is not the robots policy for `natanelia.github.io`. Submit the sitemap directly instead of relying on its discovery through that subpath file. Do not block previews in a host-level robots file if you want crawlers to observe their `noindex` metadata.
+
+After the changes reach `main` and the Documentation website workflow succeeds:
+
+1. Check that the public homepage serves the product documentation, not "zerocopy PR previews", and that the sitemap returns HTTP 200. Check `build.json` against the tested source commit.
+2. In GitHub's repository **About** settings, set the website to the production URL and describe the project as "Zero-copy immutable collections for JavaScript and TypeScript using SharedArrayBuffer and WebAssembly." Add relevant topics such as `typescript`, `javascript`, `webassembly`, `sharedarraybuffer`, `web-workers`, `immutable`, and `data-structures`. These remote settings are separate from the README and package metadata.
+3. Add a **URL-prefix property** for `https://natanelia.github.io/zerocopy/` in Google Search Console. Use Google's HTML-file verification method. The verification file must be included in future builds, not added only to `gh-pages`, where the next production publication would remove it. No verification token is shipped by default.
+4. Submit `sitemap.xml` in that property. Use URL Inspection to request indexing for the homepage and getting-started guide. Check the reported crawl/indexing reason before changing more metadata.
+
+Google controls crawl timing, indexing, and ranking. Metadata and a sitemap do not guarantee inclusion or a particular position. `llms.txt` is for model readers, not a replacement for search indexing. Run `node --test website/tests/seo.test.mjs` after a production or preview build to check the indexing rules.
 
 ## Side-by-side comparison
 

@@ -66,6 +66,8 @@ jobs:
           node proofs/node-worker.mjs
           node proofs/redux-node.mjs
           node proofs/typed-json-worker.mjs
+      - name: Check the installed npm tarball
+        run: bun run check:package
       - name: Verify historical evidence
         run: node proofs/restore-local-evidence.mjs
       - name: Archive tested source
@@ -84,19 +86,3 @@ jobs:
             package.json
             tested-source.tar
           retention-days: 7
-
-  publish:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.4.2'
-      - run: bun install
-      - run: bun run build:wasm
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true

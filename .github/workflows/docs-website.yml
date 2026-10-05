@@ -101,7 +101,7 @@ jobs:
       always() && !cancelled() &&
       ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository &&
         (needs.build.result == 'success' || github.event.action == 'closed')) ||
-       (github.ref == 'refs/heads/main' && vars.DOCS_PAGES == 'true' && needs.build.result == 'success'))
+       (github.ref == 'refs/heads/main' && vars.DOCS_PAGES != 'false' && needs.build.result == 'success'))
     needs: build
     permissions:
       contents: write

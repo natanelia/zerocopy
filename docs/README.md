@@ -1,5 +1,7 @@
 # Documentation
 
+Read the [zerocopy documentation website](https://natanelia.github.io/zerocopy/) for searchable guides, the collection API, and live worker demos.
+
 Zerocopy is a shared-collection library for many kinds of applications. Start with [use cases and alternatives](use-cases.md), or explore the [working log explorer](../website/content/log-explorer.md). The demo does not limit the library to logs.
 
 Start with the [two-file quickstart](getting-started.md). It shares state with a dedicated worker and uses direct, synchronous reads on both threads.
