@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { List } from '../_site/compare/vendor/immutable.mjs';
 import { immutableVersion } from '../_site/compare/vendor/version.mjs';
 import { fromColumns, appendImmutable, immutableView, transportColumns } from '../_site/compare/assets/immutable-storage.mjs';
+import { fromColumns as fromImmerColumns, appendImmer, immerView } from '../_site/compare/assets/immer-storage.mjs';
 import { emptyShared, appendShared } from '../_site/compare/assets/explorer-storage.mjs';
 import { FIELDS, MAX_EVENTS, SERVICES, generateColumns, nativeView, sharedView, rowAt, search, summarizeEvents } from '../assets/explorer-core.mjs';
 import { reference, verifyAnswer } from '../assets/explorer-reference.mjs';
@@ -38,7 +39,7 @@ test('invalid columns, capacity, and delta boundaries are rejected', () => {
   const full = Object.fromEntries(FIELDS.map(field => [field, List().setSize(MAX_EVENTS)]));
   assert.throws(() => appendImmutable(full, base), /capacity/);
 });
-test('seeded random data produces exact native, Immutable.js, shared, and reference results', async () => {
+test('seeded random data produces exact native, Immutable.js, Immer, shared, and reference results', async () => {
   let state = 0x51f15e;
   const random = () => { state ^= state << 13; state ^= state >>> 17; state ^= state << 5; return state >>> 0; };
   const sizes = [0, 1, 31, 32, 33, 1023, 1024, 1025, ...Array.from({ length: 32 }, () => random() % 257)];
@@ -53,17 +54,20 @@ test('seeded random data produces exact native, Immutable.js, shared, and refere
     const first = Object.fromEntries(FIELDS.map(field => [field, columns[field].slice(0, cut)]));
     const delta = Object.fromEntries(FIELDS.map(field => [field, columns[field].slice(cut)]));
     const saved = fromColumns(first), immutable = appendImmutable(saved, delta);
+    const savedImmer = fromImmerColumns(first), immer = appendImmer(savedImmer, delta);
     const shared = appendShared(emptyShared(), columns);
     const query = { term: ['', 'timeout', '日本', '🚦'][random() % 4], service: random() % (SERVICES.length + 1) - 1, level: random() % 4 - 1, offset: random() % 3, limit: 13 };
     const queries = [{}, query, { term: 'absent' }, { from: 1_700_000_000_017, to: 1_700_000_000_170, offset: 1, limit: 3 }];
     for (const q of queries) {
       const expected = reference(columns, q);
-      for (const view of [nativeView(columns), immutableView(immutable), sharedView(shared)]) {
+      for (const view of [nativeView(columns), immutableView(immutable), immerView(immer), sharedView(shared)]) {
         const found = await search(view, q), summary = await summarizeEvents(view, q);
         verifyAnswer({ search: found, summary, rows: found.indices.map(index => rowAt(view, index)) }, expected);
       }
     }
     assert.deepEqual(transportColumns(saved), first, 'Random append changed a retained root');
     assert.deepEqual(transportColumns(immutable), columns);
+    assert.deepEqual(savedImmer, first, 'Random append changed a retained Immer root');
+    assert.deepEqual(immer, columns);
   }
 });

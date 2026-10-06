@@ -46,22 +46,24 @@ try {
             await peer.request('append', { columns: generateColumns(1000, 2000) });
             const answer = await peer.request('query', { role: 'search', count: 3000, query: {} });
             if (answer.search.total !== 3000) throw new Error('Native reader returned the wrong count');
-            await peer.request('prepare-immutable');
-            await peer.request('immutable-init', { columns: generateColumns(0, 1000) });
-            await peer.request('retain', { enabled: true });
-            await peer.request('immutable-append', { columns: generateColumns(1000, 2000) });
-            const frozen = await peer.request('query', { role: 'search', count: 1000, query: {} });
-            if (frozen.search.total !== 1000) throw new Error('Immutable.js lost its retained root');
-            // Full replacement must also preserve the frozen root.
-            await peer.request('immutable-init', { columns: generateColumns(0, 5000) });
-            const replaced = await peer.request('query', { role: 'search', count: 1000, query: {} });
-            if (replaced.search.total !== 1000) throw new Error('Full replication lost the retained root');
-            await peer.request('retain', { enabled: false });
-            const live = await peer.request('query', { role: 'search', count: 5000, query: {} });
-            if (live.search.total !== 5000) throw new Error('Immutable.js did not resume live');
+            for (const path of ['immutable', 'immer']) {
+              await peer.request('prepare-' + path);
+              await peer.request(path + '-init', { columns: generateColumns(0, 1000) });
+              await peer.request('retain', { enabled: true });
+              await peer.request(path + '-append', { columns: generateColumns(1000, 2000) });
+              const frozen = await peer.request('query', { role: 'search', count: 1000, query: {} });
+              if (frozen.search.total !== 1000) throw new Error(path + ' lost its retained root');
+              // Full replacement must also preserve the frozen root.
+              await peer.request(path + '-init', { columns: generateColumns(0, 5000) });
+              const replaced = await peer.request('query', { role: 'search', count: 1000, query: {} });
+              if (replaced.search.total !== 1000) throw new Error(path + ' full replication lost the retained root');
+              await peer.request('retain', { enabled: false });
+              const live = await peer.request('query', { role: 'search', count: 5000, query: {} });
+              if (live.search.total !== 5000) throw new Error(path + ' did not resume live');
+            }
           } finally { peer.close(); }
         });
-        assert.equal(libraryRequests, 0, 'Native and Immutable.js readers must not depend on the WASM engine');
+        assert.equal(libraryRequests, 0, 'Native, Immutable.js, and Immer readers must not depend on the WASM engine');
         await context.unroute('**/library/**');
       }
       for (const size of ['1000', '100000', '1000']) {
@@ -73,6 +75,8 @@ try {
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), size);
         assert.equal(await page.locator('#copies-immutable').innerText(), await page.locator('#copies-native').innerText());
         assert.equal(await page.locator('#matches-immutable').innerText(), await page.locator('#matches-native').innerText());
+        assert.equal(await page.locator('#copies-immer').innerText(), await page.locator('#copies-native').innerText());
+        assert.equal(await page.locator('#matches-immer').innerText(), await page.locator('#matches-native').innerText());
         await page.locator('#compare-freeze').click(); await complete(Number(size) + 2000);
         await page.locator('#compare-stop').click();
         assert.equal(await page.locator('#compare-count').getAttribute('data-count'), '0');
