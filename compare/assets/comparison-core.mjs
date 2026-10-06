@@ -1,6 +1,6 @@
 import { FIELDS, MAX_EVENTS, normalizeQuery, validateColumns } from './explorer-core.mjs';
 
-export const PATHS = ['shared', 'immutable', 'native'];
+export const PATHS = ['shared', 'immutable', 'immer', 'native'];
 export const READER_COUNT = 2;
 export const COMPARISON_MODES = ['incremental', 'full'];
 export function validateMode(mode) {
@@ -15,6 +15,7 @@ export function transferCounts({ total, appended = 0, initial = false, mode = 'i
   return {
     shared: { clonedEvents: 0, publishedSnapshots: frozen ? 0 : READER_COUNT },
     immutable: { clonedEvents: (initial || mode === 'full' ? total : appended) * READER_COUNT, publishedSnapshots: READER_COUNT },
+    immer: { clonedEvents: (initial || mode === 'full' ? total : appended) * READER_COUNT, publishedSnapshots: READER_COUNT },
     native: { clonedEvents: (initial || mode === 'full' ? total : appended) * READER_COUNT, publishedSnapshots: READER_COUNT },
   };
 }
