@@ -62,7 +62,7 @@ For a host with response-header configuration, deploy `_site/` and apply its `_h
 
 Shared memory requires HTTPS (or localhost) and cross-origin isolation. This is a browser security rule, not a permission prompt. A host that sends COOP/COEP headers makes a demo ready on the first response: no service worker and no reload are needed. The generated `_headers` file is suitable for hosts that support that format; GitHub Pages does not apply it.
 
-On GitHub Pages, each demo prepares itself automatically. It registers a network-only service worker scoped to that demo path and waits until that worker is active. Setup also observes `navigator.serviceWorker.ready`, checking the exact scope and script, to recover when registration views or lifecycle events are stale. A new navigation uses the active registration even when another tab installed it and the current page was not claimed. The worker adds isolation headers to same-origin responses without caching data. A first visit then refreshes once. Return visits normally need no setup refresh. The comparison still waits for **Load all three paths**; setup does not allocate datasets or start benchmarks.
+On GitHub Pages, each demo prepares itself automatically. It registers a network-only service worker scoped to that demo path and waits until that worker is active. Setup also observes `navigator.serviceWorker.ready`, checking the exact scope and script, to recover when registration views or lifecycle events are stale. A new navigation uses the active registration even when another tab installed it and the current page was not claimed. The worker adds isolation headers to same-origin responses without caching data. A first visit then refreshes once. Return visits normally need no setup refresh. The comparison still waits for **Load all four paths**; setup does not allocate datasets or start benchmarks.
 
 A temporary `__zerocopy_isolation` query marker limits setup to one automatic navigation, even when cookies or browser storage are blocked. The marker is removed after success; other query parameters and the fragment are retained. A failed attempt does not reload repeatedly. **Retry setup** appears only after failure when another attempt could help. Registration and activation share a 12-second deadline. The next document must report actual cross-origin isolation before the demo is enabled. Late completion after a timeout cannot trigger a reload. Unknown or unrelated service workers are not removed.
 
@@ -129,9 +129,9 @@ Google controls crawl timing, indexing, and ranking. Metadata and a sitemap do n
 
 ## Side-by-side comparison
 
-The `/compare/` route runs **zerocopy, Immutable.js, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all three views.
+The `/compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
 
-Both replica baselines use incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. All three can retain this append-only stream: zerocopy and Immutable.js keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
+All three replica baselines use incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. All four can retain this append-only stream: zerocopy, Immutable.js, and Immer keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
 
 The transport counter reports logical event deliveries to worker replicas. It does not measure bytes, retained heap, or result-message traffic. Shared mode still sends descriptors, allocates wrappers, and decodes strings. Timing reports show publication/attachment and query completion separately. Owner construction and append work, startup, and DOM rendering are not included. Concurrent timings can be affected by CPU contention; use the rotated four-architecture benchmark for controlled samples.
 
@@ -141,7 +141,7 @@ A single active operation and one latest pending query bound work. Live ingestio
 
 The comparison is tested in real Chromium and Playwright WebKit, including 1,000-event startup, 100,000-event loading, Stop/restart, and no-header hosting. This is engine coverage, not a claim of testing every iPhone model. Preview publication waits for the WebKit check.
 
-The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native and Immutable.js comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
+The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native, Immutable.js, and Immer comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
 
 Nested demo workers use a small local ES module wrapper. This lets them inherit the parent worker's isolation on WebKit while importing the original worker module. The wrapper URL is released with the worker. Hosts with a custom Content Security Policy must permit `blob:` in `worker-src` for these nested demos.
 
@@ -151,13 +151,15 @@ Nested demo workers use a small local ES module wrapper. This lets them inherit 
 
 The build copies the root package's exact pinned `immutable` dependency, upstream ESM distribution, and MIT license into the site. The version is included in `build.json` and both raw exports. There is no CDN dependency and no handwritten substitute for Immutable.js. The package is used only by the demos, not by the zerocopy runtime.
 
-All three live implementations use five columns of primitive values. Immutable.js uses one `List` per column, `withMutations` for batch appends, and direct `get` calls during queries. The owner and both readers hold real Lists. The frozen view retains actual roots, including when a full replica replacement arrives. No full `toJS()` or array conversion occurs during a query.
+All four live implementations use five columns of primitive values. Immutable.js uses one `List` per column, `withMutations` for batch appends, and direct `get` calls during queries. The owner and both readers hold real Lists. The frozen view retains actual roots, including when a full replica replacement arrives. No full `toJS()` or array conversion occurs during a query.
 
 Immutable.js shares structure between versions within a worker, not the JavaScript heap between workers. Publication encodes the initial columns, or only the appended suffix, with `toArray()`. It then structured-clones those columns and reconstructs or appends Lists in each reader. Encoding and reconstruction are included in publish time. The copy counter counts event deliveries, not retained nodes, bytes, or memory savings.
 
+Immer uses the existing pinned upstream ESM package and MIT license, with its version in the live export. The owner and readers hold frozen native-array columns. Appends use one `produce` batch with default auto-freezing, copying the changed arrays while preserving the retained root. Full publication structured-clones the frozen columns and freezes each receiver without another full copy. Incremental publication sends the generated delta and runs `produce` in each receiver. Reader-side freezing and updates are timed; owner-side appends are not. Queries read the frozen arrays directly. The recorded Node.js memory tables do not include Immer.
+
 The controlled investigation benchmark has four paths: shared snapshots, Immutable.js incremental replicas, native incremental replicas, and one native data owner. It keeps two warm-ups, seven measured samples, rotated path order, separate phase timings, and independent output checks. Immutable.js owner appends and delta encoding are included in the update phase. Initial input generation and List construction are reported separately.
 
-Exports use `zerocopy-live-comparison/v2` and `zerocopy-investigation-benchmark/v2`. The controlled benchmark retains 28 measured path records. Historical benchmark files are unchanged. Tests cover seeded random columns, Unicode messages, tree-size boundaries, exact rows and aggregates, retained roots, both replication modes, and Chromium/WebKit isolation and restart flows.
+Exports use `zerocopy-live-comparison/v3` (four live paths) and `zerocopy-investigation-benchmark/v2`. The controlled benchmark retains 28 measured path records. Historical benchmark files are unchanged. Tests cover seeded random columns, Unicode messages, tree-size boundaries, exact rows and aggregates, retained roots, both replication modes, and Chromium/WebKit isolation and restart flows.
 
 ### Query scheduling and batch updates
 

@@ -44,7 +44,7 @@ routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
 // A controlled page is not sufficient: dedicated worker entry URLs and their
 // dependencies must also be inside the service worker's demo scope.
 const demoScripts = new Map([
-  ['compare/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
+  ['compare/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'immer-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
   ['lab/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs', 'bench-maps.mjs']],
   ['explorer/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'immutable-storage.mjs']],
   ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
@@ -76,8 +76,8 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', 'zerocopy: Zero-copy immutable collections for JavaScript and TypeScript', 'Share immutable maps, lists, and sets across Web Workers with SharedArrayBuffer and WebAssembly. Local reads, stable snapshots, and no dataset cloning.', home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
-writePage('compare/', 'zerocopy vs Immutable.js vs native', 'Run shared snapshots, Immutable.js Lists, and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
-writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Compare zerocopy, Immutable.js, and native arrays →</a></p><div class="explorer-setup">`), 'explorer.mjs');
+writePage('compare/', 'zerocopy vs Immutable.js vs Immer vs native', 'Run shared snapshots, Immutable.js Lists, Immer arrays, and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
+writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Compare zerocopy, Immutable.js, Immer, and native arrays →</a></p><div class="explorer-setup">`), 'explorer.mjs');
 writePage('investigation-benchmark/', 'Compare four investigation architectures', 'Measure shared snapshots, Immutable.js Lists, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
 writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');

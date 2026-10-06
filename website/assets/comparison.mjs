@@ -82,8 +82,8 @@ function render(value) {
   for (const path of PATHS) showLane(path, value.results[path]);
   if (value.results.shared.rows.length) inspect(value.results.shared.rows[0].index);
   else for (const path of PATHS) $(`detail-${path}`).textContent = 'No matching event.';
-  $('compare-page').textContent = `${number(offset + (value.results.shared.rows.length ? 1 : 0))}–${number(offset + value.results.shared.rows.length)} of ${number(value.results.shared.search.total)} matches on all three paths`;
-  $('compare-construction').textContent = `Input generation: ${ms(value.construction.nativeBuildMs)}. Immutable.js ${value.dependencies.immutable} List construction from that input: ${ms(value.construction.immutableBuildMs)}. Shared generation + construction + cooperative yields: ${ms(value.construction.sharedBuildMs)}. These are not equal-operation timings.`;
+  $('compare-page').textContent = `${number(offset + (value.results.shared.rows.length ? 1 : 0))}–${number(offset + value.results.shared.rows.length)} of ${number(value.results.shared.search.total)} matches on all four paths`;
+  $('compare-construction').textContent = `Input generation: ${ms(value.construction.nativeBuildMs)}. Immutable.js ${value.dependencies.immutable} List construction from that input: ${ms(value.construction.immutableBuildMs)}. Immer ${value.dependencies.immer} array construction and freezing: ${ms(value.construction.immerBuildMs)}. Shared generation + construction + cooperative yields: ${ms(value.construction.sharedBuildMs)}. These are not equal-operation timings.`;
 }
 function scheduleStream() {
   clearTimeout(timer);
@@ -104,7 +104,7 @@ async function execute(job) {
     const answer = await peer.request(job.type, { ...job.extra, query: job.query });
     if (current !== generation) return;
     loaded = true;
-    if (job.intent === intent) { render(answer); $('compare-status').textContent = 'Complete. All three paths ran real work; all outputs match.'; }
+    if (job.intent === intent) { render(answer); $('compare-status').textContent = 'Complete. All four paths ran real work; all outputs match.'; }
   } catch (error) { if (current === generation) stop(`Comparison stopped: ${error.message}`); }
   finally {
     if (current === generation) {
@@ -134,7 +134,7 @@ $('compare-next').addEventListener('click', () => { offset += PAGE_SIZE; enqueue
 $('compare-stop').addEventListener('click', () => stop());
 $('compare-export').addEventListener('click', () => {
   if (!last) return;
-  const result = { schema: 'zerocopy-live-comparison/v2', sourceCommit: document.body.dataset.source, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, ...last };
+  const result = { schema: 'zerocopy-live-comparison/v3', sourceCommit: document.body.dataset.source, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, ...last };
   const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'zerocopy-live-comparison.json'; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
