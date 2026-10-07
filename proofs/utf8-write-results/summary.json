@@ -1,0 +1,370 @@
+{
+  "schema": "zerocopy-utf8-write-summary/v1",
+  "date": "2026-10-07T04:40:34.319923+00:00",
+  "rounds": 3,
+  "buildSha256": {
+    "before": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "after": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f"
+  },
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "platform": "linux",
+  "arch": "x64",
+  "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+  "processIsolation": "One fresh process per runtime, workload, variant, and round; full GC after setup before each timed sample. Alternate variant order across workloads and rounds. Compare all stored payloads, descriptors, used bytes, and backing sizes across variants.",
+  "rows": [
+    {
+      "runtime": "Node v22.23.2",
+      "name": "map-json-set",
+      "operations": 5000,
+      "before": {
+        "medianMs": 16.428562000000056,
+        "p95Ms": 22.731033800000066,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 12.660683000000063,
+        "p95Ms": 19.62797900000005,
+        "samples": 45
+      },
+      "speedup": 1.2976047184816155,
+      "roundSpeedups": [
+        1.3060294609937362,
+        1.358291686675307,
+        1.2308548095160219
+      ],
+      "usedBytes": 1081588,
+      "backingBytes": 1179648,
+      "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "map-json-setMany",
+      "operations": 5000,
+      "before": {
+        "medianMs": 12.694491999999855,
+        "p95Ms": 17.33977820000009,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 10.870642000000089,
+        "p95Ms": 16.433796599999916,
+        "samples": 45
+      },
+      "speedup": 1.167777579281863,
+      "roundSpeedups": [
+        1.2606067996644443,
+        1.0343098206701966,
+        1.1301138158797432
+      ],
+      "usedBytes": 831760,
+      "backingBytes": 917504,
+      "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "map-json-update",
+      "operations": 5000,
+      "before": {
+        "medianMs": 16.421434999999747,
+        "p95Ms": 20.716443400000205,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 11.653186999999889,
+        "p95Ms": 15.120456600000123,
+        "samples": 45
+      },
+      "speedup": 1.4091797376974988,
+      "roundSpeedups": [
+        1.3605752661884185,
+        1.4706663560053441,
+        1.3378851114716688
+      ],
+      "usedBytes": 1916440,
+      "backingBytes": 2031616,
+      "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "list-json-push",
+      "operations": 5000,
+      "before": {
+        "medianMs": 15.716216000000031,
+        "p95Ms": 19.36978580000009,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 8.919407000000092,
+        "p95Ms": 14.840639200000032,
+        "samples": 45
+      },
+      "speedup": 1.7620247624085177,
+      "roundSpeedups": [
+        1.3193902871940348,
+        1.835217681405959,
+        1.851047272537276
+      ],
+      "usedBytes": 1364704,
+      "backingBytes": 1441792,
+      "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "list-4k-push",
+      "operations": 512,
+      "before": {
+        "medianMs": 4.598864000000049,
+        "p95Ms": 8.171178799999984,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 2.470058999999992,
+        "p95Ms": 7.008404799999991,
+        "samples": 45
+      },
+      "speedup": 1.86184378591769,
+      "roundSpeedups": [
+        1.3473623694070538,
+        2.2854086908062032,
+        1.610900792248284
+      ],
+      "usedBytes": 2170752,
+      "backingBytes": 2293760,
+      "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "control-list-number",
+      "operations": 5000,
+      "before": {
+        "medianMs": 1.1417239999999538,
+        "p95Ms": 3.099558000000001,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 1.045697999999959,
+        "p95Ms": 2.4694292000000018,
+        "samples": 45
+      },
+      "speedup": 1.0918295722091833,
+      "roundSpeedups": [
+        0.7183597247067279,
+        1.8127853350701024,
+        1.1821450869583394
+      ],
+      "usedBytes": 75968,
+      "backingBytes": 196608,
+      "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "control-list-repeated",
+      "operations": 5000,
+      "before": {
+        "medianMs": 1.2175880000000348,
+        "p95Ms": 2.429989999999998,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 1.3185849999999846,
+        "p95Ms": 3.7767860000000137,
+        "samples": 45
+      },
+      "speedup": 0.9234050137079134,
+      "roundSpeedups": [
+        1.0039507663785043,
+        0.8593336484090017,
+        0.9434939413104108
+      ],
+      "usedBytes": 76320,
+      "backingBytes": 196608,
+      "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "map-json-set",
+      "operations": 5000,
+      "before": {
+        "medianMs": 13.256575999999995,
+        "p95Ms": 27.386076799999753,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 13.91173700000013,
+        "p95Ms": 27.889575000000047,
+        "samples": 45
+      },
+      "speedup": 0.9529058808400325,
+      "roundSpeedups": [
+        0.8942054468108438,
+        0.8525451452761498,
+        1.1155618575267956
+      ],
+      "usedBytes": 1081588,
+      "backingBytes": 1179648,
+      "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "map-json-setMany",
+      "operations": 5000,
+      "before": {
+        "medianMs": 7.833250000000135,
+        "p95Ms": 11.097332400000045,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 8.322717000000011,
+        "p95Ms": 14.837166400000012,
+        "samples": 45
+      },
+      "speedup": 0.9411890371858281,
+      "roundSpeedups": [
+        1.0776524879479257,
+        0.8371942373783164,
+        0.8403457986240302
+      ],
+      "usedBytes": 831760,
+      "backingBytes": 917504,
+      "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "map-json-update",
+      "operations": 5000,
+      "before": {
+        "medianMs": 14.592959999999948,
+        "p95Ms": 24.07976420000013,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 13.899202999999943,
+        "p95Ms": 26.184961599999944,
+        "samples": 45
+      },
+      "speedup": 1.0499134374827108,
+      "roundSpeedups": [
+        1.254649007439941,
+        0.9142131997860715,
+        0.9548243132842523
+      ],
+      "usedBytes": 1916440,
+      "backingBytes": 2031616,
+      "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "list-json-push",
+      "operations": 5000,
+      "before": {
+        "medianMs": 12.01001499999984,
+        "p95Ms": 18.922567399999974,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 12.503645000000006,
+        "p95Ms": 17.722774200000185,
+        "samples": 45
+      },
+      "speedup": 0.9605211120437147,
+      "roundSpeedups": [
+        1.0411253913105063,
+        0.9610902264064951,
+        0.8728452261313443
+      ],
+      "usedBytes": 1364704,
+      "backingBytes": 1441792,
+      "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "list-4k-push",
+      "operations": 512,
+      "before": {
+        "medianMs": 11.292180999999971,
+        "p95Ms": 19.208702599999988,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 7.2556469999999536,
+        "p95Ms": 12.243393400000011,
+        "samples": 45
+      },
+      "speedup": 1.556329986836466,
+      "roundSpeedups": [
+        1.9105293334862226,
+        1.3218897799641711,
+        1.765252518882478
+      ],
+      "usedBytes": 2170752,
+      "backingBytes": 2293760,
+      "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "control-list-number",
+      "operations": 5000,
+      "before": {
+        "medianMs": 0.4685000000000059,
+        "p95Ms": 0.7080504000000187,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 0.38630399999999554,
+        "p95Ms": 1.0133589999999961,
+        "samples": 45
+      },
+      "speedup": 1.2127754307488696,
+      "roundSpeedups": [
+        1.0807087633939048,
+        0.848893888263957,
+        1.1419739173354306
+      ],
+      "usedBytes": 75968,
+      "backingBytes": 196608,
+      "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f"
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "control-list-repeated",
+      "operations": 5000,
+      "before": {
+        "medianMs": 0.536564999999996,
+        "p95Ms": 1.2502345999999873,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 0.500079999999997,
+        "p95Ms": 1.3948340000000026,
+        "samples": 45
+      },
+      "speedup": 1.0729583266677316,
+      "roundSpeedups": [
+        1.4696917940297967,
+        1.0611585010277549,
+        0.8885342937117177
+      ],
+      "usedBytes": 76320,
+      "backingBytes": 196608,
+      "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4"
+    }
+  ],
+  "recovery": {
+    "manifest": "recovery/manifest.json",
+    "reason": "The completed original benchmark summary contained all three paired rounds, but node-1.json retained only 13 of 14 raw variant reports; the final after/control-list-repeated report was absent. Rerun the complete Node round 1 repeated-string pair once to recover inspectable raw evidence. This replaces both variants for that pair; it is not timing-based sample selection. Original node-1.json and summary.json are preserved.",
+    "originalSummary": "recovery/originals/summary.json",
+    "replaced": {
+      "runtime": "Node v22.23.2",
+      "name": "control-list-repeated",
+      "round": 0
+    },
+    "rawPaths": [
+      "node-1.json",
+      "node-2.json",
+      "node-3.json",
+      "bun-1.json",
+      "bun-2.json",
+      "bun-3.json"
+    ]
+  }
+}

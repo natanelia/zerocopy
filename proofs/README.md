@@ -4,6 +4,7 @@ The [README](../README.md#performance) compares zerocopy with Immutable.js and n
 
 | Report | Comparison |
 | --- | --- |
+| [UTF-8 value writes](utf8-write-performance.md) | Reuse a portable encoding buffer; matched Node and Bun rounds, October 7, 2026 |
 | [Scalar map writes](map-set-performance.md) | Three libraries and a paired writer-index experiment, September 14, 2026 |
 | [Revision performance](revision-performance.md) | Block-storage revision against earlier zerocopy versions, September 13, 2026 |
 | [Recorded evidence](results/README.md) | Source hashes, raw rounds, summaries, and verification records |

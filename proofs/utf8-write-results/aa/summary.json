@@ -1,0 +1,88 @@
+{
+  "schema": "zerocopy-utf8-write-summary/v1",
+  "date": "2026-10-07T04:21:02.324Z",
+  "rounds": 3,
+  "buildSha256": {
+    "before": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "after": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475"
+  },
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "platform": "linux",
+  "arch": "x64",
+  "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+  "processIsolation": "One fresh process per runtime, workload, variant, and round; full GC after setup before each timed sample. Alternate variant order across workloads and rounds. Compare all stored payloads, descriptors, used bytes, and backing sizes across variants.",
+  "rows": [
+    {
+      "runtime": "Node v22.23.2",
+      "name": "control-map-ascii",
+      "operations": 5000,
+      "before": {
+        "medianMs": 3.819539999999961,
+        "p95Ms": 7.860749799999982,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 3.5837060000000065,
+        "p95Ms": 5.654278000000019,
+        "samples": 45
+      },
+      "speedup": 1.0658072955761309,
+      "roundSpeedups": [
+        1.5190603035162908,
+        1.0832815196070427,
+        0.8950204771650075
+      ],
+      "usedBytes": 662468,
+      "backingBytes": 786432,
+      "payloadSha256": "122092174b3ea82a8d56fecb5220dc9199c3c031fee35db67b70659f17e469eb"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "control-list-number",
+      "operations": 5000,
+      "before": {
+        "medianMs": 0.9968119999999772,
+        "p95Ms": 3.0360170000000246,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 1.0576550000000111,
+        "p95Ms": 3.241520199999977,
+        "samples": 45
+      },
+      "speedup": 0.9424736799806805,
+      "roundSpeedups": [
+        1.0122213228813353,
+        0.9101568741673662,
+        1.0893113787359032
+      ],
+      "usedBytes": 75968,
+      "backingBytes": 196608,
+      "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f"
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "control-list-repeated",
+      "operations": 5000,
+      "before": {
+        "medianMs": 1.0159649999999942,
+        "p95Ms": 3.696244200000012,
+        "samples": 45
+      },
+      "after": {
+        "medianMs": 1.1299280000000067,
+        "p95Ms": 3.8026783999999885,
+        "samples": 45
+      },
+      "speedup": 0.8991413612194655,
+      "roundSpeedups": [
+        0.9647478075441647,
+        1.1408952826734744,
+        0.8373796038783239
+      ],
+      "usedBytes": 76320,
+      "backingBytes": 196608,
+      "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4"
+    }
+  ]
+}

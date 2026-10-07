@@ -1,0 +1,2954 @@
+[
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:06.039Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-set",
+        "collection": "SharedMap",
+        "type": "object",
+        "operations": 5000,
+        "medianMs": 16.33765900000003,
+        "p95Ms": 18.300788899999812,
+        "records": [
+          {
+            "ms": 16.33765900000003,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.26570599999991,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.871253000000024,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.48889199999985,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.428562000000056,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.46643199999994,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.41002400000025,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 20.195214999999735,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.094367000000148,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.696474999999737,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.391857999999957,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.9518479999997,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.18882399999984,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 13.149179999999888,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.456972999999834,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:08.668Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-set",
+        "collection": "SharedMap",
+        "type": "object",
+        "operations": 5000,
+        "medianMs": 13.273424999999861,
+        "p95Ms": 20.128844699999988,
+        "records": [
+          {
+            "ms": 9.277826999999888,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 19.798424999999952,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 10.265128999999888,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.406547000000046,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 20.89982400000008,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 19.77687100000003,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.483142999999927,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.31465100000014,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.596567999999934,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.823943000000327,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.661837999999989,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 13.273424999999861,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.086880000000292,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.660683000000063,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 19.03241100000014,
+            "usedBytes": 1081588,
+            "backingBytes": 1179648,
+            "payloadSha256": "8e1b9ebae6a6f74571a96277722921adf29d96079b82b3f75395659049732ed7",
+            "descriptor": {
+              "root": 1147112,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:11.624Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-setMany",
+        "collection": "SharedMap",
+        "type": "object",
+        "bulk": true,
+        "operations": 5000,
+        "medianMs": 11.280324000000064,
+        "p95Ms": 15.43133909999983,
+        "records": [
+          {
+            "ms": 13.290333000000146,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 10.697090000000117,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.442745999999943,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.167123000000174,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 13.961505999999872,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.106382000000167,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 10.510978000000023,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.631841999999779,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 9.958127000000104,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.997878999999784,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 8.042556999999988,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 7.820623000000069,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 8.125357000000122,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.280324000000064,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 8.254435999999941,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:13.570Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-setMany",
+        "collection": "SharedMap",
+        "type": "object",
+        "bulk": true,
+        "operations": 5000,
+        "medianMs": 12.748049999999921,
+        "p95Ms": 20.798382700000058,
+        "records": [
+          {
+            "ms": 12.626211000000012,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.53426300000001,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.58416299999999,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 28.670141000000058,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.596515999999838,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.753870000000006,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.63691000000017,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.649841999999808,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.999803000000156,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.734525000000076,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.424772000000075,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.44674400000008,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.748049999999921,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.871467999999822,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.541502000000037,
+            "usedBytes": 831760,
+            "backingBytes": 917504,
+            "payloadSha256": "8ab6822a71961dcd3f839e5773bf84f46eea8fe25be1d1ff4a5316daa018c264",
+            "descriptor": {
+              "root": 897224,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:15.666Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-update",
+        "collection": "SharedMap",
+        "type": "object",
+        "update": true,
+        "operations": 5000,
+        "medianMs": 16.938454999999976,
+        "p95Ms": 30.537700499999968,
+        "records": [
+          {
+            "ms": 26.60104799999999,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.938454999999976,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 17.455785000000105,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.18353500000012,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.331046000000242,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.274651000000176,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.953217000000222,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 39.72322299999996,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.825672999999824,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 18.208529,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 18.71016800000052,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.445134999999937,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 15.31656700000076,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 18.50386200000048,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 18.265160999999352,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:20.328Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "map-json-update",
+        "collection": "SharedMap",
+        "type": "object",
+        "update": true,
+        "operations": 5000,
+        "medianMs": 12.660619999999653,
+        "p95Ms": 17.56610079999991,
+        "records": [
+          {
+            "ms": 15.241139000000203,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 10.279267999999774,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 19.964732000000367,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 13.070126999999957,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 10.321451999999681,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.660619999999653,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 16.538115999999718,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.72159899999997,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 14.637726999999813,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 13.778999999999996,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 9.25108199999977,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.373411000000033,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.571799000000283,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 12.371438999999555,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          },
+          {
+            "ms": 11.667529000000286,
+            "usedBytes": 1916440,
+            "backingBytes": 2031616,
+            "payloadSha256": "314297ecf323e758ebb07e5f998675738013c4370603a5c5c6a3ec59d8b1f8b4",
+            "descriptor": {
+              "root": 1981964,
+              "valueType": "object",
+              "size": 5000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:24.780Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "list-json-push",
+        "collection": "SharedList",
+        "type": "object",
+        "operations": 5000,
+        "medianMs": 8.919407000000092,
+        "p95Ms": 10.963708000000041,
+        "records": [
+          {
+            "ms": 8.268268000000035,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.291905000000042,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.874317999999903,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 10.615447000000131,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.75695799999994,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 10.065181999999822,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 9.530416999999943,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.139650999999958,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.58121099999994,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 9.098762999999963,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 10.118235999999797,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 8.919407000000092,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 11.776316999999835,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 9.425534999999854,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 7.956401000000142,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:26.821Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "list-json-push",
+        "collection": "SharedList",
+        "type": "object",
+        "operations": 5000,
+        "medianMs": 16.510244000000057,
+        "p95Ms": 19.291197800000123,
+        "records": [
+          {
+            "ms": 15.516802999999982,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 16.86387599999989,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 17.057665000000043,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 17.222418999999945,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 16.257857000000058,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 19.244045000000142,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 15.27420600000005,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 15.820075000000088,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 19.018182999999908,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 15.807136999999784,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 14.16694299999972,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 16.510244000000057,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 19.401221000000078,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 14.239223999999922,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          },
+          {
+            "ms": 18.55287700000008,
+            "usedBytes": 1364704,
+            "backingBytes": 1441792,
+            "payloadSha256": "39b8a0bf927cf2c100ab88b46ed3e8c2cb968965e0f7738d2929348c849ce024",
+            "descriptor": {
+              "root": 1428744,
+              "depth": 2,
+              "size": 5000,
+              "type": "object",
+              "tail": 1430176
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:29.289Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "list-4k-push",
+        "collection": "SharedList",
+        "type": "string",
+        "textLength": 4096,
+        "limit": 512,
+        "operations": 512,
+        "medianMs": 3.9790199999999913,
+        "p95Ms": 7.224354900000002,
+        "records": [
+          {
+            "ms": 3.1475619999999935,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 5.070975000000033,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 4.598864000000049,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.9432390000000623,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.8568760000000566,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 5.113750999999979,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 4.800118999999995,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 6.3049029999999675,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.610343000000057,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 6.796059000000014,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.9790199999999913,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.8675649999998996,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.2905660000000125,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 8.223711999999978,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.8895690000000513,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:30.022Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "list-4k-push",
+        "collection": "SharedList",
+        "type": "string",
+        "textLength": 4096,
+        "limit": 512,
+        "operations": 512,
+        "medianMs": 2.470058999999992,
+        "p95Ms": 7.735681099999988,
+        "records": [
+          {
+            "ms": 2.3210540000000037,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 1.8781910000000153,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 4.109524000000022,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.1995999999999754,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.1574549999999704,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 7.732393999999999,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 3.6314990000000194,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.313782999999944,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.3381069999999227,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 7.7433509999999615,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 4.745281999999975,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.9468709999999874,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.857018000000039,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.3129840000000286,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          },
+          {
+            "ms": 2.470058999999992,
+            "usedBytes": 2170752,
+            "backingBytes": 2293760,
+            "payloadSha256": "6794215d630438e0c8398a4ff54db3dbe8eb4eb6f9c9d6ad8ecbd91a71e51517",
+            "descriptor": {
+              "root": 2104712,
+              "depth": 1,
+              "size": 512,
+              "type": "string",
+              "tail": 2236032
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:30.639Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "control-list-number",
+        "collection": "SharedList",
+        "type": "number",
+        "operations": 5000,
+        "medianMs": 0.9658069999999839,
+        "p95Ms": 2.59300029999997,
+        "records": [
+          {
+            "ms": 0.7599179999999706,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.5003790000000095,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.936239999999998,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.5427189999999769,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.8373760000000061,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.8952429999999936,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 2.248506999999961,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.4052699999999732,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.7645410000000084,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.4383589999999913,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 3.396817999999996,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.946661000000006,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.1347840000000247,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.9658069999999839,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.8000430000000165,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:31.101Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "control-list-number",
+        "collection": "SharedList",
+        "type": "number",
+        "operations": 5000,
+        "medianMs": 1.1417239999999538,
+        "p95Ms": 1.6695372000000066,
+        "records": [
+          {
+            "ms": 1.117052000000001,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.1335990000000038,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.378893000000005,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.303453999999988,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.3350710000000277,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.0031260000000088,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.059974000000011,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.9817450000000463,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 2.347707000000014,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.1195840000000317,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.191395,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 0.9840500000000247,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.2361590000000433,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.1417239999999538,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          },
+          {
+            "ms": 1.1857510000000389,
+            "usedBytes": 75968,
+            "backingBytes": 196608,
+            "payloadSha256": "d330ab24cebb6ee17efa76a372936d60e503b2c6aa9d23cd4a161879a2dce21f",
+            "descriptor": {
+              "root": 141184,
+              "depth": 2,
+              "size": 5000,
+              "type": "number",
+              "tail": 141440
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:31.617Z",
+    "variant": "before",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+    "buildSha256": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "control-list-repeated",
+        "collection": "SharedList",
+        "type": "string",
+        "repeated": true,
+        "operations": 5000,
+        "medianMs": 0.9726629999999545,
+        "p95Ms": 2.4493380999999803,
+        "records": [
+          {
+            "ms": 1.0507460000000037,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.8972179999999526,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 4.067183,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9726629999999545,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9156209999999874,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9104049999999688,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.3533049999999776,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9163660000000391,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9285070000000246,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9088040000000319,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.021690000000035,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.7559759999999756,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.0108960000000025,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9065929999999867,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.2175880000000348,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema": "zerocopy-utf8-write-case/v1",
+    "date": "2026-10-07T04:34:32.102Z",
+    "variant": "after",
+    "round": 2,
+    "runtime": "Node v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "count": 5000,
+    "samples": 15,
+    "warmups": 20,
+    "entry": "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+    "buildSha256": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "method": "One library version and workload per process. Prebuilt fixtures; fresh arena before every run. Setup, full GC, validation, and SHA256 outside timing. Final values and retained roots checked after every warm-up and sample. No timing threshold.",
+    "cases": [
+      {
+        "name": "control-list-repeated",
+        "collection": "SharedList",
+        "type": "string",
+        "repeated": true,
+        "operations": 5000,
+        "medianMs": 1.0309159999999906,
+        "p95Ms": 2.5741493999999903,
+        "records": [
+          {
+            "ms": 0.9043330000000083,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9584939999999733,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.6131179999999858,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9105799999999817,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.8993090000000166,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.0185089999999946,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.7816550000000007,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.545236999999986,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.0766169999999988,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.0309159999999906,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.4842520000000263,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 4.423302999999976,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 1.6162260000000401,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.9877619999999752,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          },
+          {
+            "ms": 0.8846970000000169,
+            "usedBytes": 76320,
+            "backingBytes": 196608,
+            "payloadSha256": "5c23abc068523754c99aa31c30781e287c42a6aec392091253d648de121320c4",
+            "descriptor": {
+              "root": 141536,
+              "depth": 2,
+              "size": 5000,
+              "type": "string",
+              "tail": 141792
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

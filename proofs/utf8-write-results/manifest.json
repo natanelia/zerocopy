@@ -1,0 +1,75 @@
+{
+  "schema": "zerocopy-utf8-write-provenance/v1",
+  "date": "2026-10-07T04:42:24.187592+00:00",
+  "baselineCommit": "c3c45821a00030e5dd72ea4af5c9d3d51f96d836",
+  "productionSourceSha256": {
+    "before": {
+      "arena.ts": "734b38285ffc5312f79ae585158fc5c23feb5f2a6ce81aa0ec9229a056371315",
+      "utf8.ts": "9400b2d66fe9b3f84e7bee97d307c9c2a32104d546e58254acbdc0f12522b57c",
+      "persistent-core.as.ts": "85662fce0e95deef920c8fd52789b11657f0b5d7f00b9f195873c38bc99bfd6a",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+      "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713"
+    },
+    "after": {
+      "arena.ts": "d8902f184eb6e3c94204c9b3f96841f1a70fdbf8ad8ee7347b14ccc75782bc01",
+      "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+      "persistent-core.as.ts": "85662fce0e95deef920c8fd52789b11657f0b5d7f00b9f195873c38bc99bfd6a",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+      "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713"
+    }
+  },
+  "portableBuildSha256": {
+    "before": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "after": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f"
+  },
+  "portableBuildDigestMethod": "Sorted top-level dist/*.js; UTF-8 filename, NUL, file bytes, NUL for each file; SHA-256.",
+  "identicalWasmSha256": {
+    "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "sorted-tree.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "ordered-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "singly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "shared-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+    "shared-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "priority-queue.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "persistent-core.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "doubly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4"
+  },
+  "proofSourceSha256": {
+    "proofs/utf8-write-workloads.mjs": "605aa664d1a36d5faa5e6de3f069c3feb17ab868cd3bdb077da4519a7418e54d",
+    "proofs/utf8-write-case.mjs": "61748883fe21fd20bd434df61562245c9d9d0fd37cff317cf7e61c40fb807832",
+    "proofs/run-utf8-write.mjs": "af42a8887fed4008b526b6459c5292c61d876c393fc0d21b6d4bd9935fe2021a",
+    "proofs/utf8-write-browser.mjs": "ac3fe59d034e2d4a6de0d35b2454502a01dce0909de7dec6da6602470c5001c1",
+    "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658"
+  },
+  "runtimes": {
+    "Node": "22.23.2",
+    "Bun": "1.4.2",
+    "AssemblyScript": "0.28.20"
+  },
+  "measurement": {
+    "rounds": 3,
+    "warmupsPerProcess": 20,
+    "samplesPerProcess": 15,
+    "selectedCases": [
+      "map-json-set",
+      "map-json-setMany",
+      "map-json-update",
+      "list-json-push",
+      "list-4k-push",
+      "control-list-number",
+      "control-list-repeated"
+    ],
+    "ordinaryOperations": 5000,
+    "largeStringOperations": 512,
+    "rawVariantReports": 84,
+    "measuredSamples": 1260,
+    "validatedPairs": 42
+  },
+  "runnerNote": "After measurement, the parent driver was hardened to write completed round files once, apart from progress files. The child now enforces one selected workload. Timed operations and their fixtures did not change. Recovery provenance is in recovery/manifest.json.",
+  "sourceNote": "Both main-checkout portable build hashes were verified against the measured builds after adopting the patch. Existing dependencies, compiler, WASM sources, build flags, and historical evidence were unchanged."
+}

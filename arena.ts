@@ -1,6 +1,6 @@
 import { memoryDescriptor } from './memory';
 import { ReadCache } from './read-cache';
-import { decodeUtf8 } from './utf8';
+import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
@@ -181,9 +181,17 @@ export class Arena {
       if (typeof value !== 'boolean') throw new TypeError('Expected a boolean');
       this.scalar[0] = value ? 1 : 0; return this.scalar.subarray(0, 1);
     }
+    return encoder.encode(this.text(type, value));
+  }
+  private prepareText(type: string, value: any): Uint8Array {
+    // Native serialization may reenter this arena or another arena. It must
+    // finish before the module's temporary encoding buffer is used.
+    return encodeUtf8ForWrite(encoder, this.text(type, value));
+  }
+  private text(type: string, value: any): string {
     if (type === 'string') {
       if (typeof value !== 'string') throw new TypeError('Expected a string');
-      return encoder.encode(value);
+      return value;
     }
     const nested = parseNestedType(type);
     let text: string | undefined;
@@ -196,7 +204,7 @@ export class Arena {
       text = JSON.stringify(value);
     }
     if (text === undefined) throw new TypeError('Value is not JSON-serializable');
-    return encoder.encode(text);
+    return text;
   }
   encode(type: string, value: any): number {
     this.assertWritable();
@@ -206,7 +214,7 @@ export class Arena {
       const cached = this.internedStrings?.get(value);
       if (cached !== undefined) return cached;
     }
-    const bytes = this.prepare(type, value);
+    const bytes = this.prepareText(type, value);
     const p = this.alloc(4 + bytes.length);
     this.view.setUint32(p, bytes.length, true); this.bytes.set(bytes, p + 4);
     if (type === 'string' && (this.internedStrings?.size ?? 0) < 2048) {
@@ -302,7 +310,7 @@ export class Arena {
     // Finish user serialization before writing bytes. It can run callbacks.
     const number = type === 'number', boolean = type === 'boolean';
     if (number && typeof value !== 'number' || boolean && typeof value !== 'boolean') throw new TypeError(`Expected a ${type}`);
-    const v = number || boolean ? undefined : prepared ?? this.prepare(type, value);
+    const v = number || boolean ? undefined : prepared ?? this.prepareText(type, value);
     const length = number ? 8 : boolean ? 1 : v!.length;
     const prefix = ordinal === undefined ? 0 : 4;
     const p = this.wasm.mapLeaf(token.length, length + prefix) >>> 0;
@@ -420,7 +428,7 @@ export class Arena {
     const mode = type === 'number' ? 0 : type === 'boolean' ? 1 : 2;
     if (mode < 2 && typeof value !== type) throw new TypeError(`Expected a ${type}`);
     // Complete all possible user callbacks before using shared writer scratch.
-    const v = mode === 2 ? this.prepare(type, value) : undefined;
+    const v = mode === 2 ? this.prepareText(type, value) : undefined;
     let token = this.keys.get(key), n = token?.length ?? key.length;
     let bytes: Uint8Array | undefined;
     if (!token) for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { bytes = encoder.encode(key); n = bytes.length; break; }
