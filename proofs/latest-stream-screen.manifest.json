@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "status": "frozen prospective protocol; one branch push attempt after publication",
+  "pins": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "19da19f03237c28eaa8a115a5ff54c77b0ddb77d",
+    "workerSource": {
+      "baseline": "7efe2ca4e10037401eb75e15c7c38b5e72ce615d406fd309b328da9c3f4cd888",
+      "candidate": "00c75f81deaab95cc350d295adc2ececb19946cfac740c5c427d89e242a9fde4"
+    },
+    "candidateTests": "689919535e28294854bdd9336537258c64a19b32f7ccb03e0a8c90934999695f",
+    "persistentWasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+    "builds": {
+      "baseline": {
+        "chunk-bngxdyck.js": "05b0ae07261a73e6b0e41b328c9583fb268d27472da53fd828fa393339e193e6",
+        "chunk-byfqjcsj.js": "0e09e9a7a14e4a5c3c4b8ee3f4e4b1d11bcc317b238b9df4ba513cddd83a5fe2",
+        "chunk-fvjmff4x.js": "4842f051f6e854e879ac2303041a48e690da744e1fca1762f5e6911ac30dcd47",
+        "chunk-qrfmwc9f.js": "1cf6d1b08c4e9795e3c180668ae0428cb02d7f989ea67166b6f8102f43f72308",
+        "chunk-vme84hfz.js": "63bcc0990af192140dfda3b86d28b1d7b4ed02dac9afa1c06ac27d52bf020ef5",
+        "geometry.js": "fc63210907f892c92872bec322b45602e3780ba4295e0e5af776a4efe08cc885",
+        "numeric.js": "be4d299dce68743537dae7029db6df85bb6570b6257b7be36fd3ae2a246cddcc",
+        "redux.js": "a78bac0690095ba0bc58b9ec9d4a413ba1e6021fc2eee8df84e83145e97583d7",
+        "shared.js": "bf206ed59f2b426a9e5cfca9200e1e5a593bd82445290805b04450faeb6c7292",
+        "state.js": "5f69efac6e3d926fa5cd9762acde9467c7810c95c4eebb65a83359e0cade6f85",
+        "tanstack-db-collection.js": "c4fe5a39dbe129d1236d825a85cbdd9bfe7b284bd5a3dfdff4518bdfb5a3aed6",
+        "worker.js": "b60f60db31821a7699cc03eb34611adf70db1bafd0dad0fdff2b11d8263ad61f"
+      },
+      "candidate": {
+        "chunk-6jbhgzst.js": "4650c34e621f76a5317defb45ca881863356e0603b72f38f1fa40a1cd6e7e25b",
+        "chunk-bngxdyck.js": "05b0ae07261a73e6b0e41b328c9583fb268d27472da53fd828fa393339e193e6",
+        "chunk-byfqjcsj.js": "0e09e9a7a14e4a5c3c4b8ee3f4e4b1d11bcc317b238b9df4ba513cddd83a5fe2",
+        "chunk-fvjmff4x.js": "4842f051f6e854e879ac2303041a48e690da744e1fca1762f5e6911ac30dcd47",
+        "chunk-qrfmwc9f.js": "1cf6d1b08c4e9795e3c180668ae0428cb02d7f989ea67166b6f8102f43f72308",
+        "geometry.js": "fc63210907f892c92872bec322b45602e3780ba4295e0e5af776a4efe08cc885",
+        "numeric.js": "be4d299dce68743537dae7029db6df85bb6570b6257b7be36fd3ae2a246cddcc",
+        "redux.js": "1374f6866be17b300b9868b05b8a3995ddceaa4b17ddb6b8c5da88c3f694c236",
+        "shared.js": "bf206ed59f2b426a9e5cfca9200e1e5a593bd82445290805b04450faeb6c7292",
+        "state.js": "a6a3b6b844cedcbe1b79d7fbdeea1576e79baf46310d65b2df3984c29a642e32",
+        "tanstack-db-collection.js": "c4fe5a39dbe129d1236d825a85cbdd9bfe7b284bd5a3dfdff4518bdfb5a3aed6",
+        "worker.js": "4a3a220447e7d90e4577a61d8b71ac30eb072074f7d19f386f930820caf390e6"
+      }
+    },
+    "candidateTree": "70dcf2779115bf51fe363930287c2717963261e1",
+    "preDeclarationWorkerDiagnostics": "71949a315b89439fe4f58c46cfab3deebb8281db89a2d09892d75a3ec6645c03",
+    "compilers": {
+      "assemblyscript": {
+        "version": "0.28.20",
+        "sha256": "9a7260193fc67a3d695d64e6b0de3620d2df8088688c997b097fb374da5a6111"
+      },
+      "binaryen": {
+        "version": "131.0.0-nightly.20260721",
+        "sha256": "b385375477ef69e37e7b9820be1f2d87771893c2ad1799a6a5aa2d186266bef5"
+      },
+      "long": {
+        "version": "5.3.2",
+        "sha256": "ed15bce9e6e25bae25bac02c004e224831e5b604a8d4b34c7bb4a7145bc1a0e3"
+      },
+      "typescript": {
+        "version": "5.9.3",
+        "sha256": "435d941c56aa13769f28d29eded4b38f7e48f9b29c18d95728d535a3fb6815aa"
+      }
+    }
+  },
+  "toolchain": {
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "platform": "linux",
+    "arch": "x64",
+    "bunRevision": "1.4.2+744846f84"
+  },
+  "seed": 20261008,
+  "modes": [
+    "ab",
+    "aa-baseline"
+  ],
+  "quartetsPerMode": 4,
+  "degreesOfFreedom": 3,
+  "tCritical": 3.182446305284263,
+  "confidenceLevel": 0.95,
+  "latencyMargin": 1.02,
+  "minimumBatchMs": 20,
+  "pilotTargetMs": 30,
+  "pilotSamples": 3,
+  "pilotMaxSteps": 8,
+  "maxRepeats": 256,
+  "warmupBatches": 2,
+  "samples": 7,
+  "subjectTimeoutMs": 180000,
+  "sessionTimeoutMs": 30000,
+  "fixtureEntries": 256,
+  "snapshotPoolSize": 2,
+  "publisherDelivery": "all",
+  "publisherMaxPending": "exactly updates per burst",
+  "streamOptions": "default latest; default emitCurrent=true",
+  "cases": [
+    {
+      "name": "shared/paused/1/32",
+      "copy": false,
+      "consumer": "paused",
+      "streams": 1,
+      "updates": 32
+    },
+    {
+      "name": "copy/paused/1/32",
+      "copy": true,
+      "consumer": "paused",
+      "streams": 1,
+      "updates": 32
+    },
+    {
+      "name": "shared/paused/4/4096",
+      "copy": false,
+      "consumer": "paused",
+      "streams": 4,
+      "updates": 4096
+    },
+    {
+      "name": "copy/paused/4/4096",
+      "copy": true,
+      "consumer": "paused",
+      "streams": 4,
+      "updates": 4096
+    },
+    {
+      "name": "shared/waiting/4/4096",
+      "copy": false,
+      "consumer": "waiting",
+      "streams": 4,
+      "updates": 4096
+    },
+    {
+      "name": "copy/waiting/4/4096",
+      "copy": true,
+      "consumer": "waiting",
+      "streams": 4,
+      "updates": 4096
+    }
+  ],
+  "scope": "End-to-end publisher state replacement/publication through final worker stream consumption; immutable map construction is setup. Normal built-in transport ACKs remain enabled. One arm/ready and one completion exchange per burst, no added per-frame synchronization.",
+  "caveats": [
+    "The mechanism proof established 10001 to 1 executed array expressions for 10000 unread updates, not heap bytes, GC, retained memory, or API latency.",
+    "Prior focused worker tests: 42 passed. Normal typecheck, portable/WASM builds and real worker proofs passed.",
+    "Prior broad local suite was incomplete after the five-minute cap; this is not a full-suite pass.",
+    "Before declarations exist, strict worker consumers produce 12 matching baseline diagnostics. This is supplementary build-state evidence only. After build:types, both public worker consumer checks must pass with exit 0.",
+    "This first screen does not cover the default latest publisher transport, new-map construction, FIFO streams, other runtimes, ARM64, browsers, or real application speedups."
+  ]
+}

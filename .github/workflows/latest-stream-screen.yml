@@ -1,0 +1,73 @@
+name: Latest snapshot stream Node22 screen
+
+# One fixed screen on the dedicated branch; rerun attempts cannot collect timing.
+on:
+  push:
+    branches: [perf/latest-stream-slot-20261008]
+    paths:
+      - '.github/workflows/latest-stream-screen.yml'
+      - 'proofs/*latest-stream-screen*'
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/perf/latest-stream-slot-20261008' && github.run_attempt == 1 && github.event.before == '19da19f03237c28eaa8a115a5ff54c77b0ddb77d' && !github.event.forced && !github.event.deleted
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      BASELINE_SHA: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+      CANDIDATE_SHA: '19da19f03237c28eaa8a115a5ff54c77b0ddb77d'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Run deterministic protocol and source tests
+        run: node --test proofs/latest-stream-screen-tests.node.mjs
+      - name: Build frozen inputs with one toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/stream-screen/setup"
+          test "$(node --version)" = 'v22.23.3'
+          test "$(bun --revision)" = '1.4.2+744846f84'
+          bun install 2>&1 | tee "$RUNNER_TEMP/stream-screen/setup/install.log"
+          node --input-type=module -e "import { compilerContext } from './proofs/latest-stream-screen-guard.mjs'; console.log(JSON.stringify(compilerContext(process.cwd()), null, 2))" > "$RUNNER_TEMP/stream-screen/setup/compilers.json"
+          cp bun.lock "$RUNNER_TEMP/stream-screen/setup/bun.lock"
+          git worktree add --detach "$RUNNER_TEMP/stream-base" "$BASELINE_SHA"
+          git worktree add --detach "$RUNNER_TEMP/stream-candidate" "$CANDIDATE_SHA"
+          git merge-base --is-ancestor "$CANDIDATE_SHA" HEAD
+          test "$(git rev-parse "$CANDIDATE_SHA^{tree}")" = '70dcf2779115bf51fe363930287c2717963261e1'
+          for role in base candidate; do
+            ln -s "$PWD/node_modules" "$RUNNER_TEMP/stream-$role/node_modules"
+            (cd "$RUNNER_TEMP/stream-$role" && bun run build:wasm && bun run build:browser) 2>&1 | tee "$RUNNER_TEMP/stream-screen/setup/build-$role.log"
+          done
+          git archive "$BASELINE_SHA" > "$RUNNER_TEMP/stream-screen/setup/baseline-source.tar"
+          git archive "$CANDIDATE_SHA" > "$RUNNER_TEMP/stream-screen/setup/candidate-source.tar"
+          git archive HEAD > "$RUNNER_TEMP/stream-screen/setup/protocol-source.tar"
+          node --version > "$RUNNER_TEMP/stream-screen/setup/node-version.txt"
+          bun --revision > "$RUNNER_TEMP/stream-screen/setup/bun-revision.txt"
+          lscpu --json > "$RUNNER_TEMP/stream-screen/setup/lscpu.json"
+          cat /proc/cpuinfo > "$RUNNER_TEMP/stream-screen/setup/cpuinfo.txt"
+          uname -a > "$RUNNER_TEMP/stream-screen/setup/uname.txt"
+          printf 'BUN_EXECUTABLE=%s\n' "$(command -v bun)" >> "$GITHUB_ENV"
+      - name: Full unit CI and public worker correctness gate before pilots
+        run: node proofs/gate-latest-stream-screen.mjs "$RUNNER_TEMP/stream-base" "$RUNNER_TEMP/stream-candidate" "$RUNNER_TEMP/stream-screen/gate"
+      - name: Run six cells once with balanced A/B and baseline A/A quartets
+        run: node proofs/run-latest-stream-screen.mjs "$RUNNER_TEMP/stream-base" "$RUNNER_TEMP/stream-candidate" "$RUNNER_TEMP/stream-screen/measurements" --measure "$RUNNER_TEMP/stream-screen/gate/gate.json"
+      - name: Retain complete or partial evidence, bundles and path receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-stream-node22-x64-${{ github.sha }}
+          path: ${{ runner.temp }}/stream-screen/
+          retention-days: 30
+          if-no-files-found: error
