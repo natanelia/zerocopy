@@ -1,0 +1,28 @@
+# zerocopy
+
+Shared immutable collections. Reads are local; tasks are optional.
+
+Source: https://github.com/natanelia/zerocopy/commit/331f1ac062c2c86f1de242790ea9807a6b0919a7
+
+- [Get started with shared state and Web Workers](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/getting-started.md): Set up zerocopy in JavaScript or TypeScript. Share immutable state with a Web Worker using SharedArrayBuffer and read locally on both threads.
+- [How sharing works](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/mental-model.md): One writer, immutable snapshots, and local reads. A model you can reason about.
+- [Immutable collections API & types](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/collections.md): zerocopy API reference for shared immutable maps, lists, sets, typed JSON, and nested collections in JavaScript and TypeScript.
+- [Search shared text](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/text-search.md): Match UTF-8 text locally without decoding every row. Exact literal search and stable snapshots.
+- [State & subscriptions](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/sessions.md): Connect workers and publish new snapshots without a task system.
+- [Your own transport](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/transport.md): Use shared snapshots with an existing message protocol.
+- [Optional tasks](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/tasks.md): Schedule a whole calculation. Keep individual reads local.
+- [Worker tasks & pools](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/workers.md): Run typed tasks with zerocopy in Web Workers and Node.js worker threads. Use worker pools, MessagePorts, and SharedWorker connections.
+- [Redux & Redux Toolkit integration](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/redux.md): Keep your Redux store and share selected immutable collections with workers. Connect zerocopy to Redux Toolkit, selectors, and DevTools.
+- [TanStack DB integration](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/tanstack.md): Use zerocopy collection wrappers and sync-cache helpers with TanStack DB. Examples, adapter behavior, and current limits.
+- [Memory & ownership](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/memory.md): Understand storage, retained snapshots, and explicit compaction.
+- [Memory comparison](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/memory-comparison.md): Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM.
+- [Recorded benchmarks](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/benchmarks.md): All recorded results, slower workloads, and methods. No selected-only results.
+- [Migration](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/migration.md): Format and lifetime changes for existing users.
+- [Choose a use case](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/use-cases.md): Where sharing helps, where it does not, and which alternatives to consider.
+- [Live log explorer](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/log-explorer.md): One working example: search, summarize, and inspect a large shared stream.
+- [Large tables & dashboards](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/data-tables.md): Multiple independent views of the same large, changing table.
+- [Graphs & developer tools](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/graphs.md): Stable versions for traversal, layout, and diagnostics.
+- [Simulation & world state](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/simulations.md): Separate simulation ownership from analysis and rendering.
+- [Product catalogs & filtering](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/analytics.md): Read stock directly and filter a large catalog in workers.
+- [Maps & spatial tools](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/maps.md): Keep the map editable while workers inspect its data.
+- [Editors & history](https://natanelia.github.io/zerocopy/previews/pr-20/dfa366217bd02198e004a46b70eb3b0a124195ad/markdown/editors.md): Read an earlier version without stopping new edits.
