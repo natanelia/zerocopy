@@ -1,0 +1,18 @@
+/* Static, responsive memory graphs. No runtime or chart dependency. */
+.memory-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin-block:28px}
+.memory-figure{margin:28px 0 36px;min-width:0;border-top:1px solid var(--line);padding-top:24px;break-inside:avoid}
+.memory-chart-title{display:block;font-size:22px;line-height:1.25;letter-spacing:-.025em;color:var(--ink);font-weight:650;max-width:30em}
+.memory-caption,.memory-scope{display:block;font-size:14px;line-height:1.6;color:var(--muted);margin-top:8px}
+.memory-scope{font-size:12px;margin-top:4px}.memory-groups{margin-block:22px}.memory-reader-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:24px}
+.memory-group{min-width:0}.memory-group-title{font-size:14px;font-weight:650;line-height:1.5;margin:0 0 18px;color:var(--ink)}
+.memory-bar{margin:0 0 18px}.memory-bar-label{display:flex;gap:12px;align-items:baseline;justify-content:space-between;font-size:15px;line-height:1.5;margin-bottom:7px}
+.memory-bar-label>span{min-width:0}.memory-bar-label strong{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:650}.memory-bar-label small{font-size:11px;font-weight:400;color:var(--muted)}
+.memory-track{height:14px;background:#e7ebdf;position:relative;overflow:hidden}.memory-fill{display:block;height:100%;min-width:0;border-radius:0}
+.memory-shared{background:#52731a}.memory-immutable{background:#256580}.memory-native{background:#766294}.memory-centralized{background:#606b61}
+.memory-scale{display:flex;justify-content:space-between;font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);border-top:1px solid var(--line);padding-top:5px}
+.memory-figure .memory-note,.memory-figure .memory-source,.memory-values p{font-size:13px;line-height:1.7;margin:14px 0;color:var(--muted)}
+.memory-figure .memory-source{font-size:12px}.memory-source a{text-decoration:underline;text-underline-offset:3px}.memory-values{font-size:13px;margin-block:14px}.memory-values summary{cursor:pointer;font-weight:600;padding:6px 0;color:var(--ink)}
+.memory-values table{font-variant-numeric:tabular-nums}.memory-values th,.memory-values td{padding:8px 12px}
+@media(max-width:900px){.memory-overview{grid-template-columns:1fr;gap:0}.memory-reader-groups{grid-template-columns:1fr}.memory-bar-label{font-size:15px}}
+@media(forced-colors:active){.memory-track{outline:1px solid CanvasText}.memory-fill{background:CanvasText;forced-color-adjust:none}.memory-scale{border-color:CanvasText}}
+@media print{.memory-values{display:block}.memory-figure{break-inside:avoid}.memory-track,.memory-fill{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
