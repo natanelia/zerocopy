@@ -26,14 +26,21 @@ jobs:
       fail-fast: false
       matrix:
         runtime: [node, bun]
-    env:
-      EVIDENCE: ${{ runner.temp }}/trie-view-evidence-${{ matrix.runtime }}
-      BASE_ROOT: ${{ runner.temp }}/trie-view-baseline-${{ matrix.runtime }}
-      npm_config_cache: ${{ runner.temp }}/trie-view-npm-cache-${{ matrix.runtime }}
     defaults:
       run:
         shell: bash
     steps:
+      - name: Initialize and log runner-local evidence paths
+        env:
+          PROOF_RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          : "${RUNNER_TEMP:?}" "${GITHUB_ENV:?}" "${PROOF_RUNTIME:?}"
+          {
+            printf 'EVIDENCE=%s/trie-view-evidence-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+            printf 'BASE_ROOT=%s/trie-view-baseline-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+            printf 'npm_config_cache=%s/trie-view-npm-cache-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+          } | tee -a "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -49,6 +56,9 @@ jobs:
           git archive --format=tar HEAD > "$EVIDENCE/source/gate-source.tar"
           git archive --format=tar "$BASELINE_COMMIT" > "$EVIDENCE/source/baseline-source.tar"
           git archive --format=tar "$CANDIDATE_RUNTIME_COMMIT" > "$EVIDENCE/source/candidate-runtime-source.tar"
+          mkdir -p "$EVIDENCE/source/history"
+          git show 0ba719e92ddcee246e1817527857a78ac1a89f8f:.github/workflows/trie-view-capture.yml > "$EVIDENCE/source/history/37848382333-workflow.yml"
+          printf '%s\n' '{"runId":37848382333,"headSha":"0ba719e92ddcee246e1817527857a78ac1a89f8f","conclusion":"failure","jobs":[],"stage":"workflow-validation","url":"https://github.com/natanelia/zerocopy/actions/runs/37848382333"}' > "$EVIDENCE/source/history/37848382333-run.json"
           git diff "$BASELINE_COMMIT" "$CANDIDATE_RUNTIME_COMMIT" -- arena.ts > "$EVIDENCE/source/runtime.patch"
           printf '{"status":"partial","checks":[]}\n' > "$EVIDENCE/prerequisites.json"
       - uses: actions/setup-node@v4
