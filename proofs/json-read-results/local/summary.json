@@ -1,0 +1,1633 @@
+{
+  "schema": "zerocopy-json-read-summary/v1",
+  "date": "2026-10-08T11:14:51.694Z",
+  "rounds": 3,
+  "requestedCount": 512,
+  "passes": 32,
+  "warmups": 10,
+  "buildSha256": {
+    "before": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f",
+    "after": "9020368e766ad430f4f7f76e3dd31d7928337bff8b6cd91165594d9fd38c49ed"
+  },
+  "sourceSha256": {
+    "before": "6df52b15f79132b08d990625a5026e333fbad0f5368aa795e9c22b34a0515a77",
+    "after": "1f022d58f5ccb8dca2fc299dc8dde34e1c112923d3a0673df20b12b23619d9f4"
+  },
+  "harnessSha256": "a41d07c960624cfe3f4fcb985aea5c62ec0d538f256e563d36e77f9665dd2733",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "platform": "linux",
+  "arch": "x64",
+  "osRelease": "6.18.44",
+  "method": "One process per library, workload, runtime, and round. Fixtures are built once. Every run attaches a new read-only reader outside timing. Warm cases prime only their measured values; saturated cases prime 2,048 earlier records. Full GC follows setup. Timed work is public get/peek calls plus a scalar checksum. Exact values, deep freeze, caller ownership, descriptors, allocation lengths, and SHA-256 are checked outside timing after every run. No timing threshold.",
+  "processIsolation": "One fresh process per runtime, workload, variant, and round. Variant order alternates by workload and round. Each sample must retain the same allocated-byte hash, descriptor hash, used length, and backing length; matched builds must agree on all invariants.",
+  "rows": [
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-map-flat",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 2.0833115000000078,
+        "p95Ms": 3.150847750000011,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 2.0704620000000205,
+        "p95Ms": 2.969828249999992,
+        "samples": 36
+      },
+      "speedup": 1.0062061027925107,
+      "roundSpeedups": [
+        1.084580965013971,
+        1.0572500759012562,
+        0.8513471639216256
+      ],
+      "integrity": {
+        "allocatedBytes": 304044,
+        "usedBytes": 369580,
+        "backingBytes": 393216,
+        "payloadSha256": "e167cc2911520b97c041354747b57e009d77187203c2aca42425530db909ce68",
+        "descriptorSha256": "4c050d6418d29729a261501f06e65d9b08ca082e3d8d6c77d732b12bbd34c496"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-flat",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.1942725000000252,
+        "p95Ms": 1.803731500000012,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.171638999999999,
+        "p95Ms": 1.8243100000000183,
+        "samples": 36
+      },
+      "speedup": 1.019317810349456,
+      "roundSpeedups": [
+        1.1340116677716134,
+        1.0200192090104876,
+        0.8796082240941927
+      ],
+      "integrity": {
+        "allocatedBytes": 292128,
+        "usedBytes": 357664,
+        "backingBytes": 393216,
+        "payloadSha256": "07d564f4413f4e51006579a2f205f19a8fc241a7ae07b8b54df8fe60790f7ce3",
+        "descriptorSha256": "c7b846d34963d83c341db2447de6f194459ec8e262ccb237087fb870b6af3767"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-map-feature",
+      "collection": "map",
+      "shape": "feature",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "feature",
+        "jsonBytes": 6278,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 39.02954050000005,
+        "p95Ms": 46.8516259999999,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 31.785916999999813,
+        "p95Ms": 34.92852325000007,
+        "samples": 36
+      },
+      "speedup": 1.227887825290687,
+      "roundSpeedups": [
+        1.317615420919691,
+        1.2644793994688295,
+        1.1836467845823864
+      ],
+      "integrity": {
+        "allocatedBytes": 3244020,
+        "usedBytes": 3309556,
+        "backingBytes": 3342336,
+        "payloadSha256": "7c7e016cab8d8c0fb39940137f21b0236939c9e200401fff7a401198ef22ee70",
+        "descriptorSha256": "c94aa0d9b959a38ada3cc01f95d082079e21ae32cd3046e7793948bab32cf7c9"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-feature",
+      "collection": "list",
+      "shape": "feature",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "feature",
+        "jsonBytes": 6278,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 37.713340500000186,
+        "p95Ms": 42.88504475000008,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 30.587617000000023,
+        "p95Ms": 47.03092574999994,
+        "samples": 36
+      },
+      "speedup": 1.2329610541416207,
+      "roundSpeedups": [
+        1.2330667019521988,
+        1.137870759187506,
+        1.2252946346026432
+      ],
+      "integrity": {
+        "allocatedBytes": 3230656,
+        "usedBytes": 3296192,
+        "backingBytes": 3342336,
+        "payloadSha256": "2e1a66a5e561c057c8e74f837a456fe0f9a460ce7b40366c0699509315a4a53b",
+        "descriptorSha256": "04d7efb4e88b77fe8981a8bb23788f0ab99ddffa16a267bd68ba704f19d3c7f4"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-coordinates",
+      "collection": "list",
+      "shape": "coordinates",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "coordinates",
+        "jsonBytes": 5998,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 37.182673499999964,
+        "p95Ms": 47.692456749999906,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 31.489802499999996,
+        "p95Ms": 34.38440099999991,
+        "samples": 36
+      },
+      "speedup": 1.1807845889157282,
+      "roundSpeedups": [
+        1.170036095927513,
+        1.1956872219859154,
+        1.1663753361304765
+      ],
+      "integrity": {
+        "allocatedBytes": 3084288,
+        "usedBytes": 3149824,
+        "backingBytes": 3211264,
+        "payloadSha256": "6f155cb1d183a4c11857f7abf71dbfa4389aca76ffa01b017fe5495e4d5655cd",
+        "descriptorSha256": "9e5353b45e6868dc1bd5530eedf32eee3458231b2c06ca0d9cc7717279e46beb"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-numbers",
+      "collection": "list",
+      "shape": "numbers",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "numbers",
+        "jsonBytes": 2993,
+        "numberCount": 512
+      },
+      "before": {
+        "medianMs": 17.180772499999875,
+        "p95Ms": 21.53328275000007,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 11.904821500000025,
+        "p95Ms": 15.272300250000058,
+        "samples": 36
+      },
+      "speedup": 1.4431776654525932,
+      "roundSpeedups": [
+        1.3239415291987733,
+        1.4547556668565504,
+        1.4253748903719365
+      ],
+      "integrity": {
+        "allocatedBytes": 1807816,
+        "usedBytes": 1873352,
+        "backingBytes": 1900544,
+        "payloadSha256": "d1e9fa957605b954a87c5b5841a224ec350cf964fa06c06621f414f8b6dcaf13",
+        "descriptorSha256": "328128a540c998996871e66b3352889cf884af3e9f3664581caacd2c6cdec338"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-map-json",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.877410999999995,
+        "p95Ms": 2.2131037499999877,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.4840295000000197,
+        "p95Ms": 1.7984322500000332,
+        "samples": 36
+      },
+      "speedup": 1.2650766039354138,
+      "roundSpeedups": [
+        1.3121124849871753,
+        1.1218856210787553,
+        1.4463150591160583
+      ],
+      "integrity": {
+        "allocatedBytes": 304044,
+        "usedBytes": 369580,
+        "backingBytes": 393216,
+        "payloadSha256": "e167cc2911520b97c041354747b57e009d77187203c2aca42425530db909ce68",
+        "descriptorSha256": "4c050d6418d29729a261501f06e65d9b08ca082e3d8d6c77d732b12bbd34c496"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-list-json",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.2252689999999973,
+        "p95Ms": 2.0380367500000034,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.3689844999999963,
+        "p95Ms": 0.41988325000002646,
+        "samples": 36
+      },
+      "speedup": 3.3206516804906703,
+      "roundSpeedups": [
+        3.5279439648031654,
+        3.326850049774467,
+        3.3806867390829587
+      ],
+      "integrity": {
+        "allocatedBytes": 292128,
+        "usedBytes": 357664,
+        "backingBytes": 393216,
+        "payloadSha256": "07d564f4413f4e51006579a2f205f19a8fc241a7ae07b8b54df8fe60790f7ce3",
+        "descriptorSha256": "c7b846d34963d83c341db2447de6f194459ec8e262ccb237087fb870b6af3767"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-stack-json",
+      "collection": "stack",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 512,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.2213885000000175,
+        "p95Ms": 1.6945272499999646,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.24696549999998751,
+        "p95Ms": 0.3827427500000198,
+        "samples": 36
+      },
+      "speedup": 4.94558349243145,
+      "roundSpeedups": [
+        4.097790076966248,
+        5.559366472733389,
+        5.478453995782229
+      ],
+      "integrity": {
+        "allocatedBytes": 296096,
+        "usedBytes": 361632,
+        "backingBytes": 393216,
+        "payloadSha256": "8220aafeab25be4957c82adfdaa2c78cfa012fe48673c6e446c813da429674f6",
+        "descriptorSha256": "081cdfd1a5bbaecd3618f7d2de1a5ef0a8dadcaf0175519f0dbb9bf28c178343"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-queue-json",
+      "collection": "queue",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 512,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.8528795000000287,
+        "p95Ms": 2.3698242499999935,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.8033020000000022,
+        "p95Ms": 1.1263957500000004,
+        "samples": 36
+      },
+      "speedup": 2.306578970300116,
+      "roundSpeedups": [
+        2.3675929621084686,
+        2.2710151430030745,
+        2.308354892934703
+      ],
+      "integrity": {
+        "allocatedBytes": 357408,
+        "usedBytes": 422944,
+        "backingBytes": 458752,
+        "payloadSha256": "684816bbbebb053538d79aa63f8ac9cd67b558b770c71f013cb8eb31f9618b5c",
+        "descriptorSha256": "3083105ea95ca83439fba75dac39a3a45b6b07727e5308ae6391eeb3fe42ab65"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "saturated-map-json",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "saturated",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 2560,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.4063014999999552,
+        "p95Ms": 1.955141499999968,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.3821940000000268,
+        "p95Ms": 2.1332262499999786,
+        "samples": 36
+      },
+      "speedup": 1.0174414734834096,
+      "roundSpeedups": [
+        0.9401982411028296,
+        1.1083349207399535,
+        1.0114306875972439
+      ],
+      "integrity": {
+        "allocatedBytes": 1584296,
+        "usedBytes": 1649832,
+        "backingBytes": 1703936,
+        "payloadSha256": "7854e0fa4817038b3009530831a8d6997cffc4131f9a9db4ad28babd850e4361",
+        "descriptorSha256": "2fb6bca9d49b5f0fcab06e0928d14a02bab41dcdd6bf5a2723ebe7e93a05fc18"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "saturated-list-json",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "saturated",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 2560,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.1268719999999917,
+        "p95Ms": 1.4075817500000483,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.0895999999999617,
+        "p95Ms": 1.4223367500000137,
+        "samples": 36
+      },
+      "speedup": 1.0342070484581785,
+      "roundSpeedups": [
+        1.0102003292798025,
+        0.9856091032356145,
+        1.1067971406121053
+      ],
+      "integrity": {
+        "allocatedBytes": 1522464,
+        "usedBytes": 1588000,
+        "backingBytes": 1638400,
+        "payloadSha256": "26c51b52dacfd55b5cb9466f9925c5f672f967bd0c965ba617ce4f7fa7972a72",
+        "descriptorSha256": "23e7baedf34662064ccf66ec717a93653e383061383dcaa8c6ff8ab3e152c774"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-map-number",
+      "collection": "map",
+      "shape": "number",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 6.003776000000002,
+        "p95Ms": 7.484714749999981,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 5.982318500000019,
+        "p95Ms": 7.803811249999995,
+        "samples": 36
+      },
+      "speedup": 1.0035868200598117,
+      "roundSpeedups": [
+        0.9319688699077409,
+        2.218132551833385,
+        0.9577404032541358
+      ],
+      "integrity": {
+        "allocatedBytes": 452748,
+        "usedBytes": 518284,
+        "backingBytes": 524288,
+        "payloadSha256": "95047279853ae7577be32ba95ae436537d58b14e328550758bddddee19c69803",
+        "descriptorSha256": "17f5d85f4f8b1c73f00a176e7c4bc66cac8eceaaca02885259d14c00493a76b4"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-number",
+      "collection": "list",
+      "shape": "number",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.09671500000000322,
+        "p95Ms": 0.12080374999999322,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.0536210000000068,
+        "p95Ms": 0.1073989999999938,
+        "samples": 36
+      },
+      "speedup": 1.8036776636017782,
+      "roundSpeedups": [
+        1.7443185930377,
+        1.8109837801372255,
+        1.8008397650145942
+      ],
+      "integrity": {
+        "allocatedBytes": 66688,
+        "usedBytes": 132224,
+        "backingBytes": 196608,
+        "payloadSha256": "4b89bab39e867b9a522f855eb70650f94900d3ed89336eb1b525bb5c2ce9c4a2",
+        "descriptorSha256": "3091e58aba4b17148478f0fd487bf5fa147e368f2dbc36afbcf3f0dcfbb8576e"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-map-string",
+      "collection": "map",
+      "shape": "string",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 7.958796000000007,
+        "p95Ms": 9.846782000000019,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 7.315570000000008,
+        "p95Ms": 9.846620999999999,
+        "samples": 36
+      },
+      "speedup": 1.0879256161857516,
+      "roundSpeedups": [
+        1.0485084658815211,
+        1.0537092375177801,
+        1.1214994758691026
+      ],
+      "integrity": {
+        "allocatedBytes": 583500,
+        "usedBytes": 649036,
+        "backingBytes": 655360,
+        "payloadSha256": "08420c2244ae3e4b109deeb5473fa4e94a2c12fa12c3894dae854d644628f979",
+        "descriptorSha256": "abe2ca0f795ac8be7e318ccb9ece70be5365009a55afa6f9e6c22d982ad81f08"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "cold-list-string",
+      "collection": "list",
+      "shape": "string",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 3.463990999999993,
+        "p95Ms": 5.409721750000003,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 3.7977644999999995,
+        "p95Ms": 6.379009500000009,
+        "samples": 36
+      },
+      "speedup": 0.9121131655214517,
+      "roundSpeedups": [
+        0.8920279288389021,
+        0.7896491882891669,
+        0.912534793643629
+      ],
+      "integrity": {
+        "allocatedBytes": 386368,
+        "usedBytes": 451904,
+        "backingBytes": 458752,
+        "payloadSha256": "cef489acc2e75e408668a806e24d557e695310f3a0641899b3a8452741ee8482",
+        "descriptorSha256": "8c7a82345241d2c877eea535ea8403d8b1f2ae8fdca8845ef514f437348e72d2"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-map-number",
+      "collection": "map",
+      "shape": "number",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.435143999999994,
+        "p95Ms": 0.5380935000000093,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.3913079999999951,
+        "p95Ms": 0.5113699999999923,
+        "samples": 36
+      },
+      "speedup": 1.1120242877733126,
+      "roundSpeedups": [
+        0.9730507919969671,
+        1.4070170237585085,
+        0.86347071871776
+      ],
+      "integrity": {
+        "allocatedBytes": 28228,
+        "usedBytes": 93764,
+        "backingBytes": 131072,
+        "payloadSha256": "54ff713505179fdf49443c1576826585b6f401def724fe95592fc0ac8237e000",
+        "descriptorSha256": "7cc85d320d848a3d7a10041a397f75f31e8d7280b993ba1966b2bfd5d83cde63"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-list-number",
+      "collection": "list",
+      "shape": "number",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.10163250000000801,
+        "p95Ms": 0.1824587500000021,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.14945399999999154,
+        "p95Ms": 0.21236899999999537,
+        "samples": 36
+      },
+      "speedup": 0.6800252920632018,
+      "roundSpeedups": [
+        0.8387435427429321,
+        1.0283468222093524,
+        0.5537588505922687
+      ],
+      "integrity": {
+        "allocatedBytes": 4224,
+        "usedBytes": 69760,
+        "backingBytes": 131072,
+        "payloadSha256": "dd00139a8f8e9d66df1c19d7f14d0dba0bfecedf3deb37e8e8c7c3c56f2b5083",
+        "descriptorSha256": "2547119603014c116887ca94550413ea106991c646318138736616fb8bf68263"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-map-string",
+      "collection": "map",
+      "shape": "string",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 0.4652135000000044,
+        "p95Ms": 0.5637642500000055,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.4912530000000004,
+        "p95Ms": 0.8137510000000105,
+        "samples": 36
+      },
+      "speedup": 0.9469937079264737,
+      "roundSpeedups": [
+        1.0142671938529693,
+        0.9831746362830805,
+        0.6175960432087366
+      ],
+      "integrity": {
+        "allocatedBytes": 36100,
+        "usedBytes": 101636,
+        "backingBytes": 131072,
+        "payloadSha256": "9688e4e52f77cf1b5fa1556fc9cd330ab3121fa7fcccb5302d64c5e6ac2dc353",
+        "descriptorSha256": "3cce4072b7f8113449c886357bf402d714fc5bdf307395316b5ce39c03703862"
+      }
+    },
+    {
+      "runtime": "Node v22.23.2",
+      "name": "warm-list-string",
+      "collection": "list",
+      "shape": "string",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 0.33398650000000885,
+        "p95Ms": 0.3980174999999946,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.2197050000000047,
+        "p95Ms": 0.36631500000000017,
+        "samples": 36
+      },
+      "speedup": 1.5201588493662033,
+      "roundSpeedups": [
+        1.717192368077633,
+        1.6056389390043708,
+        0.9543839455884333
+      ],
+      "integrity": {
+        "allocatedBytes": 20608,
+        "usedBytes": 86144,
+        "backingBytes": 131072,
+        "payloadSha256": "4a11fcfa1d2b1e339099c10399a93ddf953e86690f9709bd3cee1b1e834fca5e",
+        "descriptorSha256": "f8eead8009f174f15934bebbd3949416a5b0a5cb98478379bef8cc04d9223c5b"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-map-flat",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.0172535000000025,
+        "p95Ms": 1.6891902500000064,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.0468330000000066,
+        "p95Ms": 1.2988982500000006,
+        "samples": 36
+      },
+      "speedup": 0.971743821602869,
+      "roundSpeedups": [
+        0.9796622535619062,
+        1.0104167930624464,
+        0.9112252780845206
+      ],
+      "integrity": {
+        "allocatedBytes": 304044,
+        "usedBytes": 369580,
+        "backingBytes": 393216,
+        "payloadSha256": "e167cc2911520b97c041354747b57e009d77187203c2aca42425530db909ce68",
+        "descriptorSha256": "4c050d6418d29729a261501f06e65d9b08ca082e3d8d6c77d732b12bbd34c496"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-flat",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.8860760000000028,
+        "p95Ms": 2.0944915000000037,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.8808984999999936,
+        "p95Ms": 1.1547399999999932,
+        "samples": 36
+      },
+      "speedup": 1.0058775216441045,
+      "roundSpeedups": [
+        1.0167435707265897,
+        1.014597547114408,
+        0.9811516120599995
+      ],
+      "integrity": {
+        "allocatedBytes": 292128,
+        "usedBytes": 357664,
+        "backingBytes": 393216,
+        "payloadSha256": "07d564f4413f4e51006579a2f205f19a8fc241a7ae07b8b54df8fe60790f7ce3",
+        "descriptorSha256": "c7b846d34963d83c341db2447de6f194459ec8e262ccb237087fb870b6af3767"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-map-feature",
+      "collection": "map",
+      "shape": "feature",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "feature",
+        "jsonBytes": 6278,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 60.50479700000005,
+        "p95Ms": 73.89457500000037,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 47.67999950000012,
+        "p95Ms": 56.7938019999998,
+        "samples": 36
+      },
+      "speedup": 1.2689764604548686,
+      "roundSpeedups": [
+        1.3641255491225333,
+        1.147091003659238,
+        1.3878018763638431
+      ],
+      "integrity": {
+        "allocatedBytes": 3244020,
+        "usedBytes": 3309556,
+        "backingBytes": 3342336,
+        "payloadSha256": "7c7e016cab8d8c0fb39940137f21b0236939c9e200401fff7a401198ef22ee70",
+        "descriptorSha256": "c94aa0d9b959a38ada3cc01f95d082079e21ae32cd3046e7793948bab32cf7c9"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-feature",
+      "collection": "list",
+      "shape": "feature",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "feature",
+        "jsonBytes": 6278,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 60.23634449999986,
+        "p95Ms": 68.85528150000039,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 44.006102500000225,
+        "p95Ms": 52.43315275000009,
+        "samples": 36
+      },
+      "speedup": 1.3688179838239378,
+      "roundSpeedups": [
+        1.321306298841618,
+        1.3889014140588085,
+        1.3381821748200866
+      ],
+      "integrity": {
+        "allocatedBytes": 3230656,
+        "usedBytes": 3296192,
+        "backingBytes": 3342336,
+        "payloadSha256": "2e1a66a5e561c057c8e74f837a456fe0f9a460ce7b40366c0699509315a4a53b",
+        "descriptorSha256": "04d7efb4e88b77fe8981a8bb23788f0ab99ddffa16a267bd68ba704f19d3c7f4"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-coordinates",
+      "collection": "list",
+      "shape": "coordinates",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "coordinates",
+        "jsonBytes": 5998,
+        "coordinateCount": 128
+      },
+      "before": {
+        "medianMs": 62.33028249999984,
+        "p95Ms": 75.44406225,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 42.84069650000015,
+        "p95Ms": 55.515787499999874,
+        "samples": 36
+      },
+      "speedup": 1.4549315859045293,
+      "roundSpeedups": [
+        1.42138266215774,
+        1.2813332197780944,
+        1.5323573948206028
+      ],
+      "integrity": {
+        "allocatedBytes": 3084288,
+        "usedBytes": 3149824,
+        "backingBytes": 3211264,
+        "payloadSha256": "6f155cb1d183a4c11857f7abf71dbfa4389aca76ffa01b017fe5495e4d5655cd",
+        "descriptorSha256": "9e5353b45e6868dc1bd5530eedf32eee3458231b2c06ca0d9cc7717279e46beb"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-numbers",
+      "collection": "list",
+      "shape": "numbers",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "numbers",
+        "jsonBytes": 2993,
+        "numberCount": 512
+      },
+      "before": {
+        "medianMs": 49.96353100000033,
+        "p95Ms": 70.1292537500002,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 34.95577199999991,
+        "p95Ms": 40.06157625000026,
+        "samples": 36
+      },
+      "speedup": 1.4293356473431758,
+      "roundSpeedups": [
+        1.5394591661796804,
+        1.4149635165898182,
+        1.419472499402331
+      ],
+      "integrity": {
+        "allocatedBytes": 1807816,
+        "usedBytes": 1873352,
+        "backingBytes": 1900544,
+        "payloadSha256": "d1e9fa957605b954a87c5b5841a224ec350cf964fa06c06621f414f8b6dcaf13",
+        "descriptorSha256": "328128a540c998996871e66b3352889cf884af3e9f3664581caacd2c6cdec338"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-map-json",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.864444000000006,
+        "p95Ms": 1.4343780000000095,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.7555050000000136,
+        "p95Ms": 1.089834500000002,
+        "samples": 36
+      },
+      "speedup": 1.1441936188377184,
+      "roundSpeedups": [
+        1.0650161812882863,
+        0.977936921538283,
+        1.4809619366958016
+      ],
+      "integrity": {
+        "allocatedBytes": 304044,
+        "usedBytes": 369580,
+        "backingBytes": 393216,
+        "payloadSha256": "e167cc2911520b97c041354747b57e009d77187203c2aca42425530db909ce68",
+        "descriptorSha256": "4c050d6418d29729a261501f06e65d9b08ca082e3d8d6c77d732b12bbd34c496"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-list-json",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.6681489999999997,
+        "p95Ms": 1.076690249999995,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.2071265000000011,
+        "p95Ms": 0.3189349999999962,
+        "samples": 36
+      },
+      "speedup": 3.2258016236454345,
+      "roundSpeedups": [
+        3.1140123152709034,
+        3.0734845308554872,
+        2.6277152817174665
+      ],
+      "integrity": {
+        "allocatedBytes": 292128,
+        "usedBytes": 357664,
+        "backingBytes": 393216,
+        "payloadSha256": "07d564f4413f4e51006579a2f205f19a8fc241a7ae07b8b54df8fe60790f7ce3",
+        "descriptorSha256": "c7b846d34963d83c341db2447de6f194459ec8e262ccb237087fb870b6af3767"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-stack-json",
+      "collection": "stack",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 512,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.7165470000000056,
+        "p95Ms": 0.9352637500000043,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.1912774999999982,
+        "p95Ms": 0.42612999999999346,
+        "samples": 36
+      },
+      "speedup": 3.7461123237182226,
+      "roundSpeedups": [
+        4.151842890957001,
+        2.9076261104501935,
+        3.9524995600558896
+      ],
+      "integrity": {
+        "allocatedBytes": 296096,
+        "usedBytes": 361632,
+        "backingBytes": 393216,
+        "payloadSha256": "8220aafeab25be4957c82adfdaa2c78cfa012fe48673c6e446c813da429674f6",
+        "descriptorSha256": "081cdfd1a5bbaecd3618f7d2de1a5ef0a8dadcaf0175519f0dbb9bf28c178343"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-queue-json",
+      "collection": "queue",
+      "shape": "flat",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 512,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.8365769999999912,
+        "p95Ms": 1.4507802499999656,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.3261155000000002,
+        "p95Ms": 0.5315335000000161,
+        "samples": 36
+      },
+      "speedup": 2.5652782526435898,
+      "roundSpeedups": [
+        2.476562511458054,
+        2.260104250263541,
+        3.6527214267539776
+      ],
+      "integrity": {
+        "allocatedBytes": 357408,
+        "usedBytes": 422944,
+        "backingBytes": 458752,
+        "payloadSha256": "684816bbbebb053538d79aa63f8ac9cd67b558b770c71f013cb8eb31f9618b5c",
+        "descriptorSha256": "3083105ea95ca83439fba75dac39a3a45b6b07727e5308ae6391eeb3fe42ab65"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "saturated-map-json",
+      "collection": "map",
+      "shape": "flat",
+      "phase": "saturated",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 2560,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 1.1205035000000123,
+        "p95Ms": 1.6869869999999878,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.1025110000000211,
+        "p95Ms": 1.7736529999999675,
+        "samples": 36
+      },
+      "speedup": 1.0163195650655557,
+      "roundSpeedups": [
+        1.0243028981661544,
+        1.054586590884089,
+        1.0736216501098987
+      ],
+      "integrity": {
+        "allocatedBytes": 1584296,
+        "usedBytes": 1649832,
+        "backingBytes": 1703936,
+        "payloadSha256": "7854e0fa4817038b3009530831a8d6997cffc4131f9a9db4ad28babd850e4361",
+        "descriptorSha256": "2fb6bca9d49b5f0fcab06e0928d14a02bab41dcdd6bf5a2723ebe7e93a05fc18"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "saturated-list-json",
+      "collection": "list",
+      "shape": "flat",
+      "phase": "saturated",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 1,
+      "operations": 512,
+      "totalValues": 2560,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "flat",
+        "jsonBytes": 515
+      },
+      "before": {
+        "medianMs": 0.8827919999999665,
+        "p95Ms": 1.2594274999999726,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.9023565000000531,
+        "p95Ms": 1.130572999999984,
+        "samples": 36
+      },
+      "speedup": 0.9783184362277155,
+      "roundSpeedups": [
+        1.0307476042445076,
+        0.9530204723671627,
+        0.9561182011979799
+      ],
+      "integrity": {
+        "allocatedBytes": 1522464,
+        "usedBytes": 1588000,
+        "backingBytes": 1638400,
+        "payloadSha256": "26c51b52dacfd55b5cb9466f9925c5f672f967bd0c965ba617ce4f7fa7972a72",
+        "descriptorSha256": "23e7baedf34662064ccf66ec717a93653e383061383dcaa8c6ff8ab3e152c774"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-map-number",
+      "collection": "map",
+      "shape": "number",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 1.3428084999999967,
+        "p95Ms": 1.8980930000000065,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 1.385232000000002,
+        "p95Ms": 1.8993749999999956,
+        "samples": 36
+      },
+      "speedup": 0.9693744441364297,
+      "roundSpeedups": [
+        0.9493772566980867,
+        0.9026109995760266,
+        1.107111232771465
+      ],
+      "integrity": {
+        "allocatedBytes": 452748,
+        "usedBytes": 518284,
+        "backingBytes": 524288,
+        "payloadSha256": "95047279853ae7577be32ba95ae436537d58b14e328550758bddddee19c69803",
+        "descriptorSha256": "17f5d85f4f8b1c73f00a176e7c4bc66cac8eceaaca02885259d14c00493a76b4"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-number",
+      "collection": "list",
+      "shape": "number",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.0625789999999995,
+        "p95Ms": 0.15976525000000308,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.06356550000000283,
+        "p95Ms": 0.08760874999999402,
+        "samples": 36
+      },
+      "speedup": 0.9844805751547099,
+      "roundSpeedups": [
+        1.0215014148763213,
+        0.8670237432758475,
+        1.0337117903929716
+      ],
+      "integrity": {
+        "allocatedBytes": 66688,
+        "usedBytes": 132224,
+        "backingBytes": 196608,
+        "payloadSha256": "4b89bab39e867b9a522f855eb70650f94900d3ed89336eb1b525bb5c2ce9c4a2",
+        "descriptorSha256": "3091e58aba4b17148478f0fd487bf5fa147e368f2dbc36afbcf3f0dcfbb8576e"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-map-string",
+      "collection": "map",
+      "shape": "string",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 2.5950485000000043,
+        "p95Ms": 4.071938000000003,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 2.749687999999992,
+        "p95Ms": 4.1617630000000005,
+        "samples": 36
+      },
+      "speedup": 0.9437610739836708,
+      "roundSpeedups": [
+        0.9137172818711933,
+        0.9445460510749865,
+        0.9769852653770769
+      ],
+      "integrity": {
+        "allocatedBytes": 583500,
+        "usedBytes": 649036,
+        "backingBytes": 655360,
+        "payloadSha256": "08420c2244ae3e4b109deeb5473fa4e94a2c12fa12c3894dae854d644628f979",
+        "descriptorSha256": "abe2ca0f795ac8be7e318ccb9ece70be5365009a55afa6f9e6c22d982ad81f08"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "cold-list-string",
+      "collection": "list",
+      "shape": "string",
+      "phase": "cold",
+      "requestedCount": 512,
+      "count": 8192,
+      "passes": 1,
+      "operations": 8192,
+      "totalValues": 8192,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 3.2355764999999934,
+        "p95Ms": 3.949958500000001,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 3.293855999999991,
+        "p95Ms": 4.5626305000000045,
+        "samples": 36
+      },
+      "speedup": 0.9823066035673698,
+      "roundSpeedups": [
+        1.0290094279275552,
+        0.7141469153196502,
+        1.0387547300185591
+      ],
+      "integrity": {
+        "allocatedBytes": 386368,
+        "usedBytes": 451904,
+        "backingBytes": 458752,
+        "payloadSha256": "cef489acc2e75e408668a806e24d557e695310f3a0641899b3a8452741ee8482",
+        "descriptorSha256": "8c7a82345241d2c877eea535ea8403d8b1f2ae8fdca8845ef514f437348e72d2"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-map-number",
+      "collection": "map",
+      "shape": "number",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.1678320000000042,
+        "p95Ms": 0.4371442500000011,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.19137750000000153,
+        "p95Ms": 0.3365627500000059,
+        "samples": 36
+      },
+      "speedup": 0.8769682956460548,
+      "roundSpeedups": [
+        0.5844612836043576,
+        1.8778833339029644,
+        0.8726093906473665
+      ],
+      "integrity": {
+        "allocatedBytes": 28228,
+        "usedBytes": 93764,
+        "backingBytes": 131072,
+        "payloadSha256": "54ff713505179fdf49443c1576826585b6f401def724fe95592fc0ac8237e000",
+        "descriptorSha256": "7cc85d320d848a3d7a10041a397f75f31e8d7280b993ba1966b2bfd5d83cde63"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-list-number",
+      "collection": "list",
+      "shape": "number",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "number",
+        "jsonBytes": 5
+      },
+      "before": {
+        "medianMs": 0.08562849999999855,
+        "p95Ms": 0.1617202499999948,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.08398150000000015,
+        "p95Ms": 0.2209845000000037,
+        "samples": 36
+      },
+      "speedup": 1.01961146204817,
+      "roundSpeedups": [
+        1.045805955201628,
+        0.687831474030801,
+        1.132984376336139
+      ],
+      "integrity": {
+        "allocatedBytes": 4224,
+        "usedBytes": 69760,
+        "backingBytes": 131072,
+        "payloadSha256": "dd00139a8f8e9d66df1c19d7f14d0dba0bfecedf3deb37e8e8c7c3c56f2b5083",
+        "descriptorSha256": "2547119603014c116887ca94550413ea106991c646318138736616fb8bf68263"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-map-string",
+      "collection": "map",
+      "shape": "string",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 0.17527299999999002,
+        "p95Ms": 0.359880000000004,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.21579950000000991,
+        "p95Ms": 0.3297230000000049,
+        "samples": 36
+      },
+      "speedup": 0.812202993982757,
+      "roundSpeedups": [
+        0.9599751946530696,
+        0.7615624728696352,
+        0.850183803243462
+      ],
+      "integrity": {
+        "allocatedBytes": 36100,
+        "usedBytes": 101636,
+        "backingBytes": 131072,
+        "payloadSha256": "9688e4e52f77cf1b5fa1556fc9cd330ab3121fa7fcccb5302d64c5e6ac2dc353",
+        "descriptorSha256": "3cce4072b7f8113449c886357bf402d714fc5bdf307395316b5ce39c03703862"
+      }
+    },
+    {
+      "runtime": "Bun 1.4.2",
+      "name": "warm-list-string",
+      "collection": "list",
+      "shape": "string",
+      "phase": "warm",
+      "requestedCount": 512,
+      "count": 512,
+      "passes": 32,
+      "operations": 16384,
+      "totalValues": 512,
+      "snapshotCount": 1,
+      "fixture": {
+        "shape": "string",
+        "jsonBytes": 28
+      },
+      "before": {
+        "medianMs": 0.2301660000000041,
+        "p95Ms": 0.3734457500000019,
+        "samples": 36
+      },
+      "after": {
+        "medianMs": 0.20637000000000327,
+        "p95Ms": 0.33812074999999453,
+        "samples": 36
+      },
+      "speedup": 1.115307457479287,
+      "roundSpeedups": [
+        0.9636037272899916,
+        1.2917452922907846,
+        1.1590039154878953
+      ],
+      "integrity": {
+        "allocatedBytes": 20608,
+        "usedBytes": 86144,
+        "backingBytes": 131072,
+        "payloadSha256": "4a11fcfa1d2b1e339099c10399a93ddf953e86690f9709bd3cee1b1e834fca5e",
+        "descriptorSha256": "f8eead8009f174f15934bebbd3949416a5b0a5cb98478379bef8cc04d9223c5b"
+      }
+    }
+  ]
+}

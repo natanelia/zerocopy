@@ -1,0 +1,79 @@
+name: JSON read performance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'arena.ts'
+      - 'codec.ts'
+      - 'freeze-json*'
+      - 'json-read-cache.test.ts'
+      - 'proofs/*json-read*.mjs'
+      - 'scripts/build-*'
+      - 'package.json'
+      - '.github/workflows/json-read-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser
+      - name: Build the PR base with the same tools
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          baseline_ref="${PR_BASE:-$(git rev-parse origin/main)}"
+          git cat-file -e "$baseline_ref^{commit}"
+          mkdir -p .proof-baseline
+          git archive "$baseline_ref" | tar -x -C .proof-baseline
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser)
+      - name: Verify deep freezing and cached reads
+        run: |
+          bun run test -- freeze-json.test.ts json-read-cache.test.ts
+          node proofs/json-read-correctness.mjs
+          bun test ./proofs/json-read-correctness.mjs
+      - name: Measure Node and Bun in isolated processes
+        env:
+          JSON_READ_WARMUPS: '10'
+          JSON_READ_SAMPLES: '12'
+          JSON_READ_ROUNDS: '3'
+        run: node proofs/run-json-read.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/json-read-results/ci
+      - name: Install browser engines
+        if: matrix.os == 'ubuntu-latest'
+        run: bunx playwright install --with-deps chromium firefox webkit
+      - name: Verify and measure browser reads
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          JSON_READ_WARMUPS: '5'
+          JSON_READ_SAMPLES: '7'
+          JSON_READ_ROUNDS: '3'
+        run: node proofs/json-read-browser.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/json-read-results/ci/browsers.json
+      - name: Retain all measurements
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-read-evidence-${{ runner.arch }}-${{ github.sha }}
+          path: proofs/json-read-results/ci/
+          retention-days: 30
+          if-no-files-found: error

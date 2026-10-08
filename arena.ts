@@ -4,6 +4,8 @@ import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
+import { freezeJSON } from './freeze-json';
+export { freezeJSON } from './freeze-json';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
@@ -15,18 +17,6 @@ const realmId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2
 export const FORMAT_VERSION = 4;
 export const HEAP_START = 65536;
 export const MAX_SIZE = 0x3fffffff;
-
-/** Freeze decoded JSON, not the caller's input. JSON trees contain no cycles. */
-export function freezeJSON<T>(value: T): T {
-  if (value === null || typeof value !== 'object') return value;
-  const todo: object[] = [value as object];
-  while (todo.length) {
-    const item = todo.pop()!;
-    for (const child of Object.values(item)) if (child !== null && typeof child === 'object') todo.push(child);
-    Object.freeze(item);
-  }
-  return value;
-}
 
 export function normalizeKey(key: string): string {
   if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
@@ -232,15 +222,21 @@ export class Arena {
     if (type === 'string') {
       const cached = this.strings.get(raw + 4);
       if (cached !== undefined) return cached;
+    } else {
+      // Cached JSON and nested snapshots are immutable. A hit needs neither
+      // the record length nor a refreshed view after shared memory growth.
+      const cached = this.objects.get(raw + 4);
+      if (cached !== undefined) return cached;
     }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
   decodeAt(type: string, ptr: number, len: number): any {
-    this.refresh();
-    if (type === 'number') return this.view.getFloat64(ptr, true);
-    if (type === 'boolean') return this.bytes[ptr] !== 0;
+    if (type === 'number') return this.dv.getFloat64(ptr, true);
+    if (type === 'boolean') return this.buf[ptr] !== 0;
     if (type === 'string') return this.string(ptr, len);
-    if (this.objects.has(ptr)) return this.objects.get(ptr);
+    const cached = this.objects.get(ptr);
+    if (cached !== undefined) return cached;
+    this.refresh();
     const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
     let result: any;
