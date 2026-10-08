@@ -1,0 +1,123 @@
+{
+  "pins": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "priorProduction": "1229e6a24a85c8d97cc72296abe5e91cea208bf7",
+    "originalHarnessSha256": "ee538f455747d6a734922ff952e310ab80e54503b7bb0d2d67e88df518b424df",
+    "source": {
+      "baseline": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "candidate": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786"
+    },
+    "build": {
+      "baseline": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "candidate": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109"
+    }
+  },
+  "toolchain": {
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "assemblyscript": "0.28.20",
+    "platform": "linux"
+  },
+  "schemaVersion": 1,
+  "purpose": "Bounded causal screen; no production repair or replacement of historical evidence",
+  "scope": {
+    "arch": "arm64",
+    "operation": "warmNestedRead",
+    "arenas": 512
+  },
+  "seed": 2026100822,
+  "states": {
+    "B": {
+      "variant": "baseline",
+      "treatment": "native"
+    },
+    "C": {
+      "variant": "candidate",
+      "treatment": "native"
+    },
+    "D": {
+      "variant": "candidate",
+      "treatment": "materialized"
+    },
+    "R": {
+      "variant": "candidate",
+      "treatment": "materialized-released"
+    }
+  },
+  "arms": {
+    "C_over_B": [
+      "B",
+      "C"
+    ],
+    "D_over_C": [
+      "C",
+      "D"
+    ],
+    "R_over_C": [
+      "C",
+      "R"
+    ],
+    "D_over_R": [
+      "R",
+      "D"
+    ],
+    "aa_B": [
+      "B",
+      "B"
+    ],
+    "aa_C": [
+      "C",
+      "C"
+    ],
+    "aa_D": [
+      "D",
+      "D"
+    ],
+    "aa_R": [
+      "R",
+      "R"
+    ]
+  },
+  "quartetsPerArm": 8,
+  "ordersPerArm": {
+    "ABBA": 4,
+    "BAAB": 4
+  },
+  "measuredSubjects": 256,
+  "warmups": 3,
+  "samples": 7,
+  "minimumBatchMs": 20,
+  "pilotTargetBatchMs": 40,
+  "pilotMaximumBatches": 8,
+  "initialIterations": 100000,
+  "maximumIterations": 10000000,
+  "margin": 1.02,
+  "tCritical": 2.3646242510102993,
+  "degreesOfFreedom": 7,
+  "timingFlags": [
+    "--expose-gc"
+  ],
+  "censusFlags": [
+    "--expose-gc",
+    "--allow-natives-syntax"
+  ],
+  "traceFlags": [
+    "--expose-gc",
+    "--trace-opt",
+    "--trace-deopt",
+    "--trace-turbo-inlining",
+    "--trace-gc"
+  ],
+  "publication": {
+    "branch": "proof/registry-arm-causal-20261008",
+    "before": "96b90882df5d5294489065bd303fbbede6a83184",
+    "forced": false,
+    "attempt": 1
+  },
+  "restorationLimitations": [
+    "registry.shared is false in D/R and true in C",
+    "Backing fields are mutable in C/D/R; baseline observed const only in localNode24",
+    "Released maps are unreachable but heap capacity, placement and allocation history are not restored"
+  ]
+}

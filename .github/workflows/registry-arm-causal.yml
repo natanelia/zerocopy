@@ -1,0 +1,86 @@
+name: Registry ARM warm-read causal controls
+
+on:
+  push:
+    branches: [proof/registry-arm-causal-20261008]
+    paths:
+      - 'proofs/registry-arm-causal*'
+      - 'proofs/run-registry-arm-causal.mjs'
+      - '.github/workflows/registry-arm-causal.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/proof/registry-arm-causal-20261008' &&
+      github.event.before == '96b90882df5d5294489065bd303fbbede6a83184' &&
+      github.event.forced == false && github.run_attempt == 1
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    env:
+      BASELINE_SHA: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+      CANDIDATE_SHA: 'ab969f043e44d53f6ba7315c2b818c1a51ce49c9'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify protocol and unchanged runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/registry-causal-setup"
+          node --test proofs/worker-arena-source-guard.node.mjs proofs/registry-attachment-tests.node.mjs proofs/registry-arm-causal-tests.node.mjs 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/protocol-tests.log"
+          node --input-type=module -e "import { publicationReceipt } from './proofs/registry-arm-causal-guard.mjs'; console.log(JSON.stringify(publicationReceipt(process.cwd(), process.env.GITHUB_SHA)));" > "$RUNNER_TEMP/registry-causal-setup/publication-receipt.json"
+          git diff --exit-code "$CANDIDATE_SHA" -- '*.ts' package.json scripts/ bunfig.toml tsconfig.json
+      - name: Build exact inputs and run focused correctness prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          bun install 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/install.log"
+          bun run build:wasm 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/build-proof-wasm.log"
+          bun --bun node_modules/vitest/vitest.mjs run worker-attachment.test.ts descriptor-validation.test.ts worker.test.ts worker-records.test.ts 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/focused-tests.log"
+          bun run typecheck 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/typecheck.log"
+          git worktree add --detach "$RUNNER_TEMP/registry-causal-baseline" "$BASELINE_SHA"
+          git worktree add --detach "$RUNNER_TEMP/registry-causal-candidate" "$CANDIDATE_SHA"
+          for role in baseline candidate; do
+            ln -s "$PWD/node_modules" "$RUNNER_TEMP/registry-causal-$role/node_modules"
+            (cd "$RUNNER_TEMP/registry-causal-$role" && bun run build:wasm && bun run build:browser) 2>&1 | tee "$RUNNER_TEMP/registry-causal-setup/build-$role.log"
+          done
+          printf 'BUN_EXECUTABLE=%s\n' "$(command -v bun)" >> "$GITHUB_ENV"
+          node --version > "$RUNNER_TEMP/registry-causal-setup/node-version.txt"
+          bun --revision > "$RUNNER_TEMP/registry-causal-setup/bun-revision.txt"
+          lscpu --json > "$RUNNER_TEMP/registry-causal-setup/lscpu.json"
+          cat /proc/cpuinfo > "$RUNNER_TEMP/registry-causal-setup/cpuinfo.txt"
+          uname -a > "$RUNNER_TEMP/registry-causal-setup/uname.txt"
+      - name: Run the single frozen ARM study
+        run: node proofs/run-registry-arm-causal.mjs "$RUNNER_TEMP/registry-causal-baseline" "$RUNNER_TEMP/registry-causal-candidate" "$RUNNER_TEMP/registry-causal-results"
+      - name: Pack complete or partial evidence with all filenames preserved
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/registry-causal-setup"
+          paths=(registry-causal-setup)
+          if [[ -d "$RUNNER_TEMP/registry-causal-results" ]]; then paths+=(registry-causal-results); fi
+          tar -czf "$RUNNER_TEMP/registry-arm-causal-evidence.tar.gz" -C "$RUNNER_TEMP" "${paths[@]}"
+          sha256sum "$RUNNER_TEMP/registry-arm-causal-evidence.tar.gz" > "$RUNNER_TEMP/registry-arm-causal-evidence.sha256"
+      - name: Retain the evidence archive
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-arm-causal-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/registry-arm-causal-evidence.tar.gz
+            ${{ runner.temp }}/registry-arm-causal-evidence.sha256
+          retention-days: 30
+          if-no-files-found: error
