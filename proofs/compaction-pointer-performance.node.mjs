@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { summarizeQuartets } from './compaction-pointer-performance.mjs';
+import { assertSameLogicalIntegrity, summarizeQuartets } from './compaction-pointer-performance.mjs';
 function fixture(ratios, flags = {}) {
   const rows = ratios.flatMap((ratio, block) => [0, 1].map(pair => ({ block, pair, speedup: 1 / ratio })));
   const subjects = ratios.flatMap(ratio => [0, 1].flatMap(() => [
@@ -47,4 +47,11 @@ test('does not create extra degrees of freedom from pairs within a quartet', () 
   assert.equal(result.independentQuartets, 4); assert.equal(result.degreesOfFreedom, 3);
   assert.deepEqual(result.quartetLatencyRatios, [1, 1, 1, 1]);
   assert.deepEqual(result.interval, [1, 1]);
+});
+
+test('allows target-ID-dependent byte size changes without weakening logical integrity', () => {
+  const initial = { names: ['list', 'child'], size: 160, compactedBytes: 19328 };
+  assertSameLogicalIntegrity(initial, { ...initial, compactedBytes: 20352 });
+  assert.throws(() => assertSameLogicalIntegrity(initial, { ...initial, size: 159 }));
+  assert.throws(() => assertSameLogicalIntegrity(initial, { ...initial, names: ['list'] }));
 });

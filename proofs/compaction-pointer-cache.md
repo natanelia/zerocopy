@@ -55,7 +55,11 @@ attachment, source-byte checks and full output inspection are outside timing.
 The timed operation is a complete `compactMany`, plus a small result-size
 checksum. New target arenas and ordinary garbage-collection costs remain part
 of the operation. Sources are reused without mutation and output arenas are
-not deliberately retained between calls.
+not deliberately retained between calls. Initial and final compacted byte totals
+are recorded separately: fresh target arena IDs are serialized into nested
+values, so a wider ID can legitimately increase blob length/alignment while
+preserving identical values and sharing. Full value and source-byte checks
+remain required; the target byte total is not compared across different IDs.
 
 Each subject uses one fresh runtime process and exactly one portable build.
 Both roles are copied to the same neutral import URL; manifests and symlink

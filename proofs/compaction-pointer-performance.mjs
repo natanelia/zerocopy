@@ -37,6 +37,14 @@ export const cases = {
   'tiny-three-kinds128': { kind: 'many', size: 128 },
 };
 
+export function assertSameLogicalIntegrity(initial, final) {
+  // Fresh target IDs are serialized into nested descriptors. A wider ID can
+  // change byte lengths/alignment even when all logical values are identical.
+  const { compactedBytes: initialBytes, ...before } = initial;
+  const { compactedBytes: finalBytes, ...after } = final;
+  assert.deepEqual(after, before);
+}
+
 export async function subject(config) {
   const api = await import(pathToFileURL(config.module).href), spec = cases[config.name];
   assert.ok(spec);
@@ -118,11 +126,12 @@ export async function subject(config) {
     throw new Error('Calibration failed');
   }
   const samples = Array.from({ length: config.samples }, () => batch(config.iterations));
-  assert.deepEqual(verify(), integrity);
+  const finalIntegrity = verify();
+  assertSameLogicalIntegrity(integrity, finalIntegrity);
   const after = api.getWorkerData(snapshots, { copy: true });
   assert.equal(after.arenas.length, original.arenas.length);
   after.arenas.forEach((a, i) => assert.equal(Buffer.compare(a.copy, original.arenas[i].copy), 0, 'Published source changed'));
-  return { mode: 'measure', iterations: config.iterations, samples, medianMs: median(samples.map(s => s.ms)), warmScans, warmElapsedMs, integrity,
+  return { mode: 'measure', iterations: config.iterations, samples, medianMs: median(samples.map(s => s.ms)), warmScans, warmElapsedMs, integrity, finalIntegrity,
     shortBatchCount: samples.filter(s => s.ms < config.floorMs).length, warmFloorMet: warmElapsedMs >= config.warmMs, runtime: process.versions };
 }
 // Student t critical values for two-sided 95% intervals, df=1..11. The
