@@ -1,0 +1,69 @@
+name: Worker arena browser correctness
+
+on:
+  push:
+    branches: [proof/worker-arena-browser-20261008]
+  workflow_dispatch:
+    inputs:
+      runtime_sha:
+        description: Frozen runtime commit to test
+        required: true
+        default: '1229e6a24a85c8d97cc72296abe5e91cea208bf7'
+
+permissions:
+  contents: read
+
+jobs:
+  browsers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUNTIME_SHA: ${{ inputs.runtime_sha || '1229e6a24a85c8d97cc72296abe5e91cea208bf7' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: proof
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RUNTIME_SHA }}
+          path: runtime
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build only the frozen runtime
+        run: |
+          test "$(git -C runtime rev-parse HEAD)" = "$RUNTIME_SHA"
+          (cd runtime && bun install && bun run build:wasm && bun run build:browser)
+          ln -s ../runtime/node_modules proof/node_modules
+      - name: Verify the shared protocol with Node workers
+        run: node proof/proofs/worker-arenas.mjs runtime/dist/shared.js
+      - name: Install all browser engines
+        working-directory: runtime
+        run: bunx playwright install --with-deps chromium firefox webkit
+      - name: Verify real browser workers in both transport modes
+        run: node proof/proofs/worker-arena-browser.mjs runtime/dist/shared.js proof/proofs/worker-arena-browser-results/ci/report.json
+      - name: Retain correctness evidence and the exact loaded runtime
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: worker-arena-browser-${{ env.RUNTIME_SHA }}-${{ github.sha }}
+          path: |
+            proof/proofs/worker-arena-browser-results/ci/
+            proof/proofs/worker-arena-protocol.mjs
+            proof/proofs/worker-arena-browser-worker.mjs
+            proof/proofs/worker-arena-browser.mjs
+            proof/proofs/worker-arenas.mjs
+            proof/proofs/worker-arena-source-guard.mjs
+            proof/.github/workflows/worker-arena-browser-correctness.yml
+            runtime/dist/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

@@ -1,59 +1,29 @@
-import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { Worker, isMainThread, parentPort } from 'node:worker_threads';
-import * as S from '../dist/shared.js';
+import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { ARENA_COUNTS, createArenaWorkerProtocol, runArenaScenario } from './worker-arena-protocol.mjs';
 
-const count = 48;
-let producer;
-function create(offset) {
-  if (!producer) {
-    const leaves = [];
-    for (let i = 0; i < count; i++) {
-      S.resetMap(); leaves.push(new S.SharedMap('number'));
-    }
-    S.resetMap(); producer = { leaves, root: new S.SharedMap('SharedMap<number>') };
-  }
-  producer.leaves = producer.leaves.map((leaf, i) => leaf.set('value', offset + i));
-  producer.root = producer.root.setMany(producer.leaves.map((leaf, i) => [`leaf${i}`, leaf]));
-  return { root: producer.root };
-}
-function check({ root }, offset, readCount = count) {
-  for (let i = 0; i < readCount; i++) {
-    const leaf = root.get(`leaf${i}`);
-    assert.equal(leaf.get('value'), offset + i);
-    assert.equal(root.get(`leaf${i}`), leaf);
-    assert.throws(() => leaf.set('value', -1), /read-only/);
-  }
-}
-
+const library = isMainThread ? pathToFileURL(resolve(process.argv[2] ?? fileURLToPath(new URL('../dist/shared.js', import.meta.url)))).href : workerData.library;
+const api = await import(library);
 if (!isMainThread) {
-  let retained;
-  parentPort.on('message', async ({ data, offset, copy }) => {
-    try {
-      const current = await S.initWorker(data);
-      if (retained) check(retained, 0);
-      // Leave the final old leaf cold until after the next attachment.
-      check(current, offset, retained ? count : count - 1);
-      retained ??= current;
-      const forwarded = S.getWorkerData(current, { copy });
-      assert.equal(forwarded.arenas.length, count + 1);
-      parentPort.postMessage({ data: forwarded });
-    } catch (error) { parentPort.postMessage({ error: error.stack }); }
+  const handle = createArenaWorkerProtocol(api);
+  parentPort.on('message', async message => {
+    try { parentPort.postMessage(await handle(message)); }
+    catch (error) { parentPort.postMessage({ error: error.stack ?? String(error) }); }
   });
 } else {
-  for (const copy of [false, true]) {
-    const worker = new Worker(new URL(import.meta.url));
-    const timer = setTimeout(() => { console.error('Many-arena worker proof timed out'); process.exit(1); }, 30000);
+  const results = [];
+  for (const arenas of ARENA_COUNTS) for (const copy of [false, true]) {
+    const worker = new Worker(new URL(import.meta.url), { workerData: { library } });
+    const timer = setTimeout(() => { console.error('Worker arena correctness proof timed out'); process.exit(1); }, 30000);
     try {
-      for (const offset of [0, 100]) {
-        const data = S.getWorkerData(create(offset), { copy });
-        assert.equal(data.arenas.length, count + 1);
-        const received = once(worker, 'message'); worker.postMessage({ data, offset, copy });
-        const [response] = await received;
-        if (response.error) throw new Error(response.error);
-        check(await S.initWorker(response.data), offset);
-      }
+      const exchange = async message => {
+        const received = once(worker, 'message'); worker.postMessage(message);
+        const [reply] = await received; return reply;
+      };
+      results.push(await runArenaScenario(api, exchange, arenas, copy));
     } finally { clearTimeout(timer); await worker.terminate(); }
   }
-  console.log(JSON.stringify({ passed: true, runtime: process.version, arenas: count + 1, copyAndShared: true, reexport: true, retained: true, nestedReadOnly: true, repeatedArenaIds: true, deferredOldRead: true }));
+  console.log(JSON.stringify({ passed: true, runtime: process.version, library, results }));
 }

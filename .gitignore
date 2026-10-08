@@ -47,3 +47,6 @@ proofs/json-read-results/ci/
 
 # Reproducible worker attachment measurements from CI
 proofs/worker-arena-results/ci/
+
+# Browser-only worker correctness evidence
+proofs/worker-arena-browser-results/ci/
