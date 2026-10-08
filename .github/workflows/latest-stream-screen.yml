@@ -1,6 +1,6 @@
 name: Latest snapshot stream Node22 screen
 
-# One fixed screen on the dedicated branch; rerun attempts cannot collect timing.
+# One replacement collection after the original upload failure; no timing-driven reruns.
 on:
   push:
     branches: [perf/latest-stream-slot-20261008]
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   screen:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/perf/latest-stream-slot-20261008' && github.run_attempt == 1 && github.event.before == '19da19f03237c28eaa8a115a5ff54c77b0ddb77d' && !github.event.forced && !github.event.deleted
+    if: github.event_name == 'push' && github.ref == 'refs/heads/perf/latest-stream-slot-20261008' && github.run_attempt == 1 && github.event.before == 'f7ba5a423bdf515a03c0e308893c658c2d8f19a9' && !github.event.forced && !github.event.deleted
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
@@ -24,6 +24,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Preserve the failed original study and exact proof source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/stream-screen/history"
+          cp proofs/latest-stream-screen-first-attempt.json "$RUNNER_TEMP/stream-screen/history/first-attempt-audit.json"
+          git archive f7ba5a423bdf515a03c0e308893c658c2d8f19a9 > "$RUNNER_TEMP/stream-screen/history/original-proof-source.tar"
+          git show f7ba5a423bdf515a03c0e308893c658c2d8f19a9:.github/workflows/latest-stream-screen.yml > "$RUNNER_TEMP/stream-screen/history/original-workflow.yml"
       - uses: actions/setup-node@v4
         with:
           node-version: '22.23.3'
@@ -63,11 +71,17 @@ jobs:
         run: node proofs/gate-latest-stream-screen.mjs "$RUNNER_TEMP/stream-base" "$RUNNER_TEMP/stream-candidate" "$RUNNER_TEMP/stream-screen/gate"
       - name: Run six cells once with balanced A/B and baseline A/A quartets
         run: node proofs/run-latest-stream-screen.mjs "$RUNNER_TEMP/stream-base" "$RUNNER_TEMP/stream-candidate" "$RUNNER_TEMP/stream-screen/measurements" --measure "$RUNNER_TEMP/stream-screen/gate/gate.json"
+      - name: Archive complete or partial evidence with original paths and bytes
+        if: always()
+        run: node proofs/archive-latest-stream-screen-evidence.mjs "$RUNNER_TEMP/stream-screen" "$RUNNER_TEMP/stream-screen-upload"
       - name: Retain complete or partial evidence, bundles and path receipts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: latest-stream-node22-x64-${{ github.sha }}
-          path: ${{ runner.temp }}/stream-screen/
+          path: |
+            ${{ runner.temp }}/stream-screen-upload/stream-screen.tar.gz
+            ${{ runner.temp }}/stream-screen-upload/stream-screen.tar.gz.sha256
+          compression-level: 0
           retention-days: 30
           if-no-files-found: error

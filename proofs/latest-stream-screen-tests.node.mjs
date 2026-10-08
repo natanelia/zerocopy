@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { protocol, scheduleCase, variantFor, interval, summarizeCase, applyRunIntegrity } from './latest-stream-screen-protocol.mjs';
 import { treeManifest, sourceContext, stageCanonical, checkAfterSubject, cleanEnvironment, sha256, verifyPinnedSnapshot, verifyGate, requiredGateChecks, createEvidenceDirectory } from './latest-stream-screen-guard.mjs';
 import { readSubjectLog } from './run-latest-stream-screen.mjs';
+import { archiveEvidence } from './archive-latest-stream-screen-evidence.mjs';
 
 test('scope, toolchain, caps and margin are frozen', () => {
   assert.deepEqual(protocol.cases.map(x => [x.copy, x.consumer, x.streams, x.updates]), [[false, 'paused', 1, 32], [true, 'paused', 1, 32], [false, 'paused', 4, 4096], [true, 'paused', 4, 4096], [false, 'waiting', 4, 4096], [true, 'waiting', 4, 4096]]);
@@ -197,12 +198,60 @@ test('evidence output creation rejects both partial and completed existing direc
     assert.equal(readFileSync(join(output, 'results.json'), 'utf8'), 'retained');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
-test('workflow gates full tests before measurement and limits collection to the dedicated first push attempt', () => {
+test('evidence archive lists and round-trips colon paths, hidden files and nested raw bytes', () => {
+  const root = mkdtempSync(join(tmpdir(), 'stream-archive-test-'));
+  try {
+    const source = join(root, 'evidence'), output = join(root, 'upload'), extracted = join(root, 'extracted');
+    const files = {
+      'gate/baseline-build:types.log': Buffer.from('declaration output\r\n\0unmodified\n'),
+      '.hidden-receipt': Buffer.from('include hidden evidence\n'),
+      'measurements/case-0/raw/subject:0.ndjson': Buffer.from('{"event":"round"}\n{"event":"partial"'),
+      'measurements/case-0/raw/trace.bin': Buffer.from([0, 1, 13, 10, 127, 128, 254, 255]),
+    };
+    for (const [path, bytes] of Object.entries(files)) {
+      mkdirSync(join(source, path, '..'), { recursive: true }); writeFileSync(join(source, path), bytes);
+    }
+    mkdirSync(join(source, 'empty')); mkdirSync(extracted);
+    const before = treeManifest(source), packaged = archiveEvidence(source, output);
+    const listed = execFileSync('tar', ['-tzf', packaged.archive], { encoding: 'utf8' }).trim().split('\n').sort();
+    assert.deepEqual(listed, ['.', ...before.entries.map(row => row.path)].map(path => path === '.' ? './' : `./${path}`).sort());
+    assert.equal(readFileSync(packaged.checksum, 'utf8'), `${sha256(readFileSync(packaged.archive))}  stream-screen.tar.gz\n`);
+    execFileSync('sha256sum', ['--check', 'stream-screen.tar.gz.sha256'], { cwd: output });
+    execFileSync('tar', ['-xzf', packaged.archive, '-C', extracted]);
+    assert.deepEqual(treeManifest(extracted), before);
+    for (const [path, bytes] of Object.entries(files)) assert.deepEqual(readFileSync(join(extracted, path)), bytes);
+    assert.deepEqual(treeManifest(source), before, 'Packaging must not mutate evidence');
+    const archivedBytes = readFileSync(packaged.archive);
+    assert.throws(() => archiveEvidence(source, output), /EEXIST/);
+    assert.deepEqual(readFileSync(packaged.archive), archivedBytes, 'Repeated packaging must not replace evidence');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+test('packaging CLI can retain an empty directory after early setup failure', () => {
+  const root = mkdtempSync(join(tmpdir(), 'stream-empty-archive-test-'));
+  try {
+    const source = join(root, 'not-yet-created'), output = join(root, 'upload');
+    execFileSync(process.execPath, [new URL('./archive-latest-stream-screen-evidence.mjs', import.meta.url).pathname, source, output]);
+    assert.equal(execFileSync('tar', ['-tzf', join(output, 'stream-screen.tar.gz')], { encoding: 'utf8' }), './\n');
+    execFileSync('sha256sum', ['--check', 'stream-screen.tar.gz.sha256'], { cwd: output });
+    assert.throws(() => archiveEvidence(source, join(source, 'upload')), /outside evidence/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+test('original failed-attempt audit remains exact and timed inputs have not changed', () => {
+  const bytes = readFileSync(new URL('./latest-stream-screen-first-attempt.json', import.meta.url));
+  assert.equal(sha256(bytes), '53ed85f8a425cd9ad1bf1516417a135776d16a801eec638adcf090b3081b9631');
+  const original = JSON.parse(bytes);
+  assert.equal(original.runId, 37849591258); assert.equal(original.jobId, 113558904846); assert.equal(original.artifactCount, 0);
+  assert.equal(original.cells.length, 6); assert(original.cells.every(cell => !cell.inferenceValid && Object.values(cell.statistics).every(value => value === null)));
+  for (const path of ['gate-latest-stream-screen.mjs', 'latest-stream-screen-protocol.mjs', 'latest-stream-screen-subject.mjs', 'latest-stream-screen.manifest.json', 'run-latest-stream-screen.mjs']) {
+    assert.equal(sha256(readFileSync(new URL(path, import.meta.url))), original.independentlyVerified.allNineReviewedProofFileHashes[`proofs/${path}`], `${path} changed`);
+  }
+});
+test('workflow gates full tests before one replacement collection from the failed proof head', () => {
   const yaml = readFileSync(new URL('../.github/workflows/latest-stream-screen.yml', import.meta.url), 'utf8');
   assert(yaml.includes('\n  push:')); assert(!yaml.includes('workflow_dispatch:')); assert(!yaml.includes('\n  pull_request:'));
   assert(yaml.includes('branches: [perf/latest-stream-slot-20261008]')); assert(yaml.includes('github.run_attempt == 1'));
   assert(yaml.includes("github.event_name == 'push'")); assert(yaml.includes("github.ref == 'refs/heads/perf/latest-stream-slot-20261008'"));
-  assert(yaml.includes("github.event.before == '19da19f03237c28eaa8a115a5ff54c77b0ddb77d'")); assert(yaml.includes('!github.event.forced'));
+  assert(yaml.includes("github.event.before == 'f7ba5a423bdf515a03c0e308893c658c2d8f19a9'")); assert(yaml.includes('!github.event.forced')); assert(yaml.includes('!github.event.deleted'));
   assert(yaml.includes(protocol.pins.candidate)); assert.equal(protocol.pins.candidate, '19da19f03237c28eaa8a115a5ff54c77b0ddb77d');
   assert(yaml.includes('node --test proofs/latest-stream-screen-tests.node.mjs')); assert(yaml.includes('if: always()'));
   assert(yaml.indexOf('gate-latest-stream-screen.mjs') < yaml.indexOf('--measure'));
@@ -210,4 +259,15 @@ test('workflow gates full tests before measurement and limits collection to the 
   const gate = readFileSync(new URL('./gate-latest-stream-screen.mjs', import.meta.url), 'utf8'); assert(gate.includes("'full-unit', bun, ['run', 'test']"));
   assert(gate.indexOf("required(variant, 'build:types'") < gate.indexOf("required(variant, 'public-worker-types'"));
   assert(gate.includes("required(variant, 'public-worker-types'"));
+  assert(yaml.includes('git archive f7ba5a423bdf515a03c0e308893c658c2d8f19a9'));
+  assert(yaml.includes('f7ba5a423bdf515a03c0e308893c658c2d8f19a9:.github/workflows/latest-stream-screen.yml'));
+  assert(yaml.includes('cp proofs/latest-stream-screen-first-attempt.json'));
+  const archive = yaml.indexOf('      - name: Archive complete or partial evidence');
+  const upload = yaml.indexOf('      - name: Retain complete or partial evidence');
+  assert(archive > yaml.indexOf('--measure') && upload > archive);
+  assert(yaml.slice(archive, upload).includes('if: always()')); assert(yaml.slice(upload).includes('if: always()'));
+  assert(yaml.slice(archive, upload).includes('node proofs/archive-latest-stream-screen-evidence.mjs'));
+  assert(yaml.slice(upload).includes('stream-screen-upload/stream-screen.tar.gz\n'));
+  assert(yaml.slice(upload).includes('stream-screen-upload/stream-screen.tar.gz.sha256\n'));
+  assert(!yaml.slice(upload).includes('path: ${{ runner.temp }}/stream-screen/'));
 });

@@ -6,7 +6,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, re
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { protocol } from './latest-stream-screen-protocol.mjs';
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-export const proofFiles = ['latest-stream-screen.manifest.json', 'latest-stream-screen.md', 'latest-stream-screen-protocol.mjs', 'latest-stream-screen-guard.mjs', 'latest-stream-screen-subject.mjs', 'latest-stream-screen-tests.node.mjs', 'run-latest-stream-screen.mjs', 'gate-latest-stream-screen.mjs'];
+export const proofFiles = ['latest-stream-screen.manifest.json', 'latest-stream-screen.md', 'latest-stream-screen-protocol.mjs', 'latest-stream-screen-guard.mjs', 'latest-stream-screen-subject.mjs', 'latest-stream-screen-tests.node.mjs', 'run-latest-stream-screen.mjs', 'gate-latest-stream-screen.mjs', 'archive-latest-stream-screen-evidence.mjs', 'latest-stream-screen-first-attempt.json'];
 export function proofFingerprint(root) {
   const paths = [...proofFiles.map(path => `proofs/${path}`), '.github/workflows/latest-stream-screen.yml'];
   return Object.fromEntries(paths.map(path => [path, sha256(readFileSync(join(root, path)))]));

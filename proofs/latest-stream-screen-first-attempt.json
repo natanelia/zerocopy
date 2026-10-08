@@ -1,0 +1,217 @@
+{
+  "status": "blocked-no-retained-raw-evidence",
+  "auditedAt": "2026-10-08T22:05:00Z",
+  "runId": 37849591258,
+  "jobId": 113558904846,
+  "url": "https://github.com/natanelia/zerocopy/actions/runs/37849591258",
+  "proofHead": "f7ba5a423bdf515a03c0e308893c658c2d8f19a9",
+  "proofTree": "95cbfa36d4ccc13f5a8b79f6a849b1ccaaf9a845",
+  "reviewedLocalProofCommit": "dcc7a225901084fdd6c8e4920a12cfd5ec30e890",
+  "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+  "candidate": "19da19f03237c28eaa8a115a5ff54c77b0ddb77d",
+  "runtimeTree": "70dcf2779115bf51fe363930287c2717963261e1",
+  "runAttempt": 1,
+  "event": "push",
+  "runConclusion": "failure",
+  "measurementControllerReported": {
+    "status": "completed",
+    "cases": 6,
+    "subjects": 204,
+    "timestamp": "2026-10-08T22:03:24.3079339Z"
+  },
+  "correctnessGateStepReported": "success; individual full-suite and built strict-consumer/worker/task/session logs and receipts are unavailable",
+  "artifactCount": 0,
+  "artifactDiscoveryFiles": 708,
+  "failure": {
+    "stage": "actions/upload-artifact@v4",
+    "firstRejectedPath": "/gate/baseline-build:types.log",
+    "reason": "Colon is forbidden in artifact paths",
+    "timestamp": "2026-10-08T22:03:24.5053000Z"
+  },
+  "independentlyVerified": {
+    "exactHeadTreeAndParent": true,
+    "allNineReviewedProofFileHashes": {
+      ".github/workflows/latest-stream-screen.yml": "ba8f00bf9784343f7a3c9e3334b761ff59e99e0afe82177ec63d92ff521256c4",
+      "proofs/gate-latest-stream-screen.mjs": "5f4ce0f82e3b732ec349d3137dadf0bd08bc04c2361a024db81dd16a182b12d6",
+      "proofs/latest-stream-screen-guard.mjs": "0dfba909bda723db33a32fb60bbabe97fe08474345273c67cb3a6515251c29d7",
+      "proofs/latest-stream-screen-protocol.mjs": "5e7d1f89dd2207cfe19128735a7e53078280c24c4dadd189daf27e8cffe581d2",
+      "proofs/latest-stream-screen-subject.mjs": "f9e4269b3bfde56f2f9b12e6e6d57756a22c2066db99561c58336f807cd228c9",
+      "proofs/latest-stream-screen-tests.node.mjs": "69f8427ab2f9e2fa1702127ca4014597714b12f030aedc8fbb9e4cea9793c60e",
+      "proofs/latest-stream-screen.manifest.json": "08819f2cbb7f4958d1defb118e5031134f237a8698a2064a39c809f0fd906f88",
+      "proofs/latest-stream-screen.md": "af649acbc15166ca8b58c0fff853bfa7c1b360369815c6357aa199e01c8abd5a",
+      "proofs/run-latest-stream-screen.mjs": "8f42ab44dacd7088775e662b443d92f7bc3504afdc0aa15dd97f20769b3ec13b"
+    },
+    "deterministicTestsFromJobLog": {
+      "passed": 17,
+      "failed": 0
+    },
+    "correctnessBeforeMeasurement": true,
+    "terminalWorkflowStatusAndEmptyArtifactRestListing": true
+  },
+  "independentRawAudit": "not possible: no artifact ZIP or raw data is retained through the exposed workflow artifact API; job stdout contains only completion status and counts",
+  "cells": [
+    {
+      "workload": {
+        "name": "shared/paused/1/32",
+        "copy": false,
+        "consumer": "paused",
+        "streams": 1,
+        "updates": 32
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    },
+    {
+      "workload": {
+        "name": "copy/paused/1/32",
+        "copy": true,
+        "consumer": "paused",
+        "streams": 1,
+        "updates": 32
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    },
+    {
+      "workload": {
+        "name": "shared/paused/4/4096",
+        "copy": false,
+        "consumer": "paused",
+        "streams": 4,
+        "updates": 4096
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    },
+    {
+      "workload": {
+        "name": "copy/paused/4/4096",
+        "copy": true,
+        "consumer": "paused",
+        "streams": 4,
+        "updates": 4096
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    },
+    {
+      "workload": {
+        "name": "shared/waiting/4/4096",
+        "copy": false,
+        "consumer": "waiting",
+        "streams": 4,
+        "updates": 4096
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    },
+    {
+      "workload": {
+        "name": "copy/waiting/4/4096",
+        "copy": true,
+        "consumer": "waiting",
+        "streams": 4,
+        "updates": 4096
+      },
+      "inferenceValid": false,
+      "reason": "missing-retained-raw-evidence",
+      "statistics": {
+        "abRatio": null,
+        "abCi95": null,
+        "aaRatio": null,
+        "aaCi95": null,
+        "absoluteMedians": null,
+        "variance": null,
+        "durationFloorFlags": null,
+        "pilotCapFlags": null,
+        "aaDriftFlag": null,
+        "traceAssertions": null,
+        "sourceCompilerBundlePathReceipts": null
+      }
+    }
+  ],
+  "conclusion": "No defensible end-to-end improvement, regression bound or numerical latency estimate can be established from this run. A completed controller is not proof of valid duration floors, A/A controls, precise intervals or retained raw integrity. Preserve only the previously verified narrow allocation-mechanism statement.",
+  "untestedOrUnestablished": [
+    "No independently auditable Node 22.23.3 Linux x64 latency result from this run",
+    "Other Node versions, Bun runtime, Deno",
+    "ARM64, Windows, macOS, browsers",
+    "Default latest publisher transport",
+    "Fresh immutable-map construction",
+    "FIFO streams",
+    "Multiple readers or multiple workers",
+    "Real application latency or throughput",
+    "Heap bytes, GC behavior and retained memory"
+  ],
+  "actionsTaken": [
+    "Read-only terminal workflow and artifact checks",
+    "Mirrored public CI log and exact-head metadata",
+    "Prepared independent raw auditor; validated its parser against existing untimed local traces",
+    "No runtime edits, proof edits, rerun, publication or numerical reconstruction from missing samples"
+  ],
+  "recoveryBoundary": "Hosted job has ended and no downloadable artifact exists. Any new collection or retention fix changes the frozen one-attempt experiment and requires a separately authorized plan; no rerun was attempted."
+}
