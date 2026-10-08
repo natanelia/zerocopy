@@ -474,18 +474,32 @@ export function vecLeaf(root: u32, depth: u32, index: u32): u32 {
   return root;
 }
 export function vecGet(root: u32, depth: u32, index: u32): f64 { return load<f64>(vecLeaf(root, depth, index) + (index & 31) * 8); }
-function vecSetAt(root: u32, depth: u32, index: u32, value: f64): u32 {
-  const bytes: u32 = depth ? 128 : 256;
-  const p = alloc(bytes);
-  if (root) memory.copy(p, root, bytes); else memory.fill(p, 0, bytes);
-  if (!depth) store<f64>(p + (index & 31) * 8, value);
-  else {
-    const off = ((index >> (depth * 5)) & 31) * 4;
-    store<u32>(p + off, vecSetAt(root ? load<u32>(root + off) : 0, depth - 1, index, value));
+function vecSetAt(root: u32, depth: u32, index: u32, value: f64, pathBytes: u32): u32 {
+  if (!depth) {
+    const off = (index & 31) * 8;
+    // Compare the stored representation, including signed zero and NaN payloads.
+    if (root && load<u64>(root + off) == reinterpret<u64>(value)) return root;
+    // Reserve only after detecting a change. The leaf occupies the end of the
+    // contiguous path, leaving parent-first addresses for ancestors on unwind.
+    const p = alloc(pathBytes) + pathBytes - 256;
+    if (root) memory.copy(p, root, 256); else memory.fill(p, 0, 256);
+    store<f64>(p + off, value); return p;
   }
-  return p;
+  const off = ((index >> (depth * 5)) & 31) * 4;
+  const old = root ? load<u32>(root + off) : 0;
+  // Resolve the existing path once, then copy only changed ancestors.
+  const child = vecSetAt(old, depth - 1, index, value, pathBytes);
+  if (child == old) return root;
+  const p = child - 128;
+  if (root) memory.copy(p, root, 128); else memory.fill(p, 0, 128);
+  store<u32>(p + off, child); return p;
 }
-export function vecSet(root: u32, depth: u32, index: u32, value: f64): u32 { return vecSetAt(root, depth, index, value); }
+export function vecSet(root: u32, depth: u32, index: u32, value: f64): u32 {
+  // Public vectors have depth <= 5. Guard the raw ABI's path-size arithmetic
+  // without narrowing its existing depth domain to the public collection limit.
+  if (depth > (0x7fff0000 - 256) / 128) unreachable();
+  return vecSetAt(root, depth, index, value, 256 + depth * 128);
+}
 // Shared accessors for the immutable block sequence tree.
 @inline function sl(p: u32): u32 { return p ? load<u32>(p) : 0; }
 @inline function sr(p: u32): u32 { return p ? load<u32>(p + 4) : 0; }
