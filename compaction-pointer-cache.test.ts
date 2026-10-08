@@ -42,6 +42,31 @@ describe('compaction pointer cache domains', () => {
     expect(result.list.push('writable').toArray()).toEqual(['same', 'other', 'writable']);
   });
 
+  for (const copy of [false, true]) test(`first cache group survives fallback groups across attachments, copy=${copy}`, async () => {
+    const a = new Arena(), b = new Arena();
+    const list = new S.SharedList('string', 0, 0, 0, a).push('first');
+    const more = list.push('later');
+    const object = new S.SharedList('object', 0, 0, 0, a).push({ value: 'object' });
+    const other = new S.SharedList('string', 0, 0, 0, b).push('other');
+    const otherMore = other.push('last');
+    expect(raw(list)).toBe(raw(other));
+    const data = S.getWorkerData({ list, more, object, other, otherMore }, { copy });
+    const first = await S.initWorker(data), second = await S.initWorker(data);
+    const result = S.compactMany({
+      list: first.list, object: first.object, other: first.other,
+      more: second.more, otherMore: second.otherMore,
+    });
+    expect(result.list.toArray()).toEqual(['first']);
+    expect(result.object.toArray()).toEqual([{ value: 'object' }]);
+    expect(result.more.toArray()).toEqual(['first', 'later']);
+    expect(result.otherMore.toArray()).toEqual(['other', 'last']);
+    expect(raw(result.list)).toBe(raw(result.more));
+    expect(raw(result.other)).toBe(raw(result.otherMore));
+    expect(raw(result.list)).not.toBe(raw(result.other));
+    const sameSession = S.compactMany({ list: first.list, object: first.object, other: first.other, more: first.more, otherMore: first.otherMore });
+    expect(arenaOf(result.list).used).toBe(arenaOf(sameSession.list).used);
+  });
+
   test('identical numeric pointers in distinct arenas remain distinct', () => {
     const first = new S.SharedList('string', 0, 0, 0, new Arena()).push('first');
     const second = new S.SharedList('string', 0, 0, 0, new Arena()).push('other');

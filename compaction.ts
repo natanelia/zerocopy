@@ -40,12 +40,22 @@ export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
 class Compactor {
   readonly target = new Arena();
   private readonly snapshots = new Map<string, Compactable>();
-  private readonly pointers = new Map<string, Map<string, Map<number | string, number>>>();
+  private readonly pointers = new Map<number | string, number>();
+  private firstArenaId: string | undefined;
+  private firstKind: string | undefined;
+  private groups: Map<string, Map<string, Map<number | string, number>>> | undefined;
   private pointerGroup(a: Arena, kind: string): Map<number | string, number> {
     // Arena IDs are shared by independent read-only attachments of one source.
     // Object identity would lose sharing when those sessions are compacted together.
-    let kinds = this.pointers.get(a.id);
-    if (!kinds) this.pointers.set(a.id, kinds = new Map());
+    // The common single group uses the initial cache directly. Allocate the
+    // grouping index only when another arena or pointer namespace is needed.
+    if (this.firstArenaId === undefined) {
+      this.firstArenaId = a.id; this.firstKind = kind; return this.pointers;
+    }
+    if (this.firstArenaId === a.id && this.firstKind === kind) return this.pointers;
+    const groups = this.groups ??= new Map();
+    let kinds = groups.get(a.id);
+    if (!kinds) groups.set(a.id, kinds = new Map());
     let pointers = kinds.get(kind);
     if (!pointers) kinds.set(kind, pointers = new Map());
     return pointers;
