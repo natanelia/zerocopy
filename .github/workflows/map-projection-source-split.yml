@@ -1,0 +1,76 @@
+name: Map projection source-split diagnostic
+on:
+  push:
+    branches: [perf/map-projection-split-20261008]
+    paths:
+      - 'proofs/map-projection-source-split.mjs'
+      - '.github/workflows/map-projection-source-split.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  firefox-source-split:
+    if: github.repository == 'natanelia/zerocopy' && github.ref == 'refs/heads/perf/map-projection-split-20261008'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BASELINE_COMMIT: 3331f2f0e9e0c3c61832e5f04b12e18c1889d96c
+      ORDERED_ONLY_COMMIT: da448d13e6c6298933b69021ffaf15edb3046427
+      SORTED_ONLY_COMMIT: d129c53f0e0f3db220c80f25f22cdaca2db31eac
+      FULL_COMMIT: e206725cf53bf07864fc05e76a39d794ad1c88c4
+      BLOCKS: '4'
+      SEED: '20261008'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check out immutable ordered-only source
+        uses: actions/checkout@v4
+        with:
+          ref: da448d13e6c6298933b69021ffaf15edb3046427
+          path: .split-ordered
+          persist-credentials: false
+      - name: Check out immutable sorted-only source
+        uses: actions/checkout@v4
+        with:
+          ref: d129c53f0e0f3db220c80f25f22cdaca2db31eac
+          path: .split-sorted
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - name: Build all four immutable sources with the same toolchain
+        run: |
+          set -euo pipefail
+          mkdir -p .split-baseline .split-full proofs/results/map-projection-source-split
+          git archive "$BASELINE_COMMIT" | tar -x -C .split-baseline
+          git archive "$FULL_COMMIT" | tar -x -C .split-full
+          test "$(git -C .split-ordered rev-parse HEAD)" = "$ORDERED_ONLY_COMMIT"
+          test "$(git -C .split-sorted rev-parse HEAD)" = "$SORTED_ONLY_COMMIT"
+          for dir in .split-baseline .split-ordered .split-sorted .split-full; do
+            ln -s "$PWD/node_modules" "$dir/node_modules"
+            (cd "$dir" && bun run build:wasm && bun run build:browser)
+          done
+          printf '%s\n' "$BASELINE_COMMIT" > proofs/results/map-projection-source-split/base-commit.txt
+          printf '%s\n' "$ORDERED_ONLY_COMMIT" > proofs/results/map-projection-source-split/ordered-only-commit.txt
+          printf '%s\n' "$SORTED_ONLY_COMMIT" > proofs/results/map-projection-source-split/sorted-only-commit.txt
+          printf '%s\n' "$FULL_COMMIT" > proofs/results/map-projection-source-split/full-commit.txt
+          git rev-parse HEAD > proofs/results/map-projection-source-split/diagnostic-commit.txt
+          (node --version; bun --version; node -p 'JSON.stringify({assemblyscript:require("./node_modules/assemblyscript/package.json").version,playwright:require("./node_modules/playwright/package.json").version,typescript:require("./node_modules/typescript/package.json").version})') > proofs/results/map-projection-source-split/tool-versions.txt
+      - name: Install only Firefox
+        run: bunx playwright install --with-deps firefox
+      - name: Serially interleave all source variants and baseline A/A
+        run: |
+          node --check proofs/map-projection-source-split.mjs
+          node proofs/map-projection-source-split.mjs .split-baseline/dist/shared.js .split-ordered/dist/shared.js .split-sorted/dist/shared.js .split-full/dist/shared.js proofs/results/map-projection-source-split/firefox.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-projection-source-split-${{ github.sha }}
+          path: proofs/results/map-projection-source-split/
+          retention-days: 30
+          if-no-files-found: error
