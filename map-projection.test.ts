@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { arenaOf } from './arena';
 import { SharedOrderedMap, SharedSortedMap, SharedList, SharedOrderedSet, SharedSortedSet, resetOrderedMap, resetSortedMap, getWorkerData, initWorker } from './shared';
@@ -109,13 +110,62 @@ test.each([false, true])('cold nested projections keep read-only child snapshots
 });
 
 
-test('ordered projection helper stays off the prototype and starts lazily', () => {
+test('ordered projection methods preserve their generator function and iterator prototypes', () => {
+  const map = new SharedOrderedMap('number').set('a', 1);
+  const generatorFunctionPrototype = Object.getPrototypeOf(function* () {});
+  assert.equal(Object.hasOwn(SharedOrderedMap.prototype, 'iterate'), false);
+  for (const operation of ['keys', 'values'] as const) {
+    const method = map[operation];
+    assert.equal(Object.getPrototypeOf(method), generatorFunctionPrototype);
+    assert.equal(method.name, operation);
+    assert.equal(method.length, 0);
+    const iterator = map[operation]();
+    assert.equal(Object.getPrototypeOf(iterator), method.prototype);
+    assert.equal(Object.getPrototypeOf(method.prototype), Object.getPrototypeOf(map.entries.prototype));
+  }
+});
+
+test.each(['keys', 'values'] as const)('ordered %s stay lazy when a writer grows before first next', operation => {
   const map = new SharedOrderedMap('number').set('a', 1).set('b', 2);
-  expect(Object.hasOwn(SharedOrderedMap.prototype, 'iterate')).toBe(false);
-  const view = vi.spyOn(arenaOf(map), 'dv', 'get');
-  const keys = map.keys(), values = map.values();
-  expect(view).not.toHaveBeenCalled();
-  expect([...keys]).toEqual(['a', 'b']);
-  expect([...values]).toEqual([1, 2]);
+  const arena = arenaOf(map), view = vi.spyOn(arena, 'dv', 'get');
+  const iterator = map[operation]();
+  assert.equal(view.mock.calls.length, 0);
+  const closed = map[operation]();
+  assert.deepEqual(closed.return('closed'), { value: 'closed', done: true });
+  const error = new Error('not started');
+  assert.throws(() => map[operation]().throw(error), caught => caught === error);
+  assert.equal(view.mock.calls.length, 0);
+  // The iterator has not captured a view or walked the insertion log yet.
+  arena.alloc(1024 * 1024);
+  const fork = map.delete('a').set('c', 3);
+  view.mockClear();
+  assert.deepEqual(iterator.next(), { value: operation === 'keys' ? 'a' : 1, done: false });
+  assert.ok(view.mock.calls.length > 0);
+  assert.deepEqual([...iterator], operation === 'keys' ? ['b'] : [2]);
+  assert.deepEqual([...fork.keys()], ['b', 'c']);
+  assert.deepEqual(closed.next(), { value: undefined, done: true });
   view.mockRestore();
+});
+
+test.each(['keys', 'values'] as const)('ordered %s stop decoding after return, throw, or an early break', operation => {
+  const map = new SharedOrderedMap('number').set('a', 1).set('b', 2).set('c', 3);
+  const arena = arenaOf(map), keyReads = vi.spyOn(arena, 'leafKey'), valueReads = vi.spyOn(arena, 'leafValue');
+  const calls = () => keyReads.mock.calls.length + valueReads.mock.calls.length;
+  for (const completion of ['return', 'throw', 'break'] as const) {
+    const before = calls(), iterator = map[operation]();
+    if (completion === 'break') {
+      for (const _ of iterator) break;
+    } else {
+      assert.equal(iterator.next().done, false);
+      if (completion === 'return') assert.deepEqual(iterator.return('closed'), { value: 'closed', done: true });
+      else {
+        const error = new Error('consumer failed');
+        assert.throws(() => iterator.throw(error), caught => caught === error);
+      }
+    }
+    assert.equal(calls() - before, 1);
+    assert.deepEqual(iterator.next(), { value: undefined, done: true });
+    assert.equal(calls() - before, 1);
+  }
+  keyReads.mockRestore(); valueReads.mockRestore();
 });

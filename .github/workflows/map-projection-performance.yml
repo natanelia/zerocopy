@@ -66,20 +66,15 @@ jobs:
         run: |
           node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES.json"
           CASE_FILTER='^((ordered|ordered-updated|sorted|sorted-custom)/(number|object)/(32|4096)/entries|sorted-custom/(number|object)/(32|4096)/values)$' BENCH_MODE=aa-baseline node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES-aa.json"
-      - name: Diagnose Firefox entry control order and lexical roles
-        if: matrix.runtime == 'firefox'
+      - name: Verify controls and targets with one build per fresh browser process
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
         env:
-          ENGINES: firefox
-          CASE_FILTER: '^ordered-updated/(number|object)/(32|4096)/entries$'
+          RUNTIME: ${{ matrix.runtime }}
+          SUITE: all
         run: |
-          for import_order in baseline-first candidate-first; do
-            for warm_order in baseline-first candidate-first; do
-              for mode in ab aa-baseline aa-candidate; do
-                IMPORT_ORDER="$import_order" WARM_ORDER="$warm_order" BENCH_MODE="$mode" node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/firefox-control-$mode-$import_order-$warm_order.json"
-              done
-              IMPORT_ORDER="$import_order" WARM_ORDER="$warm_order" node proofs/map-projection-browser.mjs dist/shared.js .proof-baseline/dist/shared.js "proofs/results/map-projection/firefox-reversed-$import_order-$warm_order.json"
-            done
-          done
+          export BASELINE_COMMIT="$(cat proofs/results/map-projection/base-commit.txt)"
+          export CANDIDATE_COMMIT="$(cat proofs/results/map-projection/candidate-commit.txt)"
+          node proofs/map-projection-isolation.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME-isolated.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
