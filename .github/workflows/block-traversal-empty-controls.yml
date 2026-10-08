@@ -1,0 +1,141 @@
+name: Block traversal fixed empty controls
+
+on:
+  push:
+    branches: ['proof/block-traversal-empty-controls']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: block-traversal-empty-controls-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CANDIDATE_COMMIT: da9b432cdf4028c62582455376f18657be65fdf8
+
+jobs:
+  fixed-bun-controls:
+    if: github.ref == 'refs/heads/proof/block-traversal-empty-controls' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      eligible: ${{ steps.eligibility.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Fetch the immutable original artifact by ID
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/natanelia/zerocopy/actions/artifacts/11575288547/zip > "$RUNNER_TEMP/block-traversal-original.zip"
+          echo '552b08659340e950c4795776b90a340c7dad346bd23c4882caa9510b565d3b3b  '"$RUNNER_TEMP/block-traversal-original.zip" | sha256sum --check
+      - name: Build exact original source pair
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          git worktree add --detach .proof-candidate da9b432cdf4028c62582455376f18657be65fdf8
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-candidate/node_modules
+          (cd .proof-candidate && bun run build:wasm && bun run build:browser)
+          cp .proof-candidate/*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+      - name: Deterministic original and supplement protocol tests
+        run: node --test proofs/block-traversal-performance.node.mjs proofs/block-traversal-empty-controls.node.mjs
+      - name: Freeze three-cell study and archive exact original evidence, helpers and complete bundles
+        run: |
+          node proofs/block-traversal-empty-controls.mjs --prepare "$RUNNER_TEMP/block-traversal-original.zip" .proof-baseline/dist/shared.js .proof-candidate/dist/shared.js proofs/results/block-traversal-empty-controls > "$RUNNER_TEMP/block-traversal-empty-prepare.json"
+          cp "$RUNNER_TEMP/block-traversal-empty-prepare.json" proofs/results/block-traversal-empty-controls/prepare-receipt.json
+          cat proofs/results/block-traversal-empty-controls/frozen-study.sha256
+      - name: Test prepared archive browser verification with synthetic evidence in a temporary copy
+        env:
+          BLOCK_EMPTY_PREPARED_EVIDENCE: proofs/results/block-traversal-empty-controls
+        run: node --test --test-name-pattern='prepared archive browser verifier' proofs/block-traversal-empty-controls.node.mjs
+      - name: One fixed Bun supplement without pilots or retries
+        run: bun proofs/block-traversal-empty-controls.mjs --run proofs/results/block-traversal-empty-controls
+      - name: Require all three new cells valid and within margin before browser correctness
+        id: eligibility
+        run: |
+          node proofs/block-traversal-empty-controls.mjs --verify-browser proofs/results/block-traversal-empty-controls > proofs/results/block-traversal-empty-controls/browser-eligibility.json
+          echo 'eligible=true' >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-traversal-empty-controls
+          path: proofs/results/block-traversal-empty-controls/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser-correctness:
+    needs: fixed-bun-controls
+    if: needs.fixed-bun-controls.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: block-traversal-empty-controls
+          path: .empty-controls-evidence
+      - name: Independently verify original evidence and complete supplement before any browser work
+        run: |
+          node proofs/block-traversal-empty-controls.mjs --verify-browser .empty-controls-evidence
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build exact main377 and da9b pair and install the selected browser
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          git worktree add --detach .proof-candidate da9b432cdf4028c62582455376f18657be65fdf8
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-candidate/node_modules
+          (cd .proof-candidate && bun run build:wasm && bun run build:browser)
+          cp .proof-candidate/*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+          bunx playwright install --with-deps ${{ matrix.runtime }}
+      - name: Verify rebuilt browser source pair and emitted bytes against supplement
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync, mkdirSync, writeFileSync} from 'node:fs';
+          import {prepareComparison} from './proofs/block-traversal-source.mjs';
+          const comparison = prepareComparison('.proof-baseline/dist/shared.js', '.proof-candidate/dist/shared.js');
+          const frozen = JSON.parse(readFileSync('.empty-controls-evidence/frozen-study.json'));
+          assert.deepEqual(comparison.manifests, frozen.sourceComparison.manifests);
+          mkdirSync('proofs/results/block-traversal-empty-browser', {recursive:true});
+          writeFileSync('proofs/results/block-traversal-empty-browser/sources.json', JSON.stringify(comparison,null,2)+'\n');
+          JS
+      - name: Original fixtures and actual paused shared/copy workers on both exact builds
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: node proofs/block-traversal-browser.mjs .proof-candidate/dist/shared.js .proof-baseline/dist/shared.js proofs/results/block-traversal-empty-browser/${{ matrix.runtime }}-checks.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-traversal-empty-${{ matrix.runtime }}-correctness
+          path: proofs/results/block-traversal-empty-browser/
+          retention-days: 30

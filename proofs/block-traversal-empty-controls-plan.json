@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "runtime": "bun",
+  "bunVersion": "1.4.2",
+  "arch": "x64",
+  "original": {
+    "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+    "candidateTree": "84882edc46755995393fbb7aac0f743707c86059",
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "run": "37831469272",
+    "artifact": "11575288547",
+    "zipSha256": "552b08659340e950c4795776b90a340c7dad346bd23c4882caa9510b565d3b3b",
+    "recordSha256": {
+      "node": "1273d9efb90af8385108f46f5ac878a1b32d249065c3f9497420cdf5f0527086",
+      "bun": "ee6d8be7c17acafcd7a26d40e12d21b4328c9346aa9ff1e90e6716a47a21164a"
+    },
+    "helpers": {
+      "block-traversal-performance.mjs": "98298f94e469bb6033649472b82b5fa2599c31051504cfe1825ff890b89bc654",
+      "block-traversal-workloads.mjs": "a033d884c43e50967ae4a93f827d36a98597d96853deeb2607c4c1d78f95bcca",
+      "block-traversal-source.mjs": "b2f8b60854f3afd6bd2ead5213dda8e1b21330edc716b9b54f832d235b345d11",
+      "block-traversal-browser.mjs": "a970f79512e568817ec682e76fefb25b4f1f301e44cd3847594341477f0a2560",
+      "block-traversal-worker.mjs": "eb85deae56d78edd2a8cefd1d2b0e456f0d03ee0202b051dc8dc1ee2642a1391",
+      "block-traversal-worker-check.mjs": "e69bdbf7e4db7e657ca3d15924b44f2f33df1859ea60ca4d73f34877dd17c53c"
+    }
+  },
+  "config": {
+    "blocks": 4,
+    "samples": 21,
+    "targetBatchMs": 10,
+    "warmupMs": 150,
+    "warmupMinElements": 262144,
+    "maxWarmupMs": 10000,
+    "compactWarmupCalls": 512,
+    "compactGcEvery": 32,
+    "compactMaxRepeat": 2048,
+    "scanMaxRepeat": 10000000,
+    "subjectTimeoutMs": 120000,
+    "seed": 20261008,
+    "nonInferiorityMargin": 1.02,
+    "confidenceLevel": 0.95
+  },
+  "newPilots": 0,
+  "multiplier": 2,
+  "measuredSubjects": 96,
+  "timedBatches": 2016,
+  "rows": [
+    {
+      "workload": {
+        "kind": "linked",
+        "type": "number",
+        "size": 0,
+        "operation": "toArray",
+        "edited": false,
+        "name": "linked/number/0/append/toArray"
+      },
+      "originalPlan": {
+        "repeat": 386202,
+        "warmupScans": 4634424,
+        "fastestPilotMsPerScan": 0.00004198320309061063,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "plan": {
+        "repeat": 772404,
+        "warmupScans": 9268848,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "schedule": [
+        {
+          "block": 0,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 0,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "kind": "doubly",
+        "type": "number",
+        "size": 0,
+        "operation": "toArray",
+        "edited": false,
+        "name": "doubly/number/0/append/toArray"
+      },
+      "originalPlan": {
+        "repeat": 391881,
+        "warmupScans": 4702572,
+        "fastestPilotMsPerScan": 0.000041872486800840044,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "plan": {
+        "repeat": 783762,
+        "warmupScans": 9405144,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "schedule": [
+        {
+          "block": 0,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 0,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "kind": "doubly",
+        "type": "number",
+        "size": 0,
+        "operation": "toArrayReverse",
+        "edited": false,
+        "name": "doubly/number/0/append/toArrayReverse"
+      },
+      "originalPlan": {
+        "repeat": 345230,
+        "warmupScans": 4487990,
+        "fastestPilotMsPerScan": 0.0000420562784230802,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "plan": {
+        "repeat": 690460,
+        "warmupScans": 8975980,
+        "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "repeatCapped": false,
+        "pilotWarmupCapped": false
+      },
+      "schedule": [
+        {
+          "block": 0,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 0,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 1,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 2,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "aa-baseline",
+          "left": "baseline",
+          "right": "baseline",
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "block": 3,
+          "mode": "ab",
+          "left": "baseline",
+          "right": "candidate",
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    }
+  ],
+  "interpretation": "A fixed-work supplement only. Original results remain immutable and Bun remains flagged-inconclusive. No pilots, adaptive work, retries, exclusions, A/A normalization, or changes to the original kernel, floors, df3 interval, 2% margin, or drift rule. Later correctness requires every new cell valid and within margin, plus original evidence free of material loss, drift, and all other validity flags. Original statistical uncertainty remains."
+}
