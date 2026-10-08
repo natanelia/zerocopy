@@ -1,0 +1,81 @@
+name: Primitive compaction diagnostic
+
+on:
+  push:
+    branches: [perf/primitive-compaction-spans-20261008]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+        runtime: [node, bun]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    env:
+      BASELINE_COMMIT: 3331f2f0e9e0c3c61832e5f04b12e18c1889d96c
+      ROUNDS: '4'
+      SAMPLES: '21'
+      TARGET_BATCH_MS: '10'
+      CASE_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(32|32769)|list/(string|object)/4096)$'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Build and typecheck the exact candidate
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          mkdir -p proofs/results/primitive-compaction
+          git rev-parse HEAD > proofs/results/primitive-compaction/candidate-commit.txt
+      - name: Verify primitive spans, retained history and nested compaction
+        run: |
+          bun run test primitive-compaction.test.ts performance-revision.test.ts immutable-proof.test.ts nested.test.ts --isolate --maxWorkers=1 --fileParallelism=false --testTimeout=30000 2>&1 | tee proofs/results/primitive-compaction/tests.log
+          node proofs/primitive-compaction-worker.mjs 2>&1 | tee proofs/results/primitive-compaction/compaction-worker.log
+          node proofs/node-worker.mjs 2>&1 | tee proofs/results/primitive-compaction/collection-worker.log
+      - name: Build pinned main with identical tools
+        run: |
+          git cat-file -e "$BASELINE_COMMIT^{commit}"
+          git worktree add --detach "$RUNNER_TEMP/compaction-baseline" "$BASELINE_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/compaction-baseline/node_modules"
+          (cd "$RUNNER_TEMP/compaction-baseline" && bun run build:wasm && bun run build:browser)
+          printf '%s\n' "$BASELINE_COMMIT" > proofs/results/primitive-compaction/base-commit.txt
+          echo "BASELINE_DIR=$RUNNER_TEMP/compaction-baseline" >> "$GITHUB_ENV"
+          echo "CANDIDATE_DIR=$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+      - name: Measure independent processes with matched A/A controls
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          # Every subject imports exactly one build. Each case/round/variant
+          # gets a fresh process, with balanced baseline/candidate order.
+          OUTPUT="proofs/results/primitive-compaction/$RUNTIME-ab.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+          BENCH_MODE=aa-baseline OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-baseline.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+          BENCH_MODE=aa-candidate OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-candidate.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+      - name: Retain raw samples, source guards and correctness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: primitive-compaction-${{ matrix.runtime }}-${{ runner.arch }}-${{ github.sha }}
+          path: proofs/results/primitive-compaction/
+          retention-days: 30
+          if-no-files-found: error
