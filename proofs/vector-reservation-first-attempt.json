@@ -1,0 +1,574 @@
+{
+  "schema": "vector-reservation-first-attempt/v1",
+  "status": "unauditable-completed-study-upload-failure",
+  "runId": 37850788732,
+  "jobId": 113562885124,
+  "proofHead": "0432589af7f62fe6d8411eeb97c6296fd32fe572",
+  "proofTree": "dd849996fb203122386f16bf36be1a3b486f2f9c",
+  "url": "https://github.com/natanelia/zerocopy/actions/runs/37850788732",
+  "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+  "runtimeCandidate": "7ba6cf75fbe3b4453f7dfc25dd2b930d2f260300",
+  "runAttempt": 1,
+  "artifactListing": {
+    "artifacts": []
+  },
+  "jobMetadata": {
+    "jobs": [
+      {
+        "id": 113562885124,
+        "name": "diagnostic",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_id": 37850788732,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Require the first workflow attempt",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run oven-sh/setup-bun@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Prepare exact baseline outside project test discovery",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Fresh WASM, portable, and declaration builds with extracted package guards",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Install Chromium for clean correctness prerequisites",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Require clean full suites, all types, packages, invariants, and actual workers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Run the fixed Node 22 x64 A/A and A/B quartets",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Run the fixed Bun 1.4.2 x64 A/A and A/B quartets",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Archive exact tested source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 13
+          },
+          {
+            "name": "Post Run oven-sh/setup-bun@v2",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 24
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 25
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27
+          }
+        ]
+      }
+    ]
+  },
+  "jobLog": {
+    "file": "vector-reservation-first-attempt.log",
+    "bytes": 54642,
+    "sha256": "666a7ccda17b0a29831e150404251e750a2af542347332e555e229834a85af42",
+    "source": "GitHub job log connector; preserved exact returned text bytes"
+  },
+  "observedBeforePackagingRepair": true,
+  "observedLabelCount": 32,
+  "labels": [
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:04:19.5486392Z",
+      "case": "control/number/tail1/1/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:04:19.5486392Z control/number/tail1/1/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:04:40.8588817Z",
+      "case": "control/number/tail32/32/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:04:40.8588817Z control/number/tail32/32/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:05:01.2221242Z",
+      "case": "control/number/tree0/33/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:05:01.2221242Z control/number/tree0/33/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:05:21.9497308Z",
+      "case": "control/number/tree1/65/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:05:21.9497308Z control/number/tree1/65/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:05:43.5193354Z",
+      "case": "control/number/tree2/1057/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:05:43.5193354Z control/number/tree2/1057/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:06:09.1811549Z",
+      "case": "control/number/tree3/32801/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:06:09.1811549Z control/number/tree3/32801/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:06:29.0755522Z",
+      "case": "control/boolean/tail32/32/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:06:29.0755522Z control/boolean/tail32/32/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:06:51.2549308Z",
+      "case": "control/boolean/tree2/1057/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:06:51.2549308Z control/boolean/tree2/1057/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:07:12.8813179Z",
+      "case": "control/string/tail32/32/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:07:12.8813179Z control/string/tail32/32/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:07:34.8163694Z",
+      "case": "control/string/tree2/1057/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:07:34.8163694Z control/string/tree2/1057/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:07:55.2023517Z",
+      "case": "unchanged-control/number/tail1/1/same",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:07:55.2023517Z unchanged-control/number/tail1/1/same: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:08:43.7135665Z",
+      "case": "target/number/tree3/32801/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:08:43.7135665Z target/number/tree3/32801/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:09:29.0289505Z",
+      "case": "target/boolean/tree1/65/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:09:29.0289505Z target/boolean/tree1/65/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:09:49.8948414Z",
+      "case": "unchanged-control/string/tail32/32/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:09:49.8948414Z unchanged-control/string/tail32/32/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:10:13.4199264Z",
+      "case": "target/number/tree2/1057/half-same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:10:13.4199264Z target/number/tree2/1057/half-same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "node",
+      "timestamp": "2026-10-08T22:10:44.2255165Z",
+      "case": "target/string/tree1/65/nine-tenths-same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:10:44.2255165Z target/string/tree1/65/nine-tenths-same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:11:01.0479800Z",
+      "case": "control/number/tail1/1/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:11:01.0479800Z control/number/tail1/1/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:11:16.8148400Z",
+      "case": "control/number/tail32/32/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:11:16.8148400Z control/number/tail32/32/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:11:33.0019008Z",
+      "case": "control/number/tree0/33/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:11:33.0019008Z control/number/tree0/33/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:11:49.5399519Z",
+      "case": "control/number/tree1/65/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:11:49.5399519Z control/number/tree1/65/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:12:06.7853545Z",
+      "case": "control/number/tree2/1057/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:12:06.7853545Z control/number/tree2/1057/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:12:25.0953151Z",
+      "case": "control/number/tree3/32801/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:12:25.0953151Z control/number/tree3/32801/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:12:41.5323337Z",
+      "case": "control/boolean/tail32/32/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:12:41.5323337Z control/boolean/tail32/32/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:12:58.4015974Z",
+      "case": "control/boolean/tree2/1057/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:12:58.4015974Z control/boolean/tree2/1057/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:13:15.2776601Z",
+      "case": "control/string/tail32/32/changed",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:13:15.2776601Z control/string/tail32/32/changed: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:13:32.3958291Z",
+      "case": "control/string/tree2/1057/changed",
+      "consoleLabel": "inconclusive",
+      "originalLine": "2026-10-08T22:13:32.3958291Z control/string/tree2/1057/changed: inconclusive",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:13:49.5799519Z",
+      "case": "unchanged-control/number/tail1/1/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:13:49.5799519Z unchanged-control/number/tail1/1/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:14:52.9747958Z",
+      "case": "target/number/tree3/32801/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:14:52.9747958Z target/number/tree3/32801/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:15:48.5708998Z",
+      "case": "target/boolean/tree1/65/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:15:48.5708998Z target/boolean/tree1/65/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:16:05.6889465Z",
+      "case": "unchanged-control/string/tail32/32/same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:16:05.6889465Z unchanged-control/string/tail32/32/same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:16:28.8623919Z",
+      "case": "target/number/tree2/1057/half-same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:16:28.8623919Z target/number/tree2/1057/half-same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    },
+    {
+      "runtime": "bun",
+      "timestamp": "2026-10-08T22:17:05.6643495Z",
+      "case": "target/string/tree1/65/nine-tenths-same",
+      "consoleLabel": "within-margin",
+      "originalLine": "2026-10-08T22:17:05.6643495Z target/string/tree1/65/nine-tenths-same: within-margin",
+      "rawAuditPossible": false,
+      "ratio": null,
+      "ci95": null,
+      "aaRatio": null,
+      "aaCi95": null,
+      "floorFlags": null
+    }
+  ],
+  "failure": {
+    "step": "actions/upload-artifact@v4",
+    "firstRejectedPath": "/logs/03-typecheck:redux.log",
+    "reason": "Colon is forbidden in direct artifact paths"
+  },
+  "interpretation": "Both 16-cell studies and prerequisites report completion. These 32 labels were observed before choosing the packaging-only repair. They are retained observations, not independently auditable acceptance, ratios, intervals, floor flags or A/A evidence. No raw artifact is available; the original study remains unauditable.",
+  "replacement": "One complete new collection after a non-forced/non-deleted push from the exact failed head. Preserve this history in the replacement archive. No pooling, selective exclusions, workload/statistical changes, or favorable-result selection.",
+  "unchangedInputs": {
+    "proofs/vector-reservation-performance.mjs": "a81ed74e743eac047a70a07a07d64daa67f71cadb1949985913b2fcbab542d9f",
+    "proofs/vector-reservation-case.mjs": "9a37fabec222d7de573802646aec853caa6f40352494aa57f2927b3739b92487",
+    "proofs/vector-reservation-build.mjs": "fe1bf8339eb0172ad35f44844ed58a513959425a986d5bf898ea471fc154dcff",
+    "proofs/vector-reservation-prerequisites.mjs": "37fa11530f600c7b326139fc9a7f84595b39b3506dd6545cd44786d47a8960bd",
+    "proofs/noop-sequence-workloads.mjs": "79dd997a0cc24a81f464f548e5b4577a435464063669531e9218374470639dff",
+    "proofs/noop-sequence-case.mjs": "2b2b8b1d4e087f85b00aa3cb0c8733bfffa61f2598fb7fe333502213dfb99368",
+    "proofs/noop-sequence-stats.mjs": "3de2af272452a5f3e54e2554f4d76b261450c92e9139aa088ec536e3b0c5761c",
+    "persistent-core.as.ts": "2b1f9638c229862618d4b0afbe4ef9b02b438c4b3bf4bf5fbe35fc23ca7359df"
+  }
+}

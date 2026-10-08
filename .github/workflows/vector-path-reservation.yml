@@ -1,9 +1,8 @@
 name: Frozen vector path reservation gate
 
 on:
-  workflow_dispatch:
   push:
-    branches: ['perf/vector-path-reservation-gate-*']
+    branches: [perf/vector-path-reservation-gate-20261008]
 
 permissions:
   contents: read
@@ -14,7 +13,7 @@ concurrency:
 
 jobs:
   diagnostic:
-    if: startsWith(github.ref, 'refs/heads/perf/vector-path-reservation-gate-')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/perf/vector-path-reservation-gate-20261008' && github.run_attempt == 1 && github.event.before == '0432589af7f62fe6d8411eeb97c6296fd32fe572' && !github.event.forced && !github.event.deleted
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -25,12 +24,21 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Preserve original observed study and failed packaging history
+        run: |
+          mkdir -p "$RUNNER_TEMP/vector-reservation-results/history"
+          cp proofs/vector-reservation-first-attempt.json "$RUNNER_TEMP/vector-reservation-results/history/first-attempt-audit.json"
+          cp proofs/vector-reservation-first-attempt.log "$RUNNER_TEMP/vector-reservation-results/history/first-attempt-job.log"
+          git archive 0432589af7f62fe6d8411eeb97c6296fd32fe572 > "$RUNNER_TEMP/vector-reservation-results/history/original-proof-source.tar"
+          git show 0432589af7f62fe6d8411eeb97c6296fd32fe572:.github/workflows/vector-path-reservation.yml > "$RUNNER_TEMP/vector-reservation-results/history/original-workflow.yml"
       - uses: actions/setup-node@v4
         with:
           node-version: '22.23.3'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Check evidence archive roundtrip and original observed history
+        run: node --test proofs/vector-reservation-evidence-tests.node.mjs
       - name: Prepare exact baseline outside project test discovery
         run: |
           bun install
@@ -52,10 +60,17 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/vector-reservation-results"
           git archive --format=tar HEAD > "$RUNNER_TEMP/vector-reservation-results/tested-source.tar"
-      - uses: actions/upload-artifact@v4
+      - name: Archive complete or partial evidence with original paths and bytes
+        if: always()
+        run: node proofs/archive-vector-reservation-evidence.mjs "$RUNNER_TEMP/vector-reservation-results" "$RUNNER_TEMP/vector-reservation-upload"
+      - name: Retain complete or partial portable evidence archive
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vector-reservation-x64-${{ github.sha }}
-          path: ${{ runner.temp }}/vector-reservation-results/
+          path: |
+            ${{ runner.temp }}/vector-reservation-upload/vector-reservation.tar.gz
+            ${{ runner.temp }}/vector-reservation-upload/vector-reservation.tar.gz.sha256
+          compression-level: 0
           retention-days: 30
           if-no-files-found: error

@@ -157,18 +157,56 @@ three were +2.74% (+1.46% to +4.03%). Both were slower in all four quartets.
 These raw archives and their reports are preserved separately; this gate does
 not edit them or transfer any favorable interval to the new candidate.
 
-## Execution boundary
+## Original study and one packaging-only replacement
 
-The new workflow triggers only on `perf/vector-path-reservation-gate-*` branches
-or an explicit dispatch on one of those branches. Runtime-only publication
-cannot trigger it. No local latency timings or publication are part of gate
-preparation. Parent review and publication of the exact proof commit are
-separate steps. The pinned runtime commit is already published; the gate's own
-Git SHA is taken from its immutable checkout and all proof files must match it.
+The original published gate was
+`0432589af7f62fe6d8411eeb97c6296fd32fe572`, GitHub run
+[37850788732](https://github.com/natanelia/zerocopy/actions/runs/37850788732),
+job `113562885124`. The prerequisite step and both complete 16-cell measurement
+steps reported success. Upload then failed because GitHub rejected
+`logs/03-typecheck:redux.log`. A fresh artifact listing contains zero artifacts.
 
-Workflow re-attempts are rejected before setup and again by the performance
-driver. Concurrency has `cancel-in-progress: false`, so a later push cannot
-silently cancel a study. Run identity and attempt are retained in the results.
-CI and the driver pin Node exactly to 22.23.3, the version recorded by both
-historical Node screens, and Bun exactly to 1.4.2. Preparing these stricter
-execution guards does not recollect or change the historical observations.
+All 32 console conclusion labels were observed before deciding on this
+packaging repair, including five inconclusive labels on Node and five on Bun.
+`vector-reservation-first-attempt.json` preserves every timestamped label,
+step metadata, the empty artifact listing and exact job-log hash. The complete
+connector-returned job log is retained as `vector-reservation-first-attempt.log`.
+The remaining labels say within-margin, which is not a claim of target speedup.
+The ratios, intervals, raw samples, floor flags, A/A flags and detailed
+correctness receipts are unavailable. The original study remains unauditable
+and does not establish performance acceptance.
+
+This repair authorizes one complete replacement collection after the exact
+non-forced, non-deleted push from the original proof head to the existing
+`perf/vector-path-reservation-gate-20261008` branch, on workflow attempt 1.
+There is no manual-dispatch trigger. Later pushes, other branches, forced
+updates, deletions and re-attempts do not satisfy the job condition. Concurrency
+remains `cancel-in-progress: false`. Node 22.23.3, Bun 1.4.2, runtime source,
+all 16 workloads, timed code, statistics and the standard prerequisites remain
+unchanged. The new archive/history tests run before the usual build and checks.
+No local builds or timing are part of this packaging repair.
+
+Replacement history includes the original audit and job log, the original
+proof-source archive and the original workflow. It is retained with the new
+study even if setup or correctness fails. Both runtimes and every scheduled
+case are collected again as a complete study. No pooling with the original,
+selective case removal, favorable-result selection or numerical reconstruction
+from console labels is permitted.
+
+`archive-vector-reservation-evidence.mjs` reuses the reviewed stream evidence
+packager with only filename substitutions. It places the entire evidence
+directory in `vector-reservation.tar.gz`, preserving original paths and bytes,
+including colons, hidden files, binary traces and partial JSON records. The
+archive is outside the source directory and refuses an existing output
+directory, so a second invocation cannot overwrite retained evidence. GitHub
+receives only that portable filename and its SHA256 sidecar, with compression
+level zero. Archiving and uploading use `if: always()`.
+
+The planned-path scan identifies all three colon-bearing prerequisite logs:
+`03-typecheck:redux.log`, `04-typecheck:values.log` and
+`05-typecheck:geometry.log`. Their original names stay unchanged inside the
+archive. The scan also covers the build/measurement partial filenames, raw
+proof files, extracted package file lists and replacement history. The two
+outer upload names contain no forbidden characters. Focused tests exercise
+roundtrip byte preservation, archive listing/checksum, empty early failure,
+partial records, hidden files, binary data and overwrite refusal.
