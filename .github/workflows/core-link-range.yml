@@ -1,0 +1,61 @@
+name: Fixed vector branch copy diagnostic
+
+on:
+  push:
+    branches: [perf/fixed-vector-branch-copy-20261008]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: bun run typecheck && bun run typecheck:values && bun run typecheck:redux
+      - name: Build the merge-base with identical dependencies and flags
+        run: |
+          baseline_ref="$(git merge-base HEAD origin/main)"
+          git cat-file -e "$baseline_ref^{commit}"
+          mkdir -p "$RUNNER_TEMP/link-range-baseline" link-range-ci
+          printf '%s\n' "$baseline_ref" > link-range-ci/baseline-commit.txt
+          git rev-parse HEAD > link-range-ci/candidate-commit.txt
+          git rev-parse origin/main > link-range-ci/observed-main-commit.txt
+          node proofs/check-core-diagnostic-source.mjs "$baseline_ref" link > link-range-ci/source-guard.json
+          git archive "$baseline_ref" | tar -x -C "$RUNNER_TEMP/link-range-baseline"
+          ln -s "$PWD/node_modules" "$RUNNER_TEMP/link-range-baseline/node_modules"
+          (cd "$RUNNER_TEMP/link-range-baseline" && bun run build:wasm && bun run build:browser)
+      - name: Verify immutable vector boundaries, forks and byte preservation
+        run: bun run test core-link-range.test.ts shared-list.test.ts shared-queue.test.ts performance-revision.test.ts freeze-json.test.ts json-read-cache.test.ts --maxWorkers=1 --fileParallelism=false --testTimeout=30000
+      - name: Verify old and new producers/readers with real workers
+        run: |
+          node proofs/core-link-range-worker.mjs "$RUNNER_TEMP/link-range-baseline" . > link-range-ci/worker-compatibility.json
+          node proofs/node-worker.mjs > link-range-ci/node-worker.log
+      - name: Compare affected bulk appends and unchanged controls in Node and Bun
+        run: node proofs/run-core-link-range.mjs "$RUNNER_TEMP/link-range-baseline" . link-range-ci/throughput
+      - name: Preserve every result
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixed-vector-branch-copy-${{ runner.arch }}-${{ github.sha }}
+          path: link-range-ci/
+          retention-days: 30
+          if-no-files-found: error

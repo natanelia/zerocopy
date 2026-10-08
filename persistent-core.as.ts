@@ -552,7 +552,7 @@ export function tailRemove(tail: u32, length: u32, index: u32): u32 {
 function linkRange(root: u32, depth: u32, base: u32, start: u32, end: u32, input: u32, origin: u32): u32 {
   if (!depth) return input + (base - origin) * 8;
   const p = alloc(128);
-  if (root) memory.copy(p, root, 128); else memory.fill(p, 0, 128);
+  if (root) copyWords(p, root, 128); else memory.fill(p, 0, 128);
   const span: u32 = 1 << (depth * 5);
   const first = (start - base) / span, last = (end - 1 - base) / span;
   for (let i = first; i <= last; i++) {
