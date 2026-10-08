@@ -475,15 +475,22 @@ export function vecLeaf(root: u32, depth: u32, index: u32): u32 {
 }
 export function vecGet(root: u32, depth: u32, index: u32): f64 { return load<f64>(vecLeaf(root, depth, index) + (index & 31) * 8); }
 function vecSetAt(root: u32, depth: u32, index: u32, value: f64): u32 {
-  const bytes: u32 = depth ? 128 : 256;
-  const p = alloc(bytes);
-  if (root) memory.copy(p, root, bytes); else memory.fill(p, 0, bytes);
-  if (!depth) store<f64>(p + (index & 31) * 8, value);
-  else {
-    const off = ((index >> (depth * 5)) & 31) * 4;
-    store<u32>(p + off, vecSetAt(root ? load<u32>(root + off) : 0, depth - 1, index, value));
+  if (!depth) {
+    const off = (index & 31) * 8;
+    // Compare the stored representation, including signed zero and NaN payloads.
+    if (root && load<u64>(root + off) == reinterpret<u64>(value)) return root;
+    const p = alloc(256);
+    if (root) memory.copy(p, root, 256); else memory.fill(p, 0, 256);
+    store<f64>(p + off, value); return p;
   }
-  return p;
+  const off = ((index >> (depth * 5)) & 31) * 4;
+  const old = root ? load<u32>(root + off) : 0;
+  // Resolve the existing path once, then copy only changed ancestors.
+  const child = vecSetAt(old, depth - 1, index, value);
+  if (child == old) return root;
+  const p = alloc(128);
+  if (root) memory.copy(p, root, 128); else memory.fill(p, 0, 128);
+  store<u32>(p + off, child); return p;
 }
 export function vecSet(root: u32, depth: u32, index: u32, value: f64): u32 { return vecSetAt(root, depth, index, value); }
 // Shared accessors for the immutable block sequence tree.
@@ -529,6 +536,7 @@ export function tailAppend(tail: u32, length: u32, value: f64): u32 {
   store<f64>(p + length * 8, value); return p;
 }
 export function tailSet(tail: u32, length: u32, index: u32, value: f64): u32 {
+  if (load<u64>(tail + index * 8) == reinterpret<u64>(value)) return tail;
   const p = alloc(length * 8); memory.copy(p, tail, length * 8);
   store<f64>(p + index * 8, value); return p;
 }

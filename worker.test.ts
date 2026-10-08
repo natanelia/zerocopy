@@ -69,6 +69,19 @@ describe('shared state and session protocol', () => {
     await drain();
     expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1);
   });
+  it('suppresses bit-identical list roots and publishes a signed-zero change', async () => {
+    const source = new SharedList('number').pushMany(Array.from({ length: 65 }, (_, i) => i));
+    const { state, reader, pair } = await setup(source);
+    const oldReader = reader.current, versions: number[] = [];
+    cleanup.push(reader.subscribe((_snapshot, version) => versions.push(version)));
+    state.update(list => list.set(0, 0)); state.update(list => list.set(64, 64));
+    await drain();
+    expect(state.current).toBe(source); expect(reader.current).toBe(oldReader);
+    expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1); expect(versions).toEqual([]);
+    state.update(list => list.set(0, -0)); await drain();
+    expect(state.version).toBe(1); expect(pair.owner.frames.length).toBe(2); expect(versions).toEqual([1]);
+    expect(Object.is(reader.current.get(0), -0)).toBe(true); expect(Object.is(oldReader.get(0), 0)).toBe(true);
+  });
   it('does not publish an update that returns to the last committed snapshot', async () => {
     const { state, pair } = await setup(new SharedMap('number'));
     const original = state.current;
