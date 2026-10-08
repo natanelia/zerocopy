@@ -514,12 +514,14 @@ export class Arena {
   number(root: number, key: string): number | undefined { return this.value(root, key, 'number'); }
 
   *radixLeaves(root: number): Generator<number> {
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
-      const pending: number[] = [], n = this.dv.getUint32(root + 12, true);
-      for (let i = 0; i < n; i++) pending.push(this.dv.getUint32(root + 16 + i * 4, true));
+    // Published pointers stay within this view after shared-memory growth.
+    let dv!: DataView;
+    if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
+      const pending: number[] = [], n = dv.getUint32(root + 12, true);
+      for (let i = 0; i < n; i++) pending.push(dv.getUint32(root + 16 + i * 4, true));
       pending.sort((a, b) => this.wasm.compareLeaves(a, b));
       let i = 0;
-      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
+      for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
         while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
         if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
       }
@@ -527,7 +529,7 @@ export class Arena {
     }
     const stack = root ? [root] : [];
     while (stack.length) {
-      const p = stack.pop()!, dv = this.dv;
+      const p = stack.pop()!;
       if (!dv.getUint32(p, true)) yield p;
       else for (let i = popcount(dv.getUint32(p + 4, true)) - 1; i >= 0; i--) stack.push(dv.getUint32(p + 16 + i * 4, true));
     }
@@ -671,11 +673,12 @@ export class Arena {
 
   *leaves(root: number): Generator<number> {
     // Each iterator owns its continuation. No shared stack or scratch survives yield.
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
-      const n = this.dv.getUint32(root + 12, true), base = this.dv.getUint32(root + 4, true);
-      for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
+    // Published pointers stay within this view after shared-memory growth.
+    let dv!: DataView;
+    if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
+      const n = dv.getUint32(root + 12, true), base = dv.getUint32(root + 4, true);
+      for (let i = 0; i < n; i++) yield dv.getUint32(root + 16 + i * 4, true);
       for (const leaf of this.leaves(base)) {
-        const dv = this.dv;
         if (!this.wasm.journalFind(root, leaf + 16, dv.getUint32(leaf + 8, true), dv.getUint32(leaf + 4, true))) yield leaf;
       }
       return;
@@ -684,7 +687,7 @@ export class Arena {
     // These two small work arrays belong to this iterator, not shared memory.
     const lanes = new Uint32Array(16), patches: number[] = [];
     while (stack.length) {
-      const p = stack.pop()!, dv = this.dv, tag = dv.getUint32(p, true);
+      const p = stack.pop()!, tag = dv.getUint32(p, true);
       if (tag === 0) { yield p; continue; }
       if (tag & 0x80000000) {
         const bitmap = dv.getUint32(p + 8, true) >>> 16;
