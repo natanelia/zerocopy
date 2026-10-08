@@ -1,0 +1,68 @@
+name: Focused Bun ARM64 compaction diagnostic
+
+on:
+  push:
+    branches: [perf/primitive-compaction-focused-20261008]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  focused:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Check the fixed diagnostic protocol without timing collections
+        run: node --test proofs/primitive-compaction-focused.test.mjs
+      - name: Build all three exact sources with identical tools
+        run: |
+          for item in \
+            main:3331f2f0e9e0c3c61832e5f04b12e18c1889d96c \
+            old:c5a242cd641e4ee96005296fab485e332a1394b7 \
+            narrow:b1e3d9d27b55ce5c4a0267f99b72c6862a58bf59; do
+            label="${item%%:*}"
+            commit="${item#*:}"
+            directory="$RUNNER_TEMP/compaction-focused-$label"
+            git cat-file -e "$commit^{commit}"
+            git worktree add --detach "$directory" "$commit"
+            ln -s "$GITHUB_WORKSPACE/node_modules" "$directory/node_modules"
+            (cd "$directory" && bun run build:wasm && bun run build:browser)
+            printf 'FOCUSED_%s_DIR=%s\n' "${label^^}" "$directory" >> "$GITHUB_ENV"
+          done
+          mkdir -p proofs/results/primitive-compaction-focused
+          git rev-parse HEAD > proofs/results/primitive-compaction-focused/harness-commit.txt
+      - name: Run one interleaved fixed-work study on this runner
+        env:
+          OUTPUT: proofs/results/primitive-compaction-focused/study.json
+        run: |
+          bun proofs/primitive-compaction-focused.mjs 2>&1 | tee proofs/results/primitive-compaction-focused/study.log
+      - name: Preserve exact protocol and all partial or completed evidence
+        if: always()
+        run: |
+          mkdir -p proofs/results/primitive-compaction-focused
+          cp proofs/primitive-compaction-focused.mjs proofs/primitive-compaction-focused.test.mjs proofs/primitive-compaction-focused.md proofs/results/primitive-compaction-focused/
+          cp .github/workflows/primitive-compaction-focused.yml proofs/results/primitive-compaction-focused/workflow.yml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: primitive-compaction-focused-bun-arm64-${{ github.sha }}
+          path: proofs/results/primitive-compaction-focused/
+          retention-days: 30
+          if-no-files-found: error
