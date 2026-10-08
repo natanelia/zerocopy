@@ -55,7 +55,7 @@ preparation. Any promotion waits for the focused evidence and review. High-churn
 gains from the original candidate cannot offset a common-path regression.
 
 ```sh
-node --test proofs/ordered-churn-guard-order.test.mjs
+node --test proofs/ordered-churn-guard-order.node.mjs
 node proofs/ordered-churn-guard-order.mjs MAIN/dist/shared.js ORIGINAL/dist/shared.js REORDERED/dist/shared.js node.json
 bun proofs/ordered-churn-guard-order.mjs MAIN/dist/shared.js ORIGINAL/dist/shared.js REORDERED/dist/shared.js bun.json
 ```

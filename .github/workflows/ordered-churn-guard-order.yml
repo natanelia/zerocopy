@@ -34,9 +34,17 @@ jobs:
       - name: Build three exact sources with one toolchain
         run: |
           set -euo pipefail
-          mkdir .guard-main .guard-original
-          git archive 3773c6e519c7c0958da13727ed1082f449f3ee25 | tar -x -C .guard-main
-          git archive 82f8d9cc9d81c459ecbd0d9c06189e0fa9ec5120 | tar -x -C .guard-original
+          git worktree add --detach .guard-main 3773c6e519c7c0958da13727ed1082f449f3ee25
+          git worktree add --detach .guard-original 82f8d9cc9d81c459ecbd0d9c06189e0fa9ec5120
+          # The frozen source guard runs git from each candidate root. An archive
+          # inside this checkout inherits a nonempty git prefix and hides its tree.
+          test "$(git -C .guard-main rev-parse HEAD)" = 3773c6e519c7c0958da13727ed1082f449f3ee25
+          test "$(git -C .guard-original rev-parse HEAD)" = 82f8d9cc9d81c459ecbd0d9c06189e0fa9ec5120
+          for source in .guard-main .guard-original; do
+            test -z "$(git -C "$source" rev-parse --show-prefix)"
+            test "$(git -C "$source" rev-parse --show-toplevel)" = "$(cd "$source" && pwd -P)"
+            git -C "$source" ls-tree -r --name-only HEAD | grep -Fx shared-ordered-map.ts
+          done
           ln -s "$PWD/node_modules" .guard-main/node_modules
           ln -s "$PWD/node_modules" .guard-original/node_modules
           bun run build:wasm && bun run build:browser && bun run typecheck
@@ -46,7 +54,7 @@ jobs:
           node --input-type=module -e 'import {prepareThree} from "./proofs/ordered-churn-guard-order.mjs"; console.log(JSON.stringify(prepareThree(".guard-main/dist/shared.js",".guard-original/dist/shared.js","dist/shared.js"),null,2))' > proofs/results/ordered-churn-guard-order/source-manifest.json
       - name: Verify the focused experiment and ordered-map regressions
         run: |
-          node --test proofs/ordered-churn-guard-order.test.mjs
+          node --test proofs/ordered-churn-guard-order.node.mjs
           bun --bun node_modules/vitest/vitest.mjs run ordered-churn.test.ts ordered-empty-regression.test.ts --maxWorkers=1 --fileParallelism=false --testTimeout=30000
       - name: Check every source and actual shared/copy workers
         run: |
