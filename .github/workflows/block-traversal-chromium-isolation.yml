@@ -1,0 +1,158 @@
+name: Block traversal Chromium process isolation
+
+on:
+  push:
+    branches: ['proof/block-chromium-isolation']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: block-traversal-chromium-isolation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CANDIDATE_COMMIT: da9b432cdf4028c62582455376f18657be65fdf8
+  SUPPLEMENT_RUN_ID: '37840231430'
+  SUPPLEMENT_ARTIFACT_ID: '11577770777'
+  SUPPLEMENT_PROOF_COMMIT: e58e49f5bb981257d2403ed4b7d9aebf5b8d9ec6
+  SUPPLEMENT_ZIP_SHA256: b228e45627f7156bea0320374a0e8e3b6d000aa50de3b856a89d3a9c2ce2dfe0
+  WORKFLOW_EVIDENCE: proofs/results/block-traversal-chromium-isolation-workflow
+
+jobs:
+  chromium-isolation:
+    if: github.ref == 'refs/heads/proof/block-chromium-isolation' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    # 92 serial cases can each consume the bounded launch/page/navigation/check
+    # and cleanup deadlines. Keep the job budget large enough to retain and
+    # continue failures instead of truncating the planned coverage early.
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preserve workflow diagnostics even if preparation fails
+        run: |
+          mkdir -p "$WORKFLOW_EVIDENCE"
+          cp .github/workflows/block-traversal-chromium-isolation.yml "$WORKFLOW_EVIDENCE/workflow.yml"
+          printf '%s\n' "$GITHUB_SHA" > "$WORKFLOW_EVIDENCE/proof-commit.txt"
+          printf '%s\n' "$GITHUB_RUN_ID" > "$WORKFLOW_EVIDENCE/run-id.txt"
+          printf '%s\n' "$GITHUB_RUN_ATTEMPT" > "$WORKFLOW_EVIDENCE/run-attempt.txt"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Fetch only the pinned successful supplement artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          fetch_evidence() {
+            local endpoint="$1" name="$2" status=0
+            if gh api "$endpoint" > "$WORKFLOW_EVIDENCE/$name" 2> "$WORKFLOW_EVIDENCE/$name.fetch.stderr"; then
+              status=0
+            else
+              status=$?
+            fi
+            printf '%s\t%s\n' "$name" "$status" >> "$WORKFLOW_EVIDENCE/fetch-status.tsv"
+            if [ "$status" -ne 0 ]; then cat "$WORKFLOW_EVIDENCE/$name.fetch.stderr" >&2; fi
+            return "$status"
+          }
+          fetch_evidence "repos/natanelia/zerocopy/actions/runs/$SUPPLEMENT_RUN_ID" supplement-run.json
+          fetch_evidence "repos/natanelia/zerocopy/actions/artifacts/$SUPPLEMENT_ARTIFACT_ID" supplement-artifact.json
+          fetch_evidence repos/natanelia/zerocopy/actions/jobs/113527447692 supplement-job.json
+          node --input-type=module <<'JS' > "$WORKFLOW_EVIDENCE/supplement-identity.json" 2> "$WORKFLOW_EVIDENCE/supplement-identity.stderr"
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const root = process.env.WORKFLOW_EVIDENCE;
+          const read = name => JSON.parse(readFileSync(`${root}/${name}.json`, 'utf8'));
+          const run = read('supplement-run'), artifact = read('supplement-artifact'), job = read('supplement-job');
+          assert.equal(run.id, Number(process.env.SUPPLEMENT_RUN_ID));
+          assert.equal(run.head_sha, process.env.SUPPLEMENT_PROOF_COMMIT);
+          assert.equal(run.head_branch, 'proof/block-traversal-empty-controls');
+          assert.equal(run.run_attempt, 1);
+          assert.equal(run.status, 'completed');
+          assert.equal(artifact.id, Number(process.env.SUPPLEMENT_ARTIFACT_ID));
+          assert.equal(artifact.name, 'block-traversal-empty-controls');
+          assert.equal(artifact.expired, false);
+          assert.equal(artifact.digest, `sha256:${process.env.SUPPLEMENT_ZIP_SHA256}`);
+          assert.equal(artifact.workflow_run.id, run.id);
+          assert.equal(artifact.workflow_run.head_sha, process.env.SUPPLEMENT_PROOF_COMMIT);
+          assert.equal(job.id, 113527447692);
+          assert.equal(job.run_id, run.id);
+          assert.equal(job.name, 'fixed-bun-controls');
+          assert.equal(job.status, 'completed');
+          assert.equal(job.conclusion, 'success');
+          console.log(JSON.stringify({runId:run.id, proofCommit:run.head_sha, artifactId:artifact.id, artifactName:artifact.name, digest:artifact.digest, successfulSupplementJob:job.id}, null, 2));
+          JS
+          fetch_evidence "repos/natanelia/zerocopy/actions/artifacts/$SUPPLEMENT_ARTIFACT_ID/zip" supplement.zip
+          printf '%s  %s\n' "$SUPPLEMENT_ZIP_SHA256" "$WORKFLOW_EVIDENCE/supplement.zip" | sha256sum --check | tee "$WORKFLOW_EVIDENCE/supplement-zip-check.txt"
+      - name: Build exact original source pair
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          git worktree add --detach .proof-candidate da9b432cdf4028c62582455376f18657be65fdf8
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-candidate/node_modules
+          (cd .proof-candidate && bun run build:wasm && bun run build:browser)
+          cp .proof-candidate/*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+      - name: Deterministic original, supplement and isolation protocol tests
+        run: |
+          node --test proofs/block-traversal-performance.node.mjs proofs/block-traversal-empty-controls.node.mjs proofs/block-traversal-chromium-isolation.node.mjs 2>&1 | tee "$WORKFLOW_EVIDENCE/protocol-tests.log"
+      - name: Freeze correctness-only schedule and archive exact prior evidence and bundles
+        run: |
+          node proofs/block-traversal-chromium-isolation.mjs --prepare "$WORKFLOW_EVIDENCE/supplement.zip" .proof-baseline/dist/shared.js .proof-candidate/dist/shared.js proofs/results/block-traversal-chromium-isolation > "$WORKFLOW_EVIDENCE/prepare-receipt.json" 2> "$WORKFLOW_EVIDENCE/prepare.stderr"
+      - name: Check prepared evidence and reject synthetic archive tampering in disposable copies
+        env:
+          BLOCK_CHROMIUM_PREPARED_EVIDENCE: proofs/results/block-traversal-chromium-isolation
+        run: |
+          node --test --test-name-pattern='prepared diagnostic verifies' proofs/block-traversal-chromium-isolation.node.mjs 2>&1 | tee "$WORKFLOW_EVIDENCE/prepared-archive-tests.log"
+      - name: Independently require the original supplement verifier with its exact old proof commit
+        run: |
+          node --input-type=module <<'JS' > "$WORKFLOW_EVIDENCE/browser-eligibility.json" 2> "$WORKFLOW_EVIDENCE/browser-eligibility.stderr"
+          import {verifyForBrowser} from './proofs/block-traversal-empty-controls.mjs';
+          console.log(JSON.stringify(verifyForBrowser('proofs/results/block-traversal-chromium-isolation/supplement', 'e58e49f5bb981257d2403ed4b7d9aebf5b8d9ec6'), null, 2));
+          JS
+      - name: Install Chromium only after independent eligibility verification
+        run: bunx playwright install --with-deps chromium
+      - name: Check 40 fixtures and 6 worker scenarios per source in 92 fresh Chromium processes
+        env:
+          RUNTIME: chromium
+        run: |
+          node proofs/block-traversal-chromium-isolation.mjs --run proofs/results/block-traversal-chromium-isolation 2>&1 | tee "$WORKFLOW_EVIDENCE/chromium-isolation.log"
+      - name: Preserve the original failed Chromium job and log when still available
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$WORKFLOW_EVIDENCE"
+          for suffix in '' /logs; do
+            name=original-chromium-job.json
+            if [ "$suffix" = /logs ]; then name=original-chromium-job.log; fi
+            status=0
+            if gh api "repos/natanelia/zerocopy/actions/jobs/113528465037$suffix" > "$WORKFLOW_EVIDENCE/$name" 2> "$WORKFLOW_EVIDENCE/$name.fetch.stderr"; then
+              status=0
+            else
+              status=$?
+            fi
+            printf '%s\t%s\n' "$name" "$status" >> "$WORKFLOW_EVIDENCE/fetch-status.tsv"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-traversal-chromium-isolation
+          path: |
+            proofs/results/block-traversal-chromium-isolation/
+            proofs/results/block-traversal-chromium-isolation-workflow/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
