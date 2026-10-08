@@ -1,86 +1,95 @@
-/** Compare the PR against its actual base, not an external library or old release.
- * Run from the repository root after building WASM in both working trees.
- * The script never uses a faster algorithm in the candidate-only workload.
- */
+/** Run AFTER building both public bundles. Ratios are diagnostic, not a gate. */
 import assert from 'node:assert/strict';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
+import { cpus, platform, arch } from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { performance } from 'node:perf_hooks';
+import { runScanChecks } from './primitive-scan-checks.mjs';
+import { runComparison } from './primitive-scan-cases.mjs';
+import { checkWorker } from './primitive-scan-worker-check.mjs';
 
 const root = resolve(import.meta.dirname, '..');
-const baseRoot = resolve(root, '.primitive-baseline');
-const [baseline, candidate] = await Promise.all(
-  [baseRoot, root].map(async dir => import(pathToFileURL(resolve(dir, 'shared.ts')).href))
-);
-const n = 32769, shortN = 8193;
-const numbers = Array.from({ length: n }, (_, i) => i + 0.5);
-const flags = Array.from({ length: n }, (_, i) => i % 3 === 0);
-const strings = Array.from({ length: shortN }, (_, i) => `key-${i}`);
-const numericSum = numbers.reduce((s, v) => s + v, 0);
-const shortSum = (shortN - 1) * shortN / 2;
-
-function prepare(module) {
-  const list = new module.SharedList('number').pushMany(numbers);
-  const bools = new module.SharedList('boolean').pushMany(flags);
-  const text = new module.SharedList('string').pushMany(strings);
-  let linked = new module.SharedLinkedList('number');
-  let doubly = new module.SharedDoublyLinkedList('number');
-  for (let i = 0; i < shortN; i++) { linked = linked.append(i); doubly = doubly.append(i); }
-  return { list, bools, text, linked, doubly };
+const baseRoot = resolve(process.env.PRIMITIVE_BASE ?? resolve(root, '.primitive-baseline'));
+const candidateRoot = resolve(process.env.PRIMITIVE_CANDIDATE ?? root);
+const browserName = process.env.BROWSER;
+const runtime = browserName ?? (typeof Bun === 'undefined' ? 'node' : 'bun');
+const round = Number(process.env.ROUND ?? 1);
+assert(Number.isInteger(round) && round >= 1 && round <= 10, 'ROUND must be 1..10');
+function commit(dir) {
+  try { return execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); }
+  catch { return 'unavailable (local bundle override)'; }
 }
-
-const source = [prepare(baseline), prepare(candidate)];
-const cases = [
-  { name: 'SharedList<number>.forEach', count: n, repeat: 4,
-    run: x => { let s = 0; x.list.forEach(v => { s += v; }); return s; }, expected: numericSum },
-  { name: 'SharedList<number>.toArray', count: n, repeat: 4,
-    run: x => { const a = x.list.toArray(); return a.length + a[0] + a[a.length - 1]; },
-    expected: n + numbers[0] + numbers[n - 1] },
-  { name: 'SharedList<number>.values', count: n, repeat: 4,
-    run: x => { let s = 0; for (const v of x.list.values()) s += v; return s; }, expected: numericSum },
-  { name: 'SharedList<boolean>.forEach', count: n, repeat: 4,
-    run: x => { let s = 0; x.bools.forEach(v => { s += Number(v); }); return s; },
-    expected: flags.filter(Boolean).length },
-  { name: 'SharedList<string>.values', count: shortN, repeat: 4,
-    run: x => { let s = 0; for (const v of x.text.values()) s += v.length; return s; },
-    expected: strings.reduce((s, v) => s + v.length, 0) },
-  { name: 'SharedLinkedList<number>.forEach', count: shortN, repeat: 4,
-    run: x => { let s = 0; x.linked.forEach(v => { s += v; }); return s; }, expected: shortSum },
-  { name: 'SharedDoublyLinkedList<number>.forEach', count: shortN, repeat: 4,
-    run: x => { let s = 0; x.doubly.forEach(v => { s += v; }); return s; }, expected: shortSum },
-  { name: 'SharedDoublyLinkedList<number>.forEachReverse', count: shortN, repeat: 4,
-    run: x => { let s = 0; x.doubly.forEachReverse(v => { s += v; }); return s; }, expected: shortSum }
-];
-
-const median = a => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
-const rows = [];
-let sink = 0;
-for (const item of cases) {
-  const samples = [[], []];
-  function run(which) {
-    let result = 0;
-    const start = performance.now();
-    for (let iteration = 0; iteration < item.repeat; iteration++) result = item.run(source[which]);
-    const time = performance.now() - start;
-    assert.equal(result, item.expected, `${item.name} output changed in ${which ? 'candidate' : 'baseline'}`);
-    sink += result;
-    return time;
+const metadata = { runtime, round, baseline: commit(baseRoot), candidate: commit(candidateRoot),
+  platform: platform(), arch: arch(), cpu: cpus()[0]?.model,
+  node: process.version, bun: typeof Bun === 'undefined' ? null : Bun.version,
+  v8: process.versions.v8 ?? null, browserVersion: null };
+let result;
+if (!browserName) {
+  const module = pathToFileURL(resolve(candidateRoot, 'dist/shared.js')).href;
+  const candidate = await import(module);
+  const baseline = await import(pathToFileURL(resolve(baseRoot, 'dist/shared.js')).href);
+  const correctness = await runScanChecks(candidate);
+  let worker = 'not run: Bun uses its separate transport proof; this worker test requires Node';
+  if (runtime === 'node') {
+    const { Worker } = await import('node:worker_threads');
+    worker = await checkWorker(candidate, new Worker(new URL('./primitive-scan-worker.mjs', import.meta.url)), module, true);
   }
-  for (let i = 0; i < 8; i++) { run(i % 2); run((i + 1) % 2); }
-  for (let round = 0; round < 15; round++) {
-    const first = round % 2, second = 1 - first;
-    samples[first].push(run(first)); samples[second].push(run(second));
+  result = { correctness, worker, ...await runComparison(baseline, candidate, { round }) };
+} else {
+  assert(['chromium', 'firefox', 'webkit'].includes(browserName), 'Unsupported BROWSER');
+  const browsers = await import('playwright');
+  const allowedProofs = new Set(['primitive-scan-checks.mjs', 'primitive-scan-cases.mjs',
+    'primitive-scan-worker.mjs', 'primitive-scan-worker-check.mjs']);
+  const server = createServer(async (request, response) => {
+    response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    response.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+    response.setHeader('Cache-Control', 'no-store');
+    try {
+      const url = new URL(request.url, 'http://127.0.0.1');
+      if (url.pathname === '/') {
+        response.setHeader('Content-Type', 'text/html');
+        response.end('<!doctype html><title>Primitive scan proof</title>'); return;
+      }
+      const match = /^\/(baseline|candidate|proofs)\/(.+)$/.exec(decodeURIComponent(url.pathname));
+      if (!match) { response.writeHead(404).end(); return; }
+      const directory = match[1] === 'baseline' ? resolve(baseRoot, 'dist')
+        : match[1] === 'candidate' ? resolve(candidateRoot, 'dist') : resolve(root, 'proofs');
+      const file = resolve(directory, match[2]);
+      if (!file.startsWith(directory + sep) || !/\.m?js$/.test(file)
+        || match[1] === 'proofs' && !allowedProofs.has(match[2])) { response.writeHead(404).end(); return; }
+      response.setHeader('Content-Type', 'text/javascript'); response.end(await readFile(file));
+    } catch { response.writeHead(404).end(); }
+  });
+  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+  let browser;
+  try {
+    browser = await browsers[browserName].launch();
+    metadata.browserVersion = browser.version();
+    const page = await browser.newPage();
+    await page.goto(`http://127.0.0.1:${server.address().port}/`);
+    result = await page.evaluate(async round => {
+      if (!crossOriginIsolated) throw new Error('Cross-origin isolation is required');
+      const [baseline, candidate, checks, bench, workerCheck] = await Promise.all([
+        import('/baseline/shared.js'), import('/candidate/shared.js'),
+        import('/proofs/primitive-scan-checks.mjs'), import('/proofs/primitive-scan-cases.mjs'),
+        import('/proofs/primitive-scan-worker-check.mjs'),
+      ]);
+      const correctness = await checks.runScanChecks(candidate);
+      const worker = await workerCheck.checkWorker(candidate,
+        new Worker('/proofs/primitive-scan-worker.mjs', { type: 'module' }),
+        new URL('/candidate/shared.js', location.href).href);
+      return { correctness, worker, ...await bench.runComparison(baseline, candidate, { round }) };
+    }, round);
+  } finally {
+    if (browser) await browser.close();
+    await new Promise(resolve => server.close(resolve));
   }
-  const beforeMs = median(samples[0]), afterMs = median(samples[1]);
-  rows.push({ name: item.name, count: item.count, repeat: item.repeat,
-    baselineMedianMs: beforeMs, candidateMedianMs: afterMs, speedup: beforeMs / afterMs,
-    baselineSamplesMs: samples[0], candidateSamplesMs: samples[1] });
-  console.log(`${item.name}: base ${beforeMs.toFixed(3)}ms, candidate ${afterMs.toFixed(3)}ms, ${(beforeMs / afterMs).toFixed(2)}x`);
 }
-const output = resolve(root, 'proofs/results/primitive-scan-comparison.json');
-mkdirSync(resolve(root, 'proofs/results'), { recursive: true });
-writeFileSync(output, JSON.stringify({
-  baseline: process.env.BASE_SHA ?? 'PR base', candidate: process.env.GITHUB_SHA ?? 'PR head',
-  bunVersion: typeof Bun === 'undefined' ? 'unknown' : Bun.version, sink, rows
-}, null, 2) + '\n');
+const outputDir = resolve(root, 'proofs/results/primitive-scan');
+await mkdir(outputDir, { recursive: true });
+await writeFile(resolve(outputDir, `${runtime}-${round}.json`), JSON.stringify({ ...metadata, ...result }, null, 2) + '\n');
+console.log(`${runtime} round ${round}: ${result.correctness.count} checks; ${result.worker}`);
+for (const row of result.rows) console.log(`${row.name} n=${row.size}: ${row.speedup.toFixed(2)}x${row.reviewSlowdown ? ' REVIEW SLOWDOWN' : ''}${row.shortBatch ? ' SHORT BATCH' : ''}`);

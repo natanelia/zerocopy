@@ -1,4 +1,4 @@
-name: Primitive sequence scan comparison
+name: Primitive sequence scan diagnostics
 
 on:
   pull_request:
@@ -6,18 +6,34 @@ on:
       - 'shared-list.ts'
       - 'shared-linked-list.ts'
       - 'shared-doubly-linked-list.ts'
+      - 'arena.ts'
+      - 'persistent-core.as.ts'
       - 'primitive-sequence-scan.test.ts'
-      - 'proofs/primitive-scan-performance.mjs'
+      - 'primitive-scan-portability.test.ts'
+      - 'proofs/primitive-scan-*.mjs'
+      - 'docs/primitive-scan-performance.md'
+      - 'scripts/build-*.ts'
+      - 'scripts/build-*.mjs'
+      - 'package.json'
       - '.github/workflows/primitive-sequence-scan.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: primitive-scans-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
+    name: scans (${{ matrix.runtime }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun, chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,27 +43,39 @@ jobs:
         with:
           bun-version: '1.4.2'
       - run: bun install
-      - name: Build and check candidate
-        run: |
-          bun run build:wasm
-          bun run typecheck
-          bun run test
-      - name: Check out base source separately
+      - name: Build candidate and check source types
+        run: bun run build:wasm && bun run build:browser && bun run typecheck
+      - name: Run full unit suite
+        if: matrix.runtime == 'node'
+        run: bun run test
+      - name: Check out actual PR base separately
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha || 'main' }}
           path: .primitive-baseline
-      - name: Build base Wasm
+      - name: Build base with the same dependencies and flags
         run: |
           ln -s "$GITHUB_WORKSPACE/node_modules" .primitive-baseline/node_modules
-          (cd .primitive-baseline && bun run build:wasm)
-      - name: Interleaved baseline / candidate benchmark with value checks
+          (cd .primitive-baseline && bun run build:wasm && bun run build:browser)
+      - name: Install browser
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        run: bunx playwright install --with-deps ${{ matrix.runtime }}
+      - name: Correctness checks and three fresh-process diagnostic rounds
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || 'main' }}
-        run: bun proofs/primitive-scan-performance.mjs
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          for round in 1 2 3; do
+            if [ "$RUNTIME" = 'bun' ]; then
+              ROUND="$round" bun proofs/primitive-scan-performance.mjs
+            elif [ "$RUNTIME" = 'node' ]; then
+              ROUND="$round" node proofs/primitive-scan-performance.mjs
+            else
+              ROUND="$round" BROWSER="$RUNTIME" node proofs/primitive-scan-performance.mjs
+            fi
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: primitive-scan-performance-evidence
-          path: proofs/results/primitive-scan-comparison.json
+          name: primitive-scan-${{ matrix.runtime }}-evidence
+          path: proofs/results/primitive-scan/
           retention-days: 30
