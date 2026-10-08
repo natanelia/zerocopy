@@ -23,7 +23,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.head_ref == 'perf/worker-arena-registry-20261008'
     env:
       CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      BASELINE_SHA: '3331f2f0e9e0c3c61832e5f04b12e18c1889d96c'
+      BASELINE_SHA: '3773c6e519c7c0958da13727ed1082f449f3ee25'
     strategy:
       fail-fast: false
       matrix:

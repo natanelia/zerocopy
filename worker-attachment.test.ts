@@ -10,6 +10,27 @@ function nestedMap(child: SharedMap<'number'>, arena = new Arena()) {
   return new SharedMap('SharedMap<number>', 0, 0, arena).set('child', child);
 }
 
+// Original iterative all-to-all traversal, without observing/materializing maps.
+function legacyArenaOrder(structures: Record<string, object>): Arena[] {
+  const found = new Map<string, Arena>();
+  for (const root of Object.values(structures)) {
+    const pending = [arenaOf(root)];
+    while (pending.length) {
+      const arena = pending.pop()!;
+      if (found.has(arena.id)) continue;
+      found.set(arena.id, arena);
+      for (const nested of (arena.transportDependencies ?? arena.dependencies).values()) pending.push(nested);
+    }
+  }
+  return [...found.values()];
+}
+function assertLegacyExport(structures: Record<string, SharedMap<'number'>>): void {
+  const expected = legacyArenaOrder(structures);
+  const actual = getWorkerData(structures, { copy: false }).arenas;
+  assert.deepEqual(actual.map(arena => arena.id), expected.map(arena => arena.id));
+  actual.forEach((arena, index) => assert.equal(arena.memory, expected[index].memory));
+}
+
 for (const copy of [false, true]) describe(`worker attachment registry (copy=${copy})`, () => {
   it('shares one lookup without materializing all-to-all dependency maps', async () => {
     const source = Object.fromEntries(Array.from({ length: 24 }, (_, i) => [`map${i}`, numberMap(i)]));
@@ -21,11 +42,93 @@ for (const copy of [false, true]) describe(`worker attachment registry (copy=${c
     try {
       const exported = getWorkerData(attached, { copy });
       assert.equal((exported.arenas).length, 24);
-      assert.equal(values.mock.calls.length, 1);
+      assert.equal(values.mock.calls.length, 0);
       assert.equal(new Set(arenas.map(arena => arena.transportDependencies)).size, 1);
       const again = await initWorker(exported);
       for (let i = 0; i < 24; i++) assert.equal(again[`map${i}`].get('value'), i);
     } finally { values.mockRestore(); }
+  });
+
+  it('exports empty, singleton, and two-arena payloads without dependency iterators', async () => {
+    assert.deepEqual(getWorkerData({}, { copy }).arenas, []);
+    for (const count of [1, 2]) {
+      const source = Object.fromEntries(Array.from({ length: count }, (_, i) => [`map${i}`, numberMap(i)]));
+      const attached = await initWorker(getWorkerData(source, { copy }));
+      const maps = Object.values(attached), lookup = arenaOf(maps[0]).transportDependencies;
+      if (count === 1) {
+        assert.equal(lookup.size, 0);
+        assert.equal(arenaOf(maps[0]).sharedDependencyMembers, undefined);
+        assert.equal(arenaOf(maps[0]).dependencies, lookup);
+      }
+      const values = vi.spyOn(lookup, 'values');
+      try {
+        for (const map of maps) {
+          const result = getWorkerData({ root: map, alias: map }, { copy });
+          const expected = [arenaOf(map).id, ...maps.slice().reverse().filter(other => other !== map).map(other => arenaOf(other).id)];
+          assert.deepEqual(result.arenas.map(arena => arena.id), expected);
+        }
+        assert.equal(values.mock.calls.length, 0);
+      } finally { values.mockRestore(); }
+      // Explicit observation still exposes distinct, self-excluding Maps.
+      for (const map of maps) assert.equal(arenaOf(map).dependencies.size, count - 1);
+    }
+  });
+
+  it('keeps a single dependency backing field and avoids dependency getters during reads', async () => {
+    const leaf = numberMap(3), parent = nestedMap(leaf);
+    const attached = await initWorker(getWorkerData({ parent }, { copy }));
+    for (const arena of [arenaOf(parent), arenaOf(attached.parent)]) {
+      assert.deepEqual(Object.getOwnPropertyNames(arena).slice(0, 7), ['memory', 'wasm', 'id', 'readOnly', 'dependencyLookup', 'writeHead', 'writeSize']);
+      assert.equal(Object.hasOwn(arena, 'dependencyRegistry'), false);
+    }
+    const metadata = vi.spyOn(Arena.prototype, 'sharedDependencyMembers', 'get');
+    const dependencies = vi.spyOn(Arena.prototype, 'dependencies', 'get');
+    try {
+      const first = attached.parent.get('child')!;
+      assert.equal(first.get('value'), 3);
+      for (let i = 0; i < 10; i++) assert.equal(attached.parent.get('child'), first);
+      assert.equal(metadata.mock.calls.length, 0);
+      assert.equal(dependencies.mock.calls.length, 0);
+    } finally { metadata.mockRestore(); dependencies.mockRestore(); }
+  });
+
+  it('preserves legacy first-ID order across overlapping closed and observed registries', async () => {
+    const group = async (ids: string[], value: number) => {
+      const roots = Object.fromEntries(ids.map((id, i) => [id, numberMap(value + i, new Arena({ id }))]));
+      return initWorker(getWorkerData(roots, { copy }));
+    };
+    const left = await group(['a', 'b', 'c'], 10), right = await group(['b', 'd', 'e'], 20);
+    for (const structures of [
+      { one: left.a, two: right.d }, { one: right.d, two: left.a },
+      { one: left.b, two: right.b }, { one: right.b, two: left.b },
+      { one: left.c, two: right.e, alias: left.c },
+    ]) assertLegacyExport(structures);
+    const writer = numberMap(30), owner = arenaOf(writer);
+    const collision = numberMap(99, new Arena({ id: 'c' }));
+    owner.dependencies.set('left', arenaOf(left.a));
+    owner.dependencies.set('collision', arenaOf(collision));
+    owner.dependencies.set('right', arenaOf(right.d));
+    assertLegacyExport({ writer });
+    // Observing one member opens every untouched sibling in that payload.
+    const observed = arenaOf(right.d).dependencies;
+    observed.clear(); observed.set(arenaOf(right.d).id, arenaOf(collision));
+    assert.equal(arenaOf(right.e).hasSharedDependencies, false);
+    assertLegacyExport({ one: right.e, two: left.a });
+    assertLegacyExport({ writer });
+    observed.set('cycle', owner);
+    assertLegacyExport({ one: right.b, writer, two: left.c });
+  });
+
+  it('follows singleton dependency values even when their key is the owner ID', async () => {
+    const child = numberMap(7), writer = numberMap(8), owner = arenaOf(writer);
+    owner.dependencies.set(owner.id, arenaOf(child));
+    assertLegacyExport({ writer });
+    assert.equal(getWorkerData({ writer }, { copy }).arenas.length, 2);
+    const attached = await initWorker(getWorkerData({ writer }, { copy }));
+    const reader = arenaOf(attached.writer), dependencies = reader.dependencies;
+    dependencies.clear(); dependencies.set(reader.id, arenaOf(child));
+    assertLegacyExport({ writer: attached.writer });
+    assert.equal(getWorkerData({ writer: attached.writer }, { copy }).arenas.length, 2);
   });
 
   it('preserves distinct self-excluding dependency maps when observed', async () => {

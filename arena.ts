@@ -62,7 +62,15 @@ export abstract class Snapshot {
   protected get arena(): Arena { return this.#owner; }
 }
 
-export interface ArenaRegistry { readonly arenas: Map<string, Arena>; shared: boolean }
+export interface ArenaRegistry { readonly arenas: Map<string, Arena>; readonly members: Arena[]; shared: boolean }
+// Registry metadata belongs to the shared lookup, not every Arena. Keeping one
+// dependency field preserves the layout of the ordinary read-cache fields.
+const arenaRegistries = new WeakMap<Map<string, Arena>, ArenaRegistry>();
+export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
+  const registry = { arenas, members: [] as Arena[], shared: true };
+  arenaRegistries.set(arenas, registry);
+  return registry;
+}
 
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
@@ -73,25 +81,28 @@ export class Arena {
   readonly wasm: any;
   readonly id: string;
   readonly readOnly: boolean;
-  private dependencyLookup: Map<string, Arena>;
-  private dependencyRegistry: ArenaRegistry | undefined;
+  private dependencyLookup = new Map<string, Arena>();
   // Worker payloads share one lookup. Preserve the distinct, self-excluding Map
   // exposed to internal callers without eagerly building an all-to-all graph.
   get dependencies(): Map<string, Arena> {
-    if (this.dependencyRegistry) {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    if (registry) {
       // Observing a mutable map opens the otherwise closed attachment graph.
       // Preserve ordinary DFS precedence if callers subsequently extend it.
-      this.dependencyRegistry.shared = false;
+      registry.shared = false;
       const dependencies = new Map<string, Arena>();
-      for (const [id, arena] of this.dependencyRegistry.arenas) if (arena !== this) dependencies.set(id, arena);
+      for (const [id, arena] of registry.arenas) if (arena !== this) dependencies.set(id, arena);
       this.dependencyLookup = dependencies;
-      this.dependencyRegistry = undefined;
     }
     return this.dependencyLookup;
   }
   /** Internal transport traversal must not materialize attachment maps. */
   get transportDependencies(): ReadonlyMap<string, Arena> { return this.dependencyLookup; }
-  get hasSharedDependencies(): boolean { return this.dependencyRegistry?.shared ?? false; }
+  get sharedDependencyMembers(): readonly Arena[] | undefined {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    return registry?.shared ? registry.members : undefined;
+  }
+  get hasSharedDependencies(): boolean { return this.sharedDependencyMembers !== undefined; }
   writeHead = 0;
   writeSize = 0;
   writeCount = 0;
@@ -155,8 +166,7 @@ export class Arena {
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
-    this.dependencyRegistry = this.readOnly ? options.registry : undefined;
-    this.dependencyLookup = this.dependencyRegistry?.arenas ?? new Map<string, Arena>();
+    if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);

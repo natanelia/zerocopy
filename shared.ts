@@ -11,7 +11,7 @@ import { SharedOrderedSet } from './shared-ordered-set';
 import { SharedSortedMap } from './shared-sorted-map';
 import { SharedSortedSet } from './shared-sorted-set';
 import { SharedPriorityQueue } from './shared-priority-queue';
-import { Arena, arenaOf, FORMAT_VERSION } from './arena';
+import { Arena, arenaOf, createArenaRegistry, FORMAT_VERSION } from './arena';
 import { structureRegistry } from './codec';
 
 export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
@@ -72,22 +72,33 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
   if (Object.getOwnPropertySymbols(structures).length) throw new TypeError('Worker structure names must be strings');
   const copy = options.copy ?? (typeof Bun !== 'undefined');
   const found = new Map<string, Arena>();
-  let expanded: Set<ReadonlyMap<string, Arena>> | undefined;
   const collect = (root: Arena): void => {
-    const pending = [root];
-    while (pending.length) {
-      const arena = pending.pop()!;
-      if (found.has(arena.id)) continue;
-      found.set(arena.id, arena);
-      const dependencies = arena.readOnly ? arena.transportDependencies : arena.dependencies;
-      if (arena.hasSharedDependencies) {
-        // Every arena in an attachment can share this registry. Expand it once,
-        // including when an attached snapshot is nested in a writable arena.
-        expanded ??= new Set();
-        if (expanded.has(dependencies)) continue;
-        expanded.add(dependencies);
+    let arena: Arena | undefined = root, pending: Arena[] | undefined;
+    while (arena) {
+      if (!found.has(arena.id)) {
+        found.set(arena.id, arena);
+        const dependencies = arena.transportDependencies ?? arena.dependencies;
+        // Empty owned maps, including one-arena payloads, need no iterator or
+        // DFS stack. Nonempty ordinary maps still follow their values verbatim.
+        if (dependencies.size) {
+          const members = arena.readOnly ? arena.sharedDependencyMembers : undefined;
+          if (members) {
+            // A closed payload is a complete graph. Legacy DFS visits its root,
+            // then all unseen members in reverse insertion order. Drain it here
+            // without revisiting each arena or allocating a deduplication Set.
+            for (let i = members.length - 1; i >= 0; i--) {
+              const nested = members[i];
+              if (nested !== arena && !found.has(nested.id)) found.set(nested.id, nested);
+            }
+          } else {
+            // Observing a mutable dependency map opens the whole registry;
+            // preserve its original per-arena DFS order and first-ID precedence.
+            pending ??= [];
+            for (const nested of dependencies.values()) pending.push(nested);
+          }
+        }
       }
-      for (const nested of dependencies.values()) pending.push(nested);
+      arena = pending?.pop();
     }
   };
   const serialized: Record<string, SerializedStructure> = Object.create(null);
@@ -107,11 +118,15 @@ export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>): P
 export function initWorker<T extends StructureRecord<T>>(data: WorkerData): Promise<Readonly<T>>;
 export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
   if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
-  const arenas = new Map<string, Arena>(), registry = { arenas, shared: true };
+  const arenas = new Map<string, Arena>();
+  // A solitary reader needs only its original empty owned dependency Map.
+  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    arenas.set(source.id, new Arena({ ...source, readOnly: true, registry }));
+    const arena = new Arena({ ...source, readOnly: true, registry });
+    arenas.set(source.id, arena);
+    registry?.members.push(arena);
   }
   // The complete registry is available before reconstructing any nested value.
   // It belongs only to this payload; later attachments cannot change old views.

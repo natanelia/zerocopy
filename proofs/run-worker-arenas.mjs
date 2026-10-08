@@ -92,7 +92,7 @@ for (const runtime of runtimes) for (const count of counts) for (let block = 0; 
     assert.equal(runs[label].configuration.samples, samples);
     assert.equal(runs[label].configuration.warmups, warmups);
     assert.equal(runs[label].dependencySets, variant === 'baseline' ? count * count : count);
-    assert.equal(runs[label].traversedArenaValues, variant === 'baseline' ? count * count : 2 * count);
+    assert.equal(runs[label].traversedArenaValues, variant === 'baseline' ? count * count : count);
     for (const row of runs[label].rows) {
       assert.equal(row.effectiveSamples, samples); assert.equal(row.effectiveWarmups, warmups);
       assert.equal(row.measured.length, samples); assert.equal(row.warmup.length, warmups);

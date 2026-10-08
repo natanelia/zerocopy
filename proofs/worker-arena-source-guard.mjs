@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const BASELINE_COMMIT = '3331f2f0e9e0c3c61832e5f04b12e18c1889d96c';
+export const BASELINE_COMMIT = '3773c6e519c7c0958da13727ed1082f449f3ee25';
 export const ALLOWED_SOURCE_CHANGES = ['arena.ts', 'shared.ts'];
 export const GUARD_SCOPE = {
   root: 'Root TS/JS source files excluding .test/.spec files, root WASM binaries, package.json, tsconfig*.json, and bunfig.toml/json',

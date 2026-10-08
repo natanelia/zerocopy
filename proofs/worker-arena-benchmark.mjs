@@ -165,5 +165,6 @@ console.log(JSON.stringify({
   metadata, arenas: count,
   configuration: { samples, warmups, minimumBatchMs, targetBatchMs, transport: 'shared', explicitGcAvailable: typeof globalThis.gc === 'function', mode: process.env.MODE ?? 'timing-and-memory' },
   dependencySets, traversedArenaValues,
+  counterScope: { dependencySets: 'Map.set calls whose value is an Arena, including the payload lookup', traversedArenaValues: 'Map.values yields whose value is an Arena, including final output traversal; excludes direct closed-registry array indexing' },
   memory: { scope: 'one retained attachment after GC; producers and shared payload buffers explicitly pinned', ...memory }, rows, sink,
 }));
