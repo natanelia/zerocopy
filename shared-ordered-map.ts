@@ -60,34 +60,8 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
       if (leaf && a.dv.getUint32(leaf + 16 + length, true) === a.dv.getUint32(old + 16 + length, true)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf, 4)];
     }
   }
-  // Keep dedicated generator methods: keys never decode values, values never
-  // decode keys, and both retain the public generator method/prototype shape.
-  *keys(): Generator<string> {
-    const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
-    while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
-    for (let i = order.length - 1; i >= 0; i--) {
-      const old = order[i]; let leaf = old;
-      if (!this.orderStable) {
-        const length = view.getUint32(old + 8, true);
-        leaf = a.wasm.mapFind(this.root, old + 16, length, view.getUint32(old + 4, true)) >>> 0;
-        if (!leaf || view.getUint32(leaf + 16 + length, true) !== view.getUint32(old + 16 + length, true)) continue;
-      }
-      yield a.leafKey(leaf);
-    }
-  }
-  *values(): Generator<ValueOf<T>> {
-    const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
-    while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
-    for (let i = order.length - 1; i >= 0; i--) {
-      const old = order[i]; let leaf = old;
-      if (!this.orderStable) {
-        const length = view.getUint32(old + 8, true);
-        leaf = a.wasm.mapFind(this.root, old + 16, length, view.getUint32(old + 4, true)) >>> 0;
-        if (!leaf || view.getUint32(leaf + 16 + length, true) !== view.getUint32(old + 16 + length, true)) continue;
-      }
-      yield a.leafValue(this.valueType, leaf, 4);
-    }
-  }
+  *keys(): Generator<string> { for (const [key] of this.entries()) yield key; }
+  *values(): Generator<ValueOf<T>> { for (const [, value] of this.entries()) yield value; }
   forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [key, value] of this.entries()) fn(value, key); }
   toWorkerData() { return Object.freeze({ root: this.root, head: this.head, tail: this.tail, size: this.size, valueType: this.valueType, orderStable: this.orderStable }); }
   static fromWorkerData<T extends string>(d: { root: number; head: number; tail: number; size: number; valueType: T; orderStable?: boolean }, source: Arena = defaultArena()): SharedOrderedMap<T> { return new SharedOrderedMap(d.valueType, d.root, d.head, d.tail, d.size, source, d.orderStable ?? false); }

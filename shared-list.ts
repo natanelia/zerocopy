@@ -136,9 +136,22 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   *values(): Generator<ValueOf<T>> {
     if (!this.size) return;
-    const a = this.arena, start = (this.size - 1) & ~31;
-    for (const raw of a.vector(this.root, this.depth, 0, start)) yield a.decode(this.type, raw);
-    for (let i = 0; i < this.size - start; i++) yield a.decode(this.type, a.dv.getFloat64(this.tail + i * 8, true));
+    const a = this.arena, view = a.dv, start = (this.size - 1) & ~31;
+    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
+    // Capture one existing view when iteration starts. Shared growth cannot
+    // detach it, and all bytes in this immutable snapshot already exist.
+    // Explicit little-endian reads also work on big-endian hosts.
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const length = Math.min(32, this.size - first);
+      if (isNumber) {
+        for (let j = 0; j < length; j++) yield view.getFloat64(leaf + j * 8, true) as ValueOf<T>;
+      } else if (isBoolean) {
+        for (let j = 0; j < length; j++) yield (view.getFloat64(leaf + j * 8, true) !== 0) as ValueOf<T>;
+      } else {
+        for (let j = 0; j < length; j++) yield a.decode(this.type, view.getFloat64(leaf + j * 8, true));
+      }
+    }
   }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;

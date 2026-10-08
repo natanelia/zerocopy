@@ -4,11 +4,11 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve, sep, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
-import { benchmarkConfig, workloadCases, roundOrders, measureCase, finishRow, summarize, prepareComparison, bundleManifest, sourceManifest, sha256, method } from './map-projection-performance.mjs';
+import { benchmarkConfig, workloadCases, workloadCounts, roundOrders, measureCase, finishRow, summarize, prepareComparison, bundleManifest, sourceManifest, sha256, method } from './map-projection-performance.mjs';
 
 const [baseline, candidate, output = `proofs/results/map-projection-browsers-${Date.now()}.json`] = process.argv.slice(2);
-if (!baseline || !candidate) throw new Error('Usage: node proofs/map-projection-browser.mjs BASELINE/dist/shared.js CANDIDATE/dist/shared.js OUTPUT.json; env: BENCH_MODE=ab|aa-baseline|aa-candidate, CASE_FILTER, ROUNDS, IMPORT_ORDER, WARM_ORDER, ORDER_OFFSET, ENGINES');
-const config = benchmarkConfig(15), workloads = workloadCases(config.caseFilter), comparison = prepareComparison(baseline, candidate, config.mode);
+if (!baseline || !candidate) throw new Error('Usage: node proofs/map-projection-browser.mjs BASELINE/dist/shared.js CANDIDATE/dist/shared.js OUTPUT.json; env: BENCH_MODE=ab|aa-baseline|aa-candidate, CASE_FILTER, CASE_CLASS=all|target|control, ROUNDS, IMPORT_ORDER, WARM_ORDER, ORDER_OFFSET, ENGINES');
+const config = benchmarkConfig(15), workloads = workloadCases(config.caseFilter, config.caseClass), comparison = prepareComparison(baseline, candidate, config.mode);
 const roots = Object.fromEntries(Object.entries(comparison.paths).map(([name, path]) => [name, dirname(path)]));
 // Even an A/A measurement verifies workers against the actual candidate build.
 roots['worker-candidate'] = dirname(resolve(candidate));
@@ -92,7 +92,7 @@ try {
   assert.equal(results.length, engines.length);
   mkdirSync(dirname(resolve(output)), { recursive: true });
   writeFileSync(output, JSON.stringify({
-    schemaVersion: 2, date: new Date().toISOString(), config, engines,
+    schemaVersion: 2, date: new Date().toISOString(), config, workloadCounts: workloadCounts(workloads), engines,
     baseline: comparison.sourcePaths.baseline, candidate: comparison.sourcePaths.candidate,
     measuredSourcePaths: comparison.measuredSourcePaths, manifests: comparison.manifests, sourceManifests: comparison.sourceManifests, sourceDiff: comparison.sourceDiff,
     workerCandidateManifest: bundleManifest(candidate), workerCandidateSourceManifest: sourceManifest(candidate),

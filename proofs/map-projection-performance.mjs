@@ -27,17 +27,24 @@ export function benchmarkConfig(defaultSamples = 21) {
   };
   const mode = process.env.BENCH_MODE ?? 'ab';
   if (!['ab', 'aa-baseline', 'aa-candidate'].includes(mode)) throw new Error(`Invalid BENCH_MODE: ${mode}`);
+  const caseClass = process.env.CASE_CLASS ?? 'all';
+  if (!['all', 'target', 'control'].includes(caseClass)) throw new Error(`Invalid CASE_CLASS: ${caseClass}`);
   return {
     mode, rounds: integer('ROUNDS', 4, 1, 100), samples: integer('SAMPLES', defaultSamples, 2, 1000),
     targetBatchMs: number('TARGET_BATCH_MS', 10, 0.1, 1000),
     warmupMs: number('WARMUP_MS', 150, 0, 5000), warmupMinElements: integer('WARMUP_MIN_ELEMENTS', 1048576, 0, 100000000),
     maxWarmupMs: number('MAX_WARMUP_MS', 5000, 1, 30000),
     importOrder: order('IMPORT_ORDER'), warmOrder: order('WARM_ORDER'),
-    orderOffset: integer('ORDER_OFFSET', 0, 0, 1000), caseFilter: process.env.CASE_FILTER ?? null,
+    orderOffset: integer('ORDER_OFFSET', 0, 0, 1000), caseFilter: process.env.CASE_FILTER ?? null, caseClass,
   };
 }
 
-export function workloadCases(filter) {
+export function workloadCounts(rows) {
+  return { total: rows.length, targets: rows.filter(row => row.classification === 'target').length, controls: rows.filter(row => row.classification === 'control').length };
+}
+
+export function workloadCases(filter, caseClass = 'all') {
+  if (!['all', 'target', 'control'].includes(caseClass)) throw new Error(`Invalid case class: ${caseClass}`);
   const cases = [];
   for (const size of [32, 4096]) for (const kind of ['ordered', 'ordered-updated', 'sorted', 'sorted-custom']) for (const type of ['number', 'object']) {
     for (const operation of ['keys', 'values', 'entries']) cases.push({ size, kind, type, operation, collection: 'map', name: `${kind}/${type}/${size}/${operation}` });
@@ -45,8 +52,18 @@ export function workloadCases(filter) {
   for (const size of [32, 4096]) for (const kind of ['ordered-set', 'sorted-set', 'sorted-set-custom']) for (const type of ['number', 'string']) {
     cases.push({ size, kind, type, operation: 'values', collection: 'set', name: `${kind}/${type}/${size}/values` });
   }
-  const selected = filter ? cases.filter(row => new RegExp(filter).test(row.name)) : cases;
-  if (!selected.length) throw new Error(`CASE_FILTER selected no workloads: ${filter}`);
+  // Only sorted projections changed. Ordered maps/sets, every entries()
+  // workload, and comparator-backed values() remain regression controls.
+  for (const row of cases) {
+    const target = row.collection === 'set'
+      ? row.kind === 'sorted-set' || row.kind === 'sorted-set-custom'
+      : row.kind === 'sorted' && ['keys', 'values'].includes(row.operation)
+        || row.kind === 'sorted-custom' && row.operation === 'keys';
+    row.classification = target ? 'target' : 'control';
+  }
+  assert.deepEqual(workloadCounts(cases), { total: 60, targets: 20, controls: 40 });
+  const selected = cases.filter(row => (caseClass === 'all' || row.classification === caseClass) && (!filter || new RegExp(filter).test(row.name)));
+  if (!selected.length) throw new Error(`CASE_FILTER/CASE_CLASS selected no workloads: ${filter}/${caseClass}`);
   return selected;
 }
 
@@ -162,6 +179,7 @@ export function summarize(runs) {
   return runs[0].rows.map((first, index) => {
     for (const run of runs) {
       assert.equal(run.rows[index].name, first.name);
+      assert.equal(run.rows[index].classification, first.classification);
       assert.equal(run.rows[index].digest, first.digest, first.name);
     }
     // Calibrated repeat counts can differ across fresh rounds. Normalize before
@@ -174,7 +192,7 @@ export function summarize(runs) {
     };
     const roundSpeedups = runs.map(run => median(run.rows[index].samples.baseline) / median(run.rows[index].samples.candidate));
     return {
-      name: first.name, digest: first.digest, baselineMs: median(before), candidateMs: median(after), speedup: median(roundSpeedups), pooledMedianRatio: median(before) / median(after),
+      name: first.name, classification: first.classification, digest: first.digest, baselineMs: median(before), candidateMs: median(after), speedup: median(roundSpeedups), pooledMedianRatio: median(before) / median(after),
       baselineSpread: spread(before), candidateSpread: spread(after),
       roundSpeedups,
       medianPairedSpeedup: median(before.map((ms, i) => ms / after[i])),
@@ -210,9 +228,8 @@ export function prepareComparison(baseline, candidate, mode) {
   const sourceManifests = Object.fromEntries(Object.entries(measuredSourcePaths).map(([name, path]) => [name, sourceManifest(path)]));
   const sourceFiles = new Set([...Object.keys(sourceManifests.baseline.files), ...Object.keys(sourceManifests.candidate.files)]);
   const sourceDiff = [...sourceFiles].filter(file => file !== 'bun.lock' && sourceManifests.baseline.files[file] !== sourceManifests.candidate.files[file]).sort();
-  const allowedRuntimeChanges = new Set(['shared-ordered-map.ts', 'shared-sorted-map.ts']);
-  const unexpected = sourceDiff.filter(file => !allowedRuntimeChanges.has(file));
-  if (unexpected.length) throw new Error(`Unrelated production/build sources differ (${unexpected.join(', ')}); pin an exact candidate and matching baseline before attributing map-projection timings`);
+  const expectedSourceDiff = mode === 'ab' ? ['shared-sorted-map.ts'] : [];
+  assert.deepEqual(sourceDiff, expectedSourceDiff, 'Sorted-only proof requires exactly shared-sorted-map.ts to differ for A/B, and identical sources for A/A');
 
   let temporary;
   const paths = { ...sourcePaths };
@@ -235,7 +252,7 @@ export function prepareComparison(baseline, candidate, mode) {
   return { paths, sourcePaths, measuredSourcePaths, manifests, sourceManifests, sourceDiff, cleanup: () => { if (temporary) rmSync(temporary, { recursive: true, force: true }); } };
 }
 
-export const method = isolation => `Each workload/operation has a fresh ${isolation} in every round, with independent baseline/candidate bundles. Only the measured operation is called before timing. Separate lexical scan functions keep baseline/candidate method-call feedback monomorphic; dispatch occurs outside the hot loops. Equal-scan calibration and warmup alternate order. Import/construction and initial warm/sample order are reversed across rounds by default and can be controlled independently. Repeats are calibrated using the minimum elapsed duration over three equal-work pairs for a target batch duration with a 25% margin, then held equal for both variants and fixed throughout measured samples. Warmup requires elapsed time on both sides and a minimum equal element count, with a recorded cap. Construction, full differential validation, and count assertions are outside timings. Raw batch milliseconds, repeats, all samples, order, calibration and warmup are retained; summaries use milliseconds per full scan because repeats can differ across rounds. Primary speedup is the median of per-round baseline/candidate median-duration ratios; pooled median ratios are retained separately and may differ under cross-round drift. Within-round samples are not independent process replicates. A/A modes use two byte-identical copies of the complete selected bundle. Every slowdown is retained. Shared-runner results are evidence, not universal guarantees.`;
+export const method = isolation => `Only natural-sorted keys/values, custom-sorted keys, and sorted-set projections are targets; all ordered APIs, entries, and custom-sorted values are controls. Each workload/operation has a fresh ${isolation} in every round, with independent baseline/candidate bundles. Only the measured operation is called before timing. Separate lexical scan functions keep baseline/candidate method-call feedback monomorphic; dispatch occurs outside the hot loops. Equal-scan calibration and warmup alternate order. Import/construction and initial warm/sample order are reversed across rounds by default and can be controlled independently. Repeats are calibrated using the minimum elapsed duration over three equal-work pairs for a target batch duration with a 25% margin, then held equal for both variants and fixed throughout measured samples. Warmup requires elapsed time on both sides and a minimum equal element count, with a recorded cap. Construction, full differential validation, and count assertions are outside timings. Raw batch milliseconds, repeats, all samples, order, calibration and warmup are retained; summaries use milliseconds per full scan because repeats can differ across rounds. Primary speedup is the median of per-round baseline/candidate median-duration ratios; pooled median ratios are retained separately and may differ under cross-round drift. Within-round samples are not independent process replicates. A/A modes use two byte-identical copies of the complete selected bundle. Every slowdown is retained. Shared-runner results are evidence, not universal guarantees.`;
 
 async function main() {
   if (process.argv[2] === '--case') {
@@ -244,8 +261,8 @@ async function main() {
     return;
   }
   const [baseline, candidate, output = `proofs/results/map-projection-${Date.now()}.json`] = process.argv.slice(2);
-  if (!baseline || !candidate) throw new Error('Usage: node proofs/map-projection-performance.mjs BASELINE/dist/shared.js CANDIDATE/dist/shared.js OUTPUT.json; env: BENCH_MODE=ab|aa-baseline|aa-candidate, CASE_FILTER, ROUNDS, IMPORT_ORDER, WARM_ORDER, ORDER_OFFSET');
-  const config = benchmarkConfig(), workloads = workloadCases(config.caseFilter), comparison = prepareComparison(baseline, candidate, config.mode), runs = [];
+  if (!baseline || !candidate) throw new Error('Usage: node proofs/map-projection-performance.mjs BASELINE/dist/shared.js CANDIDATE/dist/shared.js OUTPUT.json; env: BENCH_MODE=ab|aa-baseline|aa-candidate, CASE_FILTER, CASE_CLASS=all|target|control, ROUNDS, IMPORT_ORDER, WARM_ORDER, ORDER_OFFSET');
+  const config = benchmarkConfig(), workloads = workloadCases(config.caseFilter, config.caseClass), comparison = prepareComparison(baseline, candidate, config.mode), runs = [];
   try {
     for (let round = 0; round < config.rounds; round++) {
       const orders = roundOrders(round, config), rows = [];
@@ -265,7 +282,7 @@ async function main() {
       platform: process.platform, arch: process.arch, cpu: os.cpus()[0]?.model,
       baseline: comparison.sourcePaths.baseline, candidate: comparison.sourcePaths.candidate,
       measuredSourcePaths: comparison.measuredSourcePaths, manifests: comparison.manifests, sourceManifests: comparison.sourceManifests, sourceDiff: comparison.sourceDiff, harnessSha256: sha256(readFileSync(fileURLToPath(import.meta.url))),
-      config, rounds: config.rounds, samplesPerRound: config.samples, summaryTimingUnit: 'milliseconds per full scan', rawTimingUnit: 'milliseconds per batch',
+      config, workloadCounts: workloadCounts(workloads), rounds: config.rounds, samplesPerRound: config.samples, summaryTimingUnit: 'milliseconds per full scan', rawTimingUnit: 'milliseconds per batch',
       method: method('child process'), summary, runs,
     }, null, 2) + '\n');
     for (const row of summary) console.log(`${row.name.padEnd(46)} ${row.speedup.toFixed(2)}x (${row.baselineMs.toFixed(6)} -> ${row.candidateMs.toFixed(6)} ms/scan); rounds ${row.roundSpeedups.map(x => x.toFixed(2)).join(', ')}`);

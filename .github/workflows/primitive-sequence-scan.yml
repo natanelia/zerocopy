@@ -1,0 +1,96 @@
+name: Primitive sequence scan diagnostics
+
+on:
+  pull_request:
+    paths:
+      - 'shared-list.ts'
+      - 'shared-linked-list.ts'
+      - 'shared-doubly-linked-list.ts'
+      - 'arena.ts'
+      - 'persistent-core.as.ts'
+      - 'primitive-sequence-scan.test.ts'
+      - 'primitive-scan-portability.test.ts'
+      - 'proofs/primitive-scan-*.mjs'
+      - 'docs/primitive-scan-performance.md'
+      - 'scripts/build-*.ts'
+      - 'scripts/build-*.mjs'
+      - 'package.json'
+      - '.github/workflows/primitive-sequence-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: primitive-scans-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: scans (${{ matrix.runtime }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun, chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Build candidate and check source types
+        run: bun run build:wasm && bun run build:browser && bun run typecheck
+      - name: Run full unit suite
+        if: matrix.runtime == 'node'
+        run: bun run test
+      - name: Check out actual PR base separately
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          path: .primitive-baseline
+          persist-credentials: false
+      - name: Build base with the same dependencies and flags
+        run: |
+          ln -s "$GITHUB_WORKSPACE/node_modules" .primitive-baseline/node_modules
+          (cd .primitive-baseline && bun run build:wasm && bun run build:browser)
+      - name: Install browser
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        run: bunx playwright install --with-deps ${{ matrix.runtime }}
+      - name: Correctness checks and three fresh-process diagnostic rounds
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          run_proof() {
+            if [ "$RUNTIME" = 'bun' ]; then
+              bun proofs/primitive-scan-performance.mjs
+            elif [ "$RUNTIME" = 'node' ]; then
+              node proofs/primitive-scan-performance.mjs
+            else
+              BROWSER="$RUNTIME" node proofs/primitive-scan-performance.mjs
+            fi
+          }
+          # Tracing changes JIT feedback even after prototypes are restored.
+          # Never execute mechanism probes inside any benchmark process.
+          CHECKS_ONLY=1 run_proof
+          for round in 1 2 3; do
+            if [ "$RUNTIME" = 'bun' ]; then
+              ROUND="$round" bun proofs/primitive-scan-performance.mjs
+            elif [ "$RUNTIME" = 'node' ]; then
+              ROUND="$round" node proofs/primitive-scan-performance.mjs
+            else
+              ROUND="$round" BROWSER="$RUNTIME" node proofs/primitive-scan-performance.mjs
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: primitive-scan-${{ matrix.runtime }}-evidence
+          path: proofs/results/primitive-scan/
+          retention-days: 30

@@ -1,4 +1,4 @@
-name: Map iterator projection
+name: Sorted map iterator projection
 on:
   pull_request:
     branches: [main]
@@ -44,13 +44,13 @@ jobs:
           mkdir -p proofs/results/map-projection
           printf '%s\n' "$base" > proofs/results/map-projection/base-commit.txt
           git rev-parse HEAD > proofs/results/map-projection/candidate-commit.txt
-      - name: Measure isolated Node or Bun operation rounds
+      - name: Measure sorted targets and all ordered/entry controls
         if: matrix.runtime == 'node' || matrix.runtime == 'bun'
         env:
           RUNTIME: ${{ matrix.runtime }}
         run: |
           "$RUNTIME" proofs/map-projection-performance.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME.json"
-          CASE_FILTER='^((ordered|ordered-updated|sorted|sorted-custom)/(number|object)/(32|4096)/entries|sorted-custom/(number|object)/(32|4096)/values)$' BENCH_MODE=aa-baseline "$RUNTIME" proofs/map-projection-performance.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME-aa.json"
+          CASE_CLASS=control BENCH_MODE=aa-baseline "$RUNTIME" proofs/map-projection-performance.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME-aa.json"
       - name: Verify real Node worker projections
         if: matrix.runtime == 'node'
         run: node proofs/map-projection-worker.mjs
@@ -59,13 +59,13 @@ jobs:
         env:
           ENGINE: ${{ matrix.runtime }}
         run: bunx playwright install --with-deps "$ENGINE"
-      - name: Verify and measure isolated browser operation rounds
+      - name: Verify and measure sorted projections with full controls
         if: matrix.runtime != 'node' && matrix.runtime != 'bun'
         env:
           ENGINES: ${{ matrix.runtime }}
         run: |
           node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES.json"
-          CASE_FILTER='^((ordered|ordered-updated|sorted|sorted-custom)/(number|object)/(32|4096)/entries|sorted-custom/(number|object)/(32|4096)/values)$' BENCH_MODE=aa-baseline node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES-aa.json"
+          CASE_CLASS=control BENCH_MODE=aa-baseline node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES-aa.json"
       - name: Verify controls and targets with one build per fresh browser process
         if: matrix.runtime != 'node' && matrix.runtime != 'bun'
         env:

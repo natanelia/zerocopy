@@ -10,7 +10,7 @@ for (const [name, make] of [
   ['sorted', () => new SharedSortedMap('object')],
   ['custom sorted', () => new SharedSortedMap('object', (a, b) => b.localeCompare(a))],
 ] as const) describe(`${name} map projection`, () => {
-  test('keys skip value decoding, including cold JSON larger than the cache', () => {
+  if (name !== 'ordered') test('sorted keys skip value decoding, including cold JSON larger than the cache', () => {
     let map = make();
     for (let i = 0; i < 2100; i++) map = map.set(`key-${i}`, { index: i, text: '🙂'.repeat(8) }) as typeof map;
     const a = arenaOf(map), read = vi.spyOn(a, 'leafValue');
@@ -41,16 +41,21 @@ for (const [name, make] of [
   ['ordered', () => new SharedOrderedMap('number')],
   ['sorted', () => new SharedSortedMap('number')],
 ] as const) describe(`${name} read-only projections`, () => {
-  test('values skip key decoding and preserve every f64 value', () => {
+  test('values preserve every f64 value', () => {
     let map = make().set('d', NaN).set('b', -0).set('a', Infinity).set('c', -Infinity);
     map = map.set('d', NaN) as typeof map;
     const expected = [...map.entries()].map(([, value]) => value);
-    const keyRead = vi.spyOn(arenaOf(map), 'leafKey');
     const actual = [...map.values()];
-    expect(keyRead).not.toHaveBeenCalled();
-    keyRead.mockRestore();
     expect(actual).toHaveLength(expected.length);
     expect(actual.every((value, i) => Object.is(value, expected[i]))).toBe(true);
+  });
+
+  if (name === 'sorted') test('natural sorted values skip key decoding', () => {
+    const map = make().set('a', 1).set('b', 2);
+    const keyRead = vi.spyOn(arenaOf(map), 'leafKey');
+    expect([...map.values()]).toEqual([1, 2]);
+    expect(keyRead).not.toHaveBeenCalled();
+    keyRead.mockRestore();
   });
 
   test.each([false, true])('attached iterator remains valid across memory growth (copy=%s)', async copy => {
@@ -98,7 +103,9 @@ test.each([false, true])('cold nested projections keep read-only child snapshots
   for (const map of [readers.ordered, readers.sorted]) {
     const a = arenaOf(map), decode = vi.spyOn(a, 'leafValue');
     const keys = [...map.keys()];
-    expect(decode).not.toHaveBeenCalled();
+    // Ordered keys keep their baseline entry-backed behavior; sorted keys are
+    // the only projection here that promises to avoid child-value decoding.
+    if (map === readers.sorted) expect(decode).not.toHaveBeenCalled();
     decode.mockRestore();
     const values = [...map.values()];
     expect(values).toHaveLength(2);
@@ -110,10 +117,10 @@ test.each([false, true])('cold nested projections keep read-only child snapshots
 });
 
 
-test('ordered projection methods preserve their generator function and iterator prototypes', () => {
-  const map = new SharedOrderedMap('number').set('a', 1);
+test('natural sorted projection methods preserve their generator function and iterator prototypes', () => {
+  const map = new SharedSortedMap('number').set('a', 1);
   const generatorFunctionPrototype = Object.getPrototypeOf(function* () {});
-  assert.equal(Object.hasOwn(SharedOrderedMap.prototype, 'iterate'), false);
+  assert.equal(Object.hasOwn(SharedSortedMap.prototype, 'iterate'), false);
   for (const operation of ['keys', 'values'] as const) {
     const method = map[operation];
     assert.equal(Object.getPrototypeOf(method), generatorFunctionPrototype);
@@ -125,8 +132,8 @@ test('ordered projection methods preserve their generator function and iterator 
   }
 });
 
-test.each(['keys', 'values'] as const)('ordered %s stay lazy when a writer grows before first next', operation => {
-  const map = new SharedOrderedMap('number').set('a', 1).set('b', 2);
+test.each(['keys', 'values'] as const)('natural sorted %s stay lazy when a writer grows before first next', operation => {
+  const map = new SharedSortedMap('number').set('a', 1).set('b', 2);
   const arena = arenaOf(map), view = vi.spyOn(arena, 'dv', 'get');
   const iterator = map[operation]();
   assert.equal(view.mock.calls.length, 0);
@@ -135,7 +142,7 @@ test.each(['keys', 'values'] as const)('ordered %s stay lazy when a writer grows
   const error = new Error('not started');
   assert.throws(() => map[operation]().throw(error), caught => caught === error);
   assert.equal(view.mock.calls.length, 0);
-  // The iterator has not captured a view or walked the insertion log yet.
+  // The iterator has not captured a view or walked the radix tree yet.
   arena.alloc(1024 * 1024);
   const fork = map.delete('a').set('c', 3);
   view.mockClear();
@@ -147,8 +154,8 @@ test.each(['keys', 'values'] as const)('ordered %s stay lazy when a writer grows
   view.mockRestore();
 });
 
-test.each(['keys', 'values'] as const)('ordered %s stop decoding after return, throw, or an early break', operation => {
-  const map = new SharedOrderedMap('number').set('a', 1).set('b', 2).set('c', 3);
+test.each(['keys', 'values'] as const)('natural sorted %s stop decoding after return, throw, or an early break', operation => {
+  const map = new SharedSortedMap('number').set('a', 1).set('b', 2).set('c', 3);
   const arena = arenaOf(map), keyReads = vi.spyOn(arena, 'leafKey'), valueReads = vi.spyOn(arena, 'leafValue');
   const calls = () => keyReads.mock.calls.length + valueReads.mock.calls.length;
   for (const completion of ['return', 'throw', 'break'] as const) {

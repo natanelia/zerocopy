@@ -5,18 +5,18 @@ import { dirname, resolve, join, basename, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import { median, sha256, workloadCases, prepareComparison, bundleManifest } from './map-projection-performance.mjs';
+import { median, sha256, workloadCases, workloadCounts, prepareComparison, bundleManifest } from './map-projection-performance.mjs';
 
 // Pin immutable source commits explicitly; never infer them from branch names.
 const BASELINE_COMMIT = process.env.BASELINE_COMMIT;
 const CANDIDATE_COMMIT = process.env.CANDIDATE_COMMIT;
-const SHARED_HARNESS_SHA256 = 'f79bfdf9052ec7489315d0f7841658bffb7e748b82441fd669efbc2f51ae831d';
+const SHARED_HARNESS_SHA256 = 'f3d44dd2ea1241440a9237b14fb9161a5e9536bab015cbae7197062ba500c2ba';
 const CONTROL_CASES = [
-  'ordered-updated/number/32/entries', 'ordered-updated/object/32/entries',
-  'ordered-updated/number/4096/entries', 'ordered-updated/object/4096/entries',
+  'sorted/number/32/entries', 'sorted/object/32/entries',
+  'sorted/number/4096/entries', 'sorted/object/4096/entries',
   'sorted-custom/object/4096/entries', 'sorted-custom/object/4096/values',
 ];
-const TARGET_CASES = ['ordered/object/4096/keys', 'ordered/number/4096/values'];
+const TARGET_CASES = ['sorted/object/4096/keys', 'sorted/number/4096/values'];
 
 function configuration() {
   const numeric = (name, fallback, low, high, integer = false) => {
@@ -36,7 +36,7 @@ function configuration() {
     maxWarmupMs: numeric('MAX_WARMUP_MS', 10000, 1000, 30000),
     seed: numeric('SEED', 20261008, 1, 0xffffffff, true),
     caseFilter: process.env.CASE_FILTER ?? null,
-    candidateAAFilter: process.env.CANDIDATE_AA_FILTER ?? (runtime === 'firefox' ? '^ordered-updated/(number|object)/32/entries$' : null),
+    candidateAAFilter: process.env.CANDIDATE_AA_FILTER ?? (runtime === 'firefox' ? '^sorted/(number|object)/32/entries$' : null),
   };
 }
 
@@ -179,13 +179,14 @@ async function main() {
   const selectedNames = config.suite === 'controls' ? CONTROL_CASES : config.suite === 'targets' ? TARGET_CASES : [...CONTROL_CASES, ...TARGET_CASES];
   const selected = shuffle(workloadCases(config.caseFilter).filter(row => selectedNames.includes(row.name)), random);
   if (!selected.length) throw new Error('No selected diagnostic workloads');
+  for (const row of selected) assert.equal(row.classification, TARGET_CASES.includes(row.name) ? 'target' : 'control', 'Isolated target/control classification is inconsistent');
   const sharedHarness = new URL('./map-projection-performance.mjs', import.meta.url);
   assert.equal(sha256(readFileSync(sharedHarness)), SHARED_HARNESS_SHA256, 'The shared fixture/source-manifest harness changed');
   assert.match(BASELINE_COMMIT ?? '', /^[a-f0-9]{40}$/, 'BASELINE_COMMIT must be a full immutable commit SHA');
   assert.match(CANDIDATE_COMMIT ?? '', /^[a-f0-9]{40}$/, 'CANDIDATE_COMMIT must be a full immutable commit SHA');
   const comparison = prepareComparison(baseline, candidate, 'ab');
   verifyPinnedSources(comparison);
-  assert.deepEqual(comparison.sourceDiff, ['shared-ordered-map.ts', 'shared-sorted-map.ts']);
+  assert.deepEqual(comparison.sourceDiff, ['shared-sorted-map.ts']);
   const temporary = mkdtempSync(join(os.tmpdir(), 'map-projection-single-build-'));
   const copies = {};
   // A/A subjects use independent full copies and independent runtime processes.
@@ -204,8 +205,8 @@ async function main() {
     sourcePaths: comparison.sourcePaths, sourceManifests: comparison.sourceManifests, sourceDiff: comparison.sourceDiff, manifests: comparison.manifests,
     harnessSha256: { singleBuild: sha256(readFileSync(fileURLToPath(import.meta.url))), sharedFixtureAndManifests: SHARED_HARNESS_SHA256 },
     controller: { node: process.version, bun: process.versions.bun ?? null, platform: process.platform, arch: process.arch, cpu: os.cpus()[0]?.model },
-    caseOrder: selected.map(row => row.name), rows: [],
-    method: 'One complete build, fixture, and lexical scan function per fresh runtime process. Browser subjects launch a new browser process and close it before the next subject; build URLs use the same /subject/ path. Disposable one-build pilots choose a common timed repeat count from the faster build and a common warmup scan count. These work counts are frozen before measurements and are identical across every A/B and A/A subject for that case. Four randomized ABBA/BAAB blocks provide eight adjacent process pairs per mode by default. A/B and baseline A/A blocks are interleaved in a seeded, predeclared order; candidate A/A is included for the configured Firefox small-entry cases. Subjects never run concurrently. All raw timings, warmup batches, pilots, digests, flags and launch order are retained. Summaries use per-process scan medians, then independent adjacent-pair ratios; they never pool individual batch samples as independent process replicates and never divide A/B by A/A. No sample is discarded or retried based on timing. Caps and short batches are diagnostic flags, not silently treated as steady state. Completion establishes that the protocol ran, not that performance is regression-free. Process startup, imports, fixture construction, output validation, and count assertions are outside timed scans.',
+    caseOrder: selected.map(row => row.name), workloadCounts: workloadCounts(selected), rows: [],
+    method: 'One complete build, fixture, and lexical scan function per fresh runtime process. Browser subjects launch a new browser process and close it before the next subject; build URLs use the same /subject/ path. Disposable one-build pilots choose a common timed repeat count from the faster build and a common warmup scan count. These work counts are frozen before measurements and are identical across every A/B and A/A subject for that case. Four randomized ABBA/BAAB blocks provide eight adjacent process pairs per mode by default. A/B and baseline A/A blocks are interleaved in a seeded, predeclared order; candidate A/A is included for the configured Firefox small natural-sorted entry cases. Subjects never run concurrently. All raw timings, warmup batches, pilots, digests, flags and launch order are retained. Summaries use per-process scan medians, then independent adjacent-pair ratios; they never pool individual batch samples as independent process replicates and never divide A/B by A/A. No sample is discarded or retried based on timing. Caps and short batches are diagnostic flags, not silently treated as steady state. Completion establishes that the protocol ran, not that performance is regression-free. Process startup, imports, fixture construction, output validation, and count assertions are outside timed scans.',
   };
   const checkpoint = () => {
     for (const row of record.rows) row.summary = summarizeCase(row);
