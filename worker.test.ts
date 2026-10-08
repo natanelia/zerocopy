@@ -69,6 +69,26 @@ describe('shared state and session protocol', () => {
     await drain();
     expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1);
   });
+  it('suppresses identical tree roots and publishes identical tails and signed-zero changes', async () => {
+    const source = new SharedList('number').pushMany(Array.from({ length: 65 }, (_, i) => i));
+    const { state, reader, pair } = await setup(source);
+    const oldReader = reader.current, versions: number[] = [];
+    cleanup.push(reader.subscribe((_snapshot, version) => versions.push(version)));
+    state.update(list => list.set(0, 0));
+    await drain();
+    expect(state.current).toBe(source); expect(reader.current).toBe(oldReader);
+    expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1); expect(versions).toEqual([]);
+    state.update(list => list.set(64, 64)); await drain();
+    expect(state.version).toBe(1); expect(pair.owner.frames.length).toBe(2); expect(versions).toEqual([1]);
+    expect(state.current).not.toBe(source); expect(reader.current).not.toBe(oldReader);
+    expect(state.current.tail).not.toBe(source.tail);
+    expect(reader.current.toArray()).toEqual(source.toArray());
+    state.update(list => list.set(0, -0)); await drain();
+    expect(state.version).toBe(2); expect(pair.owner.frames.length).toBe(3); expect(versions).toEqual([1, 2]);
+    expect(Object.is(reader.current.get(0), -0)).toBe(true); expect(Object.is(oldReader.get(0), 0)).toBe(true);
+    state.update(list => list.set(0, -0)); await drain();
+    expect(state.version).toBe(2); expect(pair.owner.frames.length).toBe(3); expect(versions).toEqual([1, 2]);
+  });
   it('does not publish an update that returns to the last committed snapshot', async () => {
     const { state, pair } = await setup(new SharedMap('number'));
     const original = state.current;
