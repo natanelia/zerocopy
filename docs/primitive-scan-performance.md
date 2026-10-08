@@ -28,7 +28,7 @@ leaf boundaries, callback indexes, copy/shared attachments, read-only writes,
 retained forks, actual shared growth, suspended/interleaved iterators, nested
 collections and linked-list forward/reverse paths.
 
-A separate constructor trace runs outside timing. It checks that numeric and
+A separate constructor trace runs in its own process, not in a timing process. It checks that numeric and
 boolean scans construct no new Float64Array or DataView, and that all direct
 f64 reads explicitly request little-endian storage. This catches the original
 PR implementation. It tests mechanism, not native big-endian hardware or physical
@@ -43,7 +43,10 @@ same-realm attachment checks; the dedicated real-worker check is not run in Bun.
 
 The workflow builds the actual PR base and candidate with the same dependencies
 and build flags. All runtimes import the built public entry point, including Bun.
-Each runtime runs three fresh processes (and fresh browsers), with 15 alternating
+Each runtime first runs correctness checks in a separate process/browser.
+Constructor/prototype tracing can change JIT feedback even after restoration, so
+none of those probes execute in the timing process. Each runtime then runs three
+fresh processes (and fresh browsers), with 15 alternating
 samples per case. Both variants use identical operations and validation. Warm-up
 precedes adaptive calibration. A sample targets 8 ms, subject to repeat and
 retained-output caps; results explicitly flag shorter batches.
@@ -74,6 +77,7 @@ Build `dist` in the repository and `.primitive-baseline`, using the same install
 dependencies. Then run from the repository root:
 
 ```sh
+CHECKS_ONLY=1 node proofs/primitive-scan-performance.mjs
 ROUND=1 node proofs/primitive-scan-performance.mjs
 ROUND=1 bun proofs/primitive-scan-performance.mjs
 ROUND=1 BROWSER=chromium node proofs/primitive-scan-performance.mjs
@@ -81,8 +85,10 @@ ROUND=1 BROWSER=firefox node proofs/primitive-scan-performance.mjs
 ROUND=1 BROWSER=webkit node proofs/primitive-scan-performance.mjs
 ```
 
-Repeat with `ROUND=2` and `ROUND=3`. Browser runs require the corresponding
+Run `CHECKS_ONLY=1` separately in each runtime, then repeat timings with
+`ROUND=2` and `ROUND=3`. Browser runs require the corresponding
 Playwright browser and OS dependencies. The runner supplies isolation headers
 and binds only to loopback. It does not use a service worker or external service.
 Set `PRIMITIVE_BASE` or `PRIMITIVE_CANDIDATE` only for local built-bundle overrides.
 Reports are written to `proofs/results/primitive-scan/<runtime>-<round>.json`.
+Correctness reports use `<runtime>-checks.json`.

@@ -64,6 +64,18 @@ jobs:
         env:
           RUNTIME: ${{ matrix.runtime }}
         run: |
+          run_proof() {
+            if [ "$RUNTIME" = 'bun' ]; then
+              bun proofs/primitive-scan-performance.mjs
+            elif [ "$RUNTIME" = 'node' ]; then
+              node proofs/primitive-scan-performance.mjs
+            else
+              BROWSER="$RUNTIME" node proofs/primitive-scan-performance.mjs
+            fi
+          }
+          # Tracing changes JIT feedback even after prototypes are restored.
+          # Never execute mechanism probes inside any benchmark process.
+          CHECKS_ONLY=1 run_proof
           for round in 1 2 3; do
             if [ "$RUNTIME" = 'bun' ]; then
               ROUND="$round" bun proofs/primitive-scan-performance.mjs

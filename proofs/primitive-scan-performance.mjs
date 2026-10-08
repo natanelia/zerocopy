@@ -14,6 +14,7 @@ const root = resolve(import.meta.dirname, '..');
 const baseRoot = resolve(process.env.PRIMITIVE_BASE ?? resolve(root, '.primitive-baseline'));
 const candidateRoot = resolve(process.env.PRIMITIVE_CANDIDATE ?? root);
 const browserName = process.env.BROWSER;
+const checksOnly = process.env.CHECKS_ONLY === '1';
 const runtime = browserName ?? (typeof Bun === 'undefined' ? 'node' : 'bun');
 const round = Number(process.env.ROUND ?? 1);
 assert(Number.isInteger(round) && round >= 1 && round <= 10, 'ROUND must be 1..10');
@@ -30,13 +31,19 @@ if (!browserName) {
   const module = pathToFileURL(resolve(candidateRoot, 'dist/shared.js')).href;
   const candidate = await import(module);
   const baseline = await import(pathToFileURL(resolve(baseRoot, 'dist/shared.js')).href);
-  const correctness = await runScanChecks(candidate);
-  let worker = 'not run: Bun uses its separate transport proof; this worker test requires Node';
-  if (runtime === 'node') {
-    const { Worker } = await import('node:worker_threads');
-    worker = await checkWorker(candidate, new Worker(new URL('./primitive-scan-worker.mjs', import.meta.url)), module, true);
+  if (checksOnly) {
+    const correctness = await runScanChecks(candidate);
+    let worker = 'not run: the dedicated worker check requires Node';
+    if (runtime === 'node') {
+      const { Worker } = await import('node:worker_threads');
+      worker = await checkWorker(candidate, new Worker(new URL('./primitive-scan-worker.mjs', import.meta.url)), module, true);
+    }
+    result = { kind: 'correctness', correctness, worker, rows: [] };
+  } else {
+    // Do not run constructor/prototype tracing in a timing process. Even after
+    // restoration it changes engine inline-cache history for the tested methods.
+    result = { kind: 'timing', ...await runComparison(baseline, candidate, { round }) };
   }
-  result = { correctness, worker, ...await runComparison(baseline, candidate, { round }) };
 } else {
   assert(['chromium', 'firefox', 'webkit'].includes(browserName), 'Unsupported BROWSER');
   const browsers = await import('playwright');
@@ -70,19 +77,22 @@ if (!browserName) {
     metadata.browserVersion = browser.version();
     const page = await browser.newPage();
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
-    result = await page.evaluate(async round => {
+    result = await page.evaluate(async ({ round, checksOnly }) => {
       if (!crossOriginIsolated) throw new Error('Cross-origin isolation is required');
       const [baseline, candidate, checks, bench, workerCheck] = await Promise.all([
         import('/baseline/shared.js'), import('/candidate/shared.js'),
         import('/proofs/primitive-scan-checks.mjs'), import('/proofs/primitive-scan-cases.mjs'),
         import('/proofs/primitive-scan-worker-check.mjs'),
       ]);
-      const correctness = await checks.runScanChecks(candidate);
-      const worker = await workerCheck.checkWorker(candidate,
-        new Worker('/proofs/primitive-scan-worker.mjs', { type: 'module' }),
-        new URL('/candidate/shared.js', location.href).href);
-      return { correctness, worker, ...await bench.runComparison(baseline, candidate, { round }) };
-    }, round);
+      if (checksOnly) {
+        const correctness = await checks.runScanChecks(candidate);
+        const worker = await workerCheck.checkWorker(candidate,
+          new Worker('/proofs/primitive-scan-worker.mjs', { type: 'module' }),
+          new URL('/candidate/shared.js', location.href).href);
+        return { kind: 'correctness', correctness, worker, rows: [] };
+      }
+      return { kind: 'timing', ...await bench.runComparison(baseline, candidate, { round }) };
+    }, { round, checksOnly });
   } finally {
     if (browser) await browser.close();
     await new Promise(resolve => server.close(resolve));
@@ -90,6 +100,6 @@ if (!browserName) {
 }
 const outputDir = resolve(root, 'proofs/results/primitive-scan');
 await mkdir(outputDir, { recursive: true });
-await writeFile(resolve(outputDir, `${runtime}-${round}.json`), JSON.stringify({ ...metadata, ...result }, null, 2) + '\n');
-console.log(`${runtime} round ${round}: ${result.correctness.count} checks; ${result.worker}`);
+await writeFile(resolve(outputDir, `${runtime}-${checksOnly ? 'checks' : round}.json`), JSON.stringify({ ...metadata, ...result }, null, 2) + '\n');
+console.log(checksOnly ? `${runtime}: ${result.correctness.count} checks; ${result.worker}` : `${runtime} round ${round}: ${result.rows.length} diagnostic rows`);
 for (const row of result.rows) console.log(`${row.name} n=${row.size}: ${row.speedup.toFixed(2)}x${row.reviewSlowdown ? ' REVIEW SLOWDOWN' : ''}${row.shortBatch ? ' SHORT BATCH' : ''}`);
