@@ -72,13 +72,22 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
   if (Object.getOwnPropertySymbols(structures).length) throw new TypeError('Worker structure names must be strings');
   const copy = options.copy ?? (typeof Bun !== 'undefined');
   const found = new Map<string, Arena>();
+  let expanded: Set<ReadonlyMap<string, Arena>> | undefined;
   const collect = (root: Arena): void => {
     const pending = [root];
     while (pending.length) {
       const arena = pending.pop()!;
       if (found.has(arena.id)) continue;
       found.set(arena.id, arena);
-      for (const nested of arena.dependencies.values()) pending.push(nested);
+      const dependencies = arena.readOnly ? arena.transportDependencies : arena.dependencies;
+      if (arena.hasSharedDependencies) {
+        // Every arena in an attachment can share this registry. Expand it once,
+        // including when an attached snapshot is nested in a writable arena.
+        expanded ??= new Set();
+        if (expanded.has(dependencies)) continue;
+        expanded.add(dependencies);
+      }
+      for (const nested of dependencies.values()) pending.push(nested);
     }
   };
   const serialized: Record<string, SerializedStructure> = Object.create(null);
@@ -98,15 +107,14 @@ export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>): P
 export function initWorker<T extends StructureRecord<T>>(data: WorkerData): Promise<Readonly<T>>;
 export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
   if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
-  const arenas = new Map<string, Arena>();
+  const arenas = new Map<string, Arena>(), registry = { arenas, shared: true };
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    arenas.set(source.id, new Arena({ ...source, readOnly: true }));
+    arenas.set(source.id, new Arena({ ...source, readOnly: true, registry }));
   }
-  // Resolve all dependencies before reconstructing any nested value. Sessions are
-  // scoped to this payload, so later initWorker calls cannot change older views.
-  for (const arena of arenas.values()) for (const dependency of arenas.values()) if (arena !== dependency) arena.dependencies.set(dependency.id, dependency);
+  // The complete registry is available before reconstructing any nested value.
+  // It belongs only to this payload; later attachments cannot change old views.
   const result: Record<string, SharedStructure> = Object.create(null);
   for (const [name, item] of Object.entries(data.structures) as [string, SerializedStructure][]) {
     const arena = arenas.get(item.arena), factory = structureRegistry[item.type];

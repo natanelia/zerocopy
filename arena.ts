@@ -62,6 +62,8 @@ export abstract class Snapshot {
   protected get arena(): Arena { return this.#owner; }
 }
 
+export interface ArenaRegistry { readonly arenas: Map<string, Arena>; shared: boolean }
+
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
  * Attached arenas are read-only: their allocator and scratch cannot race a writer.
@@ -71,7 +73,25 @@ export class Arena {
   readonly wasm: any;
   readonly id: string;
   readonly readOnly: boolean;
-  readonly dependencies = new Map<string, Arena>();
+  private dependencyLookup: Map<string, Arena>;
+  private dependencyRegistry: ArenaRegistry | undefined;
+  // Worker payloads share one lookup. Preserve the distinct, self-excluding Map
+  // exposed to internal callers without eagerly building an all-to-all graph.
+  get dependencies(): Map<string, Arena> {
+    if (this.dependencyRegistry) {
+      // Observing a mutable map opens the otherwise closed attachment graph.
+      // Preserve ordinary DFS precedence if callers subsequently extend it.
+      this.dependencyRegistry.shared = false;
+      const dependencies = new Map<string, Arena>();
+      for (const [id, arena] of this.dependencyRegistry.arenas) if (arena !== this) dependencies.set(id, arena);
+      this.dependencyLookup = dependencies;
+      this.dependencyRegistry = undefined;
+    }
+    return this.dependencyLookup;
+  }
+  /** Internal transport traversal must not materialize attachment maps. */
+  get transportDependencies(): ReadonlyMap<string, Arena> { return this.dependencyLookup; }
+  get hasSharedDependencies(): boolean { return this.dependencyRegistry?.shared ?? false; }
   writeHead = 0;
   writeSize = 0;
   writeCount = 0;
@@ -129,12 +149,14 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
+    this.dependencyRegistry = this.readOnly ? options.registry : undefined;
+    this.dependencyLookup = this.dependencyRegistry?.arenas ?? new Map<string, Arena>();
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
@@ -243,7 +265,7 @@ export class Arena {
     if (nested) {
       const factory = structureRegistry[parsed.__t];
       if (!factory || parsed.__t !== nested.structureType) throw new TypeError('Invalid nested structure type');
-      const source = parsed.__a === this.id ? this : this.dependencies.get(parsed.__a);
+      const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
