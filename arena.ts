@@ -81,7 +81,7 @@ export class Arena {
   readonly wasm: any;
   readonly id: string;
   readonly readOnly: boolean;
-  private dependencyLookup = new Map<string, Arena>();
+  private dependencyLookup: Map<string, Arena>;
   // Worker payloads share one lookup. Preserve the distinct, self-excluding Map
   // exposed to internal callers without eagerly building an all-to-all graph.
   get dependencies(): Map<string, Arena> {
@@ -166,7 +166,7 @@ export class Arena {
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
-    if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
+    this.dependencyLookup = this.readOnly && options.registry ? options.registry.arenas : new Map<string, Arena>();
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
