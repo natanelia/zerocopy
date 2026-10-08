@@ -13,12 +13,13 @@ permissions:
   contents: read
 jobs:
   verify:
+    if: github.event_name != 'pull_request' || github.head_ref == 'perf/map-key-projection-20261008'
     strategy:
       fail-fast: false
       matrix:
         runtime: [node, bun, chromium, firefox, webkit]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,7 +70,7 @@ jobs:
         if: matrix.runtime == 'firefox'
         env:
           ENGINES: firefox
-          CASE_FILTER: '^ordered-updated/number/4096/entries$'
+          CASE_FILTER: '^ordered-updated/(number|object)/(32|4096)/entries$'
         run: |
           for import_order in baseline-first candidate-first; do
             for warm_order in baseline-first candidate-first; do

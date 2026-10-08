@@ -107,3 +107,15 @@ test.each([false, true])('cold nested projections keep read-only child snapshots
     }
   }
 });
+
+
+test('ordered projection helper stays off the prototype and starts lazily', () => {
+  const map = new SharedOrderedMap('number').set('a', 1).set('b', 2);
+  expect(Object.hasOwn(SharedOrderedMap.prototype, 'iterate')).toBe(false);
+  const view = vi.spyOn(arenaOf(map), 'dv', 'get');
+  const keys = map.keys(), values = map.values();
+  expect(view).not.toHaveBeenCalled();
+  expect([...keys]).toEqual(['a', 'b']);
+  expect([...values]).toEqual([1, 2]);
+  view.mockRestore();
+});
