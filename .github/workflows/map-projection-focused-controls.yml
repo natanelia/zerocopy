@@ -1,0 +1,65 @@
+name: Focused projection non-inferiority controls
+on:
+  push:
+    branches: [perf/map-projection-focused-controls-20261008]
+    paths:
+      - 'proofs/map-projection-focused-controls.mjs'
+      - '.github/workflows/map-projection-focused-controls.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused-controls:
+    if: github.repository == 'natanelia/zerocopy' && github.ref == 'refs/heads/perf/map-projection-focused-controls-20261008'
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [node-bun, webkit, firefox]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BASELINE_COMMIT: 3773c6e519c7c0958da13727ed1082f449f3ee25
+      CANDIDATE_COMMIT: e24d28d588efbc2164aaa04de5ae52c06d334309
+      GROUP: ${{ matrix.group }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - name: Validate only synthetic protocol fixtures
+        run: |
+          node --check proofs/map-projection-focused-controls.mjs
+          node proofs/map-projection-focused-controls.mjs --self-test
+      - name: Build both immutable runtime sources with one toolchain
+        run: |
+          set -euo pipefail
+          mkdir -p .focused-baseline .focused-candidate proofs/results/map-projection-focused-controls
+          git archive "$BASELINE_COMMIT" | tar -x -C .focused-baseline
+          git archive "$CANDIDATE_COMMIT" | tar -x -C .focused-candidate
+          ln -s "$PWD/node_modules" .focused-baseline/node_modules
+          ln -s "$PWD/node_modules" .focused-candidate/node_modules
+          (cd .focused-baseline && bun run build:wasm && bun run build:browser)
+          (cd .focused-candidate && bun run build:wasm && bun run build:browser)
+          printf '%s\n' "$BASELINE_COMMIT" > proofs/results/map-projection-focused-controls/base-commit.txt
+          printf '%s\n' "$CANDIDATE_COMMIT" > proofs/results/map-projection-focused-controls/candidate-commit.txt
+          git rev-parse HEAD > proofs/results/map-projection-focused-controls/diagnostic-commit.txt
+          (node --version; bun --version; node -p 'JSON.stringify({assemblyscript:require("./node_modules/assemblyscript/package.json").version,playwright:require("./node_modules/playwright/package.json").version,typescript:require("./node_modules/typescript/package.json").version})') > proofs/results/map-projection-focused-controls/tool-versions.txt
+      - name: Install only the selected browser
+        if: matrix.group != 'node-bun'
+        run: bunx playwright install --with-deps "$GROUP"
+      - name: Run the fixed predeclared controls and A/A once
+        run: |
+          BUN_EXECUTABLE="$(command -v bun)" node proofs/map-projection-focused-controls.mjs .focused-baseline/dist/shared.js .focused-candidate/dist/shared.js "$GROUP" "proofs/results/map-projection-focused-controls/$GROUP.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: focused-projection-controls-${{ matrix.group }}-${{ github.sha }}
+          path: proofs/results/map-projection-focused-controls/
+          retention-days: 30
+          if-no-files-found: error
