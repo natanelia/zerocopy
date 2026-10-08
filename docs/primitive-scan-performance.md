@@ -2,14 +2,16 @@
 
 This change keeps the public APIs, binary format and WebAssembly core unchanged.
 `SharedList.values()` walks immutable leaves without an extra generator.
-Numeric and boolean scans avoid the generic value decoder.
-Linked-list arrays use their known size, and primitive scans keep the same value
-semantics. These changes do not accelerate map writes, indexed reads or JSON
-parsing in general.
+Numeric and boolean iterators avoid the generic value decoder. All other
+production methods are restored to the base implementation, including list
+callbacks/materialization and both linked-list classes. The wider experiment
+improved numeric scans but slowed some string/object controls. Those changes
+are not shipped. No map writes, indexed reads, callbacks, array materialization
+or JSON parsing are claimed to become faster.
 
 ## Why use one DataView
 
-Each list scan captures the arena's existing DataView once. Every f64 read uses
+Each `values()` iterator captures the arena's existing DataView once. Every f64 read uses
 `getFloat64(address, true)`, matching little-endian WebAssembly storage without
 assuming host byte order. There is no per-leaf Float64Array or DataView allocation.
 The generator captures the view when its first `next()` runs, not when created.
@@ -51,9 +53,10 @@ samples per case. Both variants use identical operations and validation. Warm-up
 precedes adaptive calibration. A sample targets 8 ms, subject to repeat and
 retained-output caps; results explicitly flag shorter batches.
 
-All changed methods are measured for numbers and booleans at 33 and 32,769 values.
+The retained iterator and unchanged control methods are measured for numbers
+and booleans at 33 and 32,769 values.
 String and object controls run at 1,057 values. This is 54 rows per round, including
-linked-list `toArray` and reverse arrays. Fixtures use private arenas. Result
+linked-list `toArray` and reverse arrays as regression controls. Fixtures use private arenas. Result
 arrays from every timed iteration remain reachable until after timing and are
 then checked at every index. Object benchmark records validate both fields.
 Scalar scans use a count and order-sensitive checksum. Fixture construction,
@@ -92,3 +95,12 @@ and binds only to loopback. It does not use a service worker or external service
 Set `PRIMITIVE_BASE` or `PRIMITIVE_CANDIDATE` only for local built-bundle overrides.
 Reports are written to `proofs/results/primitive-scan/<runtime>-<round>.json`.
 Correctness reports use `<runtime>-checks.json`.
+
+## Rejected wider changes
+
+Clean-process run `37771143492` tested commit `f1b76f4` before narrowing scope.
+It showed repeated string/object slowdowns in Bun, Firefox and WebKit, including
+doubly linked string arrays and object reverse callbacks. The original source
+for these paths is restored instead of weakening controls or reporting only
+favorable numeric results. Its results describe that wider experiment, not the
+final iterator-only change. Final evidence must refer to the newer commit.

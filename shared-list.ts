@@ -154,36 +154,21 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
   }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
-    const a = this.arena, view = a.dv, start = this.size ? (this.size - 1) & ~31 : 0;
-    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
-    // A callback may grow the writer or scan a fork. This view and each leaf
-    // still refer only to the original snapshot; no per-leaf view is allocated.
+    const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
-      const length = Math.min(32, this.size - first);
-      if (isNumber) {
-        for (let j = 0; j < length; j++) fn(view.getFloat64(leaf + j * 8, true) as ValueOf<T>, first + j);
-      } else if (isBoolean) {
-        for (let j = 0; j < length; j++) fn((view.getFloat64(leaf + j * 8, true) !== 0) as ValueOf<T>, first + j);
-      } else {
-        for (let j = 0; j < length; j++) fn(a.decode(this.type, view.getFloat64(leaf + j * 8, true)), first + j);
-      }
+      const stop = Math.min(this.size, first + 32), view = a.dv;
+      // Shared views remain valid if the callback grows memory or creates forks.
+      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
     }
   }
   toArray(): ValueOf<T>[] {
-    const a = this.arena, view = a.dv, result = new Array<ValueOf<T>>(this.size);
+    const a = this.arena, result = new Array<ValueOf<T>>(this.size);
     const start = this.size ? (this.size - 1) & ~31 : 0;
-    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
-      const length = Math.min(32, this.size - first);
-      if (isNumber) {
-        for (let j = 0; j < length; j++) result[first + j] = view.getFloat64(leaf + j * 8, true) as ValueOf<T>;
-      } else if (isBoolean) {
-        for (let j = 0; j < length; j++) result[first + j] = (view.getFloat64(leaf + j * 8, true) !== 0) as ValueOf<T>;
-      } else {
-        for (let j = 0; j < length; j++) result[first + j] = a.decode(this.type, view.getFloat64(leaf + j * 8, true));
-      }
+      const stop = Math.min(this.size, first + 32), dv = a.dv;
+      for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
     }
     return result;
   }

@@ -67,26 +67,10 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
   insertAfter(index: number, value: ValueOf<T>): SharedLinkedList<T> { return validIndex(index, this.size) ? this.insert(index + 1, value) : this; }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena; let i = 0;
-    // Primitive numbers/booleans are already stored as f64. Avoid a dynamic
-    // decoder call for every value while keeping complex codecs unchanged.
-    if (this.valueType === 'number' || this.valueType === 'boolean') {
-      const isBoolean = this.valueType === 'boolean';
-      for (const raw of a.blocks(this.head)) fn((isBoolean ? raw !== 0 : raw) as ValueOf<T>, i++);
-      const view = a.dv;
-      for (let t = 0; t < this.tailSize; t++) {
-        const raw = view.getFloat64(this.tail + t * 8, true);
-        fn((isBoolean ? raw !== 0 : raw) as ValueOf<T>, i++);
-      }
-      return;
-    }
     for (const raw of a.blocks(this.head)) fn(a.decode(this.valueType, raw), i++);
     for (let t = 0; t < this.tailSize; t++) fn(a.decode(this.valueType, a.dv.getFloat64(this.tail + t * 8, true)), i++);
   }
-  toArray(): ValueOf<T>[] {
-    const result = new Array<ValueOf<T>>(this.size);
-    this.forEach((value, index) => { result[index] = value; });
-    return result;
-  }
+  toArray(): ValueOf<T>[] { const result: ValueOf<T>[] = []; this.forEach(value => result.push(value)); return result; }
   get isEmpty(): boolean { return this.size === 0; }
   toWorkerData() { return Object.freeze({ head: this.head, tail: this.tail, tailSize: this.tailSize, size: this.size, type: this.valueType }); }
   static fromWorkerData<T extends string>(d: { head: number; tail: number; tailSize: number; size: number; type: T }, source: Arena = defaultArena()): SharedLinkedList<T> { return new SharedLinkedList(d.type, d.head, d.tail, d.size, source, d.tailSize); }
