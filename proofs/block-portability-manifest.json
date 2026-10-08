@@ -1,0 +1,5346 @@
+{
+  "schema": 1,
+  "stage": "prospective-only; no timings",
+  "proofBase": "d016ba306375bb9e2146befa68efd112916f34b6",
+  "context": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+    "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+    "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+    "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+    "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+  },
+  "lanes": [
+    {
+      "schema": 1,
+      "lane": {
+        "name": "node-arm64",
+        "runtime": "node",
+        "arch": "arm64",
+        "runner": "ubuntu-24.04-arm",
+        "cases": 10
+      },
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+        "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+        "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+        "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+        "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+      },
+      "config": {
+        "blocks": 4,
+        "samples": 21,
+        "targetBatchMs": 40,
+        "warmupMs": 500,
+        "warmupMinElements": 262144,
+        "maxWarmupMs": 10000,
+        "compactWarmupCalls": 512,
+        "compactGcEvery": 32,
+        "compactMaxRepeat": 2048,
+        "scanMaxRepeat": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "nonInferiorityMargin": 1.02,
+        "confidenceLevel": 0.95,
+        "measuredBatchFloorMs": 10,
+        "measuredWarmupFloorMs": 150
+      },
+      "versions": {
+        "node": "22.23.3",
+        "bun": "1.4.2",
+        "playwright": "1.63.0"
+      },
+      "rows": [
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 0,
+            "operation": "toArray",
+            "edited": false,
+            "name": "linked/number/0/append/toArray"
+          },
+          "reason": "Empty array control; original flagged family, new independent context.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 1,
+            "operation": "toArrayReverse",
+            "edited": false,
+            "name": "doubly/number/1/append/toArrayReverse"
+          },
+          "reason": "Singleton reverse array; no block traversal.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 32,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/32/append/forEach"
+          },
+          "reason": "Largest tail-only forward callback control.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/33/append/forEach"
+          },
+          "reason": "First full block plus one tail element.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 4097,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/4097/append/forEach"
+          },
+          "reason": "Large primitive forward callback target.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "boolean",
+            "size": 4097,
+            "operation": "forEachReverse",
+            "edited": false,
+            "name": "doubly/boolean/4097/append/forEachReverse"
+          },
+          "reason": "Large primitive reverse callback target.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 4097,
+            "operation": "toArray",
+            "edited": false,
+            "name": "doubly/number/4097/append/toArray"
+          },
+          "reason": "Large forward array materialization.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "object",
+            "size": 1057,
+            "operation": "forEach",
+            "edited": true,
+            "name": "linked/object/1057/edited/forEach"
+          },
+          "reason": "Sixteen interior edits, variable block lengths, nested object decode.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "compact",
+            "edited": false,
+            "name": "linked/number/33/append/compact"
+          },
+          "reason": "Small generic compaction with fresh arena; ARM only.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "object",
+            "size": 4097,
+            "operation": "compact",
+            "edited": false,
+            "name": "doubly/object/4097/append/compact"
+          },
+          "reason": "Large generic object compaction with fresh arena; ARM only.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "pilots": 20,
+        "measuredSubjects": 320,
+        "measuredBatches": 6720,
+        "quartets": 80
+      },
+      "execution": {
+        "retryCount": 0,
+        "browserPer": "fresh process per pilot or measured subject",
+        "neutralPath": "subject/dist/shared.js",
+        "browserPath": "/subject/dist/shared.js",
+        "launchOptions": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "subjectTimeoutMs": 120000,
+        "closeTimeoutMs": 30000
+      }
+    },
+    {
+      "schema": 1,
+      "lane": {
+        "name": "bun-arm64",
+        "runtime": "bun",
+        "arch": "arm64",
+        "runner": "ubuntu-24.04-arm",
+        "cases": 10
+      },
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+        "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+        "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+        "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+        "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+      },
+      "config": {
+        "blocks": 4,
+        "samples": 21,
+        "targetBatchMs": 40,
+        "warmupMs": 500,
+        "warmupMinElements": 262144,
+        "maxWarmupMs": 10000,
+        "compactWarmupCalls": 512,
+        "compactGcEvery": 32,
+        "compactMaxRepeat": 2048,
+        "scanMaxRepeat": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "nonInferiorityMargin": 1.02,
+        "confidenceLevel": 0.95,
+        "measuredBatchFloorMs": 10,
+        "measuredWarmupFloorMs": 150
+      },
+      "versions": {
+        "node": "22.23.3",
+        "bun": "1.4.2",
+        "playwright": "1.63.0"
+      },
+      "rows": [
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 0,
+            "operation": "toArray",
+            "edited": false,
+            "name": "linked/number/0/append/toArray"
+          },
+          "reason": "Empty array control; original flagged family, new independent context.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 1,
+            "operation": "toArrayReverse",
+            "edited": false,
+            "name": "doubly/number/1/append/toArrayReverse"
+          },
+          "reason": "Singleton reverse array; no block traversal.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 32,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/32/append/forEach"
+          },
+          "reason": "Largest tail-only forward callback control.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/33/append/forEach"
+          },
+          "reason": "First full block plus one tail element.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 4097,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/4097/append/forEach"
+          },
+          "reason": "Large primitive forward callback target.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "boolean",
+            "size": 4097,
+            "operation": "forEachReverse",
+            "edited": false,
+            "name": "doubly/boolean/4097/append/forEachReverse"
+          },
+          "reason": "Large primitive reverse callback target.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 4097,
+            "operation": "toArray",
+            "edited": false,
+            "name": "doubly/number/4097/append/toArray"
+          },
+          "reason": "Large forward array materialization.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "object",
+            "size": 1057,
+            "operation": "forEach",
+            "edited": true,
+            "name": "linked/object/1057/edited/forEach"
+          },
+          "reason": "Sixteen interior edits, variable block lengths, nested object decode.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "compact",
+            "edited": false,
+            "name": "linked/number/33/append/compact"
+          },
+          "reason": "Small generic compaction with fresh arena; ARM only.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "object",
+            "size": 4097,
+            "operation": "compact",
+            "edited": false,
+            "name": "doubly/object/4097/append/compact"
+          },
+          "reason": "Large generic object compaction with fresh arena; ARM only.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "pilots": 20,
+        "measuredSubjects": 320,
+        "measuredBatches": 6720,
+        "quartets": 80
+      },
+      "execution": {
+        "retryCount": 0,
+        "browserPer": "fresh process per pilot or measured subject",
+        "neutralPath": "subject/dist/shared.js",
+        "browserPath": "/subject/dist/shared.js",
+        "launchOptions": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "subjectTimeoutMs": 120000,
+        "closeTimeoutMs": 30000
+      }
+    },
+    {
+      "schema": 1,
+      "lane": {
+        "name": "chromium-x64",
+        "runtime": "chromium",
+        "arch": "x64",
+        "runner": "ubuntu-24.04",
+        "cases": 8
+      },
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+        "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+        "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+        "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+        "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+      },
+      "config": {
+        "blocks": 4,
+        "samples": 21,
+        "targetBatchMs": 40,
+        "warmupMs": 500,
+        "warmupMinElements": 262144,
+        "maxWarmupMs": 10000,
+        "compactWarmupCalls": 512,
+        "compactGcEvery": 32,
+        "compactMaxRepeat": 2048,
+        "scanMaxRepeat": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "nonInferiorityMargin": 1.02,
+        "confidenceLevel": 0.95,
+        "measuredBatchFloorMs": 10,
+        "measuredWarmupFloorMs": 150
+      },
+      "versions": {
+        "node": "22.23.3",
+        "bun": "1.4.2",
+        "playwright": "1.63.0"
+      },
+      "rows": [
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 0,
+            "operation": "toArray",
+            "edited": false,
+            "name": "linked/number/0/append/toArray"
+          },
+          "reason": "Empty array control; original flagged family, new independent context.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 1,
+            "operation": "toArrayReverse",
+            "edited": false,
+            "name": "doubly/number/1/append/toArrayReverse"
+          },
+          "reason": "Singleton reverse array; no block traversal.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 32,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/32/append/forEach"
+          },
+          "reason": "Largest tail-only forward callback control.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/33/append/forEach"
+          },
+          "reason": "First full block plus one tail element.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 4097,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/4097/append/forEach"
+          },
+          "reason": "Large primitive forward callback target.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "boolean",
+            "size": 4097,
+            "operation": "forEachReverse",
+            "edited": false,
+            "name": "doubly/boolean/4097/append/forEachReverse"
+          },
+          "reason": "Large primitive reverse callback target.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 4097,
+            "operation": "toArray",
+            "edited": false,
+            "name": "doubly/number/4097/append/toArray"
+          },
+          "reason": "Large forward array materialization.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "object",
+            "size": 1057,
+            "operation": "forEach",
+            "edited": true,
+            "name": "linked/object/1057/edited/forEach"
+          },
+          "reason": "Sixteen interior edits, variable block lengths, nested object decode.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "pilots": 16,
+        "measuredSubjects": 256,
+        "measuredBatches": 5376,
+        "quartets": 64
+      },
+      "execution": {
+        "retryCount": 0,
+        "browserPer": "fresh process per pilot or measured subject",
+        "neutralPath": "subject/dist/shared.js",
+        "browserPath": "/subject/dist/shared.js",
+        "launchOptions": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "subjectTimeoutMs": 120000,
+        "closeTimeoutMs": 30000
+      }
+    },
+    {
+      "schema": 1,
+      "lane": {
+        "name": "firefox-x64",
+        "runtime": "firefox",
+        "arch": "x64",
+        "runner": "ubuntu-24.04",
+        "cases": 8
+      },
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+        "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+        "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+        "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+        "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+      },
+      "config": {
+        "blocks": 4,
+        "samples": 21,
+        "targetBatchMs": 40,
+        "warmupMs": 500,
+        "warmupMinElements": 262144,
+        "maxWarmupMs": 10000,
+        "compactWarmupCalls": 512,
+        "compactGcEvery": 32,
+        "compactMaxRepeat": 2048,
+        "scanMaxRepeat": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "nonInferiorityMargin": 1.02,
+        "confidenceLevel": 0.95,
+        "measuredBatchFloorMs": 10,
+        "measuredWarmupFloorMs": 150
+      },
+      "versions": {
+        "node": "22.23.3",
+        "bun": "1.4.2",
+        "playwright": "1.63.0"
+      },
+      "rows": [
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 0,
+            "operation": "toArray",
+            "edited": false,
+            "name": "linked/number/0/append/toArray"
+          },
+          "reason": "Empty array control; original flagged family, new independent context.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 1,
+            "operation": "toArrayReverse",
+            "edited": false,
+            "name": "doubly/number/1/append/toArrayReverse"
+          },
+          "reason": "Singleton reverse array; no block traversal.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 32,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/32/append/forEach"
+          },
+          "reason": "Largest tail-only forward callback control.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/33/append/forEach"
+          },
+          "reason": "First full block plus one tail element.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 4097,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/4097/append/forEach"
+          },
+          "reason": "Large primitive forward callback target.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "boolean",
+            "size": 4097,
+            "operation": "forEachReverse",
+            "edited": false,
+            "name": "doubly/boolean/4097/append/forEachReverse"
+          },
+          "reason": "Large primitive reverse callback target.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 4097,
+            "operation": "toArray",
+            "edited": false,
+            "name": "doubly/number/4097/append/toArray"
+          },
+          "reason": "Large forward array materialization.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "object",
+            "size": 1057,
+            "operation": "forEach",
+            "edited": true,
+            "name": "linked/object/1057/edited/forEach"
+          },
+          "reason": "Sixteen interior edits, variable block lengths, nested object decode.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "pilots": 16,
+        "measuredSubjects": 256,
+        "measuredBatches": 5376,
+        "quartets": 64
+      },
+      "execution": {
+        "retryCount": 0,
+        "browserPer": "fresh process per pilot or measured subject",
+        "neutralPath": "subject/dist/shared.js",
+        "browserPath": "/subject/dist/shared.js",
+        "launchOptions": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "subjectTimeoutMs": 120000,
+        "closeTimeoutMs": 30000
+      }
+    },
+    {
+      "schema": 1,
+      "lane": {
+        "name": "webkit-x64",
+        "runtime": "webkit",
+        "arch": "x64",
+        "runner": "ubuntu-24.04",
+        "cases": 8
+      },
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "da9b432cdf4028c62582455376f18657be65fdf8",
+        "original": "The original 40-case x64 Node/Bun study, its eleven statistical uncertainties, its three Bun duration flags, and the separate e58 fixed-work supplement stay unchanged. This study does not clear them.",
+        "chromium": "The combined Chromium baseline worker failed with WebAssembly.Memory allocation after fixture checks; candidate was not reached. A separate d016 run passed 92 original cases in fresh processes. These are different contexts; no cause is inferred.",
+        "scope": "A structural portability screen, not the full matrix or a universal no-regression claim. Every lane is interpreted independently. Browser compaction latency is unmeasured because the original explicit-GC helper has no portable browser API. This exclusion is frozen before timing.",
+        "jit": "Default JIT. Node exposes GC only for the original compaction policy. No engine optimization flags, manual GC browser flags, sandbox bypass, timing exclusions, reruns, extensions, or A/A normalization."
+      },
+      "config": {
+        "blocks": 4,
+        "samples": 21,
+        "targetBatchMs": 40,
+        "warmupMs": 500,
+        "warmupMinElements": 262144,
+        "maxWarmupMs": 10000,
+        "compactWarmupCalls": 512,
+        "compactGcEvery": 32,
+        "compactMaxRepeat": 2048,
+        "scanMaxRepeat": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "nonInferiorityMargin": 1.02,
+        "confidenceLevel": 0.95,
+        "measuredBatchFloorMs": 10,
+        "measuredWarmupFloorMs": 150
+      },
+      "versions": {
+        "node": "22.23.3",
+        "bun": "1.4.2",
+        "playwright": "1.63.0"
+      },
+      "rows": [
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 0,
+            "operation": "toArray",
+            "edited": false,
+            "name": "linked/number/0/append/toArray"
+          },
+          "reason": "Empty array control; original flagged family, new independent context.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 1,
+            "operation": "toArrayReverse",
+            "edited": false,
+            "name": "doubly/number/1/append/toArrayReverse"
+          },
+          "reason": "Singleton reverse array; no block traversal.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 32,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/32/append/forEach"
+          },
+          "reason": "Largest tail-only forward callback control.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 33,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/33/append/forEach"
+          },
+          "reason": "First full block plus one tail element.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "number",
+            "size": 4097,
+            "operation": "forEach",
+            "edited": false,
+            "name": "linked/number/4097/append/forEach"
+          },
+          "reason": "Large primitive forward callback target.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "boolean",
+            "size": 4097,
+            "operation": "forEachReverse",
+            "edited": false,
+            "name": "doubly/boolean/4097/append/forEachReverse"
+          },
+          "reason": "Large primitive reverse callback target.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "doubly",
+            "type": "number",
+            "size": 4097,
+            "operation": "toArray",
+            "edited": false,
+            "name": "doubly/number/4097/append/toArray"
+          },
+          "reason": "Large forward array materialization.",
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "kind": "linked",
+            "type": "object",
+            "size": 1057,
+            "operation": "forEach",
+            "edited": true,
+            "name": "linked/object/1057/edited/forEach"
+          },
+          "reason": "Sixteen interior edits, variable block lengths, nested object decode.",
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "block": 0,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 0,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 1,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 2,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "ab",
+              "left": "baseline",
+              "right": "candidate",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "block": 3,
+              "mode": "aa-baseline",
+              "left": "baseline",
+              "right": "baseline",
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "pilots": 16,
+        "measuredSubjects": 256,
+        "measuredBatches": 5376,
+        "quartets": 64
+      },
+      "execution": {
+        "retryCount": 0,
+        "browserPer": "fresh process per pilot or measured subject",
+        "neutralPath": "subject/dist/shared.js",
+        "browserPath": "/subject/dist/shared.js",
+        "launchOptions": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "subjectTimeoutMs": 120000,
+        "closeTimeoutMs": 30000
+      }
+    }
+  ],
+  "proofFiles": {
+    "proofs/block-portability-identities.json": "dce145a6a823435108d19cc12581ace301ce7f7d0b9a190a8d1567f6057d0405",
+    "proofs/block-portability-prerequisites.mjs": "65d1407fb08c9dad3ce7e85431a55bd666d576a12615505060a33eda2281f84b",
+    "proofs/block-portability-protocol.mjs": "5aa97038718db89d5d3a161ccd1ef6e216bd8330376e65cde93b1e98a0f3a436",
+    "proofs/block-portability-runner.mjs": "4677e1ef4fca2dcd372e6bb38570ebe1c12fce24ba8a1f840b852ad49cd928bc",
+    "proofs/block-portability.md": "ce0725cb283f22dfd93d5bbbbc2aeb111ff10923706da27a5201d8e3269b064e",
+    "proofs/block-portability.node.mjs": "980e52537ab8584898214fd2e8f6e095ae2b8f07fc0b9aeb4b44397900bc7d2d",
+    "proofs/block-traversal-browser.mjs": "a970f79512e568817ec682e76fefb25b4f1f301e44cd3847594341477f0a2560",
+    "proofs/block-traversal-chromium-adapter.mjs": "955f0fcec78f7f19e165dd30e80699c4615bb3e886d1adb364f275b76de74eba",
+    "proofs/block-traversal-chromium-isolation.md": "931362a39633d20745b87e0fa6423e87eec408cff5787183f0fed3b046f12c8e",
+    "proofs/block-traversal-chromium-isolation.mjs": "c52f843eb844c8eb4d1886f6bd36113ed367ffad4fe9b9041557a84b8f09689f",
+    "proofs/block-traversal-chromium-isolation.node.mjs": "0a73b48a0cda7213683f3b1007fe024da731e091be9716296adcb8c7034dbd0d",
+    "proofs/block-traversal-chromium-page.mjs": "a0711bc6bd20592d4eb06a2efcc199eb37a179a57cbfdfd02d5a60ef58000ebe",
+    "proofs/block-traversal-counts.ts": "123d31ac549947b93d042453df396762f1197668dc2f387c58b1c2f42fd791e6",
+    "proofs/block-traversal-empty-controls-plan.json": "f5c3bba4cc7efa4122c29f3d4c19adb4f74e830c16c58dcbd3551e0d58b65af0",
+    "proofs/block-traversal-empty-controls.md": "7316bc9886fb024cab1e5ce4bc1b236ed54ec5cd110db0868ee640b3e5c1246f",
+    "proofs/block-traversal-empty-controls.mjs": "ee6a5caf49b763dfd520770bc3511621e38b222cc613f1fd6ee9c17e81daf0a4",
+    "proofs/block-traversal-empty-controls.node.mjs": "38440cb33a310fb6a82cb18f9657bce2fa82c56e618e0f23cd6d251ce5669744",
+    "proofs/block-traversal-performance.md": "7574069c2e5fa7312157b36e769a82ae9dd992b6c6037a3837358298bb874278",
+    "proofs/block-traversal-performance.mjs": "98298f94e469bb6033649472b82b5fa2599c31051504cfe1825ff890b89bc654",
+    "proofs/block-traversal-performance.node.mjs": "b4897c45ce68b1b38947dd95a54de9e039226680a8409222045d790c3116d40a",
+    "proofs/block-traversal-source.mjs": "b2f8b60854f3afd6bd2ead5213dda8e1b21330edc716b9b54f832d235b345d11",
+    "proofs/block-traversal-worker-check.mjs": "e69bdbf7e4db7e657ca3d15924b44f2f33df1859ea60ca4d73f34877dd17c53c",
+    "proofs/block-traversal-worker.mjs": "eb85deae56d78edd2a8cefd1d2b0e456f0d03ee0202b051dc8dc1ee2642a1391",
+    "proofs/block-traversal-workloads.mjs": "a033d884c43e50967ae4a93f827d36a98597d96853deeb2607c4c1d78f95bcca",
+    ".github/workflows/block-portability.yml": "32a8ecae76f35f463b4aed23e0ed7d1395186ae9ef57e84942ddc3a197b330e3"
+  },
+  "kernel": {
+    "originalSha256": "9d2994ea88e244b219070b2e11ae9468d69c507643e675cb5da84b590ad7b5fe",
+    "derivedFunctionSha256": "1d8ebbcbe4482fb4a3fb9fa6ea228c314187bddf6c2ef882ce46844e2401fc9b",
+    "sourceSha256": "dfeee714d383453912467d1f1034528210c7afb7d93c91869bbf6b4264c3af00",
+    "transformations": [
+      [
+        "async function measureSingle(",
+        "async function measurePortability("
+      ],
+      [
+        "samples.filter(ms => ms < CONFIG.targetBatchMs).length",
+        "samples.filter(ms => ms < CONFIG.measuredBatchFloorMs).length"
+      ],
+      [
+        "warmupTimeShort: !allocating && warmup.elapsedMs < CONFIG.warmupMs",
+        "warmupTimeShort: !allocating && warmup.elapsedMs < CONFIG.measuredWarmupFloorMs"
+      ]
+    ]
+  },
+  "total": {
+    "rows": 44,
+    "pilots": 88,
+    "measuredSubjects": 1408,
+    "measuredBatches": 29568,
+    "quartets": 352
+  },
+  "authorization": "This deliverable is prospective only. The parent owns publication of the reviewed proof and its authorized single scoped-push execution; this worker has performed no latency measurement."
+}

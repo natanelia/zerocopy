@@ -1,0 +1,106 @@
+name: Prospective block traversal portability screen
+
+on:
+  push:
+    branches: ['proof/block-traversal-portability-20261008']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: block-portability-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CANDIDATE_COMMIT: da9b432cdf4028c62582455376f18657be65fdf8
+  BASELINE_COMMIT: 3773c6e519c7c0958da13727ed1082f449f3ee25
+
+jobs:
+  screen:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/proof/block-traversal-portability-20261008' &&
+      github.run_attempt == 1 &&
+      github.event.before == 'd016ba306375bb9e2146befa68efd112916f34b6' &&
+      github.event.forced == false && github.event.created == false && github.event.deleted == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: node-arm64
+            runner: ubuntu-24.04-arm
+            browser: ''
+          - lane: bun-arm64
+            runner: ubuntu-24.04-arm
+            browser: ''
+          - lane: chromium-x64
+            runner: ubuntu-24.04
+            browser: chromium
+          - lane: firefox-x64
+            runner: ubuntu-24.04
+            browser: firefox
+          - lane: webkit-x64
+            runner: ubuntu-24.04
+            browser: webkit
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Preserve setup evidence and freeze protocol before prerequisites
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/block-portability-setup"
+          cp .github/workflows/block-portability.yml "$RUNNER_TEMP/block-portability-setup/workflow.yml"
+          printf '%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/block-portability-setup/proof-commit.txt"
+          node proofs/block-portability-runner.mjs verify > "$RUNNER_TEMP/block-portability-setup/protocol-digest.txt"
+          node --version > "$RUNNER_TEMP/block-portability-setup/node-version.txt"
+          bun --version > "$RUNNER_TEMP/block-portability-setup/bun-version.txt"
+          uname -a > "$RUNNER_TEMP/block-portability-setup/uname.txt"
+          lscpu > "$RUNNER_TEMP/block-portability-setup/lscpu.txt"
+          bun install 2>&1 | tee "$RUNNER_TEMP/block-portability-setup/install.log"
+          cp bun.lock "$RUNNER_TEMP/block-portability-setup/bun.lock"
+          bun pm ls --all > "$RUNNER_TEMP/block-portability-setup/dependencies.txt"
+          git worktree add --detach "$RUNNER_TEMP/block-portability-baseline" "$BASELINE_COMMIT"
+          git worktree add --detach "$RUNNER_TEMP/block-portability-candidate" "$CANDIDATE_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/block-portability-baseline/node_modules"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/block-portability-candidate/node_modules"
+      - name: Install the pinned Playwright engine for browser lanes
+        if: matrix.browser != ''
+        run: |
+          set -euo pipefail
+          bunx playwright install --with-deps ${{ matrix.browser }} 2>&1 | tee "$RUNNER_TEMP/block-portability-setup/browser-install.log"
+      - name: Build and validate both exact versions before any pilots
+        run: |
+          set -euo pipefail
+          node proofs/block-portability-prerequisites.mjs "$RUNNER_TEMP/block-portability-baseline" "$RUNNER_TEMP/block-portability-candidate" "$RUNNER_TEMP/block-portability-evidence" '${{ matrix.lane }}'
+      - name: Archive immutable sources, builds and prerequisites
+        run: |
+          set -euo pipefail
+          node proofs/block-portability-runner.mjs prepare "$RUNNER_TEMP/block-portability-baseline" "$RUNNER_TEMP/block-portability-candidate" "$RUNNER_TEMP/block-portability-evidence" '${{ matrix.lane }}'
+      - name: Run the frozen lane once with all pilots before measurements
+        run: |
+          set -euo pipefail
+          node proofs/block-portability-runner.mjs run "$RUNNER_TEMP/block-portability-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-portability-${{ matrix.lane }}
+          path: |
+            ${{ runner.temp }}/block-portability-setup/
+            ${{ runner.temp }}/block-portability-evidence/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
