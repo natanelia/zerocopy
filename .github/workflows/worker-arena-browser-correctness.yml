@@ -8,17 +8,26 @@ on:
       runtime_sha:
         description: Frozen runtime commit to test
         required: true
-        default: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+        default: '1229e6a24a85c8d97cc72296abe5e91cea208bf7'
 
 permissions:
   contents: read
 
 jobs:
   browsers:
+    name: browsers (${{ matrix.variant }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: baseline
+            runtime_sha: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+          - variant: candidate
+            runtime_sha: ${{ inputs.runtime_sha || '1229e6a24a85c8d97cc72296abe5e91cea208bf7' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      RUNTIME_SHA: ${{ inputs.runtime_sha || '3773c6e519c7c0958da13727ed1082f449f3ee25' }}
+      RUNTIME_SHA: ${{ matrix.runtime_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,6 +66,7 @@ jobs:
           name: worker-arena-browser-${{ env.RUNTIME_SHA }}-${{ github.sha }}
           path: |
             proof/proofs/worker-arena-browser-results/ci/
+            proof/proofs/worker-arena-browser-results/combined-stress-controls.json
             proof/proofs/worker-arena-protocol.mjs
             proof/proofs/worker-arena-browser-worker.mjs
             proof/proofs/worker-arena-browser.mjs

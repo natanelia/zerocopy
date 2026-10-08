@@ -1,0 +1,223 @@
+{
+  "schema": "zerocopy-worker-arena-combined-browser-stress-controls/v1",
+  "method": "Historical six-scenario sequential runs within one browser process per engine. These failed observations remain separate from the subsequent fresh-process-per-scenario diagnostic; no failing count or generation was reduced.",
+  "interpretation": "The identical allocation failure reproduced on baseline and candidate. Browser memory capacity and unreclaimed prior-scenario reservations are hypotheses; the exact limit and failed generation were not measured.",
+  "records": [
+    {
+      "variant": "candidate",
+      "run": 37814394788,
+      "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/37814394788",
+      "proofCommit": "2aa21cc944707b52d98f81da305c345b7f74b877",
+      "runtimeCommit": "1229e6a24a85c8d97cc72296abe5e91cea208bf7",
+      "runtimeSourceClean": true,
+      "sourceSha256": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786",
+      "buildSha256": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109",
+      "artifactId": 11566617002,
+      "artifactZipSha256": "9bc22011ce6c213241d8322ee42e11dd3a2ddd2f5724104e79ae13f55254e204",
+      "reportPath": "proof/proofs/worker-arena-browser-results/ci/report.json",
+      "reportSha256": "ed3df652fb7b981de72b39f7db529b5def806244b960eda1e6ec20b079ece13d",
+      "engine": "chromium",
+      "browserVersion": "153.0.8010.12",
+      "passedScenarios": [
+        {
+          "arenas": 1,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 1,
+          "copy": true,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 2,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 2,
+          "copy": true,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 49,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        }
+      ],
+      "failedScenario": {
+        "arenas": 49,
+        "copy": true,
+        "generation": null,
+        "generationNote": "Original driver did not record the failing generation.",
+        "phase": "worker-attach",
+        "error": "page.evaluate: Error: RangeError: WebAssembly.Memory(): could not allocate memory\n    at new Arena (http://127.0.0.1:45323/library/chunk-ckkc933p.js:422:37)\n    at Module.initWorker2 (http://127.0.0.1:45323/library/chunk-akmx14rb.js:1065:19)\n    at http://127.0.0.1:45323/proofs/worker-arena-protocol.mjs:73:31\n    at self.onmessage (http://127.0.0.1:45323/proofs/worker-arena-browser-worker.mjs:7:33)\n    at new Arena (http://127.0.0.1:45323/library/chunk-ckkc933p.js:422:37)\n    at Module.initWorker2 (http://127.0.0.1:45323/library/chunk-akmx14rb.js:1065:19)\n    at http://127.0.0.1:45323/proofs/worker-arena-protocol.mjs:73:31\n    at self.onmessage (http://127.0.0.1:45323/proofs/worker-arena-browser-worker.mjs:7:33)\n    at Worker.onMessage (eval at evaluate (:311:30), <anonymous>:10:46)\n    at /home/runner/work/zerocopy/zerocopy/proof/proofs/worker-arena-browser.mjs:64:18"
+      },
+      "unattemptedEngines": [
+        "firefox",
+        "webkit"
+      ],
+      "helperHashes": [
+        {
+          "path": "proofs/worker-arena-browser-worker.mjs",
+          "sha256": "26f1d1f442bd2975c2955bbe41978107819c35609405bfebb9c74a056f19ea61"
+        },
+        {
+          "path": "proofs/worker-arena-browser.mjs",
+          "sha256": "81a181606d8500607b366b27769db70fe99513c41f35f36c9ad1d423f6a7c175"
+        },
+        {
+          "path": "proofs/worker-arena-protocol.mjs",
+          "sha256": "fa441ca3ac1c55446bdcc7e13c33002a933d47053d6cbe0b19f878856b347ba3"
+        },
+        {
+          "path": "proofs/worker-arenas.mjs",
+          "sha256": "0ab13a5f4e67e9bdb63d95c050283a48ffecf07eabd79b0b5a47931f07ee9c18"
+        }
+      ]
+    },
+    {
+      "variant": "baseline",
+      "run": 37816393088,
+      "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/37816393088",
+      "proofCommit": "d9b489a825ea2ec4c5cf70d0d7dbc2d33ea36ef0",
+      "runtimeCommit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+      "runtimeSourceClean": true,
+      "sourceSha256": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "buildSha256": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "artifactId": 11566434444,
+      "artifactZipSha256": "c22a57771b32338739094d3ce7f635fa25822055bd463c33b612bb2d2d754f39",
+      "reportPath": "proof/proofs/worker-arena-browser-results/ci/report.json",
+      "reportSha256": "ae1677b25797584f180cbb941db15b40e9b2ca81ff5c8f73698cefba39e8851f",
+      "engine": "chromium",
+      "browserVersion": "153.0.8010.12",
+      "passedScenarios": [
+        {
+          "arenas": 1,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 1,
+          "copy": true,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 2,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 2,
+          "copy": true,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        },
+        {
+          "arenas": 49,
+          "copy": false,
+          "generations": 2,
+          "reexport": true,
+          "retained": true,
+          "aliases": true,
+          "nestedReadOnly": true,
+          "repeatedArenaIds": true,
+          "deferredOldRead": true,
+          "backingModeVerified": true
+        }
+      ],
+      "failedScenario": {
+        "arenas": 49,
+        "copy": true,
+        "generation": null,
+        "generationNote": "Original driver did not record the failing generation.",
+        "phase": "worker-attach",
+        "error": "page.evaluate: Error: RangeError: WebAssembly.Memory(): could not allocate memory\n    at new Arena (http://127.0.0.1:42857/library/chunk-bngxdyck.js:394:37)\n    at Module.initWorker2 (http://127.0.0.1:42857/library/chunk-byfqjcsj.js:1050:27)\n    at http://127.0.0.1:42857/proofs/worker-arena-protocol.mjs:73:31\n    at self.onmessage (http://127.0.0.1:42857/proofs/worker-arena-browser-worker.mjs:7:33)\n    at new Arena (http://127.0.0.1:42857/library/chunk-bngxdyck.js:394:37)\n    at Module.initWorker2 (http://127.0.0.1:42857/library/chunk-byfqjcsj.js:1050:27)\n    at http://127.0.0.1:42857/proofs/worker-arena-protocol.mjs:73:31\n    at self.onmessage (http://127.0.0.1:42857/proofs/worker-arena-browser-worker.mjs:7:33)\n    at Worker.onMessage (eval at evaluate (:311:30), <anonymous>:10:46)\n    at /home/runner/work/zerocopy/zerocopy/proof/proofs/worker-arena-browser.mjs:64:18"
+      },
+      "unattemptedEngines": [
+        "firefox",
+        "webkit"
+      ],
+      "helperHashes": [
+        {
+          "path": "proofs/worker-arena-browser-worker.mjs",
+          "sha256": "26f1d1f442bd2975c2955bbe41978107819c35609405bfebb9c74a056f19ea61"
+        },
+        {
+          "path": "proofs/worker-arena-browser.mjs",
+          "sha256": "81a181606d8500607b366b27769db70fe99513c41f35f36c9ad1d423f6a7c175"
+        },
+        {
+          "path": "proofs/worker-arena-protocol.mjs",
+          "sha256": "fa441ca3ac1c55446bdcc7e13c33002a933d47053d6cbe0b19f878856b347ba3"
+        },
+        {
+          "path": "proofs/worker-arenas.mjs",
+          "sha256": "0ab13a5f4e67e9bdb63d95c050283a48ffecf07eabd79b0b5a47931f07ee9c18"
+        }
+      ]
+    }
+  ]
+}

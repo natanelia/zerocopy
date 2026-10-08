@@ -18,12 +18,20 @@ const runtime = capture(runtimeRoot);
 assert.equal(runtime.commit, process.env.RUNTIME_SHA, 'Runtime checkout must match the explicit frozen SHA');
 assert.equal(runtime.sourceDirty, false, 'Runtime production source must be clean');
 const proofs = dirname(fileURLToPath(import.meta.url));
+const STAGE_PREFIX = 'worker-arena-proof-stage:';
+async function bounded(promise, milliseconds, label) {
+  let timeout;
+  try { return await Promise.race([promise, new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error(`${label} timed out after ${milliseconds} ms`)), milliseconds); })]); }
+  finally { clearTimeout(timeout); }
+}
 const helperNames = ['worker-arena-protocol.mjs', 'worker-arena-browser-worker.mjs'];
 const report = {
-  schema: 'zerocopy-worker-arena-browser-correctness/v1', date: new Date().toISOString(), complete: false,
-  method: 'Correctness-only shared protocol: real module-worker attach, retained cold reads, re-export and owner reattachment; 1/2/49 arenas, shared/copy modes. No timing samples or speed claims.',
+  schema: 'zerocopy-worker-arena-browser-correctness/v2', date: new Date().toISOString(), complete: false,
+  method: 'Correctness-only shared protocol: each unchanged 1/2/49-arena shared/copy scenario gets a fresh browser process, page and worker; both generations and all retention/forwarding checks remain. Failures are recorded and remaining scenarios/engines run; any failure still makes the final exit fail. No timing samples, runtime changes, forced GC or browser bypass flags.',
+  isolation: 'fresh-browser-process-per-scenario',
+  historicalStress: { record: 'proofs/worker-arena-browser-results/combined-stress-controls.json', mode: 'six scenarios accumulated in one browser process', baselineRun: 37816393088, candidateRun: 37814394788, outcome: 'Both failed 49/copy at worker attachment in Chromium153; retained separately, not converted to a passing result.' },
   runtime, proofCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: resolve(proofs, '..'), encoding: 'utf8' }).trim(),
-  proofManifest: manifest(resolve(proofs, '..'), ['proofs/worker-arena-protocol.mjs', 'proofs/worker-arenas.mjs', 'proofs/worker-arena-browser-worker.mjs', 'proofs/worker-arena-browser.mjs', 'proofs/worker-arena-source-guard.mjs', '.github/workflows/worker-arena-browser-correctness.yml']),
+  proofManifest: manifest(resolve(proofs, '..'), ['proofs/worker-arena-protocol.mjs', 'proofs/worker-arenas.mjs', 'proofs/worker-arena-browser-worker.mjs', 'proofs/worker-arena-browser.mjs', 'proofs/worker-arena-source-guard.mjs', 'proofs/worker-arena-browser-results/combined-stress-controls.json', '.github/workflows/worker-arena-browser-correctness.yml']),
   host: { node: process.version, cpu: cpus()[0]?.model, platform: process.platform, arch: process.arch, osRelease: release() },
   engines: [],
 };
@@ -50,28 +58,45 @@ const server = createServer((request, response) => {
 });
 server.listen(0, '127.0.0.1'); await once(server, 'listening');
 try {
+  const scenarios = [1, 2, 49].flatMap(arenas => [false, true].map(copy => ({ arenas, copy })));
   for (const [engine, launcher] of Object.entries({ chromium, firefox, webkit })) {
     const row = { engine, complete: false, results: [] }; report.engines.push(row); save();
-    let browser, context;
-    try {
-      browser = await launcher.launch({ headless: true }); row.browserVersion = browser.version();
-      context = await browser.newContext(); const page = await context.newPage(), pageErrors = [];
-      page.on('pageerror', error => pageErrors.push(error.message));
-      await page.goto(`http://127.0.0.1:${server.address().port}/`);
-      row.environment = await page.evaluate(() => ({ isolated: crossOriginIsolated, userAgent: navigator.userAgent }));
-      assert.equal(row.environment.isolated, true);
-      await page.exposeFunction('saveArenaScenario', result => { row.results.push(result); save(); });
-      await page.evaluate(async () => {
-        const api = await import('/library/shared.js');
-        const { ARENA_COUNTS, runArenaScenario } = await import('/proofs/worker-arena-protocol.mjs');
-        for (const arenas of ARENA_COUNTS) for (const copy of [false, true]) {
-          const worker = new Worker('/proofs/worker-arena-browser-worker.mjs', { type: 'module' });
+    for (const scenario of scenarios) {
+      const result = { ...scenario, complete: false, failureContext: { engine, ...scenario, generation: null, phase: 'browser-launch' } };
+      row.results.push(result); save();
+      let browser, context;
+      try {
+        browser = await launcher.launch({ headless: true }); result.browserVersion = browser.version();
+        result.failureContext.phase = 'page-setup';
+        context = await browser.newContext(); const page = await context.newPage(), pageErrors = [];
+        page.on('pageerror', error => pageErrors.push(error.message));
+        page.on('console', message => {
+          const text = message.text();
+          if (!text.startsWith(STAGE_PREFIX)) return;
           try {
+            result.failureContext = JSON.parse(text.slice(STAGE_PREFIX.length));
+            result.contextEvidence = 'Last progress event received before an outer failure; caught protocol errors return their exact stage.';
+          } catch {}
+        });
+        await page.goto(`http://127.0.0.1:${server.address().port}/`);
+        result.environment = await page.evaluate(() => ({ isolated: crossOriginIsolated, userAgent: navigator.userAgent }));
+        assert.equal(result.environment.isolated, true);
+        result.failureContext.phase = 'page-evaluate';
+        const outcome = await bounded(page.evaluate(async ({ engine, arenas, copy, stagePrefix }) => {
+          let failureContext = { engine, arenas, copy, generation: 0, phase: 'page-import' };
+          const progress = stage => { failureContext = { engine, ...stage }; console.debug(stagePrefix + JSON.stringify(failureContext)); };
+          let worker;
+          try {
+            const api = await import('/library/shared.js');
+            const { runArenaScenario } = await import('/proofs/worker-arena-protocol.mjs');
+            worker = new Worker('/proofs/worker-arena-browser-worker.mjs', { type: 'module' });
             const exchange = message => new Promise((resolve, reject) => {
               const timeout = setTimeout(() => finish(new Error('Browser worker proof timed out')), 20000);
               const onMessage = event => {
-                if (event.data.error) finish(new Error(event.data.error));
-                else if (!event.data.workerEnvironment?.isolated || !event.data.workerEnvironment?.dedicatedWorker) finish(new Error('Missing real isolated-worker evidence'));
+                if (event.data.error) {
+                  failureContext = { engine, arenas, copy, generation: message.generation, ...event.data.failureContext };
+                  finish(new Error(event.data.error));
+                } else if (!event.data.workerEnvironment?.isolated || !event.data.workerEnvironment?.dedicatedWorker) finish(new Error('Missing real isolated-worker evidence'));
                 else finish(undefined, event.data);
               };
               const onError = event => finish(new Error(event.message || 'Browser worker error'));
@@ -79,19 +104,37 @@ try {
               worker.addEventListener('message', onMessage); worker.addEventListener('error', onError); worker.addEventListener('messageerror', onError);
               try { worker.postMessage(message); } catch (error) { finish(error); }
             });
-            await window.saveArenaScenario(await runArenaScenario(api, exchange, arenas, copy));
-          } finally { worker.terminate(); }
+            const checked = await runArenaScenario(api, exchange, arenas, copy, progress);
+            return { passed: true, checked };
+          } catch (error) { return { passed: false, error: error.stack ?? String(error), failureContext }; }
+          finally { worker?.terminate(); }
+        }, { engine, ...scenario, stagePrefix: STAGE_PREFIX }), 60000, 'Browser scenario');
+        result.pageErrors = pageErrors;
+        if (!outcome.passed) { result.error = outcome.error; result.failureContext = outcome.failureContext; result.contextEvidence = 'Exact caught protocol error stage'; }
+        else {
+          assert.deepEqual(pageErrors, []);
+          assert.equal(outcome.checked.arenas, scenario.arenas); assert.equal(outcome.checked.copy, scenario.copy);
+          Object.assign(result, outcome.checked, { complete: true }); delete result.failureContext; delete result.contextEvidence;
         }
-      });
-      assert.deepEqual(pageErrors, []); assert.equal(row.results.length, 6);
-      assert.deepEqual(row.results.map(result => [result.arenas, result.copy]), [[1, false], [1, true], [2, false], [2, true], [49, false], [49, true]]);
-      row.complete = true; save(); console.log(`${engine}: all six real-worker transport scenarios passed`);
-    } catch (error) { row.error = error.stack ?? String(error); save(); throw error; }
-    finally { if (context) await context.close(); if (browser) await browser.close(); }
+      } catch (error) { result.error = error.stack ?? String(error); }
+      finally {
+        // Always attempt browser closure, even if context cleanup fails.
+        for (const resource of [context, browser]) {
+          try { if (resource) await bounded(resource.close(), 10000, 'Browser resource cleanup'); }
+          catch (error) { (result.cleanupErrors ??= []).push(error.stack ?? String(error)); result.complete = false; }
+        }
+        save();
+      }
+      console.log(`${engine}: arenas=${scenario.arenas}, copy=${scenario.copy}: ${result.complete ? 'passed' : 'FAILED; recorded in report'}`);
+    }
+    row.complete = row.results.length === scenarios.length && row.results.every(result => result.complete); save();
   }
   const after = capture(runtimeRoot);
   assert.equal(after.commit, runtime.commit); assert.equal(after.sourceDirty, false);
   assert.equal(after.source.sha256, runtime.source.sha256); assert.equal(after.build.sha256, runtime.build.sha256);
   assert.equal(manifest(resolve(proofs, '..'), report.proofManifest.files.map(file => file.path)).sha256, report.proofManifest.sha256);
-  report.complete = true; save();
+  report.executionComplete = true;
+  report.complete = report.engines.length === 3 && report.engines.every(row => row.complete);
+  save();
+  assert.equal(report.complete, true, 'Browser correctness failures are recorded in the report');
 } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }

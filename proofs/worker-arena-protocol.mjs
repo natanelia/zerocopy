@@ -57,7 +57,7 @@ export function checkArenaReader(reader, offset, arenas, readCount = Math.max(1,
   }
   blocked(() => reader.root.set('illegal', null));
 }
-export function createArenaWorkerProtocol(api) {
+export function createArenaWorkerProtocol(api, onStage) {
   let retained, configuration, initialIds, nextGeneration = 0;
   return async message => {
     const { protocol, data, offset, copy, arenas, generation, marker } = message;
@@ -70,7 +70,9 @@ export function createArenaWorkerProtocol(api) {
     if (configuration) { equal(config, configuration, 'Worker scenario'); equal(ids, initialIds, 'Retained arena IDs'); }
     else { configuration = config; initialIds = ids; }
     const beforeMarker = transportMarker(data);
+    onStage?.({ arenas, copy, generation, phase: 'worker-attach' });
     const current = await api.initWorker(data);
+    onStage?.({ arenas, copy, generation, phase: 'worker-verify' });
     if (retained) checkArenaReader(retained, 0, arenas);
     // The final old leaf stays unread until after the second attachment.
     checkArenaReader(current, offset, arenas, retained ? Math.max(1, arenas - 1) : Math.max(1, arenas - 1) - 1);
@@ -78,6 +80,7 @@ export function createArenaWorkerProtocol(api) {
     // Shared writes must reach the producer. Copied transport writes must affect
     // neither the producer copy nor the reader memory already initialized above.
     writeTransportMarker(data, marker);
+    onStage?.({ arenas, copy, generation, phase: 'worker-reexport' });
     const forwarded = api.getWorkerData(current, { copy });
     checkArenaTransport(forwarded, copy, arenas);
     equal(transportMarker(forwarded), copy ? beforeMarker : marker, 'Forwarded backing mode');
@@ -85,22 +88,29 @@ export function createArenaWorkerProtocol(api) {
     return { protocol, generation, arenas, copy, offset, data: forwarded, retainedChecked: generation === 1, deferredOldRead: generation === 1, beforeMarker };
   };
 }
-export async function runArenaScenario(api, exchange, arenas, copy) {
+export async function runArenaScenario(api, exchange, arenas, copy, onStage) {
+  // Synchronous labels only: no added await or changes to retained library objects.
+  onStage?.({ arenas, copy, generation: 0, phase: 'producer-create' });
   const produce = createArenaProducer(api, arenas);
   let firstIds, retained;
   for (const generation of [0, 1]) {
+    onStage?.({ arenas, copy, generation, phase: 'producer-update-and-export' });
     const offset = generation * 100, data = api.getWorkerData(produce(offset), { copy });
     checkArenaTransport(data, copy, arenas);
     const ids = JSON.stringify(data.arenas.map(arena => arena.id).sort());
     if (firstIds) equal(ids, firstIds, 'Producer arena IDs'); else firstIds = ids;
     const beforeMarker = transportMarker(data), marker = 1000 + generation;
+    onStage?.({ arenas, copy, generation, phase: 'worker-exchange' });
     const reply = await exchange({ protocol: ARENA_PROTOCOL, generation, data, offset, copy, arenas, marker });
     if (reply.error) throw new Error(reply.error);
     equal(reply.protocol, ARENA_PROTOCOL, 'Reply protocol'); equal(reply.generation, generation, 'Reply generation');
     equal(reply.arenas, arenas, 'Reply arena count'); equal(reply.copy, copy, 'Reply transport mode');
     equal(transportMarker(data), copy ? beforeMarker : marker, 'Producer backing mode');
     checkArenaTransport(reply.data, copy, arenas);
-    const restored = await api.initWorker(reply.data); checkArenaReader(restored, offset, arenas);
+    onStage?.({ arenas, copy, generation, phase: 'page-reattach' });
+    const restored = await api.initWorker(reply.data);
+    onStage?.({ arenas, copy, generation, phase: 'page-verify' });
+    checkArenaReader(restored, offset, arenas);
     if (retained) checkArenaReader(retained, 0, arenas);
     retained ??= restored;
     if (generation === 1) check(reply.retainedChecked && reply.deferredOldRead, 'Worker did not verify the old cold nested value');
