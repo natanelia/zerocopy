@@ -1,0 +1,113 @@
+name: Baseline WebKit isolation diagnostic
+
+on:
+  push:
+    branches: [test/baseline-webkit-isolation-20261008]
+    paths: [.github/workflows/baseline-webkit-isolation.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-isolation:
+    name: Unchanged baseline isolation (attempt ${{ matrix.attempt }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        attempt: [1, 2, 3]
+    env:
+      BASELINE_COMMIT: 1d7accd0b566818c9c0d332b533c3eb504fac685
+      EVIDENCE: baseline-isolation-evidence
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the exact main baseline, without diagnostic changes
+        uses: actions/checkout@v4
+        with:
+          ref: 1d7accd0b566818c9c0d332b533c3eb504fac685
+          persist-credentials: false
+      - name: Record unchanged source identity
+        run: |
+          mkdir -p "$EVIDENCE"
+          test "$(git rev-parse HEAD)" = "$BASELINE_COMMIT"
+          git diff --exit-code
+          {
+            printf 'Diagnostic workflow commit: %s\n' "$GITHUB_SHA"
+            printf 'Attempt: %s\n' '${{ matrix.attempt }}'
+            git show -s --format=fuller HEAD
+            git rev-parse HEAD^{tree}
+            git status --short
+            sha256sum package.json website/package.json website/tests/isolation-browser.mjs website/assets/isolation.mjs website/assets/isolation-sw.js
+          } 2>&1 | tee "$EVIDENCE/source-identity.log"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install baseline package dependencies
+        run: bun install 2>&1 | tee "$EVIDENCE/bun-install.log"
+      - name: Build baseline WASM, browser library, and declarations
+        run: |
+          {
+            bun run build:wasm
+            bun run build:browser
+            bun run build:types
+          } 2>&1 | tee "$EVIDENCE/library-build.log"
+      - name: Install baseline website dependencies
+        run: npm --prefix website install --ignore-scripts --no-package-lock 2>&1 | tee "$EVIDENCE/website-install.log"
+      - name: Install the same Playwright Chromium and WebKit browsers
+        run: bunx playwright install --with-deps chromium webkit 2>&1 | tee "$EVIDENCE/browser-install.log"
+      - name: Record runtime and browser revisions
+        run: |
+          {
+            node --version
+            bun --version
+            npm --version
+            node -p 'JSON.stringify({ playwright: require("playwright/package.json").version, platform: process.platform, arch: process.arch, node: process.versions }, null, 2)'
+            cat node_modules/playwright-core/browsers.json
+            cat /etc/os-release
+          } 2>&1 | tee "$EVIDENCE/environment.log"
+          test "$(node -p 'require("playwright/package.json").version')" = '1.63.0'
+      - name: Preserve the ordinary website job preconditions
+        run: |
+          {
+            node --test proofs/memory-startup.mjs
+            node --test website/tests/preview.test.mjs
+            node website/build.mjs
+            node --test website/tests/*.test.mjs
+            node website/tests/memory-charts-browser.mjs
+          } 2>&1 | tee "$EVIDENCE/root-site-preconditions.log"
+      - name: Run the unchanged root-site isolation test once
+        id: isolation
+        timeout-minutes: 5
+        run: |
+          node -e 'const fs = require("node:fs"); const assert = require("node:assert/strict"); const build = JSON.parse(fs.readFileSync("website/_site/build.json")); assert.equal(build.base, "/"); console.log(build);'
+          git diff --exit-code -- website/tests/isolation-browser.mjs website/assets/isolation.mjs website/assets/isolation-sw.js
+          set +e
+          timeout --signal=TERM --kill-after=10s 240s node website/tests/isolation-browser.mjs 2>&1 | tee "$EVIDENCE/isolation.log"
+          statuses=("${PIPESTATUS[@]}")
+          printf '%s\n' "${statuses[0]}" > "$EVIDENCE/isolation-exit-code.txt"
+          printf '%s\n' "${statuses[1]}" > "$EVIDENCE/log-capture-exit-code.txt"
+          if [ "${statuses[0]}" -ne 0 ]; then exit "${statuses[0]}"; fi
+          exit "${statuses[1]}"
+      - name: Record diagnostic outcome
+        if: ${{ !cancelled() }}
+        env:
+          ISOLATION_OUTCOME: ${{ steps.isolation.outcome }}
+        run: |
+          mkdir -p "$EVIDENCE"
+          printf 'Baseline: %s\nWorkflow commit: %s\nAttempt: %s\nIsolation outcome: %s\n' "$BASELINE_COMMIT" "$GITHUB_SHA" '${{ matrix.attempt }}' "$ISOLATION_OUTCOME" | tee "$EVIDENCE/outcome.txt"
+          git diff --name-status > "$EVIDENCE/tracked-source-changes.txt"
+          cp website/_site/build.json "$EVIDENCE/site-build.json" 2>/dev/null || true
+      - name: Retain every attempt, including failures
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-isolation-1d7accd-attempt-${{ matrix.attempt }}-${{ github.run_id }}
+          path: baseline-isolation-evidence/
+          retention-days: 30
+          if-no-files-found: error
