@@ -137,25 +137,57 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   *values(): Generator<ValueOf<T>> {
     if (!this.size) return;
     const a = this.arena, start = (this.size - 1) & ~31;
-    for (const raw of a.vector(this.root, this.depth, 0, start)) yield a.decode(this.type, raw);
-    for (let i = 0; i < this.size - start; i++) yield a.decode(this.type, a.dv.getFloat64(this.tail + i * 8, true));
+    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
+    // Walk each immutable leaf directly. Avoid a nested generator, repeated
+    // arena lookups, and per-item decoder calls for inline primitive values.
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const length = Math.min(32, this.size - first);
+      if (isNumber || isBoolean) {
+        // Vector leaves and tails are aligned to eight bytes. A shared memory
+        // grow cannot detach a view of bytes already published in this snapshot.
+        const block = new Float64Array(a.memory.buffer, leaf, length);
+        if (isNumber) for (let j = 0; j < length; j++) yield block[j] as ValueOf<T>;
+        else for (let j = 0; j < length; j++) yield (block[j] !== 0) as ValueOf<T>;
+      } else {
+        const view = a.dv;
+        for (let j = 0; j < length; j++) yield a.decode(this.type, view.getFloat64(leaf + j * 8, true));
+      }
+    }
   }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
+    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
-      const stop = Math.min(this.size, first + 32), view = a.dv;
-      // Shared views remain valid if the callback grows memory or creates forks.
-      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
+      const length = Math.min(32, this.size - first);
+      if (isNumber || isBoolean) {
+        const block = new Float64Array(a.memory.buffer, leaf, length);
+        if (isNumber) for (let j = 0; j < length; j++) fn(block[j] as ValueOf<T>, first + j);
+        else for (let j = 0; j < length; j++) fn((block[j] !== 0) as ValueOf<T>, first + j);
+      } else {
+        const view = a.dv;
+        // Each view remains readable when the callback allocates a later arena
+        // page. Never read from mutable writer scratch or a newer snapshot.
+        for (let j = 0; j < length; j++) fn(a.decode(this.type, view.getFloat64(leaf + j * 8, true)), first + j);
+      }
     }
   }
   toArray(): ValueOf<T>[] {
     const a = this.arena, result = new Array<ValueOf<T>>(this.size);
     const start = this.size ? (this.size - 1) & ~31 : 0;
+    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
-      const stop = Math.min(this.size, first + 32), dv = a.dv;
-      for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
+      const length = Math.min(32, this.size - first);
+      if (isNumber || isBoolean) {
+        const block = new Float64Array(a.memory.buffer, leaf, length);
+        if (isNumber) for (let j = 0; j < length; j++) result[first + j] = block[j] as ValueOf<T>;
+        else for (let j = 0; j < length; j++) result[first + j] = (block[j] !== 0) as ValueOf<T>;
+      } else {
+        const view = a.dv;
+        for (let j = 0; j < length; j++) result[first + j] = a.decode(this.type, view.getFloat64(leaf + j * 8, true));
+      }
     }
     return result;
   }
