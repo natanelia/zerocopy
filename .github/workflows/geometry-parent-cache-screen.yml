@@ -1,0 +1,161 @@
+name: Frozen geometry parent-cache public screen
+
+on:
+  push:
+    branches: ['perf/geometry-parent-cache-20261008']
+    paths:
+      - 'proofs/geometry-parent-screen*'
+      - 'docs/geometry-parent-cache-screen.md'
+      - '.github/workflows/geometry-parent-cache-screen.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geometry-parent-cache-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.event.before == 'c6db76c1363b6f7512a9919fe7f450ef801fd626' && github.sha != 'c6db76c1363b6f7512a9919fe7f450ef801fd626' && github.run_attempt == 1 && github.event.forced == false && github.event.deleted == false
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+        machine:
+          - { os: ubuntu-24.04, arch: x64 }
+          - { os: ubuntu-24.04-arm, arch: arm64 }
+    runs-on: ${{ matrix.machine.os }}
+    timeout-minutes: 90
+    env:
+      PROOF_RUNTIME: ${{ matrix.runtime }}
+      PROOF_ARCH: ${{ matrix.machine.arch }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Initialize runner-local evidence paths
+        run: |
+          set -euo pipefail
+          printf 'EVIDENCE=%s/geometry-evidence-%s-%s\nBASE_ROOT=%s/geometry-baseline-%s-%s\nnpm_config_cache=%s/geometry-npm-cache\n' "$RUNNER_TEMP" "$PROOF_ARCH" "$PROOF_RUNTIME" "$RUNNER_TEMP" "$PROOF_ARCH" "$PROOF_RUNTIME" "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Retain source and first-push context before setup
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/source" "$EVIDENCE/logs"
+          git archive HEAD > "$EVIDENCE/source/proof-head.tar"
+          git archive c6db76c1363b6f7512a9919fe7f450ef801fd626 > "$EVIDENCE/source/candidate-runtime.tar"
+          git archive 3773c6e519c7c0958da13727ed1082f449f3ee25 > "$EVIDENCE/source/baseline.tar"
+          cp .github/workflows/geometry-parent-cache-screen.yml "$EVIDENCE/workflow.yml"
+          cp "$GITHUB_EVENT_PATH" "$EVIDENCE/push-event.json"
+          git rev-parse HEAD > "$EVIDENCE/proof-head.txt"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify runtime and one-shot push identity
+        run: |
+          set -euo pipefail
+          node --input-type=module -e 'import assert from "node:assert/strict"; import {execFileSync} from "node:child_process"; import {assertEvent} from "./proofs/geometry-parent-screen.mjs"; assertEvent(); assert.equal(process.versions.node,"22.23.3"); assert.equal(execFileSync("bun",["--version"],{encoding:"utf8"}).trim(),"1.4.2"); assert.equal(process.arch,process.env.PROOF_ARCH); assert.equal(process.platform,"linux"); console.log(JSON.stringify({node:process.versions.node,bun:"1.4.2",arch:process.arch,runId:process.env.GITHUB_RUN_ID,runAttempt:process.env.GITHUB_RUN_ATTEMPT,proofHead:process.env.GITHUB_SHA}));' | tee "$EVIDENCE/logs/identity.json"
+      - name: Install pinned tools and create external exact baseline
+        run: |
+          set -euo pipefail
+          bun install 2>&1 | tee "$EVIDENCE/logs/install.log"
+          git worktree add --detach "$BASE_ROOT" 3773c6e519c7c0958da13727ed1082f449f3ee25 2>&1 | tee "$EVIDENCE/logs/baseline-worktree.log"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_ROOT/node_modules"
+      - name: Build declarations then require all correctness, package and worker receipts
+        run: |
+          set -euo pipefail
+          node proofs/geometry-parent-screen-prerequisites.mjs run "$BASE_ROOT" "$GITHUB_WORKSPACE" "$EVIDENCE" 2>&1 | tee "$EVIDENCE/logs/prerequisites.log"
+      - name: Freeze checked source, compiler, root and embedded Wasm, bundles and design
+        run: |
+          set -euo pipefail
+          node proofs/geometry-parent-screen.mjs prepare "$BASE_ROOT" "$GITHUB_WORKSPACE" "$EVIDENCE/gate" 2>&1 | tee "$EVIDENCE/logs/prepare.log"
+      - name: Run all pilots, freeze common work, then execute the balanced screen once
+        run: |
+          set -euo pipefail
+          "$PROOF_RUNTIME" proofs/geometry-parent-screen.mjs run "$EVIDENCE/gate" 2>&1 | tee "$EVIDENCE/logs/screen.log"
+      - name: Independently replay receipt validation
+        run: |
+          set -euo pipefail
+          node proofs/geometry-parent-screen.mjs verify-record "$EVIDENCE/gate" 2>&1 | tee "$EVIDENCE/logs/receipt-validation.log"
+      - name: Retain complete or partial build products
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/builds" "$EVIDENCE/logs"
+          for build in baseline candidate; do
+            directory="$GITHUB_WORKSPACE"
+            if [ "$build" = baseline ]; then directory="$BASE_ROOT"; fi
+            if [ -d "$directory" ]; then
+              mkdir -p "$EVIDENCE/builds/$build"
+              for item in dist package.json bun.lock bun.lockb; do
+                if [ -e "$directory/$item" ]; then cp -a "$directory/$item" "$EVIDENCE/builds/$build/"; fi
+              done
+              find "$directory" -maxdepth 1 -type f -name '*.wasm' -exec cp '{}' "$EVIDENCE/builds/$build/" \;
+            fi
+          done
+          git status --short > "$EVIDENCE/logs/final-status.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-parent-cache-${{ matrix.machine.arch }}-${{ matrix.runtime }}-${{ github.sha }}
+          path: ${{ env.EVIDENCE }}/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+  complete-screen:
+    needs: screen
+    if: always() && github.event.before == 'c6db76c1363b6f7512a9919fe7f450ef801fd626' && github.run_attempt == 1 && github.event.forced == false && github.event.deleted == false
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: geometry-parent-cache-*-${{ github.sha }}
+          path: evidence
+      - name: Hold if any required runtime, architecture or public cell is unresolved
+        env:
+          MATRIX_RESULT: ${{ needs.screen.result }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {CASES} from './proofs/geometry-parent-screen-protocol.mjs';
+          const cells=[],problems=[];
+          for(const arch of ['x64','arm64']) for(const runtime of ['node','bun']) {
+            try {
+              const root=`evidence/geometry-parent-cache-${arch}-${runtime}-${process.env.GITHUB_SHA}`;
+              const r=JSON.parse(readFileSync(root+'/gate/result.json','utf8'));
+              assert.equal(r.proofHead,process.env.GITHUB_SHA);assert.equal(r.runId,process.env.GITHUB_RUN_ID);assert.equal(r.runAttempt,1);
+              assert.equal(r.arch,arch);assert.equal(r.runtime,runtime);assert.equal(r.status,'completed');assert.equal(r.rows.length,CASES.length);
+              cells.push({arch,runtime,screen:r.screen,rows:r.rows.map(row=>({workload:row.workload,summaries:row.summaries}))});
+              if(r.screen!=='public-within-margin') problems.push(`${arch}/${runtime}: ${r.screen}`);
+            } catch(error) {problems.push(`${arch}/${runtime}: ${error.message}`);}
+          }
+          if(process.env.MATRIX_RESULT!=='success')problems.push(`matrix jobs: ${process.env.MATRIX_RESULT}`);
+          const summary={status:problems.length?'held':'public-screen-within-margin',problems,cells,acceptance:false,
+            note:'Pointwise screen only; no pooled result, automatic acceptance, or stable speed guarantee.'};
+          writeFileSync('geometry-parent-cache-screen-summary.json',JSON.stringify(summary,null,2)+'\n');
+          console.log(JSON.stringify(summary,null,2));if(problems.length)process.exitCode=1;
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-parent-cache-summary-${{ github.sha }}
+          path: geometry-parent-cache-screen-summary.json
+          retention-days: 30
+          if-no-files-found: error
