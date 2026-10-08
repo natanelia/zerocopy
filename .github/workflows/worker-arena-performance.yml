@@ -46,7 +46,7 @@ jobs:
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - name: Verify attachment, graph traversal, and real workers
         run: |
-          node --test proofs/worker-arena-source-guard.test.mjs
+          node --test proofs/worker-arena-source-guard.node.mjs
           bun run typecheck
           bun run test -- worker-attachment.test.ts worker-records.test.ts worker.test.ts immutable-proof.test.ts nested.test.ts descriptor-validation.test.ts redux-checkpoint.test.ts
           node proofs/worker-arenas.mjs
@@ -80,7 +80,7 @@ jobs:
             proofs/worker-arena-benchmark.mjs
             proofs/run-worker-arenas.mjs
             proofs/worker-arena-source-guard.mjs
-            proofs/worker-arena-source-guard.test.mjs
+            proofs/worker-arena-source-guard.node.mjs
             dist/
             .proof-baseline/dist/
           include-hidden-files: true

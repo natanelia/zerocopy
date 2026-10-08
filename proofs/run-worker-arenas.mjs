@@ -24,7 +24,7 @@ mkdirSync(output, { recursive: true });
 const proofManifest = manifest(candidate, [
   '.github/workflows/worker-arena-performance.yml', 'worker-attachment.test.ts',
   'proofs/worker-arenas.mjs', 'proofs/worker-arena-benchmark.mjs', 'proofs/run-worker-arenas.mjs',
-  'proofs/worker-arena-source-guard.mjs', 'proofs/worker-arena-source-guard.test.mjs',
+  'proofs/worker-arena-source-guard.mjs', 'proofs/worker-arena-source-guard.node.mjs',
 ]);
 const guard = { ...sourceGuard(baseline, candidate, process.env.CANDIDATE_SHA), proofManifest };
 const guardPath = `${output}/source-guard.json`;
