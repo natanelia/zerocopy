@@ -214,6 +214,101 @@ describe('shared state and session protocol', () => {
     const pending = stream.next(); abort.abort(new Error('stopped'));
     await expect(pending).rejects.toThrow('stopped'); expect(reader.closed).toBe(false);
   });
+  describe.each([false, true])('snapshot streams with copy=%s', copy => {
+    it('captures the current version and coalesces independently of a waiting stream', async () => {
+      const { state, reader } = await setup(new SharedMap('number').set('x', 0), { copy });
+      state.publish(state.current.set('x', 1)); await drain();
+      expect(reader.version).toBe(1);
+      const initial = reader.current;
+      const paused = reader.snapshots(), waiting = reader.snapshots({ emitCurrent: false });
+      expect((await paused.next()).value).toBe(initial);
+      const retained = initial;
+      for (let value = 2; value <= 20; value++) {
+        const pending = waiting.next();
+        await expect(waiting.next()).rejects.toThrow(/sequentially/);
+        state.publish(state.current.set('x', value)); await drain();
+        expect((await pending).value).toBe(reader.current);
+      }
+      expect((await paused.next()).value).toBe(reader.current);
+      expect(reader.version).toBe(20);
+      expect(retained.get('x')).toBe(1);
+      await paused.return!();
+      const pending = waiting.next();
+      state.publish(state.current.set('x', 21)); await drain();
+      expect((await pending).value.get('x')).toBe(21);
+      expect(reader.closed).toBe(false);
+      await waiting.return!();
+    });
+    it('replaces an unread initial snapshot and does not emit current when disabled', async () => {
+      const { state, reader } = await setup(new SharedMap('number').set('x', 0), { copy });
+      const initial = reader.snapshots(), latest = reader.snapshots({ strategy: 'latest', emitCurrent: false });
+      let settled = false;
+      const pending = latest.next().then(result => { settled = true; return result; });
+      await drain(); expect(settled).toBe(false);
+      state.publish(state.current.set('x', 1)); await drain();
+      expect((await pending).value.get('x')).toBe(1);
+      state.publish(state.current.set('x', 2)); await drain();
+      expect((await initial.next()).value.get('x')).toBe(2);
+      expect((await latest.next()).value.get('x')).toBe(2);
+      await initial.return!(); await latest.return!();
+    });
+    it('keeps all-mode FIFO capacity and overflow independent of latest streams', async () => {
+      const { state, reader } = await setup(new SharedMap('number').set('x', 0), { copy });
+      const all = reader.snapshots({ strategy: 'all', capacity: 3 });
+      const overflow = reader.snapshots({ strategy: 'all', capacity: 2 });
+      const latest = reader.snapshots();
+      for (let value = 1; value <= 2; value++) {
+        state.publish(state.current.set('x', value)); await drain();
+      }
+      for (const value of [0, 1, 2]) expect((await all.next()).value.get('x')).toBe(value);
+      await expect(overflow.next()).rejects.toThrow(/overflow/);
+      expect((await latest.next()).value.get('x')).toBe(2);
+      const pending = all.next();
+      state.publish(state.current.set('x', 3)); await drain();
+      expect((await pending).value.get('x')).toBe(3);
+      expect(reader.closed).toBe(false);
+      await all.return!(); await latest.return!();
+    });
+    it('clears queued values and pending reads on return, abort, and throw', async () => {
+      const { state, reader } = await setup(new SharedMap('number').set('x', 0), { copy });
+      for (const queued of [false, true]) {
+        const returned = reader.snapshots({ emitCurrent: queued });
+        const returnedRead = queued ? undefined : returned.next();
+        expect((await returned.return!()).done).toBe(true);
+        if (returnedRead) expect((await returnedRead).done).toBe(true);
+        expect((await returned.next()).done).toBe(true);
+
+        const controller = new AbortController(), reason = new Error('stream stopped');
+        const aborted = reader.snapshots({ emitCurrent: queued, signal: controller.signal });
+        const abortedRead = queued ? undefined : aborted.next();
+        controller.abort(reason);
+        if (abortedRead) await expect(abortedRead).rejects.toBe(reason);
+        await expect(aborted.next()).rejects.toBe(reason);
+
+        const thrown = reader.snapshots({ emitCurrent: queued });
+        const thrownRead = queued ? undefined : thrown.next();
+        await expect(thrown.throw!(reason)).rejects.toBe(reason);
+        if (thrownRead) await expect(thrownRead).rejects.toBe(reason);
+        await expect(thrown.next()).rejects.toBe(reason);
+      }
+      const controller = new AbortController(); controller.abort(new Error('already stopped'));
+      await expect(reader.snapshots({ signal: controller.signal }).next()).rejects.toThrow('already stopped');
+      const active = reader.snapshots({ emitCurrent: false }), next = active.next();
+      state.publish(state.current.set('x', 1)); await drain();
+      expect((await next).value.get('x')).toBe(1);
+      expect(reader.closed).toBe(false); await active.return!();
+    });
+    it('discards queued values and resolves pending reads when the reader closes', async () => {
+      const { reader } = await setup(new SharedMap('number').set('x', 0), { copy });
+      const queued = reader.snapshots(), waiting = reader.snapshots({ emitCurrent: false });
+      const pending = waiting.next();
+      reader.dispose(); reader.dispose();
+      expect((await pending).done).toBe(true);
+      expect((await queued.next()).done).toBe(true);
+      expect((await waiting.next()).done).toBe(true);
+      expect(() => reader.snapshots()).toThrow(/closed/);
+    });
+  });
   it('keeps the session alive when a subscriber throws', async () => {
     const pair = ports(), errors: Error[] = [];
     const owner = createSharedState(new SharedMap('number')); cleanup.push(() => owner.dispose());

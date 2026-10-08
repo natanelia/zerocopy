@@ -324,20 +324,20 @@ class Reader<T extends SharedShape<T>> implements SharedReader<T> {
     const mode = options.strategy ?? 'latest', capacity = options.capacity ?? 32;
     if (mode !== 'latest' && mode !== 'all') throw new TypeError('Invalid snapshot stream strategy');
     if (!Number.isSafeInteger(capacity) || capacity < 1) throw new RangeError('capacity must be positive');
-    let queue: T[] = options.emitCurrent === false ? [] : [this.current];
+    const queue: T[] = options.emitCurrent === false ? [] : [this.current];
     let done = false, failure: Error | undefined;
     let waiter: { resolve: (value: IteratorResult<T>) => void; reject: (error: Error) => void } | undefined;
     let unsubscribe = () => {};
     const end = (error?: Error) => {
       if (done) return;
-      done = true; failure = error; queue = []; unsubscribe(); this.endings.delete(end);
+      done = true; failure = error; queue.length = 0; unsubscribe(); this.endings.delete(end);
       options.signal?.removeEventListener('abort', abort);
       if (waiter) { const pending = waiter; waiter = undefined; error ? pending.reject(error) : pending.resolve({ done: true, value: undefined }); }
     };
     const abort = () => end(errorOf(options.signal?.reason ?? 'Snapshot stream aborted'));
     unsubscribe = this.subscribe(value => {
       if (waiter) { const pending = waiter; waiter = undefined; pending.resolve({ done: false, value }); }
-      else if (mode === 'latest') queue = [value];
+      else if (mode === 'latest') queue[0] = value;
       else if (queue.length < capacity) queue.push(value);
       else end(new Error('Snapshot stream queue overflow'));
     });
