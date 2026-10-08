@@ -6,7 +6,8 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 
-const baselineCommit = '3331f2f0e9e0c3c61832e5f04b12e18c1889d96c';
+const baselineCommit = process.env.BASELINE_COMMIT ?? '3331f2f0e9e0c3c61832e5f04b12e18c1889d96c';
+assert.match(baselineCommit, /^[a-f0-9]{40}$/, 'BASELINE_COMMIT must be an exact commit SHA');
 const positive = (name, fallback, integer = false) => {
   const value = Number(process.env[name] ?? fallback);
   assert.ok(Number.isFinite(value) && value > 0 && (!integer || Number.isSafeInteger(value)), `Invalid ${name}: ${value}`);
@@ -24,7 +25,7 @@ const median = list => { const a = [...list].sort((x, y) => x - y); return a.len
 const digest = value => createHash('sha256').update(value).digest('hex');
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const cases = [];
-for (const size of [32, 4096, 32769]) for (const kind of ['list', 'queue', 'linked', 'doubly']) for (const type of ['number', 'boolean']) {
+for (const size of [31, 32, 33, 64, 256, 4096, 32769]) for (const kind of ['list', 'queue', 'linked', 'doubly']) for (const type of ['number', 'boolean']) {
   cases.push({ kind, type, size, name: `${kind}/${type}/${size}` });
 }
 for (const kind of ['list', 'queue', 'linked', 'doubly']) for (const type of ['string', 'object']) cases.push({ kind, type, size: 4096, name: `${kind}/${type}/4096` });
@@ -134,6 +135,13 @@ if (process.argv[2] === '--case') {
   assert.ok(['ab', 'aa-baseline', 'aa-candidate'].includes(mode));
   const paths = mode === 'aa-baseline' ? { baseline: before, candidate: before }
     : mode === 'aa-candidate' ? { baseline: after, candidate: after } : { baseline: before, candidate: after };
+  if (process.argv[2] === '--prepare') {
+    // Browser proofs reuse these exact pins and guards without running a Node
+    // measurement or mutating any existing evidence file.
+    process.stdout.write(JSON.stringify({ baselineCommit, mode, configuration, paths, candidatePath: after,
+      sourceState, sourceSHA256: manifests, buildSHA256: builds, wasmSHA256: wasm, workloads: selected,
+      harnessSHA256: digest(readFileSync(fileURLToPath(import.meta.url))) }));
+  } else {
   const output = resolve(process.env.OUTPUT ?? `primitive-compaction-${mode}-${typeof Bun === 'undefined' ? 'node' : 'bun'}.json`);
   mkdirSync(resolve(output, '..'), { recursive: true });
   const rows = [];
@@ -174,4 +182,5 @@ if (process.argv[2] === '--case') {
     report.status = 'failed'; report.error = String(error); report.finishedAt = new Date().toISOString(); save(); throw error;
   }
   console.log(JSON.stringify(report.summary, null, 2)); console.error(`Wrote ${output}`);
+  }
 }

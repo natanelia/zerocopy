@@ -33,6 +33,44 @@ const classes = {
 const classEntries = Object.entries(classes);
 export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
 
+// Multi-block primitive values can be copied without per-value conversion.
+function copyPrimitiveVector(targetArena: Arena, a: Arena, d: any, sequence: boolean, queue: boolean): { input: number; size: number } {
+  const size = d.size, input = size ? targetArena.alloc(size * 8) : 0;
+  const source = a.buf, target = targetArena.buf;
+  let copied = 0;
+  const copy = (start: number, length: number): void => {
+    if (copied + length > size) throw new Error('Invalid sequence descriptor');
+    // A sized view rejects truncated spans, unlike subarray's clamped bounds.
+    // Copy bytes rather than round-tripping f64 values through JavaScript, so
+    // NaN payloads and negative zero remain intact. Neither arena is mutated
+    // by a callback on this primitive-only path.
+    const span = new Uint8Array(source.buffer, source.byteOffset + start, length * 8);
+    target.set(span, input + copied * 8); copied += length;
+  };
+  if (sequence) {
+    const stack: number[] = [], view = a.dv; let node = d.head;
+    while (node || stack.length) {
+      while (node) { stack.push(node); node = view.getUint32(node, true); }
+      node = stack.pop()!;
+      copy(view.getUint32(node + 16, true), view.getUint32(node + 20, true));
+      node = view.getUint32(node + 4, true);
+    }
+    if (d.tailSize) copy(d.tail, d.tailSize);
+  } else {
+    const total = size + (queue ? d.tail : 0), tailLength = total ? ((total - 1) & 31) + 1 : 0;
+    const prefix = total - tailLength, root = queue ? d.head : d.root, tail = queue ? d.block : d.tail;
+    let index = queue ? d.tail : 0;
+    while (index < prefix) {
+      const length = Math.min(prefix - index, 32 - (index & 31));
+      copy((a.wasm.vecLeaf(root, d.depth, index) >>> 0) + (index & 31) * 8, length);
+      index += length;
+    }
+    if (index < total) copy(tail + (index - prefix) * 8, total - index);
+  }
+  if (copied !== size) throw new Error('Invalid sequence descriptor');
+  return { input, size };
+}
+
 /** Rebuild selected live data in one fresh arena. Never reset or edit a source.
  * Old arenas become reclaimable only when all their holders release them.
  * Raw JSON/string bytes are copied without parsing; nested snapshots are rebuilt.
@@ -78,9 +116,6 @@ class Compactor {
   }
   private vector(a: Arena, d: any, type: string, sequence: boolean, queue: boolean): { input: number; size: number } {
     const size = d.size;
-    if ((type === 'number' || type === 'boolean') && (!sequence || Number.isSafeInteger(d.tailSize) && d.tailSize >= 0)) {
-      return this.primitiveVector(a, d, sequence, queue);
-    }
     // Place blobs before the final contiguous values. Nested compaction may grow
     // memory, so reacquire the view after it returns.
     const values: number[] = [];
@@ -98,42 +133,6 @@ class Compactor {
     if (values.length !== size) throw new Error('Invalid sequence descriptor');
     const input = size ? this.target.alloc(size * 8) : 0, dv = this.target.dv;
     for (let i = 0; i < size; i++) dv.setFloat64(input + i * 8, values[i], true);
-    return { input, size };
-  }
-  private primitiveVector(a: Arena, d: any, sequence: boolean, queue: boolean): { input: number; size: number } {
-    const size = d.size, input = size ? this.target.alloc(size * 8) : 0;
-    const source = a.buf, target = this.target.buf;
-    let copied = 0;
-    const copy = (start: number, length: number): void => {
-      if (copied + length > size) throw new Error('Invalid sequence descriptor');
-      // A sized view rejects truncated spans, unlike subarray's clamped bounds.
-      // Copy bytes rather than round-tripping f64 values through JavaScript, so
-      // NaN payloads and negative zero remain intact. Neither arena is mutated
-      // by a callback on this primitive-only path.
-      const span = new Uint8Array(source.buffer, source.byteOffset + start, length * 8);
-      target.set(span, input + copied * 8); copied += length;
-    };
-    if (sequence) {
-      const stack: number[] = [], view = a.dv; let node = d.head;
-      while (node || stack.length) {
-        while (node) { stack.push(node); node = view.getUint32(node, true); }
-        node = stack.pop()!;
-        copy(view.getUint32(node + 16, true), view.getUint32(node + 20, true));
-        node = view.getUint32(node + 4, true);
-      }
-      if (d.tailSize) copy(d.tail, d.tailSize);
-    } else {
-      const total = size + (queue ? d.tail : 0), tailLength = total ? ((total - 1) & 31) + 1 : 0;
-      const prefix = total - tailLength, root = queue ? d.head : d.root, tail = queue ? d.block : d.tail;
-      let index = queue ? d.tail : 0;
-      while (index < prefix) {
-        const length = Math.min(prefix - index, 32 - (index & 31));
-        copy((a.wasm.vecLeaf(root, d.depth, index) >>> 0) + (index & 31) * 8, length);
-        index += length;
-      }
-      if (index < total) copy(tail + (index - prefix) * 8, total - index);
-    }
-    if (copied !== size) throw new Error('Invalid sequence descriptor');
     return { input, size };
   }
   private heap(a: Arena, type: string, root: number): number {
@@ -195,7 +194,10 @@ class Compactor {
     } else if (kind === 'SharedPriorityQueue') next = { ...d, root: this.heap(a, type, d.root) };
     else {
       const sequence = kind === 'SharedLinkedList' || kind === 'SharedDoublyLinkedList', queue = kind === 'SharedQueue';
-      const { input, size } = this.vector(a, d, type, sequence, queue), tailSize = size ? ((size - 1) & 31) + 1 : 0;
+      const { input, size } = d.size > 32 && (type === 'number' || type === 'boolean')
+        && (!sequence || Number.isSafeInteger(d.tailSize) && d.tailSize >= 0)
+        ? copyPrimitiveVector(this.target, a, d, sequence, queue) : this.vector(a, d, type, sequence, queue);
+      const tailSize = size ? ((size - 1) & 31) + 1 : 0;
       const prefix = size - tailSize, tail = size ? input + prefix * 8 : 0;
       if (sequence) next = { ...d, head: this.target.wasm.blockBuild(input, prefix / 32) >>> 0, tail, tailSize };
       else {

@@ -27,6 +27,26 @@ function unchanged(value: object, before: Uint8Array): void {
 }
 
 describe('primitive compaction byte spans', () => {
+  test.each([31, 32, 33])('keeps the scalar path through one native block, size=%s', count => {
+    for (const kind of kinds) for (const type of ['number', 'boolean'] as const) {
+      const offset = kind === 'queue' ? 7 : 0;
+      const values = Array.from({ length: count + offset }, (_, i) => type === 'number' ? i / 8 : i % 3 === 0);
+      let source = create(kind, type, values);
+      for (let i = 0; i < offset; i++) source = source.dequeue();
+      const a = arenaOf(source), view = a.dv, read = view.getFloat64.bind(view);
+      let scalarReads = 0;
+      view.getFloat64 = (position, littleEndian) => { scalarReads++; return read(position, littleEndian); };
+      const result = compact(source);
+      // Test the dispatch boundary directly, including short queues whose
+      // consumed prefix leaves the live values across two physical blocks.
+      if (count <= 32) assert.ok(scalarReads > 0);
+      else assert.strictEqual(scalarReads, 0);
+      view.getFloat64 = read;
+      assert.deepStrictEqual(valuesOf(result, kind), values.slice(offset));
+      assert.deepStrictEqual(valuesOf(source, kind), values.slice(offset));
+    }
+  });
+
   for (const kind of kinds) for (const type of ['number', 'boolean'] as const) test(`${kind} ${type} preserves block boundaries and source bytes`, () => {
     for (const count of counts) {
       const expected = Array.from({ length: count }, (_, i) => type === 'number' ? i % 7 === 0 ? -0 : i / 8 : i % 3 === 0);

@@ -26,7 +26,8 @@ jobs:
       ROUNDS: '4'
       SAMPLES: '21'
       TARGET_BATCH_MS: '10'
-      CASE_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(32|32769)|list/(string|object)/4096)$'
+      CASE_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(31|32|33|64|256|4096|32769)|list/(string|object)/4096)$'
+      CONTROL_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(32|32769)|list/(string|object)/4096)$'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,13 +70,82 @@ jobs:
           # Every subject imports exactly one build. Each case/round/variant
           # gets a fresh process, with balanced baseline/candidate order.
           OUTPUT="proofs/results/primitive-compaction/$RUNTIME-ab.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
-          BENCH_MODE=aa-baseline OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-baseline.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
-          BENCH_MODE=aa-candidate OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-candidate.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+          CASE_FILTER="$CONTROL_FILTER" BENCH_MODE=aa-baseline OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-baseline.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+          CASE_FILTER="$CONTROL_FILTER" BENCH_MODE=aa-candidate OUTPUT="proofs/results/primitive-compaction/$RUNTIME-aa-candidate.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+      - name: Compare focused controls to the previous candidate on this runner
+        if: (matrix.runtime == 'bun' && matrix.os == 'ubuntu-24.04-arm') || (matrix.runtime == 'node' && matrix.os == 'ubuntu-latest')
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+          PREVIOUS_COMMIT: c5a242cd641e4ee96005296fab485e332a1394b7
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/compaction-previous" "$PREVIOUS_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/compaction-previous/node_modules"
+          (cd "$RUNNER_TEMP/compaction-previous" && bun run build:wasm && bun run build:browser)
+          if [ "$RUNTIME" = bun ]; then
+            focused='^(linked|doubly)/boolean/32$'
+          else
+            focused='^list/object/4096$'
+          fi
+          BASELINE_COMMIT="$PREVIOUS_COMMIT" BASELINE_DIR="$RUNNER_TEMP/compaction-previous" CASE_FILTER="$focused" OUTPUT="proofs/results/primitive-compaction/$RUNTIME-previous-c5a242-ab.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
+          BASELINE_COMMIT="$PREVIOUS_COMMIT" BASELINE_DIR="$RUNNER_TEMP/compaction-previous" CASE_FILTER="$focused" BENCH_MODE=aa-baseline OUTPUT="proofs/results/primitive-compaction/$RUNTIME-previous-c5a242-aa.json" "$RUNTIME" proofs/primitive-compaction-performance.mjs
       - name: Retain raw samples, source guards and correctness evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: primitive-compaction-${{ matrix.runtime }}-${{ runner.arch }}-${{ github.sha }}
+          path: proofs/results/primitive-compaction/
+          retention-days: 30
+          if-no-files-found: error
+
+  browsers:
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BASELINE_COMMIT: 3331f2f0e9e0c3c61832e5f04b12e18c1889d96c
+      ROUNDS: '4'
+      SAMPLES: '21'
+      TARGET_BATCH_MS: '10'
+      CASE_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(32|33|4096|32769)|list/(string|object)/4096)$'
+      CONTROL_FILTER: '^((list|queue|linked|doubly)/(number|boolean)/(32|32769)|list/(string|object)/4096)$'
+      ENGINES: ${{ matrix.engine }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Build exact candidate and pinned main
+        run: |
+          bun run build:wasm && bun run build:browser
+          git worktree add --detach "$RUNNER_TEMP/compaction-baseline" "$BASELINE_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/compaction-baseline/node_modules"
+          (cd "$RUNNER_TEMP/compaction-baseline" && bun run build:wasm && bun run build:browser)
+          echo "BASELINE_DIR=$RUNNER_TEMP/compaction-baseline" >> "$GITHUB_ENV"
+          echo "CANDIDATE_DIR=$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+          mkdir -p proofs/results/primitive-compaction
+          git rev-parse HEAD > proofs/results/primitive-compaction/candidate-commit.txt
+          printf '%s\n' "$BASELINE_COMMIT" > proofs/results/primitive-compaction/base-commit.txt
+      - run: bunx playwright install --with-deps "$ENGINES"
+      - name: Measure fresh one-build pages and verify real shared/copy workers
+        run: |
+          OUTPUT="proofs/results/primitive-compaction/$ENGINES-ab.json" node proofs/primitive-compaction-browser.mjs
+          CASE_FILTER="$CONTROL_FILTER" BENCH_MODE=aa-baseline OUTPUT="proofs/results/primitive-compaction/$ENGINES-aa-baseline.json" node proofs/primitive-compaction-browser.mjs
+          CASE_FILTER="$CONTROL_FILTER" BENCH_MODE=aa-candidate OUTPUT="proofs/results/primitive-compaction/$ENGINES-aa-candidate.json" node proofs/primitive-compaction-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: primitive-compaction-${{ matrix.engine }}-${{ github.sha }}
           path: proofs/results/primitive-compaction/
           retention-days: 30
           if-no-files-found: error
