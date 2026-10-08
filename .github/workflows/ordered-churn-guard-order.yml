@@ -1,0 +1,64 @@
+name: Ordered churn guard-order diagnostic
+on:
+  push:
+    branches: [perf/ordered-churn-guard-order]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ordered-churn-guard-order-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  focused:
+    if: github.repository == 'natanelia/zerocopy'
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      RUNTIME: ${{ matrix.runtime }}
+      CANDIDATE_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - name: Build three exact sources with one toolchain
+        run: |
+          set -euo pipefail
+          mkdir .guard-main .guard-original
+          git archive 3773c6e519c7c0958da13727ed1082f449f3ee25 | tar -x -C .guard-main
+          git archive 82f8d9cc9d81c459ecbd0d9c06189e0fa9ec5120 | tar -x -C .guard-original
+          ln -s "$PWD/node_modules" .guard-main/node_modules
+          ln -s "$PWD/node_modules" .guard-original/node_modules
+          bun run build:wasm && bun run build:browser && bun run typecheck
+          (cd .guard-main && bun run build:wasm && bun run build:browser)
+          (cd .guard-original && bun run build:wasm && bun run build:browser)
+          mkdir -p proofs/results/ordered-churn-guard-order
+          node --input-type=module -e 'import {prepareThree} from "./proofs/ordered-churn-guard-order.mjs"; console.log(JSON.stringify(prepareThree(".guard-main/dist/shared.js",".guard-original/dist/shared.js","dist/shared.js"),null,2))' > proofs/results/ordered-churn-guard-order/source-manifest.json
+      - name: Verify the focused experiment and ordered-map regressions
+        run: |
+          node --test proofs/ordered-churn-guard-order.test.mjs
+          bun --bun node_modules/vitest/vitest.mjs run ordered-churn.test.ts ordered-empty-regression.test.ts --maxWorkers=1 --fileParallelism=false --testTimeout=30000
+      - name: Check every source and actual shared/copy workers
+        run: |
+          EXPECT_ADAPTIVE=0 "$RUNTIME" proofs/ordered-churn-verify.mjs .guard-main/dist/shared.js proofs/results/ordered-churn-guard-order/main-checks.json
+          "$RUNTIME" proofs/ordered-churn-verify.mjs .guard-original/dist/shared.js proofs/results/ordered-churn-guard-order/original-checks.json
+          "$RUNTIME" proofs/ordered-churn-verify.mjs dist/shared.js proofs/results/ordered-churn-guard-order/reordered-checks.json
+      - name: Fixed-work fresh-process comparisons and matched A/A
+        run: |
+          "$RUNTIME" proofs/ordered-churn-guard-order.mjs .guard-main/dist/shared.js .guard-original/dist/shared.js dist/shared.js proofs/results/ordered-churn-guard-order/performance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ordered-guard-order-${{ matrix.runtime }}-${{ runner.arch }}
+          path: proofs/results/ordered-churn-guard-order/
+          retention-days: 30

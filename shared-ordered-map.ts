@@ -56,7 +56,7 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
     // H > L * (2 + ceil(log2 L)): one traversal, comparison-sort work, and a
     // second live-sized allowance for sort scratch. Ordinary updates skip even
     // the logarithm. Each iterator still owns all of its temporary storage.
-    if (!this.orderStable && this.tail > this.size && this.size > 0 && p &&
+    if (this.tail > this.size && !this.orderStable && this.size > 0 && p &&
         this.tail > this.size * (2 + Math.ceil(Math.log2(this.size)))) {
       const newest = view.getUint32(p + 4, true);
       // Old/unchecked descriptors may carry stale counters. Keep their log
