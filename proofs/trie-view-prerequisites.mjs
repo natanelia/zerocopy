@@ -8,7 +8,7 @@ import { BASELINE_COMMIT, CANDIDATE_RUNTIME_COMMIT, sha256 } from './trie-view-s
 
 export const WORKER_COMMAND = Object.freeze(['node', 'node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.worker.json']);
 export const KNOWN_WORKER_DIAGNOSTICS = JSON.parse(readFileSync(new URL('./trie-view-worker-types.expected.json', import.meta.url)));
-export const COMMON_CHECKS = Object.freeze(['build-wasm', 'build-browser', 'build-types', 'typecheck', 'worker-types', 'type-values', 'type-redux', 'type-geometry', 'unit', 'unit-node', 'package', 'node-worker', 'redux-node', 'typed-json-worker', 'actual-workers-node', 'actual-workers-bun']);
+export const COMMON_CHECKS = Object.freeze(['build-wasm', 'build-browser', 'build-types', 'typecheck', 'worker-types', 'type-values', 'type-redux', 'type-geometry', 'unit', 'unit-node-compatible', 'package', 'worker-tasks-node', 'node-worker', 'redux-node', 'typed-json-worker', 'actual-workers-node', 'actual-workers-bun']);
 export const REQUIRED_CHECKS = Object.freeze([
   ...['baseline', 'candidate'].flatMap(build => COMMON_CHECKS.map(name => `${build}/${name}`)),
   'candidate/mechanism', 'candidate/protocol-tests',

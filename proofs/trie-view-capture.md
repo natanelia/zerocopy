@@ -23,7 +23,7 @@ This proof assumes valid library snapshots and supported shared arenas. It makes
 - Bun: 148 focused tests across nine files pass. Node: all 14 new tests pass. WASM/browser/declaration builds; ordinary, post-declaration strict public worker-consumer, typed-value (both exact-optional modes), Redux and geometry type checks; installed-package Node/Bun exports, immutable-snapshot, Node-worker and TypeScript-consumer checks pass.
 - All 12 rebuilt WASM files are byte-identical to the exact-main baseline build. Core WASM SHA-256 is `b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4`.
 
-The strict worker command has 12 matching existing source diagnostics before declarations and passes on both builds after declarations; the gate requires the latter real public-consumer pass. Full application suite and browser execution have not been run for this candidate. Focused success is not a full-suite or portable-performance claim.
+The strict worker command has 12 matching existing source diagnostics before declarations and passes on both builds after declarations; the gate requires the latter real public-consumer pass. The full standard Bun application suite and the explicitly scoped supplemental Node suite remain required in clean CI. Browser execution has not been run for this candidate. The baseline-only loader failure and precise Node exclusion are documented in [trie-view-gate.md](trie-view-gate.md). Focused success is not a full-suite or portable-performance claim.
 
 ### Mechanism counts
 

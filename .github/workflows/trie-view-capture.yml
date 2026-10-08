@@ -59,6 +59,8 @@ jobs:
           mkdir -p "$EVIDENCE/source/history"
           git show 0ba719e92ddcee246e1817527857a78ac1a89f8f:.github/workflows/trie-view-capture.yml > "$EVIDENCE/source/history/37848382333-workflow.yml"
           printf '%s\n' '{"runId":37848382333,"headSha":"0ba719e92ddcee246e1817527857a78ac1a89f8f","conclusion":"failure","jobs":[],"stage":"workflow-validation","url":"https://github.com/natanelia/zerocopy/actions/runs/37848382333"}' > "$EVIDENCE/source/history/37848382333-run.json"
+          git show 322b98280e09a85e8733ef1198a9fd4379f883b0:.github/workflows/trie-view-capture.yml > "$EVIDENCE/source/history/37848932492-workflow.yml"
+          printf '%s\n' '{"runId":37848932492,"headSha":"322b98280e09a85e8733ef1198a9fd4379f883b0","stage":"baseline/unit-node","standardBunTestsPassed":753,"supplementalNodeTestsPassed":744,"supplementalNodeTestsFailed":9,"failingFile":"workers.test.ts","cause":"ERR_MODULE_NOT_FOUND loading extensionless arena from source shared-list.ts","pilotsStarted":false,"jobs":[113556725252,113556725676],"artifacts":[{"id":11580697493,"sha256":"34e32ab99b2ce4995021e6ae885bad7035d1115a0bf341e97905a15d1e121185"},{"id":11580508170,"sha256":"109df0abd6671820b0d1ccdbe4acb30e7f10fc47e0d8f896df5f1f77f136b347"}]}' > "$EVIDENCE/source/history/37848932492-run.json"
           git diff "$BASELINE_COMMIT" "$CANDIDATE_RUNTIME_COMMIT" -- arena.ts > "$EVIDENCE/source/runtime.patch"
           printf '{"status":"partial","checks":[]}\n' > "$EVIDENCE/prerequisites.json"
       - uses: actions/setup-node@v4
@@ -110,8 +112,9 @@ jobs:
             check "$build" type-redux "$directory" bun run typecheck:redux
             check "$build" type-geometry "$directory" bun run typecheck:geometry
             check "$build" unit "$directory" bun run test
-            check "$build" unit-node "$directory" node node_modules/vitest/vitest.mjs run
+            check "$build" unit-node-compatible "$directory" node node_modules/vitest/vitest.mjs run --exclude workers.test.ts
             check "$build" package "$directory" bun run check:package
+            check "$build" worker-tasks-node "$directory" node --test proofs/worker-tasks.mjs
             check "$build" node-worker "$directory" node proofs/node-worker.mjs
             check "$build" redux-node "$directory" node proofs/redux-node.mjs
             check "$build" typed-json-worker "$directory" node proofs/typed-json-worker.mjs

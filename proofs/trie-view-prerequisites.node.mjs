@@ -41,11 +41,14 @@ test('all required prerequisite receipts must pass, including built worker consu
   });
   const data = { status: 'completed', baseline: BASELINE_COMMIT, candidate: CANDIDATE_RUNTIME_COMMIT, checks };
   const save = () => writeFileSync(join(root, 'prerequisites.json'), JSON.stringify(data)); save();
-  assert.equal(validatePrerequisites(root).checks.length, 40);
+  assert.equal(validatePrerequisites(root).checks.length, 42);
   for (let index = 0; index < checks.length; index++) {
     data.checks = checks.filter((_, i) => i !== index); save(); assert.throws(() => validatePrerequisites(root), /prerequisites/);
   }
   data.checks = [...checks, checks[0]]; save(); assert.throws(() => validatePrerequisites(root), /prerequisites/);
+  data.checks = checks; const scoped = checks.find(c => c.name === 'unit-node-compatible');
+  scoped.name = 'unit-node'; save(); assert.throws(() => validatePrerequisites(root), /prerequisites/);
+  scoped.name = 'unit-node-compatible';
   data.checks = checks; const worker = checks.find(c => c.name === 'worker-types');
   worker.status = 2; worker.outcome = 'known-diagnostic-parity'; save(); assert.throws(() => validatePrerequisites(root), /Failed prerequisite/);
   worker.status = 0; worker.outcome = 'pass'; data.status = 'partial'; save(); assert.throws(() => validatePrerequisites(root));
