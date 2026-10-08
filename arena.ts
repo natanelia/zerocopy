@@ -670,8 +670,11 @@ export class Arena {
   }
 
   *leaves(root: number): Generator<number> {
-    // Each iterator owns its continuation. No shared stack or scratch survives yield.
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+    // Continuation and scratch belong to this iterator, never to another reader.
+    if (!root) return;
+    const rootTag = this.dv.getUint32(root, true);
+    if (rootTag === 0) { yield root; return; }
+    if (rootTag === 0xffffffff) {
       const n = this.dv.getUint32(root + 12, true), base = this.dv.getUint32(root + 4, true);
       for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
       for (const leaf of this.leaves(base)) {
