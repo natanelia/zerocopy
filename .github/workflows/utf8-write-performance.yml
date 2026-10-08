@@ -1,0 +1,61 @@
+name: UTF-8 write performance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'arena.ts'
+      - 'utf8.ts'
+      - 'utf8-write.test.ts'
+      - 'proofs/*utf8-write*.mjs'
+      - 'scripts/build-*.ts'
+      - 'scripts/build-*.mjs'
+      - 'package.json'
+      - '.github/workflows/utf8-write-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser
+      - name: Build the PR base with the same compiler and dependencies
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          baseline_ref="${PR_BASE:-$(git rev-parse origin/main)}"
+          git cat-file -e "$baseline_ref^{commit}"
+          mkdir -p .proof-baseline
+          git archive "$baseline_ref" | tar -x -C .proof-baseline
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser)
+      - name: Verify native encoding and snapshot regressions
+        run: bun run test -- utf8-write.test.ts
+      - name: Measure isolated Node and Bun operation rounds
+        run: node proofs/run-utf8-write.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/utf8-write-ci
+      - name: Install browser engines
+        run: bunx playwright install --with-deps chromium firefox webkit
+      - name: Verify and measure all three browser engines
+        run: node proofs/utf8-write-browser.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/utf8-write-ci/browsers.json
+      - name: Preserve every measurement
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: utf8-write-evidence-${{ github.sha }}
+          path: proofs/results/utf8-write-ci/
+          retention-days: 30
+          if-no-files-found: error

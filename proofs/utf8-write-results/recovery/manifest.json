@@ -1,0 +1,154 @@
+{
+  "schema": "zerocopy-utf8-write-evidence-recovery/v1",
+  "started": "2026-10-07T04:40:32.942222+00:00",
+  "finished": "2026-10-07T04:40:34.319923+00:00",
+  "reason": "The completed original benchmark summary contained all three paired rounds, but node-1.json retained only 13 of 14 raw variant reports; the final after/control-list-repeated report was absent. Rerun the complete Node round 1 repeated-string pair once to recover inspectable raw evidence. This replaces both variants for that pair; it is not timing-based sample selection. Original node-1.json and summary.json are preserved.",
+  "scope": {
+    "runtime": "Node v22.23.2",
+    "workload": "control-list-repeated",
+    "roundIndex": 0,
+    "displayRound": 1,
+    "variantOrder": [
+      "before",
+      "after"
+    ],
+    "count": 5000,
+    "warmups": 20,
+    "samplesPerVariant": 15
+  },
+  "buildSha256": {
+    "before": "83792746df9762cfbfc6504d4653f01d7240cfd9dd8a34ff7322ebed73d75475",
+    "after": "b5e659960929c13d5f145b0a6b20eae344a0e6c9b901c1d1c88ffb93e2d46e5f"
+  },
+  "commands": [
+    {
+      "variant": "before",
+      "arguments": [
+        "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+        "--expose-gc",
+        "/workspace/scratch/844bacd0f270/zerocopy/proofs/utf8-write-case.mjs",
+        "/workspace/scratch/844bacd0f270/zerocopy-base/dist/shared.js",
+        "/workspace/scratch/844bacd0f270/utf8-portable-evidence/recovery/node-1-control-list-repeated-before.json"
+      ],
+      "environment": {
+        "UTF8_COUNT": "5000",
+        "UTF8_SAMPLES": "15",
+        "UTF8_WARMUPS": "20",
+        "UTF8_ROUND": "0",
+        "UTF8_CASES": "control-list-repeated",
+        "UTF8_VARIANT": "before"
+      },
+      "exitCode": 0,
+      "stdout": "before control-list-repeated: 1.087 ms\n",
+      "stderr": "(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    {
+      "variant": "after",
+      "arguments": [
+        "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+        "--expose-gc",
+        "/workspace/scratch/844bacd0f270/zerocopy/proofs/utf8-write-case.mjs",
+        "/workspace/scratch/844bacd0f270/zerocopy-utf8-portable/dist/shared.js",
+        "/workspace/scratch/844bacd0f270/utf8-portable-evidence/recovery/node-1-control-list-repeated-after.json"
+      ],
+      "environment": {
+        "UTF8_COUNT": "5000",
+        "UTF8_SAMPLES": "15",
+        "UTF8_WARMUPS": "20",
+        "UTF8_ROUND": "0",
+        "UTF8_CASES": "control-list-repeated",
+        "UTF8_VARIANT": "after"
+      },
+      "exitCode": 0,
+      "stdout": "after control-list-repeated: 1.083 ms\n",
+      "stderr": "(node:14) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    }
+  ],
+  "driver": {
+    "path": "/workspace/scratch/844bacd0f270/zerocopy/proofs/utf8-write-case.mjs",
+    "sha256": "61748883fe21fd20bd434df61562245c9d9d0fd37cff317cf7e61c40fb807832",
+    "workloadsPath": "/workspace/scratch/844bacd0f270/zerocopy/proofs/utf8-write-workloads.mjs",
+    "workloadsSha256": "605aa664d1a36d5faa5e6de3f069c3feb17ab868cd3bdb077da4519a7418e54d",
+    "note": "The driver now asserts one selected workload before measurement; setup, GC, run, validation, and timing code are unchanged."
+  },
+  "originalFiles": [
+    {
+      "path": "recovery/originals/node-1.json",
+      "sha256": "5416e5d4129119c1d40b888d71151283da383fc1630ea956fb9070cc528c1a42"
+    },
+    {
+      "path": "recovery/originals/summary.json",
+      "sha256": "eeceffcdd2b0a8270d2c45724f4ae9c5b08436d54f65c095f089ef882b003641"
+    }
+  ],
+  "replacementFiles": [
+    {
+      "path": "recovery/node-1-control-list-repeated-before.json",
+      "sha256": "aca4dfb7237cb7e0bdba96f15d747bff90b5ab0b4a32d96c26c844361e0029ee"
+    },
+    {
+      "path": "recovery/node-1-control-list-repeated-after.json",
+      "sha256": "82b39a129105e42e55512c131d33b43d732176620c8f6146e51ed479d4a4beeb"
+    },
+    {
+      "path": "recovery/node-1-recovered.json",
+      "sha256": "2689ada83565e85bfffcc794a0acb64517ea71b1070b90f641f9bd1db7d8bc04"
+    }
+  ],
+  "rawFiles": [
+    {
+      "path": "node-1.json",
+      "sha256": "2689ada83565e85bfffcc794a0acb64517ea71b1070b90f641f9bd1db7d8bc04",
+      "variantReports": 14,
+      "samples": 210
+    },
+    {
+      "path": "node-2.json",
+      "sha256": "d5234216df6bbb4dcbba702c154afc5745fe05e0cfa9124376f4e17b7d3830e9",
+      "variantReports": 14,
+      "samples": 210
+    },
+    {
+      "path": "node-3.json",
+      "sha256": "79f985db4a767407851c3b8ccca5bdea73fdc6102b93ed5f797d7f9501d3c225",
+      "variantReports": 14,
+      "samples": 210
+    },
+    {
+      "path": "bun-1.json",
+      "sha256": "a523027053a102fada881fbeb7254572f83ec711abfaf742c8c1629b24498623",
+      "variantReports": 14,
+      "samples": 210
+    },
+    {
+      "path": "bun-2.json",
+      "sha256": "8b75d044ccb34dab8c4effdad39db60c9293f775de325d1308a96984f3f3d805",
+      "variantReports": 14,
+      "samples": 210
+    },
+    {
+      "path": "bun-3.json",
+      "sha256": "e65c28065a1fdd7c97510d960764b33576dedbf3b2d2d3e79b7a2727ac5f500c",
+      "variantReports": 14,
+      "samples": 210
+    }
+  ],
+  "summary": {
+    "path": "summary.json",
+    "sha256": "3d9e61b69c77b69cf8e4102b2a19b6c937b818be12cad9ce9e2126f203d39555"
+  },
+  "verification": {
+    "variantReports": 84,
+    "measuredSamples": 1260,
+    "pairedCases": 42,
+    "samplesPerVariantPerWorkload": 45,
+    "allPairStorageChecksEqual": true,
+    "fields": [
+      "usedBytes",
+      "backingBytes",
+      "payloadSha256",
+      "descriptor"
+    ]
+  },
+  "recoveryPairSpeedup": 1.0039507663785043
+}
