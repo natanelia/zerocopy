@@ -51,6 +51,25 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
   }
   *entries(): Generator<[string, ValueOf<T>]> {
     const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
+    // The log has H insertions, including deleted ones; the HAMT has L live
+    // leaves. Only trade the log walk for a live traversal and numeric sort when
+    // H > L * (2 + ceil(log2 L)): one traversal, comparison-sort work, and a
+    // second live-sized allowance for sort scratch. Ordinary updates skip even
+    // the logarithm. Each iterator still owns all of its temporary storage.
+    if (!this.orderStable && this.tail > this.size && this.size > 0 && p &&
+        this.tail > this.size * (2 + Math.ceil(Math.log2(this.size)))) {
+      const newest = view.getUint32(p + 4, true);
+      // Old/unchecked descriptors may carry stale counters. Keep their log
+      // traversal when the counters disagree with the actual index/log tip.
+      if (a.wasm.mapSize(this.root) === this.size &&
+          view.getUint32(newest + 16 + view.getUint32(newest + 8, true), true) + 1 === this.tail) {
+        for (const leaf of a.leaves(this.root)) order.push(leaf);
+        order.sort((x, y) => view.getUint32(x + 16 + view.getUint32(x + 8, true), true) -
+          view.getUint32(y + 16 + view.getUint32(y + 8, true), true));
+        for (const leaf of order) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf, 4)];
+        return;
+      }
+    }
     while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
     for (let i = order.length - 1; i >= 0; i--) {
       const old = order[i];

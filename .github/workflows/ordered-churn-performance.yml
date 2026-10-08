@@ -1,0 +1,100 @@
+name: Ordered churn scan diagnostic
+on:
+  push:
+    branches: [perf/ordered-churn-scans]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Compact x64 gate or complete architecture/browser verification
+        type: choice
+        options: [gate, full]
+        default: gate
+permissions:
+  contents: read
+concurrency:
+  group: ordered-churn-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: github.repository == 'natanelia/zerocopy'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.stage == 'full' && '[
+          {"runtime":"node","runner":"ubuntu-latest","suite":"all"},
+          {"runtime":"bun","runner":"ubuntu-latest","suite":"all"},
+          {"runtime":"node","runner":"ubuntu-24.04-arm","suite":"all"},
+          {"runtime":"bun","runner":"ubuntu-24.04-arm","suite":"all"},
+          {"runtime":"chromium","runner":"ubuntu-latest","suite":"controls"},
+          {"runtime":"chromium","runner":"ubuntu-latest","suite":"crossover"},
+          {"runtime":"chromium","runner":"ubuntu-latest","suite":"targets"},
+          {"runtime":"firefox","runner":"ubuntu-latest","suite":"controls"},
+          {"runtime":"firefox","runner":"ubuntu-latest","suite":"crossover"},
+          {"runtime":"firefox","runner":"ubuntu-latest","suite":"targets"},
+          {"runtime":"webkit","runner":"ubuntu-latest","suite":"controls"},
+          {"runtime":"webkit","runner":"ubuntu-latest","suite":"crossover"},
+          {"runtime":"webkit","runner":"ubuntu-latest","suite":"targets"}
+          ]' || '[
+          {"runtime":"node","runner":"ubuntu-latest","suite":"gate"},
+          {"runtime":"bun","runner":"ubuntu-latest","suite":"gate"},
+          {"runtime":"chromium","runner":"ubuntu-latest","suite":"checks"},
+          {"runtime":"firefox","runner":"ubuntu-latest","suite":"checks"},
+          {"runtime":"webkit","runner":"ubuntu-latest","suite":"checks"}
+          ]') }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    env:
+      RUNTIME: ${{ matrix.runtime }}
+      SUITE: ${{ matrix.suite }}
+      CANDIDATE_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - name: Build the exact pair with identical tooling
+        run: |
+          set -euo pipefail
+          mkdir .ordered-churn-baseline
+          git archive 3773c6e519c7c0958da13727ed1082f449f3ee25 | tar -x -C .ordered-churn-baseline
+          ln -s "$PWD/node_modules" .ordered-churn-baseline/node_modules
+          bun run build:wasm && bun run build:browser && bun run typecheck
+          (cd .ordered-churn-baseline && bun run build:wasm && bun run build:browser)
+          node --input-type=module -e 'import {prepareComparison} from "./proofs/ordered-churn-source.mjs"; console.log(JSON.stringify(prepareComparison(".ordered-churn-baseline/dist/shared.js","dist/shared.js"),null,2))'
+      - name: Run focused and retained-snapshot regressions
+        if: matrix.runtime == 'node'
+        run: bun --bun node_modules/vitest/vitest.mjs run ordered-churn.test.ts ordered-empty-regression.test.ts shared-sorted.test.ts shared-set.test.ts immutable-proof.test.ts nested.test.ts workers.test.ts worker.test.ts worker-records.test.ts --maxWorkers=1 --fileParallelism=false --testTimeout=30000
+      - name: Verify both builds and actual shared/copy workers
+        if: matrix.runtime == 'node' || matrix.runtime == 'bun'
+        run: |
+          "$RUNTIME" proofs/ordered-churn-verify.mjs dist/shared.js proofs/results/ordered-churn/candidate-checks.json
+          EXPECT_ADAPTIVE=0 "$RUNTIME" proofs/ordered-churn-verify.mjs .ordered-churn-baseline/dist/shared.js proofs/results/ordered-churn/baseline-checks.json
+      - name: Install selected browser
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        run: bunx playwright install --with-deps "$RUNTIME"
+      - name: Browser correctness and actual shared/copy workers
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        run: node proofs/ordered-churn-browser.mjs dist/shared.js .ordered-churn-baseline/dist/shared.js proofs/results/ordered-churn/browser-checks.json
+      - name: Check fixtures and small-sample interval calculations
+        if: matrix.runtime == 'node' || matrix.runtime == 'bun'
+        run: |
+          "$RUNTIME" proofs/ordered-churn-harness-check.mjs dist/shared.js proofs/results/ordered-churn/harness-checks.json
+      - name: Source-pinned single-build measurements
+        if: matrix.suite != 'checks'
+        run: |
+          set -euo pipefail
+          controller=node
+          if [ "$RUNTIME" = bun ]; then controller=bun; fi
+          "$controller" proofs/ordered-churn-performance.mjs .ordered-churn-baseline/dist/shared.js dist/shared.js proofs/results/ordered-churn/performance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ordered-churn-${{ matrix.runtime }}-${{ runner.arch }}-${{ matrix.suite }}
+          path: proofs/results/ordered-churn/
+          retention-days: 30
