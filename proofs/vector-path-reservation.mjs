@@ -11,7 +11,7 @@ import { BUILD_FLAGS, BASELINE_COMMIT } from './noop-sequence-source.mjs';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const output = resolve(process.argv[2] ?? '/tmp/zerocopy-vector-path-reservation-proof');
 mkdirSync(output, { recursive: true });
-const historical = 'd01bed9f12d4b846f0afe30679f55f577877f196';
+const historical = '1bf473e03803b1ca15e8e87d0100f3c62055fdcb';
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 16 * 1024 * 1024 });
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const files = ['persistent-core.as.ts', 'shared-runtime.as.ts', 'shared-hash-reader.as.ts', 'shared-text-reader.as.ts'];

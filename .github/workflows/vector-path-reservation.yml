@@ -1,0 +1,61 @@
+name: Frozen vector path reservation gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['perf/vector-path-reservation-gate-*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vector-path-reservation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    if: startsWith(github.ref, 'refs/heads/perf/vector-path-reservation-gate-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Require the first workflow attempt
+        run: test "$GITHUB_RUN_ATTEMPT" = "1"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Prepare exact baseline outside project test discovery
+        run: |
+          bun install
+          git worktree add --detach "$RUNNER_TEMP/vector-reservation-baseline" 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/vector-reservation-baseline/node_modules"
+          node -e "require('node:assert/strict').equal(process.arch, 'x64')"
+      - name: Fresh WASM, portable, and declaration builds with extracted package guards
+        run: node proofs/vector-reservation-build.mjs "$RUNNER_TEMP/vector-reservation-baseline" . "$RUNNER_TEMP/vector-reservation-results/build.json"
+      - name: Install Chromium for clean correctness prerequisites
+        run: bunx playwright install --with-deps chromium
+      - name: Require clean full suites, all types, packages, invariants, and actual workers
+        run: node proofs/vector-reservation-prerequisites.mjs "$RUNNER_TEMP/vector-reservation-baseline/dist/shared.js" dist/shared.js "$RUNNER_TEMP/vector-reservation-results/build.json" "$RUNNER_TEMP/vector-reservation-results/prerequisites.json"
+      - name: Run the fixed Node 22 x64 A/A and A/B quartets
+        run: node proofs/vector-reservation-performance.mjs "$RUNNER_TEMP/vector-reservation-baseline/dist/shared.js" dist/shared.js "$RUNNER_TEMP/vector-reservation-results/node.json" "$RUNNER_TEMP/vector-reservation-results/build.json" "$RUNNER_TEMP/vector-reservation-results/prerequisites.json"
+      - name: Run the fixed Bun 1.4.2 x64 A/A and A/B quartets
+        run: bun proofs/vector-reservation-performance.mjs "$RUNNER_TEMP/vector-reservation-baseline/dist/shared.js" dist/shared.js "$RUNNER_TEMP/vector-reservation-results/bun.json" "$RUNNER_TEMP/vector-reservation-results/build.json" "$RUNNER_TEMP/vector-reservation-results/prerequisites.json"
+      - name: Archive exact tested source
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/vector-reservation-results"
+          git archive --format=tar HEAD > "$RUNNER_TEMP/vector-reservation-results/tested-source.tar"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vector-reservation-x64-${{ github.sha }}
+          path: ${{ runner.temp }}/vector-reservation-results/
+          retention-days: 30
+          if-no-files-found: error
