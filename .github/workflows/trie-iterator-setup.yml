@@ -1,0 +1,71 @@
+name: Trie iterator setup diagnostics
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['perf/trie-iterator-setup-*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trie-iterator-setup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnostic:
+    if: startsWith(github.ref, 'refs/heads/perf/trie-iterator-setup-')
+    name: trie setup (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Prepare exact baseline and shared dependencies
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+      - name: Build matching portable bundles and check types
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          cp ./*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+      - name: Verify allocation sites, iterator invariants, and actual workers
+        run: |
+          mkdir -p proofs/results/trie-iterator
+          node --test proofs/trie-iterator-performance.node.mjs
+          bun proofs/trie-iterator-allocations.ts .proof-baseline/arena.ts > proofs/results/trie-iterator/allocations.json
+          bun --bun node_modules/vitest/vitest.mjs run trie-iterator-setup.test.ts shared-map.test.ts shared-set.test.ts map-set-path.test.ts map-set-index.test.ts map-set-utf8.test.ts hot-path.test.ts immutable-proof.test.ts performance-revision.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000
+          node proofs/trie-iterator-workers.mjs
+          node proofs/trie-iterator-workers.mjs .proof-baseline/dist/shared.js
+      - name: Node fresh-process A/A and A/B diagnostics
+        env:
+          TRIE_OUTPUT: proofs/results/trie-iterator/node.json
+        run: node proofs/trie-iterator-performance.mjs
+      - name: Bun fresh-process A/A and A/B diagnostics
+        env:
+          TRIE_OUTPUT: proofs/results/trie-iterator/bun.json
+        run: bun proofs/trie-iterator-performance.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trie-iterator-${{ runner.arch }}
+          path: proofs/results/trie-iterator/
+          retention-days: 30

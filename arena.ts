@@ -670,8 +670,11 @@ export class Arena {
   }
 
   *leaves(root: number): Generator<number> {
-    // Each iterator owns its continuation. No shared stack or scratch survives yield.
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+    // Continuation and scratch belong to this iterator, never to another reader.
+    if (!root) return;
+    const rootTag = this.dv.getUint32(root, true);
+    if (rootTag === 0) { yield root; return; }
+    if (rootTag === 0xffffffff) {
       const n = this.dv.getUint32(root + 12, true), base = this.dv.getUint32(root + 4, true);
       for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
       for (const leaf of this.leaves(base)) {
@@ -680,13 +683,14 @@ export class Arena {
       }
       return;
     }
-    const stack = root ? [root] : [];
-    // These two small work arrays belong to this iterator, not shared memory.
-    const lanes = new Uint32Array(16), patches: number[] = [];
+    const stack = [root];
+    // Canonical branches and collision buckets need no patch-resolution scratch.
+    let lanes: Uint32Array | undefined, patches: number[] | undefined;
     while (stack.length) {
       const p = stack.pop()!, dv = this.dv, tag = dv.getUint32(p, true);
       if (tag === 0) { yield p; continue; }
       if (tag & 0x80000000) {
+        lanes ??= new Uint32Array(16); patches ??= [];
         const bitmap = dv.getUint32(p + 8, true) >>> 16;
         patches.length = 0; let base = p;
         while (dv.getUint32(base, true) & 0x80000000) {
