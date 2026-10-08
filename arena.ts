@@ -741,7 +741,7 @@ export class Arena {
       for (const key of latest.keys()) {
         let n = key.length;
         for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); unicode.set(key, b); n = b.length; break; }
-        total += (16 + n + length + 7) & ~7;
+        total += (16 + n + length + 3) & ~3;
       }
       const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
       let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
@@ -751,7 +751,7 @@ export class Arena {
         for (let i = 0; i < n; i++) { const c = encoded ? encoded[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
         dv.setUint32(p, 0, true); dv.setUint32(p + 4, hash >>> 0, true); dv.setUint32(p + 8, n, true); dv.setUint32(p + 12, length, true);
         if (type === 'number') dv.setFloat64(p + 16 + n, value, true); else bytes[p + 16 + n] = value ? 1 : 0;
-        dv.setUint32(slot, p, true); slot += 4; p += (16 + n + length + 7) & ~7;
+        dv.setUint32(slot, p, true); slot += 4; p += (16 + n + length + 3) & ~3;
       }
       return this.wasm.mapBatch(root, input, latest.size) >>> 0;
     }
