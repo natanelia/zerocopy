@@ -40,22 +40,31 @@ export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
 class Compactor {
   readonly target = new Arena();
   private readonly snapshots = new Map<string, Compactable>();
-  private readonly pointers = new Map<string, number>();
-  private key(a: Arena, kind: string, p: number): string { return `${a.id}:${kind}:${p}`; }
+  private readonly pointers = new Map<string, Map<string, Map<number | string, number>>>();
+  private pointerGroup(a: Arena, kind: string): Map<number | string, number> {
+    // Arena IDs are shared by independent read-only attachments of one source.
+    // Object identity would lose sharing when those sessions are compacted together.
+    let kinds = this.pointers.get(a.id);
+    if (!kinds) this.pointers.set(a.id, kinds = new Map());
+    let pointers = kinds.get(kind);
+    if (!pointers) kinds.set(kind, pointers = new Map());
+    return pointers;
+  }
   private bytes(a: Arena, start: number, length: number): number {
     const p = this.target.alloc(length); this.target.buf.set(a.buf.subarray(start, start + length), p); return p;
   }
   private raw(a: Arena, type: string, raw: number): number {
     if (type === 'number' || type === 'boolean') return raw;
-    const key = this.key(a, type, raw), saved = this.pointers.get(key);
+    const pointers = this.pointerGroup(a, type), saved = pointers.get(raw);
     if (saved !== undefined) return saved;
     const p = parseNestedType(type)
       ? this.target.encode(type, this.snapshot(a.decode(type, raw)))
       : this.bytes(a, raw, 4 + a.dv.getUint32(raw, true));
-    this.pointers.set(key, p); return p;
+    pointers.set(raw, p); return p;
   }
-  private leaf(a: Arena, type: string, leaf: number, prefix = 0, ordinal = -1): number {
-    const key = this.key(a, `${type}/${prefix}/${ordinal}`, leaf), saved = this.pointers.get(key);
+  private leaf(a: Arena, type: string, leaf: number, pointers: Map<number | string, number>, prefix = 0, ordinal = -1): number {
+    // Ordered leaves can acquire different ordinals in different live snapshots.
+    const key = prefix ? `${leaf}/${ordinal}` : leaf, saved = pointers.get(key);
     if (saved !== undefined) return saved;
     const dv = a.dv, keyLen = dv.getUint32(leaf + 8, true), length = dv.getUint32(leaf + 12, true);
     let value: Uint8Array;
@@ -68,7 +77,7 @@ class Compactor {
     this.target.buf.set(a.buf.subarray(leaf + 16, leaf + 16 + keyLen), p + 16);
     if (prefix) this.target.dv.setUint32(p + 16 + keyLen, ordinal, true);
     this.target.buf.set(value, p + 16 + keyLen + prefix);
-    this.pointers.set(key, p); return p;
+    pointers.set(key, p); return p;
   }
   private index(leaves: number[], sorted: boolean): number {
     if (!leaves.length) return 0;
@@ -100,19 +109,19 @@ class Compactor {
   private heap(a: Arena, type: string, root: number): number {
     if (!root) return 0;
     // Explicit postorder traversal also handles a long left spine.
-    const todo: [number, boolean][] = [[root, false]];
+    const pointers = this.pointerGroup(a, `heap/${type}`), todo: [number, boolean][] = [[root, false]];
     while (todo.length) {
-      const [old, ready] = todo.pop()!, key = this.key(a, `heap/${type}`, old);
-      if (!old || this.pointers.has(key)) continue;
+      const [old, ready] = todo.pop()!;
+      if (!old || pointers.has(old)) continue;
       const left = a.dv.getUint32(old + 16, true), right = a.dv.getUint32(old + 20, true);
       if (!ready) { todo.push([old, true], [right, false], [left, false]); continue; }
       const value = this.raw(a, type, a.dv.getFloat64(old + 8, true)), p = this.bytes(a, old, 32);
       this.target.dv.setFloat64(p + 8, value, true);
-      this.target.dv.setUint32(p + 16, left ? this.pointers.get(this.key(a, `heap/${type}`, left))! : 0, true);
-      this.target.dv.setUint32(p + 20, right ? this.pointers.get(this.key(a, `heap/${type}`, right))! : 0, true);
-      this.pointers.set(key, p);
+      this.target.dv.setUint32(p + 16, left ? pointers.get(left)! : 0, true);
+      this.target.dv.setUint32(p + 20, right ? pointers.get(right)! : 0, true);
+      pointers.set(old, p);
     }
-    return this.pointers.get(this.key(a, `heap/${type}`, root))!;
+    return pointers.get(root)!;
   }
   snapshot<T extends Compactable>(source: T): T {
     if (!(source instanceof Snapshot)) throw new TypeError('Expected an immutable shared collection');
@@ -130,27 +139,30 @@ class Compactor {
     let next: any;
     if (kind === 'SharedMap' || kind === 'SharedSet' || kind === 'SharedSortedMap' || kind === 'SharedSortedSet') {
       const sorted = kind === 'SharedSortedMap' || kind === 'SharedSortedSet', leaves: number[] = [];
-      for (const leaf of sorted ? a.radixLeaves(d.root) : a.leaves(d.root)) leaves.push(this.leaf(a, type, leaf));
+      const pointers = d.root ? this.pointerGroup(a, `leaf/${type}`) : undefined;
+      for (const leaf of sorted ? a.radixLeaves(d.root) : a.leaves(d.root)) leaves.push(this.leaf(a, type, leaf, pointers!));
       next = { ...d, root: this.index(leaves, sorted), size: leaves.length };
     } else if (kind === 'SharedOrderedMap' || kind === 'SharedOrderedSet') {
       const order: number[] = [], leaves: number[] = []; let p = d.head, head = 0;
+      const pointers = p ? this.pointerGroup(a, `ordered/${type}`) : undefined;
       while (p) { order.push(a.dv.getUint32(p + 4, true)); p = a.dv.getUint32(p, true); }
       for (let i = order.length - 1; i >= 0; i--) {
         const old = order[i], n = a.dv.getUint32(old + 8, true), leaf = a.wasm.mapFind(d.root, old + 16, n, a.dv.getUint32(old + 4, true)) >>> 0;
         if (!leaf || a.dv.getUint32(leaf + 16 + n, true) !== a.dv.getUint32(old + 16 + n, true)) continue;
-        const copied = this.leaf(a, type, leaf, 4, leaves.length); leaves.push(copied); head = this.target.wasm.orderCons(head, copied) >>> 0;
+        const copied = this.leaf(a, type, leaf, pointers!, 4, leaves.length); leaves.push(copied); head = this.target.wasm.orderCons(head, copied) >>> 0;
       }
       next = { ...d, root: this.index(leaves, false), head, tail: leaves.length, size: leaves.length, orderStable: true };
     } else if (kind === 'SharedStack') {
       const nodes: number[] = []; let old = d.head, head = 0;
+      const pointers = old ? this.pointerGroup(a, `stack/${type}`) : undefined;
       while (old) {
-        const saved = this.pointers.get(this.key(a, `stack/${type}`, old));
+        const saved = pointers!.get(old);
         if (saved !== undefined) { head = saved; break; }
         nodes.push(old); old = a.dv.getUint32(old, true);
       }
       for (let i = nodes.length - 1; i >= 0; i--) {
         const old = nodes[i], value = this.raw(a, type, a.dv.getFloat64(old + 8, true));
-        head = this.target.wasm.cons(head, value) >>> 0; this.pointers.set(this.key(a, `stack/${type}`, old), head);
+        head = this.target.wasm.cons(head, value) >>> 0; pointers!.set(old, head);
       }
       next = { ...d, head };
     } else if (kind === 'SharedPriorityQueue') next = { ...d, root: this.heap(a, type, d.root) };

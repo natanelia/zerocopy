@@ -1,0 +1,79 @@
+name: Compaction pointer cache diagnostics
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_arm:
+        description: Include ARM64 after reviewing the initial x64 gate
+        type: boolean
+        default: false
+  push:
+    branches: ['perf/compaction-pointer-cache-*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compaction-pointer-cache-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnostic:
+    if: startsWith(github.ref, 'refs/heads/perf/compaction-pointer-cache-')
+    name: pointer cache (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.include_arm && '["ubuntu-latest","ubuntu-24.04-arm"]' || '["ubuntu-latest"]') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Prepare exact baseline and shared dependencies
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+      - name: Build matching portable bundles and check types
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:redux
+          bun run typecheck:values
+          bun run typecheck:geometry
+          cp ./*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+      - name: Verify exact-byte compaction, allocation sites, and actual workers
+        run: |
+          mkdir -p proofs/results/compaction-pointer
+          node --test proofs/compaction-pointer-performance.node.mjs
+          bun proofs/compaction-pointer-allocations.ts .proof-baseline/compaction.ts > proofs/results/compaction-pointer/allocations.json
+          bun --bun node_modules/vitest/vitest.mjs run compaction-pointer-cache.test.ts performance-revision.test.ts nested.test.ts shared-stack.test.ts shared-priority-queue.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000
+          node proofs/compaction-pointer-worker.mjs
+          POINTER_MODULE=.proof-baseline/dist/shared.js node proofs/compaction-pointer-worker.mjs
+      - name: Node fresh-process A/A and A/B diagnostics
+        env:
+          POINTER_OUTPUT: proofs/results/compaction-pointer/node.json
+        run: node proofs/compaction-pointer-performance.mjs
+      - name: Bun fresh-process A/A and A/B diagnostics
+        env:
+          POINTER_OUTPUT: proofs/results/compaction-pointer/bun.json
+        run: bun proofs/compaction-pointer-performance.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compaction-pointer-${{ runner.arch }}
+          path: proofs/results/compaction-pointer/
+          retention-days: 30
