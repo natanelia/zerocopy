@@ -1,4 +1,5 @@
 import { decodeUtf8 } from './utf8';
+import { freezeJSON } from './freeze-json';
 // Shared codec utilities for encoding/decoding values
 import type { ValueOf, PrimitiveType } from './types.ts';
 import { parseNestedType } from './types.ts';
@@ -24,17 +25,6 @@ function strLen(s: string): number {
   return len;
 }
 
-function freezeDecoded(value: any): any {
-  if (value === null || typeof value !== 'object') return value;
-  const todo = [value];
-  while (todo.length) {
-    const item = todo.pop();
-    for (const child of Object.values(item)) if (child !== null && typeof child === 'object') todo.push(child);
-    Object.freeze(item);
-  }
-  return value;
-}
-
 export const codecs: Record<PrimitiveType, Codec<any>> = {
   string: {
     size: (v: string) => strLen(v),
@@ -54,7 +44,7 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   object: {
     size: (v: object) => strLen(JSON.stringify(v)),
     encode: (v: object, buf: Uint8Array, ptr: number) => encoder.encodeInto(JSON.stringify(v), buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => freezeDecoded(JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)))),
+    decode: (buf: Uint8Array, ptr: number, len: number) => freezeJSON(JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)))),
   },
 };
 

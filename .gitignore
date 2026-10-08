@@ -41,3 +41,6 @@ proofs/results/text-search/
 
 # Whole-worker memory comparison outputs
 proofs/results/investigation-memory/
+
+# Reproducible JSON-read measurements from CI
+proofs/json-read-results/ci/
