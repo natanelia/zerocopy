@@ -1,0 +1,73 @@
+name: Registry attachment focused controls
+
+on:
+  push:
+    branches: [proof/registry-attachment-controls-20261008]
+    paths:
+      - 'proofs/registry-attachment-*'
+      - 'proofs/run-registry-attachment-controls.mjs'
+      - '.github/workflows/registry-attachment-controls.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      BASELINE_SHA: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+      CANDIDATE_SHA: 'ab969f043e44d53f6ba7315c2b818c1a51ce49c9'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify proof-only protocol and discovery
+        run: |
+          node --test proofs/worker-arena-source-guard.node.mjs proofs/registry-attachment-tests.node.mjs
+          git diff --exit-code "$CANDIDATE_SHA" -- '*.ts' package.json scripts/ bunfig.toml tsconfig.json
+      - name: Build exact pinned inputs with identical tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/registry-setup"
+          bun install 2>&1 | tee "$RUNNER_TEMP/registry-setup/install.log"
+          git worktree add --detach "$RUNNER_TEMP/registry-base" "$BASELINE_SHA"
+          git worktree add --detach "$RUNNER_TEMP/registry-candidate" "$CANDIDATE_SHA"
+          for role in base candidate; do
+            ln -s "$PWD/node_modules" "$RUNNER_TEMP/registry-$role/node_modules"
+            (cd "$RUNNER_TEMP/registry-$role" && bun run build:wasm && bun run build:browser) 2>&1 | tee "$RUNNER_TEMP/registry-setup/build-$role.log"
+          done
+          printf 'BUN_EXECUTABLE=%s\n' "$(command -v bun)" >> "$GITHUB_ENV"
+          node --version > "$RUNNER_TEMP/registry-setup/node-version.txt"
+          bun --revision > "$RUNNER_TEMP/registry-setup/bun-revision.txt"
+          lscpu --json > "$RUNNER_TEMP/registry-setup/lscpu.json"
+          cat /proc/cpuinfo > "$RUNNER_TEMP/registry-setup/cpuinfo.txt"
+          uname -a > "$RUNNER_TEMP/registry-setup/uname.txt"
+      - name: Execute exactly the prospective architecture-specific cases
+        run: node proofs/run-registry-attachment-controls.mjs "$RUNNER_TEMP/registry-base" "$RUNNER_TEMP/registry-candidate" '${{ matrix.arch }}' "$RUNNER_TEMP/registry-results"
+      - name: Retain complete or partial diagnostic evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-attachment-controls-${{ matrix.arch }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/registry-results/
+            ${{ runner.temp }}/registry-setup/
+          retention-days: 30
+          if-no-files-found: error
