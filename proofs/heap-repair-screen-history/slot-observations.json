@@ -1,0 +1,96 @@
+{
+  "source": "Actual fresh dist/shared.js imports, never method overlays",
+  "rows": [
+    {
+      "variant": "baseline",
+      "commit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+      "emittedMethodSha256": "136f6d8d5c4f058705a6329c6fa0238627f5432b1c5a232478ca567b72cf121f",
+      "emittedLexicalBindings": [
+        "arena",
+        "pending",
+        "node",
+        "priority",
+        "value",
+        "left",
+        "right"
+      ],
+      "emittedLexicalBindingCount": 7,
+      "node": "v22.23.3",
+      "v8": "12.4.254.21-node.57",
+      "bytecodeLength": 285,
+      "registerCount": 15,
+      "frameBytes": 120,
+      "createdBeforeFirstNext": {
+        "generatorBytes": 160,
+        "parametersAndRegistersBytes": 136
+      },
+      "firefox155": {
+        "nfixed": null,
+        "nslots": null,
+        "allocationBytes": null,
+        "status": "not measured; no Firefox browser or shell was launched"
+      }
+    },
+    {
+      "variant": "current",
+      "commit": "994c0fc3929f64df6303739c79f71d45252350d9",
+      "emittedMethodSha256": "4516996a2692262b3d6cc3970d49328f450cfaa7f8328ad7d80b71c1d868f078",
+      "emittedLexicalBindings": [
+        "arena",
+        "pending",
+        "node",
+        "view",
+        "priority",
+        "value",
+        "left",
+        "right"
+      ],
+      "emittedLexicalBindingCount": 8,
+      "node": "v22.23.3",
+      "v8": "12.4.254.21-node.57",
+      "bytecodeLength": 270,
+      "registerCount": 16,
+      "frameBytes": 128,
+      "createdBeforeFirstNext": {
+        "generatorBytes": 160,
+        "parametersAndRegistersBytes": 144
+      },
+      "firefox155": {
+        "nfixed": null,
+        "nslots": null,
+        "allocationBytes": null,
+        "status": "not measured; no Firefox browser or shell was launched"
+      }
+    },
+    {
+      "variant": "repair",
+      "commit": "4cc59aa8b0e68e61e8d53c09d356227f9e793aac",
+      "emittedMethodSha256": "b384975fa5355ad1ffc5b4fa839b5508fd7d420eabca415cf42af0167c59a597",
+      "emittedLexicalBindings": [
+        "arena",
+        "pending",
+        "node",
+        "view",
+        "priority",
+        "value",
+        "left"
+      ],
+      "emittedLexicalBindingCount": 7,
+      "node": "v22.23.3",
+      "v8": "12.4.254.21-node.57",
+      "bytecodeLength": 270,
+      "registerCount": 15,
+      "frameBytes": 120,
+      "createdBeforeFirstNext": {
+        "generatorBytes": 160,
+        "parametersAndRegistersBytes": 136
+      },
+      "firefox155": {
+        "nfixed": null,
+        "nslots": null,
+        "allocationBytes": null,
+        "status": "not measured; no Firefox browser or shell was launched"
+      }
+    }
+  ]
+}

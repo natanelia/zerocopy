@@ -1,0 +1,54 @@
+{
+  "status": "prepared-for-independent-review; full-local-correctness-gate-not-passed",
+  "runtimeCommit": "4cc59aa8b0e68e61e8d53c09d356227f9e793aac",
+  "tree": "84c0f4135f3292bebf72100588aff432abefea45",
+  "parent": "994c0fc3929f64df6303739c79f71d45252350d9",
+  "changedTrackedPaths": [
+    "shared-priority-queue.ts"
+  ],
+  "trackedWorktreeMatchesCommit": true,
+  "timingPerformed": false,
+  "browserLaunched": false,
+  "published": false,
+  "publicPREdited": false,
+  "activePlan": {
+    "cases": 3,
+    "pairwiseCells": 6,
+    "pilots": 9,
+    "correctness": 15,
+    "quartets": 48,
+    "measuredSubjects": 192,
+    "measuredBatches": 4032,
+    "totalBrowserSubjects": 216
+  },
+  "firefoxSlotsMeasured": false,
+  "fullBun": {
+    "passed": 745,
+    "failed": 13,
+    "cause": "existing 5000 ms test timeouts"
+  },
+  "fullNode22": {
+    "passed": 749,
+    "failed": 9,
+    "cause": "raw TypeScript worker extensionless module resolution"
+  },
+  "supersededProposalRetained": true,
+  "mainArtifacts": {
+    "REVIEW.md": "bd904e96a037bad60901814cbdc789c8b57714c2d403b795e7661fbafa3ccaf3",
+    "repair.patch": "a043c17dc1b235f8336ddd7f1fa4ab5cf0bb3fd5e275bbec4b14079a2a2160de",
+    "runtime-repair.bundle": "57f8ae4181802d532845eadd8e9406ebe06cfc1b412a3f0cd9a26d6f4e2bfa13",
+    "repair-source.tar": "471bbbd6a03f926c928dfc6ec3fa8a6891cca0b5d1f9559ebdb0771300ead5cd",
+    "source-build-manifest.json": "97bec8584b28da0bd8b4e10be06ebc4223bfa0e742670a047b06683a19761e6f",
+    "compiler-manifests.json": "70edba1fc1e3175b130bc7fa66175a5a4b42eb82b89ab666e8705d4c0a6d2902",
+    "local-runtime.json": "53b2ac81b07a0853156b206a8bf6ee6fe0b090cf49ef42d7c51f8c708457df47",
+    "slot-observations.json": "9d7c5822d9b98c63b2229895f1211b94520f1b9a21b0e69ccde67a490e5763c4",
+    "semantic-comparison.json": "6ded51c8ec245867040a00211653f1a6d33b96615141e22059d5537353595855",
+    "observability-node.json": "8d14d6e710d7a038741c72ed0405d2ab177c8ec2329d09b7970b9ca3e71b3c65",
+    "observability-bun.json": "ad1f76e90a2af49680bacc2cfd6537be7956954ffacea7605382cb444a51d4d9",
+    "validation.json": "ab2102c372a7aa55ab7ad55c228d6c586a91f9663a03ff3e6ceee85ef2908ce9",
+    "full-vitest-node22.json": "399cd25375209ff9c52e21c21136b656ce89cc4fdeb5efe0704263e51207ede6",
+    "built-verification.json": "9072ac2f7c59fa56bbe090721f0af1fd2b9a53437cfeb00734d67c4542cabb66",
+    "prospective-firefox-diagnostic.md": "6b7040e0c8404ee86f778bdcb569fedfd74ddc21973be4ba69294cdfc7ffc10b",
+    "prospective-plan.json": "6669dad6f00fbff21dd1e545abb2acf59225cfede5a0614d9ef191382249d766"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "receipt": {
+    "status": null,
+    "signal": "SIGKILL",
+    "error": null,
+    "timedOut": false,
+    "interrupted": "deterministic reviewer cancellation",
+    "cleanup": {
+      "status": "verified-no-live-processes",
+      "group": 13,
+      "members": [],
+      "survivors": [],
+      "timeoutMs": 1000
+    }
+  },
+  "descendantPid": 21,
+  "survivorsOutsideReportedGroup": [
+    {
+      "pid": 21,
+      "state": "R"
+    }
+  ],
+  "finding": "Supervisor reports clean while detached descendant remains live"
+}

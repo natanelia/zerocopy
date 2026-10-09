@@ -1,0 +1,57 @@
+name: Prospective heap slot repair Firefox screen
+on:
+  push:
+    branches: [proof/heap-repair-screen-20261009]
+permissions:
+  contents: read
+concurrency:
+  group: heap-repair-screen-single-attempt
+  cancel-in-progress: false
+jobs:
+  screen:
+    if: github.run_attempt == 1 && github.event.before == '7a32ef7006a34202af7cdf5dccca3e2169abfffe' && github.event.created == false && github.event.forced == false && github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      NODE_OPTIONS: ''
+      BUN_OPTIONS: ''
+      NODE_DISABLE_COMPILE_CACHE: '1'
+      NODE_COMPILE_CACHE: ''
+      # Publication requires independent review accepting the documented effect-only scope.
+      HEAP_REPAIR_EFFECT_ONLY_REVIEW: accepted
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        timeout-minutes: 5
+        with:
+          node-version: 22.23.3
+      - uses: oven-sh/setup-bun@v2
+        timeout-minutes: 5
+        with:
+          bun-version: 1.4.2
+      - name: Prepare immutable arms and pinned browser installation
+        timeout-minutes: 18
+        run: bash proofs/heap-repair-screen-setup.sh
+      - name: Verify deterministic protocol fixtures
+        timeout-minutes: 3
+        run: node --test proofs/heap-repair-screen-tests.mjs proofs/heap-repair-screen-engine-tests.mjs proofs/heap-repair-screen-cache-tests.mjs proofs/heap-repair-screen-process-tests.mjs
+      - name: Run three-arm prerequisites, Firefox semantics, and one frozen attempt
+        timeout-minutes: 123
+        run: timeout --signal=TERM --kill-after=30s 7320s node proofs/heap-repair-screen-runner.mjs run "$RUNNER_TEMP/heap-repair-baseline" "$RUNNER_TEMP/heap-repair-current" "$RUNNER_TEMP/heap-repair-repair" "$RUNNER_TEMP/heap-repair-evidence" "$GITHUB_WORKSPACE/node_modules"
+      - name: Retain partial evidence even after setup or correctness failure
+        timeout-minutes: 5
+        if: always()
+        run: node proofs/heap-portability-archive.mjs "$RUNNER_TEMP/heap-repair-evidence" "$RUNNER_TEMP/heap-repair-archive"
+      - uses: actions/upload-artifact@v4
+        timeout-minutes: 10
+        if: always()
+        with:
+          name: heap-repair-firefox-evidence-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/heap-repair-archive/
+            ${{ runner.temp }}/heap-repair-evidence/results.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,27 @@
+{
+  "decision": "hold-before-publication-or-execution",
+  "commit": "dcca77ce4cb62775c0e3822288b895be3f15a3e2",
+  "tree": "102a8542ffc53e7611fa6716ce3c6b8f41aec73f",
+  "parent": "7a32ef7006a34202af7cdf5dccca3e2169abfffe",
+  "worktreeStatus": "?? node_modules\n",
+  "reviewRuntime": "v24.19.0",
+  "deterministicTests": {
+    "pass": 40,
+    "fail": 0
+  },
+  "browserFreeDetachedCleanupProbe": "reproduced false-clean receipt; exact probe descendant killed and verified closed",
+  "blockers": [
+    "owner-scoped native detached process lifetime and cleanup",
+    "guaranteed artifact reserve outside fixed study phase budgets"
+  ],
+  "effectOnlyScope": "accepted in principle; current implementation not accepted for execution",
+  "artifactSha256": {
+    "REVIEW.md": "449ebb2bd823915a69e7e3ff57c8544858386272523f8c41bae196f9b3aadba8",
+    "detached-cleanup-result.json": "5d997ea27626ad44f823b1cf1ea6ea7bd7ee920e9ea35afedc873a2d44cfc3ae",
+    "deterministic-tests.tap": "74001e342f5ca607f0ec696aac92eb3e232ca6f443d19a0845e8f5bb1d0364c5",
+    "docs-check.log": "f0a5736874941322ab38a8d31dbc56f18bf8c2250645341794d1cb4ab9bfd358",
+    "playwright-launch-source.json": "9eed54ff8bbc9d4c5eb719ae42d25133952d33c891844adf08773b8738a260b7",
+    "probe-detached-cleanup.mjs": "7a615ea38c5b2daaa93e8fc0b9b5a7bf95a70e01de97ccddb927d52fa907514d",
+    "source-pin-verification.json": "7f2bc194b724ec30fca777806385d9d34f6661f9cd0e7d870856efef9a8c7cf7"
+  }
+}

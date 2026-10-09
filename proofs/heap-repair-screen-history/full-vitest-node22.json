@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run"
+  ],
+  "status": "failed",
+  "returncode": 1,
+  "elapsedSeconds": 30.833645820617676
+}

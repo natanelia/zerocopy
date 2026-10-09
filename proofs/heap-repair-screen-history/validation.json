@@ -1,0 +1,200 @@
+{
+  "node": "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+  "bun": "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+  "results": [
+    {
+      "name": "build-wasm",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "scripts/build-wasm.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 14.664309740066528
+    },
+    {
+      "name": "build-browser",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+        "scripts/build-browser.ts"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 0.1251239776611328
+    },
+    {
+      "name": "build-types",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 5.502633094787598
+    },
+    {
+      "name": "typecheck",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 5.54524302482605
+    },
+    {
+      "name": "typecheck-redux",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.redux.json"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 2.8952441215515137
+    },
+    {
+      "name": "typecheck-values",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 9.325916767120361
+    },
+    {
+      "name": "typecheck-values-loose",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json",
+        "--exactOptionalPropertyTypes",
+        "false"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 6.788609027862549
+    },
+    {
+      "name": "typecheck-geometry",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.geometry.json"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 1.802255392074585
+    },
+    {
+      "name": "typecheck-worker",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 3.016890287399292
+    },
+    {
+      "name": "heap-entry-node22",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "heap-entry-views.test.ts",
+        "shared-priority-queue.test.ts"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 2.1176071166992188
+    },
+    {
+      "name": "full-vitest-bun",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run"
+      ],
+      "status": "failed",
+      "returncode": 1,
+      "elapsedSeconds": 73.72930598258972
+    },
+    {
+      "name": "worker-tasks-node22",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "--test",
+        "proofs/worker-tasks.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 1.7031798362731934
+    },
+    {
+      "name": "list-query-node22",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "--test",
+        "proofs/list-query.mjs",
+        "proofs/list-query-regression.mjs",
+        "proofs/memory-startup.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 1.6806581020355225
+    },
+    {
+      "name": "node-worker",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "proofs/node-worker.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 0.42690420150756836
+    },
+    {
+      "name": "redux-node",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "proofs/redux-node.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 0.21789884567260742
+    },
+    {
+      "name": "typed-json-worker",
+      "argv": [
+        "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+        "proofs/typed-json-worker.mjs"
+      ],
+      "status": "passed",
+      "returncode": 0,
+      "elapsedSeconds": 0.5695819854736328
+    }
+  ]
+}

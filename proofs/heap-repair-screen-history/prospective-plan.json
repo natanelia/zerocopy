@@ -1,0 +1,2571 @@
+{
+  "schema": 1,
+  "status": "proposal only; not executable timing authorization",
+  "sourceArms": {
+    "baseline": {
+      "commit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+      "tree": "10a9555df506cb9d57d7a8ad71e96f8bb947acd2",
+      "entryMethodSha256": "136f6d8d5c4f058705a6329c6fa0238627f5432b1c5a232478ca567b72cf121f",
+      "containingChunk": {
+        "path": "dist/chunk-byfqjcsj.js",
+        "sha256": "0e09e9a7a14e4a5c3c4b8ee3f4e4b1d11bcc317b238b9df4ba513cddd83a5fe2"
+      }
+    },
+    "current": {
+      "commit": "994c0fc3929f64df6303739c79f71d45252350d9",
+      "tree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+      "entryMethodSha256": "4516996a2692262b3d6cc3970d49328f450cfaa7f8328ad7d80b71c1d868f078",
+      "containingChunk": {
+        "path": "dist/chunk-sh2nf7mc.js",
+        "sha256": "13fdce94f273270a2b3052216f165b0d2af7edae22d144453c8ab0f091adf8a9"
+      }
+    },
+    "repair": {
+      "commit": "4cc59aa8b0e68e61e8d53c09d356227f9e793aac",
+      "tree": "84c0f4135f3292bebf72100588aff432abefea45",
+      "entryMethodSha256": "b384975fa5355ad1ffc5b4fa839b5508fd7d420eabca415cf42af0167c59a597",
+      "containingChunk": {
+        "path": "dist/chunk-bbwazsv5.js",
+        "sha256": "4e27b54ce87dd48e0351b88d876ad4e2441c86ab1f9f29eb85c5654dba87b95d"
+      }
+    }
+  },
+  "lane": {
+    "browser": "firefox",
+    "version": "155.0",
+    "revision": "1543",
+    "playwright": "1.63.0",
+    "platform": "linux",
+    "arch": "x64",
+    "defaultFlags": true,
+    "controllerNode": "22.23.3"
+  },
+  "config": {
+    "attempt": 1,
+    "runtimes": {
+      "node": "22.23.3",
+      "bun": "1.4.2"
+    },
+    "architecture": "x64",
+    "quartets": 4,
+    "samples": 21,
+    "batchTargetMs": 40,
+    "batchFloorMs": 10,
+    "warmupTargetMs": 500,
+    "warmupFloorMs": 150,
+    "pilotWarmupLimitMs": 10000,
+    "repeatLimit": 10000000,
+    "subjectTimeoutMs": 120000,
+    "seed": 20261008,
+    "confidence": 0.95,
+    "df": 3,
+    "tCritical": 3.182446305284263,
+    "margin": 1.02,
+    "gainThreshold": 0.98
+  },
+  "limits": {
+    "controllerMs": 3600000,
+    "retries": 0,
+    "browserSubjectMs": 240000,
+    "browserLaunchMs": 30000,
+    "browserCloseMs": 30000,
+    "workerCloseMs": 30000,
+    "correctnessMs": 90000
+  },
+  "originalHelperSha256": {
+    "heap-entry-workloads.mjs": "8fb779d17f1de1fbfedf06065080d342b75bb8c4a8fe744692d5e7c3e7340f33",
+    "heap-entry-protocol.mjs": "3d99971f237839b9e4d65ebbb4bb5ed5a42bd3c8a3ad86ce3bc95d4689c230ba",
+    "heap-entry-subject.mjs": "9b2e100db4f92f68371c2856144a384da8377664158932286b3a5734dcb30645",
+    "heap-entry-worker.mjs": "e4b1c9bb8342568f31ed12689c8d93795df88d4c20f481a3fabfacccf564473e",
+    "heap-portability-semantic.mjs": "335f771f19acceba23b08a26c2aaec0d4c783cff22dd7269491e5d26c33f3372",
+    "heap-portability-lifecycle.mjs": "fa9ed147c6710ed79bcfe07c281dbe5e559abf63ed69be05b40610cd2058e4a3",
+    "heap-portability-process.mjs": "e878a4159466d3df4cecd47a9df8cfae84da939dddedd21fd2aae72c758a3ce7",
+    "heap-portability-browser.mjs": "241b026f8b1e41516367cc3d909f06bf6c41ce19f341cc2d1f0753f01f36d109",
+    "heap-portability-adapter.mjs": "e11b7040a5a86fcf184fa35f25b591aebabd75437b7d4f9100f9eb5754ff6c6e",
+    "heap-portability-browser-shims.mjs": "9186b22ffea93a5c428f6c2997972f27bb6b3b3cb2c0eebd0bd49c04bbfe96a0"
+  },
+  "commonPlanPerCase": "one shared repeat and warmup count across all three arms from exactly three retained pilots; max repeat, min ms/iteration; original bounds",
+  "correctness": [
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "empty-next",
+      "build": "baseline"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "empty-next",
+      "build": "current"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "empty-next",
+      "build": "repair"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "string-4097-min-ties",
+      "build": "baseline"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "string-4097-min-ties",
+      "build": "current"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "string-4097-min-ties",
+      "build": "repair"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "number-1057-min",
+      "build": "baseline"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "number-1057-min",
+      "build": "current"
+    },
+    {
+      "phase": "correctness",
+      "kind": "fixture",
+      "workload": "number-1057-min",
+      "build": "repair"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": false,
+      "build": "baseline"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": false,
+      "build": "current"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": false,
+      "build": "repair"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": true,
+      "build": "baseline"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": true,
+      "build": "current"
+    },
+    {
+      "phase": "correctness",
+      "kind": "worker",
+      "copy": true,
+      "build": "repair"
+    }
+  ],
+  "pilots": [
+    {
+      "phase": "pilot",
+      "workload": "empty-next",
+      "build": "baseline"
+    },
+    {
+      "phase": "pilot",
+      "workload": "empty-next",
+      "build": "current"
+    },
+    {
+      "phase": "pilot",
+      "workload": "empty-next",
+      "build": "repair"
+    },
+    {
+      "phase": "pilot",
+      "workload": "string-4097-min-ties",
+      "build": "current"
+    },
+    {
+      "phase": "pilot",
+      "workload": "string-4097-min-ties",
+      "build": "repair"
+    },
+    {
+      "phase": "pilot",
+      "workload": "string-4097-min-ties",
+      "build": "baseline"
+    },
+    {
+      "phase": "pilot",
+      "workload": "number-1057-min",
+      "build": "repair"
+    },
+    {
+      "phase": "pilot",
+      "workload": "number-1057-min",
+      "build": "baseline"
+    },
+    {
+      "phase": "pilot",
+      "workload": "number-1057-min",
+      "build": "current"
+    }
+  ],
+  "cells": [
+    {
+      "name": "empty-next/repair-baseline",
+      "workload": {
+        "name": "empty-next",
+        "size": 0,
+        "type": "number",
+        "maxHeap": false,
+        "priorities": "mixed",
+        "operation": "next",
+        "cache": "not applicable",
+        "target": false
+      },
+      "pair": {
+        "name": "repair-baseline",
+        "left": "baseline",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "empty-next/repair-current",
+      "workload": {
+        "name": "empty-next",
+        "size": 0,
+        "type": "number",
+        "maxHeap": false,
+        "priorities": "mixed",
+        "operation": "next",
+        "cache": "not applicable",
+        "target": false
+      },
+      "pair": {
+        "name": "repair-current",
+        "left": "current",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "string-4097-min-ties/repair-baseline",
+      "workload": {
+        "name": "string-4097-min-ties",
+        "size": 4097,
+        "type": "string",
+        "maxHeap": false,
+        "priorities": "ties",
+        "operation": "full",
+        "cache": "naturally saturated: at most 2048 decoded records retained",
+        "target": true
+      },
+      "pair": {
+        "name": "repair-baseline",
+        "left": "baseline",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "string-4097-min-ties/repair-current",
+      "workload": {
+        "name": "string-4097-min-ties",
+        "size": 4097,
+        "type": "string",
+        "maxHeap": false,
+        "priorities": "ties",
+        "operation": "full",
+        "cache": "naturally saturated: at most 2048 decoded records retained",
+        "target": true
+      },
+      "pair": {
+        "name": "repair-current",
+        "left": "current",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "number-1057-min/repair-baseline",
+      "workload": {
+        "name": "number-1057-min",
+        "size": 1057,
+        "type": "number",
+        "maxHeap": false,
+        "priorities": "mixed",
+        "operation": "full",
+        "cache": "not applicable",
+        "target": true
+      },
+      "pair": {
+        "name": "repair-baseline",
+        "left": "baseline",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "number-1057-min/repair-current",
+      "workload": {
+        "name": "number-1057-min",
+        "size": 1057,
+        "type": "number",
+        "maxHeap": false,
+        "priorities": "mixed",
+        "operation": "full",
+        "cache": "not applicable",
+        "target": true
+      },
+      "pair": {
+        "name": "repair-current",
+        "left": "current",
+        "right": "repair"
+      },
+      "schedule": [
+        {
+          "mode": "ab",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 0,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 1,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 1,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 2,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 2,
+          "roles": [
+            "right",
+            "left",
+            "left",
+            "right"
+          ]
+        },
+        {
+          "mode": "ab",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        },
+        {
+          "mode": "aa-baseline",
+          "block": 3,
+          "roles": [
+            "left",
+            "right",
+            "right",
+            "left"
+          ]
+        }
+      ]
+    }
+  ],
+  "measured": [
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 0,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 0,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 1,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 1,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 2,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-current",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "number-1057-min/repair-current",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "empty-next/repair-baseline",
+      "workload": "empty-next",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "number-1057-min/repair-baseline",
+      "workload": "number-1057-min",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "baseline"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-baseline",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 0,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 1,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 2,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "ab",
+      "block": 3,
+      "sequence": 3,
+      "role": "right",
+      "build": "repair"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 0,
+      "role": "left",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 1,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 2,
+      "role": "right",
+      "build": "current"
+    },
+    {
+      "cell": "string-4097-min-ties/repair-current",
+      "workload": "string-4097-min-ties",
+      "mode": "aa-baseline",
+      "block": 3,
+      "sequence": 3,
+      "role": "left",
+      "build": "current"
+    }
+  ],
+  "expected": {
+    "cases": 3,
+    "pairwiseCells": 6,
+    "pilots": 9,
+    "correctness": 15,
+    "quartets": 48,
+    "measuredSubjects": 192,
+    "measuredBatches": 4032,
+    "totalBrowserSubjects": 216
+  },
+  "timingAllowed": false,
+  "implementationAndIndependentReviewRequired": true
+}

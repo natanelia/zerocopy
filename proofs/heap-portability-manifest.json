@@ -1,0 +1,2307 @@
+{
+  "schema": 1,
+  "stage": "prospective; no timing claim",
+  "context": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+    "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+    "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+    "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+    "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+    "originalRun": "37873278465",
+    "originalArtifact": "11592629063",
+    "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+    "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+    "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+    "browserRecoveryRun": "37882888216",
+    "branch": "proof/heap-entry-portability-20261009",
+    "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+    "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+  },
+  "plans": [
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+        "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+        "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+        "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+        "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+        "originalRun": "37873278465",
+        "originalArtifact": "11592629063",
+        "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+        "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+        "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+        "browserRecoveryRun": "37882888216",
+        "branch": "proof/heap-entry-portability-20261009",
+        "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+        "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+      },
+      "lane": {
+        "name": "node-arm64",
+        "runtime": "node",
+        "arch": "arm64",
+        "browser": false,
+        "version": "22.23.3"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 240000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "workerCloseMs": 30000,
+        "correctnessMs": 90000,
+        "archiveMs": 120000,
+        "retries": 0
+      },
+      "config": {
+        "attempt": 1,
+        "runtimes": {
+          "node": "22.23.3",
+          "bun": "1.4.2"
+        },
+        "architecture": "x64",
+        "quartets": 4,
+        "samples": 21,
+        "batchTargetMs": 40,
+        "batchFloorMs": 10,
+        "warmupTargetMs": 500,
+        "warmupFloorMs": 150,
+        "pilotWarmupLimitMs": 10000,
+        "repeatLimit": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "confidence": 0.95,
+        "df": 3,
+        "tCritical": 3.182446305284263,
+        "margin": 1.02,
+        "gainThreshold": 0.98
+      },
+      "rows": [
+        {
+          "workload": {
+            "name": "empty-next",
+            "size": 0,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "next",
+            "cache": "not applicable",
+            "target": false
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "string-4097-min-ties",
+            "size": 4097,
+            "type": "string",
+            "maxHeap": false,
+            "priorities": "ties",
+            "operation": "full",
+            "cache": "naturally saturated: at most 2048 decoded records retained",
+            "target": true
+          },
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "number-1057-min",
+            "size": 1057,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "full",
+            "cache": "not applicable",
+            "target": true
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24,
+        "correctness": 10
+      },
+      "resultRule": "Retain every cell and failure. Four quartet effects define each pointwise df=3 interval. Matched AA drift invalidates AB, without adjustment. No retries or extra samples."
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+        "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+        "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+        "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+        "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+        "originalRun": "37873278465",
+        "originalArtifact": "11592629063",
+        "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+        "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+        "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+        "browserRecoveryRun": "37882888216",
+        "branch": "proof/heap-entry-portability-20261009",
+        "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+        "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+      },
+      "lane": {
+        "name": "bun-arm64",
+        "runtime": "bun",
+        "arch": "arm64",
+        "browser": false,
+        "version": "1.4.2"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 240000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "workerCloseMs": 30000,
+        "correctnessMs": 90000,
+        "archiveMs": 120000,
+        "retries": 0
+      },
+      "config": {
+        "attempt": 1,
+        "runtimes": {
+          "node": "22.23.3",
+          "bun": "1.4.2"
+        },
+        "architecture": "x64",
+        "quartets": 4,
+        "samples": 21,
+        "batchTargetMs": 40,
+        "batchFloorMs": 10,
+        "warmupTargetMs": 500,
+        "warmupFloorMs": 150,
+        "pilotWarmupLimitMs": 10000,
+        "repeatLimit": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "confidence": 0.95,
+        "df": 3,
+        "tCritical": 3.182446305284263,
+        "margin": 1.02,
+        "gainThreshold": 0.98
+      },
+      "rows": [
+        {
+          "workload": {
+            "name": "empty-next",
+            "size": 0,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "next",
+            "cache": "not applicable",
+            "target": false
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "string-4097-min-ties",
+            "size": 4097,
+            "type": "string",
+            "maxHeap": false,
+            "priorities": "ties",
+            "operation": "full",
+            "cache": "naturally saturated: at most 2048 decoded records retained",
+            "target": true
+          },
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "number-1057-min",
+            "size": 1057,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "full",
+            "cache": "not applicable",
+            "target": true
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24,
+        "correctness": 10
+      },
+      "resultRule": "Retain every cell and failure. Four quartet effects define each pointwise df=3 interval. Matched AA drift invalidates AB, without adjustment. No retries or extra samples."
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+        "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+        "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+        "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+        "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+        "originalRun": "37873278465",
+        "originalArtifact": "11592629063",
+        "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+        "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+        "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+        "browserRecoveryRun": "37882888216",
+        "branch": "proof/heap-entry-portability-20261009",
+        "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+        "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+      },
+      "lane": {
+        "name": "chromium-x64",
+        "runtime": "chromium",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 240000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "workerCloseMs": 30000,
+        "correctnessMs": 90000,
+        "archiveMs": 120000,
+        "retries": 0
+      },
+      "config": {
+        "attempt": 1,
+        "runtimes": {
+          "node": "22.23.3",
+          "bun": "1.4.2"
+        },
+        "architecture": "x64",
+        "quartets": 4,
+        "samples": 21,
+        "batchTargetMs": 40,
+        "batchFloorMs": 10,
+        "warmupTargetMs": 500,
+        "warmupFloorMs": 150,
+        "pilotWarmupLimitMs": 10000,
+        "repeatLimit": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "confidence": 0.95,
+        "df": 3,
+        "tCritical": 3.182446305284263,
+        "margin": 1.02,
+        "gainThreshold": 0.98
+      },
+      "rows": [
+        {
+          "workload": {
+            "name": "empty-next",
+            "size": 0,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "next",
+            "cache": "not applicable",
+            "target": false
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "string-4097-min-ties",
+            "size": 4097,
+            "type": "string",
+            "maxHeap": false,
+            "priorities": "ties",
+            "operation": "full",
+            "cache": "naturally saturated: at most 2048 decoded records retained",
+            "target": true
+          },
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "number-1057-min",
+            "size": 1057,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "full",
+            "cache": "not applicable",
+            "target": true
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24,
+        "correctness": 10
+      },
+      "resultRule": "Retain every cell and failure. Four quartet effects define each pointwise df=3 interval. Matched AA drift invalidates AB, without adjustment. No retries or extra samples."
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+        "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+        "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+        "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+        "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+        "originalRun": "37873278465",
+        "originalArtifact": "11592629063",
+        "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+        "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+        "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+        "browserRecoveryRun": "37882888216",
+        "branch": "proof/heap-entry-portability-20261009",
+        "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+        "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+      },
+      "lane": {
+        "name": "firefox-x64",
+        "runtime": "firefox",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 240000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "workerCloseMs": 30000,
+        "correctnessMs": 90000,
+        "archiveMs": 120000,
+        "retries": 0
+      },
+      "config": {
+        "attempt": 1,
+        "runtimes": {
+          "node": "22.23.3",
+          "bun": "1.4.2"
+        },
+        "architecture": "x64",
+        "quartets": 4,
+        "samples": 21,
+        "batchTargetMs": 40,
+        "batchFloorMs": 10,
+        "warmupTargetMs": 500,
+        "warmupFloorMs": 150,
+        "pilotWarmupLimitMs": 10000,
+        "repeatLimit": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "confidence": 0.95,
+        "df": 3,
+        "tCritical": 3.182446305284263,
+        "margin": 1.02,
+        "gainThreshold": 0.98
+      },
+      "rows": [
+        {
+          "workload": {
+            "name": "empty-next",
+            "size": 0,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "next",
+            "cache": "not applicable",
+            "target": false
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "string-4097-min-ties",
+            "size": 4097,
+            "type": "string",
+            "maxHeap": false,
+            "priorities": "ties",
+            "operation": "full",
+            "cache": "naturally saturated: at most 2048 decoded records retained",
+            "target": true
+          },
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "number-1057-min",
+            "size": 1057,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "full",
+            "cache": "not applicable",
+            "target": true
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24,
+        "correctness": 10
+      },
+      "resultRule": "Retain every cell and failure. Four quartet effects define each pointwise df=3 interval. Matched AA drift invalidates AB, without adjustment. No retries or extra samples."
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "994c0fc3929f64df6303739c79f71d45252350d9",
+        "candidateTree": "7eac99fc07b61f7731ec68cede2a2e878432f46e",
+        "runtimeEquivalent": "4dea268e4c64acac832bb310efc83de597b27abc",
+        "originalProof": "cdcbab425fb6b3ff2f648f9d222e965dc5682783",
+        "originalProofTree": "3ed54c7f4d873b5a033b0950ddee867f8a382df0",
+        "originalRun": "37873278465",
+        "originalArtifact": "11592629063",
+        "correctedBrowserTransport": "7fe90c039ef6fdfa3f1bac85655df7b9979ab63c",
+        "correctedBrowserTransportTree": "b3fa6631efbec2f926b153ca69ff837262622285",
+        "publishedBrowserRecovery": "8b8e6d78ee444ce07b1ee59a652106e0221c7a69",
+        "browserRecoveryRun": "37882888216",
+        "branch": "proof/heap-entry-portability-20261009",
+        "priorOutcome": "hold-invalid-cells: Node empty-full, Node empty-next and Bun empty-next remain inconclusive; Node nested-65-first-close remains invalid due to baseline-AA drift. All 14 original large full-consumption cells showed valid gains.",
+        "scope": "Three selected cases on five new lanes; diagnostic only. No universal speedup, full-screen clearance, resolution of original controls, or automatic publication."
+      },
+      "lane": {
+        "name": "webkit-x64",
+        "runtime": "webkit",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 240000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "workerCloseMs": 30000,
+        "correctnessMs": 90000,
+        "archiveMs": 120000,
+        "retries": 0
+      },
+      "config": {
+        "attempt": 1,
+        "runtimes": {
+          "node": "22.23.3",
+          "bun": "1.4.2"
+        },
+        "architecture": "x64",
+        "quartets": 4,
+        "samples": 21,
+        "batchTargetMs": 40,
+        "batchFloorMs": 10,
+        "warmupTargetMs": 500,
+        "warmupFloorMs": 150,
+        "pilotWarmupLimitMs": 10000,
+        "repeatLimit": 10000000,
+        "subjectTimeoutMs": 120000,
+        "seed": 20261008,
+        "confidence": 0.95,
+        "df": 3,
+        "tCritical": 3.182446305284263,
+        "margin": 1.02,
+        "gainThreshold": 0.98
+      },
+      "rows": [
+        {
+          "workload": {
+            "name": "empty-next",
+            "size": 0,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "next",
+            "cache": "not applicable",
+            "target": false
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "string-4097-min-ties",
+            "size": 4097,
+            "type": "string",
+            "maxHeap": false,
+            "priorities": "ties",
+            "operation": "full",
+            "cache": "naturally saturated: at most 2048 decoded records retained",
+            "target": true
+          },
+          "pilotOrder": [
+            "candidate",
+            "baseline"
+          ],
+          "schedule": [
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        },
+        {
+          "workload": {
+            "name": "number-1057-min",
+            "size": 1057,
+            "type": "number",
+            "maxHeap": false,
+            "priorities": "mixed",
+            "operation": "full",
+            "cache": "not applicable",
+            "target": true
+          },
+          "pilotOrder": [
+            "baseline",
+            "candidate"
+          ],
+          "schedule": [
+            {
+              "mode": "ab",
+              "block": 0,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 0,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 1,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 2,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            },
+            {
+              "mode": "ab",
+              "block": 3,
+              "roles": [
+                "right",
+                "left",
+                "left",
+                "right"
+              ]
+            },
+            {
+              "mode": "aa-baseline",
+              "block": 3,
+              "roles": [
+                "left",
+                "right",
+                "right",
+                "left"
+              ]
+            }
+          ]
+        }
+      ],
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "number-1057-min"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "string-4097-min-ties"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "empty-next"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-heap-semantics"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copied-heap-semantics"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24,
+        "correctness": 10
+      },
+      "resultRule": "Retain every cell and failure. Four quartet effects define each pointwise df=3 interval. Matched AA drift invalidates AB, without adjustment. No retries or extra samples."
+    }
+  ],
+  "files": {
+    ".github/workflows/heap-portability.yml": "eeff423c8ada0c6ac19d53f3856dfebcf3b4af2856584544053dc6d0e2611cde",
+    "proofs/heap-portability.md": "8c2df75bd7355df6ab0f14a0ed31c1b9a8c042552a366b0a56e2064592cf7cb7",
+    "proofs/heap-portability-pins.json": "3726e85d23638a2216992912eb0201d1bfafdb3072eb7f21b4b0fb8cdbe9f3ac",
+    "proofs/heap-portability-protocol.mjs": "4dcff3ca7ef6c10c93913336db13ddbad225c5bb25c3c63c64d6afe14ffa888f",
+    "proofs/heap-portability-plan.mjs": "2aad2ed82c0a689839025b49bd2554c62e291c7ea77b45d0aa05a6bb82fb35a8",
+    "proofs/heap-portability-source.mjs": "17126e1badc95b67462676d584a32080c2b613e089ea39b8aa3b74fd4413d97a",
+    "proofs/heap-portability-adapter.mjs": "e11b7040a5a86fcf184fa35f25b591aebabd75437b7d4f9100f9eb5754ff6c6e",
+    "proofs/heap-portability-browser-shims.mjs": "9186b22ffea93a5c428f6c2997972f27bb6b3b3cb2c0eebd0bd49c04bbfe96a0",
+    "proofs/heap-portability-browser.mjs": "241b026f8b1e41516367cc3d909f06bf6c41ce19f341cc2d1f0753f01f36d109",
+    "proofs/heap-portability-lifecycle.mjs": "fa9ed147c6710ed79bcfe07c281dbe5e559abf63ed69be05b40610cd2058e4a3",
+    "proofs/heap-portability-process.mjs": "e878a4159466d3df4cecd47a9df8cfae84da939dddedd21fd2aae72c758a3ce7",
+    "proofs/heap-portability-runner.mjs": "2203961c47e29e3871dfd9bc6c6bb7b250f606248dbaaab3b6e952ea8143c88c",
+    "proofs/heap-portability-node.mjs": "546ec826f9699e84f4187d0d837a85c9acd1cb6492a73b734f13e9862b55112b",
+    "proofs/heap-portability-semantic.mjs": "335f771f19acceba23b08a26c2aaec0d4c783cff22dd7269491e5d26c33f3372",
+    "proofs/heap-portability-archive.mjs": "271ccccd85bcb8765ed88329818a415ca17e7a9ea618b7536906d56a89c3ed5b",
+    "proofs/heap-portability-tests.mjs": "3371cb35743018c532d41c1dfc2b7ffcaa0aae9cc2ce6b7a6ebaa4185e7bedc2",
+    "proofs/heap-entry-workloads.mjs": "8fb779d17f1de1fbfedf06065080d342b75bb8c4a8fe744692d5e7c3e7340f33",
+    "proofs/heap-entry-subject.mjs": "9b2e100db4f92f68371c2856144a384da8377664158932286b3a5734dcb30645",
+    "proofs/heap-entry-protocol.mjs": "3d99971f237839b9e4d65ebbb4bb5ed5a42bd3c8a3ad86ce3bc95d4689c230ba",
+    "proofs/heap-entry-worker.mjs": "e4b1c9bb8342568f31ed12689c8d93795df88d4c20f481a3fabfacccf564473e"
+  },
+  "browserAdapters": {
+    "workload": {
+      "originalSha256": "8fb779d17f1de1fbfedf06065080d342b75bb8c4a8fe744692d5e7c3e7340f33",
+      "sourceSha256": "4d491e360a3b79685c27f06dfb39b2e89e3834ba47f03b5d00f76e94b0823f91",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from './shims.mjs';"
+        ],
+        [
+          "import { createHash } from 'node:crypto';",
+          "import { createHash } from './shims.mjs';"
+        ]
+      ]
+    },
+    "protocol": {
+      "originalSha256": "3d99971f237839b9e4d65ebbb4bb5ed5a42bd3c8a3ad86ce3bc95d4689c230ba",
+      "sourceSha256": "de235c1b3f8a028875d7f4273df64fcb7db1f5d5fa46dfa90e76a31d875a1a4d",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from './shims.mjs';"
+        ]
+      ]
+    },
+    "subject": {
+      "originalSha256": "9b2e100db4f92f68371c2856144a384da8377664158932286b3a5734dcb30645",
+      "sourceSha256": "b1f9d4a171616342950f59e3a955424aa0ac72cedcac8f1d7e89839a31e5e053",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from './shims.mjs';"
+        ],
+        [
+          "from './heap-entry-protocol.mjs'",
+          "from './protocol.mjs'"
+        ],
+        [
+          "from './heap-entry-workloads.mjs'",
+          "from './workloads.mjs'"
+        ],
+        [
+          "  assert.equal(process.arch, CONFIG.architecture);",
+          "  assert.equal(globalThis.crossOriginIsolated, true);\n  assert.equal(request.authorization, 'frozen-ci-subject');"
+        ],
+        [
+          "  const runtime = process.versions.bun ? 'bun' : 'node';",
+          "  const runtime = 'browser';"
+        ],
+        [
+          "  assert.equal(runtime === 'bun' ? process.versions.bun : process.versions.node, CONFIG.runtimes[runtime]);",
+          "  assert.equal(request.entryUrl, location.origin + '/subject/dist/shared.js');"
+        ],
+        [
+          "export async function subject(request) {",
+          "async function kernelSubject(request) {"
+        ],
+        [
+          "    while (result.scans < requiredScans",
+          "    request.progress.warmup = result;\n    while (result.scans < requiredScans"
+        ],
+        [
+          "    let capped = false, minMsPerIteration = null;",
+          "    request.progress.calibration = calibration;\n    let capped = false, minMsPerIteration = null;"
+        ],
+        [
+          "  const samples = Array.from({ length: CONFIG.samples }, () => timed(request.repeat));",
+          "  const samples = []; request.progress.samples = samples;\n  for (let index = 0; index < CONFIG.samples; index++) samples.push(timed(request.repeat));"
+        ],
+        [
+          "    let capped = false, minMsPerIteration = null;",
+          "    const positivePrewarm = warmup.batches.findLast(batch => Number.isFinite(batch.ms) && batch.ms > 0);\n    assert(positivePrewarm, 'No positive recorded prewarm batch');\n    repeat = positivePrewarm.repeat;\n    request.progress.calibrationStart = { source: 'last-positive-recorded-prewarm', repeat };\n    let capped = false, minMsPerIteration = null;"
+        ]
+      ],
+      "preservedTimedKernelSha256": "c56bedcff9dd59a395a40e16eb56eec133b91fadb8b2f8268628560d44a5b5f5"
+    },
+    "parent": {
+      "originalSha256": "335f771f19acceba23b08a26c2aaec0d4c783cff22dd7269491e5d26c33f3372",
+      "sourceSha256": "14ddf6e6bcc71fda4682de533805fc418f48ce067885244c9c236e532d59b274",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from './shims.mjs';"
+        ],
+        [
+          "import { createHash } from 'node:crypto';",
+          "import { createHash, Buffer } from './shims.mjs';"
+        ],
+        [
+          "import { Worker } from 'node:worker_threads';",
+          "import { Worker } from './shims.mjs';"
+        ],
+        [
+          "new URL('./heap-entry-worker.mjs', import.meta.url)",
+          "new URL('/proofs/heap-entry-worker.mjs', location.origin)"
+        ]
+      ]
+    },
+    "worker": {
+      "sourceSha256": "660ee06ed4fe21c55e649bf533ed1de2246415da03c97851b488c7428ea1ee1e",
+      "originalSha256": "e4b1c9bb8342568f31ed12689c8d93795df88d4c20f481a3fabfacccf564473e",
+      "preservedWorkerBodySha256": "54538952d28cdf149042900db8b8ebf266061750df0876bb0e578d981844f759"
+    },
+    "fixture": {
+      "sourceSha256": "81197cae1153a128064d78837b51dba488f486817a8258bf60aebc5f946f1d7f"
+    },
+    "shims": {
+      "sourceSha256": "c497b366799eaae07bc93292b20cc39c9d53fe1852602cb6c29453ec20c93fd0",
+      "originalSha256": "9186b22ffea93a5c428f6c2997972f27bb6b3b3cb2c0eebd0bd49c04bbfe96a0"
+    }
+  },
+  "nodeAdapters": {
+    "subject": {
+      "originalSha256": "9b2e100db4f92f68371c2856144a384da8377664158932286b3a5734dcb30645",
+      "sourceSha256": "355d43963f0af3c6d30353748c4fc4c8292cde8928aa3e203bfe0022fa9af35a",
+      "edits": [
+        [
+          "  assert.equal(process.arch, CONFIG.architecture);",
+          "  assert.equal(process.arch, 'arm64');"
+        ],
+        [
+          "export async function subject(request) {",
+          "async function kernelSubject(request) {"
+        ],
+        [
+          "    while (result.scans < requiredScans",
+          "    request.progress.warmup = result;\n    while (result.scans < requiredScans"
+        ],
+        [
+          "    let capped = false, minMsPerIteration = null;",
+          "    request.progress.calibration = calibration;\n    let capped = false, minMsPerIteration = null;"
+        ],
+        [
+          "  const samples = Array.from({ length: CONFIG.samples }, () => timed(request.repeat));",
+          "  const samples = []; request.progress.samples = samples;\n  for (let index = 0; index < CONFIG.samples; index++) samples.push(timed(request.repeat));"
+        ]
+      ],
+      "preservedTimedKernelSha256": "c56bedcff9dd59a395a40e16eb56eec133b91fadb8b2f8268628560d44a5b5f5"
+    }
+  },
+  "expectedTotal": {
+    "lanes": 5,
+    "cells": 15,
+    "correctness": 50,
+    "actualWorkers": 20,
+    "workerRows": 100,
+    "pilots": 30,
+    "measuredSubjects": 480,
+    "measuredBatches": 10080,
+    "quartets": 120
+  },
+  "publication": "Local preparation only. No timing, push, or dispatch before review of this exact tree."
+}
