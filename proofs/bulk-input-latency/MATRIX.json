@@ -1,0 +1,224 @@
+{
+  "status": "source-only prospective design; awaiting final review; no timing implementation or measurement",
+  "baseline": "52d5fb012eb1f568e11807b7cb2a66c4566589e2",
+  "runtimeCandidate": "dc7ed0a5ee0aca2f54d1da34e4c3fbeef7938468",
+  "gateLocalCommit": "7701bfbe39455cee321285781e5dcb8bbca7ab99",
+  "gateTransportCommit": "18819a29da0436d2e7449072428a8eb601261a2e",
+  "warmups": 20,
+  "measuredSamples": 10,
+  "children": 80,
+  "measuredBlockSamples": 800,
+  "warmupBlockSamples": 1600,
+  "childLimitSeconds": 60,
+  "overallLimitSeconds": 2700,
+  "maximumObservedWasmBackingBytes": 134217728,
+  "requiresExclusiveMeasurementWindow": true,
+  "retries": 0,
+  "cells": [
+    {
+      "id": "updates-string-5",
+      "regime": "long-lived-updates",
+      "type": "string",
+      "count": 5,
+      "callsPerSample": 64,
+      "seedCount": 64,
+      "updatePhases": 3,
+      "control": false,
+      "index": 0,
+      "role": "affected-secondary",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "updates-object-5",
+      "regime": "long-lived-updates",
+      "type": "object",
+      "count": 5,
+      "callsPerSample": 64,
+      "seedCount": 64,
+      "updatePhases": 3,
+      "control": false,
+      "index": 1,
+      "role": "affected-secondary",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "updates-string-12288",
+      "regime": "long-lived-updates",
+      "type": "string",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 12288,
+      "updatePhases": 3,
+      "control": false,
+      "index": 2,
+      "role": "primary",
+      "abPairs": {
+        "node": 6,
+        "bun": 4
+      }
+    },
+    {
+      "id": "updates-object-12288",
+      "regime": "long-lived-updates",
+      "type": "object",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 12288,
+      "updatePhases": 3,
+      "control": false,
+      "index": 3,
+      "role": "primary",
+      "abPairs": {
+        "node": 6,
+        "bun": 4
+      }
+    },
+    {
+      "id": "updates-string-12289",
+      "regime": "long-lived-updates",
+      "type": "string",
+      "count": 12289,
+      "callsPerSample": 1,
+      "seedCount": 12289,
+      "updatePhases": 3,
+      "control": true,
+      "index": 4,
+      "role": "control",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "updates-object-12289",
+      "regime": "long-lived-updates",
+      "type": "object",
+      "count": 12289,
+      "callsPerSample": 1,
+      "seedCount": 12289,
+      "updatePhases": 3,
+      "control": true,
+      "index": 5,
+      "role": "control",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "fresh-string-12288",
+      "regime": "fresh-creation",
+      "type": "string",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 0,
+      "updatePhases": 3,
+      "control": false,
+      "index": 6,
+      "role": "affected-secondary",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "fresh-object-12288",
+      "regime": "fresh-creation",
+      "type": "object",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 0,
+      "updatePhases": 3,
+      "control": false,
+      "index": 7,
+      "role": "affected-secondary",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "updates-number-12288",
+      "regime": "long-lived-updates",
+      "type": "number",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 12288,
+      "updatePhases": 3,
+      "control": true,
+      "index": 8,
+      "role": "control",
+      "abPairs": {
+        "node": 2
+      }
+    },
+    {
+      "id": "updates-boolean-12288",
+      "regime": "long-lived-updates",
+      "type": "boolean",
+      "count": 12288,
+      "callsPerSample": 1,
+      "seedCount": 12288,
+      "updatePhases": 2,
+      "control": true,
+      "index": 9,
+      "role": "control",
+      "abPairs": {
+        "node": 2
+      }
+    }
+  ],
+  "gateTransportTree": "6a7772ae89607f88a874a3d4449d2630f955cc6d",
+  "gateRun": 37990109064,
+  "gateAttempt": 1,
+  "gateArtifact": {
+    "id": 11644597826,
+    "bytes": 2063613,
+    "sha256": "8aa0a338543bea260ce2b5d96286b4b215c56fb19a62f7a9a7f3d8bed74d1416"
+  },
+  "gateAuditSha256": "a537608078cc77d10e94ebb2c2ba7d7bdbf4a35c9cd1882dd66fb7324eab53d1",
+  "runtimes": {
+    "node": "22.23.3",
+    "bun": "1.4.2"
+  },
+  "abChildren": 72,
+  "aaChildren": 8,
+  "supervisor": {
+    "path": "${SCREEN_DIR}/supervise.py",
+    "sha256": "14ca60deec3dab98ffea94fb6006ea9b03167813d79a65b844e91e55a0478de0",
+    "seconds": 60,
+    "rssMiB": 1024,
+    "rssScope": "process-group safety metadata only; excluded from performance/memory conclusions"
+  },
+  "analysis": {
+    "unit": "independent process pair; process statistic is median of ten serial measured blocks",
+    "primaryInterval": "exp(mean(log(candidate/baseline median ratios)) +/- t(.975,n-1)*sampleSD/sqrt(n))",
+    "primaryN": {
+      "node": 6,
+      "bun": 4
+    },
+    "t975": {
+      "node": 2.570581835636314,
+      "bun": 3.182446305284263
+    },
+    "materialRegressionRatio": 1.02,
+    "aaAbsLogGuardRatio": 1.02,
+    "trajectoryGuardRatio": 1.02,
+    "trajectorySameDirectionPairCount": {
+      "node": 4,
+      "bun": 3
+    },
+    "shortMedianBlockMs": 0.1,
+    "controlGuard": "both ratios >1.02 or both ratios <1/1.02",
+    "affectedSecondaryGuard": "both ratios >1.02",
+    "classificationPriority": [
+      "invalid-or-incomplete",
+      "supported-material-loss",
+      "inconclusive",
+      "strong-primary-margin-pass"
+    ],
+    "disclosure": "All ratios/flags; supported sub-2% primary slowdowns; every control with both ratios >1; secondary uncertainty remains limited/unresolved.",
+    "positiveOutcomeScope": "Only the four prespecified primary cells under the small-sample model; eight secondary/control cells retain two-pair uncertainty. No general regression clearance.",
+    "decisionLayer": "Statistical labels do not publish, merge or authorize a latency-for-memory tradeoff. Supported material loss blocks promotion. Inconclusive does not itself require rerun or forbid a transparently scoped memory PR review."
+  }
+}
