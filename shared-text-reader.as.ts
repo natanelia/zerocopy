@@ -34,12 +34,24 @@ export function textContains16(raw: u32, size: u32, q0: u32, q1: u32, q2: u32, q
   let pointer = start, seen: u64 = 0;
   if (length >= size) {
     const limit = end - size + 1;
+    let last: u64 = 0, lastFold: u64 = 0;
+    if (size > 1 && pointer + 8 <= limit) {
+      const shift = ((size - 1) & 7) * 8;
+      last = (((size > 8 ? hi : lo) >> shift) & 255) * ONES;
+      lastFold = (((size > 8 ? maskHi : maskLo) >> shift) & 255) * ONES;
+    }
     for (; pointer + 8 <= limit; pointer += 8) {
       const word = load<u64>(pointer); seen |= word;
       const different = (word | fold) ^ first;
       // Borrow may also mark a neighboring byte, but cannot lose a candidate.
       // Each marked start is verified against the complete query words below.
       let positions = (different - ONES) & ~different & HIGH;
+      if (size > 1 && (positions & (positions - 1)) != 0) {
+        // Filter only multiple candidates to amortize the extra word test.
+        // The loop bound proves pointer + size - 1 + 8 <= end.
+        const tail = (load<u64>(pointer + size - 1) | lastFold) ^ last;
+        positions &= (tail - ONES) & ~tail & HIGH;
+      }
       while (positions) {
         const offset = <u32>(ctz<u64>(positions) >> 3);
         if (matchesAt(pointer + offset, end, size, lo, hi, maskLo, maskHi, keepLo, keepHi)) return 1;
