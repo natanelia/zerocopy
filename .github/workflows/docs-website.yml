@@ -12,7 +12,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: docs-site-${{ github.ref }}
+  # A merged PR's closed event also uses refs/heads/main. Keep its cleanup
+  # separate from production and from a reopened PR's preview build.
+  group: docs-site-${{ github.event_name == 'pull_request' && 'pr' || 'production' }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}-${{ github.event.action == 'closed' && 'cleanup' || 'build' }}
   cancel-in-progress: true
 
 jobs:
