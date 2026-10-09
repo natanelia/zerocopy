@@ -1,0 +1,54 @@
+# Prepared only: one new-branch push, attempt 1. No dispatch, matrix or timing stage.
+name: Block reuse correctness diagnostic attempt 1
+on:
+  push:
+    branches: ['proof/block-correctness-diagnostic-20261009']
+    paths:
+      - '.github/workflows/block-correctness-diagnostic.yml'
+      - 'proofs/block-correctness*'
+permissions:
+  contents: read
+concurrency:
+  group: block-correctness-diagnostic-attempt1
+  cancel-in-progress: false
+jobs:
+  correctness:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/proof/block-correctness-diagnostic-20261009' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Run the frozen correctness-only diagnostic once
+        timeout-minutes: 50
+        run: node proofs/block-correctness-diagnostic.mjs run "$RUNNER_TEMP/block-correctness-diagnostic-evidence"
+      - name: Preserve all available evidence, including failed and partial commands
+        if: always()
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/block-correctness-diagnostic-evidence/workflow"
+          cp .github/workflows/block-correctness-diagnostic.yml "$RUNNER_TEMP/block-correctness-diagnostic-evidence/workflow/"
+          git status --short > "$RUNNER_TEMP/block-correctness-diagnostic-evidence/workflow/git-status.txt"
+          git log -1 --format=fuller > "$RUNNER_TEMP/block-correctness-diagnostic-evidence/workflow/commit.txt"
+          node proofs/block-correctness-diagnostic.mjs seal-partial "$RUNNER_TEMP/block-correctness-diagnostic-evidence"
+          tar -czf "$RUNNER_TEMP/block-correctness-diagnostic-attempt1.tar.gz" -C "$RUNNER_TEMP" block-correctness-diagnostic-evidence
+          cd "$RUNNER_TEMP"
+          sha256sum block-correctness-diagnostic-attempt1.tar.gz > block-correctness-diagnostic-attempt1.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-correctness-diagnostic-attempt1-x64
+          path: |
+            ${{ runner.temp }}/block-correctness-diagnostic-attempt1.tar.gz
+            ${{ runner.temp }}/block-correctness-diagnostic-attempt1.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
