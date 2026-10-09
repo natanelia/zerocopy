@@ -1,0 +1,58 @@
+{
+  "bulk-number-4": {
+    "inputDigest": "1b4eb2b9bc5eb198afb968aa9448aec83054eb49097edd884c25bf3ad7a3db58",
+    "expectedDigest": "36fd6b2414ed2eadae92d0fd410be9622d1e8c27d42d888d02f1d6015fcdbab3",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4,
+    "seed": 0,
+    "resultSize": 4
+  },
+  "bulk-number-5": {
+    "inputDigest": "7b058cc29426bc613dc96328f53a767ab79cc82132bf716eeaf9bf7cd53c9aec",
+    "expectedDigest": "ce470b50497ffd7e9203d46457d2c290736f83447949c4a1f9f52e23970eec27",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 5,
+    "seed": 0,
+    "resultSize": 5
+  },
+  "bulk-number-4096": {
+    "inputDigest": "6ba85a73fe8d7bec337b12072981adf084ed3fe7c6f96c9403626fbfac417d8e",
+    "expectedDigest": "3173c7f91eb21d4f4f6a54af80dcb2420eeb04bb82b46971fe31b495a58af1aa",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4096,
+    "seed": 0,
+    "resultSize": 4096
+  },
+  "bulk-number-4096-half-replace": {
+    "inputDigest": "eecd074a0c59318257afa4b0bacc01df1734fd6dd84cbcef9b6ac900a79acb6a",
+    "expectedDigest": "663b4f94107e1c218aa6d815295a33b18a7ed5a98a925b86b22884ba47db810d",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4096,
+    "seed": 4096,
+    "resultSize": 6144
+  },
+  "bulk-string-4096-mixed": {
+    "inputDigest": "fc0b75df9f6a7dd2b9ed16773e73102363eae2916b5a48e5d3ae0d134f76a797",
+    "expectedDigest": "71bf3dbd05c5f8bee3c6e81d22f12e86a9a54b11dcf5cbf83810e61eff50ce70",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4096,
+    "seed": 0,
+    "resultSize": 4096
+  },
+  "compact-map-number-4096": {
+    "inputDigest": "f9f6220964fefcdb36149fcc318190755509e9ef668fa74727c70f04ba75be68",
+    "expectedDigest": "3173c7f91eb21d4f4f6a54af80dcb2420eeb04bb82b46971fe31b495a58af1aa",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4096,
+    "seed": 4096,
+    "resultSize": 4096
+  },
+  "compact-sorted-number-4096": {
+    "inputDigest": "f9f6220964fefcdb36149fcc318190755509e9ef668fa74727c70f04ba75be68",
+    "expectedDigest": "3173c7f91eb21d4f4f6a54af80dcb2420eeb04bb82b46971fe31b495a58af1aa",
+    "independentOracle": "Python fixed inputs and UTF-8 JSON digest; integral quarter values serialized as integers",
+    "entries": 4096,
+    "seed": 4096,
+    "resultSize": 4096
+  }
+}

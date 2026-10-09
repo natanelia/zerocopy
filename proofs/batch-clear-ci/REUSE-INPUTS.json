@@ -1,0 +1,65 @@
+{
+  "commit": "2fb514fa98703ffc06d55dd63646e22e809a0b59",
+  "tree": "b54c0c602f5a3629f7e0ae008999b18d89a262c9",
+  "files": [
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/controller.py",
+      "gitBlob": "dd7ad815f84300f35d1f79780d7bede67fb13d7a",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "bytes": 17534
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/math.mjs",
+      "gitBlob": "4c405762f3706e5947bea7be3ab44d006143b580",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "bytes": 2387
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/ci.py",
+      "gitBlob": "eee3e64e0fc8cfadb788863ed9664d5aaa8be450",
+      "sha256": "ad7d90250d2b3774c171fd9bd400575084f2d19a86e37f53e8b3af7c3655169a",
+      "bytes": 24593
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/ci.test.py",
+      "gitBlob": "16331c70754cd8df455a9c04bcbcafd2b31a60c3",
+      "sha256": "a00f54e402dfb8f79879966979af9e4c1696025f6e243fcb4e41ef3adbd9f884",
+      "bytes": 14652
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/controller.test.py",
+      "gitBlob": "752043d8c75210fca5bee5519e62ec78d8d51bb3",
+      "sha256": "0142f85a21ec667f078e674d627ac512d31e9ac9a2f9d45530a5c27016dff1bd",
+      "bytes": 11442
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/report.mjs",
+      "gitBlob": "35b37bf1fad062217379fabdaf91e256b6f9ca43",
+      "sha256": "708496cde68e0bccbc88d7b1f0a3389f2ab80bd402d6c9119812abba6c0fe61b",
+      "bytes": 5527
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/ci-report.test.mjs",
+      "gitBlob": "d132aa322cfd5078ac88c68307ae739f1d8506f6",
+      "sha256": "3bc017882a7ff6bb82e78d08299c7e212fde881714e07a1069c1c10c023ac3bf",
+      "bytes": 2851
+    },
+    {
+      "upstreamPath": "proofs/sorted-delete-ci/dependencies.bun.lock",
+      "gitBlob": "0b3c2b27290217a42ed14d6767f170a633b2df94",
+      "sha256": "3e2462a27f26395f52e20e1f958b227277d4e40c54c33ff64e06075c8fad99f3",
+      "bytes": 25987
+    }
+  ],
+  "copyControllerAndMathByteIdentically": true,
+  "adaptationRequired": [
+    "batch source chain",
+    "batch expectedWasm/coreAliases",
+    "seven-case public subject/fixtures",
+    "official full-WAT single-operand proof",
+    "untimed semantic comparison",
+    "workload-specific synthetic tests",
+    "batch ref/path labels"
+  ],
+  "noUpstreamFilesExecuted": true
+}

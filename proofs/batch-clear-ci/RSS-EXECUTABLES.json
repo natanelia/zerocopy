@@ -1,0 +1,18 @@
+{
+  "node": {
+    "path": "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+    "resolved": "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/node/bin/node",
+    "sha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+    "version": "v22.23.3",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "bun": {
+    "path": "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+    "resolved": "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/bun/bin/bun.exe",
+    "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+    "version": "1.4.2",
+    "platform": "linux",
+    "arch": "x64"
+  }
+}

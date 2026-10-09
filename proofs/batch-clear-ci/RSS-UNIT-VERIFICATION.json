@@ -1,0 +1,43 @@
+[
+  {
+    "command": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/.bin/node",
+      "--input-type=module",
+      "-e",
+      "import {readFileSync} from 'node:fs'; const r=process.resourceUsage(); const status=readFileSync('/proc/self/status','utf8'); const high=Number(status.match(/^VmHWM:\\s+(\\d+) kB$/m)[1]); console.log(JSON.stringify({version:typeof Bun==='undefined'?process.version:Bun.version,runtime:typeof Bun==='undefined'?'node':'bun',platform:process.platform,arch:process.arch,maxRSS:r.maxRSS,procVmHwmKiB:high,exactKiBMatch:r.maxRSS===high,bytesHypothesisRatio:r.maxRSS/high,operationClocks:false,candidateImported:false}));"
+    ],
+    "exit": 0,
+    "result": {
+      "version": "v22.23.3",
+      "runtime": "node",
+      "platform": "linux",
+      "arch": "x64",
+      "maxRSS": 53672,
+      "procVmHwmKiB": 54348,
+      "exactKiBMatch": false,
+      "bytesHypothesisRatio": 0.9875616398027526,
+      "operationClocks": false,
+      "candidateImported": false
+    }
+  },
+  {
+    "command": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+      "-e",
+      "import {readFileSync} from 'node:fs'; const r=process.resourceUsage(); const status=readFileSync('/proc/self/status','utf8'); const high=Number(status.match(/^VmHWM:\\s+(\\d+) kB$/m)[1]); console.log(JSON.stringify({version:typeof Bun==='undefined'?process.version:Bun.version,runtime:typeof Bun==='undefined'?'node':'bun',platform:process.platform,arch:process.arch,maxRSS:r.maxRSS,procVmHwmKiB:high,exactKiBMatch:r.maxRSS===high,bytesHypothesisRatio:r.maxRSS/high,operationClocks:false,candidateImported:false}));"
+    ],
+    "exit": 0,
+    "result": {
+      "version": "1.4.2",
+      "runtime": "bun",
+      "platform": "linux",
+      "arch": "x64",
+      "maxRSS": 14212,
+      "procVmHwmKiB": 15024,
+      "exactKiBMatch": false,
+      "bytesHypothesisRatio": 0.9459531416400426,
+      "operationClocks": false,
+      "candidateImported": false
+    }
+  }
+]

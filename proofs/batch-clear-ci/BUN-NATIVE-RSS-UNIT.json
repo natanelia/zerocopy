@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+    "-e",
+    "import {dlopen,ptr} from 'bun:ffi'; import assert from 'node:assert/strict'; const libc=dlopen('libc.so.6',{getrusage:{args:['i32','ptr'],returns:'i32'}}); const storage=new Uint8Array(256); const read=()=>{assert.equal(libc.symbols.getrusage(0,ptr(storage)),0);return Number(new DataView(storage.buffer).getBigInt64(32,true));}; const first=read(); const value=process.resourceUsage().maxRSS; const last=read(); assert(first<=value && value<=last); console.log(JSON.stringify({runtime:'bun',version:Bun.version,platform:process.platform,arch:process.arch,nativeLinuxRuMaxrssBefore:first,nodeCompatibleMaxRSS:value,nativeLinuxRuMaxrssAfter:last,unit:'KiB',bytesPerUnit:1024,verifiedNativeScale:true,operationClocks:false,candidateImported:false}));libc.close();"
+  ],
+  "exit": 0,
+  "result": {
+    "runtime": "bun",
+    "version": "1.4.2",
+    "platform": "linux",
+    "arch": "x64",
+    "nativeLinuxRuMaxrssBefore": 15708,
+    "nodeCompatibleMaxRSS": 16024,
+    "nativeLinuxRuMaxrssAfter": 16208,
+    "unit": "KiB",
+    "bytesPerUnit": 1024,
+    "verifiedNativeScale": true,
+    "operationClocks": false,
+    "candidateImported": false
+  }
+}

@@ -1,0 +1,9 @@
+# Preparation status, 2026-10-09
+
+This source packet is prepared for independent source/protocol review before its first untimed runtime subjects. It is disabled. No candidate package has been loaded by a preparation subject, no diagnostic observer build or fresh source build has run, no broad correctness suite has been retried, and no operation clock or external write has run.
+
+Pure validation passes: 81 protocol/statistical checks, 128 fixture/public-loop accounting checks, 19 synthetic WAT/untimed-prerequisite checks and 225 synthetic report checks under both pinned Node 22.23.3 and Bun 1.4.2; 18 controller tests; 29 adapter tests including semantic-receipt tampering and late-failure rejection; seven independent Python input-oracle cases. Initial narrower synthetic checks are retained separately. None of these counts denotes library-runtime fixtures or measured performance samples.
+
+Baseline remains `2e88bc4a53871476da9ca1ec4e6c374b61512436`; test-bearing candidate remains `48b9334788794a561f131c6619e5280748f32b08`. They are not silently repinned. During preparation the coordinator reported that main advanced to `f4fad3a850cb544ff9440d263eeec464a31dd123`. The new main's exact diff is being verified separately. This packet preserves its reviewed source identity; integration/repinning must be deliberate and reviewed before any eventual publication or fresh gates. No docs-only equivalence is assumed here.
+
+The original ad2/2ee42fd full-suite failures remain baseline four and candidate sixteen timeouts. They are not superseded by preparation. Source/runtime safety and the 75% smaller requested fill range are separate from correctness admission and end-to-end speed. The original evidence packet remains unchanged, including every failure and stated coverage limit. No physical-memory improvement is claimed.

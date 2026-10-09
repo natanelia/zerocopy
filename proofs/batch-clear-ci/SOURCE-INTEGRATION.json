@@ -1,0 +1,23 @@
+{
+  "previousBaseline": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+  "newBaseline": "f4fad3a850cb544ff9440d263eeec464a31dd123",
+  "previousCandidate": "48b9334788794a561f131c6619e5280748f32b08",
+  "newCandidate": "028a5b4f315e84ff9bc4ba59a48d582f7b2e27b0",
+  "sourceTree": "c2eb5558e7c79236b3dbc86b2cb03758ca24b70e",
+  "baselineTree": "b5cf2c9362b09d442056cd9edce944446bba8c6c",
+  "soleNewMainParent": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+  "completeMainChangedFiles": [
+    "README.md",
+    "website/README.md",
+    "website/build.mjs",
+    "website/config.mjs",
+    "website/templates.mjs",
+    "website/tests/browser.mjs",
+    "website/tests/seo.test.mjs"
+  ],
+  "candidateRelativeChangeExactlyMatchesMain": true,
+  "runtimeAndRegressionBytesUnchanged": true,
+  "originalProof": "42f844055770827efbbf92c19858705a4fe1f043",
+  "previousSourceHistoryPreserved": true,
+  "newMainDiffSha256": "8054177ab75f1fa2d2ba69d1cd51a232eee6f6f0a8158807094070b3c8dccc03"
+}
