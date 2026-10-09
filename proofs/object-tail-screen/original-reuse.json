@@ -1,0 +1,7 @@
+{
+  "cached-object-read-protocol.mjs": "bb803430fd9d0bbdde20416c097ac7e7185da0fee67d865452f5fb2190cd997a",
+  "cached-object-read-subject.mjs": "43d19e5b31585c1e13621f2493773f7a0decbe408953ed767d176a7bb7b31490",
+  "cached-object-read-workloads.mjs": "126bc3dcac0330f999b7d9188cf3d691d4eccf289591f5b9bb3487e76d576b12",
+  "cached-object-read-protocol.node.mjs": "f295f63fe27269a78bb1fc034ea8f4acf3caa0037b5ae917dead786b9d8b6e66",
+  "origin": "https://github.com/natanelia/zerocopy/actions/runs/37878061121"
+}

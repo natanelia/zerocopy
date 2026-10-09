@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "measure": false,
+  "reviewedHarnessSha256": "",
+  "reviewedAdapterSha256": "",
+  "validatedCheckCommit": "",
+  "validatedCheckRun": 0,
+  "validatedArtifactId": 0,
+  "validatedArtifactZipSha256": "",
+  "validatedManifestSha256": ""
+}

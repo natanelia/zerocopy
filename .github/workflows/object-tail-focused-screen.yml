@@ -1,0 +1,68 @@
+name: Object tail focused Bun diagnostic
+
+on:
+  push:
+    branches: [perf/object-read-simplified-tail-20261009]
+    paths:
+      - 'proofs/object-tail-screen/**'
+      - 'proofs/object-tail-ci/**'
+      - '.github/workflows/object-tail-focused-screen.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: object-tail-focused-bun-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  focused-screen:
+    if: github.run_attempt == 1 && (github.event_name != 'push' || github.event.forced == false)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Resolve and verify prospective CI intent
+        id: intent
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: python3 proofs/object-tail-ci/ci.py intent "$RUNNER_TEMP/object-tail-focused-ci"
+      - name: Build and validate pinned sources
+        run: python3 proofs/object-tail-ci/ci.py prepare "$RUNNER_TEMP/object-tail-focused-ci"
+      - name: Run one bounded focused campaign
+        if: steps.intent.outputs.measure == 'true'
+        run: python3 proofs/object-tail-ci/ci.py measure "$RUNNER_TEMP/object-tail-focused-ci"
+      - name: Retain complete and partial evidence
+        if: always()
+        run: python3 proofs/object-tail-ci/ci.py retain "$RUNNER_TEMP/object-tail-focused-ci"
+      - name: Upload check reference
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: object-tail-check-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/object-tail-focused-ci/check-reference/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: object-tail-evidence-${{ github.sha }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/object-tail-focused-ci.tar.gz
+            ${{ runner.temp }}/object-tail-focused-ci.tar.gz.sha256
+          retention-days: 30
+          if-no-files-found: error
