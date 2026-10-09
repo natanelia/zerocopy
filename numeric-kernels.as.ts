@@ -5,13 +5,21 @@ function spanCount(p: u32, count: u32, lo: f64, hi: f64): u32 {
   if (ASC_FEATURE_SIMD) {
     const lower = f64x2.splat(lo), upper = f64x2.splat(hi);
     let sums = i64x2.splat(0);
+    let secondSums = i64x2.splat(0);
     // A snapshot can expose an odd tail beside a writer's unpublished bytes.
     // Load only complete pairs inside the snapshot's visible span.
+    while (count - i >= 4) {
+      const first = v128.load(p + i * 8), second = v128.load(p + i * 8 + 16);
+      sums = i64x2.sub(sums, v128.and(f64x2.ge(first, lower), f64x2.le(first, upper)));
+      secondSums = i64x2.sub(secondSums, v128.and(f64x2.ge(second, lower), f64x2.le(second, upper)));
+      i += 4;
+    }
     while (count - i >= 2) {
       const values = v128.load(p + i * 8);
       sums = i64x2.sub(sums, v128.and(f64x2.ge(values, lower), f64x2.le(values, upper)));
       i += 2;
     }
+    sums = i64x2.add(sums, secondSums);
     total = <u32>i64x2.extract_lane(sums, 0) + <u32>i64x2.extract_lane(sums, 1);
   }
   for (; i < count; i++) {
