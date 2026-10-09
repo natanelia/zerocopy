@@ -4,6 +4,7 @@ import {readFileSync,writeSync,mkdtempSync,readdirSync,rmSync} from 'node:fs';
 import os from 'node:os';
 import childProcess from 'node:child_process';
 import {guardEngineSpawn} from './launch-guard.mjs';
+import {createOwnershipJournal} from './engine-ownership.mjs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import path from 'node:path';
@@ -29,7 +30,8 @@ const server=createServer((request,response)=>{
 let context,browser;
 const executable=playwright[config.runtime].executablePath(),profile=mkdtempSync(path.join(os.tmpdir(),'numeric-proof-profile-'));
 assert.deepEqual(readdirSync(profile),[]);
-const launchGuard=guardEngineSpawn(childProcess,{executable,profile,onSpawn:(child,args,attempt)=>emit({kind:'browser-process',pid:child.pid,spawnargs:child.spawnargs,executable,profile,profileInitiallyEmpty:true,profileMechanism:config.runtime==='firefox'?'explicit -profile argument':'explicit --user-data-dir argument',spawnAttempt:attempt})});
+const ownership=createOwnershipJournal({journalPath:config.ownershipJournal,binding:config.ownershipBinding});
+const launchGuard=guardEngineSpawn(childProcess,{executable,profile,ownership,onSpawn:(child,args,attempt,birth)=>emit({kind:'browser-process',...birth,spawnargs:child.spawnargs,executable,profile,profileInitiallyEmpty:true,profileMechanism:config.runtime==='firefox'?'explicit -profile argument':'explicit --user-data-dir argument',spawnAttempt:attempt,ownershipJournal:config.ownershipJournal})});
 try{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port;
   // Explicit fresh persistent profile also covers WebKit; one-spawn guard rejects Playwright's internal retry.
@@ -44,7 +46,9 @@ try{
     if(config.mode==='semantics'){const {semantics}=await import('/browser-semantics.mjs');await semantics(io);}else{const {runCore}=await import('/core.mjs');await runCore(config,io);}
   },config);
   assert.deepEqual(errors,[]);emit({kind:'browser-complete',version:browser.version(),origin,requests,resourceTimings:config.mode==='measure'?await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>({name:x.name,startTime:x.startTime,duration:x.duration,transferSize:x.transferSize,encodedBodySize:x.encodedBodySize}))):null,localHttpOnly:true,globallyColdCompilerOrOsCache:false});
-  await context.close();context=null;
+  await context.close();context=null;launchGuard.seal();
 }finally{
-  try{if(context)await context.close();}finally{launchGuard.restore();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));if(!launchGuard.state.child||launchGuard.state.child.exitCode!==null||launchGuard.state.child.signalCode!==null)rmSync(profile,{recursive:true,force:true});}
+  // Leave the one-spawn guard installed through adapter exit. Any unsuccessful
+  // path leaves an unsealed journal, so the controller cannot claim quiescence.
+  try{if(context)await context.close();}finally{ownership.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));if(!launchGuard.state.child||launchGuard.state.child.exitCode!==null||launchGuard.state.child.signalCode!==null)rmSync(profile,{recursive:true,force:true});}
 }

@@ -1,6 +1,8 @@
 """Bounded lane runner; imports and --help run no library subjects or operation clocks."""
 import argparse, hashlib, json, os, pathlib, signal, subprocess, sys, time
 import controller as inherited
+import evidence
+import resource_ownership as resources
 HERE=pathlib.Path(__file__).resolve().parent
 def sha(path):
     digest=hashlib.sha256()
@@ -13,158 +15,130 @@ read=inherited.read
 write=inherited.write_new
 update=inherited.update
 
-def slots(protocol,lane,phase):
-    environments=protocol['environmentOrders'][lane][0]
-    warm=protocol['warmRuntimes'][lane]
-    if phase in ('untimed','semantics'):
-        return [{'id':f'{runtime}-{phase}-{arm}','runtime':runtime,'arm':arm,'warm':runtime in warm,'mode':phase} for runtime in environments if phase!='semantics' or runtime in ('chromium','firefox','webkit') for arm in ('baseline','candidate')]
-    result=[{'id':f'{runtime}-calibration-{arm}','runtime':runtime,'arm':arm,'warm':True,'mode':'calibrate'} for runtime in environments if runtime in warm for arm in ('baseline','candidate')]
-    for block in range(4):
-        for runtime in protocol['environmentOrders'][lane][block]:
-            seen={'baseline':0,'candidate':0}
-            for position,arm in enumerate(protocol['orders'][block]):
-                result.append({'id':f'{runtime}-b{block}-{position}-{arm}','runtime':runtime,'arm':arm,'warm':runtime in warm,'mode':'measure','block':block,'position':position,'replicate':seen[arm]})
-                seen[arm]+=1
-    return result
+def write_spawn_intent(path,record):
+    """Persist uncertainty before Popen can create an unreturned child."""
+    with pathlib.Path(path).open('x') as output:
+        json.dump(record,output,indent=2);output.write('\n');output.flush();os.fsync(output.fileno())
+    directory=os.open(str(pathlib.Path(path).parent),os.O_RDONLY|os.O_DIRECTORY)
+    try:os.fsync(directory)
+    finally:os.close(directory)
 
-def proc(pid):
-    try:
-        text=pathlib.Path(f'/proc/{pid}/stat').read_text();parts=text[text.rfind(')')+2:].split()
-        return {'pid':int(pid),'state':parts[0],'ppid':int(parts[1]),'group':int(parts[2]),'session':int(parts[3]),'startTicks':int(parts[19])}
-    except (OSError,ValueError,IndexError):return None
-
-def census(root,known):
-    table={int(p.name):value for p in pathlib.Path('/proc').iterdir() if p.name.isdigit() and (value:=proc(p.name))}
-    parents={root}|{pid for pid,entry in known.items() if pid in table and table[pid]['startTicks']==entry['startTicks']}
-    while True:
-        found={pid for pid,value in table.items() if value['ppid'] in parents or pid==root}
-        if found<=parents:break
-        parents|=found
-    for pid in parents:
-        if pid in table:known[pid]=table[pid]
-    alive=[value for pid,value in known.items() if pid in table and table[pid]['startTicks']==value['startTicks'] and table[pid]['state']!='Z']
-    return alive,sum(inherited.rss(value['pid']) for value in alive)
-
-def cleanup(child,known,grace):
-    census(child.pid,known);groups={child.pid}|{v['group'] for v in known.values() if v['group']==v['pid']}
-    # Only process-group leaders observed in the owned descendant tree are included.
-    for group in groups:
-        try:os.killpg(group,signal.SIGTERM)
-        except ProcessLookupError:pass
-    deadline=time.monotonic()+grace
-    while time.monotonic()<deadline:
-        child.poll();alive,_=census(child.pid,known)
-        if not alive:break
-        time.sleep(0.02)
-    alive,_=census(child.pid,known)
-    for group in groups:
-        try:os.killpg(group,signal.SIGKILL)
-        except ProcessLookupError:pass
-    for value in alive:
-        current=proc(value['pid'])
-        if current and current['startTicks']==value['startTicks']:
-            try:os.kill(value['pid'],signal.SIGKILL)
-            except ProcessLookupError:pass
-    try:child.wait(timeout=max(0.001,deadline-time.monotonic()))
-    except subprocess.TimeoutExpired:pass
-    # A final census accounts for surviving members even after a leader exits.
-    final=[]
-    for p in pathlib.Path('/proc').iterdir():
-        if p.name.isdigit() and (value:=proc(p.name)) and value['state']!='Z' and (value['group'] in groups or (value['pid'] in known and value['startTicks']==known[value['pid']]['startTicks'])):final.append(value)
-    return {'pid':child.pid,'group':child.pid,'ownedGroups':sorted(groups),'ownedProcessIdentities':list(known.values()),'returncode':child.poll(),'ownedGroupGone':not final,'survivors':final,'scope':'observed descendant identities plus all surviving members of their owned process groups'}
+def slots(protocol,lane,phase):return evidence.schedule(lane,phase,protocol)
+# Strict adapter helpers replace the permissive inherited RSS/ancestry helpers.
+proc=resources.proc
+census=resources.census
+cleanup=resources.cleanup
 
 def parse_rows(path):
-    lines=path.read_text().splitlines();rows=[json.loads(line) for line in lines]
-    ordinal=[r['ordinal'] for r in rows if 'ordinal' in r]
-    assert ordinal==list(range(len(ordinal))),'Missing/duplicate/reordered core row'
-    assert not any(r['kind'] in ('server-error',) for r in rows)
-    return rows
+    def unique(pairs):
+        result={}
+        for key,value in pairs:
+            if key in result:raise evidence.InvalidEvidence('Duplicate JSON key '+key)
+            result[key]=value
+        return result
+    return [json.loads(line,object_pairs_hook=unique,parse_constant=lambda value:(_ for _ in ()).throw(evidence.InvalidEvidence('Nonfinite JSON '+value))) for line in pathlib.Path(path).read_text().splitlines()]
 
-def validate_rows(rows,slot,p):
-    assert rows
-    if slot['mode']=='semantics':
-        assert len([r for r in rows if r['kind']=='semantics-complete'])==1
-        workers=[r for r in rows if r['kind']=='worker-semantic']
-        assert {(r['copy'],r['mode']) for r in workers}=={(copy,mode) for copy in (False,True) for mode in ('auto','scalar')}
-        return
-    assert len([r for r in rows if r['kind']=='complete'])==1
-    starts=[r for r in rows if r['kind']=='start'];assert len(starts)==1 and starts[0]['mode']==slot['mode']
-    startup=[r for r in rows if r['kind']=='startup']
-    if slot['mode']=='measure':
-        assert [r['metric'] for r in startup]==p['startup']['metrics']
-        assert all(isinstance(r['durationMs'],(float,int)) and r['durationMs']>0 for r in startup)
-        assert startup[2]['durationMs']==startup[0]['durationMs']+startup[1]['durationMs']
-        assert len([r for r in rows if r['kind']=='startup-validation'])==1
-    else:assert not startup
-    if slot['mode']=='untimed':assert len([r for r in rows if r['kind']=='selection' and r['automatic']=='SIMD' and r['scalar']=='forced scalar' and r['validateRestored']])==1
-    expected=p['cases'] if slot['warm'] else []
-    assert [r['case'] for r in rows if r['kind']=='case-start']==[c['id'] for c in expected]
-    assert [r['case'] for r in rows if r['kind']=='case-complete']==[c['id'] for c in expected]
-    chunks=[r for r in rows if r['kind']=='chunk'];validations=[r for r in rows if r['kind']=='chunk-validation']
-    assert [r['chunk'] for r in chunks]==list(range(len(chunks)))==[r['chunk'] for r in validations]
-    for row,validation in zip(chunks,validations):
-        assert row['case']==validation['case'] and row['before']==validation['after']
-        q=row['queryCounts'];n=row['operations'];assert row['checksum']==(n//4)*sum(q)+sum(q[:n%4]) and row['lastResult']==q[(n-1)%4]
-        if slot['mode']=='untimed':assert row['durationMs'] is None and row['nsPerOperation'] is None
-        else:assert row['durationMs']>0 and row['nsPerOperation']==row['durationMs']*1e6/n
-    for spec in expected:
-        rows_for_case=[r for r in chunks if r['case']==spec['id']]
-        count={'untimed':2,'calibrate':p['calibration']['warmupChunks']+len(spec['ladder'])*p['calibration']['samplesPerLevel'],'measure':p['measurement']['warmupChunks']+p['measurement']['samples']}[slot['mode']]
-        assert len(rows_for_case)==count
-        if slot['mode']=='untimed':assert [r['operations'] for r in rows_for_case]==[spec['ladder'][0],spec['ladder'][-1]]
-    return
+def validate_rows(rows,slot,p,config=None,work=None,identity=None):
+    assert config is not None, 'Exact bound subject config required'
+    return evidence.validate_raw(rows,slot,config,p,work,identity)
 
 def calibration_work(out,runtime,p):
-    per_arm={arm:parse_rows(out/f'{runtime}-calibration-{arm}.stdout.jsonl') for arm in ('baseline','candidate')};work={}
-    for spec in p['cases']:
-        by_arm={}
-        for arm,rows in per_arm.items():
-            by_arm[arm]={count:sorted(r['durationMs'] for r in rows if r['kind']=='chunk' and r['case']==spec['id'] and r['phase']=='calibration' and r['operations']==count) for count in spec['ladder']}
-            assert all(len(values)==3 for values in by_arm[arm].values())
-        chosen=next((count for count in spec['ladder'] if all(by_arm[arm][count][1]>=p['calibration']['targetChunkMs'] for arm in by_arm)),None)
-        work[spec['id']]={'operations':chosen or spec['ladder'][-1],'targetMet':chosen is not None,'calibrationWarmupFlag':any(r['insufficientWarmup'] for rows in per_arm.values() for r in rows if r['kind']=='calibration-diagnostics' and r['case']==spec['id']),'calibration':by_arm}
-    return work
+    validated={}
+    for arm in ('baseline','candidate'):
+        identifier=f'{runtime}-calibration-{arm}'
+        config=read(out/(identifier+'.config.json'));record=read(out/(identifier+'.receipt.json'))
+        assert record['status']=='complete' and record['cleanup']['ownedGroupGone'] is True
+        assert record['configSha256']==sha(out/(identifier+'.config.json'))
+        assert record['stdoutSha256']==sha(out/(identifier+'.stdout.jsonl'))
+        assert record['processSha256']==sha(out/(identifier+'.process.json'))
+        assert record['cleanupSha256']==sha(out/(identifier+'.cleanup.json'))
+        slot={'id':identifier,'runtime':runtime,'arm':arm,'warm':True,'mode':'calibrate'}
+        validated[arm]=evidence.validate_raw(parse_rows(out/(identifier+'.stdout.jsonl')),slot,config,p)
+    return evidence.derive_work(validated,p)
 
 def launch(manifest,p,out,slot,lane,deadline,manifest_path):
     inherited.verify(manifest)
+    is_browser=slot['runtime'] in ('chromium','firefox','webkit')
     config={**slot,'lane':lane,'protocol':p,'manifestPath':str(manifest_path),'manifestSha256':sha(manifest_path),'dist':str(pathlib.Path(manifest['sources'][slot['arm']]['path'])/'dist'),'admitted':True}
     if slot['mode']=='measure' and slot['warm']:config['work']=calibration_work(out,slot['runtime'],p)
+    ownership=None
+    if is_browser:
+        config['ownershipJournal']=str(out/(slot['id']+'.ownership.jsonl'))
+        config['ownershipBinding']={'slotId':slot['id'],'manifestSha256':config['manifestSha256'],'runtime':slot['runtime'],'lane':lane,'arm':slot['arm'],'mode':slot['mode']}
+        ownership=resources.Ownership(config['ownershipJournal'],config['ownershipBinding'])
     config_path=out/(slot['id']+'.config.json');write(config_path,config)
-    is_browser=slot['runtime'] in ('chromium','firefox','webkit');runtime=manifest['runtimes']['node' if is_browser else slot['runtime']]
+    runtime=manifest['runtimes']['node' if is_browser else slot['runtime']]
     command=[runtime['path'],*runtime['args'],str(HERE/('browser-subject.mjs' if is_browser else 'node-subject.mjs')),str(config_path)]
     budget=p['budgets']['calibrationProcessWallSeconds' if slot['mode']=='calibrate' else 'measurementProcessWallSeconds' if slot['mode']=='measure' else 'untimedProcessWallSeconds']
-    limit=min(deadline,time.monotonic()+budget);record={**slot,'command':command,'status':'started','maximumTreeRssBytes':0,'controllerMaximumRssBytes':0,'hostBefore':inherited.host(),'manifestSha256':config['manifestSha256']}
-    output=out/(slot['id']+'.stdout.jsonl');error=out/(slot['id']+'.stderr.log');child=None;known={};failure=None
+    limit=min(deadline,time.monotonic()+budget)
+    record={**slot,'command':command,'status':'started','spawnAttempted':False,'maximumTreeRssBytes':0,'controllerMaximumRssBytes':0,'hostBefore':inherited.host(),'manifestSha256':config['manifestSha256'],'configSha256':sha(config_path),'resourceAccounting':{'status':'incomplete','strictRss':True,'sampledNotPeak':True,'rssSampleCount':0}}
+    output=out/(slot['id']+'.stdout.jsonl');error=out/(slot['id']+'.stderr.log');process_path=out/(slot['id']+'.process.json');cleanup_path=out/(slot['id']+'.cleanup.json');child=None;known={};failure=None;scope=None
     try:
         with output.open('xb') as stdout,error.open('xb') as stderr:
-            child=subprocess.Popen(command,cwd=manifest['sources'][slot['arm']]['path'],stdout=stdout,stderr=stderr,start_new_session=True,env={**os.environ,'LANG':'C.UTF-8','TZ':'UTC','NO_COLOR':'1'})
-            write(out/(slot['id']+'.process.json'),{'pid':child.pid,'group':child.pid,'command':command,'status':'spawned'})
+            scope=resources.begin_scope()
+            write_spawn_intent(process_path,{'pid':None,'group':None,'command':command,'status':'spawn-intent','controller':scope.controller})
+            record['spawnAttempted']=True
+            child=subprocess.Popen(command,cwd=manifest['sources'][slot['arm']]['path'],stdout=stdout,stderr=stderr,start_new_session=True,env={**os.environ,'LANG':'C.UTF-8','TZ':'UTC','NO_COLOR':'1','PYTHONDONTWRITEBYTECODE':'1'})
+            update(process_path,{'pid':child.pid,'group':child.pid,'command':command,'status':'birth-unconfirmed'})
+            birth=resources.capture_root(child.pid,known)
+            update(process_path,{'pid':child.pid,'group':child.pid,'command':command,'status':'spawned','identity':birth})
             while child.poll() is None:
-                alive,rss=census(child.pid,known);record['maximumTreeRssBytes']=max(record['maximumTreeRssBytes'],rss);record['controllerMaximumRssBytes']=max(record['controllerMaximumRssBytes'],inherited.rss(os.getpid()))
+                alive,rss=resources.census(child.pid,known,ownership=ownership,scope=scope)
+                if not alive or rss==0:
+                    if child.poll() is not None:break
+                    raise resources.ResourceAccountingError('Live owner accounting cannot be established', {'pid':child.pid,'alive':alive,'rssBytes':rss})
+                controller_rss=resources.rss_for_pid(os.getpid())
+                assert controller_rss>0, 'Positive known controller accounting required'
+                record['resourceAccounting']['rssSampleCount']+=1
+                record['maximumTreeRssBytes']=max(record['maximumTreeRssBytes'],rss);record['controllerMaximumRssBytes']=max(record['controllerMaximumRssBytes'],controller_rss)
                 assert rss<=p['memory']['maximumBrowserTreeRssBytes' if is_browser else 'maximumSubjectRssBytes'],'Subject process-tree RSS budget'
-                assert record['controllerMaximumRssBytes']<=p['memory']['maximumControllerRssBytes'],'Controller RSS budget'
+                assert controller_rss<=p['memory']['maximumControllerRssBytes'],'Controller RSS budget'
                 assert output.stat().st_size+error.stat().st_size<=p['memory']['maximumOutputBytes'],'Output budget'
                 assert time.monotonic()<limit,'Subject/whole-controller wall budget'
                 time.sleep(p['memory']['rssPollMs']/1000)
             assert child.returncode==0,f'Subject exited {child.returncode}'
             assert time.monotonic()<=limit,'Subject wall budget at exit'
-        record['status']='complete'
-    except BaseException as exc:failure=exc;record.update(status='failed',error=repr(exc))
+            assert record['resourceAccounting']['rssSampleCount']>0, 'No valid resource observations'
+        record['resourceAccounting']['status']='complete';record['status']='complete'
+    except BaseException as exc:
+        failure=exc;record.update(status='failed',error=repr(exc))
+        if isinstance(exc,resources.ResourceAccountingError):record['resourceAccountingError']=exc.evidence
     finally:
+        receipt=None
         if child is not None:
-            receipt=cleanup(child,known,p['budgets']['terminationGraceSeconds']);write(out/(slot['id']+'.cleanup.json'),receipt);record['cleanup']=receipt
-            if not receipt['ownedGroupGone']:failure=RuntimeError('Owned process remains; stable evidence unknown');record.update(status='failed',fatalOwnedProcess=True)
+            try:
+                receipt=resources.cleanup(child,known,p['budgets']['terminationGraceSeconds'],ownership=ownership,scope=scope)
+            except BaseException as exc:
+                receipt={'pid':child.pid,'ownedGroupGone':False,'quiescence':'unknown','error':repr(exc)}
+        else:
+            # Even a failed Popen constructor can have forked before a signal.
+            # A null local child is not a no-process proof.
+            receipt={'pid':None,'group':None,'ownedGroupGone':False,'quiescence':'unknown',
+                     'problems':['No captured child/terminal kernel ownership proof; spawn outcome is unverified'],
+                     'spawnAttempted':record['spawnAttempted']}
+        if receipt is not None:
+            record['cleanup']=receipt
+            if not receipt['ownedGroupGone'] or receipt.get('quiescence')!='verified':
+                failure=failure or RuntimeError('Owned resource quiescence unknown or survivor remains');record.update(status='failed',fatalOwnedProcess=True)
+            try:write(cleanup_path,receipt)
+            except BaseException as exc:
+                failure=failure or exc;record.update(status='failed',fatalOwnedProcess=True,cleanupReceiptError=repr(exc))
         if not record.get('fatalOwnedProcess'):
-            record['stdoutSha256']=sha(output) if output.exists() else None;record['stderrSha256']=sha(error) if error.exists() else None
+            try:
+                for key,path in [('stdoutSha256',output),('stderrSha256',error),('processSha256',process_path),('cleanupSha256',cleanup_path)]:record[key]=sha(path) if path.exists() else None
+                if ownership is not None:
+                    journal_path=pathlib.Path(config['ownershipJournal'])
+                    record['ownershipSha256']=sha(journal_path) if journal_path.exists() else None
+            except BaseException as exc:
+                failure=failure or exc;record.update(status='failed',finalizationError=repr(exc))
         update(out/(slot['id']+'.receipt.json'),record)
     if failure:raise failure
     try:
         assert output.stat().st_size+error.stat().st_size<=p['memory']['maximumOutputBytes']
-        rows=parse_rows(output);validate_rows(rows,slot,p)
-        if is_browser:
-            assert len([r for r in rows if r['kind']=='browser-complete'])==1
-            processes=[r for r in rows if r['kind']=='browser-process']
-            assert len(processes)==1 and processes[0]['spawnAttempt']==1 and processes[0]['profileInitiallyEmpty'] is True
+        rows=parse_rows(output);identity={'process':read(process_path),'cleanup':read(cleanup_path)}
+        evidence.validate_raw(rows,slot,config,p,config.get('work'),identity)
+        ownership_rows=parse_rows(config['ownershipJournal']) if ownership else None
+        resources.validate_resource_receipts(slot,config,read(process_path),read(cleanup_path),record,ownership_rows)
         inherited.verify(manifest)
     except BaseException as exc:
         record.update(status='failed',validationError=repr(exc));update(out/(slot['id']+'.receipt.json'),record);raise
@@ -188,6 +162,7 @@ def main():
     def interrupted(signum,frame):raise TimeoutError('Controller interrupted or expired')
     signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGALRM,interrupted);signal.setitimer(signal.ITIMER_REAL,max(.001,deadline-time.monotonic()))
     try:
+        resources.enable_subreaper()
         for index,slot in enumerate(planned):
             ledger['slots'][index]['status']='started';update(out/'ledger.json',ledger)
             result=launch(manifest,p,out,slot,args.lane,deadline,manifest_path);ledger['slots'][index]=result;update(out/'ledger.json',ledger)

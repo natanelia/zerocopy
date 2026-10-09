@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 90
     env:
       PROOF_LANE: ${{ matrix.lane }}
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,10 +72,15 @@ jobs:
         if: always() && steps.preflight.outputs.enabled == 'true'
         with:
           name: numeric-portability-${{ matrix.lane }}
-          path: ${{ steps.preflight.outputs.results }}
+          path: |
+            ${{ steps.preflight.outputs.results }}
+            !${{ steps.preflight.outputs.results }}/sources/**
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
   admission:
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
     needs: lane
     if: always()
     runs-on: ubuntu-24.04
@@ -82,6 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 2
           persist-credentials: false
       - name: Read activation state only
         id: state
@@ -96,7 +103,7 @@ jobs:
         with:
           pattern: numeric-portability-*
           path: numeric-portability-artifacts
-      - name: Reconcile both original lane admissions without pooling
+      - name: Validate complete original artifact graphs and recompute every cell
         if: always() && steps.state.outputs.enabled == 'true'
         run: node proofs/numeric-portability/aggregate.mjs numeric-portability-artifacts numeric-portability-admission.json
       - uses: actions/upload-artifact@v4

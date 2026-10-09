@@ -901,8 +901,8 @@
   "files": [
     {
       "path": ".github/workflows/numeric-portability.yml",
-      "sha256": "6ca29b22d0cf94bbc50dae72145a5e2a6949e9a85113938c1253e9945cd2304e",
-      "bytes": 4316
+      "sha256": "3ec0c8f1a369fc687708608f35d0d44f680ebc3c0457ebf82c3c3f70fed1647b",
+      "bytes": 4546
     },
     {
       "path": "proofs/numeric-portability/.gitignore",
@@ -916,13 +916,33 @@
     },
     {
       "path": "proofs/numeric-portability/README.md",
-      "sha256": "bb4f4fedd1a97d7b62dce7b57dcc9600f87613c1654d385c0a73354dcf676fa6",
-      "bytes": 3765
+      "sha256": "45ae5de120ffcec5307da10a73e9cc9139b24fb345995d336da318226960240f",
+      "bytes": 4062
+    },
+    {
+      "path": "proofs/numeric-portability/REPAIR.md",
+      "sha256": "033af21f64d971c4220caf5003e1baaa16514e5eefef7766464afe0121063971",
+      "bytes": 3769
     },
     {
       "path": "proofs/numeric-portability/aggregate.mjs",
-      "sha256": "78ee0fb3368d43a98912fb9d739c8afdc371a730d2902adbc318e5cc766b21cc",
-      "bytes": 2998
+      "sha256": "e4e974772328ecfe005d9455fb70a6d9f6ccddbfc4cdcc82266e57af97ec291f",
+      "bytes": 4718
+    },
+    {
+      "path": "proofs/numeric-portability/aggregate.test.mjs",
+      "sha256": "bb942a7936a6ef6466e16d5c36bc060ef4e9668532064fb564f73667ceb3fe5e",
+      "bytes": 5015
+    },
+    {
+      "path": "proofs/numeric-portability/artifact_admission.py",
+      "sha256": "46eb2fdd2429af98a755fae8eec2aba9a97eebdc4b0f3cb66333676b36934e49",
+      "bytes": 38386
+    },
+    {
+      "path": "proofs/numeric-portability/artifact_admission.test.py",
+      "sha256": "7cad3e602a455cf5f412c391c8e3e9760f954842ceefeda69d667905018e7419",
+      "bytes": 13201
     },
     {
       "path": "proofs/numeric-portability/artifact_checks.py",
@@ -930,19 +950,24 @@
       "bytes": 5374
     },
     {
+      "path": "proofs/numeric-portability/artifact_fixture.py",
+      "sha256": "5c4a20ed7b6421120ef2c39638bbaf181ccd5e478ff5c2ecf6ff5c273eeae0c0",
+      "bytes": 16198
+    },
+    {
       "path": "proofs/numeric-portability/browser-semantics.mjs",
-      "sha256": "51518447582ce57e1a060ec34e696a553197f19a22413eb4f22fd7612e5a3992",
-      "bytes": 4298
+      "sha256": "baa60c4ae587f36bbe6b55d2b4aa65a40059acc4a21f594d6a4c0fc823b2eaf1",
+      "bytes": 5010
     },
     {
       "path": "proofs/numeric-portability/browser-subject.mjs",
-      "sha256": "d2581493138cba75f113e8b88f1a9f269b5b5b2aead00c96b89a59fe0b3149ef",
-      "bytes": 5827
+      "sha256": "08888c0cc55ca8287dff58fc1810d509a78ab748036fbbcd6811177d16f41e87",
+      "bytes": 6229
     },
     {
       "path": "proofs/numeric-portability/ci.py",
-      "sha256": "b67a6e57923640ef35b4cd53d27de93609648a9c2514633a22771586d887c28b",
-      "bytes": 28612
+      "sha256": "be012622a983cafdfcc95a8a666ad87470b06aa804ca93240c2db32e17043c05",
+      "bytes": 31404
     },
     {
       "path": "proofs/numeric-portability/controller.py",
@@ -951,8 +976,8 @@
     },
     {
       "path": "proofs/numeric-portability/core.mjs",
-      "sha256": "86a6ad3429b2982f7bb15d600056ef754d5ac6fbd70b0472f532f5689e37913e",
-      "bytes": 10242
+      "sha256": "c727ba1275c2b6a4c208c703deca576c4c8dae20d07438c354a3040f55fbdd81",
+      "bytes": 10348
     },
     {
       "path": "proofs/numeric-portability/core.test.mjs",
@@ -970,6 +995,26 @@
       "bytes": 25987
     },
     {
+      "path": "proofs/numeric-portability/engine-ownership.mjs",
+      "sha256": "ae6f8bc4a2964ef03ba51048ffe8f902465cc61d6698054967432d980011b941",
+      "bytes": 3360
+    },
+    {
+      "path": "proofs/numeric-portability/engine-ownership.test.mjs",
+      "sha256": "dd45c8545b1766e47884c510981155c7e7f546266b2cf4fd2c93667f1a6871a5",
+      "bytes": 4166
+    },
+    {
+      "path": "proofs/numeric-portability/evidence.py",
+      "sha256": "f163ddc97b627e13b4d95de51ba703231461c08a47aca8b91fd38aa2ec2f0bf2",
+      "bytes": 26817
+    },
+    {
+      "path": "proofs/numeric-portability/evidence.test.py",
+      "sha256": "8d63fa381277948c0554e247e5c329fb25451e28a7aea54edfa3dc37d0e4fffd",
+      "bytes": 7915
+    },
+    {
       "path": "proofs/numeric-portability/expected-fixtures.json",
       "sha256": "60af8bb58ef15365fb57794d68a7dd7fcfe7a4d10e390c6398f0501a4bd1392c",
       "bytes": 1272
@@ -981,8 +1026,8 @@
     },
     {
       "path": "proofs/numeric-portability/launch-guard.mjs",
-      "sha256": "03581c4fc91e3a4048909837766c12955803ed0547f1483b773614d17b1790a0",
-      "bytes": 833
+      "sha256": "13c55c68d99505898a489d328a17945e2ae07dbceb61650e47a514ad6c3d5136",
+      "bytes": 1304
     },
     {
       "path": "proofs/numeric-portability/math.mjs",
@@ -1001,8 +1046,8 @@
     },
     {
       "path": "proofs/numeric-portability/prepare.test.py",
-      "sha256": "d577a3cdc150cd9ebc521785d9f47455e1691b754a942b265cc1fd7d0f741c63",
-      "bytes": 4320
+      "sha256": "239a629e9dd39631ccae09b5319ef36ecb7bbba57d6437fe62c241e4e1abf0ec",
+      "bytes": 4137
     },
     {
       "path": "proofs/numeric-portability/protocol.json",
@@ -1016,18 +1061,33 @@
     },
     {
       "path": "proofs/numeric-portability/report.mjs",
-      "sha256": "8ccbad6141b25fc1c6667b6d75ed7b31a715408c468c08b598a82f9bda45d1cb",
-      "bytes": 6447
+      "sha256": "bd5645c60f363c494aaae804b3cb5e1ba62051b3381dc972674da9116a60dcf2",
+      "bytes": 5766
     },
     {
       "path": "proofs/numeric-portability/report.test.mjs",
-      "sha256": "84e524fecb5f7c195ef060a89840adde67f708b756c4e922c18006d0267cb6a6",
-      "bytes": 3579
+      "sha256": "c4a360f1c3a0eab84a07cd69b605fdab99da7451ede3eea69d17bad8f80e65b9",
+      "bytes": 1724
+    },
+    {
+      "path": "proofs/numeric-portability/resource-ownership.test.py",
+      "sha256": "83ad24fc6f7a9034a663ad6f588c27d55d3e52e1531f69d4d6873271ce666c30",
+      "bytes": 15620
+    },
+    {
+      "path": "proofs/numeric-portability/resource_ownership.py",
+      "sha256": "f8649f189bc3e94f5bd299360cc4ab21556d5057d3be4f643c792f4b44d09dd6",
+      "bytes": 27481
+    },
+    {
+      "path": "proofs/numeric-portability/run-resource-failures.test.py",
+      "sha256": "c0a43837c015af53e152c69fd8d3706ce3f216e8b0cfe1a1e4e9fd028e31392a",
+      "bytes": 15070
     },
     {
       "path": "proofs/numeric-portability/run.py",
-      "sha256": "ddae7239820d9291c3c1b76397e41757db161e0f6018986a945704eae4b93714",
-      "bytes": 15068
+      "sha256": "c085f29e77fff9886a55a364b64010b17c0f76caf326f33b26ffe419e8a04a4e",
+      "bytes": 12974
     },
     {
       "path": "proofs/numeric-portability/runtime.patch",
@@ -1041,8 +1101,13 @@
     },
     {
       "path": "proofs/numeric-portability/semantic-worker.mjs",
-      "sha256": "d368790438af08a54537e96ec239b24264da0289108b7c1413f489db9323538a",
-      "bytes": 2076
+      "sha256": "ca0eef44af96063c863988df7618dce6cdb4107abac127a868e264b9504e5e9c",
+      "bytes": 2219
+    },
+    {
+      "path": "proofs/numeric-portability/synthetic_fixture.py",
+      "sha256": "cbd8be9b68e8732ebc4022d217d6eef810912a10fd1ed2b1b222bb348ffee919",
+      "bytes": 10264
     }
   ],
   "defaultOff": true,

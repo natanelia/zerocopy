@@ -24,7 +24,7 @@ export function selectionGuard(automatic,scalar,seed,wasm=WebAssembly){
     wasm.validate=()=>{counts.repeated++;throw Error('Selection cache not retained');};
     check(automatic.countInRange(seed,0,0)===1&&scalar.countInRange(seed,0,0)===1);
   }finally{wasm.validate=original;}
-  equal(counts,{automatic:1,scalar:1,repeated:0});check(wasm.validate===original);return {...counts,validateRestored:true,automatic:'SIMD',scalar:'forced scalar'};
+  equal(counts,{automatic:1,scalar:1,repeated:0});check(wasm.validate===original);return {automaticProbes:counts.automatic,scalarProbes:counts.scalar,repeated:counts.repeated,validateRestored:true,automatic:'SIMD',scalar:'forced scalar'};
 }
 export async function runCore(config,io){
   const {protocol:p,mode}=config;check(['untimed','calibrate','measure'].includes(mode));
@@ -41,7 +41,7 @@ export async function runCore(config,io){
   if(mode==='untimed'){
     const scalar=await io.importModule('numeric-scalar-control.mjs');
     const selection=selectionGuard(numeric,scalar,seed);
-    equal(await snapshot(seed),before);await emit({kind:'selection',...selection});
+    const after=await snapshot(seed);equal(after,before);await emit({kind:'selection',...selection,before,after});
   }else{
     started=mode==='measure'?now():null;
     const count=numeric.countPointsInBox(seed,p.startup.bounds);

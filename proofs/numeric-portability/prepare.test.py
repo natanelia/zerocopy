@@ -37,18 +37,14 @@ class Preparation(unittest.TestCase):
             self.assertEqual(len(origin['expectedOutputs'][arm]),65)
             expected=next(x for x in origin['expectedOutputs'][arm] if x['path']=='dist/numeric.js')
             self.assertEqual(expected['bytes'],4303 if arm=='baseline' else 4427)
-    def test_cleanup_receipts_include_browser_group(self):
-        class FakeChild:
-            pid=111
-            def poll(self):return 0
-            def wait(self,timeout):return 0
-        known={pid:{'pid':pid,'group':pid,'ppid':111,'session':pid,'startTicks':1,'state':'S'} for pid in (111,222)}
-        for survivor in (False,True):
-            with patch.object(run,'census',return_value=([],0)),patch.object(run.os,'killpg') as kill,patch.object(run.pathlib.Path,'iterdir',return_value=([pathlib.Path('/proc/222')] if survivor else [])),patch.object(run,'proc',return_value=known[222]):
-                result=run.cleanup(FakeChild(),known,2)
-                self.assertEqual(result['ownedGroups'],[111,222]);self.assertEqual(result['ownedGroupGone'],not survivor)
-                self.assertEqual({c.args[0] for c in kill.call_args_list},{111,222})
-                self.assertEqual(len(result['survivors']),int(survivor))
+    def test_unproven_cleanup_receipt_rejected(self):
+        import resource_ownership as resources
+        slot={'runtime':'node','id':'synthetic'};config={}
+        root={'pid':111,'group':111,'session':111,'ppid':100,'startTicks':1,'state':'S'}
+        process={'pid':111,'group':111,'identity':root,'status':'spawned','command':['synthetic']}
+        cleanup={'pid':111,'group':111,'returncode':0,'ownedGroupGone':True,'quiescence':'verified','survivors':[],'problems':[],'ownedGroups':[111],'ownedProcessIdentities':[root],'descendantScope':None}
+        record={'status':'complete','command':['synthetic'],'cleanup':cleanup}
+        with self.assertRaises(ValueError):resources.validate_resource_receipts(slot,config,process,cleanup,record)
     def test_no_subject_import_during_preparation(self):
         with patch.object(run.subprocess,'Popen',side_effect=AssertionError('No subject launch allowed')):
             run.slots(P,'x64','run');ci.verify_packet()

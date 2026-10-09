@@ -214,7 +214,7 @@ def preflight():
         shutil.copyfile(HERE/'packet.json', run_root()/'packet.json')
         run = {k: os.environ.get(k) for k in (
             'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'GITHUB_SHA', 'GITHUB_WORKFLOW_SHA',
-            'GITHUB_REPOSITORY', 'GITHUB_REF', 'ImageOS', 'ImageVersion', 'RUNNER_ARCH')}
+            'GITHUB_REPOSITORY', 'GITHUB_REF', 'GITHUB_WORKSPACE', 'RUNNER_TEMP', 'PROOF_LANE', 'ImageOS', 'ImageVersion', 'RUNNER_ARCH')}
         run['workDeadlineMonotonicSeconds'] = time.monotonic()+82*60
         write(run_root()/'run.json', run)
     if os.environ.get('GITHUB_OUTPUT'):
@@ -301,7 +301,8 @@ def freeze():
     require_activation(); root = run_root(); reviews = validate_gates(root)
     tools = tools_identity(); assert tools == read(root/'toolchain-before.json'), 'Toolchain changed during gates'
     harness = root/'harness'; harness.mkdir()
-    for name in ('protocol.json','core.mjs','launch-guard.mjs','node-subject.mjs','browser-subject.mjs','browser-semantics.mjs','semantic-worker.mjs','math.mjs','controller.py','run.py','report.mjs','ci.py','artifact_checks.py','origin.json','correctness-v2.mjs','inventory-browsers.mjs'):
+    from artifact_admission import FROZEN
+    for name in FROZEN:
         shutil.copyfile(HERE/name, harness/name)
     sources = {}
     for arm in ARM_NAMES:
@@ -367,6 +368,7 @@ def launch(mode):
 
 def preserve():
     """Copy artifacts only; never delete worktrees, logs, partial slots or failures."""
+    from resource_ownership import validate_cleanup_receipts, parse_ownership_rows
     root = run_root()
     if not root.exists(): return
     unresolved = []
@@ -377,6 +379,30 @@ def preserve():
         if record.get('status') == 'started' or record.get('cleanupError') or record.get('quiescence') == 'unknown' or (record.get('pid') and record.get('cleanup', {}).get('ownedGroupGone') is not True):
             unresolved.append({'receipt':str(path), 'pid':record.get('pid'), 'status':record.get('status')})
     for directory in (root/'semantics',root/'untimed',root/'run'):
+        def verified_slot_cleanup(identifier):
+            """Incomplete birth/receipt windows remain unknown, even without PID."""
+            if not isinstance(identifier,str) or not identifier or pathlib.Path(identifier).name!=identifier or identifier in ('.','..'):return False
+            process_path=directory/(identifier+'.process.json')
+            cleanup_path=directory/(identifier+'.cleanup.json')
+            config_path=directory/(identifier+'.config.json')
+            try:
+                process=read(process_path);cleanup=read(cleanup_path);config=read(config_path)
+                if config.get('id')!=identifier or identifier.split('-',1)[0]!=config.get('runtime') or process.get('command',[])[-1:]!=[str(config_path)]:return False
+                slot_receipt_path=directory/(identifier+'.receipt.json')
+                if slot_receipt_path.exists():
+                    slot_receipt=read(slot_receipt_path)
+                    if slot_receipt.get('cleanup')!=cleanup or slot_receipt.get('command')!=process.get('command'):return False
+                    if slot_receipt.get('configSha256')!=sha(config_path):return False
+                journal=None
+                if config.get('runtime') in ('chromium','firefox','webkit'):
+                    journal_path=directory/(identifier+'.ownership.jsonl')
+                    if config.get('ownershipJournal')!=str(journal_path):return False
+                    with journal_path.open('rb') as source:journal_data=source.read(65537)
+                    journal=parse_ownership_rows(journal_data)
+                    if hashlib.sha256(journal_data).hexdigest()!=cleanup.get('ownership',{}).get('sha256'):return False
+                validate_cleanup_receipts({'id':identifier,'runtime':config.get('runtime')},config,process,cleanup,journal)
+                return True
+            except (ValueError,OSError,TypeError,AttributeError,KeyError):return False
         try: timeout = read(directory/'controller-timeout.json') if (directory/'controller-timeout.json').exists() else {}
         except (ValueError, OSError) as error:
             timeout = {}; unresolved.append({'receipt':str(directory/'controller-timeout.json'),'error':repr(error)})
@@ -386,16 +412,27 @@ def preserve():
             try:
                 ledger = read(directory/'ledger.json')
                 if ledger.get('fatalOwnedProcess'): unresolved.append({'receipt':str(directory/'ledger.json'),'error':ledger['fatalOwnedProcess']})
-            except (ValueError, OSError) as error:
+                for slot in ledger.get('slots',[]):
+                    if slot.get('status') in ('pending','not-run'):continue
+                    identifier=slot.get('id')
+                    if not isinstance(identifier,str) or not identifier or not verified_slot_cleanup(identifier):
+                        unresolved.append({'receipt':str(directory/'ledger.json'),'slot':identifier,'status':slot.get('status'),'error':'Attempted slot has no verified birth-bound cleanup'})
+            except (ValueError, OSError, TypeError, AttributeError) as error:
                 unresolved.append({'receipt':str(directory/'ledger.json'), 'error':repr(error)})
+        for path in directory.glob('*.receipt.json'):
+            try:
+                record=read(path);identifier=path.name[:-len('.receipt.json')]
+                if record.get('fatalOwnedProcess') or record.get('cleanupReceiptError') or not verified_slot_cleanup(identifier):
+                    unresolved.append({'receipt':str(path),'pid':record.get('cleanup',{}).get('pid'),'status':record.get('status'),'error':'Slot ownership/preservation remains unknown'})
+            except (ValueError,OSError,TypeError,AttributeError) as error:
+                unresolved.append({'receipt':str(path),'error':repr(error)})
         for path in directory.glob('*.process.json'):
             try:
-                record = read(path); cleanup_path = path.with_name(path.name.replace('.process.json','.cleanup.json'))
-                cleanup = read(cleanup_path) if cleanup_path.exists() else timeout.get('cleanup',{})
-            except (ValueError, OSError) as error:
+                record = read(path)
+                if not verified_slot_cleanup(path.name[:-len('.process.json')]):
+                    unresolved.append({'receipt':str(path), 'pid':record.get('pid')})
+            except (ValueError, OSError, TypeError, AttributeError) as error:
                 unresolved.append({'receipt':str(path), 'error':repr(error)}); continue
-            if cleanup.get('pid') != record['pid'] or cleanup.get('ownedGroupGone') is not True:
-                unresolved.append({'receipt':str(path), 'pid':record['pid']})
     preservation = {'status':'started', 'quiescence':'unknown' if unresolved else 'verified-from-owned-receipts', 'unresolvedWriters':unresolved}
     write(root/'preservation.json', preservation)
     if unresolved:
