@@ -1,6 +1,6 @@
 {
-  "enabled": false,
-  "reviewedPacketSha256": null,
-  "reviewedPacketCommit": null,
-  "reason": "Source preparation only; independent packet review and explicit activation still required."
+  "enabled": true,
+  "reviewedPacketSha256": "d7953d582667639cb45ef47fa61f51cba5c95983550ab89a4d766af8d3c3636c",
+  "reviewedPacketCommit": "86971bc301626c29cbe00573c71e587c1a6beadf",
+  "reason": "One bounded reviewed CI screen on the fixed execution branch; original attempt only, with no promotion authorized."
 }
