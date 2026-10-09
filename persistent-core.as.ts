@@ -593,11 +593,36 @@ function bbal(left: u32, data: u32, length: u32, right: u32): u32 {
   }
   return bnode(left, data, length, right);
 }
-export function blockAppend(root: u32, data: u32, length: u32): u32 {
-  return root ? bbal(sl(root), bd(root), bn(root), blockAppend(sr(root), data, length)) : bnode(0, data, length, 0);
+// Rotations consume these child nodes. Reuse one only when this synchronous
+// insertion allocated it; an earlier public call's result is always immutable.
+function bnodeOwned(p: u32, mark: u32, left: u32, data: u32, length: u32, right: u32): u32 {
+  if (p < mark) return bnode(left, data, length, right);
+  store<u32>(p, left); store<u32>(p + 4, right);
+  store<u32>(p + 8, seqSize(left) + length + seqSize(right));
+  store<u32>(p + 12, max(sh(left), sh(right)) + 1);
+  store<u32>(p + 16, data); store<u32>(p + 20, length); return p;
 }
-function blockPrepend(root: u32, data: u32, length: u32): u32 {
-  return root ? bbal(blockPrepend(sl(root), data, length), bd(root), bn(root), sr(root)) : bnode(0, data, length, 0);
+function bbalOwned(left: u32, data: u32, length: u32, right: u32, mark: u32): u32 {
+  if (sh(left) > sh(right) + 1) {
+    const ll = sl(left), lr = sr(left);
+    if (sh(ll) >= sh(lr)) return bnodeOwned(left, mark, ll, bd(left), bn(left), bnode(lr, data, length, right));
+    return bnodeOwned(lr, mark, bnodeOwned(left, mark, ll, bd(left), bn(left), sl(lr)), bd(lr), bn(lr), bnode(sr(lr), data, length, right));
+  }
+  if (sh(right) > sh(left) + 1) {
+    const rl = sl(right), rr = sr(right);
+    if (sh(rr) >= sh(rl)) return bnodeOwned(right, mark, bnode(left, data, length, rl), bd(right), bn(right), rr);
+    return bnodeOwned(rl, mark, bnode(left, data, length, sl(rl)), bd(rl), bn(rl), bnodeOwned(right, mark, sr(rl), bd(right), bn(right), rr));
+  }
+  return bnode(left, data, length, right);
+}
+export function blockAppend(root: u32, data: u32, length: u32): u32 {
+  return blockAppendOwned(root, data, length, heapEnd);
+}
+function blockAppendOwned(root: u32, data: u32, length: u32, mark: u32): u32 {
+  return root ? bbalOwned(sl(root), bd(root), bn(root), blockAppendOwned(sr(root), data, length, mark), mark) : bnode(0, data, length, 0);
+}
+function blockPrepend(root: u32, data: u32, length: u32, mark: u32): u32 {
+  return root ? bbalOwned(blockPrepend(sl(root), data, length, mark), bd(root), bn(root), sr(root), mark) : bnode(0, data, length, 0);
 }
 export function blockGet(root: u32, index: u32): f64 {
   while (root) {
@@ -609,13 +634,16 @@ export function blockGet(root: u32, index: u32): f64 {
   unreachable(); return 0;
 }
 export function blockInsert(root: u32, index: u32, value: f64): u32 {
+  return blockInsertOwned(root, index, value, heapEnd);
+}
+function blockInsertOwned(root: u32, index: u32, value: f64, mark: u32): u32 {
   if (!root) return bnode(0, tailAppend(0, 0, value), 1, 0);
   const left = sl(root), right = sr(root), before = seqSize(left), length = bn(root), data = bd(root);
-  if (index < before) return bbal(blockInsert(left, index, value), data, length, right);
-  if (index > before + length) return bbal(left, data, length, blockInsert(right, index - before - length, value));
+  if (index < before) return bbalOwned(blockInsertOwned(left, index, value, mark), data, length, right, mark);
+  if (index > before + length) return bbalOwned(left, data, length, blockInsertOwned(right, index - before - length, value, mark), mark);
   const p = tailInsert(data, length, index - before, value);
   if (length < 32) return bnode(left, p, length + 1, right);
-  return bbal(left, p, 16, blockPrepend(right, p + 128, 17));
+  return bbalOwned(left, p, 16, blockPrepend(right, p + 128, 17, mark), mark);
 }
 function dropFirstBlock(root: u32): u32 {
   return sl(root) ? bbal(dropFirstBlock(sl(root)), bd(root), bn(root), sr(root)) : sr(root);
