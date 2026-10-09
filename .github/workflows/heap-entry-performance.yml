@@ -1,0 +1,68 @@
+name: Heap entry view screen attempt 1
+on:
+  push:
+    branches: ['perf/heap-entry-views-20261008']
+    paths:
+      - '.github/workflows/heap-entry-performance.yml'
+      - 'proofs/heap-entry-*'
+permissions:
+  contents: read
+concurrency:
+  group: heap-entry-attempt1
+  cancel-in-progress: false
+jobs:
+  screen:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      HEAP_ENTRY_ATTEMPT: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify frozen parent and install common dependencies
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/heap-entry-evidence/workflow"
+          test "$(git rev-parse HEAD^)" = '4dea268e4c64acac832bb310efc83de597b27abc'
+          test "$(git rev-parse 4dea268e4c64acac832bb310efc83de597b27abc^{tree})" = '6e180bc39a10866289816ba5aa6747b1adb18eae'
+          bun install 2>&1 | tee "$RUNNER_TEMP/heap-entry-evidence/workflow/dependencies.log"
+          git worktree add --detach "$RUNNER_TEMP/heap-entry-baseline" 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/heap-entry-baseline/node_modules"
+      - name: Verify proof protocol without latency
+        timeout-minutes: 2
+        run: |
+          node --test proofs/heap-entry-protocol.node.mjs > "$RUNNER_TEMP/heap-entry-evidence/workflow/protocol-node.log" 2>&1
+          bun test ./proofs/heap-entry-protocol.node.mjs > "$RUNNER_TEMP/heap-entry-evidence/workflow/protocol-bun.log" 2>&1
+      - name: Prerequisites, all pilots, then balanced measurements
+        timeout-minutes: 65
+        run: node proofs/heap-entry-performance.mjs "$RUNNER_TEMP/heap-entry-baseline" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/heap-entry-evidence"
+      - name: Preserve complete or partial evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/heap-entry-evidence/workflow"
+          cp .github/workflows/heap-entry-performance.yml "$RUNNER_TEMP/heap-entry-evidence/workflow/"
+          git status --short > "$RUNNER_TEMP/heap-entry-evidence/workflow/git-status.txt"
+          git log -1 --format=fuller > "$RUNNER_TEMP/heap-entry-evidence/workflow/commit.txt"
+          tar -czf "$RUNNER_TEMP/heap-entry-attempt1.tar.gz" -C "$RUNNER_TEMP" heap-entry-evidence
+          cd "$RUNNER_TEMP"
+          sha256sum heap-entry-attempt1.tar.gz > heap-entry-attempt1.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: heap-entry-attempt1-x64
+          path: |
+            ${{ runner.temp }}/heap-entry-attempt1.tar.gz
+            ${{ runner.temp }}/heap-entry-attempt1.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
