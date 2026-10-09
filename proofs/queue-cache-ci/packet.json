@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "purpose": "Default-off queue prefix-cache CI packet; no operation clocks run",
+  "origin": {
+    "baselineCommit": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+    "baselineTree": "11ad61e759f07f69fac6a5c6fa34ccb283a7563b",
+    "candidateCommit": "60bfb2941f2955e7a1ef83e9da19a09b009338b4",
+    "candidateTree": "d955cf7eac7f5da23e7d19100fbde130c1ccce26",
+    "runtimeCommit": "9a400cf0cc04d2ea6f5feb9f47adca07329b0b93",
+    "runtimeTree": "f28920d7aff5cfed36cb8566d8d1be646d18f1aa",
+    "candidateChangedFiles": {
+      "shared-queue.ts": "cef2005c166e4e1bc5f34131cfebc7d9f7aa55d16b9cbfc4c2c2a2c65a5000bc",
+      "shared-queue-prefix.test.ts": "3f6cefa1942ba2ed9ced5ea44f0305a3589270d6e8a186ed87e1197db0983e9a",
+      "proofs/queue-prefix-special-numbers.mjs": "cb935bcbc0fe534978aba9aac93e7d090166657fc1ebc761c1a264759c48e0f2"
+    },
+    "historicalEvidenceTransferred": false,
+    "localClocksRun": false,
+    "standardGateRun": false,
+    "acceptedPlanSha256": "5e48c0e0dc848c7a2fd43c3bb474d52c25e17003fd16e8ea502afd7518ffdd0b",
+    "reusedPacketCommit": "3bdd45c37da53c5bd52c4ae2c544e5fdd173738d",
+    "reusedPacketTree": "8f75077d430aa31955a6c7d70e7dbe61b16796c2",
+    "reusedPacketSha256": "e145ab2a422ad9298455abc1a5108002ed3ab25c7d66c88d09c22030b80bcc80",
+    "byteIdenticalFiles": [
+      "math.mjs",
+      "controller.py",
+      "dependencies.bun.lock"
+    ]
+  },
+  "activationFile": "proofs/queue-cache-ci/activation.json",
+  "files": [
+    {
+      "path": ".github/workflows/queue-prefix-cache-ci.yml",
+      "sha256": "054a1666cf1cb48485d308fc2d13649f5be9b6a17ced07a8364b1c2cd0af8552",
+      "bytes": 3707
+    },
+    {
+      "path": "proofs/queue-cache-ci/ADAPTER_CHANGES.md",
+      "sha256": "e2e697cacfb80848b5e8a8f8ff198b3ed2402080790ef917940ef9aa47ce534a",
+      "bytes": 3343
+    },
+    {
+      "path": "proofs/queue-cache-ci/PLAN.md",
+      "sha256": "5e48c0e0dc848c7a2fd43c3bb474d52c25e17003fd16e8ea502afd7518ffdd0b",
+      "bytes": 20258
+    },
+    {
+      "path": "proofs/queue-cache-ci/README.md",
+      "sha256": "d30994a2ccb9a8192e2d896078a9cff28bdea41be957f92e227a17e0415c15d9",
+      "bytes": 6507
+    },
+    {
+      "path": "proofs/queue-cache-ci/ci-report.test.mjs",
+      "sha256": "1939db3b5a55b71287df2dee5b7071cf09f80c30aeb83f007bce10ffa108d2d0",
+      "bytes": 3045
+    },
+    {
+      "path": "proofs/queue-cache-ci/ci.py",
+      "sha256": "a1dfcd94446e1f995927fa9a5ce9c28def32895738907bf83c8b9dea2f2d3cf4",
+      "bytes": 24401
+    },
+    {
+      "path": "proofs/queue-cache-ci/ci.test.py",
+      "sha256": "a18a6c772c535a7764e025bf5c4dfadc7e29d34ba46e6b9f8912706c40f21cc0",
+      "bytes": 14339
+    },
+    {
+      "path": "proofs/queue-cache-ci/controller.py",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "bytes": 17534
+    },
+    {
+      "path": "proofs/queue-cache-ci/controller.test.py",
+      "sha256": "df15efee38a6c686fb827696cfc5dbdaf9011d1dfa1c625d640ff3e0b923c168",
+      "bytes": 11432
+    },
+    {
+      "path": "proofs/queue-cache-ci/dependencies.bun.lock",
+      "sha256": "3e2462a27f26395f52e20e1f958b227277d4e40c54c33ff64e06075c8fad99f3",
+      "bytes": 25987
+    },
+    {
+      "path": "proofs/queue-cache-ci/math.mjs",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "bytes": 2387
+    },
+    {
+      "path": "proofs/queue-cache-ci/origin.json",
+      "sha256": "e1ac375a122cc5be2934265de48f3b437f019548d59fdb508c8057ccb7fa63b9",
+      "bytes": 1234
+    },
+    {
+      "path": "proofs/queue-cache-ci/protocol.json",
+      "sha256": "bf537cfd7bc46622b7cc409138c44ba692832414d65ede3bc357f6e22a000967",
+      "bytes": 5281
+    },
+    {
+      "path": "proofs/queue-cache-ci/protocol.test.mjs",
+      "sha256": "ba43c5145a82460443315da57aa2b4fe4b3d592017e4c3b4348ee9b8eb1365a6",
+      "bytes": 4314
+    },
+    {
+      "path": "proofs/queue-cache-ci/report.mjs",
+      "sha256": "0b4434a2f467df89c13da0b08761db4453bfd224bcef3d30c38f93a03ebeab40",
+      "bytes": 5457
+    },
+    {
+      "path": "proofs/queue-cache-ci/subject.mjs",
+      "sha256": "fc8b69dd051649b9e028534c17d5bca4f9b8c9699d7f60d911c89bd30c3df527",
+      "bytes": 13987
+    },
+    {
+      "path": "proofs/queue-cache-ci/subject.test.mjs",
+      "sha256": "62338c0455933aa1143c3aa9c115e4296cb6d35fc20be184ef567ce5205f3bd8",
+      "bytes": 3231
+    }
+  ]
+}

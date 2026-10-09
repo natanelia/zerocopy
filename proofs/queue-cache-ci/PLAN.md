@@ -1,0 +1,101 @@
+# Prospective queue prefix-cache screen
+
+Status: proposal and source inspection only, 2026-10-09. No subject implementation, builds, tests, installation, local performance clocks, external writes, or activation occurred. This is the next small screen for the accepted queue call-site candidate, not a new runtime candidate or a performance claim.
+
+## Exact sources and decision
+
+- Baseline runtime/source: `2e88bc4a53871476da9ca1ec4e6c374b61512436`, tree `11ad61e759f07f69fac6a5c6fa34ccb283a7563b`.
+- Accepted runtime-only candidate: `787d01823e35969fed2ef365d05245bad4d4f099`, tree `f28920d7aff5cfed36cb8566d8d1be646d18f1aa`.
+- Proposed candidate source for fresh gates and the screen: regression follow-on `0c5524adcc175fa74e9b9c7a1b7d490b6aed0a34`, tree `d955cf7eac7f5da23e7d19100fbde130c1ccce26`. Its production bytes are the runtime candidate above; its additional files are the queue regression test and special-number worker proof. Record this identity explicitly rather than calling the test-bearing tree the runtime-only commit.
+- Runtime diff: only the persistent-prefix expression in `SharedQueue.peek`, from `a.wasm.vecGet(...)` to the existing `a.vectorValue(...)`. No runtime edits are proposed.
+- Reuse source: native CI packet `3bdd45c37da53c5bd52c4ae2c544e5fdd173738d`, tree `8f75077d430aa31955a6c7d70e7dbe61b16796c2`, reviewed packet digest `e145ab2a422ad9298455abc1a5108002ed3ab25c7d66c88d09c22030b80bcc80`.
+
+Question: does the public API cost improve enough in sequential or repeated-prefix use to justify the candidate, while the selected miss and unchanged-path controls remain acceptable? A supported adverse loss rejects promotion from this screen. An inconclusive control is not a no-regression pass. A lead needs a clean worthwhile primary gain and no supported material loss; it still needs independent review and exact final PR correctness before any promotion. Browser/ARM work comes later only if this screen establishes a useful lead. There is no average that lets a warm-read gain erase a miss-path loss.
+
+One later integration control is reserved if this screen yields a useful lead: ordinary `SharedMap` warm reads in a process after a queue has exercised `vectorValue`. The candidate newly assigns the Arena's existing vector-cache fields, and setup history could matter to the engine. Use ordinary public setup and explicitly identify the Arena ownership; default map and queue Arenas are separate, so shared process history must not be described as a shared-cache effect. This control is untested, is not an established regression, and does not expand the initial eight-cell screen.
+
+The optimization ledger was checked. The previously closed unused `Arena.vector`/list-generator lead is distinct. This proposal does not reopen it, the rejected fixed-copy variants, or held PR 24/25/cache/ASCII/HAMT publication paths.
+
+## Eight workloads, fixed before effects
+
+Here `R` is the selected common ladder count. A drain repeatedly starts from the same retained immutable root and performs exactly `N` iterations of `value = current.peek(); consume(value); current = current.dequeue()`. It does not enqueue, inspect `isEmpty`, or make a terminal empty `peek` inside the timed body. The final empty handle is checked afterward. Every chunk rebuilds its fixture in a fresh default queue Arena. Numeric values are `i + 1` unless stated otherwise.
+
+| ID | Public setup outside timer | Measured body and primary unit | Starting cache and intended cost | Fixed R ladder |
+| --- | --- | --- | --- | --- |
+| `drain-number-65` | Enqueue 65 numbers; retain root; no reads | R complete 65-item drains; ns/full drain, plus ns/(peek + dequeue) = ns/drain/65 | Fresh Arena with unprimed vector cache on the first lookup; each drain has 64 prefix values in two blocks and one unchanged tail value | 1, 8, 64, 512, 4096 |
+| `drain-number-4097` | Enqueue 4097 numbers; retain root; no reads | R complete 4097-item drains; ns/full drain and ns/(peek + dequeue) | First lookup unprimed; each drain has 4096 prefix values in 128 blocks and one tail value | 1, 4, 16, 64, 256 |
+| `peek-prefix-warm` | Build 4097-number queue, then call its public `peek()` once | R `root.peek()` calls, accumulating returned numbers; ns/peek | Candidate root/depth/block 0 explicitly primed; every measured lookup hits the leaf cache | 1024, 8192, 65536, 524288, 4194304 |
+| `peek-alternate-roots` | Build two independent 33-number queues in the same default Arena, offsets 0 and 10000; retain both; publicly peek queue B last | R peeks in fixed A,B,A,B order; ns/peek | Same depth-zero/block-zero, distinct full-prefix leaf heads; first A and every later lookup are misses. This gives baseline its least traversal work | 1024, 8192, 65536, 524288, 4194304 |
+| `peek-alternate-blocks` | Build 4097-number root; derive and retain its offset-32 handle with 32 public dequeues; publicly peek offset 32 last | R peeks in fixed offsets 0,32,0,32 order; ns/peek | Same head/depth, blocks 0 and 1; first offset 0 and every later lookup are misses | 1024, 8192, 65536, 524288, 4194304 |
+| `peek-empty` | Construct empty number queue | R peeks, adding one for each undefined result; ns/peek | No vector or decode access; unchanged early return | 1024, 8192, 65536, 524288, 4194304 |
+| `peek-tail-only` | Enqueue 32 numbers; retain offset-31 handle after 31 public dequeues | R peeks returning 32; ns/peek | Nonzero offset in the current tail, no linked prefix; unchanged DataView branch and numeric decode | 1024, 8192, 65536, 524288, 4194304 |
+| `drain-object-4097-mixed-decode` | Enqueue 4097 distinct small JSON objects, retain root, and publicly drain once outside timer to fill the ordinary decode cache | R complete 4097-item drains; ns/full drain and ns/(peek + dequeue) | First 2048 objects cached, last 2049 decoded and recursively frozen on every measured pass; vector cache begins at block 127, so measured block 0 misses | 1, 2, 4, 8, 16 |
+
+Object input, for index 0 through 4096: `{index: i, text: 'row-' + i.toString().padStart(4, '0') + '-é-界-🙂', tags: ['queue', 'prefix'], meta: {parity: i & 1, score: i * 3}}`. Source-sized JSON is under 256 bytes per object, keeping the first 2048 entries below the 2 MiB decode-byte cap. Untimed admission must verify that fact and the actual 2048-entry occupancy. These distinct Unicode/nested JSON values exercise UTF-8 decoding, JSON parsing and freezing; this is not a claim about standalone string queues or nested collection reconstruction.
+
+The queue sizes and cache regimes are structural choices made before any queue effect data: 33 yields one depth-zero prefix leaf and one tail value; 65 crosses the first two-prefix-block transition; 4097 traverses 128 prefix blocks at larger depth. The 33-value alternating-root cell is deliberately adverse because baseline `vecGet` has no branch path to traverse while the candidate still performs its cache-miss bookkeeping and JavaScript load. The object priming pass caches indices 0–2047; indices 2048–4096 remain uncached because the non-evicting entry cap is full, and all 2049 are decoded again on every measured drain, including the final tail value at index 4096.
+
+The object cache state is created only by public reads. No cache is cleared, filled, overwritten or monkey-patched. Read-only inspection of Arena/cache fields outside the timer may verify intended state; timed code uses only public queue operations and checksum arithmetic. Baseline and candidate receive identical setup and read sequences. Instrumented mechanism runs, if needed later, must be separate untimed subjects and cannot become timing inputs.
+
+## First-use and retention meaning
+
+`peek-prefix-warm` is explicitly a warmed repeated read, never a first read. The two numeric drains include one empty-vector-cache lookup per fresh chunk; subsequent drain restarts are ordinary block misses because the previous traversal ended on a different prefix block. The two alternating cells measure unamortized misses in an already-used Arena. Neither is an isolated latency estimate of the very first read.
+
+No cell measures process/module startup, Arena construction, WebAssembly instantiation, enqueue construction, import, first JIT compilation in a new process, worker attachment, or an isolated single cold lookup. Thirty-two fresh-fixture warmup chunks warm executable code, not the numeric drain fixtures. The object cell deliberately excludes its first full decode pass and measures a stated mixed-cache steady state. It is not an all-cold object-read benchmark.
+
+Retain the initial root throughout each chunk, plus the second root/offset handle where specified. Do not retain each transient dequeue result; the final handle and a live checksum escape the timed loop for validation. Dequeue handle allocations and naturally occurring GC inside the loop are part of drain cost. There is no retained history of all R drains and no heap-saving claim. None of the measured bodies grows the Arena or changes its used bytes; this does not remove ordinary JavaScript allocation or imply unchanged physical memory.
+
+## Subject design, before implementation
+
+Keep one small queue-specific `subject.mjs` adapted from the accepted subject lifecycle. Keep the existing controller, math, process ownership and admission machinery; do not build a generalized workload framework.
+
+1. Import the official `dist/shared.js` by exact frozen absolute path in both runtimes. Require Linux x64, Node `v22.23.3` / Bun `1.4.2`, and the existing explicit `untimed`, `calibrate`, `measure` modes. Only the two latter modes may call the performance clock.
+2. Precompute and freeze ordinary input values and independent checksum expectations. Before each chunk, release prior handles, `resetQueue()`, request the same runtime-specific GC as the reused subject, then construct and prime exactly the listed fixture. Run one further explicit GC after construction/priming in all cells, outside the timer, so discarded setup handles do not deliberately enter the timed region. This lifecycle change is explicit and applies symmetrically.
+3. Record queue descriptors, Arena capacity/used bytes, input digest, and a digest of published bytes from 65536 to `used`. Assert the listed relationships, including distinct heads for the root cell, equal head/depth with distinct absolute blocks for the block cell, correct prefix/tail boundaries, and object cache membership/count. Merely reading these properties must not issue public prefix reads for the unprimed numeric cells. Record pre-timer cache state before validation can disturb it.
+4. Time only the fixed loop. Numeric checksum is the sum of returned values; a numeric drain expectation is `R * N * (N + 1) / 2`. Alternating-root expectation is `ceil(R/2) * 1 + floor(R/2) * 10001`; alternating-block expectation substitutes 33 for 10001. Tail expectation is `R * 32`; empty expectation is R. Object checksum consumes `index + text.length + tags.length + meta.score + meta.parity` per returned value; calculate the independent sum from original inputs. All maxima are exact integers below 2^53.
+5. Immediately after timing, record post-loop vector/decode cache state before post-validation public reads. Verify checksum, final handle size/identity as relevant, unchanged original descriptors, unchanged used bytes/published digest, unchanged fixture digest, and capacity/resource caps. Traverse every retained input snapshot after timing and compare every value to the independent fixture; for objects verify deep equality and frozen nested values. Post-validation reads are not included in latency or mechanism counts.
+6. Release fixture handles and reset the default Arena, request GC, and record resource observations. Preserve every raw row. Keep `operations = R` and `nsPerOperation = elapsedNs / R`; add explicit `unit`, `itemsPerOperation`, `publicPeekCalls`, `publicDequeueCalls`, and `nsPerItemPair` for drains. The reporter must use these units instead of the inherited inaccurate generic label “per public call.” R is complete drains in drain cells and individual peeks in peek cells; no inferred per-peek latency is obtained by dividing drain time.
+7. Untimed mode exercises every cell at the literal minimum ladder count and maximum ladder count, with null duration and derived latency fields, in all four source/runtime combinations. The inherited native subject hard-codes untimed minimum `1`; replace that with `spec.ladder[0]` and add a deterministic check. This matters for the alternating cells, whose intended min is 1024. No calibration or timed import is an untimed check.
+
+An independent review should check these setup/cache claims before any integrated check. If a claim fails, preserve the failed check, correct the fixture prospectively, and review the new source before calibration. Do not mutate production to satisfy it, silently drop a cell, choose new counts after seeing effects, or repeat a noisy screen for green labels.
+
+## Reused statistical and execution protocol
+
+- One fresh Linux x64 job first; two official portable bundles and the same pinned dependency/tool chain.
+- Four fresh paired process blocks per runtime. Block orders B,C,C,B then C,B,B,C then B,C,C,B then C,B,B,C; runtime order alternates. Total 32 measurement processes, two replicates per arm per block. Four calibration processes precede them. No simultaneous source subjects.
+- Collect every fixed ladder level in both arms; choose the smallest shared R whose median chunk reaches 12 ms in both, otherwise use the common maximum and retain a floor flag. Three samples per calibration level; 32 calibration warmup chunks at the fixed maximum. No arm-specific R.
+- Each measured process has 32 warmup chunks and seven measured samples per cell. Preserve the 200 ms minimum warmup-body check, 10% warmup drift diagnostic, 5 ms measured-chunk floor, 5% relative-MAD diagnostic and inherited A/A checks. The two same-arm replicates within each paired block supply A/A diagnostics; they are not separate claims of equivalence.
+- Four block-level log contrasts are the inferential units; use the accepted df=3 pointwise 95% interval, 2% material-loss and 5% worthwhile-gain cutoffs. Seven inner samples do not become seven independent replicates. Sixteen runtime/workload results are pointwise and exploratory, with no familywise or cross-platform claim.
+- Incomplete slots, any unresolved owned process, failed source/build verification, or incomplete whole-run admission leave all cells inconclusive. Keep slower ratios, all diagnostics and raw failures. Reuse the repaired report rule requiring complete ledger and successful final verification even when all measurement slots happened to finish.
+
+## Fresh gates and small adapter scope
+
+The accepted native adapter is copied, not generalized. Change only queue identities/paths, its exact diff guard, the queue-specific subject/protocol and corresponding deterministic tests/report labels. Preserve `math.mjs` byte-for-byte. Preserve controller math, schedule, cleanup, finalization bounds and fail-fast behavior. Any necessary controller identity/text adaptation must be enumerated and reviewed, not described as unchanged bytes.
+
+The candidate exact-source guard accepts only `shared-queue.ts`, `shared-queue-prefix.test.ts`, and `proofs/queue-prefix-special-numbers.mjs` relative to pinned baseline. Independently verify that production `shared-queue.ts` equals runtime 787d018 and that both test files equal follow-on 0c5524. All other tracked files must be baseline-identical in the measured source arms. The proof packet itself lives separately from those exact source worktrees.
+
+Both arms must freshly pass all 23 standard adapter gate commands from pinned `ci.yml`: official WASM/browser/type builds, every type check, full unmodified Vitest defaults, actual Node worker/lifecycle/list/memory proofs, docs/examples/Chromium correctness, typed worker examples, Node entry points, installed-package validation and historical evidence. Do not transfer the earlier focused pass or old full-suite exceptions into admission. The test-bearing candidate's additional queue regressions run through its normal full suite. Preserve exact command/log/source/run binding and successful whole-stage receipts.
+
+Use the accepted common frozen lock snapshot; original production dependencies remain unchanged. Freeze fresh source, build, tools and gate receipts after both successful gates. Run all four new untimed subjects before any calibration. An optional replay of the existing unchanged special-number worker proof can be proposed with the untimed window, but is not silently added as work or counted as completed here.
+
+Publication and activation are not part of this proposal. If later authorized, use a separate new default-off queue proof workflow and an exact digest-bound intent-only activation child, never any held path. Maintain read-only repository permissions, original-attempt-only execution, bounded preserve steps and raw-first artifacts. Source correctness and mechanism evidence cannot substitute for these fresh gates.
+
+## Bounded cost estimate and stopping condition
+
+Prospective hard bounds reuse the accepted adapter: 90-minute outer job; 82-minute work deadline; setup at most 10 minutes; each whole-arm gate 15 minutes plus fixed cleanup; source/tool freeze and pre-screen admission at most two minutes each; untimed aggregate six minutes; performance controller 35 minutes, including calibration and all slots. The screen starts only when its full 35 minutes plus cleanup remain. A 180-second calibration process, 90-second measurement/untimed process, 64 MiB Arena, 512 MiB subject RSS, 256 MiB controller RSS, 8 MiB subject output and two-second termination grace remain unchanged. These are ceilings, not an empirical prediction that gates or the screen finish.
+
+Eight cases reduce per-process cases by 20% from the reviewed ten-case native screen. Planned operation-clock chunk counts: 32 × 8 × 7 = 1792 measured chunks; 32 × 8 × 32 = 8192 measurement warmups; 4 × 8 × 32 = 1024 calibration warmups; 4 × 8 × 5 × 3 = 480 calibration samples. Total 11,488 timed chunks across 36 processes, plus 64 untimed min/max chunks across four processes. At a hypothetical 12 ms per chunk the bodies alone total about 138 seconds, but many calibration/warmup chunks use a larger fixed count and setup/GC/validation can dominate. This arithmetic is not a latency forecast.
+
+Per maximum chunk: small numeric drain 266,240 peek/dequeue pairs; large numeric drain 1,048,832 pairs; each scalar peek cell 4,194,304 peeks; object drain 65,552 pairs including 32,784 uncached JSON decodes after public priming. Retained queue fixtures are at most 4097 values per chunk, or two 33-value queues; no R-proportional retained history. The RSS ceiling covers temporary JS objects; the Arena ceiling is not an RSS guarantee.
+
+Stop after the original bounded hosted attempt reaches success, failure or its deadline; preserve everything, perform independent raw/source/receipt reconstruction, and report all sixteen cells. A failed full gate stops before clocks. A failed untimed case stops before calibration. An incomplete or unstable screen ends as inconclusive, with no replacement slots, expanded caps, silent narrowing or automatic rerun. Existing held publications remain untouched.
+
+## Inspection sources
+
+- `/workspace/shared/zerocopy-queue-vector-cache-20261009/REPORT.md`, `INDEPENDENT_REVIEW.md`, `followup/summary.json`
+- `/workspace/shared/zerocopy-native-key-ci-review-20261009/REPORT.md`
+- `/workspace/scratch/e7ec22ef2609/zerocopy-native-key-ci-20261009/proofs/native-key-ci/{subject.mjs,protocol.json,math.mjs,controller.py,ci.py,report.mjs,README.md}`
+- `/workspace/scratch/e7ec22ef2609/zerocopy-queue-vector-cache-20261009/{shared-queue.ts,arena.ts,persistent-core.as.ts,shared-queue-prefix.test.ts,CONTRIBUTING.md,docs/architecture.md}`
+- `/workspace/shared/zerocopy-optimization-ledger.md`
+
+No `AGENTS.md` was found in the inspected checkout or ancestor paths, and neither inspected checkout has `.agents/skills`. This proposal is the deliverable before implementation or execution; the next step is coordinator/source review and a separately coordinated untimed window.

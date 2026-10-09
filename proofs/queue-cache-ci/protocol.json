@@ -1,0 +1,242 @@
+{
+  "schema": 3,
+  "purpose": "Prospective eight-workload Linux x64 queue prefix-cache screen; fresh exact-source full gates required; pointwise exploratory results only, no PR promotion or cross-platform certification",
+  "entrypoint": "official portable dist/shared.js for both runtimes",
+  "runtimes": [
+    "node",
+    "bun"
+  ],
+  "runtimeVersions": {
+    "node": "v22.23.3",
+    "bun": "1.4.2"
+  },
+  "architecture": "x64",
+  "blocks": 4,
+  "orders": [
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ]
+  ],
+  "runtimeOrders": [
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ],
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ]
+  ],
+  "calibration": {
+    "warmupChunks": 32,
+    "samplesPerLevel": 3,
+    "targetChunkMs": 12,
+    "selection": "Smallest fixed ladder count whose median reaches target in BOTH arms; otherwise common maximum, flag calibration floor. Every level is collected for both arms before selection.",
+    "minimumWarmupBodyMs": 200
+  },
+  "measurement": {
+    "warmupChunks": 32,
+    "samples": 7,
+    "minimumChunkMs": 5,
+    "warmupDriftFraction": 0.1,
+    "minimumWarmupBodyMs": 200,
+    "warmupComparisonWindow": 8
+  },
+  "memory": {
+    "maximumArenaBytes": 67108864,
+    "maximumSubjectRssBytes": 536870912,
+    "maximumControllerRssBytes": 268435456,
+    "rssPollMs": 100,
+    "maximumOutputBytes": 8388608
+  },
+  "budgets": {
+    "calibrationProcessWallSeconds": 180,
+    "measurementProcessWallSeconds": 90,
+    "untimedProcessWallSeconds": 90,
+    "controllerWallSeconds": 2100,
+    "terminationGraceSeconds": 2
+  },
+  "statistics": {
+    "pointwiseConfidence": 0.95,
+    "pairedLogRatioDf": 3,
+    "tCritical": 3.182446305284263,
+    "materialLossRatio": 1.02,
+    "worthwhileGainRatio": 0.95,
+    "aaDiagnosticFraction": 0.05,
+    "sampleRelativeMadDiagnosticFraction": 0.05
+  },
+  "cases": [
+    {
+      "id": "drain-number-65",
+      "operation": "drain",
+      "type": "number",
+      "size": 65,
+      "shape": "unprimed",
+      "ladder": [
+        1,
+        8,
+        64,
+        512,
+        4096
+      ],
+      "unit": "nanoseconds per complete 65-item drain",
+      "itemsPerOperation": 65
+    },
+    {
+      "id": "drain-number-4097",
+      "operation": "drain",
+      "type": "number",
+      "size": 4097,
+      "shape": "unprimed",
+      "ladder": [
+        1,
+        4,
+        16,
+        64,
+        256
+      ],
+      "unit": "nanoseconds per complete 4097-item drain",
+      "itemsPerOperation": 4097
+    },
+    {
+      "id": "peek-prefix-warm",
+      "operation": "peek",
+      "type": "number",
+      "size": 4097,
+      "shape": "warm-prefix",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "unit": "nanoseconds per public peek call",
+      "itemsPerOperation": 1
+    },
+    {
+      "id": "peek-alternate-roots",
+      "operation": "peek",
+      "type": "number",
+      "size": 33,
+      "shape": "alternate-roots",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "unit": "nanoseconds per public peek call",
+      "itemsPerOperation": 1
+    },
+    {
+      "id": "peek-alternate-blocks",
+      "operation": "peek",
+      "type": "number",
+      "size": 4097,
+      "shape": "alternate-blocks",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "unit": "nanoseconds per public peek call",
+      "itemsPerOperation": 1
+    },
+    {
+      "id": "peek-empty",
+      "operation": "peek",
+      "type": "number",
+      "size": 0,
+      "shape": "empty",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "unit": "nanoseconds per public peek call",
+      "itemsPerOperation": 1
+    },
+    {
+      "id": "peek-tail-only",
+      "operation": "peek",
+      "type": "number",
+      "size": 32,
+      "shape": "tail",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "unit": "nanoseconds per public peek call",
+      "itemsPerOperation": 1
+    },
+    {
+      "id": "drain-object-4097-mixed-decode",
+      "operation": "drain",
+      "type": "object",
+      "size": 4097,
+      "shape": "mixed-decode",
+      "ladder": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "unit": "nanoseconds per complete 4097-item drain",
+      "itemsPerOperation": 4097
+    }
+  ],
+  "explicitlyUnmeasured": [
+    "standalone first-ever-call latency",
+    "module and process startup",
+    "Arena construction and enqueue setup",
+    "all-cold object reads",
+    "standalone string queues",
+    "nested collection decode latency",
+    "worker attachment latency",
+    "rolling enqueue/dequeue latency",
+    "growth latency or wrapper retention",
+    "SharedMap setup-history integration control",
+    "browser latency",
+    "ARM latency",
+    "heap or physical-memory savings"
+  ]
+}

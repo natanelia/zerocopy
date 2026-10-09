@@ -1,0 +1,90 @@
+name: Queue prefix cache screen (default off)
+
+on:
+  push:
+    branches: [proof/queue-prefix-cache-ci-20261009]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: queue-prefix-cache-ci-20261009
+  cancel-in-progress: false
+
+jobs:
+  validate-and-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        timeout-minutes: 2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify reviewed packet and default-off activation
+        id: activation
+        run: python3 proofs/queue-cache-ci/ci.py preflight
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 2
+        with:
+          node-version: '22.23.3'
+          architecture: x64
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 2
+        with:
+          bun-version: '1.4.2'
+      - name: Fresh exact source and frozen dependencies
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 7
+        run: python3 proofs/queue-cache-ci/ci.py setup
+      - name: Complete baseline standard correctness and build gates
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 16
+        run: python3 proofs/queue-cache-ci/ci.py gate --arm baseline
+      - name: Complete candidate standard correctness and build gates
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 16
+        run: python3 proofs/queue-cache-ci/ci.py gate --arm candidate
+      - name: Freeze fresh source, builds, tools and successful gates
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 3
+        run: |
+          node proofs/queue-cache-ci/protocol.test.mjs
+          node proofs/queue-cache-ci/subject.test.mjs
+          node proofs/queue-cache-ci/ci-report.test.mjs
+          python3 proofs/queue-cache-ci/controller.test.py
+          python3 proofs/queue-cache-ci/ci.test.py
+          python3 proofs/queue-cache-ci/ci.py freeze
+      - name: Check all original fixtures without operation clocks
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 9
+        run: python3 proofs/queue-cache-ci/ci.py untimed
+      - name: Run the original bounded four-block screen once
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 38
+        run: python3 proofs/queue-cache-ci/ci.py screen
+      - name: Report complete or partial original evidence
+        if: always() && steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 1
+        env:
+          RESULTS: ${{ steps.activation.outputs.results }}
+        run: |
+          if [ -f "$RESULTS/screen/ledger.json" ]; then
+            node "$RESULTS/harness/report.mjs" "$RESULTS/screen"
+          fi
+      - name: Preserve sources, builds, failure logs and partial slots
+        if: always() && steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 2
+        run: python3 proofs/queue-cache-ci/ci.py preserve
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 3
+        with:
+          name: queue-cache-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ steps.activation.outputs.results }}/**
+            !${{ steps.activation.outputs.results }}/sources/**
+          retention-days: 30
+          if-no-files-found: error
