@@ -1,0 +1,73 @@
+name: Heap insertion current memory chart
+
+on:
+  push:
+    branches: [proof/heap-memory-chart-20261009]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: heap-memory-chart-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  memory:
+    if: github.ref == 'refs/heads/proof/heap-memory-chart-20261009'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check out only the measured runtime
+        uses: actions/checkout@v4
+        with:
+          ref: 9972561c60e93500ae092c2b752880dca7740fdf
+          path: .heap-chart-source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify exact source and unchanged method
+        run: node proofs/heap-memory-chart-proof.mjs before .heap-chart-source .heap-chart-evidence
+      - name: Install and build the pinned runtime
+        working-directory: .heap-chart-source
+        run: |
+          set -euo pipefail
+          bun install 2>&1 | tee ../.heap-chart-evidence/install.log
+          bun run build:wasm 2>&1 | tee ../.heap-chart-evidence/build-wasm.log
+          bun run build:browser 2>&1 | tee ../.heap-chart-evidence/build-browser.log
+      - name: Verify built modules and accounting prerequisites
+        run: |
+          set -euo pipefail
+          node proofs/heap-memory-chart-proof.mjs built .heap-chart-source .heap-chart-evidence
+          node --test .heap-chart-source/proofs/investigation-memory-checks.mjs 2>&1 | tee .heap-chart-evidence/accounting-checks.log
+      - name: Measure the original 90 fresh-process cases
+        working-directory: .heap-chart-source
+        env:
+          MEMORY_SOURCE: 9972561c60e93500ae092c2b752880dca7740fdf
+          MEMORY_OUT: ../.heap-chart-evidence/raw
+          MEMORY_ENTRIES: '100000'
+          MEMORY_TRIALS: '3'
+          MEMORY_READERS: '0,2,4'
+          MEMORY_FIXTURES: repeated,unique,unicode
+          MEMORY_KINDS: shared,immutable,native,centralized
+        run: |
+          set -euo pipefail
+          node ../proofs/heap-memory-chart-proof.mjs measure . ../.heap-chart-evidence 2>&1 | tee ../.heap-chart-evidence/measurement.log
+      - name: Recompute raw totals and prepare existing data files for review
+        run: node proofs/heap-memory-chart-proof.mjs audit .heap-chart-source .heap-chart-evidence
+      - name: Retain source, modules, logs and every raw sample
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heap-memory-chart-${{ github.sha }}
+          path: .heap-chart-evidence/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,71 @@
+{
+  "schema": "zerocopy-heap-memory-chart-protocol/v1",
+  "candidateCommit": "9972561c60e93500ae092c2b752880dca7740fdf",
+  "candidateTree": "33e99353fbc136ea585dec2f9fce47514f4cf543",
+  "baselineCommit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+  "reference": {
+    "runId": 37822796651,
+    "artifactId": 11570346443,
+    "artifactSHA256": "4a35555abc6e7b49f2c9683afc7738a643696b99dce1b20b7fe89d22cf25b647",
+    "summarySHA256": "22268f73f2569f7f99e850ffd6dbb685808a103f59f655057c187b802ba88934",
+    "sourceCommit": "9e07669cc1823e171dbd67ff1ed88bb7e045d39e",
+    "chartHead": "56211356dfdb7356b8b3e572109625aa81207d0a"
+  },
+  "runtime": "v22.23.3",
+  "v8": "12.4.254.21-node.57",
+  "platform": "linux",
+  "arch": "x64",
+  "runner": "ubuntu-24.04",
+  "bunRevision": "1.4.2+744846f84",
+  "assemblyscript": "0.28.20",
+  "immutable": "5.1.9",
+  "entries": 100000,
+  "trials": 3,
+  "readerCounts": [
+    0,
+    2,
+    4
+  ],
+  "fixtures": [
+    "repeated",
+    "unique",
+    "unicode"
+  ],
+  "kinds": [
+    "shared",
+    "immutable",
+    "native",
+    "centralized"
+  ],
+  "stages": [
+    "loaded",
+    "queried",
+    "append-retained",
+    "released",
+    "streamed"
+  ],
+  "runCount": 90,
+  "stateSamples": 450,
+  "method": "Sum of post-GC JavaScript heap and tracked ArrayBuffer deltas across the controller, owner, and every reader, plus current unique shared WASM buffer capacity counted once. Empty, imported workers are the baseline. Includes caches, spare WASM capacity and unreclaimed arena history. External memory is retained as a diagnostic, not added twice. Not browser memory, RSS, virtual reservation, or peak temporary allocation.",
+  "proofHashes": {
+    "investigation-memory-agent.mjs": "2cbe3e72c0719042e6da34e1b6ebaf1eb2d614d34876a50885ce6d3e51179ecc",
+    "investigation-memory-case.mjs": "fbce2ca8a4df7cae924c9620fe6dc15637527fb84011666f039d2f944ecf4eb7",
+    "investigation-memory-checks.mjs": "26000200c96dd099d622291572d47d09622b8c595bf56d23f111f38842f56e03",
+    "investigation-memory-model.mjs": "11c27035bfe0503a651b302e02c23ffc08c1d7e31ed634949ef3be349633ec04",
+    "investigation-memory-runtime.mjs": "d567cba1d9ee4650dd821c97b688837a156b33f83299375a0db38b2543c0149a",
+    "investigation-memory.mjs": "31a008d71c7cfa4b53e6ae0c226e5d40cb3d4a5232319a746c3b785d80bee032"
+  },
+  "adapterHashes": {
+    "assets/explorer-core.mjs": "38127940855b78c60ca6b01bff6c27677cf7472315611aa28623241434ac1dd7",
+    "assets/explorer-reference.mjs": "9fbe7291af0a8775b74b5216c0bd0c253487a2e977bda7de3d9c8634d3bae082",
+    "assets/explorer-storage.mjs": "1531c5c4efc2c665469f4361ffaf589b17fa2f8b0a08e46dea1910aafe1388bd",
+    "assets/immutable-storage.mjs": "de1e4e1a15f5433b27d1ef43d843bca0c27729db9c5d1cc3e1262d572d43fd39"
+  },
+  "vendorHash": "521270c998410a0c1835fc027620308acd97dc090584c44225d8d9dabb6f300c",
+  "limits": [
+    "This refresh describes current memory; it does not establish heap-insertion speed or memory savings in this workload.",
+    "The hosted runner CPU and image revision are recorded, not assumed identical to the reference.",
+    "The reference did not retain a dependency lockfile; direct compiler, bundler, benchmark vendor and Node versions are pinned and the new resolved lockfile is retained.",
+    "Raw memory evidence must pass review before replacing existing chart data and numbers. No deployment or merge is included."
+  ]
+}
