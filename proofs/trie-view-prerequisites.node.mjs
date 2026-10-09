@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync, spawn } from 'node:child_process';
+import { closeSync, existsSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { BASELINE_COMMIT, CANDIDATE_RUNTIME_COMMIT, sha256 } from './trie-view-source.mjs';
-import { diagnosticIdentity, KNOWN_WORKER_DIAGNOSTICS, parseWorkerDiagnostics, REQUIRED_CHECKS, runCheck, validatePrerequisites, workerSourceOutcome } from './trie-view-prerequisites.mjs';
+import { diagnosticIdentity, KNOWN_WORKER_DIAGNOSTICS, parseWorkerDiagnostics, PREREQUISITE_TIMEOUT_MS, REQUIRED_CHECKS, runBoundedCommand, runCheck, validatePrerequisites, workerSourceOutcome } from './trie-view-prerequisites.mjs';
 
 const repository = dirname(dirname(fileURLToPath(import.meta.url)));
 const original = readFileSync(new URL('./trie-view-worker-types.baseline.txt', import.meta.url), 'utf8');
@@ -37,7 +37,7 @@ test('all required prerequisite receipts must pass, including built worker consu
   const checks = REQUIRED_CHECKS.map(key => {
     const [build, name] = key.split('/'), log = `${build}-${name}.log`;
     writeFileSync(join(root, log), 'pass');
-    return { build, name, log, sha256: sha256('pass'), status: 0, outcome: 'pass', signal: null, error: null, finished: '2026-10-08T00:00:00.000Z' };
+    return { build, name, log, sha256: sha256('pass'), status: 0, outcome: 'pass', signal: null, error: null, finished: '2026-10-08T00:00:00.000Z', timeoutMs: PREREQUISITE_TIMEOUT_MS, timedOut: false, interrupted: null, cleanup: { status: 'verified-no-live-processes' } };
   });
   const data = { status: 'completed', baseline: BASELINE_COMMIT, candidate: CANDIDATE_RUNTIME_COMMIT, checks };
   const save = () => writeFileSync(join(root, 'prerequisites.json'), JSON.stringify(data)); save();
@@ -51,17 +51,55 @@ test('all required prerequisite receipts must pass, including built worker consu
   assert.throws(() => validatePrerequisites(root), /prerequisites/);
   data.checks = checks; const worker = checks.find(c => c.name === 'worker-types');
   worker.status = 2; worker.outcome = 'known-diagnostic-parity'; save(); assert.throws(() => validatePrerequisites(root), /Failed prerequisite/);
-  worker.status = 0; worker.outcome = 'pass'; data.status = 'partial'; save(); assert.throws(() => validatePrerequisites(root));
+  worker.status = 0; worker.outcome = 'pass';
+  for (const [field, invalid] of [['timedOut', true], ['interrupted', 'SIGTERM'], ['timeoutMs', PREREQUISITE_TIMEOUT_MS + 1]]) {
+    const original = worker[field]; worker[field] = invalid; save(); assert.throws(() => validatePrerequisites(root)); worker[field] = original;
+  }
+  data.status = 'partial'; save(); assert.throws(() => validatePrerequisites(root));
   data.status = 'completed'; save(); writeFileSync(join(root, checks[0].log), 'changed'); assert.throws(() => validatePrerequisites(root), /log changed/);
 });
-test('failed prerequisite commands preserve raw output, exit status, and partial receipts without retry', t => {
+test('failed prerequisite commands preserve raw output, exit status, and partial receipts without retry', async t => {
   const root = mkdtempSync(join(tmpdir(), 'trie-prerequisite-failure-')); t.after(() => rmSync(root, { recursive: true, force: true }));
   writeFileSync(join(root, 'prerequisites.json'), JSON.stringify({ status: 'partial', checks: [] }));
   const args = ['-e', "process.stdout.write('partial-out'); process.stderr.write('diagnostic'); process.exit(3)"];
-  assert.equal(runCheck(root, 'gate', 'runtime', root, process.execPath, args), false);
+  assert.equal(await runCheck(root, 'gate', 'runtime', root, process.execPath, args), false);
   const receipt = JSON.parse(readFileSync(join(root, 'prerequisites.json'))), check = receipt.checks[0];
   assert.equal(receipt.status, 'partial'); assert.equal(check.status, 3); assert.equal(check.outcome, 'failed');
   assert.match(readFileSync(join(root, check.log), 'utf8'), /partial-outdiagnostic/);
   assert.equal(sha256(readFileSync(join(root, check.log))), check.sha256);
-  assert.throws(() => runCheck(root, 'gate', 'runtime', root, process.execPath, args), /retried or overwritten/);
+  await assert.rejects(runCheck(root, 'gate', 'runtime', root, process.execPath, args), /retried or overwritten/);
+});
+test('fixed command deadline preserves output and terminates descendants that ignore TERM', async t => {
+  const root = mkdtempSync(join(tmpdir(), 'trie-prerequisite-timeout-')); t.after(() => rmSync(root, { recursive: true, force: true }));
+  const log = join(root, 'raw.log'), fd = openSync(log, 'wx');
+  const parent = "trap '' TERM; (trap '' TERM; printf 'descendant-started\\n'; while :; do printf 'still-running\\n'; sleep 0.02; done) & wait";
+  let result;
+  try { result = await runBoundedCommand('/bin/sh', ['-c', parent], root, fd, 300); }
+  finally { closeSync(fd); }
+  assert.equal(result.timedOut, true); assert.equal(result.signal, 'SIGKILL'); assert.equal(result.interrupted, null);
+  assert.equal(result.cleanup.status, 'verified-no-live-processes'); assert.deepEqual(result.cleanup.survivors, []);
+  const bytes = readFileSync(log); assert.match(bytes.toString(), /descendant-started/);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  assert.deepEqual(readFileSync(log), bytes, 'No descendant may append after receipt finalization');
+});
+test('parent termination retains a failed finalized receipt and the already-written start header', async t => {
+  const root = mkdtempSync(join(tmpdir(), 'trie-prerequisite-interrupt-')); t.after(() => rmSync(root, { recursive: true, force: true }));
+  writeFileSync(join(root, 'prerequisites.json'), JSON.stringify({ status: 'partial', checks: [] }));
+  const runner = fileURLToPath(new URL('./trie-view-prerequisites.mjs', import.meta.url));
+  const child = spawn(process.execPath, [runner, 'check', root, 'gate', 'runtime', root, process.execPath, '-e', "console.log('child-started');setInterval(()=>{},1000)"], { stdio: ['ignore', 'pipe', 'pipe'] });
+  let output = ''; child.stdout.on('data', chunk => { output += chunk; }); child.stderr.resume();
+  const exited = new Promise(resolve => child.once('close', (code, signal) => resolve({ code, signal })));
+  t.after(() => { if (child.exitCode === null) child.kill('SIGTERM'); });
+  const deadline = Date.now() + 5000;
+  while (!output.includes('"timeoutMs":300000') || !existsSync(join(root, 'logs/gate-runtime.log')) || !/^child-started$/m.test(readFileSync(join(root, 'logs/gate-runtime.log'), 'utf8'))) {
+    assert(Date.now() < deadline, 'Synthetic child did not start');
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  assert.match(output, /"timeoutMs":300000/);
+  child.kill('SIGTERM'); assert.deepEqual(await exited, { code: 1, signal: null });
+  const receipt = JSON.parse(readFileSync(join(root, 'prerequisites.json'))), check = receipt.checks[0];
+  assert.equal(receipt.status, 'partial'); assert.equal(check.outcome, 'failed'); assert.equal(check.interrupted, 'SIGTERM');
+  assert.equal(check.signal, 'SIGKILL'); assert.equal(check.timedOut, false); assert.equal(typeof check.finished, 'string');
+  assert.equal(check.cleanup.status, 'verified-no-live-processes'); assert.deepEqual(check.cleanup.survivors, []);
+  assert.equal(check.sha256, sha256(readFileSync(join(root, check.log))));
 });

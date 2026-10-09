@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "priorRun": 37867002724,
+  "priorRunUrl": "https://github.com/natanelia/zerocopy/actions/runs/37867002724",
+  "priorProof": "aea884493421b1ff067a39e65f0f4b9d4d11e68a",
+  "priorTree": "e40aae8025dc0a994e790b1961a9e7b511dede43",
+  "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+  "candidate": "c79c803bf7c59a2fc559e43ce7cc74aa4dacde15",
+  "jobs": {
+    "node": {
+      "jobId": 113615998516,
+      "jobUrl": "https://github.com/natanelia/zerocopy/actions/runs/37867002724/job/113615998516",
+      "conclusion": "failure",
+      "artifactId": 11588907283,
+      "artifactApiUrl": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/11588907283",
+      "zipSha256": "a209c1717f1233be8c63c20e77ba5bc3344110eea70ebe76ee71672653b00b61",
+      "tarSha256": "33de690e92ce59e8a1884bc43938e902314b8573425d09fff375ff83901ff87f",
+      "sidecarVerified": true,
+      "prerequisiteManifestStatus": "partial",
+      "lastReceipt": {
+        "build": "candidate",
+        "name": "unit",
+        "cwd": "/home/runner/work/zerocopy/zerocopy",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "status": 1,
+        "outcome": "failed",
+        "log": "logs/candidate-unit.log",
+        "sha256": "ecdc9237f1278e6a55cfde3d3cde66d00f9adeb78e632f2672e4c22ded3b082f",
+        "started": "2026-10-09T00:54:22.028Z",
+        "finished": "2026-10-09T00:54:46.394Z",
+        "signal": null,
+        "error": null,
+        "validationError": "AssertionError [ERR_ASSERTION]: Failed prerequisite candidate/unit\n\n1 !== 0\n\n    at runCheck (file:///home/runner/work/zerocopy/zerocopy/proofs/trie-view-prerequisites.mjs:86:12)\n    at file:///home/runner/work/zerocopy/zerocopy/proofs/trie-view-prerequisites.mjs:99:44\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+      },
+      "candidateUnitRawLogSha256": "ecdc9237f1278e6a55cfde3d3cde66d00f9adeb78e632f2672e4c22ded3b082f",
+      "seal": "skipped",
+      "pilots": "skipped",
+      "measured": "skipped",
+      "retentionSteps": "all three succeeded",
+      "baselineFullStandardBun": {
+        "passed": 753,
+        "failed": 0
+      },
+      "gateDirectoryPresent": false,
+      "candidateFullStandardBun": {
+        "passed": 767,
+        "failed": 1,
+        "total": 768,
+        "failure": "geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth",
+        "error": "Test timed out in 5000ms."
+      }
+    },
+    "bun": {
+      "jobId": 113615998413,
+      "jobUrl": "https://github.com/natanelia/zerocopy/actions/runs/37867002724/job/113615998413",
+      "conclusion": "cancelled",
+      "artifactId": 11590418558,
+      "artifactApiUrl": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/11590418558",
+      "zipSha256": "dbf627b929ca956995c475e986ad93489be730bbfa9cd4fd79fdbbfc8cf72f65",
+      "tarSha256": "2a4b84991ac956b96d1d68cb8d63e9186932328bec3132aeaf705d131f8435f3",
+      "sidecarVerified": true,
+      "prerequisiteManifestStatus": "partial",
+      "lastReceipt": {
+        "build": "candidate",
+        "name": "unit",
+        "cwd": "/home/runner/work/zerocopy/zerocopy",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "status": null,
+        "outcome": "pending",
+        "log": "logs/candidate-unit.log",
+        "sha256": null,
+        "started": "2026-10-09T00:54:04.227Z",
+        "finished": null,
+        "signal": null,
+        "error": null
+      },
+      "candidateUnitRawLogSha256": "b9fcdabc7812a39beecbbe2d4f2864ddde206a468ac899c6bc5958a329760f67",
+      "seal": "skipped",
+      "pilots": "skipped",
+      "measured": "skipped",
+      "retentionSteps": "all three succeeded",
+      "baselineFullStandardBun": {
+        "passed": 753,
+        "failed": 0
+      },
+      "gateDirectoryPresent": false,
+      "termination": "60-minute job cap; no manual cancellation",
+      "candidatePartialOutput": {
+        "reportedFiles": 40,
+        "reportedTests": 765,
+        "reportedFailures": 0,
+        "missingTestFile": "worker-tasks.test.ts",
+        "missingTestCount": 3,
+        "geometry": "4 tests reported passed",
+        "trieViewCapture": "15 tests reported passed",
+        "finalSuiteSummaryPresent": false,
+        "interpretation": "Reported completed-file output is not a successful final suite receipt."
+      }
+    }
+  },
+  "interpretation": "Both original jobs stopped before prerequisite sealing, pilots or measurements. No original failed or pending prerequisite is a pass. Recovery is correctness-only.",
+  "localDiagnostic": {
+    "fullSuiteOverlay": "The unchanged candidate semantic test and fixture were copied to baseline for a predeclared paired diagnostic. Original assertions, config and 5000 ms timeout were unchanged.",
+    "geometryIsolated": {
+      "baseline": "4/4 passed",
+      "candidate": "4/4 passed"
+    },
+    "balancedFullSuite": {
+      "baseline": {
+        "passed": 743,
+        "failed": 25,
+        "total": 768,
+        "logSha256": "83a974a7dc74480e991169cf3a70b61a06bf9f9df2e0f69b6d49425e456a6425"
+      },
+      "candidate": {
+        "passed": 746,
+        "failed": 22,
+        "total": 768,
+        "logSha256": "8a0f3662e7073ffce53622e382244dd5046dfab3387d2fc5f233f60bfad0911f"
+      }
+    },
+    "limitation": "These full-suite diagnostics overlapped heap full-suite validation and reused local dependencies/cache. They establish no CI cause, intrinsic flakiness or performance result. No further local full-suite rerun accompanied recovery."
+  }
+}

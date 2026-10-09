@@ -1,7 +1,7 @@
 // Untimed prerequisite receipts and supplementary source-diagnostic inspection.
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
-import { closeSync, mkdirSync, openSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { closeSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BASELINE_COMMIT, CANDIDATE_RUNTIME_COMMIT, sha256 } from './trie-view-source.mjs';
@@ -15,7 +15,62 @@ export const REQUIRED_CHECKS = Object.freeze([
   ...['runtime', 'install', 'baseline-worktree', 'sources', 'compilers', 'exact-builds'].map(name => `gate/${name}`),
 ]);
 const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
-const saveJson = (path, value) => writeFileSync(path, JSON.stringify(value, null, 2) + '\n');
+const saveJson = (path, value) => {
+  writeFileSync(`${path}.pending`, JSON.stringify(value, null, 2) + '\n');
+  renameSync(`${path}.pending`, path);
+};
+// This bounds an entire command, never an individual assertion or Vitest test.
+export const PREREQUISITE_TIMEOUT_MS = 300_000;
+export const CLEANUP_TIMEOUT_MS = 1000;
+export function processGroupMembers(group) {
+  const members = [];
+  for (const name of readdirSync('/proc')) {
+    if (!/^[1-9][0-9]*$/.test(name)) continue;
+    let stat;
+    try { stat = readFileSync(`/proc/${name}/stat`, 'utf8'); }
+    catch (error) { if (['ENOENT', 'ESRCH'].includes(error.code)) continue; throw error; }
+    const fields = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
+    if (Number(fields[2]) === group) members.push({ pid: Number(name), state: fields[0] });
+  }
+  return members.sort((a, b) => a.pid - b.pid);
+}
+async function verifyGroupCleanup(group) {
+  const deadline = Date.now() + CLEANUP_TIMEOUT_MS;
+  for (;;) {
+    const members = processGroupMembers(group), survivors = members.filter(({ state }) => !['Z', 'X'].includes(state));
+    if (!survivors.length) return { status: 'verified-no-live-processes', group, members, survivors, timeoutMs: CLEANUP_TIMEOUT_MS };
+    if (Date.now() >= deadline) return { status: 'failed', group, members, survivors, timeoutMs: CLEANUP_TIMEOUT_MS };
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+}
+export function runBoundedCommand(command, args, cwd, fd, timeoutMs = PREREQUISITE_TIMEOUT_MS) {
+  assert.equal(process.platform, 'linux', 'Prerequisite process-group cleanup requires Linux');
+  assert(Number.isSafeInteger(timeoutMs) && timeoutMs > 0);
+  return new Promise(resolve => {
+    const child = spawn(command, args, { cwd, detached: true, stdio: ['ignore', fd, fd] });
+    let timedOut = false, interrupted = null, error = null;
+    const stop = () => {
+      if (!child.pid) return;
+      try { process.kill(-child.pid, 'SIGKILL'); }
+      catch (cause) { if (cause.code !== 'ESRCH') error ??= String(cause); }
+    };
+    const interrupt = signal => { interrupted ??= signal; stop(); };
+    const onTerm = () => interrupt('SIGTERM'), onInt = () => interrupt('SIGINT');
+    process.on('SIGTERM', onTerm); process.on('SIGINT', onInt);
+    const timer = setTimeout(() => { timedOut = true; stop(); }, timeoutMs);
+    child.once('error', cause => { error = String(cause); });
+    child.once('close', async (status, signal) => {
+      // A shell may exit while descendants still hold the raw log descriptor.
+      // End its whole group before hashing or archiving the command's evidence.
+      stop(); clearTimeout(timer);
+      let cleanup;
+      try { cleanup = child.pid ? await verifyGroupCleanup(child.pid) : { status: 'not-started', group: null, members: [], survivors: [], timeoutMs: CLEANUP_TIMEOUT_MS }; }
+      catch (cause) { error ??= String(cause); cleanup = { status: 'failed', group: child.pid ?? null, error: String(cause), timeoutMs: CLEANUP_TIMEOUT_MS }; }
+      process.off('SIGTERM', onTerm); process.off('SIGINT', onInt);
+      resolve({ status, signal, error, timedOut, interrupted, cleanup });
+    });
+  });
+}
 
 export function parseWorkerDiagnostics(output, source) {
   const diagnostics = [];
@@ -57,31 +112,40 @@ export function validatePrerequisites(directory, requireCompleted = true) {
     assert.equal(typeof check.log, 'string'); assert(!check.log.startsWith('/') && !check.log.split('/').includes('..'));
     const bytes = readFileSync(join(directory, check.log)); assert.equal(sha256(bytes), check.sha256, `Prerequisite log changed ${key}`);
     assert.equal(check.signal, null); assert.equal(check.error, null);
+    assert.equal(check.timeoutMs, PREREQUISITE_TIMEOUT_MS);
+    assert.equal(check.timedOut, false); assert.equal(check.interrupted, null);
+    assert.equal(check.cleanup?.status, 'verified-no-live-processes');
     assert.equal(typeof check.finished, 'string');
     assert.equal(check.status, 0, `Failed prerequisite ${key}`);
     assert.equal(check.outcome, 'pass');
   }
   return { ...data, manifestSha256: sha256(readFileSync(path)) };
 }
-export function runCheck(evidence, build, name, cwd, command, args) {
+export async function runCheck(evidence, build, name, cwd, command, args, requiredChecks = REQUIRED_CHECKS) {
   assert.match(build, /^(baseline|candidate|gate)$/); assert.match(name, /^[a-z0-9-]+$/);
-  assert(REQUIRED_CHECKS.includes(`${build}/${name}`), 'Unregistered prerequisite');
+  assert(requiredChecks.includes(`${build}/${name}`), 'Unregistered prerequisite');
   const manifestPath = join(evidence, 'prerequisites.json'), manifest = readJson(manifestPath);
-  Object.assign(manifest, { schema: 2, status: 'partial', baseline: BASELINE_COMMIT, candidate: CANDIDATE_RUNTIME_COMMIT,
+  Object.assign(manifest, { schema: manifest.schema ?? 2, status: 'partial', baseline: BASELINE_COMMIT, candidate: CANDIDATE_RUNTIME_COMMIT,
     gateCommit: process.env.GITHUB_SHA ?? null, runtime: process.env.PROOF_RUNTIME ?? null });
   assert(!manifest.checks.some(check => check.build === build && check.name === name), 'Prerequisite checks cannot be retried or overwritten');
   const log = `logs/${build}-${name}.log`, path = join(evidence, log), started = new Date().toISOString();
   mkdirSync(dirname(path), { recursive: true });
-  const check = { build, name, cwd: resolve(cwd), command: [command, ...args], status: null, outcome: 'pending', log, sha256: null, started, finished: null, signal: null, error: null };
+  const check = { build, name, cwd: resolve(cwd), command: [command, ...args], status: null, outcome: 'pending', log, sha256: null, started, finished: null, signal: null, error: null,
+    timeoutMs: PREREQUISITE_TIMEOUT_MS, timedOut: false, interrupted: null, cleanup: null };
   manifest.checks.push(check); saveJson(manifestPath, manifest);
-  writeFileSync(path, JSON.stringify({ build, name, cwd: check.cwd, command: check.command, started }) + '\n');
+  const header = JSON.stringify({ build, name, cwd: check.cwd, command: check.command, started, timeoutMs: check.timeoutMs }) + '\n';
+  writeFileSync(path, header, { flag: 'wx' });
+  process.stdout.write(header);
   let accepted = false;
   try {
     const fd = openSync(path, 'a');
     let result;
-    try { result = spawnSync(command, args, { cwd, stdio: ['ignore', fd, fd] }); }
+    try { result = await runBoundedCommand(command, args, cwd, fd); }
     finally { closeSync(fd); }
-    Object.assign(check, { status: result.status, signal: result.signal ?? null, error: result.error ? String(result.error) : null });
+    Object.assign(check, result);
+    assert.equal(check.cleanup?.status, 'verified-no-live-processes', `Prerequisite process cleanup unresolved: ${build}/${name}`);
+    assert.equal(check.timedOut, false, `Prerequisite command deadline exceeded: ${build}/${name}`);
+    assert.equal(check.interrupted, null, `Prerequisite command interrupted: ${build}/${name}`);
     assert.equal(check.signal, null); assert.equal(check.error, null);
     assert.equal(check.status, 0, `Failed prerequisite ${build}/${name}`); check.outcome = 'pass';
     accepted = true;
@@ -89,14 +153,14 @@ export function runCheck(evidence, build, name, cwd, command, args) {
     check.outcome = 'failed'; check.validationError = String(error.stack ?? error);
   } finally {
     check.sha256 = sha256(readFileSync(path)); check.finished = new Date().toISOString(); saveJson(manifestPath, manifest);
-    process.stdout.write(readFileSync(path));
+    process.stdout.write(readFileSync(path).subarray(Buffer.byteLength(header)));
     if (check.validationError) process.stderr.write(check.validationError + '\n');
   }
   return accepted;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [mode, evidence, build, name, cwd, command, ...args] = process.argv.slice(2);
-  if (mode === 'check') process.exitCode = runCheck(evidence, build, name, cwd, command, args) ? 0 : 1;
+  if (mode === 'check') process.exitCode = await runCheck(evidence, build, name, cwd, command, args) ? 0 : 1;
   else if (mode === 'seal') {
     validatePrerequisites(evidence, false);
     const path = join(evidence, 'prerequisites.json'), receipt = readJson(path);
