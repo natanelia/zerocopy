@@ -546,6 +546,45 @@ export class Arena {
     const leaf = this.radixFindUncached(root, key);
     this.reads.remember(key, root, leaf); return leaf;
   }
+  deleteSorted(root: number, key: string): number {
+    this.assertWritable();
+    if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+    if (!root) return root;
+    // Three UTF-8 bytes per UTF-16 code unit bound the existing 49152-byte
+    // staging range. Keep journals and longer keys on the established route.
+    if (key.length > 16384 || this.dv.getUint32(root, true) === 0xffffffff) {
+      const leaf = this.radixFind(root, key);
+      if (!leaf) return root;
+      const next = this.wasm.radixDelete(root, leaf + 16, this.dv.getUint32(leaf + 8, true)) >>> 0;
+      this.view.setUint32(8, this.wasm.radixSize(next), true); return next;
+    }
+    const reads = this.reads ??= new ReadCache(), slot = reads.slot(key);
+    const cached = slot !== undefined && reads.root(slot) === root;
+    if (cached && !reads.leaf(slot!)) return root;
+    let token: KeyToken | undefined, address: number, length: number;
+    if (slot !== undefined) {
+      const keyLeaf = reads.keyLeaf(slot);
+      address = keyLeaf + 16; length = this.dv.getUint32(keyLeaf + 8, true);
+    } else {
+      token = this.key(key); address = token.ptr ?? 16384; length = token.length;
+      if (token.ptr === undefined) {
+        this.refresh();
+        if (token.bytes) this.bytes.set(token.bytes, address);
+        else for (let i = 0; i < length; i++) this.bytes[address + i] = key.charCodeAt(i);
+      }
+    }
+    const view = this.dv;
+    try { return this.wasm.radixDeleteRecorded(root, address, length) >>> 0; }
+    finally {
+      // The old lookup primed the original root before deletion allocated.
+      // Scratch is covered by this shared view even when memory has grown.
+      const leaf = view.getUint32(0, true);
+      if (slot === undefined) {
+        if (leaf && token!.ptr === undefined) token!.ptr = leaf + 16;
+        reads.remember(key, root, leaf);
+      } else if (!cached) reads.update(slot, root, leaf);
+    }
+  }
   private radixFindUncached(root: number, key: string): number {
     const token = this.key(key);
     if (token.ptr !== undefined) return this.wasm.radixFind(root, token.ptr, token.length) >>> 0;

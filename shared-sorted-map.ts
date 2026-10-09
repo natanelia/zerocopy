@@ -41,8 +41,8 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
   get(key: string): ValueOf<T> | undefined { return this.arena.value(this.root, key, this.valueType, 0, true); }
   has(key: string): boolean { return this.arena.radixFind(this.root, key) !== 0; }
   delete(key: string): SharedSortedMap<T> {
-    const a = this.arena; a.assertWritable(); const leaf = a.radixFind(this.root, key); if (!leaf) return this;
-    return new SharedSortedMap(this.valueType, this.comparator, a.wasm.radixDelete(this.root, leaf + 16, a.dv.getUint32(leaf + 8, true)) >>> 0, undefined, a);
+    const a = this.arena, root = a.deleteSorted(this.root, key);
+    return root === this.root ? this : new SharedSortedMap(this.valueType, this.comparator, root, a.dv.getUint32(8, true), a);
   }
   private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
   *entries(): Generator<[string, ValueOf<T>]> {

@@ -722,6 +722,31 @@ function radixRemove(root: u32, key: u32, len: u32): u32 {
 }
 export function radixDelete(root: u32, key: u32, len: u32): u32 { root = materializeJournal(root, 2); return root ? radixRemove(root, key, len) : 0; }
 
+// Canonical roots only. Record the matched leaf before copying ancestors so
+// the caller can preserve lookup-cache effects even if an allocation traps.
+function radixRemoveRecorded(root: u32, key: u32, len: u32): u32 {
+  const kind = tag(root);
+  if (!kind) {
+    if (load<u32>(root + 8) != len || memory.compare(root + 16, key, len) != 0) return root;
+    store<u32>(0, root); return 0;
+  }
+  const bitmap = load<u32>(root + 4), bit: u32 = 1 << rdigit(key, len, kind - 3);
+  if (!(bitmap & bit)) return root;
+  const offset = pc(bitmap & (bit - 1)), count = pc(bitmap), old = load<u32>(root + 16 + offset * 4), child = radixRemoveRecorded(old, key, len);
+  if (old == child) return root;
+  if (!child && count == 2) return load<u32>(root + 16 + (1 - offset) * 4);
+  const p = radixBranch(kind - 3, child ? bitmap : bitmap & ~bit, radixSize(root) - 1, 0);
+  copyWords(p + 16, root + 16, offset * 4);
+  if (child) store<u32>(p + 16 + offset * 4, child);
+  copyWords(p + 16 + (offset + (child ? 1 : 0)) * 4, root + 20 + offset * 4, (count - offset - 1) * 4);
+  store<u32>(p + 12, representative(load<u32>(p + 16))); return p;
+}
+export function radixDeleteRecorded(root: u32, key: u32, len: u32): u32 {
+  store<u32>(0, 0);
+  const next = root ? radixRemoveRecorded(root, key, len) : 0;
+  store<u32>(8, radixSize(next)); return next;
+}
+
 // Single synchronous writer call: allocate the leaf, update the selected index,
 // and report new metadata. STAGE and result words are not snapshot payloads.
 const WRITE_STAGE: u32 = 16384;
