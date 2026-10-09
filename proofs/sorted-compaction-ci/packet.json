@@ -1,0 +1,227 @@
+{
+  "schema": 3,
+  "purpose": "Default-off sorted-compaction source preparation; no new-head subjects/builds/operation clocks",
+  "origin": {
+    "baselineCommit": "52d5fb012eb1f568e11807b7cb2a66c4566589e2",
+    "baselineTree": "0bc8d2425fe82e0b70bbb8558deb175536f90e9d",
+    "soleParent": "f4fad3a850cb544ff9440d263eeec464a31dd123",
+    "localTreeSource": "/workspace/shared/zerocopy-docs-concurrency-20261009",
+    "localTreeSourceHead": "a133b1d32498f28827ba99b85eb29eaf28f95bc8",
+    "changedFiles": [
+      "compaction.ts",
+      "persistent-core.as.ts",
+      "sorted-compaction.test.ts"
+    ],
+    "runtimeCommit": "69a58fead08f14082e04c4715bd89a4b3a09522c",
+    "runtimeTree": "cd69462ee2a06e5eef8d2c0b25457914c794530f",
+    "candidateCommit": "1646109ee5138b525990f7346a9d8eb4404e4b54",
+    "candidateTree": "6ded9e4d1f70c78117b61f27754fde8b25d91a22",
+    "runtimePatchSha256": "7c603d7071e92a789734dc424300c66e359f5d2c07349bb4b985b1f3671102ce",
+    "runtimeAndTestBytesUnchanged": true,
+    "buildsOrSubjectsRun": false,
+    "oldFocusedResultsTransferred": false,
+    "historicalBaselineCommit": "f4fad3a850cb544ff9440d263eeec464a31dd123",
+    "historicalCandidateCommit": "26fe38ce2b80849465ae7df16557cbe02a885e25",
+    "sourceHashes": {
+      "baseline": {
+        "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+        "persistent-core.as.ts": "85662fce0e95deef920c8fd52789b11657f0b5d7f00b9f195873c38bc99bfd6a",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "arena.ts": "71b858f8c25d52ab1b6fd8f6ab426512653fe5aee5586f801b74f6c144e11a31",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+        "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f"
+      },
+      "candidate": {
+        "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+        "persistent-core.as.ts": "e70569c2187a811b2fc91df60f59125712f3aca700d6634a04d9746462ece6ed",
+        "compaction.ts": "e71a344eabc25ef9dd452d435a9312f45c131eb9c2d086014209075e7227d60e",
+        "arena.ts": "71b858f8c25d52ab1b6fd8f6ab426512653fe5aee5586f801b74f6c144e11a31",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+        "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "sorted-compaction.test.ts": "cf7fbe3b3ecf775cebbc98e2b596941fef0afdf853ef50103ac23a39dc0c813d"
+      }
+    },
+    "expectedWasm": {
+      "baseline": {
+        "priority-queue.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "persistent-core.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+        "ordered-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "doubly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "sorted-tree.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "singly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "shared-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "shared-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+        "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0"
+      },
+      "candidate": {
+        "priority-queue.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "persistent-core.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+        "ordered-map.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "doubly-linked-list.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "sorted-tree.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "singly-linked-list.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "shared-map.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "linked-list.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "shared-list.wasm": "4cd7400b4a92ac0fd4305a70e6240fe74954b49ae23407ee1ef5b1d97b5dc32f",
+        "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0"
+      }
+    },
+    "coreAliases": [
+      "persistent-core.wasm",
+      "shared-map.wasm",
+      "shared-list.wasm",
+      "linked-list.wasm",
+      "singly-linked-list.wasm",
+      "doubly-linked-list.wasm",
+      "ordered-map.wasm",
+      "sorted-tree.wasm",
+      "priority-queue.wasm"
+    ],
+    "historicalEvidenceTransferred": false
+  },
+  "files": [
+    {
+      "path": ".github/workflows/sorted-compaction-ci.yml",
+      "sha256": "ec0504ea3eb2c58529d4f01a60e49d7e48ebc3333bc730b660b2cd4405739666",
+      "bytes": 3736
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/GATES.json",
+      "sha256": "aba99fd1f0048ab381c2b7fd0f0f9b3f3505fd5a979bd0f7fc717c37b0c1f1a1",
+      "bytes": 2010
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/README.md",
+      "sha256": "e0cddd1c8cf8f8f85a761258a30bf8a058cb1ef4f23886912fe3616616098158",
+      "bytes": 15442
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/REUSE-INPUTS.json",
+      "sha256": "d95653af89820380c41cfebf31fc3d2b170dfa6ca73499803c31038f52086116",
+      "bytes": 2653
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/SOURCE-INTEGRATION.json",
+      "sha256": "020329ca54062f902e119279dda74cbf653e56e43bcd72654a5a5919192f839a",
+      "bytes": 1069
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/ci-report.test.mjs",
+      "sha256": "876d71903d42bc37901523d606dfba91f9d7472492bc56e2f959e45332c1b4ff",
+      "bytes": 5552
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/ci.py",
+      "sha256": "73a1fcc22a0af490edaea2496debe6394cb094e76d8aa6c2c9e311194028d9fa",
+      "bytes": 29617
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/ci.test.py",
+      "sha256": "f59796c50281224e0608b4515c74fac67d3a1570e9198a78080607d99e110e9c",
+      "bytes": 20819
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/compare-emitted.py",
+      "sha256": "5731381ce1354b90aed130fdac439232cd25960b751eed9ac5725deb8eda5a4f",
+      "bytes": 2676
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/compiler-inputs.json",
+      "sha256": "77f26cb7d8fe4806a2c17f632334f4c33d8f7f7b9c9349baab9c7baec8c9f833",
+      "bytes": 46425
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/controller.py",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "bytes": 17534
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/controller.test.py",
+      "sha256": "381ed6ec4d2b450dc2e80f3821313972096cfd5460f0898c67b69df59042199d",
+      "bytes": 11708
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/dependencies.bun.lock",
+      "sha256": "3e2462a27f26395f52e20e1f958b227277d4e40c54c33ff64e06075c8fad99f3",
+      "bytes": 25987
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/fixtures.mjs",
+      "sha256": "67cab6d3be09a88f73a0dec48e45c4dc2a0277af5735267522c20f9ed0b20028",
+      "bytes": 16581
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/historical-evidence.json",
+      "sha256": "dd03bf8ba8accb3408a1422d9d855b3f2b1744b9f4fb67d5eb30bdf019a83a34",
+      "bytes": 3252
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/inspect-emitted.mjs",
+      "sha256": "8d3096a4b34be37ef2051891c4deb2113c3cda28d999f91a2a6f87f67faa7df0",
+      "bytes": 1395
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/math.mjs",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "bytes": 2387
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/origin.json",
+      "sha256": "887bac76d00e8e1fe25f40c954bd4b6744f63006da3a8dd8d50b9c7cf9eb691c",
+      "bytes": 6418
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/protocol.json",
+      "sha256": "26876dde7d0c262a926faf6d114a611763553da6b42a6f94ccfdf36f35850d44",
+      "bytes": 7306
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/protocol.test.mjs",
+      "sha256": "b3a94ab49f5823f7e0c1fb3e4fc9d487eb4ceb70366599f97d402aeee24676e2",
+      "bytes": 3014
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/report.mjs",
+      "sha256": "ca3fe54fa131f0739728e2a3227d77ce16466b738dff73adddf7dd0c31046f42",
+      "bytes": 8091
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/subject.mjs",
+      "sha256": "8aba588ea13162c7c54a6505b612e947ab4f6f5a5c97e4bc892bd9903486ab76",
+      "bytes": 6660
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/transport.mjs",
+      "sha256": "d613991eaf1d20e59917d504a964c617e12a3f54f092753e6f40cd05946030fe",
+      "bytes": 4703
+    },
+    {
+      "path": "proofs/sorted-compaction-ci/verify-untimed.mjs",
+      "sha256": "d2e436b0cdc5b07695114d82f03fdb09721fd045aff1fcbe5a377b63b9a7d1d2",
+      "bytes": 6701
+    }
+  ],
+  "activationFile": "proofs/sorted-compaction-ci/activation.json",
+  "activationExcludedFromDigestByDesign": true,
+  "sourceOnlyChecks": "14 frozen commands passed; preparation2 records all outputs",
+  "runtimeExecutionAuthorized": false
+}

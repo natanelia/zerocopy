@@ -1,0 +1,23 @@
+{
+  "baselineCommit": "52d5fb012eb1f568e11807b7cb2a66c4566589e2",
+  "baselineTree": "0bc8d2425fe82e0b70bbb8558deb175536f90e9d",
+  "soleParent": "f4fad3a850cb544ff9440d263eeec464a31dd123",
+  "localTreeSource": "/workspace/shared/zerocopy-docs-concurrency-20261009",
+  "localTreeSourceHead": "a133b1d32498f28827ba99b85eb29eaf28f95bc8",
+  "changedFiles": [
+    ".github/workflows/docs-website.yml",
+    "website/assets/isolation.mjs",
+    "website/tests/isolation-browser.mjs",
+    "website/tests/isolation-registration-cache.mjs",
+    "website/tests/isolation.test.mjs",
+    "website/tests/preview.test.mjs"
+  ],
+  "runtimeCommit": "69a58fead08f14082e04c4715bd89a4b3a09522c",
+  "runtimeTree": "cd69462ee2a06e5eef8d2c0b25457914c794530f",
+  "candidateCommit": "1646109ee5138b525990f7346a9d8eb4404e4b54",
+  "candidateTree": "6ded9e4d1f70c78117b61f27754fde8b25d91a22",
+  "runtimePatchSha256": "7c603d7071e92a789734dc424300c66e359f5d2c07349bb4b985b1f3671102ce",
+  "runtimeAndTestBytesUnchanged": true,
+  "buildsOrSubjectsRun": false,
+  "oldFocusedResultsTransferred": false
+}

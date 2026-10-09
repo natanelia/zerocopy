@@ -1,0 +1,84 @@
+{
+  "historicalBaselineCommit": "f4fad3a850cb544ff9440d263eeec464a31dd123",
+  "historicalFocusedCandidateCommit": "26fe38ce2b80849465ae7df16557cbe02a885e25",
+  "originalBaselineSuite": {
+    "passed": 138,
+    "timeouts": 3,
+    "timeoutMs": 5000,
+    "resolved": false,
+    "failedCommands": [
+      {
+        "command": [
+          "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/node/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "performance-revision.test.ts",
+          "redux-checkpoint.test.ts",
+          "redux.test.ts",
+          "worker.test.ts"
+        ],
+        "cwd": "/workspace/shared/zerocopy-sorted-compaction-prototype-20261009/baseline-repo",
+        "returncode": 1,
+        "supervisorLimit": null,
+        "peakPolledRSS": 782249984,
+        "remainingGroupPids": [],
+        "scope": "safety resource receipt; no operation latency recorded",
+        "receipt": "attempt1/logs/baseline-node-existing-focused.log.json"
+      }
+    ]
+  },
+  "focusedRepositoryTests": {
+    "node": 4,
+    "bun": 4,
+    "transferredToNewHead": false
+  },
+  "originalTestTypecheckFailure": {
+    "command": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-node22-tools/node_modules/node/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "--target",
+      "ES2022",
+      "--module",
+      "ESNext",
+      "--moduleResolution",
+      "bundler",
+      "--types",
+      "bun-types",
+      "--skipLibCheck",
+      "--esModuleInterop",
+      "sorted-compaction.test.ts"
+    ],
+    "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-sorted-compaction-regressions-20261009",
+    "returncode": 2,
+    "supervisorLimit": null,
+    "peakPolledRSS": 261214208,
+    "remainingGroupPids": [],
+    "scope": "safety resource receipt; no operation latency recorded"
+  },
+  "separatelyFrozenCorrection": "Only --allowImportingTsExtensions added; passed once. No runtime tests repeated.",
+  "deepBaselineFailure": "2,049 prefix keys under Node --stack_size=128: RangeError; candidate success. Historical only; no new depth sweep.",
+  "contractLimitation": "Relocated nested pointer text changes descriptor width 120 to 119 bytes and bounded decode-cache admission; repeated raw-get references can differ. Frozen values, same-leaf selector identity and compactMany alias promises remain.",
+  "actualWorkers": "Prior 16 processes used real cross-bundle shared/copy workers. Session MessageChannel checks in the same file were in-process, not cross-bundle real-worker sessions.",
+  "moduleGrowth": {
+    "coreWasmBytes": 904,
+    "portableJsTotalBytes": 1214,
+    "startupOrHeapGainMeasured": false
+  },
+  "historicalBranchBytes": {
+    "decimal4096": {
+      "baseline": 171000,
+      "candidate": 25504
+    },
+    "isNewHeadMeasurement": false
+  },
+  "chartBoundary": "The existing chart workload does no compaction. Its required eventual number refresh is a separate latest-runtime comparison and cannot evidence this builder gain.",
+  "unperformed": [
+    "all fresh new-head gates",
+    "all new packet subjects",
+    "all operation clocks",
+    "website deployment gate for future PR",
+    "latest-runtime memory-chart number refresh",
+    "remote source or proof publication"
+  ]
+}

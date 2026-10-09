@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "reviewedPacketSha256": null,
+  "reviewedPacketCommit": null,
+  "reason": "Source preparation only; independent packet review and explicit activation still required."
+}

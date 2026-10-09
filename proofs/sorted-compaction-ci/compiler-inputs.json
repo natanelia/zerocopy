@@ -1,0 +1,1365 @@
+{
+  "source": "Existing pinned tool files used by the original reviewed build; read and hashed only in this preparation",
+  "files": [
+    {
+      "path": "assemblyscript/LICENSE",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "bytes": 11357
+    },
+    {
+      "path": "assemblyscript/NOTICE",
+      "sha256": "03558ea0ee94e22f63393d0ed42792afd00ab8b39dac965f2da2726003f8c846",
+      "bytes": 3480
+    },
+    {
+      "path": "assemblyscript/README.md",
+      "sha256": "fdaf34bd324c076d0ad4c50bcbe49326498d0348103a63a0e72ddb062e5e66bc",
+      "bytes": 3516
+    },
+    {
+      "path": "assemblyscript/bin/asc.js",
+      "sha256": "db224cf7a4a9f16a0b7a3540753eabd413ee4db69f75dd565f309aaa057f4e44",
+      "bytes": 1018
+    },
+    {
+      "path": "assemblyscript/bin/asinit.js",
+      "sha256": "73966860bb9f512242fa04cf4cb4305c7f7cb31f5ba2d3fa38aa2143e1cabc3a",
+      "bytes": 14857
+    },
+    {
+      "path": "assemblyscript/dist/asc.d.ts",
+      "sha256": "3fb0f89f30b8a8a067a3db8c7dc240a6794810e1001f19e47bb3af9d16d9c6f5",
+      "bytes": 169
+    },
+    {
+      "path": "assemblyscript/dist/asc.generated.d.ts",
+      "sha256": "b37ca7bf65028e6e1eafd3816875f60d7012d6433cee400c573c6178390ac25e",
+      "bytes": 498426
+    },
+    {
+      "path": "assemblyscript/dist/asc.js",
+      "sha256": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891",
+      "bytes": 880639
+    },
+    {
+      "path": "assemblyscript/dist/asc.js.map",
+      "sha256": "6c561ab013466569c6062ee34dcfb699ad29ae05e79ace8d6a22bf790248eb64",
+      "bytes": 1152666
+    },
+    {
+      "path": "assemblyscript/dist/assemblyscript.d.ts",
+      "sha256": "68b1c909be5595ef139e9e8a4244dd2e8a3b70e2a50acc1761178cb92cacad5a",
+      "bytes": 202
+    },
+    {
+      "path": "assemblyscript/dist/assemblyscript.generated.d.ts",
+      "sha256": "e97285e9083a03a4b515756060bd32b134ed7fdbe2416695a38df2b5f3faa696",
+      "bytes": 595750
+    },
+    {
+      "path": "assemblyscript/dist/assemblyscript.js",
+      "sha256": "b0ea444edfff355fe2981451358c5b8b24996f5e9190e02bceae60c94adeea19",
+      "bytes": 755797
+    },
+    {
+      "path": "assemblyscript/dist/assemblyscript.js.map",
+      "sha256": "0abd083398629da3a7578e905033be4115f6d609803d9c7d52452f7a1d4966a6",
+      "bytes": 3043715
+    },
+    {
+      "path": "assemblyscript/dist/importmap.json",
+      "sha256": "1f35751781180de147a116f007be8929b3ab6f46c7fe5825d76577c46d0609c6",
+      "bytes": 372
+    },
+    {
+      "path": "assemblyscript/dist/transform.cjs",
+      "sha256": "a74887633f2a18df806b22be88ac02f1d86210ab49346f8dab86b5d74e341d76",
+      "bytes": 49
+    },
+    {
+      "path": "assemblyscript/dist/transform.d.ts",
+      "sha256": "960979ed8f86999ca1ea99400531a2f81c88034c5021da6169d2c7e829325fea",
+      "bytes": 35
+    },
+    {
+      "path": "assemblyscript/dist/transform.js",
+      "sha256": "2248b9262f8f990edfe22fe1fd335152e2584cee0dbda4ac8ad5e74dc3cc8d1c",
+      "bytes": 39
+    },
+    {
+      "path": "assemblyscript/dist/web.js",
+      "sha256": "f0e507634efc7ae3eca7f4c8c30084d427dc4c06a5e09b1b070282995ed5d703",
+      "bytes": 949
+    },
+    {
+      "path": "assemblyscript/lib/binaryen.d.ts",
+      "sha256": "f1a67ff83fd23911daa11c9c3d0f01cf19ba94d978b286a0e9fff94828fa0883",
+      "bytes": 62
+    },
+    {
+      "path": "assemblyscript/lib/binaryen.js",
+      "sha256": "f1a67ff83fd23911daa11c9c3d0f01cf19ba94d978b286a0e9fff94828fa0883",
+      "bytes": 62
+    },
+    {
+      "path": "assemblyscript/package.json",
+      "sha256": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+      "bytes": 1682
+    },
+    {
+      "path": "assemblyscript/std/README.md",
+      "sha256": "29a48170eb7ba1b45e86552be293a97bd2aff3b359cf5601c795e7be48b3c535",
+      "bytes": 223
+    },
+    {
+      "path": "assemblyscript/std/assembly/array.ts",
+      "sha256": "b219355bec6fc830bf9b41662986aa81e657a701f71ea472749746779ee951cc",
+      "bytes": 18777
+    },
+    {
+      "path": "assemblyscript/std/assembly/arraybuffer.ts",
+      "sha256": "d568975080fec24da88c60fc41b7f590b24ed2243f853acf0662e5488e8fb5cb",
+      "bytes": 2734
+    },
+    {
+      "path": "assemblyscript/std/assembly/atomics.ts",
+      "sha256": "8cd3c70c193e098dc9ae6d4b3fa4a270d0d842a2ec924883623123fdb091bf76",
+      "bytes": 4714
+    },
+    {
+      "path": "assemblyscript/std/assembly/bindings/asyncify.ts",
+      "sha256": "a22c2acd2ad46256341899ef2e9fcf784fe27b6a106903390335ee037234a1e4",
+      "bytes": 626
+    },
+    {
+      "path": "assemblyscript/std/assembly/bindings/dom.ts",
+      "sha256": "859a7c34a85b3a6282f66dba007e7d439ce308a5d25c3a95dfcb9b0df37462b9",
+      "bytes": 12147
+    },
+    {
+      "path": "assemblyscript/std/assembly/bindings/node.ts",
+      "sha256": "5d0f44c0614f15c821550732850f88abdcb35cea82ee7916ecd3713bf6a586bf",
+      "bytes": 179
+    },
+    {
+      "path": "assemblyscript/std/assembly/builtins.ts",
+      "sha256": "ab65f974762f6f2411431f563ec40b0372c04e60b5b639942920e71eded57871",
+      "bytes": 66814
+    },
+    {
+      "path": "assemblyscript/std/assembly/compat.ts",
+      "sha256": "f42a4aa925060da439376b006ae7b7a1d5017f90a2511c949b474d55c7c47f1c",
+      "bytes": 82
+    },
+    {
+      "path": "assemblyscript/std/assembly/console.ts",
+      "sha256": "edab4486635b8d4089befde81efabc2fadf9532b878ff26c7da19bdfefbdc839",
+      "bytes": 907
+    },
+    {
+      "path": "assemblyscript/std/assembly/crypto.ts",
+      "sha256": "9e382d37e90cd563d06cac29a40bff25131326da49e05f44c8c6cf5e64c2ebd8",
+      "bytes": 196
+    },
+    {
+      "path": "assemblyscript/std/assembly/dataview.ts",
+      "sha256": "49b7711e2cb420f1f6998f85d4afb979945e6341ef8131d175a93d85fbdc3385",
+      "bytes": 6969
+    },
+    {
+      "path": "assemblyscript/std/assembly/date.ts",
+      "sha256": "a259197bd7db1a856dec11f6835fdf2e200cb968b0153256760f03d64dc1b306",
+      "bytes": 11407
+    },
+    {
+      "path": "assemblyscript/std/assembly/diagnostics.ts",
+      "sha256": "265cf44ae465f3fca43fa77299fe1508c6fcafcaff75c0fe7561b9b95afb24a6",
+      "bytes": 270
+    },
+    {
+      "path": "assemblyscript/std/assembly/error.ts",
+      "sha256": "3b9b266ecc9e2d728279cd2457f206404bf7f1d88db87a54b6ed5526fc18d986",
+      "bytes": 812
+    },
+    {
+      "path": "assemblyscript/std/assembly/function.ts",
+      "sha256": "0baf4b0884478d982d85b3ca6d388e84be7cb2e76ac762c5479c729a626eef8c",
+      "bytes": 837
+    },
+    {
+      "path": "assemblyscript/std/assembly/index.d.ts",
+      "sha256": "72233c0621edd1144e5912d6ee04d31cb164a76f4473b5474064b44d0f94c06d",
+      "bytes": 155035
+    },
+    {
+      "path": "assemblyscript/std/assembly/iterator.ts",
+      "sha256": "5e1af42a340f8e0a76906911f564f2b0d193d7e780f3cbb6ceb42e70f54a30b1",
+      "bytes": 1536
+    },
+    {
+      "path": "assemblyscript/std/assembly/map.ts",
+      "sha256": "a4c9b2bea009a72c4e488de2538935829b15687a1f0addf35fe514dfe9bd4c4b",
+      "bytes": 8393
+    },
+    {
+      "path": "assemblyscript/std/assembly/math.ts",
+      "sha256": "ac6543532b3c97bc9cd36d118eb964c79919d31cdcaea6c4aedece59c673584c",
+      "bytes": 105850
+    },
+    {
+      "path": "assemblyscript/std/assembly/memory.ts",
+      "sha256": "282c33255ef815c66185532ebd4dcb43fcae557e653e07d98457a5ebe038c130",
+      "bytes": 3539
+    },
+    {
+      "path": "assemblyscript/std/assembly/number.ts",
+      "sha256": "46abbaf3f622f3b312b260b2aaa8050655b8060c64e238ddf3234daa009ef52e",
+      "bytes": 8323
+    },
+    {
+      "path": "assemblyscript/std/assembly/object.ts",
+      "sha256": "75b425ad2bdc558b93c647b4827a6b4d5d1393f0be6ddcea2a6dfbf503134f96",
+      "bytes": 1262
+    },
+    {
+      "path": "assemblyscript/std/assembly/performance.ts",
+      "sha256": "58111cfdb96ff00caf12ec964835c4b390a5bc70c5d59ad7cb518310f8c6fbe8",
+      "bytes": 176
+    },
+    {
+      "path": "assemblyscript/std/assembly/polyfills.ts",
+      "sha256": "a4ccc47cc63bd2a10492694b8b2d8ad80de7522d7c1e905f8896016a8fac6b98",
+      "bytes": 693
+    },
+    {
+      "path": "assemblyscript/std/assembly/process.ts",
+      "sha256": "5f2909c2afb276b4dd4dab7216ff62b8658a05a403ce35c13b05288054c5926b",
+      "bytes": 1072
+    },
+    {
+      "path": "assemblyscript/std/assembly/reference.ts",
+      "sha256": "46ad8c4b95108f79489ef3c701986b7b0e2f9915c4110fa94a2129ffa791a70a",
+      "bytes": 1073
+    },
+    {
+      "path": "assemblyscript/std/assembly/regexp.ts",
+      "sha256": "256f45db7d0324f08a1c94b4ee5e94afd9737a63912d89cf1348bb5d1c090522",
+      "bytes": 380
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/README.md",
+      "sha256": "0733b26005e00091ce07d0ef5289c69d70aaad0a70738850c570c6d3e73404c7",
+      "bytes": 5160
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/common.ts",
+      "sha256": "8864fd8a1dcf43b0aa8f01030cf37f21760a52ee69e24cfb3f7b641c4386e36b",
+      "bytes": 4437
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/index-incremental.ts",
+      "sha256": "d4909c1c4c21d70b74b66b6710397d82cb3d7a9c1e9f09d4312f2dba1e3b1106",
+      "bytes": 35
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/index-minimal.ts",
+      "sha256": "cbbb7ad59cc7024a75318eaab42b0cf20ba1a31922b22b81e170e80e48dbd413",
+      "bytes": 34
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/index-stub.ts",
+      "sha256": "a0e8cac724905667c36aa019b9c5179811ab06a71ae2ebc170e823e583de4514",
+      "bytes": 17
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/index.d.ts",
+      "sha256": "f5119425ba4b87b3b284439cbfa863803187f9cffdf334d4e1d2a54da379d647",
+      "bytes": 1258
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/itcms.ts",
+      "sha256": "7ef783af8bc200fa9cd4acda183b8642166f0549ff82da1078ed612b7f1f6dea",
+      "bytes": 15641
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/rtrace.ts",
+      "sha256": "26395031952f266a74f982cbee7b22e773393442a633ee91b03af373e7150cb8",
+      "bytes": 610
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/stub.ts",
+      "sha256": "958e9ebb92e9cc70068e6eb60be8ee4945a60184c3059bcf4494871c137ba9c0",
+      "bytes": 4119
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/tcms.ts",
+      "sha256": "e4d6e0729bf7ba6db1e975d4a55504908b548be87bf7fce2988bf91546c5f3dc",
+      "bytes": 9465
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt/tlsf.ts",
+      "sha256": "4199f0fc9bd1faf5ca7df44a05931d7d1cbeff86255c0e845788024349c2f47b",
+      "bytes": 24021
+    },
+    {
+      "path": "assemblyscript/std/assembly/rt.ts",
+      "sha256": "0e61c6bcb2ef16063c97305f84dd08eee99db09b21b4f35f20ee147342cd81d9",
+      "bytes": 2851
+    },
+    {
+      "path": "assemblyscript/std/assembly/set.ts",
+      "sha256": "30db5cbef8aeb912d567ffd9db976ba3cc2686ed42755e51abc3fd50ae2c2e88",
+      "bytes": 7032
+    },
+    {
+      "path": "assemblyscript/std/assembly/shared/feature.ts",
+      "sha256": "158748e1d6619b5638c933eabb0d8b34b4a5a565165936b42ba3a44a064bc95d",
+      "bytes": 3062
+    },
+    {
+      "path": "assemblyscript/std/assembly/shared/runtime.ts",
+      "sha256": "8634306c91b9028440f79f5c09ac00ec7bdbf0573fd788929b1853a5218e4b61",
+      "bytes": 270
+    },
+    {
+      "path": "assemblyscript/std/assembly/shared/target.ts",
+      "sha256": "7947897fd1195e8f80ed214178773af91843ab3deba59f39b73563b9086f907f",
+      "bytes": 311
+    },
+    {
+      "path": "assemblyscript/std/assembly/shared/tsconfig.json",
+      "sha256": "e7a3a81843398615f8c909ea596417a4f165dcc552afc6832979a2ef6f89e2b4",
+      "bytes": 177
+    },
+    {
+      "path": "assemblyscript/std/assembly/shared/typeinfo.ts",
+      "sha256": "4f458444b05a7da92b68036f0e7d5fb21979fbcd606947e7045324466f70eb20",
+      "bytes": 2882
+    },
+    {
+      "path": "assemblyscript/std/assembly/staticarray.ts",
+      "sha256": "a364782946b599acd2df60cefa3158b79fc35745c07850b55d1f1be17c03eca1",
+      "bytes": 14967
+    },
+    {
+      "path": "assemblyscript/std/assembly/string.ts",
+      "sha256": "f2a659ed018f7bda8d8e662fe38f04f2f6bbdb11d36f64dcad59021d1d659922",
+      "bytes": 31411
+    },
+    {
+      "path": "assemblyscript/std/assembly/symbol.ts",
+      "sha256": "2a193cf4156e4a408554703dd5665e4b116d212993114d502e33f0bbab86770d",
+      "bytes": 3172
+    },
+    {
+      "path": "assemblyscript/std/assembly/table.ts",
+      "sha256": "c85a6ea08e66714f2fe359ad508ff5fbc5700bc40d9b19ca0226ee33ac6f6a72",
+      "bytes": 408
+    },
+    {
+      "path": "assemblyscript/std/assembly/tsconfig.json",
+      "sha256": "e4417fe111ceb07847d28b51333f1de0d81b2181d6b7ff4981c56b32dc440d4e",
+      "bytes": 72
+    },
+    {
+      "path": "assemblyscript/std/assembly/typedarray.ts",
+      "sha256": "8c71de191e6bfc8d62695f45116f1619cc395fcb7dfd653d13a7be1557a80a9b",
+      "bytes": 59907
+    },
+    {
+      "path": "assemblyscript/std/assembly/uri.ts",
+      "sha256": "dd53e1a0de84009603c8026c1b7c589658f834defe3f15c11063e0a76e89f8af",
+      "bytes": 624
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/bytes.ts",
+      "sha256": "820f9565c92ce9c6755c280802810f39cb45cfac9fd8deb3c68e50164bd358ac",
+      "bytes": 2791
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/casemap.ts",
+      "sha256": "3f8e3b6197db6d2c4c84333409d8d625e9f88b14eb93fb717edb2b8414824678",
+      "bytes": 22185
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/error.ts",
+      "sha256": "1a59151ec5a96d0c02c0a80c9716ebd474dbedaf97130efe24be85ad2d2531bc",
+      "bytes": 1501
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/hash.ts",
+      "sha256": "d4f730c70f2cf536c9e865e8f92051c35a9e6e1c73724af910c0d28bd557c87d",
+      "bytes": 2934
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/math.ts",
+      "sha256": "af4ebce8c9b81a50d00eca29583ef4da91679fe015fe8418444e6158fcc39ab2",
+      "bytes": 78032
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/memory.ts",
+      "sha256": "98d2acc7479cf045d4ca5c4df98e07394e264d0474d4832ace72e9788f6276b2",
+      "bytes": 7896
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/number.ts",
+      "sha256": "44227cb197ed2ef93eaad6554501449684a73a0879d2e5abe4bf6b6961119bc4",
+      "bytes": 27112
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/sort.ts",
+      "sha256": "2d181d8428471189f83dcde15eac017f37d9fb48aff86028f49dc9bb21e304a1",
+      "bytes": 8951
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/string.ts",
+      "sha256": "01351784e4ff459091e5cd645e2496ca35483ebc7f6b209193ed84d122cc3635",
+      "bytes": 48599
+    },
+    {
+      "path": "assemblyscript/std/assembly/util/uri.ts",
+      "sha256": "a24c0817f0fbb603cb548dcf5d9d2d01c68d75f25ec46b8859c58ef299e7c130",
+      "bytes": 7962
+    },
+    {
+      "path": "assemblyscript/std/assembly/vector.ts",
+      "sha256": "9431f6a04c559c2eb37f894b26e075a5c81cdf808252fff53cf9f1b3cde39f94",
+      "bytes": 76
+    },
+    {
+      "path": "assemblyscript/std/assembly.json",
+      "sha256": "2bed25ada57ccb1c14582c40c627299141830f70ab795dd070ebd6090d8496e5",
+      "bytes": 284
+    },
+    {
+      "path": "assemblyscript/std/portable/index.d.ts",
+      "sha256": "2dfff07b7188e1a9ef134013f81c0ad2ae1ec05ef1ee41eff63681945c601ed5",
+      "bytes": 20816
+    },
+    {
+      "path": "assemblyscript/std/portable/index.js",
+      "sha256": "5c8649e6c54e62504a37f2b53f953740249fb9bcd77ab62ade8d55a5b1031d21",
+      "bytes": 11575
+    },
+    {
+      "path": "assemblyscript/std/portable.json",
+      "sha256": "1b59fc511a8a48036eb334a838346015e327588e60489993e801bab6249e9bc9",
+      "bytes": 238
+    },
+    {
+      "path": "assemblyscript/std/types/assembly/index.d.ts",
+      "sha256": "f8fe92b891ad9eae7fac315e0e72fe94140f6b7e8389c70d158e39925c00f87c",
+      "bytes": 31
+    },
+    {
+      "path": "assemblyscript/std/types/assembly/package.json",
+      "sha256": "3d6e64292bcaf0b771bb6fe51ccd5abad4269498d5fa348465fde0baaa79af41",
+      "bytes": 27
+    },
+    {
+      "path": "assemblyscript/std/types/portable/index.d.ts",
+      "sha256": "ef32392910f40aaf878d3b3feef57b910f72e54d62f6e183286061f0e2a8b739",
+      "bytes": 31
+    },
+    {
+      "path": "assemblyscript/std/types/portable/package.json",
+      "sha256": "3d6e64292bcaf0b771bb6fe51ccd5abad4269498d5fa348465fde0baaa79af41",
+      "bytes": 27
+    },
+    {
+      "path": "assemblyscript/tsconfig-base.json",
+      "sha256": "73421f25bd71ef1f0ede294b8f9b3dc7ffc33363093b760dbce785860291d35e",
+      "bytes": 288
+    },
+    {
+      "path": "assemblyscript/util/README.md",
+      "sha256": "85f64895dae58f44d3f31c46b060bb12840251b26f0366ef3bf79d94d5cb2c48",
+      "bytes": 700
+    },
+    {
+      "path": "assemblyscript/util/browser/fs.js",
+      "sha256": "f3804930b5f35439088b3b5d3f72056e7b22d14f7b942cade2f4592f031302c2",
+      "bytes": 28
+    },
+    {
+      "path": "assemblyscript/util/browser/module.js",
+      "sha256": "0be7f65d2b217cf97a26e1c26581bbc1cf661758217ab45bd8864de3a819648a",
+      "bytes": 129
+    },
+    {
+      "path": "assemblyscript/util/browser/path.js",
+      "sha256": "3ad20b44dadfc21057d18be9e6f3efb21562cebdc10d88547a71f483f1226ee1",
+      "bytes": 15268
+    },
+    {
+      "path": "assemblyscript/util/browser/process.js",
+      "sha256": "4a7ece750f8c42914f3486e245603f67446d5e304c982ce57db091e149d159b0",
+      "bytes": 2160
+    },
+    {
+      "path": "assemblyscript/util/browser/url.js",
+      "sha256": "b453891f3cee6bc0f274e569a23a6789ec4c2c883c9c8506e9076113d56add16",
+      "bytes": 558
+    },
+    {
+      "path": "assemblyscript/util/cpu.d.ts",
+      "sha256": "310d8a6ef86dad73fceffdd206adf0a452a3d267e7218f153ef9e2ec67ecd10d",
+      "bytes": 190
+    },
+    {
+      "path": "assemblyscript/util/cpu.js",
+      "sha256": "73b4cf12815d305c10c031dd91001852a2ea6b3edbfbd2cab1005811dbdfe701",
+      "bytes": 1163
+    },
+    {
+      "path": "assemblyscript/util/find.d.ts",
+      "sha256": "b871c14f8aafd83a6d44c8d90e7bb58b498f40888c761f21adf3bffb283a20cd",
+      "bytes": 184
+    },
+    {
+      "path": "assemblyscript/util/find.js",
+      "sha256": "e8c4644a6d2cc8e65606247a2fcf73f7ff9e7fdf77c165b372f3101f757698e8",
+      "bytes": 546
+    },
+    {
+      "path": "assemblyscript/util/node.d.ts",
+      "sha256": "9eca321555351d962ff056ea1dc82798a0bf00bc6c723b03bea3e471a1bdc5b5",
+      "bytes": 333
+    },
+    {
+      "path": "assemblyscript/util/node.js",
+      "sha256": "4486694b96753ccf138c900649f86064983d177d25ffa33f558a09d28b94046c",
+      "bytes": 724
+    },
+    {
+      "path": "assemblyscript/util/options.d.ts",
+      "sha256": "3eb6cb08b31746d1bcc45a466112153ede2d9717814225c17628e8532c51463e",
+      "bytes": 2279
+    },
+    {
+      "path": "assemblyscript/util/options.js",
+      "sha256": "8c2c433c9c0e72796f24e08e8a9b83381f1dabbec4e861c59786a5872d77b6ab",
+      "bytes": 9104
+    },
+    {
+      "path": "assemblyscript/util/terminal.d.ts",
+      "sha256": "edef78ba69d78f39d278bb44f1751b7e1419350466a71d9065f7a0761d0640fb",
+      "bytes": 1631
+    },
+    {
+      "path": "assemblyscript/util/terminal.js",
+      "sha256": "3a7e13b32710fda6fff28b18ad922bdc9f382114430e2e4687e2ed755d370065",
+      "bytes": 1287
+    },
+    {
+      "path": "assemblyscript/util/text.d.ts",
+      "sha256": "b572ff9e8145ffb95a8e6ab54a073e02199d00481eef796609cf92f853919b5e",
+      "bytes": 844
+    },
+    {
+      "path": "assemblyscript/util/text.js",
+      "sha256": "0ca89a7ec908091594791b8bbbbd4c285c5a75e769a8e8807f0b9cb47d9c3341",
+      "bytes": 3163
+    },
+    {
+      "path": "assemblyscript/util/tsconfig.json",
+      "sha256": "b547ebd8f1a89691b03f84b6d3826b18a4678523925e153b78946266d23d3a46",
+      "bytes": 133
+    },
+    {
+      "path": "assemblyscript/util/web.d.ts",
+      "sha256": "8b4faac6199c3a4d0c1ec39b8783b1c55863b83359bb1163e635d663b6073164",
+      "bytes": 296
+    },
+    {
+      "path": "assemblyscript/util/web.js",
+      "sha256": "87f0d20717f70e9777ed3bcda9d50168e3165a273e0b56253022bb0ed1d66005",
+      "bytes": 756
+    },
+    {
+      "path": "binaryen/LICENSE",
+      "sha256": "c5accbbd8546e94c34aed24afe689a617627d18eed5a6c48277e48db57c23851",
+      "bytes": 11356
+    },
+    {
+      "path": "binaryen/README.md",
+      "sha256": "4f2ca9a3174cdab525baccad3b8ee0541fd6061eb46d030334d60f2b18fed3f5",
+      "bytes": 74502
+    },
+    {
+      "path": "binaryen/bin/package.json",
+      "sha256": "58b55392b5778941e1e96892a70edc12e2d7bb8541289b237fbddc9926ed51bd",
+      "bytes": 28
+    },
+    {
+      "path": "binaryen/bin/wasm-as",
+      "sha256": "f6904ef11c66882b09c696d9c0a7eaf7beb1b31bf40b48aa7391bb8ce70a4875",
+      "bytes": 9055052
+    },
+    {
+      "path": "binaryen/bin/wasm-ctor-eval",
+      "sha256": "012394e8b991cbd4057ac89f84af15b2b2f3e31978fe9ccf0979d8672efc3a84",
+      "bytes": 9477777
+    },
+    {
+      "path": "binaryen/bin/wasm-dis",
+      "sha256": "d1ea59ca56e9587b5f68d4e6c10db61ee42a55826008bea6b8e5fdeed932bfe8",
+      "bytes": 9054178
+    },
+    {
+      "path": "binaryen/bin/wasm-merge",
+      "sha256": "5377857fb700f637074cd95c2217c054eded440e43f48a69aa2ebcd20ad5c4e9",
+      "bytes": 9123060
+    },
+    {
+      "path": "binaryen/bin/wasm-metadce",
+      "sha256": "c7aea0f8b348ff3378bf0a697c2359d9aefcf73e1c97a9d03cbf29d9f5dd2e32",
+      "bytes": 9154876
+    },
+    {
+      "path": "binaryen/bin/wasm-opt",
+      "sha256": "36b3cffbbfa97a7dcafc62a56d5aeaa4b8d178e4c85d061059b676c605a3395a",
+      "bytes": 10196889
+    },
+    {
+      "path": "binaryen/bin/wasm-reduce",
+      "sha256": "488a1eca7246165af5662d98fe058dd42cda2fd67fb081d119b2e3aa6612d8ba",
+      "bytes": 9165107
+    },
+    {
+      "path": "binaryen/bin/wasm-shell",
+      "sha256": "5454331a83e66eebfc76e385f5a5f43ec4c8255a1b15bd233862b0a88e8c7164",
+      "bytes": 9519017
+    },
+    {
+      "path": "binaryen/bin/wasm2js",
+      "sha256": "f8335f607c1a5ecff335c58658e1d889d83eaabd14b6bccd7a6b810c738fb0da",
+      "bytes": 9505919
+    },
+    {
+      "path": "binaryen/index.d.ts",
+      "sha256": "4070415465f0d5b83fbca3609a9b99b110f34d1daabd1b9eedd6411130490422",
+      "bytes": 93111
+    },
+    {
+      "path": "binaryen/index.js",
+      "sha256": "08e348487a67b24351d5ff81ae707e051b5d213bd359d84ad90c789f3793001a",
+      "bytes": 13572386
+    },
+    {
+      "path": "binaryen/package.json",
+      "sha256": "64babb72bd39f38352b8207e5723ce3502df547f5d230ca2eadd064571ce0d56",
+      "bytes": 1395
+    },
+    {
+      "path": "long/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "path": "long/README.md",
+      "sha256": "0f8d18d81099b6d07cf2b533b682827d8c4334c91ec76241adba0dd6fd5da2a8",
+      "bytes": 11124
+    },
+    {
+      "path": "long/index.d.ts",
+      "sha256": "b040cca7e788c8de6fb758eaf4f0e5887d4e4591a829aa1d2379650f065516a2",
+      "bytes": 56
+    },
+    {
+      "path": "long/index.js",
+      "sha256": "8d6b1d2162ff21170db73d6b91e313e6b90bd35acfdd60453b2792ec433ae69e",
+      "bytes": 44190
+    },
+    {
+      "path": "long/package.json",
+      "sha256": "982e554a35d140981c7962fbba77855563e5890de200f8dc0a249135e4d9acb8",
+      "bytes": 1493
+    },
+    {
+      "path": "long/types.d.ts",
+      "sha256": "84206a85be8e7e8f9307c1d5c087aedb4d389e05b755234aa8f37cc22f717aaf",
+      "bytes": 10071
+    },
+    {
+      "path": "long/umd/index.d.ts",
+      "sha256": "45b1df23c0a6e5b45cb8fc998bd90fa9a6a79f2931f6bb1bd15cf8f7efd886d0",
+      "bytes": 76
+    },
+    {
+      "path": "long/umd/index.js",
+      "sha256": "ea6da8d5fff04abc358b94488dbbb7eeb46e5027cc05303b1761cea94bef7821",
+      "bytes": 50994
+    },
+    {
+      "path": "long/umd/package.json",
+      "sha256": "8005a3491db7d92f36ac66369861589f9c47123d3a7c71e643fc2c06168cd45a",
+      "bytes": 25
+    },
+    {
+      "path": "long/umd/types.d.ts",
+      "sha256": "84206a85be8e7e8f9307c1d5c087aedb4d389e05b755234aa8f37cc22f717aaf",
+      "bytes": 10071
+    },
+    {
+      "path": "typescript/LICENSE.txt",
+      "sha256": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47",
+      "bytes": 9197
+    },
+    {
+      "path": "typescript/README.md",
+      "sha256": "73147458477d90cd6236627cdd9b0871df12e6e8a21d2d0fda6d1ad2826bdc0e",
+      "bytes": 2842
+    },
+    {
+      "path": "typescript/SECURITY.md",
+      "sha256": "7b6976eec43edfa68b79a459dd089c56b7a395916dbf1a01bd11e6d86e12128f",
+      "bytes": 2656
+    },
+    {
+      "path": "typescript/ThirdPartyNoticeText.txt",
+      "sha256": "1af3c68039c57e539422da82a4faada506ce6d0ea6f90e0b699d02dbcdb7a90c",
+      "bytes": 37824
+    },
+    {
+      "path": "typescript/bin/tsc",
+      "sha256": "8d5fa5bd883fec0979fc2004f1fe1d99aef40570155d550eadc0b03b55513bf0",
+      "bytes": 45
+    },
+    {
+      "path": "typescript/bin/tsserver",
+      "sha256": "a088f0c3419bcb2f7b860ad42e4c9f25ead067eda70af6a10d0a7d453954aada",
+      "bytes": 50
+    },
+    {
+      "path": "typescript/lib/_tsc.js",
+      "sha256": "e8f349eabd48486bdb2bf9dc1a00c89d58297270c54b745838879e2859194419",
+      "bytes": 6213092
+    },
+    {
+      "path": "typescript/lib/_tsserver.js",
+      "sha256": "0efcc88cdf0593cc1dcc8b6afd605c7bed9eca6f648c70c8f0df8695114bf6d7",
+      "bytes": 27888
+    },
+    {
+      "path": "typescript/lib/_typingsInstaller.js",
+      "sha256": "62a69c574365f1c81633b86b3214f9df860aad08843028dd5244b00aa7f1e190",
+      "bytes": 10363
+    },
+    {
+      "path": "typescript/lib/cs/diagnosticMessages.generated.json",
+      "sha256": "5b30e58d35f877521e14c16551c86320b2ed19ddb70fe5f41841b561d27f18c2",
+      "bytes": 320453
+    },
+    {
+      "path": "typescript/lib/de/diagnosticMessages.generated.json",
+      "sha256": "a4031a8028febc35f92ba317104878d93f02c1750e6ee16351c2270ab4dff517",
+      "bytes": 344426
+    },
+    {
+      "path": "typescript/lib/es/diagnosticMessages.generated.json",
+      "sha256": "3c7844125e1f2a3a2227e16dd1fed75218a3454919706b34cd8a5da9d43cda22",
+      "bytes": 340054
+    },
+    {
+      "path": "typescript/lib/fr/diagnosticMessages.generated.json",
+      "sha256": "9fc1836d7575840a8b7a63dacdedd99e90e4144c0bbe29a4b7fa78a86e0e8bf5",
+      "bytes": 346016
+    },
+    {
+      "path": "typescript/lib/it/diagnosticMessages.generated.json",
+      "sha256": "a740fe2b2338d72a8d165fb8c7c22ac1393a18b6aa7f1ed6d45b79887867f98a",
+      "bytes": 339409
+    },
+    {
+      "path": "typescript/lib/ja/diagnosticMessages.generated.json",
+      "sha256": "ae1a2d439bfb60b9fa32408bde0e9ec39840a33d621014fcb5b2fb4e69a606de",
+      "bytes": 381398
+    },
+    {
+      "path": "typescript/lib/ko/diagnosticMessages.generated.json",
+      "sha256": "31b27d2d556fc037eeac1672f771bf940ec70afba342e977faa75a2fa292a8be",
+      "bytes": 346139
+    },
+    {
+      "path": "typescript/lib/lib.d.ts",
+      "sha256": "a7297ff837fcdf174a9524925966429eb8e5feecc2cc55cc06574e6b092c1eaa",
+      "bytes": 992
+    },
+    {
+      "path": "typescript/lib/lib.decorators.d.ts",
+      "sha256": "8e7f8264d0fb4c5339605a15daadb037bf238c10b654bb3eee14208f860a32ea",
+      "bytes": 13192
+    },
+    {
+      "path": "typescript/lib/lib.decorators.legacy.d.ts",
+      "sha256": "782dec38049b92d4e85c1585fbea5474a219c6984a35b004963b00beb1aab538",
+      "bytes": 1326
+    },
+    {
+      "path": "typescript/lib/lib.dom.asynciterable.d.ts",
+      "sha256": "d7a3c8b952931daebdfc7a2897c53c0a1c73624593fa070e46bd537e64dcd20a",
+      "bytes": 1887
+    },
+    {
+      "path": "typescript/lib/lib.dom.d.ts",
+      "sha256": "080941d9f9ff9307f7e27a83bcd888b7c8270716c39af943532438932ec1d0b9",
+      "bytes": 1874901
+    },
+    {
+      "path": "typescript/lib/lib.dom.iterable.d.ts",
+      "sha256": "2e80ee7a49e8ac312cc11b77f1475804bee36b3b2bc896bead8b6e1266befb43",
+      "bytes": 29802
+    },
+    {
+      "path": "typescript/lib/lib.es2015.collection.d.ts",
+      "sha256": "dc2df20b1bcdc8c2d34af4926e2c3ab15ffe1160a63e58b7e09833f616efff44",
+      "bytes": 5229
+    },
+    {
+      "path": "typescript/lib/lib.es2015.core.d.ts",
+      "sha256": "c57796738e7f83dbc4b8e65132f11a377649c00dd3eee333f672b8f0a6bea671",
+      "bytes": 22866
+    },
+    {
+      "path": "typescript/lib/lib.es2015.d.ts",
+      "sha256": "45b7ab580deca34ae9729e97c13cfd999df04416a79116c3bfb483804f85ded4",
+      "bytes": 1241
+    },
+    {
+      "path": "typescript/lib/lib.es2015.generator.d.ts",
+      "sha256": "515d0b7b9bea2e31ea4ec968e9edd2c39d3eebf4a2d5cbd04e88639819ae3b71",
+      "bytes": 2557
+    },
+    {
+      "path": "typescript/lib/lib.es2015.iterable.d.ts",
+      "sha256": "0559b1f683ac7505ae451f9a96ce4c3c92bdc71411651ca6ddb0e88baaaad6a3",
+      "bytes": 18200
+    },
+    {
+      "path": "typescript/lib/lib.es2015.promise.d.ts",
+      "sha256": "0dc1e7ceda9b8b9b455c3a2d67b0412feab00bd2f66656cd8850e8831b08b537",
+      "bytes": 3200
+    },
+    {
+      "path": "typescript/lib/lib.es2015.proxy.d.ts",
+      "sha256": "ce691fb9e5c64efb9547083e4a34091bcbe5bdb41027e310ebba8f7d96a98671",
+      "bytes": 5251
+    },
+    {
+      "path": "typescript/lib/lib.es2015.reflect.d.ts",
+      "sha256": "8d697a2a929a5fcb38b7a65594020fcef05ec1630804a33748829c5ff53640d0",
+      "bytes": 6493
+    },
+    {
+      "path": "typescript/lib/lib.es2015.symbol.d.ts",
+      "sha256": "4ff2a353abf8a80ee399af572debb8faab2d33ad38c4b4474cff7f26e7653b8d",
+      "bytes": 1649
+    },
+    {
+      "path": "typescript/lib/lib.es2015.symbol.wellknown.d.ts",
+      "sha256": "fb0f136d372979348d59b3f5020b4cdb81b5504192b1cacff5d1fbba29378aa1",
+      "bytes": 11010
+    },
+    {
+      "path": "typescript/lib/lib.es2016.array.include.d.ts",
+      "sha256": "d15bea3d62cbbdb9797079416b8ac375ae99162a7fba5de2c6c505446486ac0a",
+      "bytes": 5204
+    },
+    {
+      "path": "typescript/lib/lib.es2016.d.ts",
+      "sha256": "3facaf05f0c5fc569c5649dd359892c98a85557e3e0c847964caeb67076f4d75",
+      "bytes": 965
+    },
+    {
+      "path": "typescript/lib/lib.es2016.full.d.ts",
+      "sha256": "807e0e0bdc67605dd28efe18f20ab5fcd75d944ef95936120702335f9379094b",
+      "bytes": 1032
+    },
+    {
+      "path": "typescript/lib/lib.es2016.intl.d.ts",
+      "sha256": "68d18b664c9d32a7336a70235958b8997ebc1c3b8505f4f1ae2b7e7753b87618",
+      "bytes": 1484
+    },
+    {
+      "path": "typescript/lib/lib.es2017.arraybuffer.d.ts",
+      "sha256": "eb3d66c8327153d8fa7dd03f9c58d351107fe824c79e9b56b462935176cdf12a",
+      "bytes": 915
+    },
+    {
+      "path": "typescript/lib/lib.es2017.d.ts",
+      "sha256": "e44bb8bbac7f10ecc786703fe0a6a4b952189f908707980ba8f3c8975a760962",
+      "bytes": 1162
+    },
+    {
+      "path": "typescript/lib/lib.es2017.date.d.ts",
+      "sha256": "38f0219c9e23c915ef9790ab1d680440d95419ad264816fa15009a8851e79119",
+      "bytes": 1916
+    },
+    {
+      "path": "typescript/lib/lib.es2017.full.d.ts",
+      "sha256": "1d242d5c24cf285c88bc4fb93c5ff903de8319064e282986edeb6247ba028d5e",
+      "bytes": 1032
+    },
+    {
+      "path": "typescript/lib/lib.es2017.intl.d.ts",
+      "sha256": "4de680d5bb41c17f7f68e0419412ca23c98d5749dcaaea1896172f06435891fc",
+      "bytes": 1449
+    },
+    {
+      "path": "typescript/lib/lib.es2017.object.d.ts",
+      "sha256": "69ab18c3b76cd9b1be3d188eaf8bba06112ebbe2f47f6c322b5105a6fbc45a2e",
+      "bytes": 2473
+    },
+    {
+      "path": "typescript/lib/lib.es2017.sharedmemory.d.ts",
+      "sha256": "a680117f487a4d2f30ea46f1b4b7f58bef1480456e18ba53ee85c2746eeca012",
+      "bytes": 7209
+    },
+    {
+      "path": "typescript/lib/lib.es2017.string.d.ts",
+      "sha256": "2f11ff796926e0832f9ae148008138ad583bd181899ab7dd768a2666700b1893",
+      "bytes": 2378
+    },
+    {
+      "path": "typescript/lib/lib.es2017.typedarrays.d.ts",
+      "sha256": "954296b30da6d508a104a3a0b5d96b76495c709785c1d11610908e63481ee667",
+      "bytes": 1542
+    },
+    {
+      "path": "typescript/lib/lib.es2018.asyncgenerator.d.ts",
+      "sha256": "ac9538681b19688c8eae65811b329d3744af679e0bdfa5d842d0e32524c73e1c",
+      "bytes": 2692
+    },
+    {
+      "path": "typescript/lib/lib.es2018.asynciterable.d.ts",
+      "sha256": "0a969edff4bd52585473d24995c5ef223f6652d6ef46193309b3921d65dd4376",
+      "bytes": 2257
+    },
+    {
+      "path": "typescript/lib/lib.es2018.d.ts",
+      "sha256": "5e1c4c362065a6b95ff952c0eab010f04dcd2c3494e813b493ecfd4fcb9fc0d8",
+      "bytes": 1088
+    },
+    {
+      "path": "typescript/lib/lib.es2018.full.d.ts",
+      "sha256": "95f1023b824c2c511c48f1201e2d1188bcb0ca1138a309a870b956d2e92e44ab",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2018.intl.d.ts",
+      "sha256": "9e9fbd7030c440b33d021da145d3232984c8bb7916f277e8ffd3dc2e3eae2bdb",
+      "bytes": 3021
+    },
+    {
+      "path": "typescript/lib/lib.es2018.promise.d.ts",
+      "sha256": "811ec78f7fefcabbda4bfa93b3eb67d9ae166ef95f9bff989d964061cbf81a0c",
+      "bytes": 1353
+    },
+    {
+      "path": "typescript/lib/lib.es2018.regexp.d.ts",
+      "sha256": "717937616a17072082152a2ef351cb51f98802fb4b2fdabd32399843875974ca",
+      "bytes": 1232
+    },
+    {
+      "path": "typescript/lib/lib.es2019.array.d.ts",
+      "sha256": "d7e7d9b7b50e5f22c915b525acc5a49a7a6584cf8f62d0569e557c5cfc4b2ac2",
+      "bytes": 3163
+    },
+    {
+      "path": "typescript/lib/lib.es2019.d.ts",
+      "sha256": "68d73b4a11549f9c0b7d352d10e91e5dca8faa3322bfb77b661839c42b1ddec7",
+      "bytes": 1071
+    },
+    {
+      "path": "typescript/lib/lib.es2019.full.d.ts",
+      "sha256": "08f6861df84fba9719c14d5adc3ba40be9f0c687639e6c4df3c05b9301b8ff94",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2019.intl.d.ts",
+      "sha256": "74f7fa2d027d5b33eb0471c8e82a6c87216223181ec31247c357a3e8e2fddc5b",
+      "bytes": 958
+    },
+    {
+      "path": "typescript/lib/lib.es2019.object.d.ts",
+      "sha256": "71c37f4c9543f31dfced6c7840e068c5a5aacb7b89111a4364b1d5276b852557",
+      "bytes": 1473
+    },
+    {
+      "path": "typescript/lib/lib.es2019.string.d.ts",
+      "sha256": "576711e016cf4f1804676043e6a0a5414252560eb57de9faceee34d79798c850",
+      "bytes": 1528
+    },
+    {
+      "path": "typescript/lib/lib.es2019.symbol.d.ts",
+      "sha256": "89c1b1281ba7b8a96efc676b11b264de7a8374c5ea1e6617f11880a13fc56dc6",
+      "bytes": 1006
+    },
+    {
+      "path": "typescript/lib/lib.es2020.bigint.d.ts",
+      "sha256": "d6d7ae4d1f1f3772e2a3cde568ed08991a8ae34a080ff1151af28b7f798e22ca",
+      "bytes": 38185
+    },
+    {
+      "path": "typescript/lib/lib.es2020.d.ts",
+      "sha256": "5efce4fc3c29ea84e8928f97adec086e3dc876365e0982cc8479a07954a3efd4",
+      "bytes": 1201
+    },
+    {
+      "path": "typescript/lib/lib.es2020.date.d.ts",
+      "sha256": "063600664504610fe3e99b717a1223f8b1900087fab0b4cad1496a114744f8df",
+      "bytes": 2956
+    },
+    {
+      "path": "typescript/lib/lib.es2020.full.d.ts",
+      "sha256": "1305d1e76ca44e30fb8b2b8075fa522b83f60c0bcf5d4326a9d2cf79b53724f8",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2020.intl.d.ts",
+      "sha256": "639e512c0dfc3fad96a84caad71b8834d66329a1f28dc95e3946c9b58176c73a",
+      "bytes": 22438
+    },
+    {
+      "path": "typescript/lib/lib.es2020.number.d.ts",
+      "sha256": "368af93f74c9c932edd84c58883e736c9e3d53cec1fe24c0b0ff451f529ceab1",
+      "bytes": 1587
+    },
+    {
+      "path": "typescript/lib/lib.es2020.promise.d.ts",
+      "sha256": "934019d7e3c81950f9a8426d093458b65d5aff2c7c1511233c0fd5b941e608ab",
+      "bytes": 1803
+    },
+    {
+      "path": "typescript/lib/lib.es2020.sharedmemory.d.ts",
+      "sha256": "52ada8e0b6e0482b728070b7639ee42e83a9b1c22d205992756fe020fd9f4a47",
+      "bytes": 5128
+    },
+    {
+      "path": "typescript/lib/lib.es2020.string.d.ts",
+      "sha256": "3bdefe1bfd4d6dee0e26f928f93ccc128f1b64d5d501ff4a8cf3c6371200e5e6",
+      "bytes": 2556
+    },
+    {
+      "path": "typescript/lib/lib.es2020.symbol.wellknown.d.ts",
+      "sha256": "59fb2c069260b4ba00b5643b907ef5d5341b167e7d1dbf58dfd895658bda2867",
+      "bytes": 1606
+    },
+    {
+      "path": "typescript/lib/lib.es2021.d.ts",
+      "sha256": "feecb1be483ed332fad555aff858affd90a48ab19ba7272ee084704eb7167569",
+      "bytes": 1036
+    },
+    {
+      "path": "typescript/lib/lib.es2021.full.d.ts",
+      "sha256": "4a66df3ab5de5cfcda11538cffddd67ff6a174e003788e270914c1e0248483cf",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2021.intl.d.ts",
+      "sha256": "965f36eae237dd74e6cca203a43e9ca801ce38824ead814728a2807b1910117d",
+      "bytes": 8245
+    },
+    {
+      "path": "typescript/lib/lib.es2021.promise.d.ts",
+      "sha256": "af3dd424cf267428f30ccfc376f47a2c0114546b55c44d8c0f1d57d841e28d74",
+      "bytes": 2262
+    },
+    {
+      "path": "typescript/lib/lib.es2021.string.d.ts",
+      "sha256": "995c005ab91a498455ea8dfb63aa9f83fa2ea793c3d8aa344be4a1678d06d399",
+      "bytes": 1592
+    },
+    {
+      "path": "typescript/lib/lib.es2021.weakref.d.ts",
+      "sha256": "959d36cddf5e7d572a65045b876f2956c973a586da58e5d26cde519184fd9b8a",
+      "bytes": 3171
+    },
+    {
+      "path": "typescript/lib/lib.es2022.array.d.ts",
+      "sha256": "3925a6c820dcb1a06506c90b1577db1fdbf7705d65b62b99dce4be75c637e26b",
+      "bytes": 4676
+    },
+    {
+      "path": "typescript/lib/lib.es2022.d.ts",
+      "sha256": "ee7bad0c15b58988daa84371e0b89d313b762ab83cb5b31b8a2d1162e8eb41c2",
+      "bytes": 1108
+    },
+    {
+      "path": "typescript/lib/lib.es2022.error.d.ts",
+      "sha256": "0a3d63ef2b853447ec4f749d3f368ce642264246e02911fcb1590d8c161b8005",
+      "bytes": 2379
+    },
+    {
+      "path": "typescript/lib/lib.es2022.full.d.ts",
+      "sha256": "3cbad9a1ba4453443026ed38e4b8be018abb26565fa7c944376463ad9df07c41",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2022.intl.d.ts",
+      "sha256": "8cdf8847677ac7d20486e54dd3fcf09eda95812ac8ace44b4418da1bbbab6eb8",
+      "bytes": 7692
+    },
+    {
+      "path": "typescript/lib/lib.es2022.object.d.ts",
+      "sha256": "8444af78980e3b20b49324f4a16ba35024fef3ee069a0eb67616ea6ca821c47a",
+      "bytes": 1085
+    },
+    {
+      "path": "typescript/lib/lib.es2022.regexp.d.ts",
+      "sha256": "b4b67b1a91182421f5df999988c690f14d813b9850b40acd06ed44691f6727ad",
+      "bytes": 1331
+    },
+    {
+      "path": "typescript/lib/lib.es2022.string.d.ts",
+      "sha256": "3287d9d085fbd618c3971944b65b4be57859f5415f495b33a6adc994edd2f004",
+      "bytes": 1155
+    },
+    {
+      "path": "typescript/lib/lib.es2023.array.d.ts",
+      "sha256": "df83c2a6c73228b625b0beb6669c7ee2a09c914637e2d35170723ad49c0f5cd4",
+      "bytes": 40236
+    },
+    {
+      "path": "typescript/lib/lib.es2023.collection.d.ts",
+      "sha256": "436aaf437562f276ec2ddbee2f2cdedac7664c1e4c1d2c36839ddd582eeb3d0a",
+      "bytes": 900
+    },
+    {
+      "path": "typescript/lib/lib.es2023.d.ts",
+      "sha256": "27bdc30a0e32783366a5abeda841bc22757c1797de8681bbe81fbc735eeb1c10",
+      "bytes": 999
+    },
+    {
+      "path": "typescript/lib/lib.es2023.full.d.ts",
+      "sha256": "785921608325fa246b450f05b238f4b3ed659f1099af278ce9ebbc9416a13f1d",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2023.intl.d.ts",
+      "sha256": "8e3c06ea092138bf9fa5e874a1fdbc9d54805d074bee1de31b99a11e2fec239d",
+      "bytes": 2645
+    },
+    {
+      "path": "typescript/lib/lib.es2024.arraybuffer.d.ts",
+      "sha256": "87dc0f382502f5bbce5129bdc0aea21e19a3abbc19259e0b43ae038a9fc4e326",
+      "bytes": 2637
+    },
+    {
+      "path": "typescript/lib/lib.es2024.collection.d.ts",
+      "sha256": "b1cb28af0c891c8c96b2d6b7be76bd394fddcfdb4709a20ba05a7c1605eea0f9",
+      "bytes": 1224
+    },
+    {
+      "path": "typescript/lib/lib.es2024.d.ts",
+      "sha256": "8fd575e12870e9944c7e1d62e1f5a73fcf23dd8d3a321f2a2c74c20d022283fe",
+      "bytes": 1166
+    },
+    {
+      "path": "typescript/lib/lib.es2024.full.d.ts",
+      "sha256": "b3e9cef4eed59f8a2249ed834ba4aabe9d0d4e9037d4679487fa17dad99004a3",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.es2024.object.d.ts",
+      "sha256": "2fef54945a13095fdb9b84f705f2b5994597640c46afeb2ce78352fab4cb3279",
+      "bytes": 1259
+    },
+    {
+      "path": "typescript/lib/lib.es2024.promise.d.ts",
+      "sha256": "ac77cb3e8c6d3565793eb90a8373ee8033146315a3dbead3bde8db5eaf5e5ec6",
+      "bytes": 1389
+    },
+    {
+      "path": "typescript/lib/lib.es2024.regexp.d.ts",
+      "sha256": "56e4ed5aab5f5920980066a9409bfaf53e6d21d3f8d020c17e4de584d29600ad",
+      "bytes": 1073
+    },
+    {
+      "path": "typescript/lib/lib.es2024.sharedmemory.d.ts",
+      "sha256": "4ece9f17b3866cc077099c73f4983bddbcb1dc7ddb943227f1ec070f529dedd1",
+      "bytes": 3077
+    },
+    {
+      "path": "typescript/lib/lib.es2024.string.d.ts",
+      "sha256": "0a6282c8827e4b9a95f4bf4f5c205673ada31b982f50572d27103df8ceb8013c",
+      "bytes": 1194
+    },
+    {
+      "path": "typescript/lib/lib.es5.d.ts",
+      "sha256": "c430d44666289dae81f30fa7b2edebf186ecc91a2d4c71266ea6ae76388792e1",
+      "bytes": 218439
+    },
+    {
+      "path": "typescript/lib/lib.es6.d.ts",
+      "sha256": "df039a67536fe2acc3affdcbfb645892f842db36fe599e8e652e2f0c640a90d1",
+      "bytes": 1032
+    },
+    {
+      "path": "typescript/lib/lib.esnext.array.d.ts",
+      "sha256": "1c9319a09485199c1f7b0498f2988d6d2249793ef67edda49d1e584746be9032",
+      "bytes": 1791
+    },
+    {
+      "path": "typescript/lib/lib.esnext.collection.d.ts",
+      "sha256": "e3a2a0cee0f03ffdde24d89660eba2685bfbdeae955a6c67e8c4c9fd28928eeb",
+      "bytes": 3878
+    },
+    {
+      "path": "typescript/lib/lib.esnext.d.ts",
+      "sha256": "2ab096661c711e4a81cc464fa1e6feb929a54f5340b46b0a07ac6bbf857471f0",
+      "bytes": 1282
+    },
+    {
+      "path": "typescript/lib/lib.esnext.decorators.d.ts",
+      "sha256": "d4b1d2c51d058fc21ec2629fff7a76249dec2e36e12960ea056e3ef89174080f",
+      "bytes": 1070
+    },
+    {
+      "path": "typescript/lib/lib.esnext.disposable.d.ts",
+      "sha256": "51ad4c928303041605b4d7ae32e0c1ee387d43a24cd6f1ebf4a2699e1076d4fa",
+      "bytes": 6806
+    },
+    {
+      "path": "typescript/lib/lib.esnext.error.d.ts",
+      "sha256": "73f78680d4c08509933daf80947902f6ff41b6230f94dd002ae372620adb0f60",
+      "bytes": 1029
+    },
+    {
+      "path": "typescript/lib/lib.esnext.float16.d.ts",
+      "sha256": "196cb558a13d4533a5163286f30b0509ce0210e4b316c56c38d4c0fd2fb38405",
+      "bytes": 20528
+    },
+    {
+      "path": "typescript/lib/lib.esnext.full.d.ts",
+      "sha256": "bde31fd423cd93b0eff97197a3f66df7c93e8c0c335cbeb113b7ff1ac35c23f4",
+      "bytes": 1074
+    },
+    {
+      "path": "typescript/lib/lib.esnext.intl.d.ts",
+      "sha256": "811c71eee4aa0ac5f7adf713323a5c41b0cf6c4e17367a34fbce379e12bbf0a4",
+      "bytes": 893
+    },
+    {
+      "path": "typescript/lib/lib.esnext.iterator.d.ts",
+      "sha256": "22adec94ef7047a6c9d1af3cb96be87a335908bf9ef386ae9fd50eeb37f44c47",
+      "bytes": 8676
+    },
+    {
+      "path": "typescript/lib/lib.esnext.promise.d.ts",
+      "sha256": "60037901da1a425516449b9a20073aa03386cce92f7a1fd902d7602be3a7c2e9",
+      "bytes": 1658
+    },
+    {
+      "path": "typescript/lib/lib.esnext.sharedmemory.d.ts",
+      "sha256": "c5239f5c01bcfa9cd32f37c496cf19c61d69d37e48be9de612b541aac915805b",
+      "bytes": 1067
+    },
+    {
+      "path": "typescript/lib/lib.scripthost.d.ts",
+      "sha256": "cd034f499c6cdca722b60c04b5b1b78e058487a7085a8e0d6fb50809947ee573",
+      "bytes": 9451
+    },
+    {
+      "path": "typescript/lib/lib.webworker.asynciterable.d.ts",
+      "sha256": "ca417afee74054e99d5a8252b35bef26ca6e2942d67d343fce6b42fc9f432993",
+      "bytes": 1887
+    },
+    {
+      "path": "typescript/lib/lib.webworker.d.ts",
+      "sha256": "6d08cde2bfb6ff909efbf7cb7d6d55be412cf4b9f48fd0430185986973fa91f5",
+      "bytes": 609557
+    },
+    {
+      "path": "typescript/lib/lib.webworker.importscripts.d.ts",
+      "sha256": "80e18897e5884b6723488d4f5652167e7bb5024f946743134ecc4aa4ee731f89",
+      "bytes": 1041
+    },
+    {
+      "path": "typescript/lib/lib.webworker.iterable.d.ts",
+      "sha256": "d6c6331ce67c41b2ad5bfb0c8c022403980b479a377a44da8f16b61120418f66",
+      "bytes": 22768
+    },
+    {
+      "path": "typescript/lib/pl/diagnosticMessages.generated.json",
+      "sha256": "0645575abe920de1ee4cf3f2f70c7abc7f6691daa01cf1e9ad6b1ce53917c9ff",
+      "bytes": 342111
+    },
+    {
+      "path": "typescript/lib/pt-br/diagnosticMessages.generated.json",
+      "sha256": "34a649eb937cd70fe7b15663c2e5479e753d42df0e5c2933636789b60c2c939d",
+      "bytes": 330482
+    },
+    {
+      "path": "typescript/lib/ru/diagnosticMessages.generated.json",
+      "sha256": "29bb8ea9d44f55bb7acdedfac0a57865ea40552f004d0d6e3b96746ac76666cc",
+      "bytes": 443587
+    },
+    {
+      "path": "typescript/lib/tr/diagnosticMessages.generated.json",
+      "sha256": "9466915f3e0cdb2625495bbe9c02c8b7ef9e3543fffae957ba034655563abf65",
+      "bytes": 330684
+    },
+    {
+      "path": "typescript/lib/tsc.js",
+      "sha256": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+      "bytes": 267
+    },
+    {
+      "path": "typescript/lib/tsserver.js",
+      "sha256": "e3ccfeec65ec5c470b8ffc5611878a31182650c7e8a062c38a719f83b523edcb",
+      "bytes": 272
+    },
+    {
+      "path": "typescript/lib/tsserverlibrary.d.ts",
+      "sha256": "73b15a0b7cf5c6df9076b9408c5ce682f11813453bf54c54cb284f075b5224cf",
+      "bytes": 865
+    },
+    {
+      "path": "typescript/lib/tsserverlibrary.js",
+      "sha256": "7ca9b464de80a5382d9ccfed2b224323bc0274c8de61bf0464e89ee824677c76",
+      "bytes": 1012
+    },
+    {
+      "path": "typescript/lib/typesMap.json",
+      "sha256": "4143fb8b1c5d4421dfa19a4b80ddf2da375fc0835a349c3b18519fda5955e1d9",
+      "bytes": 16788
+    },
+    {
+      "path": "typescript/lib/typescript.d.ts",
+      "sha256": "e134052a6b1ded61693b4037f615dc72f14e2881e79c1ddbff6c514c8a516b05",
+      "bytes": 588085
+    },
+    {
+      "path": "typescript/lib/typescript.js",
+      "sha256": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675",
+      "bytes": 9112572
+    },
+    {
+      "path": "typescript/lib/typingsInstaller.js",
+      "sha256": "2d48a038523ea7c626fa2796a30fa5fdc07612ea5fab83544423009d7683a213",
+      "bytes": 280
+    },
+    {
+      "path": "typescript/lib/watchGuard.js",
+      "sha256": "471200d4bc555ef8d8429358bdca2a68ea7c9bfff6c853b5b048d2512fe4092a",
+      "bytes": 2313
+    },
+    {
+      "path": "typescript/lib/zh-cn/diagnosticMessages.generated.json",
+      "sha256": "6bd4ae6aea0991f6b73c46ec79ebb643b280a07e4808be363b07d01d2f6d399d",
+      "bytes": 295909
+    },
+    {
+      "path": "typescript/lib/zh-tw/diagnosticMessages.generated.json",
+      "sha256": "c35cf732ff01539090a3622b7a07f7bb4cadb28f6f13048b366012c458329be1",
+      "bytes": 292532
+    },
+    {
+      "path": "typescript/package.json",
+      "sha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+      "bytes": 3620
+    }
+  ]
+}

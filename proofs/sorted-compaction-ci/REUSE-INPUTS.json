@@ -1,0 +1,51 @@
+{
+  "sourceReview": "/workspace/shared/zerocopy-batch-clear-screen-review2-20261009/REVIEW.md",
+  "files": {
+    "controller.py": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/controller.py",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "copiedUnchanged": true
+    },
+    "math.mjs": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/math.mjs",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "copiedUnchanged": true
+    },
+    "ci.py": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/ci.py",
+      "sha256": "26597d4ba770f272b969600e490da7afd1d42bf5496952ebbd759daba9ed40d1",
+      "copiedUnchanged": false
+    },
+    "report.mjs": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/report.mjs",
+      "sha256": "3ae9b813d03b467f903cf32fb946062c77aa98e3f23b0d62e3562e902438a74a",
+      "copiedUnchanged": false
+    },
+    "subject.mjs": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/subject.mjs",
+      "sha256": "b4519b659ed1ca775f22bbed66997d9ac8b4c262e8d9b7ab8d75d306dbddc0f1",
+      "copiedUnchanged": false
+    },
+    "ci.test.py": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/ci.test.py",
+      "sha256": "7afea856c00d84591835c252c5685d2270261f385d06b2c91a93c53ff2a0a24c",
+      "copiedUnchanged": false
+    },
+    "controller.test.py": {
+      "source": "/workspace/shared/zerocopy-batch-clear-screen-revision2-20261009/packet/proofs/batch-clear-ci/controller.test.py",
+      "sha256": "6260b56424ae19c4a21a3d2b727f11f6af8c04def3bad1957c0fe093a43f428c",
+      "copiedUnchanged": false
+    }
+  },
+  "adapterChanges": [
+    "new exact two-commit source chain and source/compiler/WASM pins",
+    "24 standard gates including Chromium demo suite",
+    "fresh all-old-function audit and original cross-bundle transport file",
+    "80 untimed endpoints with public semantics separate from allocation addresses",
+    "retained output lifetimes and total live backing bound",
+    "immediate unvalidated body observations and stable validation links",
+    "sorted-compaction historical failures and chart/cache/module limits",
+    "copied controller guard test case metadata updated from seven batch cases to ten compaction cases"
+  ],
+  "controllerAndMathUnchanged": true
+}
