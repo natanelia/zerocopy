@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "purpose": "Default-off fixed numeric two-way SIMD screen, revision 1; no subject execution or operation clocks in preparation",
+  "purpose": "Default-off numeric sibling-module fixture repair; original failed run remains preserved",
   "origin": {
     "historicalBaselineCommit": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
     "baselineCommit": "f4fad3a850cb544ff9440d263eeec464a31dd123",
@@ -241,13 +241,13 @@
   "files": [
     {
       "path": ".github/workflows/numeric-unroll-ci.yml",
-      "bytes": 3822,
-      "sha256": "6b02d1d4722f62d1709a36ede4fda5de7c8ac3d4d65fb9ca0c6de08e301cb1b8"
+      "bytes": 3840,
+      "sha256": "715c4f5a859d6ea41af216080d3eb775cf84ae17f1bfa45bc93222c0632fc8bb"
     },
     {
       "path": "proofs/numeric-unroll-ci/PLAN.md",
-      "bytes": 25840,
-      "sha256": "3858087c8fe9169912ccd289f1cd28dc7833697c6bdc0733e9225d09ff76fb8e"
+      "bytes": 26225,
+      "sha256": "d851f2b41aa24e346ed65c494a8c9f551d09338effc4ee0685cf41bb83bf4e61"
     },
     {
       "path": "proofs/numeric-unroll-ci/PLAN.revision0.md",
@@ -255,9 +255,19 @@
       "sha256": "dfd62d86b75980e13ba880d31e8748c3e389017804b70187540b4738854c9ad0"
     },
     {
+      "path": "proofs/numeric-unroll-ci/PLAN.revision1.md",
+      "bytes": 25840,
+      "sha256": "3858087c8fe9169912ccd289f1cd28dc7833697c6bdc0733e9225d09ff76fb8e"
+    },
+    {
       "path": "proofs/numeric-unroll-ci/README.md",
-      "bytes": 3868,
-      "sha256": "9d42bc290dc12b0fb142f4a8c6d1b20404a4c9b20a9bcbf5f9dee2480acada30"
+      "bytes": 4981,
+      "sha256": "0ac02640e991344936868e82692c1102393916403309d8b2a7b7dbd0d064950d"
+    },
+    {
+      "path": "proofs/numeric-unroll-ci/REPAIR-2.md",
+      "bytes": 3515,
+      "sha256": "409bcdc6e7470c409da6d409700e2e8a7f19b2ff9bd8ceb99b470d9a9245e2b2"
     },
     {
       "path": "proofs/numeric-unroll-ci/RESOURCE-UNITS.md",
@@ -271,13 +281,13 @@
     },
     {
       "path": "proofs/numeric-unroll-ci/artifact_checks.py",
-      "bytes": 4018,
-      "sha256": "7ddde6b0a6b75bfd52d958b341a1d058578dfd5b360efcb92937dbf1e9472d52"
+      "bytes": 5374,
+      "sha256": "a574306288e2f5620b3b150980497c6784ceee4a071e77fcc837168e002d12d4"
     },
     {
       "path": "proofs/numeric-unroll-ci/artifact_checks.test.py",
-      "bytes": 1165,
-      "sha256": "f57dec1fe4436dfeae4c7bd281a8f2d53d3054c266d02e1f70dd6123e2749d5a"
+      "bytes": 3549,
+      "sha256": "e6134a3ca935809e9472453d5c2968dd0cb7b390a410033f1f680186a3976fe2"
     },
     {
       "path": "proofs/numeric-unroll-ci/ci-report.test.mjs",
@@ -286,13 +296,13 @@
     },
     {
       "path": "proofs/numeric-unroll-ci/ci.py",
-      "bytes": 25999,
-      "sha256": "4791a7af931daf4a2ec619866a41f273669ae1bde267bf850c2034025e01d785"
+      "bytes": 26509,
+      "sha256": "14320718c972d62a4cf0c9d54705a4f6dee68f3917405e1242cbcc4157d09542"
     },
     {
       "path": "proofs/numeric-unroll-ci/ci.test.py",
-      "bytes": 17046,
-      "sha256": "146783ee3ed9f461303d3a2c2219f942c325ff94a174cab4bafd8d12fb20061d"
+      "bytes": 18056,
+      "sha256": "965f106baaf5f14c37233b9bb9acb188a3252e4a0de2a636c0c3dfbaa5d41494"
     },
     {
       "path": "proofs/numeric-unroll-ci/controller.py",
@@ -395,6 +405,31 @@
       "sha256": "8cadc17994216c36578ad5f2e66843024288c8ea5f07e0b6501a5ba729a22674"
     },
     {
+      "path": "proofs/numeric-unroll-ci/history/run-37946676323/AUDIT.md",
+      "bytes": 8606,
+      "sha256": "71e64b188ed2e48ac854558e136b568ef4ff659caa96de0e4d6c891d70391e31"
+    },
+    {
+      "path": "proofs/numeric-unroll-ci/history/run-37946676323/bun-baseline.stderr",
+      "bytes": 867,
+      "sha256": "720f9bdf2a31bb2a3b0c7c16f139036baed9c7c300cf5f2a4f2c74621c4c497f"
+    },
+    {
+      "path": "proofs/numeric-unroll-ci/history/run-37946676323/bun-baseline.stdout.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "proofs/numeric-unroll-ci/history/run-37946676323/ledger.json",
+      "bytes": 77941,
+      "sha256": "82c6650d2a5d33a2de3c1a4abb3bc7f655fe5fdd3fb615c0839a8610132ff1de"
+    },
+    {
+      "path": "proofs/numeric-unroll-ci/history/run-37946676323/provenance.json",
+      "bytes": 1124,
+      "sha256": "753e2e5ffdfa99c6bb8686db8329880ee0b4f5aad301eb73832b0c043f607e60"
+    },
+    {
       "path": "proofs/numeric-unroll-ci/math.mjs",
       "bytes": 2387,
       "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c"
@@ -426,13 +461,13 @@
     },
     {
       "path": "proofs/numeric-unroll-ci/subject.mjs",
-      "bytes": 12536,
-      "sha256": "928ff32ce4ee7540bfb21e39a7a764d1a4183c91402530b91df349bad8eceb23"
+      "bytes": 13529,
+      "sha256": "f7ce229a3f9f64c062eca60472e793fd1761e16b77b9979860b226f038ec1f55"
     },
     {
       "path": "proofs/numeric-unroll-ci/subject.test.mjs",
-      "bytes": 6095,
-      "sha256": "5f23a24778b1a830e9bde288fa56f05ed8fc39debb77d241b4dc9fc85df222a2"
+      "bytes": 7134,
+      "sha256": "3729f3780bd590b323b7b702054bcb6b6abf95855efbc6d07b4f3a4b176a9219"
     },
     {
       "path": "proofs/numeric-unroll-ci/verify-preparation.py",

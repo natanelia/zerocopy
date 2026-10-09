@@ -1,6 +1,6 @@
 // Public numeric subject. Importing this file never imports an arm or reads a clock.
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,lstatSync,realpathSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
@@ -10,7 +10,18 @@ const digest = value => createHash('sha256').update(JSON.stringify(value)).diges
 const bytesDigest = value => createHash('sha256').update(value).digest('hex');
 const emit = value => process.stdout.write(JSON.stringify(value)+'\n');
 export const SIMD_PROBE = Object.freeze([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,9,1,7,0,65,0,253,15,26,11]);
-export const SCALAR_ALIAS = '?numeric-unroll-scalar-control';
+export const SCALAR_CONTROL_FILE = 'numeric-scalar-control.mjs';
+
+export function verifyScalarFixture(numericURL) {
+  const official=fileURLToPath(numericURL), sibling=fileURLToPath(new URL('./'+SCALAR_CONTROL_FILE,numericURL));
+  assert.equal(realpathSync(path.dirname(official)),path.dirname(official),'Fixture directory cannot use symlinks');
+  const a=lstatSync(official),b=lstatSync(sibling);
+  assert(a.isFile()&&b.isFile()&&!a.isSymbolicLink()&&!b.isSymbolicLink(),'Numeric files must be regular files');
+  assert(a.dev!==b.dev||a.ino!==b.ino,'Scalar fixture must be a separate physical file');
+  const bytes=readFileSync(official); assert(bytes.equals(readFileSync(sibling)),'Scalar fixture must match official bytes');
+  return {file:SCALAR_CONTROL_FILE,sha256:bytesDigest(bytes),bytes:bytes.length,
+    generatedTestFixture:true,officialOutput:false,byteIdenticalToOfficial:true,physicalFileDistinct:true};
+}
 
 export function fixture(spec) {
   const spatial = spec.operation === 'countPointsInBox';
@@ -50,7 +61,7 @@ export function spatialBody(api, list, queries, operations) {
   return {checksum,last};
 }
 export function selectionGuard(automatic, scalar, seed, wasm = WebAssembly) {
-  assert.notEqual(automatic.countInRange,scalar.countInRange,'Alias must have an independent module closure');
+  assert.notEqual(automatic.countInRange,scalar.countInRange,'Scalar fixture must have an independent module closure');
   assert.notEqual(automatic.countPointsInBox,scalar.countPointsInBox);
   const original=wasm.validate;
   const counts={automatic:0,scalar:0,repeated:0};
@@ -72,7 +83,7 @@ export function selectionGuard(automatic, scalar, seed, wasm = WebAssembly) {
   } finally { wasm.validate=original; }
   assert.deepEqual(counts,{automatic:1,scalar:1,repeated:0});
   assert.equal(wasm.validate,original);
-  return {automatic:'SIMD',scalar:'forced scalar',...counts,validateRestored:true,fixedAlias:SCALAR_ALIAS,firstUseMeasured:false};
+  return {automatic:'SIMD',scalar:'forced scalar',...counts,validateRestored:true,scalarControlFile:SCALAR_CONTROL_FILE,firstUseMeasured:false};
 }
 export function clockFor(mode, clock=performance) {
   assert(['untimed','calibrate','measure'].includes(mode));
@@ -115,8 +126,9 @@ export async function runSubject(config) {
   const api=await import(pathToFileURL(config.entrypoint).href);
   api.configureMemory({maximumBytes:protocol.memory.maximumArenaBytes});
   const numericURL=new URL('./numeric.js',pathToFileURL(config.entrypoint));
+  const scalarFixture=verifyScalarFixture(numericURL);
   const automatic=await import(numericURL.href);
-  const scalar=await import(numericURL.href+SCALAR_ALIAS);
+  const scalar=await import(new URL('./'+SCALAR_CONTROL_FILE,numericURL).href);
   const collect=runtime==='bun'?()=>Bun.gc(true):()=>{assert.equal(typeof globalThis.gc,'function');globalThis.gc();};
   let seed=new api.SharedList('number').pushMany([0]);
   const selection=selectionGuard(automatic,scalar,seed);
@@ -163,7 +175,7 @@ export async function runSubject(config) {
       before,after,liveArenaCapacityBytes:before.capacity,afterValidation,afterCleanup};
   }
   emit({kind:'start',mode:config.mode,runtime,version:runtime==='node'?process.version:Bun.version,
-    pid:process.pid,arch:process.arch,selection,operationClockBlocked:!timed,firstUseStatus:'unresolved'});
+    pid:process.pid,arch:process.arch,selection,scalarFixture,operationClockBlocked:!timed,firstUseStatus:'unresolved'});
   const offset=config.block??0;
   const cases=[...protocol.cases.slice(offset),...protocol.cases.slice(0,offset)];
   for(const spec of cases) {

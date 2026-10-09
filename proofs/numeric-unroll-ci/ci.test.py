@@ -200,6 +200,20 @@ class AdmissionTests(unittest.TestCase):
             digest.assert_not_called();receipt=ci.read(root/'preservation.json')
             self.assertFalse(receipt['archivesVerified']);self.assertEqual(receipt['quiescence'],'unknown')
             self.assertEqual(p.with_suffix('.log').read_text(),'partial');self.assertFalse((root/'artifact-inventory.json').exists())
+    def test_preserve_copies_separate_generated_scalar_fixture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=pathlib.Path(directory);tree=root/'sources/baseline';(tree/'dist').mkdir(parents=True)
+            (tree/'dist/numeric.js').write_bytes(b'synthetic module')
+            fixture=ci.scalar_fixture(tree,create=True)
+            ci.write(root/'generated-fixtures.json',{'baseline':fixture})
+            # Existing synthetic archive avoids invoking Git in this file-copy test.
+            (root/'baseline-source.tar').write_bytes(b'synthetic archive')
+            with patch('ci.run_root',return_value=root):ci.preserve()
+            target=root/'builds/baseline'/fixture['path']
+            self.assertEqual(target.read_bytes(),b'synthetic module')
+            names=[item['path'] for item in ci.read(root/'artifact-inventory.json')['files']]
+            self.assertIn('builds/baseline/'+fixture['path'],names)
+            self.assertIn('generated-fixtures.json',names)
     def test_preserve_treats_incomplete_receipts_as_unknown(self):
         for contents in ('{"status":"started"}', '{"status":', '{"cleanupError":"identity not persisted"}', '{"quiescence":"unknown"}'):
             with tempfile.TemporaryDirectory() as directory:

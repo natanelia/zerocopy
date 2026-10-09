@@ -6,11 +6,11 @@ This file replaces only local historical admission with fresh exact-source gates
 """
 import argparse, hashlib, json, os, pathlib, platform, shutil, signal, subprocess, sys, time, threading
 import controller
-from artifact_checks import verify_build_pair
+from artifact_checks import verify_build_pair, scalar_fixture
 
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-BRANCH = 'refs/heads/proof/numeric-unroll-screen-20261009'
+BRANCH = 'refs/heads/proof/numeric-unroll-sibling-control-20261009'
 ARM_NAMES = ('baseline', 'candidate')
 ORIGIN = json.loads((HERE/'origin.json').read_text())
 ADAPTER_DEADLINE_AT = None
@@ -286,6 +286,10 @@ def freeze():
     verify_source_chain()
     for arm in ARM_NAMES: verify_wasm(arm, source(arm))
     write(root/'build-comparison.json', verify_build_pair(source('baseline'), source('candidate'), ORIGIN))
+    # Generate only after official outputs pass; never count this as official output 13.
+    fixtures = {arm:scalar_fixture(source(arm), create=True) for arm in ARM_NAMES}
+    for arm in ARM_NAMES: sources[arm]['generatedFixtures'] = [fixtures[arm]]
+    write(root/'generated-fixtures.json', fixtures)
     policy = {'mode':'ci-screen', 'promotionAllowed':False,
         'fullStandardGateStatus':{'baseline':'passed-fresh-exact-source', 'candidate':'passed-fresh-exact-source'},
         'gateReceiptFiles': reviews, 'historicalEvidenceTransferred':False,
@@ -294,7 +298,8 @@ def freeze():
     write(harness/'admission.json', policy)
     manifest = {'schema':3, 'purpose':'Fresh exact-source numeric unroll CI screen', 'sources':sources,
         'runtimes':{name:{'path':str(pathlib.Path(shutil.which(name)).resolve()), 'args':['--expose-gc'] if name == 'node' else []} for name in ('node','bun')},
-        'tools':tools, 'harness':[item(p) for p in sorted(harness.iterdir()) if p.is_file()],
+        'tools':tools, 'harness':[item(p) for p in sorted(harness.iterdir()) if p.is_file()] +
+            [item(source(arm)/fixtures[arm]['path']) for arm in ARM_NAMES],
         'sourceReview':{'files':[item(HERE/'packet.json'), *reviews]}, 'origin':ORIGIN,
         'ciRun':read(root/'run.json'), 'preparationHost':controller.host()}
     controller.write_new(harness/'manifest.json', manifest)
@@ -309,6 +314,7 @@ def fresh_admission():
     assert policy['mode'] == 'ci-screen' and policy['promotionAllowed'] is False
     for entry in policy['gateReceiptFiles']: assert sha(entry['path']) == entry['sha256']
     assert policy['fullStandardGateStatus'] == {arm:'passed-fresh-exact-source' for arm in ARM_NAMES}
+    assert read(root/'generated-fixtures.json') == {arm:scalar_fixture(source(arm)) for arm in ARM_NAMES}
     return policy
 def launch(mode):
     require_activation(); bounded('admission-'+mode,120,fresh_admission)

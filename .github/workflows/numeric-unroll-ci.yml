@@ -2,13 +2,13 @@ name: Numeric two-way SIMD screen (default off)
 
 on:
   push:
-    branches: [proof/numeric-unroll-screen-20261009]
+    branches: [proof/numeric-unroll-sibling-control-20261009]
 
 permissions:
   contents: read
 
 concurrency:
-  group: numeric-unroll-screen-20261009
+  group: numeric-unroll-sibling-control-20261009
   cancel-in-progress: false
 
 jobs:

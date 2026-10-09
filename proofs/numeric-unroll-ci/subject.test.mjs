@@ -1,10 +1,11 @@
 // Pure fixtures, model calls, alias/clock/admission guards. No arm or subject execution.
 import assert from 'node:assert/strict';
-import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {readFileSync,mkdtempSync,writeFileSync,rmSync,symlinkSync,linkSync,unlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {fixture,expectedChecksum,rangeAutoBody,rangeScalarBody,spatialBody,selectionGuard,
-  SIMD_PROBE,SCALAR_ALIAS,clockFor,workCounts,requireTimedAdmission} from './subject.mjs';
+  SIMD_PROBE,SCALAR_CONTROL_FILE,verifyScalarFixture,clockFor,workCounts,requireTimedAdmission} from './subject.mjs';
 import {investigationDecision} from './decision.mjs';
 const protocol=JSON.parse(readFileSync(new URL('./protocol.json',import.meta.url)));
 let checks=0;
@@ -37,9 +38,18 @@ function model({automaticResult=true,sharedCache=false,badProbe=false,throwScala
   },countPointsInBox(){return 0;}};}
   return {wasm,original,choices,automatic:realm('automatic'),scalar:realm('scalar')};
 }
-check(()=>{const m=model();const record=selectionGuard(m.automatic,m.scalar,{},m.wasm);assert.deepEqual(m.choices,[['automatic',true],['scalar',false]]);assert.equal(m.wasm.validate,m.original);assert.equal(record.fixedAlias,SCALAR_ALIAS);assert.equal(record.firstUseMeasured,false);});
+check(()=>{const m=model();const record=selectionGuard(m.automatic,m.scalar,{},m.wasm);assert.deepEqual(m.choices,[['automatic',true],['scalar',false]]);assert.equal(m.wasm.validate,m.original);assert.equal(record.scalarControlFile,SCALAR_CONTROL_FILE);assert.equal(record.firstUseMeasured,false);});
 check(()=>{const m=model();assert.throws(()=>selectionGuard(m.automatic,m.automatic,{},m.wasm),/independent/);});
 for(const options of [{automaticResult:false},{sharedCache:true},{badProbe:true},{throwScalar:true}]) check(()=>{const m=model(options);assert.throws(()=>selectionGuard(m.automatic,m.scalar,{},m.wasm));assert.equal(m.wasm.validate,m.original);});
+const fixtureDirectory=mkdtempSync(path.join(tmpdir(),'numeric-sibling-file-test-'));
+try {
+  const official=path.join(fixtureDirectory,'numeric.js'),copy=path.join(fixtureDirectory,SCALAR_CONTROL_FILE);
+  writeFileSync(official,'export const value=1;\n');writeFileSync(copy,readFileSync(official));
+  check(()=>{const f=verifyScalarFixture(pathToFileURL(official));assert.equal(f.generatedTestFixture,true);assert.equal(f.officialOutput,false);});
+  check(()=>{writeFileSync(copy,'changed');assert.throws(()=>verifyScalarFixture(pathToFileURL(official)),/match official/);});
+  check(()=>{unlinkSync(copy);symlinkSync(official,copy);assert.throws(()=>verifyScalarFixture(pathToFileURL(official)),/regular files/);});
+  check(()=>{unlinkSync(copy);linkSync(official,copy);assert.throws(()=>verifyScalarFixture(pathToFileURL(official)),/separate physical/);});
+} finally {rmSync(fixtureDirectory,{recursive:true,force:true});}
 const temporary=mkdtempSync(path.join(tmpdir(),'numeric-unroll-admission-test-'));
 try {
   check(()=>requireTimedAdmission({mode:'untimed'},temporary));

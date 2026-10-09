@@ -1,0 +1,29 @@
+{
+  "originalInactivePacket": "f06799727dcd1008d86fb6321b972c711c9357dc",
+  "originalActivation": "963774efba94515e7a2005f36d743ff20fa9cffc",
+  "originalRun": "https://github.com/natanelia/zerocopy/actions/runs/37946676323",
+  "originalPacketSha256": "ab0fcdb75028106aad505db261f010109315767b2885a73fe068a456721d31c7",
+  "originalZipSha256": "c6f841e7c138cfaf52c8c99dd34128d5229206b91fa2ae19b8b6b89068b7e903",
+  "originalAttemptUnchanged": true,
+  "repair": "physical byte-identical sibling scalar test fixture",
+  "firstUseStatus": "unresolved",
+  "rowBufferLimitationUnchanged": true,
+  "files": [
+    {
+      "path": "AUDIT.md",
+      "sha256": "71e64b188ed2e48ac854558e136b568ef4ff659caa96de0e4d6c891d70391e31"
+    },
+    {
+      "path": "bun-baseline.stderr",
+      "sha256": "720f9bdf2a31bb2a3b0c7c16f139036baed9c7c300cf5f2a4f2c74621c4c497f"
+    },
+    {
+      "path": "bun-baseline.stdout.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "ledger.json",
+      "sha256": "82c6650d2a5d33a2de3c1a4abb3bc7f655fe5fdd3fb615c0839a8610132ff1de"
+    }
+  ]
+}
