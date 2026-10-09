@@ -74,7 +74,7 @@ class Compactor {
     if (!leaves.length) return 0;
     const input = this.target.alloc(leaves.length * 4), dv = this.target.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
-    return (sorted ? this.target.wasm.radixBuild(input, leaves.length) : this.target.wasm.mapBatch(0, input, leaves.length)) >>> 0;
+    return (sorted ? this.target.wasm.radixBuildSorted(input, leaves.length) : this.target.wasm.mapBatch(0, input, leaves.length)) >>> 0;
   }
   private vector(a: Arena, d: any, type: string, sequence: boolean, queue: boolean): { input: number; size: number } {
     const size = d.size;

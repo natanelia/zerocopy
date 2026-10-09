@@ -837,6 +837,64 @@ export function radixBuild(input: u32, count: u32): u32 {
   for (let i: u32 = 0; i < count; i++) root = radixInsertOwned(root, load<u32>(input + i * 4), mark);
   return root;
 }
+function radixGroupEnd(input: u32, first: u32, end: u32, position: u32): u32 {
+  const leaf = load<u32>(input + first * 4), digit = rdigit(leaf + 16, load<u32>(leaf + 8), position);
+  let next = first + 1;
+  while (next < end) {
+    const p = load<u32>(input + next * 4);
+    if (rdigit(p + 16, load<u32>(p + 8), position) != digit) break;
+    next++;
+  }
+  return next;
+}
+// Checked compaction builder. Only this call's unfinished fresh branches hold
+// continuation state: size is the range end, representative is the parent.
+// Completed children have final headers; no input words or leaves are changed.
+export function radixBuildSorted(input: u32, count: u32): u32 {
+  if (count < 2) return count ? load<u32>(input) : 0;
+  for (let i: u32 = 1; i < count; i++) {
+    if (compareLeaves(load<u32>(input + (i - 1) * 4), load<u32>(input + i * 4)) >= 0) return radixBuild(input, count);
+  }
+  let first: u32 = 0, end = count, parent: u32 = 0;
+  while (true) {
+    let child = load<u32>(input + first * 4);
+    if (end - first > 1) {
+      const last = load<u32>(input + (end - 1) * 4), len = load<u32>(child + 8), lastLen = load<u32>(last + 8), limit = min(len, lastLen);
+      // The range already shares its parent's digit, including an odd nibble.
+      let i: u32 = parent ? (tag(parent) - 2) >> 1 : 0;
+      while (i + 8 <= limit && load<u64>(child + 16 + i) == load<u64>(last + 16 + i)) i += 8;
+      while (i < limit && load<u8>(child + 16 + i) == load<u8>(last + 16 + i)) i++;
+      const position = i * 2 + (i < limit && (load<u8>(child + 16 + i) >> 4) == (load<u8>(last + 16 + i) >> 4) ? 1 : 0);
+      let bitmap: u32 = 0;
+      for (let j = first; j < end; j++) {
+        const p = load<u32>(input + j * 4);
+        bitmap |= 1 << rdigit(p + 16, load<u32>(p + 8), position);
+      }
+      // All four header words are initialized before descending. Sorted groups
+      // fill slots in increasing rank; unfinished slots are never read.
+      parent = radixBranch(position, bitmap, end, parent);
+      end = radixGroupEnd(input, first, end, position);
+      continue;
+    }
+    while (parent) {
+      const position = tag(parent) - 3, bitmap = load<u32>(parent + 4), rep = representative(child);
+      const bit: u32 = 1 << rdigit(rep + 16, load<u32>(rep + 8), position);
+      store<u32>(parent + 16 + pc(bitmap & (bit - 1)) * 4, child);
+      const rangeEnd = load<u32>(parent + 8);
+      if (end < rangeEnd) {
+        first = end; end = radixGroupEnd(input, first, rangeEnd, position);
+        break;
+      }
+      const ancestor = load<u32>(parent + 12), children = pc(bitmap);
+      let size: u32 = 0;
+      for (let j: u32 = 0; j < children; j++) size += radixSize(load<u32>(parent + 16 + j * 4));
+      store<u32>(parent + 8, size); store<u32>(parent + 12, rep);
+      child = parent; parent = ancestor;
+    }
+    if (!parent) return child;
+  }
+  return 0;
+}
 function blockBuildRange(input: u32, first: u32, end: u32): u32 {
   if (first == end) return 0;
   const mid = first + ((end - first) >> 1);
