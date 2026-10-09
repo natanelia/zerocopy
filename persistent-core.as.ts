@@ -412,7 +412,8 @@ function batchAt(old: u32, input: u32, count: u32, shift: u32, mark: u32 = 0x7ff
   }
   // Per-depth counts and cursors. Only this synchronous writer uses the scratch.
   const frame: u32 = 8192 + (shift / 4) * 256;
-  memory.fill(frame, 0, 256);
+  // Only counts need clearing; every cursor is assigned before its first read.
+  memory.fill(frame, 0, 64);
   for (let i: u32 = 0; i < count; i++) {
     const digit = (load<u32>(load<u32>(input + i * 4) + 4) >> shift) & 15;
     store<u32>(frame + digit * 4, load<u32>(frame + digit * 4) + 1);
