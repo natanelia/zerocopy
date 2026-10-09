@@ -1,0 +1,103 @@
+name: Cached object read correctness
+
+on:
+  push:
+    branches: [perf/cached-object-read-20261009]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    if: github.event_name == 'push' && github.event.forced == false && github.event.before == 'e249dd4148211dfec0e439ea5988af041c446e94' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [baseline, candidate]
+    env:
+      BASELINE_SHA: 3773c6e519c7c0958da13727ed1082f449f3ee25
+      CANDIDATE_SHA: e249dd4148211dfec0e439ea5988af041c446e94
+      ROLE: ${{ matrix.role }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install declared dependencies
+        run: bun install
+      - name: Verify source scope and run supported correctness checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE="$RUNNER_TEMP/cached-object-evidence"
+          PROJECT="$RUNNER_TEMP/cached-object-project"
+          mkdir -p "$EVIDENCE"
+          run() { local label="$1"; shift; "$@" 2>&1 | tee "$EVIDENCE/$label.log"; }
+          run source-guard node proofs/cached-object-read-check.mjs "$PWD" "$BASELINE_SHA" "$CANDIDATE_SHA" "$EVIDENCE"
+          PROOF_ROOT="$PWD"
+          if [[ "$ROLE" == baseline ]]; then SOURCE_SHA="$BASELINE_SHA"; EXPECTED=3; else SOURCE_SHA="$CANDIDATE_SHA"; EXPECTED=1; fi
+          git worktree add --detach "$PROJECT" "$SOURCE_SHA"
+          ln -s "$PROOF_ROOT/node_modules" "$PROJECT/node_modules"
+          git show "$CANDIDATE_SHA:cached-object-read.test.ts" > "$PROJECT/cached-object-read.test.ts"
+          cp "$PROJECT/arena.ts" "$EVIDENCE/arena.ts"
+          cp "$PROJECT/cached-object-read.test.ts" "$EVIDENCE/cached-object-read.test.ts"
+          cp "$PROOF_ROOT/proofs/cached-object-read-workers.mjs" "$EVIDENCE/"
+          cp "$PROOF_ROOT/proofs/cached-object-read-check.mjs" "$EVIDENCE/"
+          cp "$PROOF_ROOT/proofs/cached-object-read-correctness.md" "$EVIDENCE/"
+          cp "$PROOF_ROOT/.github/workflows/cached-object-read-correctness.yml" "$EVIDENCE/workflow.yml"
+          if [[ -f "$PROOF_ROOT/bun.lock" ]]; then cp "$PROOF_ROOT/bun.lock" "$EVIDENCE/bun.lock"; fi
+          if [[ -f "$PROOF_ROOT/bun.lockb" ]]; then cp "$PROOF_ROOT/bun.lockb" "$EVIDENCE/bun.lockb"; fi
+          node --version > "$EVIDENCE/node-version.txt"
+          bun --version > "$EVIDENCE/bun-version.txt"
+          lscpu > "$EVIDENCE/cpu.txt"
+          git --version > "$EVIDENCE/git-version.txt"
+          sha256sum "$PROOF_ROOT/node_modules/assemblyscript/dist/asc.js" > "$EVIDENCE/compiler-sha256.txt"
+          cd "$PROJECT"
+          export CACHED_OBJECT_EXPECTED_SLOT_READS="$EXPECTED"
+          run build-wasm bun run build:wasm
+          run build-browser bun run build:browser
+          run build-types bun run build:types
+          run typecheck bun run typecheck
+          run typecheck-redux bun run typecheck:redux
+          run typecheck-values bun run typecheck:values
+          run typecheck-geometry bun run typecheck:geometry
+          run typecheck-worker ./node_modules/.bin/tsc --noEmit -p tsconfig.worker.json
+          run full-tests bun run test
+          run built-worker-tasks node --test proofs/worker-tasks.mjs
+          run built-node-worker node proofs/node-worker.mjs
+          run typed-json-worker node proofs/typed-json-worker.mjs
+          run cached-object-real-workers node "$PROOF_ROOT/proofs/cached-object-read-workers.mjs" "$PROJECT"
+          run package bun run check:package
+          run final-arena-identity git diff --exit-code -- arena.ts
+          cmp cached-object-read.test.ts "$EVIDENCE/cached-object-read.test.ts"
+          printf '%s\n' "$SOURCE_SHA" > "$EVIDENCE/source-sha.txt"
+          printf '%s\n' "$EXPECTED" > "$EVIDENCE/expected-slot-count.txt"
+          cp -a dist "$EVIDENCE/dist"
+          cp package.json "$EVIDENCE/package.json"
+          sha256sum ./*.wasm > "$EVIDENCE/root-wasm-sha256.txt"
+      - name: Retain complete or partial evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/cached-object-evidence"
+          if [[ -d "$RUNNER_TEMP/cached-object-project/dist" && ! -d "$RUNNER_TEMP/cached-object-evidence/dist" ]]; then cp -a "$RUNNER_TEMP/cached-object-project/dist" "$RUNNER_TEMP/cached-object-evidence/dist"; fi
+          tar -czf "$RUNNER_TEMP/cached-object-evidence.tar.gz" -C "$RUNNER_TEMP" cached-object-evidence
+          sha256sum "$RUNNER_TEMP/cached-object-evidence.tar.gz" > "$RUNNER_TEMP/cached-object-evidence.sha256"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cached-object-correctness-${{ matrix.role }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/cached-object-evidence.tar.gz
+            ${{ runner.temp }}/cached-object-evidence.sha256
+          retention-days: 30
+          if-no-files-found: error
