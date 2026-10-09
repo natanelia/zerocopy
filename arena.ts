@@ -575,6 +575,14 @@ export class Arena {
     }
     const view = this.dv;
     try { return this.wasm.radixDeleteRecorded(root, address, length) >>> 0; }
+    catch (error) {
+      // Recursion or entry can trap before matching or resetting scratch.
+      // Recover the original lookup without relying on a partial result.
+      const leaf = this.wasm.radixFind(root, address, length) >>> 0;
+      view.setUint32(0, leaf, true);
+      if (!leaf) return root;
+      throw error;
+    }
     finally {
       // The old lookup primed the original root before deletion allocated.
       // Scratch is covered by this shared view even when memory has grown.
