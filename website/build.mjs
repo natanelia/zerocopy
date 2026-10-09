@@ -3,7 +3,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { pages, repository, basePath } from './config.mjs';
+import { pages, projectName, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
 import { comparison } from './comparison-template.mjs';
 import { injectMemoryCharts, writeMemoryChartAssets } from './memory-charts.mjs';
@@ -75,7 +75,7 @@ function writePage(route, title, description, body, script) {
   writeFileSync(join(destination, 'index.html'), html);
   siteRoutes.push(route);
 }
-writePage('', 'zerocopy: Zero-copy immutable collections for JavaScript and TypeScript', 'Share immutable maps, lists, and sets across Web Workers with SharedArrayBuffer and WebAssembly. Local reads, stable snapshots, and no dataset cloning.', home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
+writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
 writePage('compare/', 'zerocopy vs Immutable.js vs Immer vs native', 'Run shared snapshots, Immutable.js Lists, Immer arrays, and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
 writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Compare zerocopy, Immutable.js, Immer, and native arrays →</a></p><div class="explorer-setup">`), 'explorer.mjs');
 writePage('investigation-benchmark/', 'Compare four investigation architectures', 'Measure shared snapshots, Immutable.js Lists, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
@@ -93,7 +93,7 @@ for (const page of pages) {
 }
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
 writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
-writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
+writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', route: '404.html', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
 for (const route of ['lab', 'playground', 'explorer', 'investigation-benchmark', 'compare']) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');
 writeFileSync(join(out, '_headers'), '/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Resource-Policy: same-origin\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n');
