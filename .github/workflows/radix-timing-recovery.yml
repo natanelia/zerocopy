@@ -1,0 +1,112 @@
+name: Radix timing after sealed correctness
+
+on:
+  push:
+    branches: ['proof/radix-timing-recovery-20261009']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: radix-timing-recovery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  x64:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/proof/radix-timing-recovery-20261009' && github.run_attempt == 1 && github.event.created && github.event.before == '0000000000000000000000000000000000000000' && !github.event.forced && !github.event.deleted
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Initialize independent runner-local evidence paths
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          {
+            printf 'EVIDENCE=%s/radix-timing-%s\n' "$RUNNER_TEMP" "$RUNTIME"
+            printf 'RADIX_TIMING_INPUT=%s/radix-timing-%s/input\n' "$RUNNER_TEMP" "$RUNTIME"
+            printf 'UPLOAD_ROOT=%s/radix-timing-upload-%s\n' "$RUNNER_TEMP" "$RUNTIME"
+          } | tee -a "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preserve proof and event before any setup can fail
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/logs" "$EVIDENCE/source" "$RADIX_TIMING_INPUT"
+          cp "$GITHUB_EVENT_PATH" "$EVIDENCE/source/push-event.json"
+          git archive --format=tar HEAD > "$EVIDENCE/source/timing-proof-source.tar"
+          cp .github/workflows/radix-timing-recovery.yml "$EVIDENCE/source/"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Download only the pinned successful correctness artifact and metadata
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/natanelia/zerocopy/actions/runs/37873312900 > "$RADIX_TIMING_INPUT/run.json"
+          gh api repos/natanelia/zerocopy/actions/runs/37873312900/jobs > "$RADIX_TIMING_INPUT/jobs.json"
+          gh api repos/natanelia/zerocopy/actions/runs/37873312900/artifacts > "$RADIX_TIMING_INPUT/artifacts.json"
+          gh api repos/natanelia/zerocopy/actions/artifacts/11591645832/zip > "$RADIX_TIMING_INPUT/correctness.zip"
+      - name: Verify ZIP, tar, all receipts, source and complete built inputs
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          node proofs/radix-timing-input.mjs unpack "$RADIX_TIMING_INPUT" > "$EVIDENCE/logs/input-validation.json" 2> "$EVIDENCE/logs/input-validation.stderr"
+          node proofs/radix-timing-input.mjs stage-tests "$RADIX_TIMING_INPUT" > "$EVIDENCE/logs/test-bundle.json" 2> "$EVIDENCE/logs/test-bundle.stderr"
+      - name: Validate the adapter and unchanged workload/protocol without timing
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          node --test proofs/radix-timing-recovery.node.mjs proofs/trie-view-protocol.node.mjs proofs/trie-view-gate.node.mjs proofs/trie-view-workloads.node.mjs > "$EVIDENCE/logs/untimed-checks.log" 2>&1
+      - name: Freeze the original catalogue and imported complete builds
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          node proofs/radix-timing-recovery.mjs prepare "$RADIX_TIMING_INPUT" "$EVIDENCE/gate" "${{ matrix.runtime }}" > "$EVIDENCE/logs/freeze.log" 2>&1
+      - name: Run the unchanged study once with bounded durable children
+        timeout-minutes: 50
+        run: |
+          set -euo pipefail
+          ${{ matrix.runtime }} proofs/radix-timing-recovery.mjs run "$EVIDENCE/gate" > "$EVIDENCE/logs/controller.log" 2>&1
+      - name: Independently recheck complete records and imported evidence
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          node proofs/radix-timing-recovery.mjs verify "$EVIDENCE/gate" > "$EVIDENCE/logs/verification.log" 2>&1
+      - name: Retain final context even on partial or failed studies
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/logs"
+          git status --short > "$EVIDENCE/logs/final-git-status.log"
+          git rev-parse HEAD > "$EVIDENCE/logs/proof-commit.log"
+      - name: Archive original input and complete or partial timing evidence
+        if: always()
+        run: node proofs/trie-view-archive.mjs "$EVIDENCE" "$UPLOAD_ROOT"
+      - name: Upload portable complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: radix-timing-recovery-${{ matrix.runtime }}-${{ github.sha }}
+          path: |
+            ${{ env.UPLOAD_ROOT }}/radix-view.tar.gz
+            ${{ env.UPLOAD_ROOT }}/radix-view.tar.gz.sha256
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
