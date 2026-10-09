@@ -1,0 +1,98 @@
+name: Prospective radix browser recovery
+on:
+  push:
+    branches: ['proof/radix-browser-recovery-20261009']
+permissions:
+  contents: read
+concurrency:
+  group: radix-browser-recovery-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  BASELINE_COMMIT: 3773c6e519c7c0958da13727ed1082f449f3ee25
+  CANDIDATE_COMMIT: cda6f639faab0ef627fb97ed199864fc4cc2468a
+jobs:
+  screen:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/proof/radix-browser-recovery-20261009' &&
+      github.run_attempt == 1 &&
+      github.event.before == 'cda6f639faab0ef627fb97ed199864fc4cc2468a' &&
+      github.event.forced == false && github.event.created == false && github.event.deleted == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: chromium-x64
+            runner: ubuntu-24.04
+            browser: chromium
+          - lane: firefox-x64
+            runner: ubuntu-24.04
+            browser: firefox
+          - lane: webkit-x64
+            runner: ubuntu-24.04
+            browser: webkit
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 55
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Freeze the protocol and retain setup
+        timeout-minutes: 8
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/radix-browser-recovery-evidence/setup"
+          cp .github/workflows/radix-browser-recovery.yml "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/workflow.yml"
+          node proofs/radix-browser-recovery-runner.mjs verify > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/protocol-sha256.txt"
+          node --version > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/node-version.txt"
+          bun --version > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/bun-version.txt"
+          uname -a > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/uname.txt"
+          lscpu > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/lscpu.txt"
+          timeout --signal=TERM --kill-after=5s 300s bun install 2>&1 | tee "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/install.log"
+          cp bun.lock "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/bun.lock"
+          bun pm ls --all > "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/dependencies.txt"
+          git worktree add --detach "$RUNNER_TEMP/radix-browser-recovery-baseline" "$BASELINE_COMMIT"
+          git worktree add --detach "$RUNNER_TEMP/radix-browser-recovery-candidate" "$CANDIDATE_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/radix-browser-recovery-baseline/node_modules"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/radix-browser-recovery-candidate/node_modules"
+      - name: Install the pinned browser engine
+        if: matrix.browser != ''
+        timeout-minutes: 11
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=5s 600s bunx playwright install --with-deps '${{ matrix.browser }}' 2>&1 | tee "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/browser-install.log"
+      - name: Check the frozen protocol and adapters without timing
+        timeout-minutes: 2
+        run: |
+          set -euo pipefail
+          node --test proofs/radix-portability-tests.mjs proofs/radix-browser-recovery-tests.mjs 2>&1 | tee "$RUNNER_TEMP/radix-browser-recovery-evidence/setup/protocol-tests.log"
+      - name: Build exact sources, check correctness, then measure once
+        timeout-minutes: 27
+        run: |
+          set -euo pipefail
+          node proofs/radix-browser-recovery-runner.mjs run "$RUNNER_TEMP/radix-browser-recovery-baseline" "$RUNNER_TEMP/radix-browser-recovery-candidate" "$RUNNER_TEMP/radix-browser-recovery-evidence" '${{ matrix.lane }}'
+      - name: Archive complete or partial evidence
+        if: always()
+        timeout-minutes: 3
+        run: node proofs/radix-portability-archive.mjs "$RUNNER_TEMP/radix-browser-recovery-evidence" "$RUNNER_TEMP/radix-browser-recovery-artifact"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radix-browser-recovery-${{ matrix.lane }}
+          path: |
+            ${{ runner.temp }}/radix-browser-recovery-artifact/
+            ${{ runner.temp }}/radix-browser-recovery-evidence/results.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
