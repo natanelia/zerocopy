@@ -1,21 +1,23 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { chartData, chartNames, chartModel, formatMiB, validateChartData, memoryFigure, memorySVG, injectMemoryCharts } from '../memory-charts.mjs';
+import { chartData, recordedDate, chartNames, chartModel, formatMiB, validateChartData, memoryFigure, memorySVG, injectMemoryCharts } from '../memory-charts.mjs';
 
 const clone = () => structuredClone(chartData);
 test('charted samples retain the recorded source, workload, and exact byte medians', () => {
   assert.equal(validateChartData(chartData), chartData);
   assert.equal(chartData.groups.length, 30);
-  assert.deepEqual(chartModel('retained').groups[0].points.map(p=>p.bytes), [9482568,46183264,34987232,14761560]);
-  assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [104669184,199213056,147939328,96714752]);
-  assert.equal(formatMiB(9482568), '9.04');
+  assert.equal(recordedDate(), '9 October 2026');
+  assert.equal(recordedDate(chartData, 'short'), '9 Oct 2026');
+  assert.deepEqual(chartModel('retained').groups[0].points.map(p=>p.bytes), [9529128,46729264,34976344,14725856]);
+  assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [127623168,224120832,171905024,122970112]);
+  assert.equal(formatMiB(9529128), '9.09');
 });
 test('reader scaling includes only measured counts on one common zero-based scale', () => {
   const model=chartModel('readers'); assert.equal(model.limit,80);
   assert.deepEqual(model.groups.map(group=>group.points[0].readers),[0,2,4]);
   for (const group of model.groups) assert.deepEqual(group.points.map(p=>p.kind),['shared','immutable','native']);
-  assert.deepEqual(model.groups[2].points.map(p=>p.bytes),[9822536,74162160,56926080]);
+  assert.deepEqual(model.groups[2].points.map(p=>p.bytes),[9867096,74388112,56913808]);
 });
 test('missing, repeated, invalid, or altered-source samples cannot silently render', () => {
   for (const mutate of [d=>d.groups.pop(), d=>d.groups[1]=d.groups[0], d=>d.groups[0].samples.pop(), d=>d.groups[0].samples[0].retainedBytes=NaN, d=>d.groups[0].samples[0].rssBytes=-1, d=>d.runtime='different', d=>d.summarySHA256='wrong']) {
@@ -41,6 +43,8 @@ test('figures keep units, independent RAM definitions, ranges, and inspectable s
     for(const text of ['Recorded Node.js','MiB','not confidence intervals','Not browser RAM','3 trials','Exact values and trial range','Download chart data','aria-labelledby'])assert.ok(html.includes(text),text);
     assert.ok(!html.includes('<script'));assert.ok(!html.includes('<canvas'));
     assert.ok(html.includes('/zerocopy/previews/pr-13/test/assets/memory-chart-data.json'));
+    assert.ok(html.includes(recordedDate()));
+    assert.ok(html.includes(chartData.runtime));
     for(const p of model.groups.flatMap(g=>g.points))assert.ok(html.includes(`${formatMiB(p.min)}–${formatMiB(p.max)}`));
   }
   assert.ok(memoryFigure('rss').includes('One native owner uses the least RSS'));

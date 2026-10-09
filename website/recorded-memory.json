@@ -1,41 +1,41 @@
 {
   "schema": "zerocopy-investigation-memory/v1",
-  "runtime": "v22.16.0",
-  "v8": "12.4.254.21-node.26",
+  "runtime": "v22.23.3",
+  "v8": "12.4.254.21-node.57",
   "platform": "linux",
   "arch": "x64",
-  "cpu": "AMD EPYC 9V74 80-Core Processor",
-  "measuredAt": "2026-09-29T00:29:25.337Z",
+  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "measuredAt": "2026-10-09T04:02:33.162Z",
   "trials": 3,
   "entries": 100000,
-  "runtimeSourceCommit": "593bbd41931b945b6fa657e5ebb340d0ccdf2f5a",
-  "summarySHA256": "c59763ab7a3aa8de58de761b44d7106f4f36af3f34d8c5afaac0b575eb54d046",
+  "runtimeSourceCommit": "9972561c60e93500ae092c2b752880dca7740fdf",
+  "summarySHA256": "b318e78be89143dbc9cb3a7e6200f37e63c963ea907d35fc57cecc9ef30049af",
   "readers": 2,
   "runCount": 90,
   "rows": [
     {
       "fixture": "repeated",
       "label": "Repeated messages",
-      "shared": 4903192,
-      "immutable": 35786672,
-      "native": 24492992,
-      "centralized": 6361176
+      "shared": 4932424,
+      "immutable": 35320824,
+      "native": 24483848,
+      "centralized": 6354912
     },
     {
       "fixture": "unique",
       "label": "Unique messages",
-      "shared": 9482568,
-      "immutable": 46183264,
-      "native": 34987232,
-      "centralized": 14761560
+      "shared": 9529128,
+      "immutable": 46729264,
+      "native": 34976344,
+      "centralized": 14725856
     },
     {
       "fixture": "unicode",
       "label": "Unique messages, 20% Unicode prefix",
-      "shared": 10166688,
-      "immutable": 48753680,
-      "native": 37608976,
-      "centralized": 15606232
+      "shared": 10239232,
+      "immutable": 48891368,
+      "native": 37598576,
+      "centralized": 15599968
     }
   ]
 }
