@@ -1,0 +1,65 @@
+name: Website isolation registration order
+on:
+  push:
+    branches: [proof/website-isolation-register-first-20261009]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Check source identity and unit regression
+        run: |
+          test "$(git rev-parse HEAD^)" = 56211356dfdb7356b8b3e572109625aa81207d0a
+          git diff --exit-code 56211356dfdb7356b8b3e572109625aa81207d0a -- arena.ts shared.ts website/assets/isolation-sw.js
+          node --test website/tests/isolation.test.mjs website/tests/isolation-slot.test.mjs
+      - name: Compare both sources in the same browser processes
+        run: |
+          set -o pipefail
+          mkdir -p proofs/website-isolation-register-first/results
+          node proofs/website-isolation-register-first/browser.mjs 2>&1 | tee proofs/website-isolation-register-first/results/browser.log
+      - name: Build the full production website
+        run: |
+          bun run build:wasm && bun run build:browser && bun run build:types
+          npm --prefix website install --ignore-scripts --no-package-lock
+      - name: Keep all existing browser setup assertions at every deployment path
+        run: |
+          set -o pipefail
+          for route in root subpath preview; do
+            case "$route" in
+              root) export SITE_BASE=/ ;;
+              subpath) export SITE_BASE=/zerocopy/ ;;
+              preview) export SITE_BASE=/zerocopy/previews/pr-22/56211356dfdb7356b8b3e572109625aa81207d0a/ ;;
+            esac
+            node website/build.mjs
+            node --test website/tests/*.test.mjs 2>&1 | tee "proofs/website-isolation-register-first/results/site-$route.log"
+            node website/tests/isolation-browser.mjs 2>&1 | tee "proofs/website-isolation-register-first/results/isolation-$route.log"
+          done
+      - name: Retain complete or partial evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-isolation-register-first-${{ github.sha }}
+          path: |
+            proofs/website-isolation-register-first/
+            website/tests/isolation-registration-cache.mjs
+            website/tests/isolation-browser.mjs
+            website/tests/isolation.test.mjs
+            website/assets/isolation.mjs
+            .github/workflows/website-isolation-register-first.yml
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
