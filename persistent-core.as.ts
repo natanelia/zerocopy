@@ -180,6 +180,20 @@ function replaceChild(root: u32, bitmap: u32, delta: i32, digit: u32, child: u32
       store<u32>(root + 8 + pc(bitmap & ((1 << digit) - 1)) * 4, child);
       store<u32>(root, tag(root) + (delta << 2)); return root;
     }
+    // A batch-owned final branch can grow without abandoning its old record.
+    // Reserve the new lane before changing any bytes; published nodes are below mark.
+    if (!(tag(root) & OVERLAY)) {
+      const previous = load<u32>(root + 4), bit: u32 = 1 << digit, count = pc(previous);
+      if (!(previous & bit) && bitmap == (previous | bit) && root + 8 + count * 4 == heapEnd) {
+        const end = heapEnd + 4;
+        if (end > capacity) growTo(end);
+        heapEnd = end;
+        const position = pc(previous & (bit - 1));
+        for (let i = count; i > position; i--) store<u32>(root + 8 + i * 4, load<u32>(root + 4 + i * 4));
+        store<u32>(root + 8 + position * 4, child);
+        store<u32>(root + 4, bitmap); store<u32>(root, tag(root) + (delta << 2)); return root;
+      }
+    }
   } else {
     const patch = tryOverlay(root, bitmap, delta, digit, child);
     if (patch) return patch;
