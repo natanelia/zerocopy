@@ -513,7 +513,11 @@ function heapMerge(a: u32, b: u32, isMax: bool): u32 {
   return hn(load<f64>(a), load<f64>(a + 8), load<u32>(a + 16), heapMerge(load<u32>(a + 20), b, isMax));
 }
 export function heapInsert(root: u32, priority: f64, value: f64, isMax: bool): u32 {
-  return heapMerge(root, hn(priority, value, 0, 0), isMax);
+  if (!root) return hn(priority, value, 0, 0);
+  const rp = load<f64>(root);
+  // Fuse singleton creation with merging so a promoted new node is not copied.
+  if (isMax ? priority > rp : priority < rp) return hn(priority, value, 0, root);
+  return hn(rp, load<f64>(root + 8), load<u32>(root + 16), heapInsert(load<u32>(root + 20), priority, value, isMax));
 }
 export function heapPop(root: u32, isMax: bool): u32 { return root ? heapMerge(load<u32>(root + 16), load<u32>(root + 20), isMax) : 0; }
 
