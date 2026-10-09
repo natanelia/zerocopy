@@ -7,7 +7,7 @@ import { getWorkerData, initWorker } from './shared';
 beforeEach(() => resetSharedList());
 const reference = (values: readonly number[], lo: number, hi: number): number => values.reduce((n, v) => n + Number(v >= lo && v <= hi), 0);
 describe('numeric countInRange', () => {
-  it.each([0, 1, 2, 3, 15, 16, 17, 31, 32, 33, 63, 64, 65, 1023, 1024, 1025, 32768, 32769])('matches scalar semantics at size %i', size => {
+  it.each([0, 1, 2, 3, 4, 5, 6, 7, 15, 16, 17, 31, 32, 33, 63, 64, 65, 1023, 1024, 1025, 32768, 32769])('matches scalar semantics at size %i', size => {
     const values = Array.from({ length: size }, (_, i) => (i * 7919) % 10007 - 5000);
     if (size) values[0] = NaN;
     if (size > 1) values[1] = Infinity;
