@@ -1,4 +1,5 @@
 import type { Arena } from './arena';
+import { textKernelFor } from './text-kernel';
 
 /** Literal substring search. Case-insensitive mode uses JavaScript toLowerCase,
  * not locale-sensitive collation, regex matching, or Unicode normalization. */
@@ -53,14 +54,20 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
       if (!sensitive && code >= 97 && code <= 122) masks[i >>> 2] |= 32 << shift;
     }
     const [q0,q1,q2,q3] = packed, [m0,m1,m2,m3] = masks;
-    const scan = arena.wasm.textContains16;
+    let scan: typeof arena.wasm.textContains16 | undefined;
     const test = (raw: number) => {
+      scan ??= (textKernelFor(arena.memory) ?? arena.wasm).textContains16;
       const result = scan(raw, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
       return result < 0 ? fallback(raw) : result !== 0;
     };
-    const scanBlock = arena.wasm.textContainsBlock16;
+    let scanBlock: typeof arena.wasm.textContainsBlock16 | undefined;
     return Object.assign(test, {
-      block16: (address: number, count: number) => scanBlock(address, count, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive),
+      block16: (address: number, count: number) => {
+        // SharedList validates the index before calling this function. Query
+        // compilation, empty lists, and invalid-only access never activate it.
+        scanBlock ??= (textKernelFor(arena.memory) ?? arena.wasm).textContainsBlock16;
+        return scanBlock(address, count, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
+      },
       fallback,
     });
   }

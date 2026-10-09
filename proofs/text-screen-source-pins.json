@@ -1,0 +1,54 @@
+{
+  "baseline": "ad2a19d65a836985a2364b181bc9bd8dce6e42ad",
+  "originalPrototypeTree": "1af8af965c3f29cb07a6db818ee326d3491f6965",
+  "prototypeFiles": [
+    {
+      "file": "proofs/text-aux-activation.mjs",
+      "sha256": "14cd964c2d6c6ca9a28945ecd44dbb800ebb57d4c9e1f1052c3788ebafcd7143"
+    },
+    {
+      "file": "proofs/text-aux-build.mjs",
+      "sha256": "e84804b1bd438d9887517d19fb56b73e801e10fe82e7d9e8b52093dd6c9163cf"
+    },
+    {
+      "file": "proofs/text-aux-experiment.md",
+      "sha256": "0c6d22a3f76e64624efb4a90696123499aeecbcddeea9380544ad8499f6716d9"
+    },
+    {
+      "file": "proofs/text-aux-format.mjs",
+      "sha256": "47c6917f2ab139e9d7ade5dfb66fa7ecad8db7834507e3b732a4ada57c28d0a5"
+    },
+    {
+      "file": "proofs/text-aux-kernel.mjs",
+      "sha256": "cd00ab780fe9b63bd4122a327d53368ce3da8eb04a34e083f8860f030dd61138"
+    },
+    {
+      "file": "scripts/build-browser.ts",
+      "sha256": "a5e42c74369012f6ea535bcfd484f9e21185bbce6ce362dd2de650dd7a0f6d38"
+    },
+    {
+      "file": "scripts/build-text-aux-experiment.mjs",
+      "sha256": "60a12fa8d5343124317a4cd6d45c1dc39d570d065e99422d8ca2e73f70af15b5"
+    },
+    {
+      "file": "scripts/build-wasm.mjs",
+      "sha256": "1acaf089accdfdba7bf17bae04fd8b055efa1b4d6829d038ca253ff484d62f1b"
+    },
+    {
+      "file": "text-aux-reader.as.ts",
+      "sha256": "d2bee09286139243791ae8be17c3507327512622ce1d4fa3630f375bfe09cc1e"
+    },
+    {
+      "file": "text-kernel.ts",
+      "sha256": "66963b565d6c5eb2e5c4b721afc5a57a75843aecdedafc1176a49fab6a67746f"
+    },
+    {
+      "file": "text-search.ts",
+      "sha256": "7251d12e470b5d70db4927a954d039016fda53320683562ab5750b9c4f30d1a9"
+    },
+    {
+      "file": "text-wasm.ts",
+      "sha256": "882e6af7d5e78cafe0389fa29f8cd5de9f30021707a191805da06a39c59f91e5"
+    }
+  ]
+}

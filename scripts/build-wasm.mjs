@@ -10,3 +10,5 @@ for (const simd of [false, true]) {
 }
 // Optional read-only geometry module. Rejected SIMD experiments are not shipped.
 execFileSync(process.execPath, ['node_modules/assemblyscript/bin/asc.js', 'geometry-kernels.as.ts', '-o', 'geometry-kernels.wasm', '--textFile', 'geometry-kernels.wat', ...flags], { stdio: 'inherit' });
+// Experimental optional text reader. The mandatory scalar core is unchanged.
+execFileSync(process.execPath, ['node_modules/assemblyscript/bin/asc.js', 'text-aux-reader.as.ts', '-o', 'text-aux-simd.wasm', '--enable', 'simd', ...flags], { stdio: 'inherit' });

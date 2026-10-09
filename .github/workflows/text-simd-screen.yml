@@ -1,0 +1,50 @@
+name: Bounded text SIMD screen
+on:
+  workflow_dispatch:
+  push:
+    branches: [proof/text-simd-screen-20261009]
+permissions:
+  contents: read
+concurrency:
+  group: text-simd-screen
+  cancel-in-progress: false
+jobs:
+  node-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.23.3
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: 1.4.2
+      - name: Pin dependencies
+        run: |
+          cp proofs/text-screen-bun.lock bun.lock
+          bun install --frozen-lockfile
+      - name: Build, gate, and run the fixed screen
+        run: bash proofs/text-screen-ci.sh
+      - name: Retain partial descriptive summary
+        if: always()
+        run: |
+          if test -d "$RUNNER_TEMP/text-screen/timing"; then
+            node proofs/text-screen-summary.mjs "$RUNNER_TEMP/text-screen"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: text-simd-screen-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/text-screen/logs
+            ${{ runner.temp }}/text-screen/binaries
+            ${{ runner.temp }}/text-screen/runtime
+            ${{ runner.temp }}/text-screen/timing
+            ${{ runner.temp }}/text-screen/manifest.json
+            ${{ runner.temp }}/text-screen/correctness.json
+            ${{ runner.temp }}/text-screen/summary.json
+          retention-days: 30
