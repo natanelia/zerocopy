@@ -1,0 +1,98 @@
+[
+  {
+    "file": "arena.ts",
+    "line": 492,
+    "column": 59,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 492,
+    "column": 93,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 492,
+    "column": 132,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 496,
+    "column": 59,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 496,
+    "column": 93,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 496,
+    "column": 132,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 498,
+    "column": 57,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "    if (code !== 0 && code !== 4 && slot !== undefined) this.reads.cacheValue(slot, code, result);"
+  },
+  {
+    "file": "arena.ts",
+    "line": 633,
+    "column": 13,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "      if (!(this.prefixValid[word] & bit)) {"
+  },
+  {
+    "file": "arena.ts",
+    "line": 634,
+    "column": 9,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "        this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;"
+  },
+  {
+    "file": "arena.ts",
+    "line": 635,
+    "column": 9,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "        this.prefixValid[word] |= bit;"
+  },
+  {
+    "file": "arena.ts",
+    "line": 637,
+    "column": 50,
+    "code": "TS2532",
+    "message": "Object is possibly 'undefined'.",
+    "sourceLine": "      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;"
+  },
+  {
+    "file": "redux-jsan.ts",
+    "line": 29,
+    "column": 57,
+    "code": "TS7053",
+    "message": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'any[] | Record<string, unknown>'.\n  No index signature with a parameter of type 'string' was found on type 'any[] | Record<string, unknown>'.",
+    "sourceLine": "      Object.defineProperty(value, key, { value: unwrap(value[key]), enumerable: true, configurable: true, writable: true });"
+  }
+]

@@ -1,0 +1,172 @@
+name: Frozen radix-only view x64 screen
+
+on:
+  push:
+    branches: ['perf/radix-view-only-20261008']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radix-view-only-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BASELINE_COMMIT: 3773c6e519c7c0958da13727ed1082f449f3ee25
+  CANDIDATE_RUNTIME_COMMIT: c79c803bf7c59a2fc559e43ce7cc74aa4dacde15
+
+jobs:
+  x64-screen:
+    # Exactly one nonforced update from the published runtime, never a retry or dispatch.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/perf/radix-view-only-20261008' && github.run_attempt == 1 && github.event.before == 'c79c803bf7c59a2fc559e43ce7cc74aa4dacde15' && !github.event.created && !github.event.forced && !github.event.deleted
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Initialize and log runner-local evidence paths
+        env:
+          PROOF_RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          : "${RUNNER_TEMP:?}" "${GITHUB_ENV:?}" "${PROOF_RUNTIME:?}"
+          {
+            printf 'EVIDENCE=%s/radix-view-evidence-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+            printf 'BASE_ROOT=%s/radix-view-baseline-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+            printf 'UPLOAD_ROOT=%s/radix-view-upload-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+            printf 'npm_config_cache=%s/radix-view-npm-cache-%s\n' "$RUNNER_TEMP" "$PROOF_RUNTIME"
+          } | tee -a "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Retain source, event, prior history and partial prerequisites from the start
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/logs" "$EVIDENCE/source/.github/workflows" "$EVIDENCE/source/proofs" "$EVIDENCE/builds"
+          cp .github/workflows/radix-view-only.yml "$EVIDENCE/source/.github/workflows/"
+          cp proofs/trie-view-* proofs/radix-view-* "$EVIDENCE/source/proofs/"
+          cp trie-view-capture.test.ts package.json "$EVIDENCE/source/"
+          cp "$GITHUB_EVENT_PATH" "$EVIDENCE/source/push-event.json"
+          git archive --format=tar HEAD > "$EVIDENCE/source/gate-source.tar"
+          git archive --format=tar "$BASELINE_COMMIT" > "$EVIDENCE/source/baseline-source.tar"
+          git archive --format=tar "$CANDIDATE_RUNTIME_COMMIT" > "$EVIDENCE/source/candidate-runtime-source.tar"
+          git diff "$BASELINE_COMMIT" "$CANDIDATE_RUNTIME_COMMIT" -- arena.ts > "$EVIDENCE/source/runtime.patch"
+          printf '{"status":"partial","checks":[]}\n' > "$EVIDENCE/prerequisites.json"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Require a single direct proof commit and retained historical method input
+        run: |
+          set -euo pipefail
+          test "$(git show -s --format=%P HEAD)" = "$CANDIDATE_RUNTIME_COMMIT"
+          test "$(git rev-parse "$CANDIDATE_RUNTIME_COMMIT^{tree}")" = b09e5938f1312a91c833b64122657254c8bc1de8
+          git cat-file -e 47402ad2ec2ac7226831a577e6e224c555710af8:arena.ts
+          git show 47402ad2ec2ac7226831a577e6e224c555710af8:arena.ts > "$EVIDENCE/source/held-combined-arena.ts"
+      - name: Set up logged prerequisite runner and verify fixed runtime versions
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/radix-view-check.sh" <<'SH'
+          check() {
+            local build="$1" name="$2" directory="$3"
+            shift 3
+            node "$GITHUB_WORKSPACE/proofs/trie-view-prerequisites.mjs" check "$EVIDENCE" "$build" "$name" "$directory" "$@"
+          }
+          SH
+          source "$RUNNER_TEMP/radix-view-check.sh"
+          check gate runtime "$GITHUB_WORKSPACE" node --input-type=module -e "import assert from 'node:assert/strict'; import {execFileSync} from 'node:child_process'; assert.equal(process.platform,'linux'); assert.equal(process.arch,'x64'); assert.equal(process.versions.node,'22.23.3'); assert.equal(execFileSync('bun',['--version'],{encoding:'utf8'}).trim(),'1.4.2'); console.log(JSON.stringify({node:process.version,bun:'1.4.2',platform:process.platform,arch:process.arch}));"
+        env:
+          PROOF_RUNTIME: ${{ matrix.runtime }}
+      - name: Install dependencies and create external exact baseline worktree
+        env:
+          PROOF_RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          source "$RUNNER_TEMP/radix-view-check.sh"
+          check gate install "$GITHUB_WORKSPACE" bun install
+          check gate baseline-worktree "$GITHUB_WORKSPACE" git worktree add --detach "$BASE_ROOT" "$BASELINE_COMMIT"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_ROOT/node_modules"
+          check gate sources "$GITHUB_WORKSPACE" node proofs/trie-view-source.mjs sources "$BASE_ROOT" "$GITHUB_WORKSPACE"
+          check gate compilers "$GITHUB_WORKSPACE" node proofs/trie-view-source.mjs compiler "$GITHUB_WORKSPACE"
+      - name: Independently build and fully validate both source trees before any pilots
+        env:
+          PROOF_RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          source "$RUNNER_TEMP/radix-view-check.sh"
+          for build in baseline candidate; do
+            directory="$GITHUB_WORKSPACE"
+            if [ "$build" = baseline ]; then directory="$BASE_ROOT"; fi
+            check "$build" build-wasm "$directory" bun run build:wasm
+            check "$build" build-browser "$directory" bun run build:browser
+            check "$build" build-types "$directory" bun run build:types
+            check "$build" typecheck "$directory" bun run typecheck
+            check "$build" worker-types "$directory" node node_modules/typescript/bin/tsc --noEmit -p tsconfig.worker.json
+            check "$build" type-values "$directory" bun run typecheck:values
+            check "$build" type-redux "$directory" bun run typecheck:redux
+            check "$build" type-geometry "$directory" bun run typecheck:geometry
+            check "$build" unit "$directory" bun run test
+            check "$build" package "$directory" bun run check:package
+            check "$build" worker-tasks-node "$directory" node --test proofs/worker-tasks.mjs
+            check "$build" node-worker "$directory" node proofs/node-worker.mjs
+            check "$build" redux-node "$directory" node proofs/redux-node.mjs
+            check "$build" typed-json-worker "$directory" node proofs/typed-json-worker.mjs
+            check "$build" actual-workers-node "$GITHUB_WORKSPACE" node proofs/trie-view-workers.mjs "$directory/dist/shared.js"
+            check "$build" actual-workers-bun "$GITHUB_WORKSPACE" bun proofs/trie-view-workers.mjs "$directory/dist/shared.js"
+          done
+          check candidate mechanism "$GITHUB_WORKSPACE" bun proofs/trie-view-mechanism.ts
+          check candidate protocol-tests "$GITHUB_WORKSPACE" node --test proofs/trie-view-*.node.mjs
+          check gate exact-builds "$GITHUB_WORKSPACE" node proofs/trie-view-source.mjs compare "$BASE_ROOT" "$GITHUB_WORKSPACE"
+      - name: Seal successful prerequisite receipts
+        run: |
+          set -euo pipefail
+          node proofs/trie-view-prerequisites.mjs seal "$EVIDENCE"
+      - name: Freeze exact builds, prerequisites and all pilots before measured processes
+        run: |
+          set -euo pipefail
+          ${{ matrix.runtime }} proofs/trie-view-gate.mjs prepare "$BASE_ROOT" "$GITHUB_WORKSPACE" "$EVIDENCE/gate" 2>&1 | tee "$EVIDENCE/logs/prepare.log"
+      - name: Run the frozen initial x64 screen once
+        run: |
+          set -euo pipefail
+          ${{ matrix.runtime }} proofs/trie-view-gate.mjs run "$EVIDENCE/gate" 2>&1 | tee "$EVIDENCE/logs/run.log"
+      - name: Retain complete or partial builds and final run context
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE/builds" "$EVIDENCE/logs"
+          for build in baseline candidate; do
+            directory="$GITHUB_WORKSPACE"
+            if [ "$build" = baseline ]; then directory="$BASE_ROOT"; fi
+            if [ -d "$directory" ]; then
+              mkdir -p "$EVIDENCE/builds/$build"
+              for item in dist package.json bun.lock bun.lockb; do
+                if [ -e "$directory/$item" ]; then cp -a "$directory/$item" "$EVIDENCE/builds/$build/"; fi
+              done
+              find "$directory" -maxdepth 1 -type f -name '*.wasm' -exec cp '{}' "$EVIDENCE/builds/$build/" \;
+            fi
+          done
+          git status --short > "$EVIDENCE/logs/final-git-status.log"
+          git rev-parse HEAD > "$EVIDENCE/logs/gate-commit.log"
+      - name: Archive complete or partial evidence with original paths and bytes
+        if: always()
+        run: node proofs/trie-view-archive.mjs "$EVIDENCE" "$UPLOAD_ROOT"
+      - name: Retain portable complete or partial evidence archive
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radix-view-only-x64-${{ matrix.runtime }}-${{ github.sha }}
+          path: |
+            ${{ env.UPLOAD_ROOT }}/radix-view.tar.gz
+            ${{ env.UPLOAD_ROOT }}/radix-view.tar.gz.sha256
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30

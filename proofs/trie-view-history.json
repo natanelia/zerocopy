@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "combinedRuntime": "47402ad2ec2ac7226831a577e6e224c555710af8",
+  "gate": "d7e097270fe80e785c6b7740f73f366d1ad3cb83",
+  "runId": 37850139130,
+  "url": "https://github.com/natanelia/zerocopy/actions/runs/37850139130",
+  "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+  "bunEmptyHamtEntries": {
+    "latencyChangePercent": 3.779,
+    "pointwise95IntervalPercent": [
+      3.33,
+      4.231
+    ],
+    "baselineNanoseconds": 58.158,
+    "candidateNanoseconds": 60.349,
+    "classification": "detected material loss",
+    "quartets": 4,
+    "allQuartetsAdverse": true,
+    "validFloors": true,
+    "baselineAADriftFlag": false
+  },
+  "node": {
+    "status": "failed prerequisite",
+    "name": "baseline/unit-node-compatible",
+    "pilotsStarted": false,
+    "timingsAvailable": false
+  },
+  "priorEvidenceHashes": {
+    "AUDIT.md": "a31a09dbbe93e3c519c16f3a8f45298bc941c4de5e2bcaed093af005b29c8473",
+    "bun.zip": "fd2b617aa67a38af09d3ae20f5730d011ee14edeb91ef6bb1c294b97910fe51e",
+    "node.zip": "044b50d0069b64e0153122e4f35fe6fc3035a3d026e218e66acac430feb02021",
+    "independent-recomputation.json": "0bc33d9fcd70ae738387d25f8d4970192cb109127b259e20c2186a78471a4afe",
+    "independent-evidence-audit.json": "74812b3b72e7eadf5c44ed5b77f9869a19e5cbca821ca2bc37ee1568477dbc31"
+  },
+  "localRadixPreparation": {
+    "fullStandardBun": {
+      "passed": 763,
+      "failedTimeouts": 5
+    },
+    "boundedRecheck": {
+      "passed": 84,
+      "failedTimeouts": 6
+    },
+    "focused": 139,
+    "fullCleanCIRemainsMandatory": true
+  },
+  "olderHistory": [
+    {
+      "runId": 37848382333,
+      "stage": "workflow validation",
+      "pilotsStarted": false
+    },
+    {
+      "runId": 37848932492,
+      "stage": "baseline/unit-node",
+      "fullBunPassed": 753,
+      "supplementalNodeFailed": 9,
+      "pilotsStarted": false
+    }
+  ],
+  "priorGateSourceHashes": {
+    "trie-view-subject.mjs": "bbe02fc9614f14d32424efec988d55cda2ce3f80c218dec65517d6454f6f878d",
+    "trie-view-protocol.mjs": "ebf65b59a240451254754916c31c0942e675577745902c7890b794c5b4a7b739",
+    "trie-view-workloads.mjs": "e8660c766626b006adcf27421650927e119221be7efa54cbbd703fbbf5b35a10"
+  }
+}
