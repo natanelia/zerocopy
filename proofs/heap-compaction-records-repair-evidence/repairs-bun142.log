@@ -1,0 +1,12 @@
+12 | const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', timeout: 10000, killSignal: 'SIGKILL', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+13 | const commit = (cwd, text) => git(cwd, '-c', 'user.name=Codex Test', '-c', 'user.email=codex-test@openai.com', 'commit', '-m', text);
+14 | function temp() { return mkdtempSync(join(tmpdir(), 'heap-record-repair-')); }
+15 | function put(path, text) { mkdirSync(resolve(path, '..'), { recursive: true }); writeFileSync(path, text); }
+16 | 
+17 | test('glob-only negative nested baseline and exact real-arm discovery', async () => {
+     ^
+error: Cannot use test outside of the test runner. Run "bun test" to run tests.
+      at addTest (node:test:1653:9)
+      at /workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-screen-repair-20261009/proofs/heap-compaction-records-repairs.node.mjs:17:1
+
+Bun v1.4.2 (Linux x64)

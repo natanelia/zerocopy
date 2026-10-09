@@ -1,0 +1,716 @@
+[
+  {
+    "id": "zerocopy@0.2.1",
+    "name": "zerocopy",
+    "version": "0.2.1",
+    "size": 203550,
+    "unpackedSize": 1017258,
+    "shasum": "709d7bcbba4c8c16a34526d1bda3749c3ae1aeab",
+    "integrity": "sha512-b8dwTdiRiKCZcJNnO3kDJ6Eu4IYEyBCrk5rUqgSDSeXn/G0YWINWtYKEoYlwKdhRQhkEGe0GZVYYfNB/NDIqfA==",
+    "filename": "zerocopy-0.2.1.tgz",
+    "files": [
+      {
+        "path": ".gitattributes",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "size": 7759,
+        "mode": 420
+      },
+      {
+        "path": "LICENSE",
+        "size": 1066,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 6956,
+        "mode": 420
+      },
+      {
+        "path": "REDUX.md",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "arena.ts",
+        "size": 42991,
+        "mode": 420
+      },
+      {
+        "path": "codec.ts",
+        "size": 3318,
+        "mode": 420
+      },
+      {
+        "path": "compaction.ts",
+        "size": 11383,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-b5n5gve5.js",
+        "size": 43242,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-bngxdyck.js",
+        "size": 82282,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-cvrjzj6a.js",
+        "size": 39066,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-fvjmff4x.js",
+        "size": 3129,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-qrfmwc9f.js",
+        "size": 11887,
+        "mode": 420
+      },
+      {
+        "path": "dist/geometry.js",
+        "size": 2072,
+        "mode": 420
+      },
+      {
+        "path": "dist/numeric.js",
+        "size": 4303,
+        "mode": 420
+      },
+      {
+        "path": "dist/redux.js",
+        "size": 35088,
+        "mode": 420
+      },
+      {
+        "path": "dist/shared.js",
+        "size": 2141,
+        "mode": 420
+      },
+      {
+        "path": "dist/state.js",
+        "size": 224,
+        "mode": 420
+      },
+      {
+        "path": "dist/tanstack-db-collection.js",
+        "size": 3707,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/arena.d.ts",
+        "size": 4629,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/codec.d.ts",
+        "size": 677,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/compaction.d.ts",
+        "size": 6020,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/freeze-json.d.ts",
+        "size": 362,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry-runtime.d.ts",
+        "size": 405,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry-wasm.d.ts",
+        "size": 56,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry.d.ts",
+        "size": 689,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/memory.d.ts",
+        "size": 515,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/numeric-wasm.d.ts",
+        "size": 68,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/numeric.d.ts",
+        "size": 1152,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/read-cache.d.ts",
+        "size": 945,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-checkpoint.d.ts",
+        "size": 1988,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-codec.d.ts",
+        "size": 2279,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-heap-codec.d.ts",
+        "size": 732,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-internal.d.ts",
+        "size": 1553,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-jsan.d.ts",
+        "size": 678,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux.d.ts",
+        "size": 4339,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/set-key.d.ts",
+        "size": 223,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-doubly-linked-list.d.ts",
+        "size": 2449,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-linked-list.d.ts",
+        "size": 2160,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-list.d.ts",
+        "size": 2528,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-map.d.ts",
+        "size": 2853,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-ordered-map.d.ts",
+        "size": 2112,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-ordered-set.d.ts",
+        "size": 1097,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-priority-queue.d.ts",
+        "size": 2071,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-queue.d.ts",
+        "size": 1835,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-set.d.ts",
+        "size": 741,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-sorted-map.d.ts",
+        "size": 1879,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-sorted-set.d.ts",
+        "size": 1049,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-stack.d.ts",
+        "size": 1534,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared.d.ts",
+        "size": 8603,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/state.d.ts",
+        "size": 232,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/tanstack-db-collection.d.ts",
+        "size": 3200,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/text-search.d.ts",
+        "size": 933,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/types.d.ts",
+        "size": 7285,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/utf8.d.ts",
+        "size": 493,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/wasm-utils.d.ts",
+        "size": 571,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-protocol.d.ts",
+        "size": 3614,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-redux.d.ts",
+        "size": 815,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-tasks.d.ts",
+        "size": 3261,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker.d.ts",
+        "size": 3055,
+        "mode": 420
+      },
+      {
+        "path": "dist/worker.js",
+        "size": 682,
+        "mode": 420
+      },
+      {
+        "path": "docs/api.md",
+        "size": 13455,
+        "mode": 420
+      },
+      {
+        "path": "docs/architecture.md",
+        "size": 7767,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-readers.svg",
+        "size": 4483,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-retained.svg",
+        "size": 2573,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-rss.svg",
+        "size": 2563,
+        "mode": 420
+      },
+      {
+        "path": "docs/benchmarks.md",
+        "size": 15944,
+        "mode": 420
+      },
+      {
+        "path": "docs/geometry-performance.md",
+        "size": 9660,
+        "mode": 420
+      },
+      {
+        "path": "docs/geometry.md",
+        "size": 3757,
+        "mode": 420
+      },
+      {
+        "path": "docs/getting-started.md",
+        "size": 6219,
+        "mode": 420
+      },
+      {
+        "path": "docs/memory-comparison.md",
+        "size": 10337,
+        "mode": 420
+      },
+      {
+        "path": "docs/migration.md",
+        "size": 7293,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric-experiment-followup.md",
+        "size": 3061,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric-performance.md",
+        "size": 5160,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric.md",
+        "size": 2076,
+        "mode": 420
+      },
+      {
+        "path": "docs/primitive-scan-performance.md",
+        "size": 6128,
+        "mode": 420
+      },
+      {
+        "path": "docs/README.md",
+        "size": 2279,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux-checkpoints.md",
+        "size": 5558,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux-compatibility.md",
+        "size": 3592,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux.md",
+        "size": 12276,
+        "mode": 420
+      },
+      {
+        "path": "docs/spatial-bulk-performance.md",
+        "size": 3663,
+        "mode": 420
+      },
+      {
+        "path": "docs/spatial-bulk.md",
+        "size": 2997,
+        "mode": 420
+      },
+      {
+        "path": "docs/tanstack.md",
+        "size": 3696,
+        "mode": 420
+      },
+      {
+        "path": "docs/task-quickstart.md",
+        "size": 3373,
+        "mode": 420
+      },
+      {
+        "path": "docs/text-search.md",
+        "size": 4539,
+        "mode": 420
+      },
+      {
+        "path": "docs/use-cases.md",
+        "size": 5022,
+        "mode": 420
+      },
+      {
+        "path": "docs/worker-sessions.md",
+        "size": 11018,
+        "mode": 420
+      },
+      {
+        "path": "docs/worker-sharing.md",
+        "size": 7799,
+        "mode": 420
+      },
+      {
+        "path": "docs/workers.md",
+        "size": 22987,
+        "mode": 420
+      },
+      {
+        "path": "doubly-linked-list.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "freeze-json.ts",
+        "size": 907,
+        "mode": 420
+      },
+      {
+        "path": "geometry-kernels.wasm",
+        "size": 571,
+        "mode": 420
+      },
+      {
+        "path": "geometry-runtime.ts",
+        "size": 1073,
+        "mode": 420
+      },
+      {
+        "path": "geometry-wasm.ts",
+        "size": 167,
+        "mode": 420
+      },
+      {
+        "path": "geometry.ts",
+        "size": 1166,
+        "mode": 420
+      },
+      {
+        "path": "linked-list.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "memory.ts",
+        "size": 1381,
+        "mode": 420
+      },
+      {
+        "path": "numeric-kernels-simd.wasm",
+        "size": 782,
+        "mode": 420
+      },
+      {
+        "path": "numeric-kernels.wasm",
+        "size": 720,
+        "mode": 420
+      },
+      {
+        "path": "numeric-wasm.ts",
+        "size": 372,
+        "mode": 420
+      },
+      {
+        "path": "numeric.ts",
+        "size": 3539,
+        "mode": 420
+      },
+      {
+        "path": "ordered-map.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 4029,
+        "mode": 420
+      },
+      {
+        "path": "persistent-core.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "priority-queue.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "read-cache.ts",
+        "size": 2598,
+        "mode": 420
+      },
+      {
+        "path": "redux-checkpoint.ts",
+        "size": 13045,
+        "mode": 420
+      },
+      {
+        "path": "redux-codec.ts",
+        "size": 14115,
+        "mode": 420
+      },
+      {
+        "path": "redux-heap-codec.ts",
+        "size": 3429,
+        "mode": 420
+      },
+      {
+        "path": "redux-internal.ts",
+        "size": 2382,
+        "mode": 420
+      },
+      {
+        "path": "redux-jsan.ts",
+        "size": 3514,
+        "mode": 420
+      },
+      {
+        "path": "redux.ts",
+        "size": 6625,
+        "mode": 420
+      },
+      {
+        "path": "set-key.ts",
+        "size": 478,
+        "mode": 420
+      },
+      {
+        "path": "shared-doubly-linked-list.ts",
+        "size": 6537,
+        "mode": 420
+      },
+      {
+        "path": "shared-linked-list.ts",
+        "size": 5751,
+        "mode": 420
+      },
+      {
+        "path": "shared-list.ts",
+        "size": 10196,
+        "mode": 420
+      },
+      {
+        "path": "shared-list.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "shared-map.ts",
+        "size": 5895,
+        "mode": 420
+      },
+      {
+        "path": "shared-map.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "shared-ordered-map.ts",
+        "size": 4976,
+        "mode": 420
+      },
+      {
+        "path": "shared-ordered-set.ts",
+        "size": 1789,
+        "mode": 420
+      },
+      {
+        "path": "shared-priority-queue.ts",
+        "size": 4535,
+        "mode": 420
+      },
+      {
+        "path": "shared-queue.ts",
+        "size": 4007,
+        "mode": 420
+      },
+      {
+        "path": "shared-set.ts",
+        "size": 1629,
+        "mode": 420
+      },
+      {
+        "path": "shared-sorted-map.ts",
+        "size": 4805,
+        "mode": 420
+      },
+      {
+        "path": "shared-sorted-set.ts",
+        "size": 2062,
+        "mode": 420
+      },
+      {
+        "path": "shared-stack.ts",
+        "size": 3064,
+        "mode": 420
+      },
+      {
+        "path": "shared.ts",
+        "size": 7241,
+        "mode": 420
+      },
+      {
+        "path": "singly-linked-list.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "sorted-tree.wasm",
+        "size": 26118,
+        "mode": 420
+      },
+      {
+        "path": "state.ts",
+        "size": 227,
+        "mode": 420
+      },
+      {
+        "path": "tanstack-db-collection.ts",
+        "size": 5620,
+        "mode": 420
+      },
+      {
+        "path": "text-search.ts",
+        "size": 6206,
+        "mode": 420
+      },
+      {
+        "path": "types.ts",
+        "size": 10963,
+        "mode": 420
+      },
+      {
+        "path": "utf8.ts",
+        "size": 1377,
+        "mode": 420
+      },
+      {
+        "path": "wasm-utils.ts",
+        "size": 1417,
+        "mode": 420
+      },
+      {
+        "path": "worker-protocol.ts",
+        "size": 9074,
+        "mode": 420
+      },
+      {
+        "path": "worker-redux.ts",
+        "size": 1084,
+        "mode": 420
+      },
+      {
+        "path": "worker-tasks.ts",
+        "size": 26239,
+        "mode": 420
+      },
+      {
+        "path": "worker.ts",
+        "size": 23719,
+        "mode": 420
+      }
+    ],
+    "entryCount": 140,
+    "bundled": []
+  }
+]

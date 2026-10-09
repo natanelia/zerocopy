@@ -1,0 +1,14 @@
+bun test v1.4.2 (744846f84)
+
+proofs/heap-compaction-records-stats.node.mjs:
+(pass) audited quartet estimator retains small-sample uncertainty and units [12.05ms]
+(pass) pairs and batches never add independent observations [0.73ms]
+(pass) distinguishes invalid measurements from valid inconclusive intervals [1.85ms]
+(pass) requires a material target benefit and compatible AA, without AA subtraction [1.03ms]
+(pass) predeclared process and budget arithmetic stays bounded [0.35ms]
+(pass) churn ceilings are symmetric, conservative, and reject overflow [1.15ms]
+(pass) pilot and measurement modes are disabled before any fixture work by default [2.55ms]
+
+ 7 pass
+ 0 fail
+Ran 7 tests across 1 file. [2.40s]

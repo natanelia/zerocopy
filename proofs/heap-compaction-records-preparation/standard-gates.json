@@ -1,0 +1,304 @@
+{
+  "passed": false,
+  "complete": false,
+  "records": [
+    {
+      "arm": "baseline",
+      "stage": "build-wasm",
+      "command": [
+        "node",
+        "scripts/build-wasm.mjs"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/build-wasm.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "build-wasm",
+      "command": [
+        "node",
+        "scripts/build-wasm.mjs"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/build-wasm.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "build-portable",
+      "command": [
+        "bun",
+        "scripts/build-browser.ts"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/build-portable.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "build-portable",
+      "command": [
+        "bun",
+        "scripts/build-browser.ts"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/build-portable.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "build-types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/build-types.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "build-types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/build-types.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-main",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-main.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-main",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-main.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-redux",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.redux.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-redux.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-redux",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.redux.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-redux.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-values",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-values.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-values",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-values.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-values-loose-optional",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json",
+        "--exactOptionalPropertyTypes",
+        "false"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-values-loose-optional.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-values-loose-optional",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.typed-values.json",
+        "--exactOptionalPropertyTypes",
+        "false"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-values-loose-optional.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-geometry",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.geometry.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-geometry.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-geometry",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.geometry.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-geometry.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "types-worker",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/types-worker.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "candidate",
+      "stage": "types-worker",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/candidate/types-worker.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 0
+    },
+    {
+      "arm": "baseline",
+      "stage": "unit-standard",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009",
+      "log": "/workspace/shared/zerocopy-heap-compaction-records-20261009/first-screen/standard-gates/baseline/unit-standard.log",
+      "nodeVersion": "v22.23.3",
+      "bunVersion": "1.4.2",
+      "exitCode": 1
+    }
+  ]
+}

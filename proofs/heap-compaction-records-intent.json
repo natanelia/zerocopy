@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "publishedRuntime": "21de2bf4b49d1b2cf5da698be41a27f37fd84bed",
+  "acceptedCommit": null,
+  "acceptedTree": null,
+  "acceptedHarnessSha256": null,
+  "note": "Default off. Parent may make one separately reviewed intent-only activation commit after independent acceptance and publication, then create a fresh isolated proof/heap-compaction-records-run-* branch. No activation is authorized by this file alone."
+}

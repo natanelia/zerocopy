@@ -1,0 +1,7 @@
+{
+  "base": "ad2a19d65a836985a2364b181bc9bd8dce6e42ad",
+  "baselineSourceSha256": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+  "candidateSourceSha256": "edb16a44839b37e268620231a7ef2f1decb4b23101b3778f20a0f5daa4461455",
+  "baselineInstrumentedSha256": "8529e039c302dedefc7fe66d17f12e9e2edc17c2f96d53c5f9096b89b648886b",
+  "candidateInstrumentedSha256": "399b9772f428fc76eaf043d3f12ba2caef766a1e8ea8359cc439169919878154"
+}

@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "runtime": "v22.23.3",
+  "results": [
+    {
+      "arm": "baseline",
+      "copy": false,
+      "passed": true,
+      "actualWorker": true,
+      "sharedOrCopyWitness": true,
+      "workerCompaction": true,
+      "returnAttachment": true,
+      "readOnlyEnforced": true,
+      "sourceGrowthAndResetPreserveOldSnapshots": true,
+      "nestedCompactionSingleArena": true,
+      "primitiveBytesHash": "c5e2fa0f408cc52b231d54c5a2e0e071cd4b3bccb3fa1bf15d383a005556985b",
+      "primitiveUsed": 74256
+    },
+    {
+      "arm": "baseline",
+      "copy": true,
+      "passed": true,
+      "actualWorker": true,
+      "sharedOrCopyWitness": true,
+      "workerCompaction": true,
+      "returnAttachment": true,
+      "readOnlyEnforced": true,
+      "sourceGrowthAndResetPreserveOldSnapshots": true,
+      "nestedCompactionSingleArena": true,
+      "primitiveBytesHash": "c5e2fa0f408cc52b231d54c5a2e0e071cd4b3bccb3fa1bf15d383a005556985b",
+      "primitiveUsed": 74256
+    },
+    {
+      "arm": "candidate",
+      "copy": false,
+      "passed": true,
+      "actualWorker": true,
+      "sharedOrCopyWitness": true,
+      "workerCompaction": true,
+      "returnAttachment": true,
+      "readOnlyEnforced": true,
+      "sourceGrowthAndResetPreserveOldSnapshots": true,
+      "nestedCompactionSingleArena": true,
+      "primitiveBytesHash": "c5e2fa0f408cc52b231d54c5a2e0e071cd4b3bccb3fa1bf15d383a005556985b",
+      "primitiveUsed": 74256
+    },
+    {
+      "arm": "candidate",
+      "copy": true,
+      "passed": true,
+      "actualWorker": true,
+      "sharedOrCopyWitness": true,
+      "workerCompaction": true,
+      "returnAttachment": true,
+      "readOnlyEnforced": true,
+      "sourceGrowthAndResetPreserveOldSnapshots": true,
+      "nestedCompactionSingleArena": true,
+      "primitiveBytesHash": "c5e2fa0f408cc52b231d54c5a2e0e071cd4b3bccb3fa1bf15d383a005556985b",
+      "primitiveUsed": 74256
+    }
+  ]
+}

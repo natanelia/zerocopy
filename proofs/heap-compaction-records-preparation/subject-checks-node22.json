@@ -1,0 +1,330 @@
+{
+  "passed": true,
+  "measurementClockTripwire": true,
+  "results": [
+    {
+      "name": "heap-number4096",
+      "mode": "checks",
+      "initial": {
+        "used": 196608,
+        "backingBytes": 196608,
+        "counterDigits": 1,
+        "bounds": {
+          "initialUsed": 196608,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 196608,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 4096
+      },
+      "final": {
+        "used": 196608,
+        "backingBytes": 196608,
+        "counterDigits": 1,
+        "bounds": {
+          "initialUsed": 196608,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 196608,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 4096
+      },
+      "passed": true
+    },
+    {
+      "name": "heap-spine4096",
+      "mode": "checks",
+      "initial": {
+        "used": 196608,
+        "backingBytes": 196608,
+        "counterDigits": 1,
+        "bounds": {
+          "initialUsed": 196608,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 196608,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 4096
+      },
+      "final": {
+        "used": 196608,
+        "backingBytes": 196608,
+        "counterDigits": 1,
+        "bounds": {
+          "initialUsed": 196608,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 196608,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 4096
+      },
+      "passed": true
+    },
+    {
+      "name": "heap-shared4096",
+      "mode": "checks",
+      "initial": {
+        "used": 197728,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 197728,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 262144,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap",
+          "first",
+          "second",
+          "again"
+        ],
+        "size": 16386
+      },
+      "final": {
+        "used": 197728,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 197728,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 262144,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap",
+          "first",
+          "second",
+          "again"
+        ],
+        "size": 16386
+      },
+      "passed": true
+    },
+    {
+      "name": "heap-nested128x512",
+      "mode": "checks",
+      "initial": {
+        "used": 228352,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 228352,
+          "nestedIdAndAlignmentReserve": 67200,
+          "bounded": 327680,
+          "ceiling": 524288,
+          "chunkCompactions": 16,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "outer",
+          "child0",
+          "child7",
+          "again"
+        ],
+        "size": 1280
+      },
+      "final": {
+        "used": 228352,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 228352,
+          "nestedIdAndAlignmentReserve": 67200,
+          "bounded": 327680,
+          "ceiling": 524288,
+          "chunkCompactions": 16,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "outer",
+          "child0",
+          "child7",
+          "again"
+        ],
+        "size": 1280
+      },
+      "passed": true
+    },
+    {
+      "name": "heap-empty",
+      "mode": "checks",
+      "initial": {
+        "used": 65536,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 65536,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 131072,
+          "chunkCompactions": 64,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 0
+      },
+      "final": {
+        "used": 65536,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 65536,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 131072,
+          "chunkCompactions": 64,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 0
+      },
+      "passed": true
+    },
+    {
+      "name": "heap-object1",
+      "mode": "checks",
+      "initial": {
+        "used": 65600,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 65600,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 131072,
+          "chunkCompactions": 64,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 1
+      },
+      "final": {
+        "used": 65600,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 65600,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 131072,
+          "chunkCompactions": 64,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "heap"
+        ],
+        "size": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "list-number4096",
+      "mode": "checks",
+      "initial": {
+        "used": 98944,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 98944,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "list"
+        ],
+        "size": 4096
+      },
+      "final": {
+        "used": 98944,
+        "backingBytes": 131072,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 98944,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 131072,
+          "ceiling": 262144,
+          "chunkCompactions": 32,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "list"
+        ],
+        "size": 4096
+      },
+      "passed": true
+    },
+    {
+      "name": "map-string4096",
+      "mode": "checks",
+      "initial": {
+        "used": 251784,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 251784,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 262144,
+          "ceiling": 524288,
+          "chunkCompactions": 16,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "map"
+        ],
+        "size": 4096
+      },
+      "final": {
+        "used": 251784,
+        "backingBytes": 262144,
+        "counterDigits": 2,
+        "bounds": {
+          "initialUsed": 251784,
+          "nestedIdAndAlignmentReserve": 0,
+          "bounded": 262144,
+          "ceiling": 524288,
+          "chunkCompactions": 16,
+          "chunkBackingCeiling": 8388608
+        },
+        "names": [
+          "map"
+        ],
+        "size": 4096
+      },
+      "passed": true
+    }
+  ]
+}

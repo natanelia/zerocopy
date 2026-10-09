@@ -1,0 +1,56 @@
+(node:5) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+TAP version 13
+# (node:12) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: audited quartet estimator retains small-sample uncertainty and units
+ok 1 - audited quartet estimator retains small-sample uncertainty and units
+  ---
+  duration_ms: 3.524053
+  type: 'test'
+  ...
+# Subtest: pairs and batches never add independent observations
+ok 2 - pairs and batches never add independent observations
+  ---
+  duration_ms: 3.382478
+  type: 'test'
+  ...
+# Subtest: distinguishes invalid measurements from valid inconclusive intervals
+ok 3 - distinguishes invalid measurements from valid inconclusive intervals
+  ---
+  duration_ms: 1.986691
+  type: 'test'
+  ...
+# Subtest: requires a material target benefit and compatible AA, without AA subtraction
+ok 4 - requires a material target benefit and compatible AA, without AA subtraction
+  ---
+  duration_ms: 7.396527
+  type: 'test'
+  ...
+# Subtest: predeclared process and budget arithmetic stays bounded
+ok 5 - predeclared process and budget arithmetic stays bounded
+  ---
+  duration_ms: 0.249161
+  type: 'test'
+  ...
+# Subtest: churn ceilings are symmetric, conservative, and reject overflow
+ok 6 - churn ceilings are symmetric, conservative, and reject overflow
+  ---
+  duration_ms: 2.174753
+  type: 'test'
+  ...
+# Subtest: pilot and measurement modes are disabled before any fixture work by default
+ok 7 - pilot and measurement modes are disabled before any fixture work by default
+  ---
+  duration_ms: 3.578263
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2692.392064

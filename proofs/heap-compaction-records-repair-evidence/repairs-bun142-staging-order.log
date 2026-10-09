@@ -1,0 +1,13 @@
+bun test v1.4.2 (744846f84)
+
+proofs/heap-compaction-records-repairs.node.mjs:
+(pass) glob-only negative nested baseline and exact real-arm discovery [121.49ms]
+(pass) private cache aliases are rejected without changing Vitest settings [106.38ms]
+(pass) evidence is incremental and failed/partial records stay distinguishable [3.73ms]
+(pass) Node and Bun focused results cannot overwrite or be relabeled [1.74ms]
+(pass) cleanup fits existing envelopes; expired post-staging budgets cannot launch [0.84ms]
+(pass) creation-push guard binds accepted tree, intent-only change and physical modes [823.20ms]
+
+ 6 pass
+ 0 fail
+Ran 6 tests across 1 file. [2.92s]

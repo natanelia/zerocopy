@@ -1,0 +1,22 @@
+[
+  {
+    "arm": "baseline",
+    "nodeModules": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009/node_modules",
+    "cachePathsAbsent": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009/node_modules/.vite",
+      "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009/node_modules/.cache"
+    ],
+    "regularFiles": 2268,
+    "contentHash": "2dfb63da8622f172a70eae5c067c2b991e53b1e1407c56c88cf9f94cd22ad679"
+  },
+  {
+    "arm": "candidate",
+    "nodeModules": "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009/node_modules",
+    "cachePathsAbsent": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009/node_modules/.vite",
+      "/workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-records-20261009/node_modules/.cache"
+    ],
+    "regularFiles": 2268,
+    "contentHash": "2dfb63da8622f172a70eae5c067c2b991e53b1e1407c56c88cf9f94cd22ad679"
+  }
+]

@@ -1,0 +1,104 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/e7ec22ef2609/zerocopy-heap-compaction-baseline-20261009
+
+ ❯ map-set-index.test.ts (10 tests | 1 failed) 7234ms
+     × preserves snapshots while every prefix is inserted and then overwritten 5986ms
+ ❯ performance-revision.test.ts (21 tests | 4 failed) 30676ms
+     × SharedMap: inserts, overwrites and deletes preserve forks 5231ms
+     × SharedOrderedMap: inserts, overwrites and deletes preserve forks 5949ms
+     × SharedSortedMap: inserts, overwrites and deletes preserve forks 5705ms
+     × compaction removes dead history and does not parse primitive JSON payloads 6256ms
+ ❯ geometry.test.ts (4 tests | 1 failed) 7196ms
+     × preserves attached snapshots after append, fork, and memory growth 7135ms
+ ❯ redux-checkpoint.test.ts (34 tests | 6 failed) 73867ms
+     × restores a writable map with its original semantics 5897ms
+     × restores a writable doubly linked list with its original semantics 5119ms
+     × restores a writable ordered set with its original semantics 5442ms
+     × restores a writable sorted map with its original semantics 17721ms
+     × restores a writable sorted set with its original semantics 5706ms
+     × restores a writable priority queue with its original semantics 5255ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  performance-revision.test.ts > maps, journals and raw live-data compaction > SharedMap: inserts, overwrites and deletes preserve forks
+ FAIL  performance-revision.test.ts > maps, journals and raw live-data compaction > SharedOrderedMap: inserts, overwrites and deletes preserve forks
+ FAIL  performance-revision.test.ts > maps, journals and raw live-data compaction > SharedSortedMap: inserts, overwrites and deletes preserve forks
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> performance-revision.test.ts:129:35
+    109|     expect(data.version).toBe(4); await expect(S.initWorker({ ...data,…
+    110|   });
+    111| });
+       |    ^
+    112|
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  performance-revision.test.ts > maps, journals and raw live-data compaction > compaction removes dead history and does not parse primitive JSON payloads
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> performance-revision.test.ts:197:32
+    109|     expect(data.version).toBe(4); await expect(S.initWorker({ ...data,…
+    110|   });
+    111| });
+       |    ^
+    112|
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> geometry.test.ts:45:30
+     38|     expect(bboxXY(newer)).toEqual([-5, -4, -2, -1]);
+     39|   });
+     40| });
+       |    ^
+     41|
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  map-set-index.test.ts > bounded writer prefix index > preserves snapshots while every prefix is inserted and then overwritten
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> map-set-index.test.ts:25:30
+     23|   it('preserves snapshots while every prefix is inserted and then over…
+     24|     let map = fresh('number');
+     25|     const retained: [SharedMap<any>, Map<string, number>][] = [];
+       |                              ^
+     26|     let model = new Map<string, number>();
+     27|     for (let i = 0; i < 3000; i++) {
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable map with its original semantics
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable doubly linked list with its original semantics
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable ordered set with its original semantics
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable sorted map with its original semantics
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable sorted set with its original semantics
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable priority queue with its original semantics
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ forEach unknown:1:11
+ ❯ <anonymous> redux-checkpoint.test.ts:92:41
+     90|     const map = new SharedMap<'SharedList<number>'>('SharedList<number…
+     91|     const restored = deserializeZerocopyState<typeof map>(serializeZer…
+     92|     expect(restored.get('child')!.toArray()).toEqual([1, 2]);
+       |                                         ^
+     93|     const worker = await initWorker<any>(getWorkerData({ restored }, {…
+     94|     expect(worker.restored.get('child').toArray()).toEqual([1, 2]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+
+ Test Files  4 failed | 37 passed (41)
+      Tests  12 failed | 762 passed (774)
+   Start at  15:06:25
+   Duration  86.68s (transform 2.92s, setup 0ms, import 4.57s, tests 229.44s, environment 48ms)
+
+error: script "test" exited with code 1

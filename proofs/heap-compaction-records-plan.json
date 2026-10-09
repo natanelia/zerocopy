@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "state": "prospective-only-no-pilots-or-timings",
+  "baseline": "ad2a19d65a836985a2364b181bc9bd8dce6e42ad",
+  "runtimeSourceSha256": "edb16a44839b37e268620231a7ef2f1decb4b23101b3778f20a0f5daa4461455",
+  "expectedPublishedCandidate": "Runtime HEAP_EXPECTED_HEAD supplied by the verified remote github.sha; no local candidate SHA is a CI pin.",
+  "engines": [
+    "Node 22.23.3",
+    "Bun 1.4.2"
+  ],
+  "cases": {
+    "heap-number4096": {
+      "role": "target",
+      "kind": "ordinary",
+      "backingCeiling": 262144
+    },
+    "heap-spine4096": {
+      "role": "target",
+      "kind": "spine",
+      "backingCeiling": 262144
+    },
+    "heap-shared4096": {
+      "role": "target",
+      "kind": "shared",
+      "backingCeiling": 262144
+    },
+    "heap-nested128x512": {
+      "role": "target",
+      "kind": "nested",
+      "backingCeiling": 524288,
+      "nestedDescriptorCopies": 128
+    },
+    "heap-empty": {
+      "role": "control",
+      "kind": "empty",
+      "backingCeiling": 131072
+    },
+    "heap-object1": {
+      "role": "control",
+      "kind": "singleton",
+      "backingCeiling": 131072
+    },
+    "list-number4096": {
+      "role": "control",
+      "kind": "list",
+      "backingCeiling": 262144
+    },
+    "map-string4096": {
+      "role": "control",
+      "kind": "map",
+      "backingCeiling": 524288
+    }
+  },
+  "limits": {
+    "chunkBackingBytes": 8388608,
+    "chunkCompactions": 64,
+    "batchChunks": 16,
+    "pilotWarmChunks": 64,
+    "processArenaCounterDigits": 6,
+    "initialArenaBytes": 131072,
+    "maximumArenaBytes": 268435456
+  },
+  "protocol": {
+    "blocks": 4,
+    "samples": 5,
+    "floorMs": 20,
+    "warmMs": 150,
+    "margin": 0.02,
+    "measureSubjectMs": 2000,
+    "pilotSubjectMs": 5000,
+    "engineMs": 720000
+  },
+  "budgetMinutes": {
+    "setup": 8,
+    "correctness": 20,
+    "perEngine": 12,
+    "artifactPackaging": 2,
+    "artifactUpload": 3,
+    "job": 65
+  },
+  "budgetHistory": {
+    "superseded": {
+      "perEngine": 8,
+      "job": 55
+    },
+    "reason": "256 measured launches * 2 seconds + 16 pilots * 5 seconds = 592 seconds before staging, so the original engine budget was not supported."
+  },
+  "independentUnits": "4 fresh-process ABBA/BAAB quartets per case/engine/AA-or-AB; 5 batches per process are descriptive.",
+  "localGateStatus": {
+    "baselineUnit": "762 passed, 12 default 5-second timeouts",
+    "candidateUnit": "unrun",
+    "laterStandardPackageAndWorkers": "unrun",
+    "eligibilityForTimings": false
+  },
+  "nextGate": "Independent repair review and exact proof publication; separate accepted intent-only creation-push activation, then fresh exact-head controlled-CI standard gates before any screen.",
+  "sourceFiles": {
+    "proofs/heap-compaction-records-fixtures.mjs": "76f7f9a234f8c7feeeaee44a9fa4201c0f9cc66cdf0627b05f8652dac3536e5e",
+    "proofs/heap-compaction-records-performance.mjs": "b9795de05ffd4163a82228d76c8fc8158632c58f66287aaf1e8cec724e787747",
+    "proofs/heap-compaction-records-stats.mjs": "298ca6f4fc0aa21506790a05bb69576a9e091d4db72a101526fe43e4b357f16e",
+    "proofs/heap-compaction-records-gates.mjs": "5d8af31e99b40355158d42c015ef99b23aef8b824a818926e711b60b8b00cff0",
+    ".github/workflows/heap-compaction-records.yml": "c4a98e3789e29f961044d463016e8614436631c51071849dbb8a040569d98eb7",
+    "proofs/heap-compaction-records-command.mjs": "6743d7d87c2e1599a2d2f6e9deb34a5ebdf4b7b8a917bcaf22720e8b0eaed8f9",
+    "proofs/heap-compaction-records-discovery.mjs": "7343d0c790fc22239a54cd8bc64423b365169daf13e7f60be5aa8726bd8b9045",
+    "proofs/heap-compaction-records-evidence.mjs": "7bc008802276a3fdceec8d20f7a52092ab41347ef76b72295ffd2865059a1ea3",
+    "proofs/heap-compaction-records-activation.mjs": "3f6477e21b440ab6bd688e460c93c39ab45c763732bb2ace8be01cf1bc248323",
+    "proofs/heap-compaction-records-intent.json": "8b3e942ab61063c1870d0b4547371a1be9193e6107af9146511f0b0870061288",
+    "proofs/heap-compaction-records-repairs.node.mjs": "4804ea934fc7f283a069798bed779316e32d393d427a6dd9df96ae78924cc0c4",
+    "proofs/heap-compaction-records-supervisor-guard.py": "03c0ee7cd55e8d9c11b15b91ee9bb982673aa022c14de5c6e55526a2a3ae46fa",
+    "proofs/heap-compaction-records-supervisor-synthetic.mjs": "06b9e4a5fbe5eec13b8af2e475d03c4ef36946fdb0c6b3e2443f32441fa0622f",
+    "proofs/heap-compaction-records.md": "dfa3ffd18089af00de2a8569f8cbb476b1760303bf40ed83ed40f51b0908c2b7"
+  },
+  "timingEnabledByDefault": false,
+  "activationRequires": [
+    "Independent R1\u2013R3 and activation review",
+    "Actual published proof commit/tree/harness digest in an intent-only child commit",
+    "Final narrow activation/pin review",
+    "Isolated new branch creation push with default-off preparation intent",
+    "Fresh passing exact-head controlled-CI gate receipt"
+  ],
+  "publishedRuntime": "21de2bf4b49d1b2cf5da698be41a27f37fd84bed",
+  "publishedRuntimeTree": "4c7dc0ac84cfdb016e70f01bde711a2650bcf724",
+  "repairs": {
+    "discovery": "Physically disjoint external baseline; exact own tracked glob discovery; unchanged config/default test timeout; equal separate physical dependencies and initially empty private caches",
+    "supervision": {
+      "ownedGroupsOnly": true,
+      "cleanupReserveMs": 200,
+      "termGraceMs": 50,
+      "killVerificationMs": 150,
+      "withinUnchangedSubjectCaps": true,
+      "recheckAfterStaging": true
+    },
+    "evidence": "Durable complete slot receipt before spawn; fd-streamed logs; synchronous incremental chunk/calibration/batch evidence after both operation timer reads; incomplete observations excluded; separate Node/Bun focused receipts",
+    "evidenceIODeclaredBeforeData": true,
+    "physicalModesVerified": true
+  }
+}

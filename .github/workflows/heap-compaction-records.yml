@@ -1,0 +1,87 @@
+name: Heap compaction records first screen
+on:
+  push:
+    branches: ['proof/heap-compaction-records-run-*']
+permissions:
+  contents: read
+concurrency:
+  group: heap-compaction-records-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  first-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      HEAP_EXPECTED_HEAD: ${{ github.sha }}
+      HEAP_RESULTS: ${{ github.workspace }}/proofs/results/heap-compaction-records
+      HEAP_GATE_RECEIPT: ${{ github.workspace }}/proofs/results/heap-compaction-records/gates.json
+      HEAP_ENABLE_TIMING: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - name: Guard isolated creation-push activation
+        id: activation
+        timeout-minutes: 1
+        run: node proofs/heap-compaction-records-activation.mjs
+      - uses: oven-sh/setup-bun@v2
+        if: steps.activation.outputs.enabled == 'true'
+        with:
+          bun-version: '1.4.2'
+      - name: Prepare distinct equal dependencies and empty test caches
+        if: steps.activation.outputs.enabled == 'true'
+        timeout-minutes: 8
+        run: |
+          bun install
+          task_private="$RUNNER_TEMP/heap-compaction-records-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          mkdir -p "$task_private"
+          git worktree add --detach "$task_private/baseline" ad2a19d65a836985a2364b181bc9bd8dce6e42ad
+          echo "HEAP_PRIVATE_DIR=$task_private" >> "$GITHUB_ENV"
+          echo "HEAP_BASE=$task_private/baseline" >> "$GITHUB_ENV"
+          test ! -e node_modules/.vite
+          test ! -e node_modules/.cache
+          cp -a node_modules "$task_private/baseline/node_modules"
+          mkdir -p proofs/results/heap-compaction-records
+          git rev-parse HEAD > proofs/results/heap-compaction-records/source-commit.txt
+          git ls-files -s 'proofs/heap-compaction-records*' '.github/workflows/heap-compaction-records.yml' > proofs/results/heap-compaction-records/file-modes.txt
+      - name: Fresh full standard gates and deterministic protocol proofs
+        if: steps.activation.outputs.enabled == 'true'
+        id: gates
+        timeout-minutes: 20
+        run: node proofs/heap-compaction-records-gates.mjs
+      - name: Node 22 matched AA and AB
+        if: ${{ !cancelled() && steps.gates.outcome == 'success' && steps.activation.outputs.enabled == 'true' }}
+        timeout-minutes: 12
+        env:
+          HEAP_ENABLE_TIMING: '1'
+          HEAP_OUTPUT: proofs/results/heap-compaction-records/node.json
+        run: node proofs/heap-compaction-records-performance.mjs
+      - name: Bun 1.4.2 matched AA and AB
+        if: ${{ !cancelled() && steps.gates.outcome == 'success' && steps.activation.outputs.enabled == 'true' }}
+        timeout-minutes: 12
+        env:
+          HEAP_ENABLE_TIMING: '1'
+          HEAP_OUTPUT: proofs/results/heap-compaction-records/bun.json
+        run: bun proofs/heap-compaction-records-performance.mjs
+      - name: Preserve exact source and deterministic proof outputs
+        if: always()
+        timeout-minutes: 2
+        run: |
+          mkdir -p proofs/results/heap-compaction-records
+          git archive --format=tar HEAD > proofs/results/heap-compaction-records/tested-source.tar
+          if [ -d .proof-tools/heap-compaction-records ]; then
+            cp -a .proof-tools/heap-compaction-records proofs/results/heap-compaction-records/deterministic
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        timeout-minutes: 3
+        with:
+          name: heap-compaction-records-${{ github.sha }}
+          path: proofs/results/heap-compaction-records/
+          retention-days: 30
+          if-no-files-found: error
