@@ -1,0 +1,2160 @@
+{
+  "config": {
+    "blocks": 8,
+    "samples": 21,
+    "targetBatchMs": 40,
+    "warmupMs": 500,
+    "measuredBatchFloorMs": 10,
+    "measuredWarmupFloorMs": 150,
+    "warmupMinElements": 262144,
+    "maxWarmupMs": 10000,
+    "scanMaxRepeat": 10000000,
+    "compactWarmupCalls": 512,
+    "compactGcEvery": 32,
+    "compactMaxRepeat": 2048,
+    "subjectTimeoutMs": 60000,
+    "campaignTimeoutMs": 1800000,
+    "prerequisitesTimeoutMs": 2400000,
+    "totalJobTimeoutMinutes": 95,
+    "margin": 1.02,
+    "worthwhileUpper": 0.9803921568627451,
+    "confidenceLevel": 0.95,
+    "seed": 539365385,
+    "retryCount": 0,
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "architecture": "x64",
+    "platform": "linux"
+  },
+  "rows": [
+    {
+      "workload": {
+        "id": "linked-number-4097",
+        "name": "linked-number-4097",
+        "kind": "linked",
+        "type": "number",
+        "size": 4097,
+        "operation": "forEach",
+        "target": true,
+        "edited": false,
+        "note": "Large forward linked callback"
+      },
+      "pilotOrder": [
+        "pr23",
+        "main",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "linked-number-4097",
+          "block": 0,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 1,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 3,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 6,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-number-4097",
+          "block": 7,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "doubly-number-4097",
+        "name": "doubly-number-4097",
+        "kind": "doubly",
+        "type": "number",
+        "size": 4097,
+        "operation": "forEach",
+        "target": true,
+        "edited": false,
+        "note": "Large forward doubly callback"
+      },
+      "pilotOrder": [
+        "main",
+        "pr23",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "doubly-number-4097",
+          "block": 0,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 1,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 3,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 6,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "doubly-number-4097",
+          "block": 7,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "reverse-number-4097",
+        "name": "reverse-number-4097",
+        "kind": "doubly",
+        "type": "number",
+        "size": 4097,
+        "operation": "forEachReverse",
+        "target": true,
+        "edited": false,
+        "note": "Large reverse doubly callback"
+      },
+      "pilotOrder": [
+        "main",
+        "pr23",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "reverse-number-4097",
+          "block": 0,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 1,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 3,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 5,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 6,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-number-4097",
+          "block": 7,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "linked-string-4097",
+        "name": "linked-string-4097",
+        "kind": "linked",
+        "type": "string",
+        "size": 4097,
+        "operation": "forEach",
+        "target": true,
+        "edited": false,
+        "note": "Repeated distinct Unicode strings; natural 2048-entry cache cap"
+      },
+      "pilotOrder": [
+        "main",
+        "candidate",
+        "pr23"
+      ],
+      "blocks": [
+        {
+          "caseId": "linked-string-4097",
+          "block": 0,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 1,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 2,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 3,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 4,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 6,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-string-4097",
+          "block": 7,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "doubly-object-4097",
+        "name": "doubly-object-4097",
+        "kind": "doubly",
+        "type": "object",
+        "size": 4097,
+        "operation": "forEach",
+        "target": true,
+        "edited": false,
+        "note": "Repeated distinct nested JSON objects; natural 2048-entry cache cap"
+      },
+      "pilotOrder": [
+        "pr23",
+        "candidate",
+        "main"
+      ],
+      "blocks": [
+        {
+          "caseId": "doubly-object-4097",
+          "block": 0,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 1,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 2,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 3,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 6,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "doubly-object-4097",
+          "block": 7,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "linked-empty",
+        "name": "linked-empty",
+        "kind": "linked",
+        "type": "number",
+        "size": 0,
+        "operation": "forEach",
+        "target": false,
+        "edited": false,
+        "note": "Empty forward callback control"
+      },
+      "pilotOrder": [
+        "pr23",
+        "main",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "linked-empty",
+          "block": 0,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 1,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 2,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 3,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 4,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 5,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 6,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-empty",
+          "block": 7,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "reverse-empty",
+        "name": "reverse-empty",
+        "kind": "doubly",
+        "type": "number",
+        "size": 0,
+        "operation": "forEachReverse",
+        "target": false,
+        "edited": false,
+        "note": "Empty reverse callback control"
+      },
+      "pilotOrder": [
+        "main",
+        "candidate",
+        "pr23"
+      ],
+      "blocks": [
+        {
+          "caseId": "reverse-empty",
+          "block": 0,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 1,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 2,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 3,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 4,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 6,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-empty",
+          "block": 7,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "linked-tail-32",
+        "name": "linked-tail-32",
+        "kind": "linked",
+        "type": "number",
+        "size": 32,
+        "operation": "forEach",
+        "target": false,
+        "edited": false,
+        "note": "Tail-only forward callback control"
+      },
+      "pilotOrder": [
+        "main",
+        "pr23",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "linked-tail-32",
+          "block": 0,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 1,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 3,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 4,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 5,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 6,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "linked-tail-32",
+          "block": 7,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "reverse-tail-32",
+        "name": "reverse-tail-32",
+        "kind": "doubly",
+        "type": "number",
+        "size": 32,
+        "operation": "forEachReverse",
+        "target": false,
+        "edited": false,
+        "note": "Tail-only reverse callback control"
+      },
+      "pilotOrder": [
+        "pr23",
+        "main",
+        "candidate"
+      ],
+      "blocks": [
+        {
+          "caseId": "reverse-tail-32",
+          "block": 0,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 1,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 3,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 5,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 6,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "reverse-tail-32",
+          "block": 7,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "vector-number-4097",
+        "name": "vector-number-4097",
+        "kind": "list",
+        "type": "number",
+        "size": 4097,
+        "operation": "forEach",
+        "target": false,
+        "edited": false,
+        "note": "Unchanged SharedList callback control"
+      },
+      "pilotOrder": [
+        "pr23",
+        "candidate",
+        "main"
+      ],
+      "blocks": [
+        {
+          "caseId": "vector-number-4097",
+          "block": 0,
+          "roles": [
+            "main",
+            "pr23",
+            "candidate",
+            "candidate",
+            "pr23",
+            "main"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 1,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 2,
+          "roles": [
+            "pr23",
+            "main",
+            "candidate",
+            "candidate",
+            "main",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 3,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 4,
+          "roles": [
+            "candidate",
+            "pr23",
+            "main",
+            "main",
+            "pr23",
+            "candidate"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 5,
+          "roles": [
+            "pr23",
+            "candidate",
+            "main",
+            "main",
+            "candidate",
+            "pr23"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 6,
+          "roles": [
+            "main",
+            "candidate",
+            "pr23",
+            "pr23",
+            "candidate",
+            "main"
+          ]
+        },
+        {
+          "caseId": "vector-number-4097",
+          "block": 7,
+          "roles": [
+            "candidate",
+            "main",
+            "pr23",
+            "pr23",
+            "main",
+            "candidate"
+          ]
+        }
+      ]
+    }
+  ],
+  "measuredOrder": [
+    {
+      "caseId": "reverse-number-4097",
+      "block": 0,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 0,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 0,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 0,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 0,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 0,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 0,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 0,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 0,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 0,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 1,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 1,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 1,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 1,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 1,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 1,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 1,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 1,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 1,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 1,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 2,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 2,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 2,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 2,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 2,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 3,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 3,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 3,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 3,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 3,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 3,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 3,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 3,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 3,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 3,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 4,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 4,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 4,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 4,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 4,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 5,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 5,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 5,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 5,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 5,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 6,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 6,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 6,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 6,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 6,
+      "roles": [
+        "main",
+        "pr23",
+        "candidate",
+        "candidate",
+        "pr23",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 6,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 6,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 6,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 6,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 6,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-tail-32",
+      "block": 7,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-string-4097",
+      "block": 7,
+      "roles": [
+        "pr23",
+        "candidate",
+        "main",
+        "main",
+        "candidate",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "linked-tail-32",
+      "block": 7,
+      "roles": [
+        "pr23",
+        "main",
+        "candidate",
+        "candidate",
+        "main",
+        "pr23"
+      ]
+    },
+    {
+      "caseId": "reverse-empty",
+      "block": 7,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "reverse-number-4097",
+      "block": 7,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-number-4097",
+      "block": 7,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "doubly-object-4097",
+      "block": 7,
+      "roles": [
+        "candidate",
+        "pr23",
+        "main",
+        "main",
+        "pr23",
+        "candidate"
+      ]
+    },
+    {
+      "caseId": "doubly-number-4097",
+      "block": 7,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "linked-empty",
+      "block": 7,
+      "roles": [
+        "main",
+        "candidate",
+        "pr23",
+        "pr23",
+        "candidate",
+        "main"
+      ]
+    },
+    {
+      "caseId": "vector-number-4097",
+      "block": 7,
+      "roles": [
+        "candidate",
+        "main",
+        "pr23",
+        "pr23",
+        "main",
+        "candidate"
+      ]
+    }
+  ],
+  "counts": {
+    "cases": 10,
+    "pilots": 30,
+    "blocks": 80,
+    "subjects": 480,
+    "batches": 10080
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "measure": true,
+  "reviewedHarnessSha256": "5cdba40cb5de1f7c92a626419c828c6b80e515522b55d676c102ef99a53a7b01",
+  "note": "Run the single reviewed lossless-index recovery only after its complete fresh correctness barrier. Preserve the original incomplete run and every new failed or incomplete result; no retries."
+}

@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "pinsSha256": "91581ddb8a772b872055d7bddbacbf47b186ccc9b9076b6715654721db10835b",
+  "files": {
+    "PROTOCOL.md": {
+      "sha256": "43d4d4e2603eab4e614369b7b6f5db3206a8c4fb858042b6f9d7832295211849",
+      "bytes": 13720
+    },
+    "command.test.mjs": {
+      "sha256": "ab9f4ff61780e719fe4a11d86519e1b81c5c6d690550f7cde9723fd08f7079cf",
+      "bytes": 1393
+    },
+    "controller.mjs": {
+      "sha256": "72cfc97ab57b30aac16dca3d038fb2c60fb0a32f8742068d1bba08cf726d2d67",
+      "bytes": 6861
+    },
+    "evidence.mjs": {
+      "sha256": "d39ba5e6da938f0c7c6ee84fc78746da538681f0ba08cdb11176d69f8a2cff18",
+      "bytes": 3095
+    },
+    "evidence.test.mjs": {
+      "sha256": "eccd574ef8742c1427d92e9687c0bd6a3e6d7ea1f7387ad5b931f37ba31c7d80",
+      "bytes": 4387
+    },
+    "fixtures.mjs": {
+      "sha256": "c342f6f7c7020dae369099be5e4f98927bf0f3fdfd140b3171a4098bce08bf8d",
+      "bytes": 390
+    },
+    "gate.mjs": {
+      "sha256": "cb69d1a846ac775d451d5c8a677e351dd5a3ff8de7ee1894238db317c893836c",
+      "bytes": 9354
+    },
+    "pins.json": {
+      "sha256": "91581ddb8a772b872055d7bddbacbf47b186ccc9b9076b6715654721db10835b",
+      "bytes": 383944
+    },
+    "plan.json": {
+      "sha256": "6d4f6bd2c8cfafc19d550e68be6c8eb649a86e80c4c8840824eefb1d68859c85",
+      "bytes": 40620
+    },
+    "protocol.mjs": {
+      "sha256": "1ee7a262e21f60384375b981ac00cab00f599d449e268b5693124a0ae00254c8",
+      "bytes": 7916
+    },
+    "protocol.test.mjs": {
+      "sha256": "c3c615b4ab789a340a4ee1337dd7de8e3a7a892e186e9a33d9d1c7a1bb938460",
+      "bytes": 10532
+    },
+    "references/dependencies.lock": {
+      "sha256": "3e2462a27f26395f52e20e1f958b227277d4e40c54c33ff64e06075c8fad99f3",
+      "bytes": 25987
+    },
+    "references/pr23-blocks.txt": {
+      "sha256": "cf0eb77214e6ed19beeb24ee69842d8969501a4c8d0abdfecdd8ade9e98f3921",
+      "bytes": 871
+    },
+    "references/review-probe.original.mjs": {
+      "sha256": "8cf5695d1b09b90e1247618f6e89342b7313d878664dffe6df4143ef32882085",
+      "bytes": 5336
+    },
+    "reuse.json": {
+      "sha256": "1fead26a78056a47af1eb85b723ec3b94fa701663361dde0033b52e076835802",
+      "bytes": 2276
+    },
+    "reused/command.mjs": {
+      "sha256": "35a2d4fe9840ba68d3c327ab6c2921055d362f87760f313093850019d7b99ff3",
+      "bytes": 5316
+    },
+    "reused/fixtures.mjs": {
+      "sha256": "5804594f69efb731ffcdef6fe6eefa2ee3e02ff26e689245f28f0631c14e7262",
+      "bytes": 1774
+    },
+    "reused/subject.mjs": {
+      "sha256": "1b5c487262637b4435ae6f408456ab5e891bb12fe687e8492d65e7392d8ae827",
+      "bytes": 4727
+    },
+    "review-probe.mjs": {
+      "sha256": "537521e0d3d95eff1456441f165db5e732aed98a89025ac7862cb836162df489",
+      "bytes": 5426
+    },
+    "semantic.mjs": {
+      "sha256": "d439ce99b78909d894d89e367666e8ed95e1deebfa610ae464a80977278072a5",
+      "bytes": 1781
+    },
+    "subject.mjs": {
+      "sha256": "02538d44f2a0e5fe2cefe03f206f65aa7ed7c82175865742b13b2e38dc86c04e",
+      "bytes": 1117
+    },
+    "support.mjs": {
+      "sha256": "5d60e6dac0e23333c0f4f8c886b886cd1b1eb638cb0df22b28d58eb31f0fd313",
+      "bytes": 5725
+    },
+    "@repo/proofs/block-callback/workers.mjs": {
+      "sha256": "5ab45963315fcabd06d761a22b99b4f9a0bee04fffd919151dddb85e60dd54d2",
+      "bytes": 5058
+    },
+    "@repo/block-callback.test.ts": {
+      "sha256": "e5564bf7ade386cfab46357bec050a4c05bf1985bf5f6d48d71511e551a78aae",
+      "bytes": 10253
+    },
+    "@repo/.github/workflows/block-callback-screen.yml": {
+      "sha256": "b15b6ea4b5c3ee32cb0cf771db9ac0e72c56f4fc5f46ff1fb5969d14ead1ca5b",
+      "bytes": 2117
+    }
+  },
+  "harnessSha256": "5cdba40cb5de1f7c92a626419c828c6b80e515522b55d676c102ef99a53a7b01"
+}

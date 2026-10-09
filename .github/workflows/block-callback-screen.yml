@@ -1,0 +1,53 @@
+name: Block callback lossless index recovery
+on:
+  push:
+    branches: [proof/block-callback-index-recovery-20261009]
+permissions:
+  contents: read
+jobs:
+  node-x64:
+    if: github.event.before == '2fbd8b27599ad9575038a2a9c4f9fc68e25aa391' && github.event.created == false && github.event.forced == false && github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        timeout-minutes: 2
+        with:
+          node-version: 22.23.3
+      - uses: oven-sh/setup-bun@v2
+        timeout-minutes: 2
+        with:
+          bun-version: 1.4.2
+      - name: Verify fixed protocol
+        timeout-minutes: 1
+        run: |
+          node --test proofs/block-callback/screen/protocol.test.mjs proofs/block-callback/screen/command.test.mjs proofs/block-callback/screen/evidence.test.mjs
+          node proofs/block-callback/screen/controller.mjs check
+      - name: Fresh complete correctness barrier
+        timeout-minutes: 42
+        run: node proofs/block-callback/screen/controller.mjs gate "$RUNNER_TEMP/block-callback-evidence"
+      - name: One reviewed bounded screen
+        timeout-minutes: 32
+        run: node proofs/block-callback/screen/controller.mjs run "$RUNNER_TEMP/block-callback-evidence"
+      - name: Preserve complete or partial evidence
+        timeout-minutes: 4
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/block-callback-evidence"
+          tar -czf block-callback-evidence.tar.gz -C "$RUNNER_TEMP" block-callback-evidence
+          sha256sum block-callback-evidence.tar.gz > block-callback-evidence.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        timeout-minutes: 5
+        if: always()
+        with:
+          name: block-callback-node-x64-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            block-callback-evidence.tar.gz
+            block-callback-evidence.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
