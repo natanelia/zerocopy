@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 import { ATTEMPT_PARAMETER } from '../assets/isolation.mjs';
+import { cacheEarlyRegistration } from './isolation-registration-cache.mjs';
 
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const demos = [
@@ -150,11 +151,38 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         for (let index = 0; index < starts.length; index++) {
           if (starts[index].status === 'rejected') {
             console.error(`Concurrent tab ${index}:`, JSON.stringify(histories[index].trace));
+            // A new document has a new wrapper cache. Compare it with the
+            // failed document to distinguish a stalled install from stale
+            // registration state. This diagnostic never changes the verdict.
+            const observer = await tabs.newPage();
+            await observer.goto(origin + base);
+            console.error('Fresh document registration:', JSON.stringify(await observer.evaluate(async scope => {
+              const value = await navigator.serviceWorker.getRegistration(scope);
+              const worker = item => item && ({ url: item.scriptURL, state: item.state });
+              return value && { scope: value.scope, active: worker(value.active), waiting: worker(value.waiting), installing: worker(value.installing) };
+            }, origin + base + 'compare/')));
             throw starts[index].reason;
           }
         }
         assert.ok(histories.every(history => history.length >= 1 && history.length <= 2)); await tabs.close();
         }
+
+        // A pre-registration lookup can permanently cache an empty wrapper.
+        // Real service workers still install, and only a genuinely isolated
+        // second document may pass. Run both tabs together, without retries.
+        const cached = await browser.newContext();
+        await cached.addInitScript(cacheEarlyRegistration);
+        const cachedPair = [await cached.newPage(), await cached.newPage()];
+        const cachedHistories = await Promise.all(cachedPair.map(navigations));
+        for (const tab of cachedPair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
+        await Promise.all(cachedPair.map(async tab => {
+          const url = origin + base + 'compare/?cached-registration=1#main';
+          await tab.goto(url, { waitUntil: 'commit' }); await ready(tab, 'compare-start');
+          assert.equal(tab.url(), url);
+          assert.equal(await tab.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + 'compare/isolation-sw.js');
+        }));
+        assert.ok(cachedHistories.every(history => history.length >= 1 && history.length <= 2));
+        await cached.close();
 
         // Inject a policy/registration error once. Retry is a recovery action, not a first-visit gate.
         const failure = await browser.newContext();
