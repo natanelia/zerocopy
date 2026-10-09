@@ -10,11 +10,13 @@ The current x64 study establishes lower latency for large number-entry traversal
 
 - Baseline: `3773c6e519c7c0958da13727ed1082f449f3ee25`.
 - Measured runtime: `c79c803bf7c59a2fc559e43ce7cc74aa4dacde15`.
-- The PR updates this evidence document above that runtime. Its production code, regression tests, WASM inputs and public API remain byte-identical to the measured runtime.
+- The PR updates this evidence document and removes a Git-history dependency from the test fixture. Production code, regression-test assertions, WASM inputs and the public API remain unchanged from the measured runtime.
 - [Sealed correctness run](https://github.com/natanelia/zerocopy/actions/runs/37873312900): pristine baseline 753/753, pristine candidate 768/768, and the same 15 semantic tests added to baseline all pass. The artifact contains 46 complete command receipts, builds, type and package checks, actual workers, and exact sources. Existing five-second test timeouts were retained.
 - [Timing run](https://github.com/natanelia/zerocopy/actions/runs/37875343311) imports those exact complete builds. It does not relabel the prior suites as newly run tests.
 
 The generator keeps its method shape, lazy first access, yield order and early return/throw behavior. Each recursive journal walk captures its own view. Shared memory can grow while iteration is paused because every published pointer already fits in the captured view. Empty roots keep their prior behavior. Tests cover immutable bytes, forks, callback reentry, interleaved iterators, growth before and during iteration, natural/custom key order, Unicode keys, values and nested snapshots, plus shared/copied workers.
+
+The first normal PR checks at `0ef7afd` exposed a fixture integration error: shallow checkouts could not load the pinned baseline commit through `git show`. The fixture now stores the exact baseline generator methods and checks each method SHA-256 before use. All 15 semantic tests pass in a source archive with no Git repository under both Node 22.23.3 and Bun 1.4.2. The method bytes and existing assertions are unchanged. This is a test setup fix; no workflow, timeout or production code was changed. The original [failed integration job](https://github.com/natanelia/zerocopy/actions/runs/37878466423/job/113652368776) remains recorded.
 
 ARM and browser performance have not yet been measured for this candidate. A future portability diagnostic cannot replace this complete x64 study or erase its unresolved cells. Normal PR checks apply to the actual PR head and are separate from the evidence below.
 
