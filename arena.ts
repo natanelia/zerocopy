@@ -10,6 +10,24 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+function decodeShortString(bytes: Uint8Array, ptr: number, len: number): string {
+  let value = '', i = 0;
+  // Decode complete ASCII groups without creating a one-character string per byte.
+  for (; i + 8 <= len; i += 8) {
+    const a = bytes[ptr + i], b = bytes[ptr + i + 1];
+    const c = bytes[ptr + i + 2], d = bytes[ptr + i + 3];
+    const e = bytes[ptr + i + 4], f = bytes[ptr + i + 5];
+    const g = bytes[ptr + i + 6], h = bytes[ptr + i + 7];
+    if ((a | b | c | d | e | f | g | h) > 127) return decodeUtf8(decoder, bytes.subarray(ptr, ptr + len));
+    value += String.fromCharCode(a, b, c, d, e, f, g, h);
+  }
+  for (; i < len; i++) {
+    const c = bytes[ptr + i];
+    if (c > 127) return decodeUtf8(decoder, bytes.subarray(ptr, ptr + len));
+    value += String.fromCharCode(c);
+  }
+  return value;
+}
 let nextId = 0;
 const PRESENT = Symbol("present; primitive value not decoded");
 interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
@@ -256,13 +274,14 @@ export class Arena {
     if (cached !== undefined) return cached;
     this.refresh();
     let value = '';
-    if (len <= 32) {
+    if (len < 8) {
       for (let i = 0; i < len; i++) {
         const c = this.bytes[ptr + i];
         if (c > 127) { value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)); break; }
         value += String.fromCharCode(c);
       }
-    } else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
+    } else if (len <= 32) value = decodeShortString(this.bytes, ptr, len);
+    else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
     // Empty byte ranges can share an address with a following allocation.
     if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
     return value;
