@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "measure": false,
-  "reviewed_harness_sha256": "",
-  "validated_check_commit": "",
-  "validated_check_run": 0
+  "measure": true,
+  "reviewed_harness_sha256": "51eacf6df5907c5ef560def5b34e74e5f648fc06fa09d7057b559d381310f040",
+  "validated_check_commit": "c99e1b5d24b41e264dfba408bd5acf7faab52166",
+  "validated_check_run": 37877663016
 }
