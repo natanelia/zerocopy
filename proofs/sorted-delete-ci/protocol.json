@@ -1,0 +1,240 @@
+{
+  "schema": 3,
+  "purpose": "Prospective public SharedSortedMap.delete fusion screen with cold/warm/stale hits, adverse misses, unchanged fallbacks and SharedMap control; exploratory x64 only",
+  "entrypoint": "official portable dist/shared.js for both runtimes",
+  "runtimes": [
+    "node",
+    "bun"
+  ],
+  "runtimeVersions": {
+    "node": "v22.23.3",
+    "bun": "1.4.2"
+  },
+  "architecture": "x64",
+  "blocks": 4,
+  "orders": [
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ]
+  ],
+  "runtimeOrders": [
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ],
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ]
+  ],
+  "calibration": {
+    "warmupChunks": 32,
+    "samplesPerLevel": 3,
+    "targetChunkMs": 12,
+    "selection": "Smallest fixed ladder count whose median reaches target in BOTH arms; otherwise common maximum, flag calibration floor. Every level is collected for both arms before selection.",
+    "minimumWarmupBodyMs": 200
+  },
+  "measurement": {
+    "warmupChunks": 32,
+    "samples": 7,
+    "minimumChunkMs": 5,
+    "warmupDriftFraction": 0.1,
+    "minimumWarmupBodyMs": 200,
+    "warmupComparisonWindow": 8
+  },
+  "memory": {
+    "maximumArenaBytes": 67108864,
+    "maximumSubjectRssBytes": 536870912,
+    "maximumControllerRssBytes": 268435456,
+    "rssPollMs": 100,
+    "maximumOutputBytes": 8388608
+  },
+  "budgets": {
+    "calibrationProcessWallSeconds": 180,
+    "measurementProcessWallSeconds": 90,
+    "untimedProcessWallSeconds": 90,
+    "controllerWallSeconds": 2100,
+    "terminationGraceSeconds": 2
+  },
+  "statistics": {
+    "pointwiseConfidence": 0.95,
+    "pairedLogRatioDf": 3,
+    "tCritical": 3.182446305284263,
+    "materialLossRatio": 1.02,
+    "worthwhileGainRatio": 0.95,
+    "aaDiagnosticFraction": 0.05,
+    "sampleRelativeMadDiagnosticFraction": 0.05
+  },
+  "cases": [
+    {
+      "id": "sorted-cold-hit-16",
+      "kind": "cold-small",
+      "size": 16,
+      "ladder": [
+        16,
+        256,
+        2048,
+        16384,
+        65536
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-cold-hit-4096",
+      "kind": "cold-large",
+      "size": 4096,
+      "ladder": [
+        256,
+        1024,
+        4096,
+        16384,
+        65536
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-warm-hit-4096",
+      "kind": "warm",
+      "size": 4096,
+      "ladder": [
+        64,
+        512,
+        4096,
+        16384,
+        65536
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-stale-hit-4096",
+      "kind": "stale",
+      "size": 4096,
+      "ladder": [
+        64,
+        512,
+        4096,
+        16384,
+        65536
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-cold-miss-4096",
+      "kind": "cold-miss",
+      "size": 4096,
+      "ladder": [
+        256,
+        1024,
+        4096,
+        16384,
+        65536
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-cached-miss-4096",
+      "kind": "cached-miss",
+      "size": 4096,
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-journal-hit-4096",
+      "kind": "journal",
+      "size": 4096,
+      "ladder": [
+        16,
+        64,
+        512,
+        4096,
+        16384
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "sorted-long-hit-16",
+      "kind": "long",
+      "size": 16,
+      "ladder": [
+        16,
+        64,
+        512,
+        4096,
+        32768
+      ],
+      "operation": "delete",
+      "type": "number"
+    },
+    {
+      "id": "map-delete-control-4096",
+      "kind": "control",
+      "size": 4096,
+      "ladder": [
+        64,
+        512,
+        4096,
+        16384,
+        32768
+      ],
+      "operation": "delete",
+      "type": "number"
+    }
+  ],
+  "explicitlyUnmeasured": [
+    "module startup/parse/compilation/instantiation",
+    "first-ever Arena read as separate cell",
+    "Unicode and malformed staging latency",
+    "journal and long-key miss latency",
+    "known-token without read slot latency",
+    "changing-root deletion chains",
+    "browser latency",
+    "ARM latency",
+    "recursive or allocation failure latency",
+    "complete size/cache/value-type factorial",
+    "physical-memory savings"
+  ],
+  "untimedMinimum": "literal first ladder entry, never hard-coded one",
+  "units": "nanoseconds per public delete call including identical loop and preallocated output-array store"
+}

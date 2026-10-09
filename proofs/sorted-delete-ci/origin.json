@@ -1,0 +1,121 @@
+{
+  "baselineCommit": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+  "candidateCommit": "7ffe1fde6a39223e3ddb70f9db0b5cd5b73fe37c",
+  "baselineTree": "11ad61e759f07f69fac6a5c6fa34ccb283a7563b",
+  "candidateTree": "8868209153a7c62d369f2a0ead9b290ee09eb443",
+  "runtimeCommit": "20e4a17ac680a5dbdd873244be55a8f7fcf90c12",
+  "runtimeTree": "9032fcaeb5d286f36fcbca0cd580457881ff516e",
+  "runtimeParent": "1151a3960ca6a7fca53d561656ab7d9f94261bc6",
+  "originalRuntime": "dcb20e79397bc9328fec00538b6fb3f032d3adfb",
+  "originalFailureEvidencePreserved": true,
+  "changedFiles": [
+    "arena.ts",
+    "persistent-core.as.ts",
+    "shared-sorted-map.ts",
+    "sorted-delete.test.ts"
+  ],
+  "historicalEvidenceTransferred": false,
+  "localClocksRun": false,
+  "standardGateRun": false,
+  "planRevision": 2,
+  "planSha256": "27a81f66d907ef06c0f7e8de2ea0f23845d29750288de6d061a5f490cc6c86e1",
+  "originalPlanSha256": "70dffded66f59ae47bb47c5d5fff4a2d3211e50402a30f210e9b18fc3c937cbd",
+  "reviewedRepairManifestSha256": "5b14d628d62cacd7d1973eb156035e9f39e04baca85ef1f81bfd2b21e82240ef",
+  "byteIdenticalFiles": [
+    "controller.py",
+    "math.mjs"
+  ],
+  "upstreamFiles": [
+    {
+      "path": "controller.py",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "bytes": 17534
+    },
+    {
+      "path": "math.mjs",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "bytes": 2387
+    },
+    {
+      "path": "ci.py",
+      "sha256": "3c4126e1edafd5198b7dc54c5329776e58bc59d8ea2836b85c8f63727c6c6621",
+      "bytes": 23763
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "5f8def897032c36eebc0a0bb1ae78c23e254314b8d0d8be1cbee9906f13f7c91",
+      "bytes": 4852
+    },
+    {
+      "path": "subject.mjs",
+      "sha256": "3cc24f952b1f556a200565faa445b2258ac38672064cba49f4bd5fa1917802f7",
+      "bytes": 11388
+    },
+    {
+      "path": "report.mjs",
+      "sha256": "c18d5ba06817ba162b6ab6e3bb0569d05640eab73a8fc0647c9cfc49c9c8ea26",
+      "bytes": 5448
+    }
+  ],
+  "sourceHashes": {
+    "baseline": {
+      "arena.ts": "71b858f8c25d52ab1b6fd8f6ab426512653fe5aee5586f801b74f6c144e11a31",
+      "persistent-core.as.ts": "85662fce0e95deef920c8fd52789b11657f0b5d7f00b9f195873c38bc99bfd6a",
+      "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489"
+    },
+    "candidate": {
+      "arena.ts": "cf9844f32f3a93edc007208dd9b09ab3ebd8c533f314da2519fd7898223f6058",
+      "persistent-core.as.ts": "7787d10bd4987a456a77cceb675cf949c4c85d07b586becfcf447131c035ae43",
+      "shared-sorted-map.ts": "3eb24ecfdf8f62c0acb7fa367cff40a5c51a9486395ccd21343fdedf6a3f260b",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+      "sorted-delete.test.ts": "b5500a12c246a6b2b8ebd2c7c90d4c6f764dd5a151ec791d1f61c69df407d482"
+    }
+  },
+  "coreAliases": [
+    "doubly-linked-list.wasm",
+    "linked-list.wasm",
+    "ordered-map.wasm",
+    "persistent-core.wasm",
+    "priority-queue.wasm",
+    "shared-list.wasm",
+    "shared-map.wasm",
+    "singly-linked-list.wasm",
+    "sorted-tree.wasm"
+  ],
+  "expectedWasm": {
+    "baseline": {
+      "doubly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "ordered-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "persistent-core.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "priority-queue.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "shared-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "shared-map.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "singly-linked-list.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "sorted-tree.wasm": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+    },
+    "candidate": {
+      "doubly-linked-list.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "linked-list.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "ordered-map.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "persistent-core.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "priority-queue.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "shared-list.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "shared-map.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "singly-linked-list.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "sorted-tree.wasm": "b3ddc5838d9b5c56fa60cc33fc211528df0c970717089da8558321cca9163a3a",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+    }
+  },
+  "previousPacketCommit": "de808ca9465da4450251128cdc3508fb13d51234",
+  "previousPacketSha256": "ee973ab934d3a72f7684ef2b9b0fb4c93ae6e5f7d6a59211b0c3dde007723dc5",
+  "originalUntimedAttempt": "failed baseline oracle; preserved unchanged"
+}
