@@ -1,3 +1,5 @@
+const EMPTY_WORDS = new Uint32Array(0);
+
 /** Bounded, process-local address cache. Never part of a published snapshot.
  * The root is part of every hit check. Forks and old versions cannot share a
  * result merely because their string keys are equal.
@@ -5,7 +7,7 @@
  */
 export class ReadCache {
   private readonly slots = new Map<string, number>();
-  private words = new Uint32Array(4 * 256);
+  private words = EMPTY_WORDS;
   private chars = 0;
   private readonly values: unknown[] = [];
   private valueBytes = 0;
@@ -41,7 +43,8 @@ export class ReadCache {
     if (!leaf || this.slots.size >= ReadCache.MAX_ENTRIES || this.chars + key.length > ReadCache.MAX_CHARS) return;
     const slot = this.slots.size * 4;
     if (slot === this.words.length) {
-      const next = new Uint32Array(this.words.length * 2); next.set(this.words); this.words = next;
+      const next = new Uint32Array(this.words.length * 2 || 4 * 256);
+      if (this.words.length) next.set(this.words); this.words = next;
     }
     this.slots.set(key, slot); this.chars += key.length;
     this.words[slot] = leaf; this.update(slot, root, leaf);
