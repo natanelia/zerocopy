@@ -132,6 +132,39 @@ function decodeUtf8(decoder, bytes) {
   const input = !acceptsSharedInput && bytes.buffer instanceof SharedArrayBuffer ? bytes.slice() : bytes;
   return decoder.decode(input);
 }
+var supportsEncodeInto = typeof TextEncoder.prototype.encodeInto === "function";
+var writeScratch;
+function encodeUtf8ForWrite(encoder, text) {
+  if (!supportsEncodeInto || text.length > 49152)
+    return encoder.encode(text);
+  const scratch = writeScratch ??= new Uint8Array(49152);
+  const result = encoder.encodeInto(text, scratch);
+  return result.read === text.length ? scratch.subarray(0, result.written) : encoder.encode(text);
+}
+
+// freeze-json.ts
+function freezeJSON(value) {
+  if (value === null || typeof value !== "object")
+    return value;
+  const todo = [value];
+  while (todo.length) {
+    const item = todo.pop();
+    if (Array.isArray(item)) {
+      for (let i = 0;i < item.length; i++) {
+        const child = item[i];
+        if (child !== null && typeof child === "object")
+          todo.push(child);
+      }
+    } else {
+      for (const child of Object.values(item)) {
+        if (child !== null && typeof child === "object")
+          todo.push(child);
+      }
+    }
+    Object.freeze(item);
+  }
+  return value;
+}
 
 // codec.ts
 var encoder = new TextEncoder;
@@ -227,19 +260,6 @@ var realmId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}
 var FORMAT_VERSION = 4;
 var HEAP_START = 65536;
 var MAX_SIZE = 1073741823;
-function freezeJSON(value) {
-  if (value === null || typeof value !== "object")
-    return value;
-  const todo = [value];
-  while (todo.length) {
-    const item = todo.pop();
-    for (const child of Object.values(item))
-      if (child !== null && typeof child === "object")
-        todo.push(child);
-    Object.freeze(item);
-  }
-  return value;
-}
 function normalizeKey(key) {
   if (typeof key !== "string")
     throw new TypeError("Map keys must be strings");
@@ -432,10 +452,16 @@ class Arena {
       this.scalar[0] = value ? 1 : 0;
       return this.scalar.subarray(0, 1);
     }
+    return encoder2.encode(this.text(type, value));
+  }
+  prepareText(type, value) {
+    return encodeUtf8ForWrite(encoder2, this.text(type, value));
+  }
+  text(type, value) {
     if (type === "string") {
       if (typeof value !== "string")
         throw new TypeError("Expected a string");
-      return encoder2.encode(value);
+      return value;
     }
     const nested = parseNestedType(type);
     let text;
@@ -451,7 +477,7 @@ class Arena {
     }
     if (text === undefined)
       throw new TypeError("Value is not JSON-serializable");
-    return encoder2.encode(text);
+    return text;
   }
   encode(type, value) {
     this.assertWritable();
@@ -470,7 +496,7 @@ class Arena {
       if (cached !== undefined)
         return cached;
     }
-    const bytes = this.prepare(type, value);
+    const bytes = this.prepareText(type, value);
     const p = this.alloc(4 + bytes.length);
     this.view.setUint32(p, bytes.length, true);
     this.bytes.set(bytes, p + 4);
@@ -492,19 +518,24 @@ class Arena {
       const cached = this.strings.get(raw + 4);
       if (cached !== undefined)
         return cached;
+    } else {
+      const cached = this.objects.get(raw + 4);
+      if (cached !== undefined)
+        return cached;
     }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
   decodeAt(type, ptr, len) {
-    this.refresh();
     if (type === "number")
-      return this.view.getFloat64(ptr, true);
+      return this.dv.getFloat64(ptr, true);
     if (type === "boolean")
-      return this.bytes[ptr] !== 0;
+      return this.buf[ptr] !== 0;
     if (type === "string")
       return this.string(ptr, len);
-    if (this.objects.has(ptr))
-      return this.objects.get(ptr);
+    const cached = this.objects.get(ptr);
+    if (cached !== undefined)
+      return cached;
+    this.refresh();
     const parsed = JSON.parse(decodeUtf8(decoder2, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
     let result;
@@ -595,7 +626,7 @@ class Arena {
     const number = type === "number", boolean = type === "boolean";
     if (number && typeof value !== "number" || boolean && typeof value !== "boolean")
       throw new TypeError(`Expected a ${type}`);
-    const v = number || boolean ? undefined : prepared ?? this.prepare(type, value);
+    const v = number || boolean ? undefined : prepared ?? this.prepareText(type, value);
     const length = number ? 8 : boolean ? 1 : v.length;
     const prefix = ordinal === undefined ? 0 : 4;
     const p = this.wasm.mapLeaf(token.length, length + prefix) >>> 0;
@@ -755,7 +786,7 @@ class Arena {
     const mode = type === "number" ? 0 : type === "boolean" ? 1 : 2;
     if (mode < 2 && typeof value !== type)
       throw new TypeError(`Expected a ${type}`);
-    const v = mode === 2 ? this.prepare(type, value) : undefined;
+    const v = mode === 2 ? this.prepareText(type, value) : undefined;
     let token = this.keys.get(key), n = token?.length ?? key.length;
     let bytes;
     if (!token) {
@@ -1315,4 +1346,4 @@ class Arena {
   }
 }
 
-export { configureMemory2, json2, map2, list2, stack2, queue2, linkedList2, doublyLinkedList2, orderedMap2, sortedMap2, priorityQueue2, set2, orderedSet2, sortedSet2, parseNestedType, structureRegistry, FORMAT_VERSION, HEAP_START, MAX_SIZE, freezeJSON, hashBytes, vectorDepth, validIndex, checkedSize, arenaOf, Snapshot, Arena };
+export { configureMemory2, freezeJSON, json2, map2, list2, stack2, queue2, linkedList2, doublyLinkedList2, orderedMap2, sortedMap2, priorityQueue2, set2, orderedSet2, sortedSet2, parseNestedType, structureRegistry, FORMAT_VERSION, HEAP_START, MAX_SIZE, hashBytes, vectorDepth, validIndex, checkedSize, arenaOf, Snapshot, Arena };

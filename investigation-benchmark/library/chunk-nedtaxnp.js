@@ -8,13 +8,13 @@ import {
   arenaOf,
   Snapshot,
   Arena
-} from "./chunk-t6h7eyc5.js";
+} from "./chunk-bngxdyck.js";
 import {
   SharedMap2
-} from "./chunk-y0faxj5x.js";
+} from "./chunk-fvjmff4x.js";
 import {
   SharedList2
-} from "./chunk-yw6at2wx.js";
+} from "./chunk-qrfmwc9f.js";
 
 // set-key.ts
 function encodeSetKey(value) {
@@ -647,12 +647,25 @@ class SharedSortedMap2 extends Snapshot {
       yield* this.naturalEntries();
   }
   *keys() {
-    for (const [key] of this.entries())
-      yield key;
+    const a = this.arena;
+    if (this.comparator) {
+      const keys = [];
+      for (const leaf of a.radixLeaves(this.root))
+        keys.push(a.leafKey(leaf));
+      yield* keys.sort((a, b) => this.comparator(a, b));
+    } else
+      for (const leaf of a.radixLeaves(this.root))
+        yield a.leafKey(leaf);
   }
   *values() {
-    for (const [, value] of this.entries())
-      yield value;
+    if (this.comparator) {
+      for (const [, value] of this.entries())
+        yield value;
+    } else {
+      const a = this.arena;
+      for (const leaf of a.radixLeaves(this.root))
+        yield a.leafValue(this.valueType, leaf);
+    }
   }
   forEach(fn) {
     for (const [key, value] of this.entries())

@@ -5,7 +5,7 @@ import {
   checkedSize,
   Snapshot,
   Arena
-} from "./chunk-t6h7eyc5.js";
+} from "./chunk-bngxdyck.js";
 
 // text-search.ts
 function compileStringSearch(arena, term, options = {}) {
@@ -272,11 +272,22 @@ class SharedList2 extends Snapshot {
   *values() {
     if (!this.size)
       return;
-    const a = this.arena, start = this.size - 1 & ~31;
-    for (const raw of a.vector(this.root, this.depth, 0, start))
-      yield a.decode(this.type, raw);
-    for (let i = 0;i < this.size - start; i++)
-      yield a.decode(this.type, a.dv.getFloat64(this.tail + i * 8, true));
+    const a = this.arena, view = a.dv, start = this.size - 1 & ~31;
+    const isNumber = this.type === "number", isBoolean = this.type === "boolean";
+    for (let first = 0;first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const length = Math.min(32, this.size - first);
+      if (isNumber) {
+        for (let j = 0;j < length; j++)
+          yield view.getFloat64(leaf + j * 8, true);
+      } else if (isBoolean) {
+        for (let j = 0;j < length; j++)
+          yield view.getFloat64(leaf + j * 8, true) !== 0;
+      } else {
+        for (let j = 0;j < length; j++)
+          yield a.decode(this.type, view.getFloat64(leaf + j * 8, true));
+      }
+    }
   }
   forEach(fn) {
     const a = this.arena, start = this.size ? this.size - 1 & ~31 : 0;
