@@ -1,0 +1,127 @@
+name: Prospective radix helper frame screen
+on:
+  push:
+    branches: ['proof/radix-frame-screen-20261009']
+permissions:
+  contents: read
+concurrency:
+  group: radix-frame-screen-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  BASELINE_COMMIT: 3773c6e519c7c0958da13727ed1082f449f3ee25
+  CURRENT_COMMIT: cda6f639faab0ef627fb97ed199864fc4cc2468a
+  HELPER_COMMIT: e15597748144bf92439a88a2d0405f038e1cc833
+jobs:
+  prerequisites:
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/proof/radix-frame-screen-20261009' &&
+      github.run_attempt == 1 &&
+      github.event.before == 'cda6f639faab0ef627fb97ed199864fc4cc2468a' &&
+      github.event.forced == false && github.event.created == false && github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Freeze exact inputs and setup
+        timeout-minutes: 8
+        run: bash proofs/radix-frame-screen-setup.sh
+      - name: Install exact WebKit revision
+        timeout-minutes: 11
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=5s 600s bunx playwright install --with-deps webkit 2>&1 | tee "$RUNNER_TEMP/radix-frame-evidence/setup/browser-install.log"
+      - name: Validate deterministic protocol and transport
+        timeout-minutes: 3
+        run: |
+          set -euo pipefail
+          node --test proofs/radix-portability-tests.mjs proofs/radix-browser-recovery-tests.mjs proofs/radix-frame-screen-protocol-tests.mjs proofs/radix-frame-screen-tests.mjs 2>&1 | tee "$RUNNER_TEMP/radix-frame-evidence/setup/protocol-tests.log"
+      - name: All-source full correctness and exact WebKit semantics
+        timeout-minutes: 77
+        run: |
+          set -euo pipefail
+          node proofs/radix-frame-screen-runner.mjs run "$RUNNER_TEMP/radix-frame-baseline" "$RUNNER_TEMP/radix-frame-current" "$RUNNER_TEMP/radix-frame-helper" "$RUNNER_TEMP/radix-frame-evidence" webkit-x64 prerequisites-only
+      - name: Seal complete or partial prerequisite evidence
+        if: always()
+        timeout-minutes: 3
+        run: node proofs/radix-portability-archive.mjs "$RUNNER_TEMP/radix-frame-evidence" "$RUNNER_TEMP/radix-frame-artifact"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radix-frame-prerequisites
+          path: ${{ runner.temp }}/radix-frame-artifact/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+  screen:
+    needs: prerequisites
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: webkit-x64
+            browser: webkit
+          - lane: bun-x64
+            browser: ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Freeze exact inputs and setup
+        timeout-minutes: 8
+        run: bash proofs/radix-frame-screen-setup.sh
+      - uses: actions/download-artifact@v4
+        with:
+          name: radix-frame-prerequisites
+          path: ${{ runner.temp }}/radix-frame-prerequisites-packed
+      - name: Verify and materialize shared prerequisites
+        timeout-minutes: 3
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/radix-frame-prerequisites-packed"
+          sha256sum --check radix-portability.tar.gz.sha256
+          mkdir "$RUNNER_TEMP/radix-frame-prerequisites"
+          tar -xzf radix-portability.tar.gz -C "$RUNNER_TEMP/radix-frame-prerequisites"
+      - name: Install exact WebKit revision
+        if: matrix.browser != ''
+        timeout-minutes: 11
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=5s 600s bunx playwright install --with-deps webkit 2>&1 | tee "$RUNNER_TEMP/radix-frame-evidence/setup/browser-install.log"
+      - name: Verify prerequisites, run 18 runtime checks, then one fixed screen
+        timeout-minutes: 77
+        run: |
+          set -euo pipefail
+          node proofs/radix-frame-screen-runner.mjs run "$RUNNER_TEMP/radix-frame-baseline" "$RUNNER_TEMP/radix-frame-current" "$RUNNER_TEMP/radix-frame-helper" "$RUNNER_TEMP/radix-frame-evidence" '${{ matrix.lane }}' "$RUNNER_TEMP/radix-frame-prerequisites"
+      - name: Seal complete or partial lane evidence
+        if: always()
+        timeout-minutes: 3
+        run: node proofs/radix-portability-archive.mjs "$RUNNER_TEMP/radix-frame-evidence" "$RUNNER_TEMP/radix-frame-artifact"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radix-frame-screen-${{ matrix.lane }}
+          path: ${{ runner.temp }}/radix-frame-artifact/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,1650 @@
+{
+  "schema": 1,
+  "stage": "prospective browser-only recovery; no timing claim",
+  "originalManifestSha256": "17e2ec8396adc02772012e6b9a8b7e72914443d39c3514bbd1a6554236eaf8d3",
+  "context": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "cda6f639faab0ef627fb97ed199864fc4cc2468a",
+    "runtimeEquivalent": "c79c803bf7c59a2fc559e43ce7cc74aa4dacde15",
+    "publishedTimingProof": "ac7f07a139422bd2fd6e8637c2792c38ece9c4a3",
+    "publishedTimingRun": "37875343311",
+    "isolationArchitecture": "d016ba306375bb9e2146befa68efd112916f34b6",
+    "portabilityArchitecture": "4640d663eeba989ebebf0623c779ecc447b2920f",
+    "branch": "proof/radix-browser-recovery-20261009",
+    "priorOutcome": "x64 all-catalogue acceptance inconclusive: 15 statistically uncertain cells and one Node baseline-AA drift cell. Canonical 4096 radix entries improved 14.596% Node and 12.264% Bun. Bun empty radix +2.765% [0.708%, 4.864%] remains important.",
+    "scope": "New browser-only prospective protocol, three fixed cells on three engines. Preserve the failed original browser study and the independent ARM study; no retries, replacements, pooling, or catalogue-wide claim.",
+    "protocol": "radix-browser-recovery-v1",
+    "originalPortabilityProof": "44b6b88f3773731438356b4826914be12040a6b4",
+    "originalPortabilityTree": "0e4b88e044a350ba95324a590867b597c827ddd0",
+    "originalPortabilityRun": "37881676434",
+    "recoveryReason": "Chromium/WebKit rejected a zero-duration repeat=1 calibration probe after positive prewarm. Firefox worker assertions passed but browser disconnect could dispose the pending worker-close listener."
+  },
+  "plans": [
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "cda6f639faab0ef627fb97ed199864fc4cc2468a",
+        "runtimeEquivalent": "c79c803bf7c59a2fc559e43ce7cc74aa4dacde15",
+        "publishedTimingProof": "ac7f07a139422bd2fd6e8637c2792c38ece9c4a3",
+        "publishedTimingRun": "37875343311",
+        "isolationArchitecture": "d016ba306375bb9e2146befa68efd112916f34b6",
+        "portabilityArchitecture": "4640d663eeba989ebebf0623c779ecc447b2920f",
+        "branch": "proof/radix-browser-recovery-20261009",
+        "priorOutcome": "x64 all-catalogue acceptance inconclusive: 15 statistically uncertain cells and one Node baseline-AA drift cell. Canonical 4096 radix entries improved 14.596% Node and 12.264% Bun. Bun empty radix +2.765% [0.708%, 4.864%] remains important.",
+        "scope": "New browser-only prospective protocol, three fixed cells on three engines. Preserve the failed original browser study and the independent ARM study; no retries, replacements, pooling, or catalogue-wide claim.",
+        "protocol": "radix-browser-recovery-v1",
+        "originalPortabilityProof": "44b6b88f3773731438356b4826914be12040a6b4",
+        "originalPortabilityTree": "0e4b88e044a350ba95324a590867b597c827ddd0",
+        "originalPortabilityRun": "37881676434",
+        "recoveryReason": "Chromium/WebKit rejected a zero-duration repeat=1 calibration probe after positive prewarm. Firefox worker assertions passed but browser disconnect could dispose the pending worker-close listener."
+      },
+      "lane": {
+        "name": "chromium-x64",
+        "runtime": "chromium",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 300000,
+        "archiveMs": 120000,
+        "cleanupMs": 1000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "correctnessMs": 90000,
+        "retries": 0,
+        "workerCloseMs": 30000
+      },
+      "study": {
+        "schemaVersion": 1,
+        "config": {
+          "schemaVersion": 1,
+          "seed": 20261008,
+          "quartets": 4,
+          "samples": 21,
+          "pilotWarmupMs": 500,
+          "pilotWarmupMinCalls": 1024,
+          "pilotWarmupMaxMs": 15000,
+          "pilotCalibrationTargetMs": 40,
+          "pilotCalibrationSteps": 16,
+          "pilotSamples": 3,
+          "batchTargetMs": 40,
+          "warmupTargetMs": 500,
+          "rateSafetyFactor": 1.25,
+          "minBatchMs": 10,
+          "minWarmupMs": 150,
+          "maxRepeat": 10000000,
+          "maxWarmupCalls": 100000000,
+          "subjectTimeoutMs": 180000,
+          "margin": 1.02,
+          "confidenceLevel": 0.95,
+          "tCriticalDf3": 3.182446305284263
+        },
+        "rows": [
+          {
+            "workload": {
+              "name": "map/radix/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty natural-sorted numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/hamt/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "hamt",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty ordinary numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/radix/number/4096/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 4096,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "target",
+              "target": true,
+              "description": "Full entries() on natural-sorted radix; a temporary-key set/delete flushes its journal."
+            },
+            "pilotOrder": [
+              "candidate",
+              "baseline"
+            ],
+            "schedule": [
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          }
+        ],
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "pilots": 6,
+        "modes": [
+          {
+            "mode": "ab",
+            "left": "baseline",
+            "right": "candidate"
+          },
+          {
+            "mode": "aa-baseline",
+            "left": "baseline",
+            "right": "baseline"
+          }
+        ]
+      },
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24
+      },
+      "resultRule": "Every selected cell is reported. Any failure, floor miss, cleanup failure or incomplete quartet invalidates inference. AA drift invalidates its matched AB. Pointwise df=3 intervals, 2% loss margin. No retries or extra samples.",
+      "browserRecovery": {
+        "calibrationStart": "last retained positive prewarm batch repeat",
+        "workerClosure": "observe exact worker close before requesting browser close",
+        "failedOrZeroDuration": "fail and retain partial evidence; never skip, clamp, retry or infer closure"
+      }
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "cda6f639faab0ef627fb97ed199864fc4cc2468a",
+        "runtimeEquivalent": "c79c803bf7c59a2fc559e43ce7cc74aa4dacde15",
+        "publishedTimingProof": "ac7f07a139422bd2fd6e8637c2792c38ece9c4a3",
+        "publishedTimingRun": "37875343311",
+        "isolationArchitecture": "d016ba306375bb9e2146befa68efd112916f34b6",
+        "portabilityArchitecture": "4640d663eeba989ebebf0623c779ecc447b2920f",
+        "branch": "proof/radix-browser-recovery-20261009",
+        "priorOutcome": "x64 all-catalogue acceptance inconclusive: 15 statistically uncertain cells and one Node baseline-AA drift cell. Canonical 4096 radix entries improved 14.596% Node and 12.264% Bun. Bun empty radix +2.765% [0.708%, 4.864%] remains important.",
+        "scope": "New browser-only prospective protocol, three fixed cells on three engines. Preserve the failed original browser study and the independent ARM study; no retries, replacements, pooling, or catalogue-wide claim.",
+        "protocol": "radix-browser-recovery-v1",
+        "originalPortabilityProof": "44b6b88f3773731438356b4826914be12040a6b4",
+        "originalPortabilityTree": "0e4b88e044a350ba95324a590867b597c827ddd0",
+        "originalPortabilityRun": "37881676434",
+        "recoveryReason": "Chromium/WebKit rejected a zero-duration repeat=1 calibration probe after positive prewarm. Firefox worker assertions passed but browser disconnect could dispose the pending worker-close listener."
+      },
+      "lane": {
+        "name": "firefox-x64",
+        "runtime": "firefox",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 300000,
+        "archiveMs": 120000,
+        "cleanupMs": 1000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "correctnessMs": 90000,
+        "retries": 0,
+        "workerCloseMs": 30000
+      },
+      "study": {
+        "schemaVersion": 1,
+        "config": {
+          "schemaVersion": 1,
+          "seed": 20261008,
+          "quartets": 4,
+          "samples": 21,
+          "pilotWarmupMs": 500,
+          "pilotWarmupMinCalls": 1024,
+          "pilotWarmupMaxMs": 15000,
+          "pilotCalibrationTargetMs": 40,
+          "pilotCalibrationSteps": 16,
+          "pilotSamples": 3,
+          "batchTargetMs": 40,
+          "warmupTargetMs": 500,
+          "rateSafetyFactor": 1.25,
+          "minBatchMs": 10,
+          "minWarmupMs": 150,
+          "maxRepeat": 10000000,
+          "maxWarmupCalls": 100000000,
+          "subjectTimeoutMs": 180000,
+          "margin": 1.02,
+          "confidenceLevel": 0.95,
+          "tCriticalDf3": 3.182446305284263
+        },
+        "rows": [
+          {
+            "workload": {
+              "name": "map/radix/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty natural-sorted numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/hamt/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "hamt",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty ordinary numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/radix/number/4096/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 4096,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "target",
+              "target": true,
+              "description": "Full entries() on natural-sorted radix; a temporary-key set/delete flushes its journal."
+            },
+            "pilotOrder": [
+              "candidate",
+              "baseline"
+            ],
+            "schedule": [
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          }
+        ],
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "pilots": 6,
+        "modes": [
+          {
+            "mode": "ab",
+            "left": "baseline",
+            "right": "candidate"
+          },
+          {
+            "mode": "aa-baseline",
+            "left": "baseline",
+            "right": "baseline"
+          }
+        ]
+      },
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24
+      },
+      "resultRule": "Every selected cell is reported. Any failure, floor miss, cleanup failure or incomplete quartet invalidates inference. AA drift invalidates its matched AB. Pointwise df=3 intervals, 2% loss margin. No retries or extra samples.",
+      "browserRecovery": {
+        "calibrationStart": "last retained positive prewarm batch repeat",
+        "workerClosure": "observe exact worker close before requesting browser close",
+        "failedOrZeroDuration": "fail and retain partial evidence; never skip, clamp, retry or infer closure"
+      }
+    },
+    {
+      "schema": 1,
+      "context": {
+        "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+        "candidate": "cda6f639faab0ef627fb97ed199864fc4cc2468a",
+        "runtimeEquivalent": "c79c803bf7c59a2fc559e43ce7cc74aa4dacde15",
+        "publishedTimingProof": "ac7f07a139422bd2fd6e8637c2792c38ece9c4a3",
+        "publishedTimingRun": "37875343311",
+        "isolationArchitecture": "d016ba306375bb9e2146befa68efd112916f34b6",
+        "portabilityArchitecture": "4640d663eeba989ebebf0623c779ecc447b2920f",
+        "branch": "proof/radix-browser-recovery-20261009",
+        "priorOutcome": "x64 all-catalogue acceptance inconclusive: 15 statistically uncertain cells and one Node baseline-AA drift cell. Canonical 4096 radix entries improved 14.596% Node and 12.264% Bun. Bun empty radix +2.765% [0.708%, 4.864%] remains important.",
+        "scope": "New browser-only prospective protocol, three fixed cells on three engines. Preserve the failed original browser study and the independent ARM study; no retries, replacements, pooling, or catalogue-wide claim.",
+        "protocol": "radix-browser-recovery-v1",
+        "originalPortabilityProof": "44b6b88f3773731438356b4826914be12040a6b4",
+        "originalPortabilityTree": "0e4b88e044a350ba95324a590867b597c827ddd0",
+        "originalPortabilityRun": "37881676434",
+        "recoveryReason": "Chromium/WebKit rejected a zero-duration repeat=1 calibration probe after positive prewarm. Firefox worker assertions passed but browser disconnect could dispose the pending worker-close listener."
+      },
+      "lane": {
+        "name": "webkit-x64",
+        "runtime": "webkit",
+        "arch": "x64",
+        "browser": true,
+        "playwright": "1.63.0"
+      },
+      "limits": {
+        "controllerMs": 1500000,
+        "prerequisiteMs": 300000,
+        "browserSubjectMs": 300000,
+        "archiveMs": 120000,
+        "cleanupMs": 1000,
+        "browserLaunchMs": 30000,
+        "browserCloseMs": 30000,
+        "correctnessMs": 90000,
+        "retries": 0,
+        "workerCloseMs": 30000
+      },
+      "study": {
+        "schemaVersion": 1,
+        "config": {
+          "schemaVersion": 1,
+          "seed": 20261008,
+          "quartets": 4,
+          "samples": 21,
+          "pilotWarmupMs": 500,
+          "pilotWarmupMinCalls": 1024,
+          "pilotWarmupMaxMs": 15000,
+          "pilotCalibrationTargetMs": 40,
+          "pilotCalibrationSteps": 16,
+          "pilotSamples": 3,
+          "batchTargetMs": 40,
+          "warmupTargetMs": 500,
+          "rateSafetyFactor": 1.25,
+          "minBatchMs": 10,
+          "minWarmupMs": 150,
+          "maxRepeat": 10000000,
+          "maxWarmupCalls": 100000000,
+          "subjectTimeoutMs": 180000,
+          "margin": 1.02,
+          "confidenceLevel": 0.95,
+          "tCriticalDf3": 3.182446305284263
+        },
+        "rows": [
+          {
+            "workload": {
+              "name": "map/radix/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty natural-sorted numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/hamt/number/0/canonical/entries",
+              "kind": "map",
+              "trie": "hamt",
+              "type": "number",
+              "size": 0,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "control",
+              "target": false,
+              "description": "Empty ordinary numeric map, full entries()."
+            },
+            "pilotOrder": [
+              "baseline",
+              "candidate"
+            ],
+            "schedule": [
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          },
+          {
+            "workload": {
+              "name": "map/radix/number/4096/canonical/entries",
+              "kind": "map",
+              "trie": "radix",
+              "type": "number",
+              "size": 4096,
+              "shape": "canonical",
+              "operation": "entries",
+              "category": "target",
+              "target": true,
+              "description": "Full entries() on natural-sorted radix; a temporary-key set/delete flushes its journal."
+            },
+            "pilotOrder": [
+              "candidate",
+              "baseline"
+            ],
+            "schedule": [
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 0,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 0,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 1,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 1,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 2,
+                "roles": [
+                  "right",
+                  "left",
+                  "left",
+                  "right"
+                ]
+              },
+              {
+                "mode": "ab",
+                "left": "baseline",
+                "right": "candidate",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              },
+              {
+                "mode": "aa-baseline",
+                "left": "baseline",
+                "right": "baseline",
+                "block": 3,
+                "roles": [
+                  "left",
+                  "right",
+                  "right",
+                  "left"
+                ]
+              }
+            ]
+          }
+        ],
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "pilots": 6,
+        "modes": [
+          {
+            "mode": "ab",
+            "left": "baseline",
+            "right": "candidate"
+          },
+          {
+            "mode": "aa-baseline",
+            "left": "baseline",
+            "right": "baseline"
+          }
+        ]
+      },
+      "correctness": [
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/4096/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/hamt/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "candidate",
+          "kind": "fixture",
+          "name": "map/radix/number/0/canonical/entries"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": false,
+          "name": "shared-growth-paused"
+        },
+        {
+          "build": "candidate",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        },
+        {
+          "build": "baseline",
+          "kind": "worker",
+          "copy": true,
+          "name": "copy-growth-paused"
+        }
+      ],
+      "expected": {
+        "cells": 3,
+        "pilots": 6,
+        "measuredSubjects": 96,
+        "measuredBatches": 2016,
+        "quartets": 24
+      },
+      "resultRule": "Every selected cell is reported. Any failure, floor miss, cleanup failure or incomplete quartet invalidates inference. AA drift invalidates its matched AB. Pointwise df=3 intervals, 2% loss margin. No retries or extra samples.",
+      "browserRecovery": {
+        "calibrationStart": "last retained positive prewarm batch repeat",
+        "workerClosure": "observe exact worker close before requesting browser close",
+        "failedOrZeroDuration": "fail and retain partial evidence; never skip, clamp, retry or infer closure"
+      }
+    }
+  ],
+  "files": {
+    ".github/workflows/radix-portability.yml": "26d194f943bdd4eaf1a68e1271543b55164b0969deb08005aa9e38961e60e7be",
+    "proofs/radix-portability.md": "54d0b610521ddcc6babe358b7c6f097c2e1fde92939f4289964c9998802d468f",
+    "proofs/radix-portability-pins.json": "dfdb99cf4c08ff26dba15cbb1fec3af36e636adc36d511cef4c9519e8e7148e7",
+    "proofs/radix-portability-protocol.mjs": "6cc23b6ddb6063117d7b50239ccd592a69a215d006f180815a9a7afd0d1c5567",
+    "proofs/radix-portability-source.mjs": "3f8e275592e442c5a9dceb07a67b0ac2c22e1776f68e7212e74d39b69092bf92",
+    "proofs/radix-portability-adapter.mjs": "edb6589d1750d632fcbb9a3fc3bf35a6d89542900d53b25eef9851f211a4248a",
+    "proofs/radix-portability-browser-shims.mjs": "9186b22ffea93a5c428f6c2997972f27bb6b3b3cb2c0eebd0bd49c04bbfe96a0",
+    "proofs/radix-portability-browser.mjs": "7367069c12ac6d255def2e340f3fd29e21409492cceff0e62882ac79053b1d2a",
+    "proofs/radix-portability-process.mjs": "e878a4159466d3df4cecd47a9df8cfae84da939dddedd21fd2aae72c758a3ce7",
+    "proofs/radix-portability-runner.mjs": "91f66c7624c38e02da9ac4460b24d60844a51d012bd27584d4c1d9e35cdb4afc",
+    "proofs/radix-portability-archive.mjs": "c61aa8fdcb894631be3ff2bf41cc08de557942f5770e86efa28527af15a276f2",
+    "proofs/radix-portability-tests.mjs": "76ba084e9ca8d593beaf1f1d606387fc2963fe0741e37b00f0561c8bfa95ab90",
+    "proofs/trie-view-workloads.mjs": "6efed2d1c345e33b73364054b53a46f621d1196bd43ceb5642277cfe77a9940b",
+    "proofs/trie-view-subject.mjs": "bbe02fc9614f14d32424efec988d55cda2ce3f80c218dec65517d6454f6f878d",
+    "proofs/trie-view-source.mjs": "d9b1cb905d72f7b642a8f742d9f9955327130fdc88479ebafdc2c861e111d6e4",
+    "proofs/trie-view-protocol.mjs": "b083040d4e8f76d880db4560cebe34af49105cab2a23e31eb54f7f6689a54f1b",
+    "proofs/trie-view-worker.mjs": "f2e0f8efe959d78cabc4afb3d905da8865812d2c4d560c1f3a80f44cf5c9947e",
+    "proofs/trie-view-workers.mjs": "612a4b9f5a64253cf517468ce552825be8d01b14487ecdce7d1f5a58533aacf5",
+    "proofs/radix-portability-manifest.json": "17e2ec8396adc02772012e6b9a8b7e72914443d39c3514bbd1a6554236eaf8d3",
+    ".github/workflows/radix-browser-recovery.yml": "0ba22f91ba005bb6de8cf729731c1a61f309fdc9a9dd5db7319141284ed30b1d",
+    "proofs/radix-browser-recovery.md": "85ef6a2dd1ded0cc4eebe3477c714b8a79a4ad58e669161c2c7e6a02f7ab390c",
+    "proofs/radix-browser-recovery-protocol.mjs": "bef00c4d32470fc71147980804e14c3a8d6000d26074494a232246e9c5cf3cda",
+    "proofs/radix-browser-recovery-adapter.mjs": "513a49317aacf106e5b5de3d2a0141257f64d21f4a3101850d7d320557a59ec4",
+    "proofs/radix-browser-recovery-lifecycle.mjs": "fa9ed147c6710ed79bcfe07c281dbe5e559abf63ed69be05b40610cd2058e4a3",
+    "proofs/radix-browser-recovery-browser.mjs": "dac16451ff1796c65c7bd80dab9e6321dcc326ad36eeccfe902c3dff35804cf4",
+    "proofs/radix-browser-recovery-runner.mjs": "413107a780e4ddb83c7afde54c44d0853a347d18bfa7824d56cc404ec5cfa7a1",
+    "proofs/radix-browser-recovery-tests.mjs": "710bc5eaa59707ccdb849e95f3607255377e849e097b8b3596bdfd806006630e"
+  },
+  "adapters": {
+    "workload": {
+      "originalSha256": "6efed2d1c345e33b73364054b53a46f621d1196bd43ceb5642277cfe77a9940b",
+      "sourceSha256": "3dac536c5d492d9efec5bfd85a028588a2da5916da6c0db7ec5e5fdfba796821",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from './shims.mjs';"
+        ],
+        [
+          "import { createHash } from 'node:crypto';",
+          "import { createHash } from './shims.mjs';"
+        ]
+      ]
+    },
+    "subject": {
+      "originalSha256": "bbe02fc9614f14d32424efec988d55cda2ce3f80c218dec65517d6454f6f878d",
+      "originalBodySha256": "8c5bbe0fb09acd1793e0898321f3e31c03d230a5e7acee3fb1c9594e88c83d67",
+      "derivedBodySha256": "7c789ff2066688b974502aff2fbefa32ea49750785eb81da4a29648079c1ec60",
+      "edits": [
+        [
+          "    assert.equal(process.execArgv.length, 0, 'Subject requires default JIT flags');",
+          "    assert.equal(globalThis.crossOriginIsolated, true, 'Browser subject requires cross-origin isolation');"
+        ],
+        [
+          "    assert.ok(!process.env.NODE_OPTIONS && !process.env.BUN_OPTIONS, 'Subject requires default runtime options');",
+          "    assert.equal(request.authorization, 'frozen-ci-subject', 'Browser timing authorization missing');"
+        ]
+      ],
+      "sourceSha256": "8982e39260a42391b0c3b470334783f91870787aaf4d7edcb2671bf554b377a0",
+      "protocol": "radix-browser-recovery-v1",
+      "originalAdapterSha256": "6dcd09c55adb4d86dd8079accd163853d1619881f059ca0e9f426a7fa6ca5490",
+      "originalTimedCoreSha256": "76a3626e181ec519be496b817992d4686c4de4500678a8a3d9205ea7d7987502",
+      "derivedTimedCoreSha256": "d43c06d12d2a8fd3db295cb75fc24b3117de3c0ad3de7da0c487526c14c636f0",
+      "calibrationEdits": [
+        [
+          "  repeat = 1;\n  for (let step = 0;",
+          "  repeat = prewarm.batches.at(-1).repeat;\n  for (let step = 0;"
+        ]
+      ],
+      "receiptEdits": [
+        [
+          "derivation: 'exact-pinned-browser-adapter-v1'",
+          "derivation: 'exact-pinned-browser-recovery-v1'"
+        ]
+      ],
+      "preservedSha256": {
+        "timedBatch": "1d58c192b9fbc3a534406e16a830775cdcd21f709a320dc4199f8799ce693b26",
+        "fixedMeasure": "7da175a21a7bbac7b3262fee03ddc718332f8080f5c07594bdc9d9c6050706cf",
+        "positiveDuration": "c6a6210c373d5277e6c2124fabcf86a6abc1c44eeefa40733c09ad051e37c77f",
+        "fixtureExecute": "3c177ad6db2df3859b94041605e02a5882129cf2921c2c4b661cc3a88095671d"
+      }
+    },
+    "worker": {
+      "originalSha256": "f2e0f8efe959d78cabc4afb3d905da8865812d2c4d560c1f3a80f44cf5c9947e",
+      "sourceSha256": "cc44e1b0d0a40d89d9233a3957e053faa6e533d184b2eccdfac52cf3d1404b50",
+      "edits": [
+        [
+          "import assert from 'node:assert/strict';",
+          "import { assert } from '/study/shims.mjs';"
+        ],
+        [
+          "import { parentPort } from 'node:worker_threads';",
+          "import { parentPort } from '/study/shims.mjs';"
+        ]
+      ]
+    },
+    "parent": {
+      "sourceSha256": "e270d84b76967fb058e98fbf0d7c4ef4ba071481576bfaf815e19c5a8385f5a7",
+      "originalSha256": "612a4b9f5a64253cf517468ce552825be8d01b14487ecdce7d1f5a58533aacf5",
+      "originalBodySha256": "70e102c3874d05505392126c1724aed97e345cda73c9c610cbd734b9e2943fbf",
+      "derivedBodySha256": "024f26675b55215a74e59d4246d2eae20a107c1df59cb6fec926efcfba688b75",
+      "edits": [
+        [
+          "for (const copy of [false, true]) {",
+          "for (const copy of [selectedCopy]) {"
+        ],
+        [
+          "console.log(JSON.stringify({ transport:",
+          "reports.push(JSON.stringify({ transport:"
+        ],
+        [
+          "new URL('./trie-view-worker.mjs', import.meta.url)",
+          "new URL('/proofs/trie-view-worker.mjs', location.origin)"
+        ]
+      ]
+    },
+    "shims": {
+      "sourceSha256": "9186b22ffea93a5c428f6c2997972f27bb6b3b3cb2c0eebd0bd49c04bbfe96a0"
+    }
+  },
+  "expectedTotal": {
+    "lanes": 3,
+    "cells": 9,
+    "pilots": 18,
+    "measuredSubjects": 288,
+    "measuredBatches": 6048,
+    "quartets": 72
+  },
+  "publication": "Local preparation only. Publication and the single scoped-push execution require parent review of this exact tree."
+}
