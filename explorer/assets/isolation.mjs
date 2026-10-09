@@ -105,19 +105,20 @@ function waitForActive(environment, url, scope, timeoutMs) {
     }
     const timer = environment.setTimeout(() => finish(new Error('Demo setup timed out. Check your connection and try again.')), timeoutMs);
     container.addEventListener('controllerchange', check);
-    // Reuse another tab's installation before starting a competing job. A
-    // rejected job may still have a matching installation created by that tab.
+    // Register before looking up this scope. A concurrent tab can expose a
+    // registration whose worker slots are still empty. WebKit caches that
+    // wrapper without refreshing its slots on subsequent lookup/ready calls.
+    // register() resolves after the installing worker is assigned; the browser
+    // serializes jobs for the same scope and reuses the same script. A rejected
+    // job may still have a matching installation created by another tab.
     // Recheck once on failure; do not retry arbitrary policy or network errors.
     Promise.resolve().then(async () => {
-      // ready is an independent activation signal when WebKit's registration
-      // slots or lifecycle events are stale after another tab installs. Do not
+      // ready can signal activation when lifecycle events are missed. It does
+      // not refresh an already cached registration wrapper in WebKit. Do not
       // await it: it may never settle, or resolve for a broader registration.
       // adopt still requires our exact scope/script and a navigation-capable
       // worker; the shared deadline and finished guard also apply here.
       container.ready?.then(value => adopt(value), finish);
-      const existing = await existingRegistration();
-      if (finished) return;
-      if (adopt(existing)) { refresh(); return; }
       const value = await container.register(url, { scope: scope.href, updateViaCache: 'none' });
       // A successful register() may return before updatefound fills the slots.
       // An empty registration is not success: only a matching active worker
