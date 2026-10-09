@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "measure": false,
-  "reviewedHarnessSha256": "",
-  "reviewedAdapterSha256": "",
-  "validatedCheckCommit": "",
-  "validatedCheckRun": 0,
-  "validatedArtifactId": 0,
-  "validatedArtifactZipSha256": "",
-  "validatedManifestSha256": ""
+  "measure": true,
+  "reviewedHarnessSha256": "f814ddaca8d22056be8ef5c063d8d2dcfe0851af7e6f651c3108e96b43293fad",
+  "reviewedAdapterSha256": "72213a99d02b9de84ee60aa64e3c01bd28f754a2b35f7db4968ed78f5060450f",
+  "validatedCheckCommit": "696150d7141f23b896a6a01015ea239381a859f1",
+  "validatedCheckRun": 37887971781,
+  "validatedArtifactId": 11597137692,
+  "validatedArtifactZipSha256": "56e8b9e91265b98bcc8d29862c1538b351807b9dadd24514732aa0891ddeb18b",
+  "validatedManifestSha256": "0f60240f308cb609081883a258590533afe15e1e21fb01c7b72dd0a82be6f63c"
 }
