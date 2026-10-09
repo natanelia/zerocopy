@@ -1,0 +1,663 @@
+{
+  "schema": "block-reuse-allocation-pins/v1",
+  "latencyCollected": false,
+  "roots": {
+    "baseline": "ad2a19d65a836985a2364b181bc9bd8dce6e42ad",
+    "candidate": "5df600e139666c28d338800a8d5d79270a284af9"
+  },
+  "sources": {
+    "baseline": "85662fce0e95deef920c8fd52789b11657f0b5d7f00b9f195873c38bc99bfd6a",
+    "candidate": "1db06a5158579fbdc5290b3f3e54dcb74245545bd283fb11b0408cf6c7062fae"
+  },
+  "rows": {
+    "linked-append-8192": {
+      "baseline": {
+        "first": 120424,
+        "next": 120424
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 120424,
+          "backing": 196608
+        },
+        {
+          "repeat": 2,
+          "used": 240848,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 361272,
+          "backing": 458752
+        },
+        {
+          "repeat": 17,
+          "used": 2047208,
+          "backing": 2162688
+        }
+      ],
+      "candidate": {
+        "first": 114496,
+        "next": 114496
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 114496,
+          "backing": 196608
+        },
+        {
+          "repeat": 2,
+          "used": 228992,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 343488,
+          "backing": 458752
+        },
+        {
+          "repeat": 17,
+          "used": 1946432,
+          "backing": 2031616
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 0,
+          "tail": 0,
+          "tailSize": 0,
+          "size": 0,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 65536,
+          "capacityBytes": 131072,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "inputSha256": "3f4a0396d1ed2009fb5bcc152b6a90ccd33961167a529ac2afb5652cfe952dd2",
+        "outputSha256": "468e07ed9b7727e526587eabeffd66bb3e7d4e7f3e9f69207850280aff807ec0",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "linked-prepend-256": {
+      "baseline": {
+        "first": 98688,
+        "next": 98688
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 98688,
+          "backing": 262144
+        },
+        {
+          "repeat": 2,
+          "used": 197376,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 296064,
+          "backing": 458752
+        },
+        {
+          "repeat": 17,
+          "used": 1677696,
+          "backing": 1835008
+        }
+      ],
+      "candidate": {
+        "first": 98112,
+        "next": 98112
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 98112,
+          "backing": 262144
+        },
+        {
+          "repeat": 2,
+          "used": 196224,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 294336,
+          "backing": 458752
+        },
+        {
+          "repeat": 17,
+          "used": 1667904,
+          "backing": 1769472
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 101352,
+          "tail": 0,
+          "tailSize": 0,
+          "size": 4096,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 101376,
+          "capacityBytes": 131072,
+          "sha256": "8ebdbe0ba0308875215d4ad4e8f9b0282dbe6ac95aaca8fc0680b7e67a2f69b4"
+        },
+        "inputSha256": "d5a5ce17b9a70872d4079c2fc9a9e8ff0f7ae9021b85d1224ee3dfb88ee8fc1f",
+        "outputSha256": "9a032fcdb555340f08ba7253da6aa9089e526f3431ab1704780fa26f71fb24ba",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "doubly-mixed-insert-256": {
+      "baseline": {
+        "first": 96304,
+        "next": 96304
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 96304,
+          "backing": 262144
+        },
+        {
+          "repeat": 2,
+          "used": 192608,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 288912,
+          "backing": 393216
+        },
+        {
+          "repeat": 17,
+          "used": 1637168,
+          "backing": 1769472
+        }
+      ],
+      "candidate": {
+        "first": 96256,
+        "next": 96256
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 96256,
+          "backing": 262144
+        },
+        {
+          "repeat": 2,
+          "used": 192512,
+          "backing": 327680
+        },
+        {
+          "repeat": 3,
+          "used": 288768,
+          "backing": 393216
+        },
+        {
+          "repeat": 17,
+          "used": 1636352,
+          "backing": 1769472
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 101352,
+          "tail": 0,
+          "tailSize": 0,
+          "size": 4096,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 101376,
+          "capacityBytes": 131072,
+          "sha256": "8ebdbe0ba0308875215d4ad4e8f9b0282dbe6ac95aaca8fc0680b7e67a2f69b4"
+        },
+        "inputSha256": "6530c2d7ea2558b0b3feaed488d08a3bdd07887a713e0e5c101cfc47af1646bd",
+        "outputSha256": "85c391c86f5dd30860b654269ffedfd98673cc3e5dd4063536f1bc46fdbf2e6e",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "vector-list-push-4096": {
+      "baseline": {
+        "first": 61312,
+        "next": 61312
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 61312,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 122624,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 183936,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 1042304,
+          "backing": 1114112
+        }
+      ],
+      "candidate": {
+        "first": 61312,
+        "next": 61312
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 61312,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 122624,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 183936,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 1042304,
+          "backing": 1114112
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "root": 0,
+          "depth": 0,
+          "size": 0,
+          "type": "number",
+          "tail": 0
+        },
+        "arena": {
+          "usedBytes": 65536,
+          "capacityBytes": 131072,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "inputSha256": "a701432dd4b2f4f6576e5a2da6ed0089f6d616f852a137f014fbc6a5e0a5156e",
+        "outputSha256": "e212953147a5357cd401632ae868b3c0a391e032c6d3b3d21673a704bb7db42c",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "vector-queue-enqueue-4096": {
+      "baseline": {
+        "first": 61312,
+        "next": 61312
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 61312,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 122624,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 183936,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 1042304,
+          "backing": 1114112
+        }
+      ],
+      "candidate": {
+        "first": 61312,
+        "next": 61312
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 61312,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 122624,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 183936,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 1042304,
+          "backing": 1114112
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 0,
+          "tail": 0,
+          "size": 0,
+          "type": "number",
+          "block": 0,
+          "depth": 0
+        },
+        "arena": {
+          "usedBytes": 65536,
+          "capacityBytes": 131072,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "inputSha256": "819bbef97ccb6b5012c1d1ceea5880773b1ee36b52bf10847f4e0eacd87db341",
+        "outputSha256": "e212953147a5357cd401632ae868b3c0a391e032c6d3b3d21673a704bb7db42c",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "linked-singleton-tail-append": {
+      "baseline": {
+        "first": 8,
+        "next": 16
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 8,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 24,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 40,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 264,
+          "backing": 131072
+        }
+      ],
+      "candidate": {
+        "first": 8,
+        "next": 16
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 8,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 24,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 40,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 264,
+          "backing": 131072
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 0,
+          "tail": 65536,
+          "tailSize": 1,
+          "size": 1,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 65544,
+          "capacityBytes": 131072,
+          "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        },
+        "inputSha256": "7d148956dad24e34428d97ea60339b5e6041338f88c99c9d18ea2f26595359f4",
+        "outputSha256": "342c7b4e4eac6607523fe2a90e12e6555d84227e3008b494eb1e7e53fc9cceb0",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "linked-first-block-append": {
+      "baseline": {
+        "first": 32,
+        "next": 32
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 32,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 64,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 96,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 544,
+          "backing": 131072
+        }
+      ],
+      "candidate": {
+        "first": 32,
+        "next": 32
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 32,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 64,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 96,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 544,
+          "backing": 131072
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 0,
+          "tail": 65536,
+          "tailSize": 32,
+          "size": 32,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 65792,
+          "capacityBytes": 131072,
+          "sha256": "46c0786feb8237cb9096486d58e114584808cb25b5f576a9833da0cb3c892aa8"
+        },
+        "inputSha256": "8b2207ef3e47df5e0be5d534ce481bc4afef44d8ed0842f8fd2ef07044d4ec4c",
+        "outputSha256": "7b52d50c762bfd0ad687826f517815a2e022cf9990920b2bdedb76cbf4eb6ecb",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "doubly-delete-256": {
+      "baseline": {
+        "first": 38280,
+        "next": 38280
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 38280,
+          "backing": 196608
+        },
+        {
+          "repeat": 2,
+          "used": 76560,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 114840,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 650760,
+          "backing": 786432
+        }
+      ],
+      "candidate": {
+        "first": 38280,
+        "next": 38280
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 38280,
+          "backing": 196608
+        },
+        {
+          "repeat": 2,
+          "used": 76560,
+          "backing": 196608
+        },
+        {
+          "repeat": 3,
+          "used": 114840,
+          "backing": 262144
+        },
+        {
+          "repeat": 17,
+          "used": 650760,
+          "backing": 786432
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 101352,
+          "tail": 0,
+          "tailSize": 0,
+          "size": 4096,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 101376,
+          "capacityBytes": 131072,
+          "sha256": "8ebdbe0ba0308875215d4ad4e8f9b0282dbe6ac95aaca8fc0680b7e67a2f69b4"
+        },
+        "inputSha256": "ff8787a8638d5d4bc20660a5afdb37a01054d37e6a98ff1394559897650be26f",
+        "outputSha256": "67d1e79ca95ae298a9f33fb2dc90b3be95b4e23a09c186ace70441da3b3ae500",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    },
+    "linked-indexed-read-4096": {
+      "baseline": {
+        "first": 0,
+        "next": 0
+      },
+      "baselineObservations": [
+        {
+          "repeat": 1,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 0,
+          "backing": 131072
+        }
+      ],
+      "candidate": {
+        "first": 0,
+        "next": 0
+      },
+      "candidateObservations": [
+        {
+          "repeat": 1,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 2,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 3,
+          "used": 0,
+          "backing": 131072
+        },
+        {
+          "repeat": 17,
+          "used": 0,
+          "backing": 131072
+        }
+      ],
+      "fixture": {
+        "schema": "block-reuse-input/v1",
+        "descriptor": {
+          "head": 101352,
+          "tail": 0,
+          "tailSize": 0,
+          "size": 4096,
+          "type": "number"
+        },
+        "arena": {
+          "usedBytes": 101376,
+          "capacityBytes": 131072,
+          "sha256": "8ebdbe0ba0308875215d4ad4e8f9b0282dbe6ac95aaca8fc0680b7e67a2f69b4"
+        },
+        "inputSha256": "60393e4a362122cad649ae00164a630e6c12be9462075dcada6d98ba51e99c7d",
+        "outputSha256": "cb2249fa75b0f55c6f8922ce37038f8596d44b3ecf325f1ddc6d9d8a301d7e66",
+        "fixture": "fresh empty/tail or unchanged balanced blockBuild with deterministic numeric values"
+      }
+    }
+  }
+}

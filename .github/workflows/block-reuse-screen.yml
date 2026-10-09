@@ -1,0 +1,71 @@
+# Prepared locally only. Publishing this exact proof branch enables attempt 1;
+# there is no manual trigger and reruns cannot execute the screen job.
+name: Fresh block reuse allocation and latency screen attempt 1
+on:
+  push:
+    branches: ['proof/fresh-block-reuse-screen-20261009']
+    paths:
+      - '.github/workflows/block-reuse-screen.yml'
+      - 'proofs/block-reuse-*'
+permissions:
+  contents: read
+concurrency:
+  group: block-reuse-screen-attempt1
+  cancel-in-progress: false
+jobs:
+  screen:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/proof/fresh-block-reuse-screen-20261009' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      BLOCK_REUSE_ATTEMPT: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify frozen candidate and install common dependencies
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/block-reuse-evidence/workflow"
+          test "$(git rev-parse HEAD^)" = '5df600e139666c28d338800a8d5d79270a284af9'
+          test "$(git rev-parse 5df600e139666c28d338800a8d5d79270a284af9^{tree})" = '0dde0756fa4a71aa82112b2d0e52b722f12082af'
+          test "$(git rev-parse 5df600e139666c28d338800a8d5d79270a284af9^)" = 'ad2a19d65a836985a2364b181bc9bd8dce6e42ad'
+          bun install 2>&1 | tee "$RUNNER_TEMP/block-reuse-evidence/workflow/dependencies.log"
+          git worktree add --detach "$RUNNER_TEMP/block-reuse-baseline" ad2a19d65a836985a2364b181bc9bd8dce6e42ad
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/block-reuse-baseline/node_modules"
+      - name: Verify proof protocol without latency
+        timeout-minutes: 2
+        run: |
+          node --test proofs/block-reuse-protocol.node.mjs > "$RUNNER_TEMP/block-reuse-evidence/workflow/protocol-node.log" 2>&1
+          bun test ./proofs/block-reuse-protocol.node.mjs > "$RUNNER_TEMP/block-reuse-evidence/workflow/protocol-bun.log" 2>&1
+      - name: Gate full prerequisites before all pilots and balanced measurements
+        timeout-minutes: 65
+        run: node proofs/block-reuse-performance.mjs "$RUNNER_TEMP/block-reuse-baseline" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/block-reuse-evidence"
+      - name: Preserve complete or partial evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/block-reuse-evidence/workflow"
+          cp .github/workflows/block-reuse-screen.yml "$RUNNER_TEMP/block-reuse-evidence/workflow/"
+          git status --short > "$RUNNER_TEMP/block-reuse-evidence/workflow/git-status.txt"
+          git log -1 --format=fuller > "$RUNNER_TEMP/block-reuse-evidence/workflow/commit.txt"
+          tar -czf "$RUNNER_TEMP/block-reuse-attempt1.tar.gz" -C "$RUNNER_TEMP" block-reuse-evidence
+          cd "$RUNNER_TEMP"
+          sha256sum block-reuse-attempt1.tar.gz > block-reuse-attempt1.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-reuse-attempt1-x64
+          path: |
+            ${{ runner.temp }}/block-reuse-attempt1.tar.gz
+            ${{ runner.temp }}/block-reuse-attempt1.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
