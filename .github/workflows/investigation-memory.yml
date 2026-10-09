@@ -1,5 +1,7 @@
 name: Investigation memory comparison
 on:
+  push:
+    branches: [proof/bulk-input-memory-chart-20261009]
   pull_request:
     branches: [main]
   workflow_dispatch:
