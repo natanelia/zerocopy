@@ -603,7 +603,12 @@ export class Arena {
     let hash = 2166136261, encoded: Uint8Array | undefined;
     for (let i = 0; i < key.length; i++) {
       const code = key.charCodeAt(i);
-      if (code > 127) { encoded = encoder.encode(key); hash = hashBytes(encoded); break; }
+      if (code > 127) {
+        encoded = encoder.encode(key);
+        for (let j = i; j < encoded.length; j++) hash = Math.imul(hash ^ encoded[j], 16777619);
+        hash >>>= 0;
+        break;
+      }
       hash = Math.imul(hash ^ code, 16777619);
     }
     this.lastReadAscii = !encoded;
