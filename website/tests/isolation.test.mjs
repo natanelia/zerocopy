@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { ATTEMPT_PARAMETER, prepareIsolation } from '../assets/isolation.mjs';
+import { cacheEarlyRegistration } from './isolation-registration-cache.mjs';
 
 const route = 'https://example.test/zerocopy/previews/pr-10/test/compare/';
 const workerURL = new URL('isolation-sw.js', route);
@@ -166,29 +167,29 @@ test('a throwing service-worker getter rejects without navigation or leaked reso
 });
 
 
-test('reuse an exact active installation from another tab without registering or claiming', async () => {
+test('register reuses an exact active installation from another tab without claiming', async () => {
   const s = setup(); s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
   s.container.getRegistration = async scope => { assert.equal(scope, route); return s.registration; };
   assert.equal(await s.run(), 'reloading');
-  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 1);
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1);
   assert.equal(s.container.controller, null); assert.deepEqual(s.worker.messages, []);
   s.container.emit('controllerchange'); s.registration.emit('updatefound');
   assert.equal(s.navigations.length, 1); s.clean();
 });
 test('a rejected registration job can use a matching installation completed by another tab', async () => {
   const s = setup(); let reads = 0;
-  s.container.getRegistration = async () => ++reads === 1 ? undefined : s.registration;
+  s.container.getRegistration = async () => { reads++; return s.registration; };
   s.container.register = async () => {
     s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
     throw new Error('Concurrent registration rejected');
   };
   assert.equal(await s.run(), 'reloading');
-  assert.equal(reads, 2); assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 1);
+  assert.equal(reads, 1); assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 1);
   assert.equal(s.container.controller, null); s.clean();
 });
 test('a matching installation in progress is reused until activation', async () => {
   const s = setup(); s.container.getRegistration = async () => s.registration;
-  const pending = s.run(); await tick(); assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 0);
+  const pending = s.run(); await tick(); assert.equal(s.calls.length, 1); assert.equal(s.worker.messages.length, 0);
   s.registration.installing = null; s.registration.active = s.worker; s.worker.change('activated');
   assert.equal(await pending, 'reloading');
   assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 1); s.clean();
@@ -209,17 +210,39 @@ test('failed registration lookup preserves the registration error', async () => 
   s.container.register = () => Promise.reject(new Error('Registration blocked'));
   await assert.rejects(s.run(), /Registration blocked/); s.clean(); assert.equal(s.navigations.length, 0);
 });
-test('a late registration lookup after the deadline must neither register nor claim nor navigate', async () => {
-  const s = setup(); let release;
-  s.container.getRegistration = () => new Promise(resolve => { release = resolve; });
+test('register precedes lookup so a transient empty wrapper cannot hide activation', async () => {
+  const s = setup(); let cached, reads = 0;
+  const empty = Object.assign(new Events(), { scope: route, installing: null, waiting: null, active: null });
+  s.worker.state = 'activated'; s.registration.installing = null; s.registration.active = s.worker;
+  s.container.getRegistration = async () => { reads++; return cached ??= empty; };
+  s.container.register = async (...args) => { s.calls.push(args); return cached ??= s.registration; };
+  assert.equal(await s.run(), 'reloading');
+  assert.equal(reads, 0); assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1);
+  assert.equal(s.environment.crossOriginIsolated, false); s.clean();
+});
+test('the cached-wrapper browser fixture leaves a fresh observer document native', () => {
+  let reads = 0;
+  const navigator = { get serviceWorker() { reads++; throw new Error('Observer API must remain untouched'); } };
+  runInNewContext(`(${cacheEarlyRegistration.toString()})();`, { location: { pathname: '/' }, navigator });
+  assert.equal(reads, 0);
+  assert.throws(() => runInNewContext(`(${cacheEarlyRegistration.toString()})();`, {
+    location: { pathname: '/zerocopy/previews/pr-22/test/compare/' }, navigator,
+  }), /Observer API must remain untouched/);
+  assert.equal(reads, 1, 'The regression fixture must still apply to demo documents');
+});
+test('registration settling after the deadline cannot start lookup or navigate', async () => {
+  const s = setup(); let release, reads = 0;
+  s.container.register = (...args) => { s.calls.push(args); return new Promise(resolve => { release = resolve; }); };
+  s.container.getRegistration = async () => { reads++; return s.registration; };
   await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
   s.worker.state = 'activated'; s.registration.active = s.worker; s.registration.installing = null;
   release(s.registration); await tick();
-  assert.equal(s.calls.length, 0); assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
+  assert.equal(s.calls.length, 1); assert.equal(reads, 0);
+  assert.equal(s.worker.messages.length, 0); assert.equal(s.navigations.length, 0); s.clean();
 });
 test('a late recovery lookup after registration failure must not claim or navigate', async () => {
-  const s = setup(); let release, reads = 0;
-  s.container.getRegistration = () => ++reads === 1 ? Promise.resolve(undefined) : new Promise(resolve => { release = resolve; });
+  const s = setup(); let release;
+  s.container.getRegistration = () => new Promise(resolve => { release = resolve; });
   s.container.register = () => Promise.reject(new Error('Concurrent registration rejected'));
   await assert.rejects(s.run({ timeoutMs: 15 }), /timed out/); s.clean();
   release(s.registration); s.claim(); await tick();
@@ -231,7 +254,7 @@ test('an active registration alone does not enable shared memory after the navig
   assert.equal(await s.run(), 'reloading');
   assert.equal(s.environment.crossOriginIsolated, false);
   await assert.rejects(s.run(), /Automatic reloads have stopped/);
-  assert.equal(s.calls.length, 0); assert.equal(s.navigations.length, 1); s.clean();
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1); s.clean();
 });
 
 function workerHarness(claim = async () => {}) {
@@ -301,7 +324,7 @@ test('refresh observes activation through a different wrapper without any state 
   Object.assign(replacement, { scope: route, installing: null, waiting: null, active: s.worker });
   current = replacement; // A different process supplies a fresh wrapper; no event arrives here.
   assert.equal(await pending, 'reloading');
-  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1); assert.ok(reads >= 2);
+  assert.equal(s.calls.length, 1); assert.equal(s.navigations.length, 1); assert.equal(reads, 1);
   assert.equal(replacement.listenerCount, 0); s.clean();
 });
 test('an empty registration cannot enable the demo and has a bounded lifetime', async () => {
@@ -322,7 +345,7 @@ test('a different script appearing in an empty registration is rejected without 
 });
 test('a late refresh after the deadline cannot navigate or leave another timer', async () => {
   const s = setup(); s.registration.installing = null; let release, reads = 0;
-  s.container.getRegistration = () => ++reads === 1 ? Promise.resolve(s.registration) : new Promise(resolve => { release = resolve; });
+  s.container.getRegistration = () => { reads++; return new Promise(resolve => { release = resolve; }); };
   await assert.rejects(s.run({ timeoutMs: 150 }), /timed out/); s.clean();
   s.registration.active = s.worker; s.worker.state = 'activated';
   release(s.registration); await tick();
