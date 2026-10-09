@@ -163,6 +163,29 @@ describe('sorted deletion preserves retained roots and lookup effects', () => {
     finally { a.wasm.setHeapEnd(mark); }
   });
 
+  it.each([false, true])('preserves misses, source reads, and the original pre-match error (entry reset: %s)', reset => {
+    const base = numbers(), a = arenaOf(base) as any, wasm = a.wasm;
+    const failure = new RangeError('Injected pre-match recursion failure'), used = a.used;
+    // The existing route looks up first; the fused entry resets its result
+    // before descending. Inject the same error at each deletion entry.
+    a.dv.setUint32(0, 0xffffffff, true);
+    a.wasm = { ...wasm,
+      radixDelete() { throw failure; },
+      radixDeleteRecorded() { if (reset) a.dv.setUint32(0, 0, true); throw failure; },
+    };
+    try {
+      expect(base.delete('missing')).toBe(base);
+      let caught: unknown;
+      try { base.delete('key005'); } catch (error) { caught = error; }
+      expect(caught).toBe(failure);
+      expect(base.get('key005')).toBe(5);
+      expect(base.has('key005')).toBe(true);
+      expect(base.set('key005', 5)).toBe(base);
+      expect(a.used).toBe(used);
+    } finally { a.wasm = wasm; }
+    expect(base.delete('key006').size).toBe(30);
+  });
+
   it('reads the result through shared memory growth and keeps attached roots read-only', () => {
     const memory = new WebAssembly.Memory({ initial: 2, maximum: 4, shared: true });
     const a = new Arena({ memory }), base = numbers(126, a), before = payload(base);
