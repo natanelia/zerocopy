@@ -10,6 +10,7 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const toWellFormed: ((this: string) => string) | undefined = Reflect.get(String.prototype, 'toWellFormed');
 let nextId = 0;
 const PRESENT = Symbol("present; primitive value not decoded");
 interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
@@ -20,6 +21,7 @@ export const MAX_SIZE = 0x3fffffff;
 
 export function normalizeKey(key: string): string {
   if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+  if (typeof toWellFormed === 'function') return toWellFormed.call(key);
   // TextEncoder replaces unpaired UTF-16 surrogates. Use the same equivalence
   // for scalar writes and bulk deduplication. Valid keys do not need a copy.
   for (let i = 0; i < key.length; i++) {
