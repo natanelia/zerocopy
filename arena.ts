@@ -488,6 +488,10 @@ export class Arena {
         return this.readPrimitive(root, key, type, prefix, code, hit === PRESENT);
       }
     }
+    if (code === 0 || code === 4) {
+      const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
+      return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    }
     let slot = this.reads?.slot(key);
     if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
