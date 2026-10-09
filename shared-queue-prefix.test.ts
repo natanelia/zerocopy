@@ -58,6 +58,28 @@ describe('queue persistent-prefix reads', () => {
     expect(arena.buf.slice(HEAP_START, HEAP_START + before.length)).toEqual(before);
   });
 
+  test.each([1, 31, 32, 33, 65].flatMap(width => [false, true].map(enqueueFirst => [width, enqueueFirst] as const)))(
+    'keeps a rolling queue correct across append/dequeue boundaries (width=%i, enqueueFirst=%s)', (width, enqueueFirst) => {
+      let expected = Array.from({ length: width }, (_, i) => i), queue = numbers(expected);
+      const retained: { queue: SharedQueue<'number'>; expected: number[] }[] = [];
+      const checkpoints = new Set([0, 31, 32, 63, 64, 1023, 1024]);
+      for (let step = 0; step < 1100; step++) {
+        expect(queue.peek()).toBe(expected[0]); expect(queue.peek()).toBe(expected[0]);
+        if (checkpoints.has(step)) {
+          retained.push({ queue, expected: expected.slice() });
+          retained.push({ queue: queue.enqueue(-step - 1), expected: [...expected, -step - 1] });
+        }
+        const next = width + step;
+        queue = enqueueFirst ? queue.enqueue(next).dequeue() : queue.dequeue().enqueue(next);
+        expected = [...expected.slice(1), next];
+        expect(queue.size).toBe(width); expect(queue.peek()).toBe(expected[0]);
+        if (retained.length) expect(retained[0].queue.peek()).toBe(retained[0].expected[0]);
+        expect(queue.peek()).toBe(expected[0]);
+      }
+      expect(values(queue)).toEqual(expected);
+      for (const snapshot of retained) expect(values(snapshot.queue)).toEqual(snapshot.expected);
+    });
+
   test('cached old views survive explicit shared growth and newly allocated roots', () => {
     const memory = new WebAssembly.Memory({ initial: 2, maximum: 64, shared: true }), arena = new Arena({ memory });
     const expected = Array.from({ length: 1057 }, (_, i) => i), old = numbers(expected, arena);
