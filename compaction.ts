@@ -105,7 +105,12 @@ class Compactor {
       const [old, ready] = todo.pop()!, key = this.key(a, `heap/${type}`, old);
       if (!old || this.pointers.has(key)) continue;
       const left = a.dv.getUint32(old + 16, true), right = a.dv.getUint32(old + 20, true);
-      if (!ready) { todo.push([old, true], [right, false], [left, false]); continue; }
+      if (!ready) {
+        todo.push([old, true]);
+        if (right) todo.push([right, false]);
+        if (left) todo.push([left, false]);
+        continue;
+      }
       const value = this.raw(a, type, a.dv.getFloat64(old + 8, true)), p = this.bytes(a, old, 32);
       this.target.dv.setFloat64(p + 8, value, true);
       this.target.dv.setUint32(p + 16, left ? this.pointers.get(this.key(a, `heap/${type}`, left))! : 0, true);
