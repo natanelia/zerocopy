@@ -2,9 +2,9 @@
   "schema": 1,
   "origin": {
     "historicalBaselineCommit": "f4fad3a850cb544ff9440d263eeec464a31dd123",
-    "baselineCommit": "cd6dcc5e2384fff77ce39c82efccd7a0231b34d7",
+    "baselineCommit": "d2977bc1a092d8ed673ac55782010176db61bc6e",
     "baselineTree": "6ac29f5ee0be61c482a9fb95c1fa426c4aa6655a",
-    "candidateCommit": "5dcb7d29617bbcebfc191663de1e1626dec7778f",
+    "candidateCommit": "1368712f9a1746f2a93057b2d88a7e061339b30a",
     "candidateTree": "fcdb0be92d674b6b739a82ca515114ff66e8c809",
     "runtimeCommit": "50d91158eeff95456dd2945cba2140ab08e9f029",
     "runtimeTree": "de653792a52f64a76723bc4a4a82c3b0fd3ec051",
@@ -236,7 +236,7 @@
     "correctnessV2Sha256": "1c6903e6fabbde72af99ace182add3669c8fcf5d45304a61830aa83009458936",
     "mainCommit": "52d5fb012eb1f568e11807b7cb2a66c4566589e2",
     "mainTree": "0bc8d2425fe82e0b70bbb8558deb175536f90e9d",
-    "sourceCandidateCommit": "7058230502932eeadda3d146988893d2ab4c8bcb",
+    "sourceCandidateCommit": "959f4108b194346edc1077bc9b3828a00b75ac0f",
     "sourceCandidateTree": "ab1a4f974335d66353023877f1d309d340502666",
     "historicalCandidateCommit": "50d91158eeff95456dd2945cba2140ab08e9f029",
     "commonTestPatchSha256": "fb1231ccdf231050867e2cfd12681f2f6c474b23f6eb7ed388a1bf0dc95caf6a",
@@ -911,12 +911,12 @@
     },
     {
       "path": "proofs/numeric-portability/PLAN.md",
-      "sha256": "f7c77b753db46f042d01adf5dc7c9bdf9a8cb33b80eaac2fc28ae134d392f223",
+      "sha256": "198eb1a217b7d080336d7cc4a1a7941b8e1f4c2540c0861fa844c57543eacad3",
       "bytes": 11617
     },
     {
       "path": "proofs/numeric-portability/README.md",
-      "sha256": "45ae5de120ffcec5307da10a73e9cc9139b24fb345995d336da318226960240f",
+      "sha256": "6aef6188e9d5bd04c4acd487d6ee1da78f0580a7d871d58f5d370e17cdae86af",
       "bytes": 4062
     },
     {
@@ -1041,7 +1041,7 @@
     },
     {
       "path": "proofs/numeric-portability/origin.json",
-      "sha256": "ec8d41ab3f526b596c627d682c528d56c4701c8f10bdc81162863f6527cce05f",
+      "sha256": "2b58012cd559cd58c9151572b35a39d435600d179a142616b0c4fad0c88625c5",
       "bytes": 32762
     },
     {
