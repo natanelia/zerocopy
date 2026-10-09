@@ -54,12 +54,15 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
   *entries(): Generator<[ValueOf<T>, number]> {
     const arena = this.arena, pending = this.root ? [this.root] : [];
     while (pending.length) {
-      const node = pending.pop()!, view = arena.dv;
+      let node = pending.pop()!;
+      const view = arena.dv;
       const priority = view.getFloat64(node, true);
       const value = arena.decode(this.valueType, view.getFloat64(node + 8, true));
       // Published nodes remain in this shared view if decoding grows memory.
-      const left = view.getUint32(node + 16, true), right = view.getUint32(node + 20, true);
-      if (right) pending.push(right);
+      const left = view.getUint32(node + 16, true);
+      // Reuse the consumed node address for its right child.
+      node = view.getUint32(node + 20, true);
+      if (node) pending.push(node);
       if (left) pending.push(left);
       yield [value, priority];
     }
