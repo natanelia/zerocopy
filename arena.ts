@@ -493,13 +493,13 @@ export class Arena {
       return leaf ? this.leafValue(type, leaf, prefix) : undefined;
     }
     let slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
     // A root change can still resolve to the exact same immutable leaf.
     slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const result = leaf ? this.leafValue(type, leaf, prefix) : undefined;
-    if (code !== 0 && code !== 4 && slot !== undefined) this.reads.cacheValue(slot, code, result);
+    if (slot !== undefined) this.reads.cacheValue(slot, code, result);
     return result;
   }
   private readPrimitive(root: number, key: string, type: string, prefix: number, code: number, present: boolean): any {
