@@ -721,8 +721,11 @@ export class Arena {
         for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
         total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
       }
-      const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
-      let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+      // Preparation is complete. The synchronous builder never retains this table.
+      const staged = latest.size > 0 && latest.size <= 12288 && total <= 0x7ffe0000;
+      const tableBytes = (latest.size * 4 + 7) & ~7;
+      const data = this.alloc(staged ? total - tableBytes : total), input = staged ? 16384 : data, dv = this.dv, bytes = this.bytes;
+      let p = data + (staged ? 0 : tableBytes), slot = input;
       for (const [key, value] of latest) {
         const k = encodedKeys.get(key), v = encodedValues.get(key);
         const keyLength = k?.length ?? key.length, valueLength = v?.length ?? value.length;
@@ -757,7 +760,8 @@ export class Arena {
     }
     const leaves: number[] = [];
     for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
-    const input = this.alloc(leaves.length * 4), dv = this.dv;
+    // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
+    const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
   }

@@ -1,0 +1,39 @@
+name: Bulk input storage validation
+
+on:
+  push:
+    branches: [proof/bulk-input-storage-20261009]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Validate both exact sources with ordinary repository checks
+        timeout-minutes: 40
+        run: node proofs/bulk-input-hosted.mjs
+      - name: Retain raw outcomes and both portable builds
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-input-correctness-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/bulk-input/evidence/
+            ${{ runner.temp }}/bulk-input/baseline/dist/
+            ${{ runner.temp }}/bulk-input/candidate/dist/
+            ${{ runner.temp }}/bulk-input/baseline/*.wasm
+            ${{ runner.temp }}/bulk-input/candidate/*.wasm
+          retention-days: 30
+          if-no-files-found: error
