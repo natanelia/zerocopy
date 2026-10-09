@@ -1,0 +1,110 @@
+{
+  "historical": [
+    {
+      "run": "37822788650",
+      "url": "https://github.com/natanelia/zerocopy/actions/runs/37822788650",
+      "cpu": "AMD EPYC 9V74",
+      "attach1Ratio": 1.1317531150868512,
+      "attach1CI95": [
+        1.0740409311172603,
+        1.1925663877412793
+      ],
+      "attach1MedianUs": [
+        25.08273008945842,
+        29.10774353933786
+      ],
+      "shortBatches": 0,
+      "note": "All four quartets, both orientations; passed historical 15% drift bound. Material signal remains."
+    },
+    {
+      "run": "37822796941",
+      "url": "https://github.com/natanelia/zerocopy/actions/runs/37822796941",
+      "cpu": "AMD EPYC 9V74",
+      "attach1Ratio": 1.0263893255424774,
+      "attach1CI95": [
+        0.9823332781516795,
+        1.0724212148953354
+      ],
+      "note": "Inconclusive; does not prove absence of loss."
+    },
+    {
+      "commit": "1229e6a24a85c8d97cc72296abe5e91cea208bf7",
+      "cpu": "AMD EPYC 7763",
+      "attach1Ratio": 0.97481,
+      "attach1CI95": [
+        0.88755,
+        1.07065
+      ],
+      "note": "Original run was inconclusive, production sources and bundles identical to ab969."
+    }
+  ],
+  "originalArmPrimary": {
+    "run": 37834362984,
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/37834362984",
+    "proof": "96b90882df5d5294489065bd303fbbede6a83184",
+    "ratio": 1.039104,
+    "ci95": [
+      1.03064,
+      1.047638
+    ],
+    "quartets": 8,
+    "allQuartetsAdverse": true,
+    "processMedianNanoseconds": [
+      155.04,
+      160.85
+    ],
+    "x64Attach1": {
+      "ratio": 1.02921,
+      "ci95": [
+        0.99471,
+        1.06491
+      ]
+    },
+    "source": "Verified run association supplied by parent; exact numerical values retained from parent evidence.",
+    "archiveCaveat": "Original archive omitted hidden workflow; workflow was recovered from the pinned proof commit and its hash verified.",
+    "mustPreserve": true,
+    "artifacts": [
+      {
+        "id": 11575850317,
+        "name": "registry-attachment-controls-arm64-96b90882df5d5294489065bd303fbbede6a83184",
+        "size_in_bytes": 1040012,
+        "digest": "sha256:6675bd79eb8c90d6992ead5901d5bc861e0a487800dec30222a390d40a2c367e",
+        "url": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/11575850317",
+        "workflow_run": {
+          "id": 37834362984,
+          "repository_id": 1121397035,
+          "head_repository_id": 1121397035,
+          "head_branch": "proof/registry-attachment-controls-20261008",
+          "head_sha": "96b90882df5d5294489065bd303fbbede6a83184"
+        }
+      },
+      {
+        "id": 11575593917,
+        "name": "registry-attachment-controls-x64-96b90882df5d5294489065bd303fbbede6a83184",
+        "size_in_bytes": 1489086,
+        "digest": "sha256:26e848d5d3e4068f54c4e53d32329c561c716182d089e5cb5c401c53c60c2fa9",
+        "url": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/11575593917",
+        "workflow_run": {
+          "id": 37834362984,
+          "repository_id": 1121397035,
+          "head_repository_id": 1121397035,
+          "head_branch": "proof/registry-attachment-controls-20261008",
+          "head_sha": "96b90882df5d5294489065bd303fbbede6a83184"
+        }
+      }
+    ]
+  },
+  "priorScope": {
+    "previousConcurrentSubjects": 672,
+    "currentStage1Subjects": 352,
+    "currentConditionalStage2Subjects": 240,
+    "reasonForRefinement": "Before implementation or timing, prioritize ARM and remove redundant main/old bridges from controls. Stage2 requires the complete prospective ARM gate.",
+    "timingUnimplemented": true
+  },
+  "limitations": [
+    "Separate causal controls changed setup and cannot replace the original focused primary.",
+    "Cleanup removes a discarded dependency Map per shared attachment, not settled topology, Map count, 37 slots or 320-byte Arena size.",
+    "Owned and singleton dependency field feedback broadens to mutable/Any.",
+    "Bun/browser and x64 owned/singleton controls remain required before broad repair."
+  ]
+}

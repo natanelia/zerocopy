@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "mode": "correctness-build-only-no-pilots-no-timing",
+  "branch": "proof/registry-single-initialization-preflight-20261009",
+  "runtimeParent": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+  "runtimeTree": "d61ad90768846b3ae222baba7cadc73fec3e6982",
+  "pins": {
+    "main": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "old": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "cleanup": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+    "originalProof": "96b90882df5d5294489065bd303fbbede6a83184",
+    "originalSubjectPath": "proofs/registry-attachment-subject.mjs",
+    "originalSubjectBlob": "789ff9f724a2453dc814231f42eb257e3e350781",
+    "source": {
+      "main": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "old": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786"
+    },
+    "build": {
+      "main": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "old": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109"
+    }
+  },
+  "toolchain": {
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "assemblyscript": "0.28.20",
+    "typescript": "5.9.3",
+    "platform": "linux"
+  },
+  "variants": [
+    "main",
+    "old",
+    "cleanup"
+  ],
+  "prerequisites": {
+    "commonTests": [
+      "worker.test.ts",
+      "workers.test.ts",
+      "nested.test.ts",
+      "json-read-cache.test.ts"
+    ],
+    "registryTests": [
+      "worker-attachment.test.ts"
+    ],
+    "typeScripts": [
+      "typecheck",
+      "typecheck:redux",
+      "typecheck:values",
+      "typecheck:geometry"
+    ],
+    "workerProofs": [
+      "proofs/worker-arenas.mjs",
+      "proofs/node-worker.mjs",
+      "proofs/typed-json-worker.mjs",
+      "proofs/worker-sessions.mjs"
+    ]
+  },
+  "cleanupExpectedDigestStatus": "Not known before preflight. This preflight emits receipts; the later timing gate must pin independently reviewed successful receipts.",
+  "timingPlan": {
+    "stages": {
+      "1": 352,
+      "2": 240
+    },
+    "cases": [
+      {
+        "id": "arm64-attached-warm-512",
+        "stage": 1,
+        "arch": "arm64",
+        "subject": "original",
+        "operation": "warmNestedRead",
+        "arenas": 512,
+        "primary": true,
+        "quartets": 8,
+        "arms": [
+          "bridge",
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      },
+      {
+        "id": "arm64-attached-warm-1",
+        "stage": 1,
+        "arch": "arm64",
+        "subject": "original",
+        "operation": "warmNestedRead",
+        "arenas": 1,
+        "primary": false,
+        "quartets": 4,
+        "arms": [
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      },
+      {
+        "id": "arm64-owned-warm-512",
+        "stage": 1,
+        "arch": "arm64",
+        "subject": "owned",
+        "operation": "warmNestedRead",
+        "arenas": 512,
+        "primary": false,
+        "quartets": 4,
+        "arms": [
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      },
+      {
+        "id": "x64-attached-warm-512",
+        "stage": 2,
+        "arch": "x64",
+        "subject": "original",
+        "operation": "warmNestedRead",
+        "arenas": 512,
+        "primary": false,
+        "quartets": 4,
+        "arms": [
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      },
+      {
+        "id": "x64-attach-1",
+        "stage": 2,
+        "arch": "x64",
+        "subject": "original",
+        "operation": "attach",
+        "arenas": 1,
+        "primary": false,
+        "quartets": 4,
+        "arms": [
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      },
+      {
+        "id": "x64-reexport-512",
+        "stage": 2,
+        "arch": "x64",
+        "subject": "original",
+        "operation": "reexport",
+        "arenas": 512,
+        "primary": false,
+        "quartets": 4,
+        "arms": [
+          "repair",
+          "acceptance",
+          "aa-main",
+          "aa-old",
+          "aa-cleanup"
+        ]
+      }
+    ],
+    "rules": {
+      "primaryPass": "All arms valid; acceptance upper<=1.02 AND repair upper<1 AND bridge lower>1.02.",
+      "controlPass": "All arms valid; acceptance upper<=1.02 AND repair upper<=1.02. x64 reexport also needs acceptance upper<1.",
+      "stage2": "Only after stage1 completed with integrity true, primaryPass and both ARM controlPass. Otherwise stage2 is not run.",
+      "aa": "Any dedicated A/A point outside[1/1.02,1.02] with CI excluding1 invalidates the case; never normalize.",
+      "short": "Any measured-subject warmup or sample<20ms invalidates the case; retain all fixed samples.",
+      "stopping": "One non-forced push, run_attempt1. Hard failure stops that job; no timing-selected reruns, replacements, extra quartets, pooling or exclusions.",
+      "followup": "Any inconclusive/invalid control blocks progression. A later confirmation requires a separately declared protocol and review, retains this run, and cannot replace or pool it.",
+      "memory": "Original setup deltas are descriptive only. Untimed instrumented Map-expression counts are separate from retained heap, settled topology and latency."
+    },
+    "implementationStatus": "Unimplemented and unvalidated; cannot run from this preflight"
+  }
+}
