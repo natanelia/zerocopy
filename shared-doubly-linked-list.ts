@@ -1,4 +1,4 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, forEachBlockValue } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 // Registering a collection must not allocate an unused writer in every reader.
@@ -66,8 +66,7 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   }
   insertAfter(index: number, value: ValueOf<T>): SharedDoublyLinkedList<T> { return validIndex(index, this.size) ? this.insert(index + 1, value) : this; }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
-    const a = this.arena; let i = 0;
-    for (const raw of a.blocks(this.head)) fn(a.decode(this.valueType, raw), i++);
+    const a = this.arena; let i = forEachBlockValue(a, this.head, this.valueType, fn);
     for (let t = 0; t < this.tailSize; t++) fn(a.decode(this.valueType, a.dv.getFloat64(this.tail + t * 8, true)), i++);
   }
   toArray(): ValueOf<T>[] { const result: ValueOf<T>[] = []; this.forEach(value => result.push(value)); return result; }
@@ -80,7 +79,7 @@ export class SharedDoublyLinkedList<T extends string = SharedDoublyLinkedListTyp
   forEachReverse(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena; let i = this.size - 1;
     for (let t = this.tailSize - 1; t >= 0; t--) fn(a.decode(this.valueType, a.dv.getFloat64(this.tail + t * 8, true)), i--);
-    for (const raw of a.blocks(this.head, true)) fn(a.decode(this.valueType, raw), i--);
+    forEachBlockValue(a, this.head, this.valueType, fn, i, true);
   }
   toArrayReverse(): ValueOf<T>[] { const result: ValueOf<T>[] = []; this.forEachReverse(value => result.push(value)); return result; }
 }

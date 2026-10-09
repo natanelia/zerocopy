@@ -811,3 +811,37 @@ export class Arena {
     }
   }
 }
+
+const defaultBlocks = Arena.prototype.blocks;
+
+// Internal callback traversal. Keep the scalar generator for other consumers
+// and for callers which supply an Arena.blocks override.
+export function forEachBlockValue(arena: Arena, root: number, type: string, fn: (value: any, index: number) => void, index = 0, reverse = false): number {
+  const blocks = arena.blocks;
+  if (blocks !== defaultBlocks) {
+    for (const raw of Reflect.apply(blocks, arena, reverse ? [root, true] : [root])) {
+      if (reverse) fn(arena.decode(type, raw), index--);
+      else fn(arena.decode(type, raw), index++);
+    }
+    return index;
+  }
+  if (!root) return index;
+  visitBlockSpans(arena, root, reverse, (data, length) => {
+    if (reverse) for (let t = length - 1; t >= 0; t--) { const raw = arena.dv.getFloat64(data + t * 8, true); fn(arena.decode(type, raw), index--); }
+    else for (let t = 0; t < length; t++) { const raw = arena.dv.getFloat64(data + t * 8, true); fn(arena.decode(type, raw), index++); }
+  });
+  return index;
+}
+
+function visitBlockSpans(arena: Arena, root: number, reverse: boolean, visit: (data: number, length: number) => void): void {
+  const stack: number[] = []; let node = root;
+  const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
+  while (node || stack.length) {
+    while (node) { stack.push(node); node = arena.dv.getUint32(node + first, true); }
+    node = stack.pop()!;
+    const data = arena.dv.getUint32(node + 16, true), length = arena.dv.getUint32(node + 20, true);
+    const next = arena.dv.getUint32(node + second, true);
+    visit(data, length);
+    node = next;
+  }
+}
