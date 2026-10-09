@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "purpose": "Default-off, source-only native-key normalization CI packet",
+  "origin": {
+    "baselineCommit": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+    "candidateCommit": "933ade07042e4145e3ceada93197bbd1b1fa72db",
+    "candidateTree": "f69475c9fa245e7b2e44fd712305431fda14808c",
+    "historicalBaseline": "ad2a19d65a836985a2364b181bc9bd8dce6e42ad",
+    "historicalCandidate": "121a790ece079687c7b456d24ac63fa77f7e4c6e",
+    "historicalCandidateTree": "f049ee602949bf0045bd677a59ff5d58fc5cca8f",
+    "historicalScreenManifest": "7ac724c233c301189e0829c32bf5c19cce678454fd1a5d9f9ee24633f2baadf2",
+    "historicalEvidenceTransferred": false,
+    "localClocksRun": false,
+    "standardGateRun": false,
+    "candidateArenaSha256": "ee358bcc2f8e75d0ac2214dfcda5ac9bf8ca68a60f7fa3a5515c248c156a89d2",
+    "upstreamFiles": [
+      {
+        "path": "protocol.json",
+        "sha256": "5f8def897032c36eebc0a0bb1ae78c23e254314b8d0d8be1cbee9906f13f7c91",
+        "bytes": 4852
+      },
+      {
+        "path": "subject.mjs",
+        "sha256": "3cc24f952b1f556a200565faa445b2258ac38672064cba49f4bd5fa1917802f7",
+        "bytes": 11388
+      },
+      {
+        "path": "math.mjs",
+        "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+        "bytes": 2387
+      },
+      {
+        "path": "controller.py",
+        "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+        "bytes": 17534
+      },
+      {
+        "path": "report.mjs",
+        "sha256": "10a80b68cc56c5fdc0ef3cff9524e3b237debd42da1886ea072ec9d79eb29f7a",
+        "bytes": 4904
+      },
+      {
+        "path": "protocol.test.mjs",
+        "sha256": "932eddbd4f375f59a82471bd3e8cfd17cc1611abc55b3f4dae3e3703d9c642e7",
+        "bytes": 4329
+      },
+      {
+        "path": "controller.test.py",
+        "sha256": "d2618fe41fad634424909a54dc7d1d09c58ac92b45b5782ff8dc7417d09f2957",
+        "bytes": 11344
+      }
+    ],
+    "byteIdenticalFiles": [
+      "protocol.json",
+      "subject.mjs",
+      "math.mjs",
+      "controller.py",
+      "protocol.test.mjs"
+    ]
+  },
+  "activationFile": "proofs/native-key-ci/activation.json",
+  "files": [
+    {
+      "path": "proofs/native-key-ci/README.md",
+      "sha256": "f40e3c0a729ffe5da012c31d9460e58470a7e8e5cfe80cb3b789512e354106cd",
+      "bytes": 7361
+    },
+    {
+      "path": "proofs/native-key-ci/ci-report.test.mjs",
+      "sha256": "9236be1d6ad5b3e23e36c6ba4099322798c4ecebfba07c50f69d5f97d0bf0bc2",
+      "bytes": 2848
+    },
+    {
+      "path": "proofs/native-key-ci/ci.py",
+      "sha256": "3c4126e1edafd5198b7dc54c5329776e58bc59d8ea2836b85c8f63727c6c6621",
+      "bytes": 23763
+    },
+    {
+      "path": "proofs/native-key-ci/ci.test.py",
+      "sha256": "b08ed64c0e54cf2709547a855b2a02c69fe09d07228b7f563a3bf13d61a7121b",
+      "bytes": 11972
+    },
+    {
+      "path": "proofs/native-key-ci/controller.py",
+      "sha256": "d7177aea2508971bf7e24760de9f3c464ef1e94e557c3bf289428b26bf55f613",
+      "bytes": 17534
+    },
+    {
+      "path": "proofs/native-key-ci/controller.test.py",
+      "sha256": "9c0de577421c554eccb0857871e3b1f0d8c48df0c67204317e1f9a9fc7d60eb4",
+      "bytes": 11433
+    },
+    {
+      "path": "proofs/native-key-ci/dependencies.bun.lock",
+      "sha256": "3e2462a27f26395f52e20e1f958b227277d4e40c54c33ff64e06075c8fad99f3",
+      "bytes": 25987
+    },
+    {
+      "path": "proofs/native-key-ci/math.mjs",
+      "sha256": "5d9bd04c6d51766e126aa7ec8dfbbac91a86d6bc75d6aa8fead3855b8c19480c",
+      "bytes": 2387
+    },
+    {
+      "path": "proofs/native-key-ci/origin.json",
+      "sha256": "e1f4672162c4ef58eda2fd93d81ea48a7901ed287ba47a1294e034639c7943cf",
+      "bytes": 1889
+    },
+    {
+      "path": "proofs/native-key-ci/protocol.json",
+      "sha256": "5f8def897032c36eebc0a0bb1ae78c23e254314b8d0d8be1cbee9906f13f7c91",
+      "bytes": 4852
+    },
+    {
+      "path": "proofs/native-key-ci/protocol.test.mjs",
+      "sha256": "932eddbd4f375f59a82471bd3e8cfd17cc1611abc55b3f4dae3e3703d9c642e7",
+      "bytes": 4329
+    },
+    {
+      "path": "proofs/native-key-ci/report.mjs",
+      "sha256": "c18d5ba06817ba162b6ab6e3bb0569d05640eab73a8fc0647c9cfc49c9c8ea26",
+      "bytes": 5448
+    },
+    {
+      "path": "proofs/native-key-ci/subject.mjs",
+      "sha256": "3cc24f952b1f556a200565faa445b2258ac38672064cba49f4bd5fa1917802f7",
+      "bytes": 11388
+    },
+    {
+      "path": ".github/workflows/native-key-normalization-ci.yml",
+      "sha256": "571aaa6cc4476c966c5a2d3965e4eca795306d1feb732b0459222e7d9ef404bc",
+      "bytes": 3658
+    }
+  ]
+}

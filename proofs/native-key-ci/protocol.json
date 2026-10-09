@@ -1,0 +1,250 @@
+{
+  "schema": 3,
+  "purpose": "Local exploratory native key normalization screen: public SharedMap.setMany, primed scalar set and unchanged warm get controls; no full correctness, PR promotion or cross-platform certification",
+  "entrypoint": "official portable dist/shared.js for both runtimes",
+  "runtimes": [
+    "node",
+    "bun"
+  ],
+  "runtimeVersions": {
+    "node": "v22.23.3",
+    "bun": "1.4.2"
+  },
+  "architecture": "x64",
+  "blocks": 4,
+  "orders": [
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    [
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ]
+  ],
+  "runtimeOrders": [
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ],
+    [
+      "node",
+      "bun"
+    ],
+    [
+      "bun",
+      "node"
+    ]
+  ],
+  "calibration": {
+    "warmupChunks": 32,
+    "samplesPerLevel": 3,
+    "targetChunkMs": 12,
+    "selection": "Smallest fixed ladder count whose median reaches target in BOTH arms; otherwise common maximum, flag calibration floor. Every level is collected for both arms before selection.",
+    "minimumWarmupBodyMs": 200
+  },
+  "measurement": {
+    "warmupChunks": 32,
+    "samples": 7,
+    "minimumChunkMs": 5,
+    "warmupDriftFraction": 0.1,
+    "minimumWarmupBodyMs": 200,
+    "warmupComparisonWindow": 8
+  },
+  "memory": {
+    "maximumArenaBytes": 67108864,
+    "maximumSubjectRssBytes": 536870912,
+    "maximumControllerRssBytes": 268435456,
+    "rssPollMs": 100,
+    "maximumOutputBytes": 8388608
+  },
+  "budgets": {
+    "calibrationProcessWallSeconds": 180,
+    "measurementProcessWallSeconds": 90,
+    "untimedProcessWallSeconds": 90,
+    "controllerWallSeconds": 2100,
+    "terminationGraceSeconds": 2
+  },
+  "statistics": {
+    "pointwiseConfidence": 0.95,
+    "pairedLogRatioDf": 3,
+    "tCritical": 3.182446305284263,
+    "materialLossRatio": 1.02,
+    "worthwhileGainRatio": 0.95,
+    "aaDiagnosticFraction": 0.05,
+    "sampleRelativeMadDiagnosticFraction": 0.05
+  },
+  "cases": [
+    {
+      "id": "ascii-string-16",
+      "type": "string",
+      "size": 16,
+      "shape": "ascii",
+      "ladder": [
+        1,
+        8,
+        64,
+        512,
+        2048
+      ],
+      "operation": "setMany"
+    },
+    {
+      "id": "ascii-string-4096",
+      "type": "string",
+      "size": 4096,
+      "shape": "ascii",
+      "ladder": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "operation": "setMany"
+    },
+    {
+      "id": "unicode-keys-4096",
+      "type": "string",
+      "size": 4096,
+      "shape": "unicode-keys",
+      "ladder": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "operation": "setMany"
+    },
+    {
+      "id": "object-fallback-4096",
+      "type": "object",
+      "size": 4096,
+      "shape": "ascii",
+      "ladder": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "operation": "setMany"
+    },
+    {
+      "id": "empty",
+      "type": "string",
+      "size": 0,
+      "shape": "ascii",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ],
+      "operation": "setMany"
+    },
+    {
+      "id": "long-malformed-alias-string-16",
+      "operation": "setMany",
+      "type": "string",
+      "size": 16,
+      "shape": "long-malformed-alias",
+      "ladder": [
+        1,
+        8,
+        64,
+        256,
+        512
+      ]
+    },
+    {
+      "id": "scalar-cache-ascii-string-16",
+      "operation": "set",
+      "type": "string",
+      "size": 16,
+      "shape": "ascii",
+      "ladder": [
+        64,
+        256,
+        1024,
+        4096,
+        16384
+      ]
+    },
+    {
+      "id": "scalar-cache-malformed-number-16",
+      "operation": "set",
+      "type": "number",
+      "size": 16,
+      "shape": "malformed-alias",
+      "ladder": [
+        64,
+        256,
+        1024,
+        4096,
+        16384
+      ]
+    },
+    {
+      "id": "warm-read-ascii-string-16",
+      "operation": "get",
+      "type": "string",
+      "size": 16,
+      "shape": "ascii",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ]
+    },
+    {
+      "id": "warm-read-normalized-alias-string-16",
+      "operation": "get",
+      "type": "string",
+      "size": 16,
+      "shape": "malformed-alias",
+      "ladder": [
+        1024,
+        8192,
+        65536,
+        524288,
+        4194304
+      ]
+    }
+  ],
+  "explicitlyUnmeasured": [
+    "numeric bulk",
+    "boolean bulk",
+    "Unicode-value bulk",
+    "mixed key/value bulk",
+    "forced fallback latency",
+    "older-engine latency",
+    "browser latency",
+    "ARM latency",
+    "module startup"
+  ]
+}
