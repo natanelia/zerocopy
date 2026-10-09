@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Prospective ARM-first bounded single-initialization gate; no blanket repair or no-regression claim",
+  "branch": "perf/registry-single-initialization-20261008",
+  "runtimeParent": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+  "runtimeTree": "d61ad90768846b3ae222baba7cadc73fec3e6982",
+  "pins": {
+    "main": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "old": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "cleanup": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+    "originalProof": "96b90882df5d5294489065bd303fbbede6a83184",
+    "originalSubjectPath": "proofs/registry-attachment-subject.mjs",
+    "originalSubjectBlob": "789ff9f724a2453dc814231f42eb257e3e350781"
+  },
+  "toolchain": {
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "assemblyscript": "0.28.20",
+    "typescript": "5.9.3",
+    "platform": "linux"
+  },
+  "variants": [
+    "main",
+    "old",
+    "cleanup"
+  ],
+  "preflight": {
+    "commit": "3a3c05d96c989721e7bfdb5e6400cf1a7312edbf",
+    "tree": "7434337e595217782262abf4b6f0bca1bf649a5e",
+    "run": 37867223456,
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/37867223456",
+    "jobs": {
+      "arm64": 113616715268,
+      "x64": 113616715489
+    }
+  },
+  "cases": [
+    {
+      "id": "arm64-attached-warm-512",
+      "stage": 1,
+      "arch": "arm64",
+      "subject": "original",
+      "operation": "warmNestedRead",
+      "arenas": 512,
+      "primary": true,
+      "quartets": 8,
+      "arms": [
+        "bridge",
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    },
+    {
+      "id": "arm64-attached-warm-1",
+      "stage": 1,
+      "arch": "arm64",
+      "subject": "original",
+      "operation": "warmNestedRead",
+      "arenas": 1,
+      "primary": false,
+      "quartets": 4,
+      "arms": [
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    },
+    {
+      "id": "arm64-owned-warm-512",
+      "stage": 1,
+      "arch": "arm64",
+      "subject": "owned",
+      "operation": "warmNestedRead",
+      "arenas": 512,
+      "primary": false,
+      "quartets": 4,
+      "arms": [
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    },
+    {
+      "id": "x64-attached-warm-512",
+      "stage": 2,
+      "arch": "x64",
+      "subject": "original",
+      "operation": "warmNestedRead",
+      "arenas": 512,
+      "primary": false,
+      "quartets": 4,
+      "arms": [
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    },
+    {
+      "id": "x64-attach-1",
+      "stage": 2,
+      "arch": "x64",
+      "subject": "original",
+      "operation": "attach",
+      "arenas": 1,
+      "primary": false,
+      "quartets": 4,
+      "arms": [
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    },
+    {
+      "id": "x64-reexport-512",
+      "stage": 2,
+      "arch": "x64",
+      "subject": "original",
+      "operation": "reexport",
+      "arenas": 512,
+      "primary": false,
+      "quartets": 4,
+      "arms": [
+        "repair",
+        "acceptance",
+        "aa-main",
+        "aa-old",
+        "aa-cleanup"
+      ]
+    }
+  ],
+  "stageBudgets": {
+    "1": 352,
+    "2": 240
+  },
+  "arms": {
+    "bridge": [
+      "main",
+      "old"
+    ],
+    "repair": [
+      "old",
+      "cleanup"
+    ],
+    "acceptance": [
+      "main",
+      "cleanup"
+    ],
+    "aa-main": [
+      "main",
+      "main"
+    ],
+    "aa-old": [
+      "old",
+      "old"
+    ],
+    "aa-cleanup": [
+      "cleanup",
+      "cleanup"
+    ]
+  },
+  "seed": 2026100901,
+  "samples": 7,
+  "warmups": 3,
+  "minimumBatchMs": 20,
+  "pilotTargetBatchMs": 40,
+  "pilotMaximumBatches": 8,
+  "pilotBounds": {
+    "attach": {
+      "initial": 64,
+      "maximum": 8192
+    },
+    "reexport": {
+      "initial": 32,
+      "maximum": 1000000
+    },
+    "warmNestedRead": {
+      "initial": 100000,
+      "maximum": 10000000
+    }
+  },
+  "subjectTimeoutMs": 240000,
+  "margin": 1.02,
+  "confidence": 0.95,
+  "tCriticalByDf": {
+    "3": 3.182446305284263,
+    "7": 2.3646242510102993
+  },
+  "rules": {
+    "primaryPass": "All arms valid; acceptance upper<=1.02 AND repair upper<1 AND bridge lower>1.02.",
+    "controlPass": "All arms valid; acceptance upper<=1.02 AND repair upper<=1.02. x64 reexport also needs acceptance upper<1.",
+    "stage2": "Only after stage1 completed with integrity true, primaryPass and both ARM controlPass. Otherwise stage2 is not run.",
+    "aa": "Any dedicated A/A point outside[1/1.02,1.02] with CI excluding1 invalidates the case; never normalize.",
+    "short": "Any measured-subject warmup or sample<20ms invalidates the case; retain all fixed samples.",
+    "stopping": "One non-forced push, run_attempt1. Hard failure stops that job; no timing-selected reruns, replacements, extra quartets, pooling or exclusions.",
+    "followup": "Any inconclusive/invalid control blocks progression. A later confirmation requires a separately declared protocol and review, retains this run, and cannot replace or pool it.",
+    "memory": "Original setup deltas are descriptive only. Untimed instrumented Map-expression counts are separate from retained heap, settled topology and latency."
+  },
+  "samplingUnit": "Mean of two adjacent-pair log ratios per fresh-process quartet; process median7 batches; no batch pseudoreplication",
+  "work": "All three-source pilots for every case in a stage finish before any measurement. Maximum prescription freezes one common count per case. No later adjustment.",
+  "ordering": "Case order fixed by manifest. Within each quartet, seeded shuffle of arms; each arm has exactly half ABBA and half BAAB. Source-independent pilot order frozen prospectively.",
+  "reporting": "Every direct contrast and A/A interval remains visible, including invalid/adverse/inconclusive outcomes; setup heap deltas descriptive only; no normalization or pooling",
+  "stage2FailureStatus": "Not run when ARM primary/control/integrity conditions fail; this is not a successful x64 result"
+}

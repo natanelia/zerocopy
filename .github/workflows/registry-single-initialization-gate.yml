@@ -1,0 +1,137 @@
+name: Registry single-initialization bounded gate
+on:
+  push:
+    branches: [perf/registry-single-initialization-20261008]
+    paths:
+      - 'proofs/registry-single-initialization/**'
+      - '.github/workflows/registry-single-initialization-gate.yml'
+permissions:
+  contents: read
+jobs:
+  arm64:
+    if: ${{ github.event_name == 'push' && github.run_attempt == 1 }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    outputs:
+      advance: ${{ steps.timing.outputs.advance }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Bind the immutable historical subject
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e 96b90882df5d5294489065bd303fbbede6a83184^{commit} || git fetch --no-tags origin 96b90882df5d5294489065bd303fbbede6a83184
+      - name: Revalidate frozen source tools correctness and untimed Map probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          export BUN_EXECUTABLE="$(command -v bun)"
+          node proofs/registry-single-initialization/prepare.mjs arm64 "$GITHUB_WORKSPACE/proof-artifacts/preparation" 2>&1 | tee "$GITHUB_WORKSPACE/proof-artifacts/preparation.log"
+      - name: Execute exactly the352-subject ARM-first stage
+        id: timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          export BUN_EXECUTABLE="$(command -v bun)"
+          node proofs/registry-single-initialization/run-stage.mjs 1 "$GITHUB_WORKSPACE/proof-artifacts/preparation" "$GITHUB_WORKSPACE/proof-artifacts/timing" 2>&1 | tee "$GITHUB_WORKSPACE/proof-artifacts/timing.log"
+      - name: Retain complete or partial ARM evidence and the stage decision
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          printf '%s\n' "run=${{ github.run_id }} attempt=${{ github.run_attempt }} sha=${{ github.sha }} arch=arm64" > "$GITHUB_WORKSPACE/proof-artifacts/workflow.txt"
+          if [ -f "$GITHUB_WORKSPACE/proof-artifacts/timing/summary.json" ]; then
+            cp "$GITHUB_WORKSPACE/proof-artifacts/timing/summary.json" "$GITHUB_WORKSPACE/stage1-summary.json"
+            sha256sum "$GITHUB_WORKSPACE/stage1-summary.json" | cut -d ' ' -f 1 > "$GITHUB_WORKSPACE/stage1-summary.json.sha256"
+          else
+            printf '%s\n' '{"stage":1,"status":"not-run-prerequisite-or-process-failure","stage2":"not-run"}' > "$GITHUB_WORKSPACE/proof-artifacts/timing-disposition.json"
+          fi
+          tar --exclude='./preparation/worktrees/*/node_modules' --exclude='./preparation/temporary' -czf "$GITHUB_WORKSPACE/registry-gate-arm64.tar.gz" -C "$GITHUB_WORKSPACE/proof-artifacts" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum registry-gate-arm64.tar.gz > registry-gate-arm64.tar.gz.sha256
+          cat registry-gate-arm64.tar.gz.sha256
+      - name: Upload ARM evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-single-initialization-arm64-${{ github.sha }}
+          path: |
+            registry-gate-arm64.tar.gz
+            registry-gate-arm64.tar.gz.sha256
+            stage1-summary.json
+            stage1-summary.json.sha256
+          retention-days: 30
+          if-no-files-found: error
+  x64:
+    needs: arm64
+    if: ${{ github.event_name == 'push' && github.run_attempt == 1 && needs.arm64.outputs.advance == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: actions/download-artifact@v4
+        with:
+          name: registry-single-initialization-arm64-${{ github.sha }}
+          path: stage1-evidence
+      - name: Bind the immutable historical subject
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e 96b90882df5d5294489065bd303fbbede6a83184^{commit} || git fetch --no-tags origin 96b90882df5d5294489065bd303fbbede6a83184
+      - name: Revalidate frozen source tools correctness and untimed Map probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          export BUN_EXECUTABLE="$(command -v bun)"
+          node proofs/registry-single-initialization/prepare.mjs x64 "$GITHUB_WORKSPACE/proof-artifacts/preparation" 2>&1 | tee "$GITHUB_WORKSPACE/proof-artifacts/preparation.log"
+      - name: Execute the conditional240-subject x64 stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          export BUN_EXECUTABLE="$(command -v bun)"
+          node proofs/registry-single-initialization/run-stage.mjs 2 "$GITHUB_WORKSPACE/proof-artifacts/preparation" "$GITHUB_WORKSPACE/proof-artifacts/timing" "$GITHUB_WORKSPACE/stage1-evidence/stage1-summary.json" 2>&1 | tee "$GITHUB_WORKSPACE/proof-artifacts/timing.log"
+      - name: Retain complete or partial x64 evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          printf '%s\n' "run=${{ github.run_id }} attempt=${{ github.run_attempt }} sha=${{ github.sha }} arch=x64" > "$GITHUB_WORKSPACE/proof-artifacts/workflow.txt"
+          if [ ! -f "$GITHUB_WORKSPACE/proof-artifacts/timing/summary.json" ]; then
+            printf '%s\n' '{"stage":2,"status":"not-run-prerequisite-or-process-failure"}' > "$GITHUB_WORKSPACE/proof-artifacts/timing-disposition.json"
+          fi
+          tar --exclude='./preparation/worktrees/*/node_modules' --exclude='./preparation/temporary' -czf "$GITHUB_WORKSPACE/registry-gate-x64.tar.gz" -C "$GITHUB_WORKSPACE/proof-artifacts" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum registry-gate-x64.tar.gz > registry-gate-x64.tar.gz.sha256
+          cat registry-gate-x64.tar.gz.sha256
+      - name: Upload x64 evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-single-initialization-x64-${{ github.sha }}
+          path: |
+            registry-gate-x64.tar.gz
+            registry-gate-x64.tar.gz.sha256
+          retention-days: 30
+          if-no-files-found: error

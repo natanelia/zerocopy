@@ -1,0 +1,545 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "scope": "Read-only independent archival and source reconciliation. No builds, subjects, pilots, measurements, refs, PRs or runtime edits executed.",
+  "verifiedAt": "2026-10-09T01:32:28.598790+00:00",
+  "proofCommit": "3a3c05d96c989721e7bfdb5e6400cf1a7312edbf",
+  "proofTree": "7434337e595217782262abf4b6f0bca1bf649a5e",
+  "runId": 37867223456,
+  "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/37867223456",
+  "runAttempt": 1,
+  "jobs": {
+    "arm64": 113616715268,
+    "x64": 113616715489
+  },
+  "artifacts": [
+    {
+      "arch": "arm64",
+      "artifactId": 11589185385,
+      "zipSha256": "82cdd29b70a4c602ad78749af5af702df17f6026c1f5753497a43134fa54fc7f",
+      "zipBytes": 5696873,
+      "tarSha256": "a11b5f3eb07da5615c9a448fd32d366ec7839f3656438d12b996a5e6d944d872",
+      "tarMembers": 583
+    },
+    {
+      "arch": "x64",
+      "artifactId": 11588453905,
+      "zipSha256": "d18708f602b03893ebe11371257f7a40e99cb565ed4daf7b59a1fbd8668f9fa5",
+      "zipBytes": 5645815,
+      "tarSha256": "c5a88f0b4d86fd6c8d5be2401cc80fb3eaa45f97c6644fbba2ee6a4a6830e4a6",
+      "tarMembers": 583
+    }
+  ],
+  "pins": {
+    "main": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "old": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "cleanup": "6b4b436435955be5cedeeafa763df44c4e8004ec"
+  },
+  "configSha256": "fe0515f9859ec5faa3c9f0100aff29553e24def8673610f3dfb9fa742b1aef50",
+  "builds": {
+    "main": {
+      "source": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "emittedJs": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "1cd8c2f7f7ca4cd94d420703353e081d863f449d7a9d2bd0bf9d2875d64ff71c"
+    },
+    "old": {
+      "source": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786",
+      "emittedJs": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "7efb45c79080c79b2acaea37e95801fb41609a61182bde7113747878f6ef9b62"
+    },
+    "cleanup": {
+      "source": "9bcde3bee8420b36b8a03ee054bf39916862c5f95a6c2f838fc6dd058c3b1e7c",
+      "emittedJs": "2136957d182ab6b48d07c189ddaa1b441150cea3196513062cf2ba20bc2ebe6c",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "8c412b4e1afc02d3dd8e1d25cf3816ba1d84938b26dcdb7200aefaf9c31efbc9"
+    }
+  },
+  "originalSubject": {
+    "blob": "789ff9f724a2453dc814231f42eb257e3e350781",
+    "sha256": "5afbc414c9dcb593aae6bb6b1a10be9b1303e9b51c5b4bcefbc0cdfa09c7b646",
+    "bytes": 7458
+  },
+  "ownedSubject": {
+    "path": "proofs/registry-single-initialization/owned-subject.mjs",
+    "gitBlob": "471db134fc99a53cee5dd70a22006db3d1109632",
+    "bytes": 6382,
+    "sha256": "4805fbac4259ba26a17d90329f4e3c9c059c8058d74d8ba960857a7244c5bcb1"
+  },
+  "proofInputs": {
+    "sha256": "3f66af4c77e3ee5be9fef36e405393e7fb79d80439b16b7d3af612ba339e3953",
+    "entries": [
+      {
+        "path": "historical-controls.manifest.json",
+        "sha256": "90dcde25a419daad5c13bccd9722d7d12ba0c0681e7b9e7502b1ba996a5a770d"
+      },
+      {
+        "path": "historical-controls.md",
+        "sha256": "24385c3823d470cb950f8bc2d9c2f1e9183e7316fd943e334227681fcab8c51c"
+      },
+      {
+        "path": "history.json",
+        "sha256": "e32ffb834e4e524e1c173bf8448b5478476c8b2343c670c69a192c67e00108d0"
+      },
+      {
+        "path": "original-subject.mjs",
+        "sha256": "5afbc414c9dcb593aae6bb6b1a10be9b1303e9b51c5b4bcefbc0cdfa09c7b646"
+      },
+      {
+        "path": "owned-subject.mjs",
+        "sha256": "4805fbac4259ba26a17d90329f4e3c9c059c8058d74d8ba960857a7244c5bcb1"
+      },
+      {
+        "path": "package-tools.mjs",
+        "sha256": "e16109357d335bb33d598ff6552aed79d046d33cf406a4a89269ccc6882d9c36"
+      },
+      {
+        "path": "preflight-guard.mjs",
+        "sha256": "226f0fb71a5e3d513c2d25abc61f7b36258398e3cf07c721851eba66a39ecb87"
+      },
+      {
+        "path": "preflight.json",
+        "sha256": "fe0515f9859ec5faa3c9f0100aff29553e24def8673610f3dfb9fa742b1aef50"
+      },
+      {
+        "path": "preflight.mjs",
+        "sha256": "a351334f42938548b90aad06286f4ddf41c65560d4ce5eec049d0746c3435983"
+      },
+      {
+        "path": "preflight.node.mjs",
+        "sha256": "2fcf1a1bb770f5607071327109a0e144664d6d0554ed29025f0fdc76587aa3d3"
+      },
+      {
+        "path": "README.md",
+        "sha256": "580692a87264f0ae73421c97e49c09770a6dc68e5de019ee2ae3b49516dc44c2"
+      }
+    ]
+  },
+  "workflowSha256": "678e40c935dc879d335d11b1f65f21e664e1f68ae1a1dd5a8e976a885fee2203",
+  "workerProofSha256": {
+    "proofs/worker-arenas.mjs": "954835204a088de4461705c7c86f77000ffc3f5ae8bb6268f4efdb1d65152121",
+    "proofs/node-worker.mjs": "415cf7624f7797d175be6b4236e718ba3486489a18bcd121b5af18538dba613a",
+    "proofs/typed-json-worker.mjs": "f1160cbbab42d9541057f3c9016d830947157b462fea2e53125b3ed0d9c6f3d2",
+    "proofs/worker-sessions.mjs": "72339b90917f2e8cc7aba6cfc6e9bf13a3c9587ed4a56c5e338545a37f6c6fde"
+  },
+  "proofInputGitPins": [
+    {
+      "path": ".github/workflows/registry-single-initialization-preflight.yml",
+      "gitBlob": "7b8ffe4c26b6720e89320f1d93560d69839d8371",
+      "bytes": 2862,
+      "sha256": "678e40c935dc879d335d11b1f65f21e664e1f68ae1a1dd5a8e976a885fee2203"
+    },
+    {
+      "path": "proofs/registry-single-initialization/README.md",
+      "gitBlob": "e7ade1919c1022e41defc86cecbfd73ba1a3b680",
+      "bytes": 9169,
+      "sha256": "580692a87264f0ae73421c97e49c09770a6dc68e5de019ee2ae3b49516dc44c2"
+    },
+    {
+      "path": "proofs/registry-single-initialization/historical-controls.manifest.json",
+      "gitBlob": "c1575c225d24c912536ca184c1121960bfcaec99",
+      "bytes": 3913,
+      "sha256": "90dcde25a419daad5c13bccd9722d7d12ba0c0681e7b9e7502b1ba996a5a770d"
+    },
+    {
+      "path": "proofs/registry-single-initialization/historical-controls.md",
+      "gitBlob": "8a58e891b5a2880a687d966058cfa535b4461d89",
+      "bytes": 10581,
+      "sha256": "24385c3823d470cb950f8bc2d9c2f1e9183e7316fd943e334227681fcab8c51c"
+    },
+    {
+      "path": "proofs/registry-single-initialization/history.json",
+      "gitBlob": "6910d17ebb4d7d9ea5091f786617459f38577b42",
+      "bytes": 4038,
+      "sha256": "e32ffb834e4e524e1c173bf8448b5478476c8b2343c670c69a192c67e00108d0"
+    },
+    {
+      "path": "proofs/registry-single-initialization/original-subject.mjs",
+      "gitBlob": "789ff9f724a2453dc814231f42eb257e3e350781",
+      "bytes": 7458,
+      "sha256": "5afbc414c9dcb593aae6bb6b1a10be9b1303e9b51c5b4bcefbc0cdfa09c7b646"
+    },
+    {
+      "path": "proofs/registry-single-initialization/owned-subject.mjs",
+      "gitBlob": "471db134fc99a53cee5dd70a22006db3d1109632",
+      "bytes": 6382,
+      "sha256": "4805fbac4259ba26a17d90329f4e3c9c059c8058d74d8ba960857a7244c5bcb1"
+    },
+    {
+      "path": "proofs/registry-single-initialization/package-tools.mjs",
+      "gitBlob": "c98f1accaa4c06a002a0cfe0fd88740a803f0d5e",
+      "bytes": 3494,
+      "sha256": "e16109357d335bb33d598ff6552aed79d046d33cf406a4a89269ccc6882d9c36"
+    },
+    {
+      "path": "proofs/registry-single-initialization/preflight-guard.mjs",
+      "gitBlob": "6699a88f298fc56ef6ee21d2d515ae2a716e5c90",
+      "bytes": 4028,
+      "sha256": "226f0fb71a5e3d513c2d25abc61f7b36258398e3cf07c721851eba66a39ecb87"
+    },
+    {
+      "path": "proofs/registry-single-initialization/preflight.json",
+      "gitBlob": "a0875d33c9116e67c277a5c1c6b92dc2cdfbf22d",
+      "bytes": 5520,
+      "sha256": "fe0515f9859ec5faa3c9f0100aff29553e24def8673610f3dfb9fa742b1aef50"
+    },
+    {
+      "path": "proofs/registry-single-initialization/preflight.mjs",
+      "gitBlob": "f6239f44210297d35d6f457f5095c26e58534bc0",
+      "bytes": 16608,
+      "sha256": "a351334f42938548b90aad06286f4ddf41c65560d4ce5eec049d0746c3435983"
+    },
+    {
+      "path": "proofs/registry-single-initialization/preflight.node.mjs",
+      "gitBlob": "493a1b38275ac1ae287c904c627016f05c388df5",
+      "bytes": 6770,
+      "sha256": "2fcf1a1bb770f5607071327109a0e144664d6d0554ed29025f0fdc76587aa3d3"
+    }
+  ],
+  "toolsByArchitecture": {
+    "arm64": {
+      "node": {
+        "version": "22.23.3",
+        "sha256": "d09e299258c24f7cdf6f5d5ec185e3a56512b27a697113735dac909f1cac7b8d",
+        "versions": {
+          "node": "22.23.3",
+          "acorn": "8.16.0",
+          "ada": "2.9.2",
+          "amaro": "1.1.8",
+          "ares": "1.34.8",
+          "brotli": "1.1.0",
+          "cjs_module_lexer": "2.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "modules": "127",
+          "napi": "10",
+          "nbytes": "0.1.3",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.69.0",
+          "openssl": "3.5.8",
+          "simdjson": "4.5.0",
+          "simdutf": "6.4.2",
+          "sqlite": "3.51.3",
+          "tz": "2026c",
+          "undici": "6.28.1",
+          "unicode": "17.0",
+          "uv": "1.51.0",
+          "uvwasi": "0.0.23",
+          "v8": "12.4.254.21-node.57",
+          "zlib": "1.3.1-e00f703",
+          "zstd": "1.5.7"
+        }
+      },
+      "bun": {
+        "version": "1.4.2",
+        "sha256": "616f267a34278ff5ac282df37ffdfba1d7141f4f6926bca99af2cd6ef3ad32b1",
+        "revision": "1.4.2+744846f84"
+      },
+      "assemblyscript": {
+        "version": "0.28.20",
+        "packageSha256": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+        "compilerSha256": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891"
+      },
+      "typescript": {
+        "version": "5.9.3",
+        "packageSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+        "compilerSha256": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+      }
+    },
+    "x64": {
+      "node": {
+        "version": "22.23.3",
+        "sha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+        "versions": {
+          "node": "22.23.3",
+          "acorn": "8.16.0",
+          "ada": "2.9.2",
+          "amaro": "1.1.8",
+          "ares": "1.34.8",
+          "brotli": "1.1.0",
+          "cjs_module_lexer": "2.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "modules": "127",
+          "napi": "10",
+          "nbytes": "0.1.3",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.69.0",
+          "openssl": "3.5.8",
+          "simdjson": "4.5.0",
+          "simdutf": "6.4.2",
+          "sqlite": "3.51.3",
+          "tz": "2026c",
+          "undici": "6.28.1",
+          "unicode": "17.0",
+          "uv": "1.51.0",
+          "uvwasi": "0.0.23",
+          "v8": "12.4.254.21-node.57",
+          "zlib": "1.3.1-e00f703",
+          "zstd": "1.5.7"
+        }
+      },
+      "bun": {
+        "version": "1.4.2",
+        "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "revision": "1.4.2+744846f84"
+      },
+      "assemblyscript": {
+        "version": "0.28.20",
+        "packageSha256": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+        "compilerSha256": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891"
+      },
+      "typescript": {
+        "version": "5.9.3",
+        "packageSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+        "compilerSha256": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+      }
+    }
+  },
+  "architectureChecks": {
+    "arm64": {
+      "passed": true,
+      "receiptPath": "/workspace/shared/registry-node22-preflight-reconciliation/arm64/results/receipt.json",
+      "receiptSha256": "f9bef452ca68e3f7122fa29ea9f28b38122ec152ca2aba98776897b796d5b45f",
+      "summaryPath": "/workspace/shared/registry-node22-preflight-reconciliation/arm64/results/summary.json",
+      "summarySha256": "862c58fee9fff0210ec2a4c24d150888e4ae9cb53d50f26212d20f1c8d4fa256",
+      "commandsPassed": 61,
+      "protocolTestsPassed": 10,
+      "focusedTestsPassed": {
+        "main": 78,
+        "old": 104,
+        "cleanup": 104
+      },
+      "workerProofsPassed": 12,
+      "fixturesPassed": 9,
+      "pilotSubjects": 0,
+      "measuredSubjects": 0,
+      "builds": {
+        "main": {
+          "source": {
+            "sha256": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+            "files": 81
+          },
+          "build": {
+            "sha256": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "1cd8c2f7f7ca4cd94d420703353e081d863f449d7a9d2bd0bf9d2875d64ff71c",
+            "files": 53,
+            "entries": 54
+          }
+        },
+        "old": {
+          "source": {
+            "sha256": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786",
+            "files": 81
+          },
+          "build": {
+            "sha256": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "7efb45c79080c79b2acaea37e95801fb41609a61182bde7113747878f6ef9b62",
+            "files": 53,
+            "entries": 54
+          }
+        },
+        "cleanup": {
+          "source": {
+            "sha256": "9bcde3bee8420b36b8a03ee054bf39916862c5f95a6c2f838fc6dd058c3b1e7c",
+            "files": 81
+          },
+          "build": {
+            "sha256": "2136957d182ab6b48d07c189ddaa1b441150cea3196513062cf2ba20bc2ebe6c",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "8c412b4e1afc02d3dd8e1d25cf3816ba1d84938b26dcdb7200aefaf9c31efbc9",
+            "files": 53,
+            "entries": 54
+          }
+        }
+      },
+      "sourceArchives": {
+        "main": {
+          "commit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+          "gitTree": "10a9555df506cb9d57d7a8ad71e96f8bb947acd2",
+          "sha256": "f395ff48f71a43b1714ed0069f6e5dd07fdb5c6b1a3a6eea9ab380006cfbbae5",
+          "gitBlobsVerified": 450
+        },
+        "old": {
+          "commit": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+          "gitTree": "842f7cc9eacd78b2855a9ed5060ec65df71d1d0f",
+          "sha256": "009643761fc5cee8ab452d93908ac9847db6841a12e08fd3bcf1d9fbbffcae25",
+          "gitBlobsVerified": 457
+        },
+        "cleanup": {
+          "commit": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+          "gitTree": "d61ad90768846b3ae222baba7cadc73fec3e6982",
+          "sha256": "7bb72a5b22e515712fa46d189cb404a2edb1fc85e6e4f4e8255cfda14a3d07bc",
+          "gitBlobsVerified": 457
+        }
+      },
+      "compilers": {
+        "assemblyscript-package.json": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+        "asc.js": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891",
+        "typescript-package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+        "typescript.js": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+      },
+      "runtimeExecutableHashesIndependentByteVerification": false
+    },
+    "x64": {
+      "passed": true,
+      "receiptPath": "/workspace/shared/registry-node22-preflight-reconciliation/x64/results/receipt.json",
+      "receiptSha256": "ba843560d586760299dc7f5db6cebacca018f8d328d1148b3061d4387ce3083b",
+      "summaryPath": "/workspace/shared/registry-node22-preflight-reconciliation/x64/results/summary.json",
+      "summarySha256": "9ca9cc58b5fe011ec1b485dabf9ab1ab2f2c7572a21c29524bea0ea76d4f95ac",
+      "commandsPassed": 61,
+      "protocolTestsPassed": 10,
+      "focusedTestsPassed": {
+        "main": 78,
+        "old": 104,
+        "cleanup": 104
+      },
+      "workerProofsPassed": 12,
+      "fixturesPassed": 9,
+      "pilotSubjects": 0,
+      "measuredSubjects": 0,
+      "builds": {
+        "main": {
+          "source": {
+            "sha256": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+            "files": 81
+          },
+          "build": {
+            "sha256": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "1cd8c2f7f7ca4cd94d420703353e081d863f449d7a9d2bd0bf9d2875d64ff71c",
+            "files": 53,
+            "entries": 54
+          }
+        },
+        "old": {
+          "source": {
+            "sha256": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786",
+            "files": 81
+          },
+          "build": {
+            "sha256": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "7efb45c79080c79b2acaea37e95801fb41609a61182bde7113747878f6ef9b62",
+            "files": 53,
+            "entries": 54
+          }
+        },
+        "cleanup": {
+          "source": {
+            "sha256": "9bcde3bee8420b36b8a03ee054bf39916862c5f95a6c2f838fc6dd058c3b1e7c",
+            "files": 81
+          },
+          "build": {
+            "sha256": "2136957d182ab6b48d07c189ddaa1b441150cea3196513062cf2ba20bc2ebe6c",
+            "files": 12
+          },
+          "wasm": {
+            "sha256": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+            "files": 12
+          },
+          "completeDist": {
+            "sha256": "8c412b4e1afc02d3dd8e1d25cf3816ba1d84938b26dcdb7200aefaf9c31efbc9",
+            "files": 53,
+            "entries": 54
+          }
+        }
+      },
+      "sourceArchives": {
+        "main": {
+          "commit": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+          "gitTree": "10a9555df506cb9d57d7a8ad71e96f8bb947acd2",
+          "sha256": "f395ff48f71a43b1714ed0069f6e5dd07fdb5c6b1a3a6eea9ab380006cfbbae5",
+          "gitBlobsVerified": 450
+        },
+        "old": {
+          "commit": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+          "gitTree": "842f7cc9eacd78b2855a9ed5060ec65df71d1d0f",
+          "sha256": "009643761fc5cee8ab452d93908ac9847db6841a12e08fd3bcf1d9fbbffcae25",
+          "gitBlobsVerified": 457
+        },
+        "cleanup": {
+          "commit": "6b4b436435955be5cedeeafa763df44c4e8004ec",
+          "gitTree": "d61ad90768846b3ae222baba7cadc73fec3e6982",
+          "sha256": "7bb72a5b22e515712fa46d189cb404a2edb1fc85e6e4f4e8255cfda14a3d07bc",
+          "gitBlobsVerified": 457
+        }
+      },
+      "compilers": {
+        "assemblyscript-package.json": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+        "asc.js": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891",
+        "typescript-package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+        "typescript.js": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+      },
+      "runtimeExecutableHashesIndependentByteVerification": false
+    }
+  },
+  "receiptPaths": {
+    "arm64": "/workspace/shared/registry-node22-preflight-reconciliation/arm64/results/receipt.json",
+    "x64": "/workspace/shared/registry-node22-preflight-reconciliation/x64/results/receipt.json"
+  },
+  "sourceBuildWasmCompilerProofBytesVerified": true,
+  "runtimeExecutableBytesVerified": false,
+  "completeDistDefinition": "SHA256(JSON.stringify(entries)); entries are recursive localeCompare-sorted relative paths, directories have trailing slash and null hash, files have SHA256. Includes emitted JavaScript and declarations.",
+  "priorEvidenceComparison": {
+    "main": {
+      "source": true,
+      "emittedJs": true,
+      "wasm": true
+    },
+    "old": {
+      "source": true,
+      "emittedJs": true,
+      "wasm": true
+    },
+    "cleanup": {
+      "source": true,
+      "emittedJs": true,
+      "wasm": true
+    }
+  },
+  "limits": [
+    "Node and Bun executable bytes were not archived. Executable SHA-256 values are CI-recorded; Node hashes are also checked in each fixture metadata record. This audit does not independently rehash those executable binaries.",
+    "No pilots, warmup batches or measured batches ran. Existing correctness setup durations and test/command durations are not performance evidence.",
+    "Supported focused preflight coverage only: not a full browser suite, full repository test pass, or performance claim.",
+    "Source digest includes generated WASM and is scoped to the guard input list; the entire pinned source.tar was additionally checked against the GitHub Git tree.",
+    "Prior Node24 local evidence only supplements the independently verified Node22 archives. Prior completePackage uses a different definition and is not equated to completeDist."
+  ],
+  "failures": [],
+  "preservedTransportFailures": "download-failures.json"
+}

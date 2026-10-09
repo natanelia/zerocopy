@@ -1,0 +1,66 @@
+name: Registry single-initialization correctness preflight
+on:
+  push:
+    branches: [proof/registry-single-initialization-preflight-20261009]
+    paths:
+      - 'proofs/registry-single-initialization/**'
+      - '.github/workflows/registry-single-initialization-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  preflight:
+    if: ${{ github.event_name == 'push' && github.run_attempt == 1 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04-arm
+            arch: arm64
+          - os: ubuntu-latest
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Ensure original immutable focused proof object exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e 96b90882df5d5294489065bd303fbbede6a83184^{commit} || git fetch --no-tags origin 96b90882df5d5294489065bd303fbbede6a83184
+      - name: Run correctness and build receipt generation only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          export BUN_EXECUTABLE="$(command -v bun)"
+          node proofs/registry-single-initialization/preflight.mjs '${{ matrix.arch }}' "$GITHUB_WORKSPACE/proof-artifacts/results" 2>&1 | tee "$GITHUB_WORKSPACE/proof-artifacts/preflight.log"
+      - name: Archive complete or partial preflight evidence
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/proof-artifacts"
+          printf '%s\n' "run=${{ github.run_id }} attempt=${{ github.run_attempt }} sha=${{ github.sha }} arch=${{ matrix.arch }}" > "$GITHUB_WORKSPACE/proof-artifacts/workflow.txt"
+          tar --exclude='./results/worktrees' --exclude='./results/temporary' --exclude='./results/neutral' -czf "$GITHUB_WORKSPACE/registry-preflight-${{ matrix.arch }}.tar.gz" -C "$GITHUB_WORKSPACE/proof-artifacts" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum "registry-preflight-${{ matrix.arch }}.tar.gz" > "registry-preflight-${{ matrix.arch }}.tar.gz.sha256"
+          cat "registry-preflight-${{ matrix.arch }}.tar.gz.sha256"
+      - name: Retain compressed evidence and checksum
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-preflight-${{ matrix.arch }}-${{ github.sha }}
+          path: |
+            registry-preflight-${{ matrix.arch }}.tar.gz
+            registry-preflight-${{ matrix.arch }}.tar.gz.sha256
+          retention-days: 30
+          if-no-files-found: error

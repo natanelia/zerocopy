@@ -1,0 +1,89 @@
+{
+  "proofCommit": "3a3c05d96c989721e7bfdb5e6400cf1a7312edbf",
+  "configSha256": "fe0515f9859ec5faa3c9f0100aff29553e24def8673610f3dfb9fa742b1aef50",
+  "arch": "x64",
+  "pins": {
+    "main": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "old": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "cleanup": "6b4b436435955be5cedeeafa763df44c4e8004ec"
+  },
+  "originalSubject": {
+    "blob": "789ff9f724a2453dc814231f42eb257e3e350781",
+    "sha256": "5afbc414c9dcb593aae6bb6b1a10be9b1303e9b51c5b4bcefbc0cdfa09c7b646",
+    "bytes": 7458
+  },
+  "tools": {
+    "node": {
+      "version": "22.23.3",
+      "sha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+      "versions": {
+        "node": "22.23.3",
+        "acorn": "8.16.0",
+        "ada": "2.9.2",
+        "amaro": "1.1.8",
+        "ares": "1.34.8",
+        "brotli": "1.1.0",
+        "cjs_module_lexer": "2.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "modules": "127",
+        "napi": "10",
+        "nbytes": "0.1.3",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.69.0",
+        "openssl": "3.5.8",
+        "simdjson": "4.5.0",
+        "simdutf": "6.4.2",
+        "sqlite": "3.51.3",
+        "tz": "2026c",
+        "undici": "6.28.1",
+        "unicode": "17.0",
+        "uv": "1.51.0",
+        "uvwasi": "0.0.23",
+        "v8": "12.4.254.21-node.57",
+        "zlib": "1.3.1-e00f703",
+        "zstd": "1.5.7"
+      }
+    },
+    "bun": {
+      "version": "1.4.2",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "revision": "1.4.2+744846f84"
+    },
+    "assemblyscript": {
+      "version": "0.28.20",
+      "packageSha256": "976b644fe0dd3390f97e2ebe3d1c150ba354e9e37b537b57d6035f5740310321",
+      "compilerSha256": "ebce85ca33b6e2d901ad2f9fe2daf4f98a42217a0bcbbb40fd98991ababd3891"
+    },
+    "typescript": {
+      "version": "5.9.3",
+      "packageSha256": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+      "compilerSha256": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+    }
+  },
+  "builds": {
+    "main": {
+      "source": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "emittedJs": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "1cd8c2f7f7ca4cd94d420703353e081d863f449d7a9d2bd0bf9d2875d64ff71c"
+    },
+    "old": {
+      "source": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786",
+      "emittedJs": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "7efb45c79080c79b2acaea37e95801fb41609a61182bde7113747878f6ef9b62"
+    },
+    "cleanup": {
+      "source": "9bcde3bee8420b36b8a03ee054bf39916862c5f95a6c2f838fc6dd058c3b1e7c",
+      "emittedJs": "2136957d182ab6b48d07c189ddaa1b441150cea3196513062cf2ba20bc2ebe6c",
+      "wasm": "90c24ece1c6f80cd45591025a0dd4c46ab2a4c999e08b3c757fcaf1d75a1a3f0",
+      "completeDist": "8c412b4e1afc02d3dd8e1d25cf3816ba1d84938b26dcdb7200aefaf9c31efbc9"
+    }
+  },
+  "correctness": "passed",
+  "integrityComplete": true,
+  "measuredSubjects": 0,
+  "pilotSubjects": 0
+}

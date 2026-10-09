@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Prospective bounded diagnostic; never replaces, pools, normalizes, or invalidates historical runs",
+  "pins": {
+    "baseline": "3773c6e519c7c0958da13727ed1082f449f3ee25",
+    "candidate": "ab969f043e44d53f6ba7315c2b818c1a51ce49c9",
+    "priorProduction": "1229e6a24a85c8d97cc72296abe5e91cea208bf7",
+    "originalHarnessSha256": "ee538f455747d6a734922ff952e310ab80e54503b7bb0d2d67e88df518b424df",
+    "source": {
+      "baseline": "23ca67e8b9602e80493d5ef28cef91e1a860032433406b467acf29f172e3f603",
+      "candidate": "334d95de58b9726faeed91c206b84e8eb1ff78804caa48dd4470f844fa084786"
+    },
+    "build": {
+      "baseline": "0880a60cf7471786200ef48bbc0432fe786294650e4072ba1fb511cb4d729506",
+      "candidate": "2d44b075c5ac0c4dc39dad8a840f387716f5e245900aa5f6b1f378f5ef3f0109"
+    }
+  },
+  "toolchain": { "node": "22.23.3", "bun": "1.4.2", "assemblyscript": "0.28.20", "platform": "linux" },
+  "cases": [
+    { "id": "x64-attach-1", "arch": "x64", "operation": "attach", "arenas": 1, "role": "primary" },
+    { "id": "x64-reexport-512", "arch": "x64", "operation": "reexport", "arenas": 512, "role": "positive-control" },
+    { "id": "arm64-warm-read-512", "arch": "arm64", "operation": "warmNestedRead", "arenas": 512, "role": "targeted-secondary" }
+  ],
+  "modes": ["ab", "aa-baseline", "aa-candidate"],
+  "quartetsPerMode": 8,
+  "ordersPerMode": { "ABBA": 4, "BAAB": 4 },
+  "seed": 2026100809,
+  "samples": 7,
+  "warmups": 3,
+  "minimumBatchMs": 20,
+  "pilotTargetBatchMs": 40,
+  "pilotMaximumBatches": 8,
+  "pilotBounds": {
+    "attach": { "initial": 64, "maximum": 8192 },
+    "reexport": { "initial": 32, "maximum": 1000000 },
+    "warmNestedRead": { "initial": 100000, "maximum": 10000000 }
+  },
+  "margin": 1.02,
+  "confidence": 0.95,
+  "degreesOfFreedom": 7,
+  "tCritical": 2.3646242510102993,
+  "interval": "Two-sided pointwise Student t over eight independent-process quartet log ratios; no batch pseudoreplication or familywise claim",
+  "aaInvalidation": "For either separate A/A arm: point estimate outside [1/1.02,1.02] AND 95% CI excludes 1 invalidates that case's A/B inference; report raw A/A, never normalize",
+  "work": "All disposable pilots finish before measured subjects. Freeze one common iteration count per case, maximum of both pilot prescriptions. Each measured process executes exactly three common-count warmup batches and seven common-count measured batches; no per-process calibration.",
+  "stopping": "One fixed run per architecture, no timing-based exclusions, extra quartets, retries, or favorable-run selection. Short warmup or measured batches retain every sample and invalidate inference; failures retain partial evidence and stop without retry.",
+  "history": [
+    { "run": "37822788650", "url": "https://github.com/natanelia/zerocopy/actions/runs/37822788650", "cpu": "AMD EPYC 9V74", "attach1Ratio": 1.1317531150868512, "attach1CI95": [1.0740409311172603,1.1925663877412793], "attach1MedianUs": [25.08273008945842,29.10774353933786], "shortBatches": 0, "note": "All four quartets, both orientations; passed historical 15% drift bound. Material signal remains." },
+    { "run": "37822796941", "url": "https://github.com/natanelia/zerocopy/actions/runs/37822796941", "cpu": "AMD EPYC 9V74", "attach1Ratio": 1.0263893255424774, "attach1CI95": [0.9823332781516795,1.0724212148953354], "note": "Inconclusive; does not prove absence of loss." },
+    { "commit": "1229e6a24a85c8d97cc72296abe5e91cea208bf7", "cpu": "AMD EPYC 7763", "attach1Ratio": 0.97481, "attach1CI95": [0.88755,1.07065], "note": "Original run was inconclusive, production sources and bundles identical to ab969." }
+  ],
+  "armScopeReason": "Before any diagnostic timing, add only Node ARM 512-arena warm reads: original +3.58%, PR +5.66%, push +6.31%, all intervals spanning 1. The sustained direction warrants one focused secondary check; histories stay separate."
+}
