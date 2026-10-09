@@ -1,0 +1,16 @@
+{
+  "role": "baseline",
+  "label": "06-node-auto-corpus",
+  "argv": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "/workspace/shared/zerocopy-numeric-unroll-prototype-20261009/correctness.mjs",
+    "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+    "auto"
+  ],
+  "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+  "timeoutSeconds": 180,
+  "pid": 5,
+  "exitCode": 1,
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSha256": "a1ce6f90e6082b20919ddb66dd9129d68b0113de856b75816af3870a9e61d279"
+}

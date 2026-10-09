@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009
+
+ ❯ numeric-spatial.test.ts (21 tests | 1 failed) 9413ms
+     × preserves attached and old snapshots after append, edit, and growth 8699ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 44 passed (45)
+   Start at  21:08:31
+   Duration  11.16s (transform 2.09s, setup 0ms, import 2.66s, tests 12.80s, environment 9ms)
+

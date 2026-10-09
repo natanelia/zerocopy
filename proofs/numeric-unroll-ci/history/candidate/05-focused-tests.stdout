@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009
+
+ ❯ numeric.test.ts (24 tests | 1 failed) 7061ms
+     × reads attached arenas without allocating or changing shared bytes 6380ms
+ ❯ numeric-spatial.test.ts (21 tests | 1 failed) 11710ms
+     × preserves attached and old snapshots after append, edit, and growth 10343ms
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 43 passed (45)
+   Start at  21:11:43
+   Duration  13.55s (transform 1.39s, setup 0ms, import 2.12s, tests 18.77s, environment 2ms)
+

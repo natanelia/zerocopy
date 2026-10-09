@@ -1,0 +1,19 @@
+{
+  "role": "baseline",
+  "label": "05-focused-tests",
+  "argv": [
+    "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+    "--bun",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "numeric.test.ts",
+    "numeric-spatial.test.ts",
+    "--no-cache"
+  ],
+  "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+  "timeoutSeconds": 180,
+  "pid": 13,
+  "exitCode": 1,
+  "stdoutSha256": "08aa4f4057659276b5d0561bededf3c8b1d8096b5ccbf243a739128223b6d403",
+  "stderrSha256": "fcc429d6723bcdc45fc0668a97b87307658384791e5d19c453584d91c7fba4a4"
+}

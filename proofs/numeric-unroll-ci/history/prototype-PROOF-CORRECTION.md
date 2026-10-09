@@ -1,0 +1,5 @@
+# One-line worker cleanup correction
+
+The first baseline Node/auto corpus process failed in its proof's response listener cleanup. `finish(error, value)` shadowed the surrounding `error` listener, causing `worker.off('error', error)` to receive null after a normal worker message. The original proof and failure are retained at `correctness.mjs` and `logs/baseline/06-node-auto-corpus.*`; this process has no complete passing receipt.
+
+`correctness-v2.mjs` changes only the function parameter from `error` to `reason` and its reject/resolve use, leaving listener removal bound to the original function. The fixed deterministic inputs, seed, assertions, worker workload, timeouts, runtime variant and all other proof bytes are unchanged. This is a proof defect, not a kernel defect or timing-selected change. The new proof version is hashed before its first execution and uses distinct log names. Run all originally planned role/runtime/selection combinations with this version, retaining both original failures.

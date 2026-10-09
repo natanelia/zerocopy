@@ -1,0 +1,231 @@
+{
+  "status": "fixed-corpus-and-emitted-code-verified; focused-test-gate-incomplete",
+  "baselineCommit": "2e88bc4a53871476da9ca1ec4e6c374b61512436",
+  "manifestSha256": "55cb6817756a249b6f1cd504a6642453868f5dca6a59192346a6f2ee471f6e4b",
+  "sourceCounts": {
+    "baseline": 453,
+    "candidate": 453
+  },
+  "receipts": 30,
+  "successfulCommands": 27,
+  "failedCommands": [
+    [
+      "baseline",
+      "05-focused-tests"
+    ],
+    [
+      "baseline",
+      "06-node-auto-corpus"
+    ],
+    [
+      "candidate",
+      "05-focused-tests"
+    ]
+  ],
+  "fixedCorpusProcesses": 8,
+  "fixedCorpusTotals": {
+    "direct": 171584,
+    "public": 5792,
+    "spatial": 720,
+    "memoryChecks": 6992,
+    "attachments": 192,
+    "workers": 16,
+    "workerCalls": 176016
+  },
+  "browserJsFiles": 12,
+  "changedBrowserJs": [
+    "numeric.js"
+  ],
+  "archive": {
+    "path": "/workspace/shared/zerocopy-numeric-unroll-prototype-20261009/source-and-builds.tar.gz",
+    "bytes": 1835174,
+    "sha256": "18fc16ffb973ea066317d2b60011d705b80d9a6a856e15eccc298bc7a3cbdac7",
+    "members": 1036
+  },
+  "results": [
+    {
+      "role": "baseline",
+      "runtime": "v24.19.0",
+      "mode": "auto",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+      "fallback": false,
+      "bun": null,
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "baseline",
+      "runtime": "v24.19.0",
+      "mode": "scalar",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+      "fallback": true,
+      "bun": null,
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "baseline",
+      "runtime": "v26.3.0",
+      "mode": "auto",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+      "fallback": false,
+      "bun": "1.4.2",
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "baseline",
+      "runtime": "v26.3.0",
+      "mode": "scalar",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-baseline-20261009",
+      "fallback": true,
+      "bun": "1.4.2",
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "candidate",
+      "runtime": "v24.19.0",
+      "mode": "auto",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009",
+      "fallback": false,
+      "bun": null,
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "candidate",
+      "runtime": "v24.19.0",
+      "mode": "scalar",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009",
+      "fallback": true,
+      "bun": null,
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "candidate",
+      "runtime": "v26.3.0",
+      "mode": "auto",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009",
+      "fallback": false,
+      "bun": "1.4.2",
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    },
+    {
+      "role": "candidate",
+      "runtime": "v26.3.0",
+      "mode": "scalar",
+      "status": "passed",
+      "root": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009",
+      "fallback": true,
+      "bun": "1.4.2",
+      "arch": "x64",
+      "seed": "0x6d2b79f5",
+      "finalSeed": 1012861933,
+      "counts": {
+        "direct": 21448,
+        "public": 724,
+        "spatial": 90,
+        "memoryChecks": 874,
+        "attachments": 24,
+        "workers": 2,
+        "workerCalls": 22002
+      },
+      "checksum": 486050,
+      "probes": 1
+    }
+  ]
+}

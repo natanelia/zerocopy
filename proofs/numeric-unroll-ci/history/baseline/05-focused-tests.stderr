@@ -1,0 +1,16 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  numeric-spatial.test.ts > countPointsInBox > preserves attached and old snapshots after append, edit, and growth
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> numeric-spatial.test.ts:92:30
+     67|     expect(() => kernel.countPointsInBox(0, 0, 131064, 1, 0, 0, 1, 1))…
+     68|   });
+     69| });
+       |    ^
+     70|
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

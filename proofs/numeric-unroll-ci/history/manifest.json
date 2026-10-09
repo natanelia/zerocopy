@@ -1,0 +1,76 @@
+{
+  "historicalOnly": true,
+  "originalFailuresRetained": true,
+  "files": [
+    {
+      "path": "baseline/05-focused-tests.json",
+      "bytes": 595,
+      "sha256": "7823a123555622aedc637cd8572fa81c4d40e3f9ffa34d192e463ee8ac721626"
+    },
+    {
+      "path": "baseline/05-focused-tests.stderr",
+      "bytes": 641,
+      "sha256": "fcc429d6723bcdc45fc0668a97b87307658384791e5d19c453584d91c7fba4a4"
+    },
+    {
+      "path": "baseline/05-focused-tests.stdout",
+      "bytes": 425,
+      "sha256": "08aa4f4057659276b5d0561bededf3c8b1d8096b5ccbf243a739128223b6d403"
+    },
+    {
+      "path": "baseline/06-node-auto-corpus.json",
+      "bytes": 640,
+      "sha256": "010013d1774849f348097d4cfa1d2d0e737e029847ba63c08a4f0cf6d110fc11"
+    },
+    {
+      "path": "baseline/06-node-auto-corpus.stderr",
+      "bytes": 869,
+      "sha256": "a1ce6f90e6082b20919ddb66dd9129d68b0113de856b75816af3870a9e61d279"
+    },
+    {
+      "path": "baseline/06-node-auto-corpus.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "candidate/05-focused-tests.json",
+      "bytes": 598,
+      "sha256": "3d1df42448fbaa798e68696d97904749c296f4b6f2df016e10648f224888c793"
+    },
+    {
+      "path": "candidate/05-focused-tests.stderr",
+      "bytes": 1139,
+      "sha256": "93331f7c59b97c9588b1e96e34b000517eb73612289883159758a7f077e96bbb"
+    },
+    {
+      "path": "candidate/05-focused-tests.stdout",
+      "bytes": 548,
+      "sha256": "6f2cb2cf3553b0bed3979779408dbb58c598f2e3437c0f12acf9fe5bea2511b4"
+    },
+    {
+      "path": "diagnostic-REPORT.md",
+      "bytes": 6173,
+      "sha256": "06d9885a85eb638fe49fec742b44dccddb20c861fefb360e157631067f6002d6"
+    },
+    {
+      "path": "prototype-PROOF-CORRECTION.md",
+      "bytes": 1012,
+      "sha256": "b6b1115effe216b4a3beb77b3bd84005a17ff65dcd6c0f34ddcc0e10e836b05f"
+    },
+    {
+      "path": "prototype-REPORT.md",
+      "bytes": 9766,
+      "sha256": "ff920f6b67eaba23e8be89b8730844b9f3d30bca46fa887cf10211acdcd9f494"
+    },
+    {
+      "path": "prototype-VERIFIED.json",
+      "bytes": 5760,
+      "sha256": "bb1bfd6df05219508b3ad4dc646b04e7198a1f57ec3b61dc8d2df75faf5c12d0"
+    },
+    {
+      "path": "review-REPORT.md",
+      "bytes": 13343,
+      "sha256": "8cadc17994216c36578ad5f2e66843024288c8ea5f07e0b6501a5ba729a22674"
+    }
+  ]
+}

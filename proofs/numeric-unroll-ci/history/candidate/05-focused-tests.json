@@ -1,0 +1,19 @@
+{
+  "role": "candidate",
+  "label": "05-focused-tests",
+  "argv": [
+    "/workspace/scratch/e7ec22ef2609/zerocopy-tools/node_modules/.bin/bun",
+    "--bun",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "numeric.test.ts",
+    "numeric-spatial.test.ts",
+    "--no-cache"
+  ],
+  "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-numeric-unroll-candidate-20261009",
+  "timeoutSeconds": 180,
+  "pid": 172,
+  "exitCode": 1,
+  "stdoutSha256": "6f2cb2cf3553b0bed3979779408dbb58c598f2e3437c0f12acf9fe5bea2511b4",
+  "stderrSha256": "93331f7c59b97c9588b1e96e34b000517eb73612289883159758a7f077e96bbb"
+}
