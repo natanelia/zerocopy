@@ -1,0 +1,68 @@
+name: Heap insertion allocation screen attempt 1
+on:
+  push:
+    branches: ['perf/heap-insert-single-allocation-20261009']
+    paths:
+      - '.github/workflows/heap-insert-performance.yml'
+      - 'proofs/heap-insert-*'
+permissions:
+  contents: read
+concurrency:
+  group: heap-insert-attempt1
+  cancel-in-progress: false
+jobs:
+  screen:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      HEAP_INSERT_ATTEMPT: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify frozen parent and install common dependencies
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/heap-insert-evidence/workflow"
+          test "$(git rev-parse HEAD^)" = '9972561c60e93500ae092c2b752880dca7740fdf'
+          test "$(git rev-parse 9972561c60e93500ae092c2b752880dca7740fdf^{tree})" = '33e99353fbc136ea585dec2f9fce47514f4cf543'
+          bun install 2>&1 | tee "$RUNNER_TEMP/heap-insert-evidence/workflow/dependencies.log"
+          git worktree add --detach "$RUNNER_TEMP/heap-insert-baseline" 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/heap-insert-baseline/node_modules"
+      - name: Verify proof protocol without latency
+        timeout-minutes: 2
+        run: |
+          node --test proofs/heap-insert-protocol.node.mjs > "$RUNNER_TEMP/heap-insert-evidence/workflow/protocol-node.log" 2>&1
+          bun test ./proofs/heap-insert-protocol.node.mjs > "$RUNNER_TEMP/heap-insert-evidence/workflow/protocol-bun.log" 2>&1
+      - name: Prerequisites, all pilots, then balanced measurements
+        timeout-minutes: 65
+        run: node proofs/heap-insert-performance.mjs "$RUNNER_TEMP/heap-insert-baseline" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/heap-insert-evidence"
+      - name: Preserve complete or partial evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/heap-insert-evidence/workflow"
+          cp .github/workflows/heap-insert-performance.yml "$RUNNER_TEMP/heap-insert-evidence/workflow/"
+          git status --short > "$RUNNER_TEMP/heap-insert-evidence/workflow/git-status.txt"
+          git log -1 --format=fuller > "$RUNNER_TEMP/heap-insert-evidence/workflow/commit.txt"
+          tar -czf "$RUNNER_TEMP/heap-insert-attempt1.tar.gz" -C "$RUNNER_TEMP" heap-insert-evidence
+          cd "$RUNNER_TEMP"
+          sha256sum heap-insert-attempt1.tar.gz > heap-insert-attempt1.tar.gz.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: heap-insert-attempt1-x64
+          path: |
+            ${{ runner.temp }}/heap-insert-attempt1.tar.gz
+            ${{ runner.temp }}/heap-insert-attempt1.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
