@@ -114,6 +114,8 @@ Tested `main` builds publish the production documentation by default. Set the re
 Production URL: `https://natanelia.github.io/zerocopy/`.
 Sitemap: `https://natanelia.github.io/zerocopy/sitemap.xml`.
 
+The homepage names `natanelia/zerocopy` in its title and visible repository link, so readers can distinguish it from other projects called zerocopy. Its `SoftwareSourceCode` JSON-LD connects the source repository, npm package, and license. This is project identity metadata, not a promise of a Google rich result or ranking. Local builds without an origin, PR previews, and other pages omit it.
+
 Production guides contain static HTML, unique titles and descriptions, canonical URLs, and Open Graph metadata. The sitemap lists only production pages. PR previews and the 404 page carry `noindex,nofollow`; previews do not generate a sitemap. Crawlers may fetch previews so they can see the exclusion directive.
 
 GitHub Pages project sites cannot control the host's `/robots.txt` from a repository subdirectory. `/zerocopy/robots.txt` is not the robots policy for `natanelia.github.io`. Submit the sitemap directly instead of relying on its discovery through that subpath file. Do not block previews in a host-level robots file if you want crawlers to observe their `noindex` metadata.

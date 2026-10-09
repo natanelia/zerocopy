@@ -2,7 +2,7 @@
 
 ## Share your data. Not copies.
 
-**Shared, immutable collections for JavaScript and TypeScript.** Let your UI and workers read the same collection storage, without cloning the dataset for each worker.
+**[natanelia/zerocopy](https://github.com/natanelia/zerocopy) provides shared, immutable collections for JavaScript and TypeScript.** Let your UI and workers read the same collection storage, without cloning the dataset for each worker.
 
 zerocopy uses SharedArrayBuffer and WebAssembly to share persistent maps, lists, and sets across Web Workers and Node.js worker threads. Each thread reads locally; updates create immutable snapshots.
 

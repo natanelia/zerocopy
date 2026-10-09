@@ -23,7 +23,9 @@ export const pages = [
   { source: 'website/content/maps.md', slug: 'maps', title: 'Maps & spatial tools', group: 'Use cases', description: 'Keep the map editable while workers inspect its data.' },
   { source: 'website/content/editors.md', slug: 'editors', title: 'Editors & history', group: 'Use cases', description: 'Read an earlier version without stopping new edits.' },
 ];
-export const repository = 'https://github.com/natanelia/zerocopy';
+export const projectName = 'natanelia/zerocopy';
+export const repository = `https://github.com/${projectName}`;
+export const npmPackage = 'https://www.npmjs.com/package/zerocopy';
 /** Restrict a deployment prefix to clean URL path segments. */
 export function basePath(value = '/') {
   if (!/^\/(?:[A-Za-z0-9_-]+\/)*$/.test(value)) throw new Error('SITE_BASE must be / or a path such as /zerocopy/');
