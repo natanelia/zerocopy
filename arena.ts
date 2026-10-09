@@ -490,6 +490,10 @@ export class Arena {
     }
     let slot = this.reads?.slot(key);
     if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if ((code === 0 || code === 4) && slot !== undefined && this.reads.root(slot) === root) {
+      const leaf = this.reads.leaf(slot);
+      return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    }
     const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
     // A root change can still resolve to the exact same immutable leaf.
     slot = this.reads?.slot(key);
