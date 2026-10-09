@@ -1,0 +1,128 @@
+name: Object read single-lookup correctness
+
+on:
+  push:
+    branches: [proof/object-read-correctness-20261009]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    if: github.event_name == 'push' && github.event.forced == false && github.event.before == '042b41a7f68a89a10751f285eef79259adfe4aa3' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [baseline, candidate]
+    env:
+      BASELINE_SHA: 3773c6e519c7c0958da13727ed1082f449f3ee25
+      CANDIDATE_SHA: 042b41a7f68a89a10751f285eef79259adfe4aa3
+      ROLE: ${{ matrix.role }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Configure task-local npm cache
+        shell: bash
+        run: printf 'npm_config_cache=%s/cached-object-npm-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Verify exact sources and run bounded correctness checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE="$RUNNER_TEMP/cached-object-evidence"
+          PROJECT="$RUNNER_TEMP/cached-object-project"
+          PROOF_ROOT="$PWD"
+          mkdir -p "$EVIDENCE"
+          printf 'label\tlimit_seconds\texit_code\tlog_exit_code\n' > "$EVIDENCE/commands.tsv"
+          run() {
+            local label="$1" limit="$2"; shift 2
+            printf 'START %s limit=%ss command=' "$label" "$limit"
+            printf '%q ' "$@"; printf '\n'
+            date -u +%FT%TZ > "$EVIDENCE/$label.started.txt"
+            printf '%q ' "$@" > "$EVIDENCE/$label.command.txt"
+            set +e
+            timeout --signal=TERM --kill-after=10s "${limit}s" "$@" 2>&1 | tee "$EVIDENCE/$label.log"
+            local status=("${PIPESTATUS[@]}")
+            set -e
+            date -u +%FT%TZ > "$EVIDENCE/$label.finished.txt"
+            printf '%s\t%s\t%s\t%s\n' "$label" "$limit" "${status[0]}" "${status[1]}" >> "$EVIDENCE/commands.tsv"
+            printf 'END %s exit=%s log_exit=%s\n' "$label" "${status[0]}" "${status[1]}"
+            [[ "${status[0]}" == 0 && "${status[1]}" == 0 ]]
+          }
+          FAILED=0
+          check() { run "$@" || FAILED=1; }
+          cp proofs/cached-object-read-{check,workers}.mjs proofs/cached-object-read-correctness.md "$EVIDENCE/"
+          cp .github/workflows/cached-object-read-correctness.yml "$EVIDENCE/workflow.yml"
+          git archive --format=tar HEAD --output="$EVIDENCE/proof-source.tar"
+          node --version > "$EVIDENCE/node-version.txt"
+          bun --version > "$EVIDENCE/bun-version.txt"
+          lscpu > "$EVIDENCE/cpu.txt"
+          git --version > "$EVIDENCE/git-version.txt"
+          run source-guard 120 node proofs/cached-object-read-check.mjs "$PWD" "$BASELINE_SHA" "$CANDIDATE_SHA" "$EVIDENCE"
+          if [[ "$ROLE" == baseline ]]; then SOURCE_SHA="$BASELINE_SHA"; EXPECTED=3; else SOURCE_SHA="$CANDIDATE_SHA"; EXPECTED=1; fi
+          printf '%s\n' "$SOURCE_SHA" > "$EVIDENCE/source-sha.txt"
+          printf '%s\n' "$EXPECTED" > "$EVIDENCE/expected-slot-count.txt"
+          git worktree add --detach "$PROJECT" "$SOURCE_SHA"
+          git archive --format=tar "$SOURCE_SHA" --output="$EVIDENCE/source.tar"
+          git show "$CANDIDATE_SHA:cached-object-read.test.ts" > "$PROJECT/cached-object-read.test.ts"
+          cp "$PROJECT/arena.ts" "$PROJECT/cached-object-read.test.ts" "$PROJECT/package.json" "$EVIDENCE/"
+          run install 180 bun install
+          ln -s "$PROOF_ROOT/node_modules" "$PROJECT/node_modules"
+          sha256sum "$PROOF_ROOT/node_modules/assemblyscript/dist/asc.js" > "$EVIDENCE/compiler-sha256.txt"
+          cd "$PROJECT"
+          export CACHED_OBJECT_EXPECTED_SLOT_READS="$EXPECTED"
+          run build-wasm 240 bun run build:wasm
+          run build-browser 120 bun run build:browser
+          check build-types 120 bun run build:types
+          check typecheck 120 bun run typecheck
+          check typecheck-redux 120 bun run typecheck:redux
+          check typecheck-values 120 bun run typecheck:values
+          check typecheck-geometry 120 bun run typecheck:geometry
+          check typecheck-worker 120 ./node_modules/.bin/tsc --noEmit -p tsconfig.worker.json
+          check full-tests 300 bun run test --reporter=default --reporter=json --outputFile.json="$EVIDENCE/full-tests.json"
+          check full-tests-report 15 node "$PROOF_ROOT/proofs/cached-object-read-check.mjs" --test-report "$EVIDENCE/full-tests.json"
+          check built-worker-tasks 90 node --test proofs/worker-tasks.mjs
+          check built-node-worker 60 node proofs/node-worker.mjs
+          check typed-json-worker 60 node proofs/typed-json-worker.mjs
+          check cached-object-real-workers 210 node "$PROOF_ROOT/proofs/cached-object-read-workers.mjs" "$PROJECT"
+          check package 180 bun run check:package
+          check final-source-identity 15 git diff --exit-code -- . ':!cached-object-read.test.ts'
+          check final-overlay-identity 15 cmp cached-object-read.test.ts "$EVIDENCE/cached-object-read.test.ts"
+          exit "$FAILED"
+      - name: Retain complete or partial evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE="$RUNNER_TEMP/cached-object-evidence"
+          PROJECT="$RUNNER_TEMP/cached-object-project"
+          mkdir -p "$EVIDENCE"
+          for lock in bun.lock bun.lockb; do
+            if [[ -f "$lock" ]]; then cp "$lock" "$EVIDENCE/$lock"; fi
+          done
+          if [[ -d "$PROJECT" ]]; then
+            git -C "$PROJECT" status --short > "$EVIDENCE/final-worktree-status.txt"
+            if [[ -d "$PROJECT/dist" ]]; then cp -a "$PROJECT/dist" "$EVIDENCE/dist"; fi
+            if compgen -G "$PROJECT/*.wasm" > /dev/null; then (cd "$PROJECT" && sha256sum ./*.wasm) > "$EVIDENCE/root-wasm-sha256.txt"; fi
+          fi
+          (cd "$EVIDENCE" && find . -type f ! -name evidence-sha256.txt -print0 | sort -z | xargs -0 sha256sum) > "$EVIDENCE/evidence-sha256.txt"
+          timeout --signal=TERM --kill-after=10s 120s tar -czf "$RUNNER_TEMP/cached-object-evidence.tar.gz" -C "$RUNNER_TEMP" cached-object-evidence
+          sha256sum "$RUNNER_TEMP/cached-object-evidence.tar.gz" > "$RUNNER_TEMP/cached-object-evidence.sha256"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: object-read-correctness-${{ matrix.role }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/cached-object-evidence.tar.gz
+            ${{ runner.temp }}/cached-object-evidence.sha256
+          retention-days: 30
+          if-no-files-found: error
