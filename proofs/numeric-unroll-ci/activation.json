@@ -1,5 +1,5 @@
 {
-  "enabled": false,
-  "reviewedPacketCommit": null,
-  "reviewedPacketSha256": null
+  "enabled": true,
+  "reviewedPacketCommit": "f06799727dcd1008d86fb6321b972c711c9357dc",
+  "reviewedPacketSha256": "ab0fcdb75028106aad505db261f010109315767b2885a73fe068a456721d31c7"
 }
