@@ -1,0 +1,85 @@
+{
+  "algorithm": "FNV-1a 32, independently verified by BigInt recurrence",
+  "generation": {
+    "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
+    "seed": 2166136261,
+    "prime": 16777619,
+    "inverse": 899433627,
+    "zeroPrefix": "zero/é/",
+    "maxForward": 262144,
+    "maxReverse": 262144,
+    "collisionLimit": 200000,
+    "collisionSeed": 1682381,
+    "collisionGenerator": "xorshift32, low 6 bits, eight ASCII units between equal/ and /界"
+  },
+  "zero": {
+    "key": "zero/é/PEhINA",
+    "utf8": [
+      122,
+      101,
+      114,
+      111,
+      47,
+      195,
+      169,
+      47,
+      80,
+      69,
+      104,
+      73,
+      78,
+      65
+    ],
+    "hash": 0
+  },
+  "collision": [
+    {
+      "key": "equal/ykKPfB-w/界",
+      "utf8": [
+        101,
+        113,
+        117,
+        97,
+        108,
+        47,
+        121,
+        107,
+        75,
+        80,
+        102,
+        66,
+        45,
+        119,
+        47,
+        231,
+        149,
+        140
+      ],
+      "hash": 2679306464
+    },
+    {
+      "key": "equal/2oCCzp1O/界",
+      "utf8": [
+        101,
+        113,
+        117,
+        97,
+        108,
+        47,
+        50,
+        111,
+        67,
+        67,
+        122,
+        112,
+        49,
+        79,
+        47,
+        231,
+        149,
+        140
+      ],
+      "hash": 2679306464
+    }
+  ]
+}
