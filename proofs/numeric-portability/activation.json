@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "reviewedPacketCommit": null,
+  "reviewedPacketSha256": null,
+  "scope": "inactive preparation only; library subjects, clocks and external writes not authorized"
+}

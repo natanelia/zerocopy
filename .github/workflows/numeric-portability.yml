@@ -1,0 +1,108 @@
+name: Inactive numeric startup and portability proof
+on:
+  push:
+    branches: [proof/numeric-portability-20261009]
+permissions:
+  contents: read
+jobs:
+  lane:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lane: x64
+            os: ubuntu-24.04
+          - lane: arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      PROOF_LANE: ${{ matrix.lane }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify packet and keep execution disabled unless separately reviewed
+        id: preflight
+        run: python3 proofs/numeric-portability/ci.py preflight
+        timeout-minutes: 2
+      - uses: actions/setup-node@v4
+        if: steps.preflight.outputs.enabled == 'true'
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        if: steps.preflight.outputs.enabled == 'true'
+        with:
+          bun-version: '1.4.2'
+      - name: Install frozen tools and browser distributions
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py setup
+        timeout-minutes: 11
+      - name: Complete fresh baseline gate
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py gate --arm baseline
+        timeout-minutes: 16
+      - name: Complete fresh candidate gate
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py gate --arm candidate
+        timeout-minutes: 16
+      - name: Verify emitted equality and freeze exact identities
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py freeze
+        timeout-minutes: 3
+      - name: Require real browser and worker semantics
+        if: steps.preflight.outputs.enabled == 'true' && matrix.lane == 'x64'
+        run: python3 proofs/numeric-portability/ci.py semantics
+        timeout-minutes: 7
+      - name: Require untimed selection and workload guards
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py untimed
+        timeout-minutes: 7
+      - name: Run only the fixed original schedule
+        if: steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py screen
+        timeout-minutes: 33
+      - name: Preserve original complete or partial evidence
+        if: always() && steps.preflight.outputs.enabled == 'true'
+        run: python3 proofs/numeric-portability/ci.py preserve
+        timeout-minutes: 3
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.preflight.outputs.enabled == 'true'
+        with:
+          name: numeric-portability-${{ matrix.lane }}
+          path: ${{ steps.preflight.outputs.results }}
+          if-no-files-found: error
+          retention-days: 30
+  admission:
+    needs: lane
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read activation state only
+        id: state
+        run: python3 -c "import json,os; value=json.load(open('proofs/numeric-portability/activation.json'))['enabled']; open(os.environ['GITHUB_OUTPUT'],'a').write('enabled='+str(value).lower()+'\n')"
+      - uses: actions/setup-node@v4
+        if: steps.state.outputs.enabled == 'true'
+        with:
+          node-version: '22.23.3'
+      - uses: actions/download-artifact@v4
+        if: steps.state.outputs.enabled == 'true'
+        continue-on-error: true
+        with:
+          pattern: numeric-portability-*
+          path: numeric-portability-artifacts
+      - name: Reconcile both original lane admissions without pooling
+        if: always() && steps.state.outputs.enabled == 'true'
+        run: node proofs/numeric-portability/aggregate.mjs numeric-portability-artifacts numeric-portability-admission.json
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.state.outputs.enabled == 'true'
+        with:
+          name: numeric-portability-admission
+          path: numeric-portability-admission.json
+          if-no-files-found: error
+          retention-days: 30

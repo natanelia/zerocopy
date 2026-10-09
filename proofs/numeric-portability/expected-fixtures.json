@@ -1,0 +1,56 @@
+{
+  "sourceRun": "37952544553",
+  "sourceFileSha256": "08cc7d2d60202f56357c771de4db99c3aa4f40b28b604c90f1621f1783c88ca9",
+  "cases": {
+    "range-auto-1": {
+      "inputDigest": "7b0c669d8f7734db065680dcaf7a9bdc8d3dcf7a669689ff5401a753b34338ae",
+      "queryCounts": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "inputEntries": 1
+    },
+    "range-auto-4": {
+      "inputDigest": "355c47dfa2cd24e72e2096ed9435e888473715caf0c9d26dc95083fdb0768f67",
+      "queryCounts": [
+        2,
+        0,
+        4,
+        1
+      ],
+      "inputEntries": 4
+    },
+    "range-auto-4096": {
+      "inputDigest": "3714ff131f2811d4e9dd875e0e14b787f739d1ecd524d224f2006cde2dc3bfab",
+      "queryCounts": [
+        1036,
+        0,
+        4096,
+        16
+      ],
+      "inputEntries": 4096
+    },
+    "range-auto-32769": {
+      "inputDigest": "c1e880518dfd72bd42541e05cec5c1a2221e4225e8278a9593f140cea7fc03e2",
+      "queryCounts": [
+        8288,
+        0,
+        32769,
+        128
+      ],
+      "inputEntries": 32769
+    },
+    "spatial-auto-16384": {
+      "inputDigest": "d5317c2270b831a13e8ac3a788c7d3b8de6d11285dc33a4c424e6e0db6d9bada",
+      "queryCounts": [
+        1053,
+        0,
+        16384,
+        1
+      ],
+      "inputEntries": 32768
+    }
+  }
+}
