@@ -1,0 +1,49 @@
+{
+  "fixtures": {
+    "origin": "/workspace/scratch/e7ec22ef2609/zerocopy-block-portability-proof/proofs/block-traversal-workloads.mjs",
+    "sourceSha256": "a033d884c43e50967ae4a93f827d36a98597d96853deeb2607c4c1d78f95bcca",
+    "extraction": "equal, fixture, materialize functions copied exactly",
+    "extractedSha256": "5804594f69efb731ffcdef6fe6eefa2ee3e02ff26e689245f28f0631c14e7262"
+  },
+  "subject": {
+    "origin": "/workspace/scratch/e7ec22ef2609/zerocopy-block-portability-proof/proofs/block-traversal-performance.mjs",
+    "sourceSha256": "98298f94e469bb6033649472b82b5fa2599c31051504cfe1825ff890b89bc654",
+    "replacements": [
+      [
+        "samples.filter(ms => ms < CONFIG.targetBatchMs).length",
+        "samples.filter(ms => ms < CONFIG.measuredBatchFloorMs).length"
+      ],
+      [
+        "warmupTimeShort: !allocating && warmup.elapsedMs < CONFIG.warmupMs",
+        "warmupTimeShort: !allocating && warmup.elapsedMs < CONFIG.measuredWarmupFloorMs"
+      ]
+    ],
+    "originalFunctionSha256": "99ccf63683057309052545adab61a2b35c326c568292bb7f2067c21fea379d62"
+  },
+  "command": {
+    "origin": "/workspace/scratch/e7ec22ef2609/zerocopy-block-screen-prepare-20261009/proofs/block-reuse-command.mjs",
+    "sha256": "35a2d4fe9840ba68d3c327ab6c2921055d362f87760f313093850019d7b99ff3"
+  },
+  "reviewProbe": {
+    "origin": "/workspace/shared/zerocopy-block-callback-review-20261009/review-probe.mjs",
+    "sha256": "8cf5695d1b09b90e1247618f6e89342b7313d878664dffe6df4143ef32882085",
+    "adapterReplacements": [
+      [
+        "const root = '/workspace/shared/zerocopy-block-callback-traversal-20261009/sources';",
+        "const root = process.argv[2], candidateRole = process.argv[3];\nassert(root && ['candidate', 'pr23'].includes(candidateRole));"
+      ],
+      [
+        "await import(pathToFileURL(`${root}/${subject}/dist/shared.js`).href)",
+        "await import(pathToFileURL(`${root}/${subject === 'candidate' ? candidateRole : subject}/dist/shared.js`).href)"
+      ],
+      [
+        "`${root}/candidate/dist/types/${name}`",
+        "`${root}/${candidateRole}/dist/types/${name}`"
+      ],
+      [
+        "if (process.argv[2]) writeFileSync(process.argv[2],",
+        "if (process.argv[4]) writeFileSync(process.argv[4],"
+      ]
+    ]
+  }
+}

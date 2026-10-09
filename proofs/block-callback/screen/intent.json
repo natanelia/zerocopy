@@ -1,0 +1,5 @@
+{
+  "measure": true,
+  "reviewedHarnessSha256": "f19908130cf6558c3fd2f19ddaaa2151794fb210dea873e3338b67d9b6dc9fd3",
+  "note": "Run the single reviewed Node screen only after its complete fresh correctness barrier. Preserve every failed or incomplete result; no retries."
+}
