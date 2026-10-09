@@ -1,0 +1,676 @@
+{
+  "schema": "zerocopy-investigation-memory/v1",
+  "runtime": "v22.23.3",
+  "v8": "12.4.254.21-node.57",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "measuredAt": "2026-10-09T04:02:33.162Z",
+  "trials": 3,
+  "entries": 100000,
+  "runtimeSourceCommit": "9972561c60e93500ae092c2b752880dca7740fdf",
+  "summarySHA256": "b318e78be89143dbc9cb3a7e6200f37e63c963ea907d35fc57cecc9ef30049af",
+  "description": "Recorded post-query memory. Signed retained-data totals and absolute process RSS are separate metrics. Three fresh processes per case; not browser measurements.",
+  "groups": [
+    {
+      "kind": "shared",
+      "fixture": "repeated",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 4727976,
+          "rssBytes": 87367680
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 4727752,
+          "rssBytes": 85835776
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 4713944,
+          "rssBytes": 84086784
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "repeated",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 4914336,
+          "rssBytes": 112570368
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 4932424,
+          "rssBytes": 114286592
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 4936968,
+          "rssBytes": 113233920
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "repeated",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 5270360,
+          "rssBytes": 141643776
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 5269168,
+          "rssBytes": 138915840
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 5247256,
+          "rssBytes": 143003648
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "repeated",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 9390280,
+          "rssBytes": 102404096
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 10277032,
+          "rssBytes": 103571456
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 10046520,
+          "rssBytes": 103137280
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "repeated",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 35320824,
+          "rssBytes": 191598592
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 35204304,
+          "rssBytes": 190365696
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 35657944,
+          "rssBytes": 197603328
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "repeated",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 61874176,
+          "rssBytes": 284758016
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 61571584,
+          "rssBytes": 291442688
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 61728464,
+          "rssBytes": 290992128
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "repeated",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 6355632,
+          "rssBytes": 92549120
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 6354912,
+          "rssBytes": 95641600
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 6355080,
+          "rssBytes": 94310400
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "repeated",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 24480336,
+          "rssBytes": 149274624
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 24484240,
+          "rssBytes": 150896640
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 24483848,
+          "rssBytes": 149393408
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "repeated",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 44298280,
+          "rssBytes": 213348352
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 44298280,
+          "rssBytes": 213061632
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 44299448,
+          "rssBytes": 213303296
+        }
+      ]
+    },
+    {
+      "kind": "centralized",
+      "fixture": "repeated",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 6354912,
+          "rssBytes": 94597120
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 6355632,
+          "rssBytes": 92594176
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 6354912,
+          "rssBytes": 94879744
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unique",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 9318080,
+          "rssBytes": 101511168
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 9331456,
+          "rssBytes": 101310464
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 9333208,
+          "rssBytes": 99790848
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unique",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 9538328,
+          "rssBytes": 127623168
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 9526288,
+          "rssBytes": 127516672
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 9529128,
+          "rssBytes": 128421888
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unique",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 9867096,
+          "rssBytes": 154669056
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 9865256,
+          "rssBytes": 154406912
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 9867376,
+          "rssBytes": 154341376
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unique",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 17732568,
+          "rssBytes": 128561152
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 18605200,
+          "rssBytes": 129433600
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 19678832,
+          "rssBytes": 129699840
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unique",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 46789208,
+          "rssBytes": 224120832
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 46390096,
+          "rssBytes": 230547456
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 46729264,
+          "rssBytes": 223473664
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unique",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 74388112,
+          "rssBytes": 335278080
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 74306640,
+          "rssBytes": 326795264
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 74972536,
+          "rssBytes": 330756096
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unique",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 14725856,
+          "rssBytes": 121946112
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 14726696,
+          "rssBytes": 122417152
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 14730664,
+          "rssBytes": 123678720
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unique",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 34976344,
+          "rssBytes": 171905024
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 34976240,
+          "rssBytes": 173412352
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 34976536,
+          "rssBytes": 171421696
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unique",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 56911592,
+          "rssBytes": 237707264
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 56914104,
+          "rssBytes": 238002176
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 56913808,
+          "rssBytes": 238559232
+        }
+      ]
+    },
+    {
+      "kind": "centralized",
+      "fixture": "unique",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 14725856,
+          "rssBytes": 123158528
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 14725856,
+          "rssBytes": 122011648
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 14725856,
+          "rssBytes": 122970112
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unicode",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 9746488,
+          "rssBytes": 99938304
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 9745896,
+          "rssBytes": 101830656
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 9757896,
+          "rssBytes": 99614720
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unicode",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 10219288,
+          "rssBytes": 128434176
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 10263088,
+          "rssBytes": 128909312
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 10239232,
+          "rssBytes": 128860160
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "fixture": "unicode",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 11142384,
+          "rssBytes": 154513408
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 11105864,
+          "rssBytes": 155951104
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 11126384,
+          "rssBytes": 156688384
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unicode",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 19623024,
+          "rssBytes": 131547136
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 19814024,
+          "rssBytes": 131944448
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 19103424,
+          "rssBytes": 131829760
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unicode",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 48891368,
+          "rssBytes": 237195264
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 49487824,
+          "rssBytes": 232718336
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 48790344,
+          "rssBytes": 234557440
+        }
+      ]
+    },
+    {
+      "kind": "immutable",
+      "fixture": "unicode",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 78650120,
+          "rssBytes": 340094976
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 79343744,
+          "rssBytes": 345042944
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 79342496,
+          "rssBytes": 347701248
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unicode",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 15600816,
+          "rssBytes": 123850752
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 15599968,
+          "rssBytes": 124264448
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 15599968,
+          "rssBytes": 124268544
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unicode",
+      "readers": 2,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 37598576,
+          "rssBytes": 180154368
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 37598696,
+          "rssBytes": 180649984
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 37598400,
+          "rssBytes": 178446336
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "fixture": "unicode",
+      "readers": 4,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 61283632,
+          "rssBytes": 248369152
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 61284216,
+          "rssBytes": 249847808
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 61283728,
+          "rssBytes": 250982400
+        }
+      ]
+    },
+    {
+      "kind": "centralized",
+      "fixture": "unicode",
+      "readers": 0,
+      "samples": [
+        {
+          "trial": 1,
+          "retainedBytes": 15605784,
+          "rssBytes": 126218240
+        },
+        {
+          "trial": 2,
+          "retainedBytes": 15599968,
+          "rssBytes": 123539456
+        },
+        {
+          "trial": 3,
+          "retainedBytes": 15599968,
+          "rssBytes": 123555840
+        }
+      ]
+    }
+  ]
+}

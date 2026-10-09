@@ -1,0 +1,45 @@
+{
+  "sourceCommit": "7b19074e8ebd9a1a315df77f1f9f22e5f075615e",
+  "version": "0.2.1",
+  "dependencies": {
+    "immutable": "5.1.9",
+    "immer": "11.1.21"
+  },
+  "base": "/zerocopy/previews/pr-26/b1ba3a55be8d4c0ac167f87ad271443e7cdee31e/",
+  "preview": {
+    "number": 26,
+    "headCommit": "b1ba3a55be8d4c0ac167f87ad271443e7cdee31e"
+  },
+  "pages": [
+    "",
+    "compare/",
+    "explorer/",
+    "investigation-benchmark/",
+    "lab/",
+    "playground/",
+    "use-cases/",
+    "docs/getting-started/",
+    "docs/mental-model/",
+    "docs/collections/",
+    "docs/text-search/",
+    "docs/sessions/",
+    "docs/transport/",
+    "docs/tasks/",
+    "docs/workers/",
+    "docs/redux/",
+    "docs/tanstack/",
+    "docs/memory/",
+    "docs/memory-comparison/",
+    "docs/benchmarks/",
+    "docs/migration/",
+    "docs/use-cases/",
+    "docs/log-explorer/",
+    "docs/data-tables/",
+    "docs/graphs/",
+    "docs/simulations/",
+    "docs/analytics/",
+    "docs/maps/",
+    "docs/editors/"
+  ],
+  "librarySHA256": "59efb082757c4c6bd8a4e77d5aa478faa55dd4212bc65eac45bdb20a43c15fec"
+}
