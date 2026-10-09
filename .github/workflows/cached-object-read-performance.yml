@@ -1,0 +1,177 @@
+name: Single-lookup object read performance gate
+
+on:
+  push:
+    branches: [perf/object-read-single-lookup-20261009]
+    paths:
+      - 'proofs/cached-object-read-*'
+      - '.github/workflows/cached-object-read-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: object-read-single-lookup-performance-gate
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: github.run_attempt == 1 && (github.event_name != 'push' || github.event.forced == false)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    env:
+      BASELINE_SHA: 3773c6e519c7c0958da13727ed1082f449f3ee25
+      CANDIDATE_SHA: 042b41a7f68a89a10751f285eef79259adfe4aa3
+      CORRECTNESS_SHA: 63f1a0a2d589418fb4f4630f2353f2ba88e9f58d
+      CORRECTNESS_RUN: '37876200596'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Use a task-local npm cache
+        shell: bash
+        run: printf 'npm_config_cache=%s/object-read-screen-npm-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Resolve one-time prospective measurement intent
+        id: intent
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re, subprocess
+          path = "proofs/cached-object-read-run.json"
+          intent = json.load(open(path))
+          assert set(intent) == {"schema", "measure", "reviewed_harness_sha256", "validated_check_commit", "validated_check_run"}
+          assert type(intent["schema"]) is int and intent["schema"] == 1 and type(intent["measure"]) is bool
+          digest = intent["reviewed_harness_sha256"]
+          validated = intent["validated_check_commit"]
+          validation_run = intent["validated_check_run"]
+          assert isinstance(digest, str) and isinstance(validated, str) and type(validation_run) is int
+          measure = intent["measure"] and os.environ["EVENT_NAME"] == "push"
+          if measure:
+              assert re.fullmatch("[0-9a-f]{64}", digest), "exact reviewed harness digest required"
+              before = os.environ["BEFORE_SHA"]
+              assert re.fullmatch("[0-9a-f]{40}", before) and set(before) != {"0"}
+              assert re.fullmatch("[0-9a-f]{40}", validated) and validated == before
+              assert type(validation_run) is int and validation_run > 0
+              parent = subprocess.check_output(["git", "rev-parse", "HEAD^"], text=True).strip()
+              assert parent == validated, "activation must directly follow its validated check commit"
+              changed = subprocess.check_output(["git", "diff", "--name-only", validated, "HEAD"], text=True).splitlines()
+              assert changed == [path], "activation may change only the intent file"
+              history = subprocess.check_output(["git", "log", "--format=%H", before, "--", path], text=True).splitlines()
+              assert history, "publish checks-only intent before timing"
+              for revision in history:
+                  previous = json.loads(subprocess.check_output(["git", "show", revision + ":" + path], text=True))
+                  assert previous["measure"] is False, "this pinned experiment already had a measurement activation; no rerun"
+          else:
+              assert not intent["measure"] or os.environ["EVENT_NAME"] == "workflow_dispatch"
+              if not intent["measure"]:
+                  assert digest == "" and validated == "" and validation_run == 0
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("measure=" + str(measure).lower() + "\n")
+              output.write("digest=" + (digest if measure else "") + "\n")
+              output.write("validation_commit=" + (validated if measure else "") + "\n")
+              output.write("validation_run=" + (str(validation_run) if measure else "0") + "\n")
+          PY
+      - name: Verify prior successful checks for the exact activation parent
+        if: steps.intent.outputs.measure == 'true'
+        env:
+          VALIDATION_COMMIT: ${{ steps.intent.outputs.validation_commit }}
+          VALIDATION_RUN: ${{ steps.intent.outputs.validation_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 proofs/cached-object-read-reference.py --validate-activation "$VALIDATION_RUN" "$VALIDATION_COMMIT" "$RUNNER_TEMP/cached-object-read-gate/validated-check-run.json"
+      - name: Retrieve and verify immutable correctness references
+        shell: bash
+        run: |
+          set -euo pipefail
+          GATE="$RUNNER_TEMP/cached-object-read-gate"
+          mkdir -p "$GATE/references" "$GATE/downloads" "$GATE/logs"
+          for role in baseline candidate; do
+            python3 proofs/cached-object-read-reference.py "$role" "$GATE/downloads/$role.zip" "$GATE/references/$role" 2>&1 | tee "$GATE/logs/$role-reference.log"
+          done
+      - name: Rebuild pinned sources with the original dependency lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          GATE="$RUNNER_TEMP/cached-object-read-gate"
+          DEPS="$RUNNER_TEMP/cached-object-read-dependencies"
+          mkdir -p "$DEPS" "$GATE/builds"
+          cmp "$GATE/references/baseline/cached-object-evidence/bun.lock" "$GATE/references/candidate/cached-object-evidence/bun.lock"
+          git show "$BASELINE_SHA:package.json" > "$DEPS/package.json"
+          cp "$GATE/references/baseline/cached-object-evidence/bun.lock" "$DEPS/bun.lock"
+          (cd "$DEPS" && bun install --frozen-lockfile) 2>&1 | tee "$GATE/logs/dependency-install.log"
+          for role in baseline candidate; do
+            if [[ "$role" == baseline ]]; then source="$BASELINE_SHA"; else source="$CANDIDATE_SHA"; fi
+            PROJECT="$GATE/builds/$role"
+            git worktree add --detach "$PROJECT" "$source"
+            ln -s "$DEPS/node_modules" "$PROJECT/node_modules"
+            (cd "$PROJECT" && bun run build:wasm) 2>&1 | tee "$GATE/logs/$role-build-wasm.log"
+            (cd "$PROJECT" && bun run build:browser) 2>&1 | tee "$GATE/logs/$role-build-browser.log"
+            (cd "$PROJECT" && bun run build:types) 2>&1 | tee "$GATE/logs/$role-build-types.log"
+          done
+          node --version > "$GATE/logs/node-version.txt"
+          bun --version > "$GATE/logs/bun-version.txt"
+          lscpu > "$GATE/logs/cpu.txt"
+          uname -a > "$GATE/logs/kernel.txt"
+      - name: Validate protocol and all public-get fixtures before any timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          GATE="$RUNNER_TEMP/cached-object-read-gate"
+          node --test proofs/cached-object-read-protocol.node.mjs 2>&1 | tee "$GATE/logs/protocol-node.log"
+          bun test ./proofs/cached-object-read-protocol.node.mjs 2>&1 | tee "$GATE/logs/protocol-bun.log"
+          node proofs/cached-object-read-controller.mjs check "$PWD" "$GATE/builds/baseline" "$GATE/builds/candidate" "$GATE" 2>&1 | tee "$GATE/logs/fixture-checks.log"
+      - name: Run independently reviewed frozen campaign once
+        if: steps.intent.outputs.measure == 'true'
+        env:
+          REVIEWED_DIGEST: ${{ steps.intent.outputs.digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          GATE="$RUNNER_TEMP/cached-object-read-gate"
+          node proofs/cached-object-read-controller.mjs measure "$PWD" "$GATE/builds/baseline" "$GATE/builds/candidate" "$GATE" "$REVIEWED_DIGEST" 2>&1 | tee "$GATE/logs/campaign.log"
+      - name: Retain complete and partial evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          GATE="$RUNNER_TEMP/cached-object-read-gate"
+          mkdir -p "$GATE/harness"
+          cp proofs/cached-object-read-{protocol.mjs,workloads.mjs,subject.mjs,controller.mjs,protocol.node.mjs,reference.py,performance.md,run.json} "$GATE/harness/"
+          cp .github/workflows/cached-object-read-performance.yml "$GATE/harness/workflow.yml"
+          git rev-parse HEAD > "$GATE/harness/proof-commit.txt"
+          # Exclude source worktrees and their external node_modules symlinks.
+          # Retain checked build bytes separately in a self-contained archive.
+          for role in baseline candidate; do
+            if [[ -d "$GATE/builds/$role/dist" ]]; then
+              mkdir -p "$GATE/retained-builds/$role"
+              cp -a "$GATE/builds/$role/dist" "$GATE/retained-builds/$role/"
+              cp "$GATE/builds/$role/package.json" "$GATE/retained-builds/$role/"
+              cp "$GATE/builds/$role/"*.wasm "$GATE/retained-builds/$role/"
+            fi
+          done
+          tar --exclude='cached-object-read-gate/builds' -czf "$RUNNER_TEMP/cached-object-read-gate.tar.gz" -C "$RUNNER_TEMP" cached-object-read-gate
+          sha256sum "$RUNNER_TEMP/cached-object-read-gate.tar.gz" > "$RUNNER_TEMP/cached-object-read-gate.sha256"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cached-object-read-gate-${{ github.sha }}-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/cached-object-read-gate.tar.gz
+            ${{ runner.temp }}/cached-object-read-gate.sha256
+          retention-days: 30
+          if-no-files-found: error
