@@ -1,8 +1,8 @@
 {
-  "enabled": false,
+  "enabled": true,
   "publishedRuntime": "21de2bf4b49d1b2cf5da698be41a27f37fd84bed",
-  "acceptedCommit": null,
-  "acceptedTree": null,
-  "acceptedHarnessSha256": null,
-  "note": "Default off. Parent may make one separately reviewed intent-only activation commit after independent acceptance and publication, then create a fresh isolated proof/heap-compaction-records-run-* branch. No activation is authorized by this file alone."
+  "acceptedCommit": "ae351f237bf2af368b5f7e29c5d63e27ebbf3d75",
+  "acceptedTree": "83ba9ebcb5f3c264cf21f1457ea4973641cee7a9",
+  "acceptedHarnessSha256": "a87089a23273a8438eca36e0ee547cd2cffc715a706dc8597fb73f7ef2e2446a",
+  "note": "Reviewed intent-only activation for the first Node 22/Bun heap-compaction screen. Fresh exact-head correctness gates are mandatory before any pilot."
 }
