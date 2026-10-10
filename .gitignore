@@ -44,3 +44,6 @@ proofs/results/investigation-memory/
 
 # Reproducible JSON-read measurements from CI
 proofs/json-read-results/ci/
+
+# Reproducible worker attachment measurements from CI
+proofs/worker-arena-results/ci/

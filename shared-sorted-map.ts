@@ -48,8 +48,19 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
   *entries(): Generator<[string, ValueOf<T>]> {
     if (this.comparator) yield* [...this.naturalEntries()].sort((a, b) => this.comparator!(a[0], b[0])); else yield* this.naturalEntries();
   }
-  *keys(): Generator<string> { for (const [key] of this.entries()) yield key; }
-  *values(): Generator<ValueOf<T>> { for (const [, value] of this.entries()) yield value; }
+  *keys(): Generator<string> {
+    const a = this.arena;
+    if (this.comparator) {
+      const keys: string[] = [];
+      for (const leaf of a.radixLeaves(this.root)) keys.push(a.leafKey(leaf));
+      // Stable sorting preserves radix order when a custom comparator ties.
+      yield* keys.sort((a, b) => this.comparator!(a, b));
+    } else for (const leaf of a.radixLeaves(this.root)) yield a.leafKey(leaf);
+  }
+  *values(): Generator<ValueOf<T>> {
+    if (this.comparator) { for (const [, value] of this.entries()) yield value; }
+    else { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield a.leafValue(this.valueType, leaf); }
+  }
   forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [key, value] of this.entries()) fn(value, key); }
   toWorkerData() {
     if (this.comparator) throw new Error('Custom comparator functions cannot be sent to workers');

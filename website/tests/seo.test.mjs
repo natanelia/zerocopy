@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { shell } from '../templates.mjs';
+import { projectName, repository, npmPackage } from '../config.mjs';
 
 const out = new URL('../_site/', import.meta.url);
 const read = path => readFileSync(new URL(path, out), 'utf8');
@@ -12,7 +14,12 @@ test('production documentation publishes by default, with an explicit opt-out', 
 });
 
 test('the homepage identifies the library, not only its slogan', () => {
-  assert.match(read('index.html'), /<title>zerocopy: Zero-copy immutable collections for JavaScript and TypeScript/);
+  const html = read('index.html');
+  assert.match(html, /<title>natanelia\/zerocopy: Immutable collections for JavaScript and TypeScript<\/title>/);
+  const body = html.split('<body')[1];
+  assert.ok(body.includes(`<a href="${repository}">${projectName}</a>`));
+  assert.match(body, /zerocopy is a JavaScript and TypeScript library/);
+  assert.ok(body.includes(`href="${npmPackage}"`));
   assert.match(read('index.html'), /SharedArrayBuffer/);
 });
 
@@ -46,4 +53,47 @@ test('production sitemap and page metadata agree on clean deployment URLs', () =
   }
   assert.doesNotMatch(read('sitemap.xml'), /previews\/|404\.html|markdown\//);
   assert.ok(read('robots.txt').includes(`Sitemap: ${new URL('sitemap.xml', locations[0]).href}`));
+});
+
+function projectData(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map(match => JSON.parse(match[1]));
+}
+
+test('built pages describe the source project only on the canonical production homepage', () => {
+  for (const route of meta.pages) {
+    const html = read(route + 'index.html');
+    const data = projectData(html);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)">/);
+    if (route || meta.preview || !canonical) {
+      assert.deepEqual(data, [], route);
+      continue;
+    }
+    assert.equal(data.length, 1);
+    assert.equal(data[0]['@context'], 'https://schema.org');
+    assert.equal(data[0]['@type'], 'SoftwareSourceCode');
+    assert.equal(data[0]['@id'], repository);
+    assert.equal(data[0].name, projectName);
+    assert.equal(data[0].alternateName, 'zerocopy');
+    assert.equal(data[0].url, canonical[1]);
+    assert.equal(data[0].codeRepository, repository);
+    assert.equal(data[0].license, `${repository}/blob/main/LICENSE`);
+    assert.deepEqual(data[0].sameAs, [npmPackage]);
+    assert.deepEqual(data[0].programmingLanguage, ['TypeScript', 'JavaScript']);
+  }
+  assert.deepEqual(projectData(read('404.html')), []);
+});
+
+test('project identity uses the deployment URL and cannot escape its JSON-LD script', () => {
+  const description = 'Shared "maps" & lists </script><script>alert(1)</script>';
+  const options = { title: projectName, description, body: '<main></main>', version: '0.2.1', sha: 'a'.repeat(40), origin: 'https://example.test' };
+  for (const base of ['/', '/zerocopy/']) {
+    const html = shell({ ...options, base });
+    assert.equal(projectData(html)[0].url, options.origin + base);
+    assert.equal(projectData(html)[0].description, description);
+    assert.doesNotMatch(html, /<script>alert/);
+    assert.ok(html.includes('\\u003c/script>'));
+    assert.deepEqual(projectData(shell({ ...options, base, origin: '' })), []);
+    assert.deepEqual(projectData(shell({ ...options, base, noindex: true })), []);
+    assert.deepEqual(projectData(shell({ ...options, base, route: 'docs/getting-started/' })), []);
+  }
 });

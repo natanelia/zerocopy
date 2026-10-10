@@ -1,0 +1,84 @@
+name: Sorted map iterator projection
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared-ordered-map.ts'
+      - 'shared-sorted-map.ts'
+      - 'map-projection.test.ts'
+      - 'proofs/map-projection*'
+      - '.github/workflows/map-projection-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.event_name != 'pull_request' || github.head_ref == 'perf/map-key-projection-20261008'
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun, chromium, firefox, webkit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck
+      - run: bun run test -- map-projection.test.ts
+      - name: Build exact branch merge-base with identical tools
+        run: |
+          base="$(git merge-base HEAD origin/main)"
+          git cat-file -e "$base^{commit}"
+          mkdir -p .proof-baseline
+          git archive "$base" | tar -x -C .proof-baseline
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser)
+          mkdir -p proofs/results/map-projection
+          printf '%s\n' "$base" > proofs/results/map-projection/base-commit.txt
+          git rev-parse HEAD > proofs/results/map-projection/candidate-commit.txt
+      - name: Measure sorted targets and all ordered/entry controls
+        if: matrix.runtime == 'node' || matrix.runtime == 'bun'
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          "$RUNTIME" proofs/map-projection-performance.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME.json"
+          CASE_CLASS=control BENCH_MODE=aa-baseline "$RUNTIME" proofs/map-projection-performance.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME-aa.json"
+      - name: Verify real Node worker projections
+        if: matrix.runtime == 'node'
+        run: node proofs/map-projection-worker.mjs
+      - name: Install browser engine
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        env:
+          ENGINE: ${{ matrix.runtime }}
+        run: bunx playwright install --with-deps "$ENGINE"
+      - name: Verify and measure sorted projections with full controls
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        env:
+          ENGINES: ${{ matrix.runtime }}
+        run: |
+          node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES.json"
+          CASE_CLASS=control BENCH_MODE=aa-baseline node proofs/map-projection-browser.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$ENGINES-aa.json"
+      - name: Verify controls and targets with one build per fresh browser process
+        if: matrix.runtime != 'node' && matrix.runtime != 'bun'
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+          SUITE: all
+        run: |
+          export BASELINE_COMMIT="$(cat proofs/results/map-projection/base-commit.txt)"
+          export CANDIDATE_COMMIT="$(cat proofs/results/map-projection/candidate-commit.txt)"
+          node proofs/map-projection-isolation.mjs .proof-baseline/dist/shared.js dist/shared.js "proofs/results/map-projection/$RUNTIME-isolated.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-projection-evidence-${{ matrix.runtime }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: proofs/results/map-projection/
+          retention-days: 30
+          if-no-files-found: error

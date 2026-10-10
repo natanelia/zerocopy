@@ -76,6 +76,11 @@ try {
   await mobile.setViewportSize({ width: 390, height: 844 });
   assert.equal(await mobile.locator('#mobile-nav').isVisible(), false);
   const noJs = await browser.newContext({ javaScriptEnabled: false }); const plain = await noJs.newPage();
+  await plain.goto(origin + base);
+  assert.match(await plain.title(), /^natanelia\/zerocopy:/);
+  assert.equal(await plain.locator('.hero a[href="https://github.com/natanelia/zerocopy"]').innerText(), 'natanelia/zerocopy');
+  assert.match(await plain.locator('.hero-description').innerText(), /JavaScript and TypeScript/);
+  assert.equal(await plain.locator('a[href="https://www.npmjs.com/package/zerocopy"]').isVisible(), true);
   await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap')); await noJs.close();
   await context.close();
   console.log('Passed: desktop/mobile layout, lazy runtime, navigation, safe search, no-JS docs, actual worker snapshots, live benchmark checksums/export, and cancellation.');

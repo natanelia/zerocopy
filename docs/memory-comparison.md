@@ -4,6 +4,8 @@ Memory is part of the performance result. A copy counter is not a memory measure
 
 These are **recorded Node.js worker measurements**, not live measurements of your browser. The speed comparison uses Chromium and WebKit. Do not combine these memory figures with those timings as one browser result. Browser and physical iPhone RAM remain unmeasured here.
 
+This report preserves the 9 October recording from source `9972561`, before the later merge with main. The shared path stores five columns in SharedLists. It does not use priority queues, so these figures do not measure the heap-insertion savings or the effect of that merge.
+
 ## Retained data memory
 
 100,000 initial events. One data owner and two reader workers for Shared, Immutable.js and Native replicas. The one-owner control uses one native data owner with no reader replicas. All paths also have a small controller thread. Values are **MiB**, where 1 MiB = 1,048,576 bytes. Lower is better.

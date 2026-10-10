@@ -1,0 +1,88 @@
+name: Worker arena performance
+
+on:
+  push:
+    branches: [perf/worker-arena-registry-20261008]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'arena.ts'
+      - 'shared.ts'
+      - 'worker-attachment.test.ts'
+      - 'proofs/worker-arenas.mjs'
+      - 'proofs/*worker-arena*.mjs'
+      - 'scripts/build-*'
+      - '.github/workflows/worker-arena-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event_name != 'pull_request' || github.head_ref == 'perf/worker-arena-registry-20261008'
+    env:
+      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      BASELINE_SHA: '3773c6e519c7c0958da13727ed1082f449f3ee25'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - name: Verify attachment, graph traversal, and real workers
+        run: |
+          node --test proofs/worker-arena-source-guard.node.mjs
+          bun run typecheck
+          bun run test -- worker-attachment.test.ts worker-records.test.ts worker.test.ts immutable-proof.test.ts nested.test.ts descriptor-validation.test.ts redux-checkpoint.test.ts
+          node proofs/worker-arenas.mjs
+          node proofs/node-worker.mjs
+          node proofs/worker-sessions.mjs
+          node proofs/typed-json-worker.mjs
+      - name: Build the baseline with identical tools
+        run: |
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          git cat-file -e "$BASELINE_SHA^{commit}"
+          git worktree add --detach .proof-baseline "$BASELINE_SHA"
+          test "$(git -C .proof-baseline rev-parse HEAD)" = "$BASELINE_SHA"
+          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd .proof-baseline && bun run build:wasm && bun run build:browser)
+      - name: Measure small, representative, and stress payloads
+        env:
+          ARENA_COUNTS: '1,2,12,32,512'
+          ARENA_RUNTIMES: 'node,bun'
+          SAMPLES: '7'
+          WARMUPS: '3'
+          ARENA_BLOCKS: '4'
+          MIN_BATCH_MS: '10'
+        run: node proofs/run-worker-arenas.mjs .proof-baseline . proofs/worker-arena-results/ci
+      - name: Retain exact evidence and measured builds
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: worker-arena-evidence-${{ runner.arch }}-${{ env.CANDIDATE_SHA }}
+          path: |
+            proofs/worker-arena-results/ci/
+            proofs/worker-arena-benchmark.mjs
+            proofs/run-worker-arenas.mjs
+            proofs/worker-arena-source-guard.mjs
+            proofs/worker-arena-source-guard.node.mjs
+            dist/
+            .proof-baseline/dist/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
