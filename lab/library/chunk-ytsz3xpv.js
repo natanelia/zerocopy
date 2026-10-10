@@ -1,10 +1,10 @@
 import {
   Snapshot
-} from "./chunk-bngxdyck.js";
+} from "./chunk-8hw6gtrx.js";
 import {
   getWorkerData2,
   initWorker2
-} from "./chunk-nedtaxnp.js";
+} from "./chunk-tncfb2ad.js";
 
 // worker-protocol.ts
 var PROTOCOL = "zerocopy/session";

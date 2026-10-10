@@ -318,13 +318,41 @@ class Snapshot {
     return this.#owner;
   }
 }
+var arenaRegistries = new WeakMap;
+function createArenaRegistry(arenas) {
+  const registry = { arenas, members: [], shared: true };
+  arenaRegistries.set(arenas, registry);
+  return registry;
+}
 
 class Arena {
   memory;
   wasm;
   id;
   readOnly;
-  dependencies = new Map;
+  dependencyLookup = new Map;
+  get dependencies() {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    if (registry) {
+      registry.shared = false;
+      const dependencies = new Map;
+      for (const [id, arena] of registry.arenas)
+        if (arena !== this)
+          dependencies.set(id, arena);
+      this.dependencyLookup = dependencies;
+    }
+    return this.dependencyLookup;
+  }
+  get transportDependencies() {
+    return this.dependencyLookup;
+  }
+  get sharedDependencyMembers() {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    return registry?.shared ? registry.members : undefined;
+  }
+  get hasSharedDependencies() {
+    return this.sharedDependencyMembers !== undefined;
+  }
   writeHead = 0;
   writeSize = 0;
   writeCount = 0;
@@ -398,6 +426,8 @@ class Arena {
     if (options.used !== undefined)
       this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
+    if (this.readOnly && options.registry)
+      this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
@@ -543,7 +573,7 @@ class Arena {
       const factory = structureRegistry[parsed.__t];
       if (!factory || parsed.__t !== nested.structureType)
         throw new TypeError("Invalid nested structure type");
-      const source = parsed.__a === this.id ? this : this.dependencies.get(parsed.__a);
+      const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source)
         throw new Error("Missing nested arena in worker data");
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
@@ -914,13 +944,14 @@ class Arena {
     return this.value(root, key, "number");
   }
   *radixLeaves(root) {
-    if (root && this.dv.getUint32(root, true) === 4294967295) {
-      const pending = [], n = this.dv.getUint32(root + 12, true);
+    let dv;
+    if (root && (dv = this.dv).getUint32(root, true) === 4294967295) {
+      const pending = [], n = dv.getUint32(root + 12, true);
       for (let i = 0;i < n; i++)
-        pending.push(this.dv.getUint32(root + 16 + i * 4, true));
+        pending.push(dv.getUint32(root + 16 + i * 4, true));
       pending.sort((a, b) => this.wasm.compareLeaves(a, b));
       let i = 0;
-      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
+      for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
         while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0)
           yield pending[i++];
         if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0)
@@ -934,7 +965,7 @@ class Arena {
     }
     const stack = root ? [root] : [];
     while (stack.length) {
-      const p = stack.pop(), dv = this.dv;
+      const p = stack.pop();
       if (!dv.getUint32(p, true))
         yield p;
       else
@@ -1312,23 +1343,26 @@ class Arena {
     return input;
   }
   *blocks(root, reverse = false) {
+    if (!root)
+      return;
+    const dv = this.dv;
     const stack = [];
     let node = root;
     const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
     while (node || stack.length) {
       while (node) {
         stack.push(node);
-        node = this.dv.getUint32(node + first, true);
+        node = dv.getUint32(node + first, true);
       }
       node = stack.pop();
-      const data = this.dv.getUint32(node + 16, true), length = this.dv.getUint32(node + 20, true);
-      const next = this.dv.getUint32(node + second, true);
+      const data = dv.getUint32(node + 16, true), length = dv.getUint32(node + 20, true);
+      const next = dv.getUint32(node + second, true);
       if (reverse)
         for (let i = length - 1;i >= 0; i--)
-          yield this.dv.getFloat64(data + i * 8, true);
+          yield dv.getFloat64(data + i * 8, true);
       else
         for (let i = 0;i < length; i++)
-          yield this.dv.getFloat64(data + i * 8, true);
+          yield dv.getFloat64(data + i * 8, true);
       node = next;
     }
   }
@@ -1346,4 +1380,4 @@ class Arena {
   }
 }
 
-export { configureMemory2, freezeJSON, json2, map2, list2, stack2, queue2, linkedList2, doublyLinkedList2, orderedMap2, sortedMap2, priorityQueue2, set2, orderedSet2, sortedSet2, parseNestedType, structureRegistry, FORMAT_VERSION, HEAP_START, MAX_SIZE, hashBytes, vectorDepth, validIndex, checkedSize, arenaOf, Snapshot, Arena };
+export { configureMemory2, freezeJSON, json2, map2, list2, stack2, queue2, linkedList2, doublyLinkedList2, orderedMap2, sortedMap2, priorityQueue2, set2, orderedSet2, sortedSet2, parseNestedType, structureRegistry, FORMAT_VERSION, HEAP_START, MAX_SIZE, hashBytes, vectorDepth, validIndex, checkedSize, arenaOf, Snapshot, createArenaRegistry, Arena };

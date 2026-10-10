@@ -7,14 +7,15 @@ import {
   checkedSize,
   arenaOf,
   Snapshot,
+  createArenaRegistry,
   Arena
-} from "./chunk-bngxdyck.js";
+} from "./chunk-8hw6gtrx.js";
 import {
   SharedMap2
-} from "./chunk-fvjmff4x.js";
+} from "./chunk-y3qf8ee4.js";
 import {
   SharedList2
-} from "./chunk-qrfmwc9f.js";
+} from "./chunk-q6sd1gxn.js";
 
 // set-key.ts
 function encodeSetKey(value) {
@@ -789,10 +790,10 @@ class SharedPriorityQueue2 extends Snapshot {
   *entries() {
     const arena = this.arena, pending = this.root ? [this.root] : [];
     while (pending.length) {
-      const node = pending.pop();
-      const priority = arena.dv.getFloat64(node, true);
-      const value = arena.decode(this.valueType, arena.dv.getFloat64(node + 8, true));
-      const left = arena.dv.getUint32(node + 16, true), right = arena.dv.getUint32(node + 20, true);
+      const node = pending.pop(), view = arena.dv;
+      const priority = view.getFloat64(node, true);
+      const value = arena.decode(this.valueType, view.getFloat64(node + 8, true));
+      const left = view.getUint32(node + 16, true), right = view.getUint32(node + 20, true);
       if (right)
         pending.push(right);
       if (left)
@@ -1029,14 +1030,27 @@ function getWorkerData2(structures, options = {}) {
   const copy = options.copy ?? typeof Bun !== "undefined";
   const found = new Map;
   const collect = (root) => {
-    const pending = [root];
-    while (pending.length) {
-      const arena = pending.pop();
-      if (found.has(arena.id))
-        continue;
-      found.set(arena.id, arena);
-      for (const nested of arena.dependencies.values())
-        pending.push(nested);
+    let arena = root, pending;
+    while (arena) {
+      if (!found.has(arena.id)) {
+        found.set(arena.id, arena);
+        const dependencies = arena.transportDependencies ?? arena.dependencies;
+        if (dependencies.size) {
+          const members = arena.readOnly ? arena.sharedDependencyMembers : undefined;
+          if (members) {
+            for (let i = members.length - 1;i >= 0; i--) {
+              const nested = members[i];
+              if (nested !== arena && !found.has(nested.id))
+                found.set(nested.id, nested);
+            }
+          } else {
+            pending ??= [];
+            for (const nested of dependencies.values())
+              pending.push(nested);
+          }
+        }
+      }
+      arena = pending?.pop();
     }
   };
   const serialized = Object.create(null);
@@ -1055,17 +1069,16 @@ async function initWorker2(data) {
   if (!data?.__shared || data.version !== FORMAT_VERSION)
     throw new Error("Unsupported worker data; create a v4 payload with getWorkerData()");
   const arenas = new Map;
+  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
   for (const source of data.arenas) {
     if (!source.memory && !source.copy || arenas.has(source.id))
       throw new Error("Invalid arena transport");
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy.byteLength))
       throw new Error("Invalid arena length");
-    arenas.set(source.id, new Arena({ ...source, readOnly: true }));
+    const arena = new Arena({ ...source, readOnly: true, registry });
+    arenas.set(source.id, arena);
+    registry?.members.push(arena);
   }
-  for (const arena of arenas.values())
-    for (const dependency of arenas.values())
-      if (arena !== dependency)
-        arena.dependencies.set(dependency.id, dependency);
   const result = Object.create(null);
   for (const [name, item] of Object.entries(data.structures)) {
     const arena = arenas.get(item.arena), factory = structureRegistry[item.type];
