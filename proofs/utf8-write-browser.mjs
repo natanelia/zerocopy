@@ -61,7 +61,7 @@ const quantile = (input, fraction) => {
 const runs = [];
 const report = { schema: 'zerocopy-utf8-write-browser/v1', date: new Date().toISOString(),
   platform: process.platform, arch: process.arch, cpu: cpus()[0]?.model, settings, paths, buildSha256,
-  method: 'One fresh browser context and page per variant and workload; each page imports only one build. Variant order rotates by workload and round. Fresh arena before every run. Initialization, validation, SHA256, and sample transfer are outside timing. All measured pairs compare exact payload hashes, descriptors, used bytes, and backing bytes after retrieval. No explicit GC or timing threshold.', runs };
+  method: 'One fresh browser context and page per variant and workload; each page imports only one build. Variant order rotates by workload and round. Fresh arena before every run. Initialization, validation, SHA256, and sample transfer are outside timing. Every fresh run is checked for per-build stability of payload hashes, descriptors, used bytes, and backing bytes. Eligible bounded generic-map pairs compare verified logical contents and structure and retain both physical records; unaffected paths compare exact physical records after retrieval. No explicit GC or timing threshold.', runs };
 mkdirSync(dirname(resolve(outputArg)), { recursive: true });
 const save = () => writeFileSync(outputArg, JSON.stringify(report, null, 2) + '\n');
 save();
