@@ -62,6 +62,16 @@ export abstract class Snapshot {
   protected get arena(): Arena { return this.#owner; }
 }
 
+export interface ArenaRegistry { readonly arenas: Map<string, Arena>; readonly members: Arena[]; shared: boolean }
+// Registry metadata belongs to the shared lookup, not every Arena. Keeping one
+// dependency field preserves the layout of the ordinary read-cache fields.
+const arenaRegistries = new WeakMap<Map<string, Arena>, ArenaRegistry>();
+export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
+  const registry = { arenas, members: [] as Arena[], shared: true };
+  arenaRegistries.set(arenas, registry);
+  return registry;
+}
+
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
  * Attached arenas are read-only: their allocator and scratch cannot race a writer.
@@ -71,7 +81,28 @@ export class Arena {
   readonly wasm: any;
   readonly id: string;
   readonly readOnly: boolean;
-  readonly dependencies = new Map<string, Arena>();
+  private dependencyLookup = new Map<string, Arena>();
+  // Worker payloads share one lookup. Preserve the distinct, self-excluding Map
+  // exposed to internal callers without eagerly building an all-to-all graph.
+  get dependencies(): Map<string, Arena> {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    if (registry) {
+      // Observing a mutable map opens the otherwise closed attachment graph.
+      // Preserve ordinary DFS precedence if callers subsequently extend it.
+      registry.shared = false;
+      const dependencies = new Map<string, Arena>();
+      for (const [id, arena] of registry.arenas) if (arena !== this) dependencies.set(id, arena);
+      this.dependencyLookup = dependencies;
+    }
+    return this.dependencyLookup;
+  }
+  /** Internal transport traversal must not materialize attachment maps. */
+  get transportDependencies(): ReadonlyMap<string, Arena> { return this.dependencyLookup; }
+  get sharedDependencyMembers(): readonly Arena[] | undefined {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    return registry?.shared ? registry.members : undefined;
+  }
+  get hasSharedDependencies(): boolean { return this.sharedDependencyMembers !== undefined; }
   writeHead = 0;
   writeSize = 0;
   writeCount = 0;
@@ -129,12 +160,13 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
+    if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
@@ -243,7 +275,7 @@ export class Arena {
     if (nested) {
       const factory = structureRegistry[parsed.__t];
       if (!factory || parsed.__t !== nested.structureType) throw new TypeError('Invalid nested structure type');
-      const source = parsed.__a === this.id ? this : this.dependencies.get(parsed.__a);
+      const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
