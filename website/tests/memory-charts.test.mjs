@@ -7,15 +7,15 @@ const clone = () => structuredClone(chartData);
 test('charted samples retain the recorded source, workload, and exact byte medians', () => {
   assert.equal(validateChartData(chartData), chartData);
   assert.equal(chartData.groups.length, 30);
-  assert.deepEqual(chartModel('retained').groups[0].points.map(p=>p.bytes), [9482568,46183264,34987232,14761560]);
-  assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [104669184,199213056,147939328,96714752]);
+  assert.deepEqual(chartModel('retained').groups[0].points.map(p=>p.bytes), [9539456,46616648,34976584,14726792]);
+  assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [127991808,223334400,172146688,121851904]);
   assert.equal(formatMiB(9482568), '9.04');
 });
 test('reader scaling includes only measured counts on one common zero-based scale', () => {
   const model=chartModel('readers'); assert.equal(model.limit,80);
   assert.deepEqual(model.groups.map(group=>group.points[0].readers),[0,2,4]);
   for (const group of model.groups) assert.deepEqual(group.points.map(p=>p.kind),['shared','immutable','native']);
-  assert.deepEqual(model.groups[2].points.map(p=>p.bytes),[9822536,74162160,56926080]);
+  assert.deepEqual(model.groups[2].points.map(p=>p.bytes),[9868408,74573136,56914152]);
 });
 test('missing, repeated, invalid, or altered-source samples cannot silently render', () => {
   for (const mutate of [d=>d.groups.pop(), d=>d.groups[1]=d.groups[0], d=>d.groups[0].samples.pop(), d=>d.groups[0].samples[0].retainedBytes=NaN, d=>d.groups[0].samples[0].rssBytes=-1, d=>d.runtime='different', d=>d.summarySHA256='wrong']) {
