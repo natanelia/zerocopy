@@ -1,0 +1,114 @@
+name: Session flush fixed portability screen
+on:
+  push:
+    branches: ['proof/session-flush-portability-20261010']
+permissions:
+  contents: read
+concurrency:
+  group: session-flush-portability-20261010
+  cancel-in-progress: false
+jobs:
+  arm:
+    # Dormant until a separately reviewed activation patch changes this guard.
+    if: ${{ false && github.run_attempt == 1 && github.event.before == '0000000000000000000000000000000000000000' }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: proofs/session-flush-portability
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with: { persist-credentials: false }
+      - name: Check one-run identity
+        run: |
+          test '${{ github.run_attempt }}' = '1'
+          test "$GITHUB_REF" = 'refs/heads/proof/session-flush-portability-20261010'
+          python3 -c "from host import check_activation; check_activation()"
+          python3 -c "import time; from host import ROOT, write, check_activation; p=ROOT/'results/arm'; p.mkdir(parents=True); write(p/'JOB.json', {'activation':check_activation(),'startEpoch':time.time(),'subjectsDeadlineEpoch':time.time()+1020})"
+      - uses: actions/setup-node@v4
+        timeout-minutes: 1
+        with: { node-version: '22.23.3' }
+      - uses: oven-sh/setup-bun@v2
+        timeout-minutes: 1
+        with: { bun-version: '1.4.2' }
+      - name: Install exact validation dependencies once
+        timeout-minutes: 2
+        run: |
+          mkdir -p results/arm/setup
+          python3 supervise.py --cwd "$PWD/toolchain" --seconds 110 --rss-mib 2048 --stdout-bytes 33554432 --stderr-bytes 33554432 --output results/arm/setup/dependencies.jsonl --stderr results/arm/setup/dependencies.stderr --receipt results/arm/setup/dependencies.receipt.json -- bun install --frozen-lockfile --ignore-scripts --registry=https://registry.npmjs.org
+      - name: Single correctness and runtime preflight
+        timeout-minutes: 5
+        run: python3 prepare-host.py arm
+      - name: Fixed ARM screen and raw audit
+        timeout-minutes: 7
+        run: |
+          python3 run-once.py arm
+          python3 analyze.py arm results/arm
+      - name: Verify unchanged inputs and whitelist evidence
+        if: always()
+        timeout-minutes: 1
+        run: python3 finalize.py arm
+      - uses: actions/upload-artifact@v4
+        if: always()
+        timeout-minutes: 1
+        with:
+          name: session-flush-arm-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: proofs/session-flush-portability/public-artifacts/arm
+          if-no-files-found: error
+          retention-days: 30
+  browsers:
+    # Dormant until a separately reviewed activation patch changes this guard.
+    if: ${{ false && github.run_attempt == 1 && github.event.before == '0000000000000000000000000000000000000000' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: proofs/session-flush-portability
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/proofs/session-flush-portability/browser-cache
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with: { persist-credentials: false }
+      - name: Check one-run identity
+        run: |
+          test '${{ github.run_attempt }}' = '1'
+          test "$GITHUB_REF" = 'refs/heads/proof/session-flush-portability-20261010'
+          python3 -c "from host import check_activation; check_activation()"
+          python3 -c "import time; from host import ROOT, write, check_activation; p=ROOT/'results/browsers'; p.mkdir(parents=True); write(p/'JOB.json', {'activation':check_activation(),'startEpoch':time.time(),'subjectsDeadlineEpoch':time.time()+1620})"
+      - uses: actions/setup-node@v4
+        timeout-minutes: 1
+        with: { node-version: '22.23.3' }
+      - uses: oven-sh/setup-bun@v2
+        timeout-minutes: 1
+        with: { bun-version: '1.4.2' }
+      - name: Install exact validation dependencies once
+        timeout-minutes: 2
+        run: |
+          mkdir -p results/browsers/setup
+          python3 supervise.py --cwd "$PWD/toolchain" --seconds 110 --rss-mib 2048 --stdout-bytes 33554432 --stderr-bytes 33554432 --output results/browsers/setup/dependencies.jsonl --stderr results/browsers/setup/dependencies.stderr --receipt results/browsers/setup/dependencies.receipt.json -- bun install --frozen-lockfile --ignore-scripts --registry=https://registry.npmjs.org
+      - name: Install pinned browsers from official Playwright sources
+        timeout-minutes: 4
+        run: |
+          python3 supervise.py --cwd "$PWD" --seconds 230 --rss-mib 2048 --stdout-bytes 33554432 --stderr-bytes 33554432 --output results/browsers/setup/browsers.jsonl --stderr results/browsers/setup/browsers.stderr --receipt results/browsers/setup/browsers.receipt.json --env DEBUG=pw:install -- node toolchain/node_modules/playwright/cli.js install --with-deps chromium firefox webkit
+      - name: Single three-engine correctness and runtime preflight
+        timeout-minutes: 5
+        run: python3 prepare-host.py browsers
+      - name: Fixed three-engine screen and raw audit
+        timeout-minutes: 16
+        run: |
+          python3 run-once.py browsers
+          python3 analyze.py browsers results/browsers
+      - name: Verify unchanged inputs and whitelist evidence
+        if: always()
+        timeout-minutes: 1
+        run: python3 finalize.py browsers
+      - uses: actions/upload-artifact@v4
+        if: always()
+        timeout-minutes: 1
+        with:
+          name: session-flush-browsers-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: proofs/session-flush-portability/public-artifacts/browsers
+          if-no-files-found: error
+          retention-days: 30

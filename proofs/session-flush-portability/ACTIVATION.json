@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "enabled": false,
+  "intentId": "session-flush-portability-20261010",
+  "expectedBefore": null,
+  "canonicalSourceSHA256": "0938dc51d56d76b7e8b1aba53e188ebf8674746f3fdfc508f6b3cb08ab17962a"
+}
