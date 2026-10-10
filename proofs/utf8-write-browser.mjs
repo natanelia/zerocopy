@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import { cpus } from 'node:os';
 import { basename, dirname, resolve } from 'node:path';
 import { chromium, firefox, webkit } from 'playwright';
-import { utf8WriteCases } from './utf8-write-workloads.mjs';
+import { utf8WriteCases, compareUtf8WriteStorage } from './utf8-write-workloads.mjs';
 
 const [beforeArg, afterArg, outputArg] = process.argv.slice(2);
 assert(beforeArg && afterArg && outputArg, 'Usage: utf8-write-browser.mjs before-entry after-entry output.json');
@@ -85,16 +85,22 @@ async function measureVariant(browser, row, spec, variant) {
     save();
     assert.equal(state.crossOriginIsolated, true, 'Shared-memory isolation is required');
     const operations = await page.evaluate(async ({ entry, spec, settings }) => {
-      const { createUtf8WriteWorkload } = await import('/workloads.mjs');
+      const { createUtf8WriteWorkload, checkUtf8WriteStorage } = await import('/workloads.mjs');
       const api = await import(entry), work = createUtf8WriteWorkload(api, spec, settings.count);
       const hash = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256', Uint8Array.from(bytes)))].map(n => n.toString(16).padStart(2, '0')).join('');
+      let reference;
       for (let sample = -settings.warmups; sample < settings.samples; sample++) {
         work.setup();
         const start = performance.now(), result = work.run(), ms = performance.now() - start;
         const checked = work.verify(result);
-        if (sample >= 0) await window.saveUtf8WriteSample({ sample, ms,
-          usedBytes: checked.usedBytes, backingBytes: checked.backingBytes,
-          payloadSha256: await hash(checked.payload), descriptor: checked.descriptor });
+        const { canonical, ...metadata } = checked.logical ?? {};
+        const record = { usedBytes: checked.usedBytes, backingBytes: checked.backingBytes,
+          payloadSha256: await hash(checked.payload), descriptor: checked.descriptor,
+          ...(checked.logical ? { logical: { ...metadata,
+            canonicalSha256: await hash(new TextEncoder().encode(canonical)) } } : {}) };
+        if (reference) checkUtf8WriteStorage(record, reference);
+        else reference = record;
+        if (sample >= 0) await window.saveUtf8WriteSample({ sample, ms, ...record });
       }
       return work.count;
     }, { entry: entries[variant], spec, settings });
@@ -129,7 +135,7 @@ try {
           for (let sample = 0; sample < settings.samples; sample++) {
             const { ms: beforeMs, ...before } = row.records.before[sample];
             const { ms: afterMs, ...after } = row.records.after[sample];
-            assert.deepEqual(after, before, spec.name + ': storage differs from baseline at sample ' + sample);
+            compareUtf8WriteStorage(spec, row.operations, before, after);
           }
           row.speedup = row.before.medianMs / row.after.medianMs;
           row.complete = true; save();

@@ -16,6 +16,23 @@ export const jsonReadCases = [
     ['map', 'list'].map(collection => ({ name: `${phase}-${collection}-${shape}`, collection, shape, phase })))),
 ];
 
+// Only these fixtures construct a bounded generic map through Arena.bulk.
+export function jsonReadUsesBulkMap(spec, total) {
+  return spec.collection === 'map' && spec.shape !== 'number' && spec.shape !== 'string'
+    && total > 0 && total <= 12288;
+}
+
+export function checkJsonReadStorage(actual, reference) {
+  equal(actual, reference, 'A read changed allocated bytes or descriptors');
+}
+
+export function compareJsonReadStorage(spec, total, before, after) {
+  if (jsonReadUsesBulkMap(spec, total)) {
+    check(before.logical && after.logical, 'Missing verified map evidence');
+    equal(after.logical, before.logical, `${spec.name}: logical map differs`);
+  } else equal(after.integrity, before.integrity, `${spec.name}: baseline storage differs`);
+}
+
 export function quantile(values, fraction) {
   const sorted = [...values].sort((a, b) => a - b), position = (sorted.length - 1) * fraction;
   const low = Math.floor(position);
@@ -155,14 +172,27 @@ export function createJsonReadWorkload(api, spec, requestedCount, requestedPasse
     },
     verify(checksum) {
       check(Object.is(checksum, expectedChecksum), 'Read checksum differs from the fixture');
+      const entries = jsonReadUsesBulkMap(spec, total) ? [] : undefined;
       for (let index = 0; index < total; index++) {
         const actual = read(index);
         equal(actual, expected[index], 'Decoded value differs from native JSON');
+        if (entries) entries.push([keys[index], actual]);
         frozenTree(actual, true, 'Decoded JSON is not deeply frozen');
         frozenTree(values[index], false, 'Caller input was frozen');
         equal(values[index], expected[index], 'Caller input was changed');
       }
-      return storage();
+      let logical;
+      if (jsonReadUsesBulkMap(spec, total)) {
+        const map = snapshots[0], descriptor = map.toWorkerData();
+        equal(Object.keys(descriptor).sort(), ['root', 'size', 'valueType'], 'Unexpected map descriptor fields');
+        check(descriptor.valueType === 'object' && descriptor.size === total && map.size === total,
+          'Map type or size differs from the fixture');
+        check(Number.isSafeInteger(descriptor.root) && descriptor.root >= 65536, 'Invalid map root');
+        equal([...map.keys()].sort(), [...keys].sort(), 'Map key set differs from the fixture');
+        logical = { collection: 'SharedMap', valueType: descriptor.valueType, size: map.size,
+          snapshotCount: names.length, keyCount: entries.length, canonical: JSON.stringify(entries) };
+      }
+      return { ...storage(), logical };
     },
     storage,
   };

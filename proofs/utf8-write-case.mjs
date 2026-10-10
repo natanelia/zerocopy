@@ -7,7 +7,7 @@ import { cpus } from 'node:os';
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { utf8WriteCases, createUtf8WriteWorkload } from './utf8-write-workloads.mjs';
+import { utf8WriteCases, createUtf8WriteWorkload, checkUtf8WriteStorage } from './utf8-write-workloads.mjs';
 
 const [entryArg, outputArg] = process.argv.slice(2);
 assert(entryArg && outputArg, 'Usage: utf8-write-case.mjs library-entry output.json');
@@ -42,12 +42,18 @@ const quantile = (values, fraction) => {
 mkdirSync(dirname(resolve(outputArg)), { recursive: true });
 for (const spec of cases) {
   const work = createUtf8WriteWorkload(api, spec, count), records = [];
+  let reference;
   for (let sample = -warmups; sample < samples; sample++) {
     work.setup(); gc();
     const start = performance.now(), result = work.run(), ms = performance.now() - start;
     const checked = work.verify(result);
-    if (sample >= 0) records.push({ ms, usedBytes: checked.usedBytes, backingBytes: checked.backingBytes,
-      payloadSha256: hash(checked.payload), descriptor: checked.descriptor });
+    const { canonical, ...metadata } = checked.logical ?? {};
+    const record = { usedBytes: checked.usedBytes, backingBytes: checked.backingBytes,
+      payloadSha256: hash(checked.payload), descriptor: checked.descriptor,
+      ...(checked.logical ? { logical: { ...metadata, canonicalSha256: hash(canonical) } } : {}) };
+    if (reference) checkUtf8WriteStorage(record, reference);
+    else reference = record;
+    if (sample >= 0) records.push({ ms, ...record });
   }
   const result = { ...spec, operations: work.count, medianMs: quantile(records.map(record => record.ms), 0.5),
     p95Ms: quantile(records.map(record => record.ms), 0.95), records };

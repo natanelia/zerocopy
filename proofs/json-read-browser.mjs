@@ -10,7 +10,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
-import { jsonReadCases, quantile } from './json-read-workloads.mjs';
+import { jsonReadCases, quantile, compareJsonReadStorage } from './json-read-workloads.mjs';
 
 const [beforeArg, afterArg, outputArg] = process.argv.slice(2);
 assert(beforeArg && afterArg && outputArg, 'Usage: json-read-browser.mjs before-entry after-entry output.json');
@@ -81,23 +81,30 @@ async function measure(browser, row, spec, variant) {
     assert.equal(environment.crossOriginIsolated, true, 'Shared-memory isolation is required');
     state.environment = environment; save();
     const result = await page.evaluate(async ({ entry, spec, settings }) => {
-      const { createJsonReadWorkload } = await import('/workloads.mjs');
+      const { createJsonReadWorkload, checkJsonReadStorage } = await import('/workloads.mjs');
       const api = await import(entry), work = createJsonReadWorkload(api, spec, settings.count, settings.passes);
       const hash = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256', Uint8Array.from(bytes)))].map(byte => byte.toString(16).padStart(2, '0')).join('');
       const evidence = async checked => ({ allocatedBytes: checked.allocatedBytes, usedBytes: checked.usedBytes,
         backingBytes: checked.backingBytes, payloadSha256: await hash(checked.payload),
         descriptorSha256: await hash(new TextEncoder().encode(JSON.stringify(checked.descriptors))) });
       const integrity = await evidence(work.storage()), reference = JSON.stringify(integrity);
-      let verifiedRuns = 0;
+      let verifiedRuns = 0, logical;
       for (let sample = -settings.warmups; sample < settings.samples; sample++) {
         await work.setup();
         if (JSON.stringify(await evidence(work.storage())) !== reference) throw new Error('Storage changed before a read');
         const start = performance.now(), checksum = work.run(), ms = performance.now() - start;
-        if (JSON.stringify(await evidence(work.verify(checksum))) !== reference) throw new Error('A read changed allocated bytes or descriptors');
+        const checked = work.verify(checksum);
+        checkJsonReadStorage(await evidence(checked), integrity);
+        if (checked.logical) {
+          const { canonical, ...metadata } = checked.logical;
+          const current = { ...metadata, canonicalSha256: await hash(new TextEncoder().encode(canonical)) };
+          if (logical && JSON.stringify(current) !== JSON.stringify(logical)) throw new Error('Verified map changed between reads');
+          logical = current;
+        }
         verifiedRuns++;
         if (sample >= 0) await window.saveJsonReadSample({ sample, ms });
       }
-      return { integrity, verifiedRuns, requestedCount: work.requestedCount, count: work.count, passes: work.passes,
+      return { integrity, logical, verifiedRuns, requestedCount: work.requestedCount, count: work.count, passes: work.passes,
         operations: work.operations, totalValues: work.totalValues,
         snapshotCount: work.snapshotCount, fixture: work.fixture };
     }, { entry: entries[variant], spec, settings });
@@ -119,7 +126,7 @@ try {
         const row = { ...spec, round, order, complete: false, variants: {} }; run.cases.push(row); save();
         for (const variant of order) await measure(browser, row, spec, variant);
         const { before, after } = row.variants;
-        assert.deepEqual(after.integrity, before.integrity, `${spec.name}: baseline storage differs`);
+        compareJsonReadStorage(spec, before.totalValues, before, after);
         assert.equal(after.count, before.count); assert.equal(after.requestedCount, before.requestedCount);
         assert.equal(after.operations, before.operations); assert.deepEqual(after.fixture, before.fixture);
         row.speedup = before.medianMs / after.medianMs; row.complete = true; save();
@@ -135,7 +142,10 @@ try {
           requestedCount: found[0].variants.before.requestedCount, count: found[0].variants.before.count,
           passes: found[0].variants.before.passes,
           operations: found[0].variants.before.operations, ...summary, speedup: summary.before.medianMs / summary.after.medianMs,
-          roundSpeedups: found.map(row => row.speedup), integrity: found[0].variants.before.integrity });
+          roundSpeedups: found.map(row => row.speedup),
+          integrity: found[0].variants.before.integrity,
+          integrityByVariant: { before: found[0].variants.before.integrity, after: found[0].variants.after.integrity },
+          logical: found[0].variants.before.logical });
       }
       run.complete = true; save();
     } catch (error) { run.error = error instanceof Error ? error.message : String(error); save(); throw error; }
