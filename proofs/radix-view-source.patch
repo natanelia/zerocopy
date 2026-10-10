@@ -1,0 +1,19 @@
+diff --git a/arena.ts b/arena.ts
+index afc6ef0..a945a8d 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -517,3 +517,5 @@ export class Arena {
+-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+-      const pending: number[] = [], n = this.dv.getUint32(root + 12, true);
+-      for (let i = 0; i < n; i++) pending.push(this.dv.getUint32(root + 16 + i * 4, true));
++    // Published pointers stay within this view after shared-memory growth.
++    let dv!: DataView;
++    if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
++      const pending: number[] = [], n = dv.getUint32(root + 12, true);
++      for (let i = 0; i < n; i++) pending.push(dv.getUint32(root + 16 + i * 4, true));
+@@ -522 +524 @@ export class Arena {
+-      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
++      for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
+@@ -530 +532 @@ export class Arena {
+-      const p = stack.pop()!, dv = this.dv;
++      const p = stack.pop()!;

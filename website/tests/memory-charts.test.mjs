@@ -11,6 +11,11 @@ test('charted samples retain the recorded source, workload, and exact byte media
   assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [127991808,223334400,172146688,121851904]);
   assert.equal(formatMiB(9482568), '9.04');
 });
+test('source labels follow the recorded date and runtime', () => {
+  const data = clone(); data.measuredAt = '2030-01-02T00:00:00.000Z'; data.runtime = 'v99.0.0';
+  assert.ok(memoryFigure('retained', '/', { data }).includes('2 January 2030 · Node v99.0.0'));
+  assert.ok(memorySVG('retained').includes('10 Oct 2026 · Node v22.23.3'));
+});
 test('reader scaling includes only measured counts on one common zero-based scale', () => {
   const model=chartModel('readers'); assert.equal(model.limit,80);
   assert.deepEqual(model.groups.map(group=>group.points[0].readers),[0,2,4]);

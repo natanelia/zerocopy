@@ -1,0 +1,162 @@
+name: Block traversal view diagnostics
+
+on:
+  push:
+    branches: ['perf/block-traversal-*']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Run the first gate or later browser correctness without repeating timings
+        type: choice
+        options: [gate, browser]
+        default: gate
+      gate_run_id:
+        description: For browser stage, completed eligible gate run for this exact commit
+        type: string
+        required: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: block-traversal-${{ github.ref }}-${{ inputs.stage || 'gate' }}
+  cancel-in-progress: true
+
+env:
+  CANDIDATE_COMMIT: ${{ github.sha }}
+
+jobs:
+  x64-gate:
+    if: startsWith(github.ref, 'refs/heads/perf/block-traversal-') && inputs.stage != 'browser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Prepare exact main377 and shared dependencies
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+      - name: Build matching sources and check all public types
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:redux
+          bun run typecheck:values
+          bun run typecheck:geometry
+          cp ./*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+      - name: Verify protocol, mechanism, both source trees and relevant existing suites
+        run: |
+          mkdir -p proofs/results/block-traversal
+          node --test proofs/block-traversal-performance.node.mjs
+          node --input-type=module -e "import {prepareComparison} from './proofs/block-traversal-source.mjs'; console.log(JSON.stringify(prepareComparison('.proof-baseline/dist/shared.js','dist/shared.js'), null, 2))" > proofs/results/block-traversal/sources.json
+          bun proofs/block-traversal-counts.ts .proof-baseline baseline > proofs/results/block-traversal/baseline-counts.json
+          bun proofs/block-traversal-counts.ts . candidate > proofs/results/block-traversal/candidate-counts.json
+          for directory in .proof-baseline .; do
+            (cd "$directory" && bun --bun node_modules/vitest/vitest.mjs run shared-linked-list.test.ts shared-doubly-linked-list.test.ts primitive-sequence-scan.test.ts primitive-scan-portability.test.ts performance-revision.test.ts nested.test.ts typed-values.test.ts immutable-proof.test.ts descriptor-validation.test.ts worker-records.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000)
+          done
+          bun --bun node_modules/vitest/vitest.mjs run block-traversal-view.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000
+          node proofs/block-traversal-worker-check.mjs > proofs/results/block-traversal/candidate-workers.json
+          node proofs/block-traversal-worker-check.mjs ../.proof-baseline/dist/shared.js > proofs/results/block-traversal/baseline-workers.json
+          node --input-type=module -e "import {runChecks} from './proofs/block-traversal-workloads.mjs'; for (const path of ['./dist/shared.js','./.proof-baseline/dist/shared.js']) { console.log(path, await runChecks(await import(path))); }" > proofs/results/block-traversal/fixture-checks.log
+      - name: Node x64 balanced A/A and A/B gate
+        run: node proofs/block-traversal-performance.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/block-traversal/node.json
+      - name: Bun x64 balanced A/A and A/B gate
+        run: bun proofs/block-traversal-performance.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/block-traversal/bun.json
+      - name: Report later-stage eligibility without claiming equivalence
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {gateStatus} from './proofs/block-traversal-performance.mjs';
+          for (const runtime of ['node', 'bun']) {
+            const record = JSON.parse(readFileSync(`proofs/results/block-traversal/${runtime}.json`));
+            console.log(`${runtime}: ${gateStatus(record)}`);
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-traversal-X64
+          path: proofs/results/block-traversal/
+          retention-days: 30
+
+  browser-correctness:
+    if: github.event_name == 'workflow_dispatch' && inputs.stage == 'browser' && startsWith(github.ref, 'refs/heads/perf/block-traversal-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require a specific prior gate run
+        env:
+          GATE_RUN_ID: ${{ inputs.gate_run_id }}
+        run: test -n "$GATE_RUN_ID" && test "$GATE_RUN_ID" -gt 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: block-traversal-X64
+          path: .gate-evidence
+          run-id: ${{ inputs.gate_run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify eligible prior evidence for this exact source and protocol
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          import {gateStatus} from './proofs/block-traversal-performance.mjs';
+          import {sha256, BASELINE_COMMIT} from './proofs/block-traversal-source.mjs';
+          for (const runtime of ['node', 'bun']) {
+            const record = JSON.parse(readFileSync(`.gate-evidence/${runtime}.json`));
+            assert.equal(record.candidateCommit, process.env.CANDIDATE_COMMIT);
+            assert.equal(record.baselineCommit, BASELINE_COMMIT);
+            assert.equal(record.runtime, runtime);
+            assert.equal(gateStatus(record), 'eligible-for-later-correctness');
+            for (const [file, expected] of Object.entries(record.harnessSha256)) assert.equal(sha256(readFileSync(`proofs/${file}`)), expected);
+          }
+          JS
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build exact source pair and install browser
+        run: |
+          bun install
+          git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
+          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          bun run build:wasm
+          bun run build:browser
+          cp ./*.wasm .proof-baseline/
+          (cd .proof-baseline && bun run build:browser)
+          bunx playwright install --with-deps ${{ matrix.runtime }}
+      - name: Baseline and candidate browser checks with actual shared/copy workers
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: node proofs/block-traversal-browser.mjs dist/shared.js .proof-baseline/dist/shared.js proofs/results/block-traversal/${{ matrix.runtime }}-checks.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: block-traversal-${{ matrix.runtime }}-correctness
+          path: proofs/results/block-traversal/
+          retention-days: 30

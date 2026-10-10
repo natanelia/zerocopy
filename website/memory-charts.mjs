@@ -16,6 +16,7 @@ const fixtures = ['repeated', 'unique', 'unicode'];
 export const chartNames = ['retained', 'readers', 'rss'];
 const median = values => [...values].sort((a,b) => a-b)[1];
 export const formatMiB = bytes => (bytes / MIB).toFixed(2);
+export const recordedDate = (data = chartData, month = 'long') => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month, year: 'numeric', timeZone: 'UTC' }).format(new Date(data.measuredAt));
 
 export function validateChartData(data, summary = recorded) {
   for (const key of ['schema','runtime','v8','platform','arch','cpu','measuredAt','trials','entries','runtimeSourceCommit','summarySHA256']) assert.equal(data[key], summary[key], `Chart source mismatch: ${key}`);
@@ -85,7 +86,7 @@ export function memoryFigure(name, base = '/', { id = `memory-${name}`, data = c
     <div class="memory-groups ${name === 'readers' ? 'memory-reader-groups' : ''}">${groups}</div>
     <p class="memory-note">${escape(model.note)}${name === 'readers' ? '' : ' Replicated paths: one owner + two readers. One native owner: no reader replicas.'}</p>
     <details class="memory-values"><summary>Exact values and trial range</summary><p>Median and observed min–max of three fresh processes. These ranges are not confidence intervals.</p><div class="table-scroll" tabindex="0" role="region" aria-label="${escape(model.title)} data"><table><thead><tr><th scope="col">Design · readers</th><th scope="col">Median (MiB)</th><th scope="col">Trial range (MiB)</th></tr></thead><tbody>${trialRows}</tbody></table></div></details>
-    <p class="memory-source">10 October 2026 · Node ${escape(data.runtime)} · Linux x64 · 3 trials per case. Not browser RAM.<br><a href="${base}assets/memory-${name}.svg">Open SVG</a> · <a href="${base}assets/memory-chart-data.json" download>Download chart data</a></p>
+    <p class="memory-source">${recordedDate(data)} · Node ${escape(data.runtime)} · ${escape(data.platform)} ${escape(data.arch)} · ${data.trials} trials per case. Not browser RAM.<br><a href="${base}assets/memory-${name}.svg">Open SVG</a> · <a href="${base}assets/memory-chart-data.json" download>Download chart data</a></p>
   </figure>`;
 }
 
@@ -104,7 +105,7 @@ export function memorySVG(name) {
     parts.push(`<text x="18" y="${y}" font-size="12">0</text><text x="210" y="${y}" text-anchor="middle" font-size="12">${model.limit/2}</text><text x="402" y="${y}" text-anchor="end" font-size="12">${model.limit} MiB</text>`); y+=38;
   }
   const notes = name === 'readers' ? ['Only 0 / 2 / 4 readers measured; same scale.', '0 readers: owner runs both calculations.'] : ['Replicas: owner + 2 readers; native owner: 0.', name === 'rss' ? 'One native owner has the lowest process RSS.' : 'Shared buffer counted once; empty baseline excluded.'];
-  notes.push('10 Oct 2026 · Node v22.23.3 · median of 3 trials');
+  notes.push(`${recordedDate(chartData, 'short')} · Node ${chartData.runtime} · median of ${chartData.trials} trials`);
   for (const line of notes) {parts.push(`<text x="18" y="${y}" font-size="12">${escape(line)}</text>`);y+=20;}
   parts.push('</g></svg>'); return parts.join('\n')+'\n';
 }

@@ -62,6 +62,16 @@ export abstract class Snapshot {
   protected get arena(): Arena { return this.#owner; }
 }
 
+export interface ArenaRegistry { readonly arenas: Map<string, Arena>; readonly members: Arena[]; shared: boolean }
+// Registry metadata belongs to the shared lookup, not every Arena. Keeping one
+// dependency field preserves the layout of the ordinary read-cache fields.
+const arenaRegistries = new WeakMap<Map<string, Arena>, ArenaRegistry>();
+export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
+  const registry = { arenas, members: [] as Arena[], shared: true };
+  arenaRegistries.set(arenas, registry);
+  return registry;
+}
+
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
  * Attached arenas are read-only: their allocator and scratch cannot race a writer.
@@ -71,7 +81,28 @@ export class Arena {
   readonly wasm: any;
   readonly id: string;
   readonly readOnly: boolean;
-  readonly dependencies = new Map<string, Arena>();
+  private dependencyLookup = new Map<string, Arena>();
+  // Worker payloads share one lookup. Preserve the distinct, self-excluding Map
+  // exposed to internal callers without eagerly building an all-to-all graph.
+  get dependencies(): Map<string, Arena> {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    if (registry) {
+      // Observing a mutable map opens the otherwise closed attachment graph.
+      // Preserve ordinary DFS precedence if callers subsequently extend it.
+      registry.shared = false;
+      const dependencies = new Map<string, Arena>();
+      for (const [id, arena] of registry.arenas) if (arena !== this) dependencies.set(id, arena);
+      this.dependencyLookup = dependencies;
+    }
+    return this.dependencyLookup;
+  }
+  /** Internal transport traversal must not materialize attachment maps. */
+  get transportDependencies(): ReadonlyMap<string, Arena> { return this.dependencyLookup; }
+  get sharedDependencyMembers(): readonly Arena[] | undefined {
+    const registry = arenaRegistries.get(this.dependencyLookup);
+    return registry?.shared ? registry.members : undefined;
+  }
+  get hasSharedDependencies(): boolean { return this.sharedDependencyMembers !== undefined; }
   writeHead = 0;
   writeSize = 0;
   writeCount = 0;
@@ -129,12 +160,13 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
+    if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
@@ -243,7 +275,7 @@ export class Arena {
     if (nested) {
       const factory = structureRegistry[parsed.__t];
       if (!factory || parsed.__t !== nested.structureType) throw new TypeError('Invalid nested structure type');
-      const source = parsed.__a === this.id ? this : this.dependencies.get(parsed.__a);
+      const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
@@ -514,12 +546,14 @@ export class Arena {
   number(root: number, key: string): number | undefined { return this.value(root, key, 'number'); }
 
   *radixLeaves(root: number): Generator<number> {
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
-      const pending: number[] = [], n = this.dv.getUint32(root + 12, true);
-      for (let i = 0; i < n; i++) pending.push(this.dv.getUint32(root + 16 + i * 4, true));
+    // Published pointers stay within this view after shared-memory growth.
+    let dv!: DataView;
+    if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
+      const pending: number[] = [], n = dv.getUint32(root + 12, true);
+      for (let i = 0; i < n; i++) pending.push(dv.getUint32(root + 16 + i * 4, true));
       pending.sort((a, b) => this.wasm.compareLeaves(a, b));
       let i = 0;
-      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
+      for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
         while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
         if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
       }
@@ -527,7 +561,7 @@ export class Arena {
     }
     const stack = root ? [root] : [];
     while (stack.length) {
-      const p = stack.pop()!, dv = this.dv;
+      const p = stack.pop()!;
       if (!dv.getUint32(p, true)) yield p;
       else for (let i = popcount(dv.getUint32(p + 4, true)) - 1; i >= 0; i--) stack.push(dv.getUint32(p + 16 + i * 4, true));
     }
@@ -791,15 +825,19 @@ export class Arena {
     return input;
   }
   *blocks(root: number, reverse = false): Generator<number> {
+    if (!root) return;
+    // Published blocks already fit this view. Shared-memory growth cannot
+    // detach it, including while a callback or another iterator is running.
+    const dv = this.dv;
     const stack: number[] = []; let node = root;
     const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
     while (node || stack.length) {
-      while (node) { stack.push(node); node = this.dv.getUint32(node + first, true); }
+      while (node) { stack.push(node); node = dv.getUint32(node + first, true); }
       node = stack.pop()!;
-      const data = this.dv.getUint32(node + 16, true), length = this.dv.getUint32(node + 20, true);
-      const next = this.dv.getUint32(node + second, true);
-      if (reverse) for (let i = length - 1; i >= 0; i--) yield this.dv.getFloat64(data + i * 8, true);
-      else for (let i = 0; i < length; i++) yield this.dv.getFloat64(data + i * 8, true);
+      const data = dv.getUint32(node + 16, true), length = dv.getUint32(node + 20, true);
+      const next = dv.getUint32(node + second, true);
+      if (reverse) for (let i = length - 1; i >= 0; i--) yield dv.getFloat64(data + i * 8, true);
+      else for (let i = 0; i < length; i++) yield dv.getFloat64(data + i * 8, true);
       node = next;
     }
   }
