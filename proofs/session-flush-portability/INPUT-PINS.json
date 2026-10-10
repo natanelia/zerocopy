@@ -6,8 +6,8 @@
   "files": [
     {
       "path": "ACTIVATION.json",
-      "bytes": 211,
-      "sha256": "aae97350e563f5a0ed27398b0619659408f7d8676cabef3e9ee53a6752617b76"
+      "bytes": 248,
+      "sha256": "25a4edb9d13d670a4111b224bb94b9055175ba1247ed92e8cbe7a3e19c3a1e23"
     },
     {
       "path": "DEPENDENCIES.md",
@@ -316,8 +316,8 @@
     },
     {
       "path": "workflow.yml",
-      "bytes": 5816,
-      "sha256": "e4003c5c4fbd28c3d0e4ab0b913feea8e0624fb6ae72dae42b7ec8636ab2e51f"
+      "bytes": 5814,
+      "sha256": "ff40decd0c6fe54d6cafb482dfe44d0ac2ce742956a6897e1c1fb679a6a4b164"
     },
     {
       "path": "workload.mjs",

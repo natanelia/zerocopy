@@ -10,7 +10,7 @@ concurrency:
 jobs:
   arm:
     # Dormant until a separately reviewed activation patch changes this guard.
-    if: ${{ false && github.run_attempt == 1 && github.event.before == '0000000000000000000000000000000000000000' }}
+    if: ${{ true && github.run_attempt == 1 && github.event.before == '9f4de1a3d8caee5d809649df3352741a238668cf' }}
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
     defaults:
@@ -59,7 +59,7 @@ jobs:
           retention-days: 30
   browsers:
     # Dormant until a separately reviewed activation patch changes this guard.
-    if: ${{ false && github.run_attempt == 1 && github.event.before == '0000000000000000000000000000000000000000' }}
+    if: ${{ true && github.run_attempt == 1 && github.event.before == '9f4de1a3d8caee5d809649df3352741a238668cf' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
