@@ -757,7 +757,8 @@ export class Arena {
     }
     const leaves: number[] = [];
     for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
-    const input = this.alloc(leaves.length * 4), dv = this.dv;
+    // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
+    const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
   }
