@@ -546,12 +546,14 @@ export class Arena {
   number(root: number, key: string): number | undefined { return this.value(root, key, 'number'); }
 
   *radixLeaves(root: number): Generator<number> {
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
-      const pending: number[] = [], n = this.dv.getUint32(root + 12, true);
-      for (let i = 0; i < n; i++) pending.push(this.dv.getUint32(root + 16 + i * 4, true));
+    // Published pointers stay within this view after shared-memory growth.
+    let dv!: DataView;
+    if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
+      const pending: number[] = [], n = dv.getUint32(root + 12, true);
+      for (let i = 0; i < n; i++) pending.push(dv.getUint32(root + 16 + i * 4, true));
       pending.sort((a, b) => this.wasm.compareLeaves(a, b));
       let i = 0;
-      for (const leaf of this.radixLeaves(this.dv.getUint32(root + 4, true))) {
+      for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
         while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
         if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
       }
@@ -559,7 +561,7 @@ export class Arena {
     }
     const stack = root ? [root] : [];
     while (stack.length) {
-      const p = stack.pop()!, dv = this.dv;
+      const p = stack.pop()!;
       if (!dv.getUint32(p, true)) yield p;
       else for (let i = popcount(dv.getUint32(p + 4, true)) - 1; i >= 0; i--) stack.push(dv.getUint32(p + 16 + i * 4, true));
     }
