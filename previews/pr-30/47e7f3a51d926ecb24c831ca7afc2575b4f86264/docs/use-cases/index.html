@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8f2"><title>Choose a use case · zerocopy</title><meta name="description" content="Where sharing helps, where it does not, and which alternatives to consider."><meta property="og:title" content="Choose a use case · zerocopy"><meta property="og:description" content="Where sharing helps, where it does not, and which alternatives to consider."><meta property="og:type" content="website"><link rel="canonical" href="https://natanelia.github.io/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/use-cases/"><meta property="og:url" content="https://natanelia.github.io/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/use-cases/"><meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/assets/site.css"><script type="module" src="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/assets/main.mjs"></script><link rel="stylesheet" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/assets/comparison.css"></head><body data-base="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/" data-source="3547e0fc589385596b2cd4777d7fed1ff6c9213a"><a class="skip" href="#main">Skip to content</a>
+  <aside class="preview-banner">PR #30 preview · 47e7f3a · Not a release · <a href="https://github.com/natanelia/zerocopy/pull/30">Return to PR</a></aside><header class="site-header"><a class="wordmark" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/" aria-label="zerocopy home"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/" aria-current="page">Documentation</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/use-cases/" >Use cases</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/lab/" >Benchmark lab</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="https://github.com/natanelia/zerocopy">GitHub <span aria-hidden="true">↗</span></a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/">Documentation</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/use-cases/">Use cases</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/playground/">Small snapshot example</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/lab/">Benchmark lab</a><a href="https://github.com/natanelia/zerocopy">GitHub</a></nav>
+  <div class="docs-layout"><aside class="docs-sidebar" aria-label="Documentation"><p class="eyebrow">DOCUMENTATION</p><div class="sidebar-group"><h2>Start here</h2><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/" >Get started with shared state and Web Workers</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/mental-model/" >How sharing works</a></div><div class="sidebar-group"><h2>Build with it</h2><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/collections/" >Immutable collections API &amp; types</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/text-search/" >Search shared text</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/sessions/" >State &amp; subscriptions</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/transport/" >Your own transport</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/tasks/" >Optional tasks</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/workers/" >Worker tasks &amp; pools</a></div><div class="sidebar-group"><h2>Integrations</h2><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/redux/" >Redux &amp; Redux Toolkit integration</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/tanstack/" >TanStack DB integration</a></div><div class="sidebar-group"><h2>Go deeper</h2><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory/" >Memory &amp; ownership</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory-comparison/" >Memory comparison</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/benchmarks/" >Recorded benchmarks</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/migration/" >Migration</a></div><div class="sidebar-group"><h2>Use cases</h2><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/use-cases/" aria-current="page">Choose a use case</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/log-explorer/" >Live log explorer</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/data-tables/" >Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/graphs/" >Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/simulations/" >Simulation &amp; world state</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/analytics/" >Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/maps/" >Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/editors/" >Editors &amp; history</a></div><a class="sidebar-lab" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/lab/">↗ Benchmark lab</a></aside><main class="doc-main" id="main"><details class="mobile-docs-menu"><summary>Browse documentation</summary><nav aria-label="All documentation"><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/">Get started with shared state and Web Workers</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/mental-model/">How sharing works</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/collections/">Immutable collections API &amp; types</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/text-search/">Search shared text</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/sessions/">State &amp; subscriptions</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/transport/">Your own transport</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/tasks/">Optional tasks</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/workers/">Worker tasks &amp; pools</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/redux/">Redux &amp; Redux Toolkit integration</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/tanstack/">TanStack DB integration</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory/">Memory &amp; ownership</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory-comparison/">Memory comparison</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/benchmarks/">Recorded benchmarks</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/migration/">Migration</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/use-cases/">Choose a use case</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/log-explorer/">Live log explorer</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/data-tables/">Large tables &amp; dashboards</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/graphs/">Graphs &amp; developer tools</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/simulations/">Simulation &amp; world state</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/analytics/">Product catalogs &amp; filtering</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/maps/">Maps &amp; spatial tools</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/editors/">Editors &amp; history</a></nav></details><div class="doc-breadcrumb">Use cases <span>/</span> Choose a use case</div><h1>Choose a use case</h1><p class="doc-description">Where sharing helps, where it does not, and which alternatives to consider.</p><div class="doc-meta"><span>Source documentation</span><a href="https://github.com/natanelia/zerocopy/blob/3547e0fc589385596b2cd4777d7fed1ff6c9213a/docs/use-cases.md">View source ↗</a><button class="copy-page" data-markdown="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/markdown/use-cases.md">Copy Markdown</button></div><article class="prose"><p><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/">Get started</a> · <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/collections/">Collections</a> · <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory/">Memory and ownership</a></p>
+<p>Zerocopy is a shared-collection library, not a log engine, editor framework, or database. The log explorer is one working demonstration of a general access pattern: <strong>large data, several readers, and versions that must remain stable</strong>.</p>
+<h2 id="start-with-the-problem-not-the-demo">Start with the problem, not the demo<a class="heading-link" href="#start-with-the-problem-not-the-demo" aria-label="Link to Start with the problem, not the demo">#</a></h2>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Application</th>
+<th>What can be shared</th>
+<th>Independent work</th>
+<th>Why versions matter</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Logs, traces, and observability</td>
+<td>Event columns and indexes</td>
+<td>Search, timeline counts, service summaries, visible-row inspection</td>
+<td>Keep an investigation stable while ingestion continues.</td>
+</tr>
+<tr>
+<td>Document, diagram, and design editors</td>
+<td>Nodes, properties, and document indexes</td>
+<td>Layout, validation, export, search</td>
+<td>Finish work on an earlier document without blocking new edits.</td>
+</tr>
+<tr>
+<td>Large tables and dashboards</td>
+<td>Rows or primitive columns</td>
+<td>Filters, grouping, charts, export previews</td>
+<td>Different views can finish reading one consistent input.</td>
+</tr>
+<tr>
+<td>Large product catalogs</td>
+<td>Product records, category indexes, and availability</td>
+<td>Facets, filtering, recommendations, UI inspection</td>
+<td>Update the catalog without changing a running calculation&#39;s input.</td>
+</tr>
+<tr>
+<td>Graphs and developer tools</td>
+<td>Nodes, adjacency lists, symbols, dependencies</td>
+<td>Traversal, layout, diagnostics, impact analysis</td>
+<td>Keep results tied to the graph version that produced them.</td>
+</tr>
+<tr>
+<td>Simulations and game tools</td>
+<td>Published world state, entities, and event history</td>
+<td>Analysis, inspection, planning, visual previews</td>
+<td>Readers inspect a stable frame while the owner creates the next one.</td>
+</tr>
+<tr>
+<td>General GIS and scientific tools</td>
+<td>Feature metadata, topology, sample collections</td>
+<td>Spatial selection, statistics, validation</td>
+<td>Keep a stable analysis input while data is updated.</td>
+</tr>
+</tbody></table></div>
+<p>These are design patterns, not customer testimonials, measured production case studies, or guarantees of a speedup.</p>
+<h2 id="the-strongest-fit">The strongest fit<a class="heading-link" href="#the-strongest-fit" aria-label="Link to The strongest fit">#</a></h2>
+<p>Consider zerocopy when the input is large enough that copying it to several workers is a meaningful cost. Those workers should need local access to the same collections, not just a small answer from one central service.</p>
+<p>Stable versions add value when inputs change during background work. Capture a collection record for one calculation and keep it until that calculation finishes. Use a result revision check before applying output to a newer UI state.</p>
+<p>One thread allocates in each arena. Several readers can work independently. This is not a multi-writer mutable heap or a lock-free replacement for every JavaScript object.</p>
+<h2 id="choose-the-simpler-alternative-when-it-fits">Choose the simpler alternative when it fits<a class="heading-link" href="#choose-the-simpler-alternative-when-it-fits" aria-label="Link to Choose the simpler alternative when it fits">#</a></h2>
+<div class="table-scroll" tabindex="0"><table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Consider first</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Small data on one thread</td>
+<td>Native <code>Map</code>, arrays, and ordinary objects.</td>
+</tr>
+<tr>
+<td>One worker owns data and the UI only needs small results</td>
+<td>A data-owning worker with a small message API.</td>
+</tr>
+<tr>
+<td>Existing workers already apply cheap deltas</td>
+<td>Keep the incremental replication design; measure before replacing it.</td>
+</tr>
+<tr>
+<td>A binary buffer has one owner at a time</td>
+<td>Transfer the buffer rather than creating a shared collection model.</td>
+</tr>
+<tr>
+<td>SQL scans, joins, and column analytics</td>
+<td>A database or query engine designed for those operations.</td>
+</tr>
+<tr>
+<td>Persistence, recovery, or offline storage</td>
+<td>A storage layer. Shared memory alone is not persistence.</td>
+</tr>
+<tr>
+<td>Concurrent user editing or conflict resolution</td>
+<td>A collaboration protocol or CRDT. Zerocopy does not merge edits.</td>
+</tr>
+<tr>
+<td>Audio samples, video frames, tensors, or GPU data</td>
+<td>Their native buffer/compute APIs. General collections are not automatically the best representation.</td>
+</tr>
+</tbody></table></div>
+<p>In particular, a log explorer can work well with a central worker, native column arrays, incremental replication, or a query engine. The live example explains shared access; the benchmark compares alternatives instead of claiming this application can only work with zerocopy.</p>
+<h2 id="explore-the-implementations">Explore the implementations<a class="heading-link" href="#explore-the-implementations" aria-label="Link to Explore the implementations">#</a></h2>
+<p><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/log-explorer/">Log explorer</a>: an implemented browser demonstration with a generated event stream, two calculation workers, direct UI reads, frozen investigations, and bounded retention.</p>
+<p><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/editors/">Editors and history</a>, <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/data-tables/">large tables</a>, <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/analytics/">catalogs</a>, <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/graphs/">graphs</a>, and <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/simulations/">simulations</a>: application designs with ownership and lifetime guidance. These are not full applications shipped by the library.</p>
+<h2 id="budget-for-the-real-costs">Budget for the real costs<a class="heading-link" href="#budget-for-the-real-costs" aria-label="Link to Budget for the real costs">#</a></h2>
+<p>Shared backing bytes still need JavaScript handles, worker messages, and read caches. Strings and JSON can decode into local allocations. JSON values are not direct binary field access. Immutable updates allocate new nodes; storage is append-only.</p>
+<p>Use bounded retention and planned compaction for long-running applications. Retained snapshots can keep an entire arena alive. Browser use requires cross-origin isolation. See <a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory/">memory and ownership</a> before building an unbounded stream or edit history.</p>
+</article><div class="doc-bottom"><span>Found something unclear?</span><a href="https://github.com/natanelia/zerocopy/issues/new">Improve this guide ↗</a></div></main><aside class="doc-toc" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p><a href="#start-with-the-problem-not-the-demo">Start with the problem, not the demo</a><a href="#the-strongest-fit">The strongest fit</a><a href="#choose-the-simpler-alternative-when-it-fits">Choose the simpler alternative when it fits</a><a href="#explore-the-implementations">Explore the implementations</a><a href="#budget-for-the-real-costs">Budget for the real costs</a><a class="toc-help" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/playground/">Try a real snapshot →</a></aside></div>
+  <footer class="site-footer"><div><a class="wordmark" href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy.</span></a><p>Share your data. Keep your options.</p></div><div class="footer-links"><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-30/47e7f3a51d926ecb24c831ca7afc2575b4f86264/docs/memory/">Know the trade-offs</a><a href="https://github.com/natanelia/zerocopy/issues">Feedback <span aria-hidden="true">↗</span></a><a href="https://www.npmjs.com/package/zerocopy">npm package <span aria-hidden="true">↗</span></a><a href="https://github.com/natanelia/zerocopy/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v0.2.1 · <a href="https://github.com/natanelia/zerocopy/commit/3547e0fc589385596b2cd4777d7fed1ff6c9213a">3547e0f</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off"><p id="search-status" role="status">Type a topic to find a guide.</p><div id="search-results"></div></dialog><div class="toast" role="status" aria-live="polite"></div>
+  </body></html>
