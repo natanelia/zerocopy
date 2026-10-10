@@ -63,11 +63,22 @@ describe('shared state and session protocol', () => {
     expect(pair.owner.frames.length).toBe(2);
   });
   it('suppresses no-ops, including newly allocated record wrappers', async () => {
-    const { state, pair } = await setup({ map: new SharedMap('number').set('a', 1) });
+    const { state, reader, pair } = await setup({ map: new SharedMap('number').set('a', 1) });
+    const old = state.current, seen: number[] = [];
+    state.subscribe((_, version) => seen.push(version));
+    expect(state.flush()).toBe(0); expect(state.flush()).toBe(0);
     state.update(current => ({ ...current }));
     state.update('map', map => map); // Same handle, not deep value equality.
+    expect(state.publish({ ...state.current })).toBe(0);
     await drain();
     expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1);
+    expect(state.current).toBe(old); expect(seen).toEqual([]);
+    expect(state.publish({ map: old.map.set('a', 2) })).toBe(1);
+    expect(state.flush()).toBe(1); expect(state.flush()).toBe(1);
+    await drain();
+    expect(state.version).toBe(1); expect(pair.owner.frames.length).toBe(2);
+    expect(seen).toEqual([1]); expect(reader.current.map.get('a')).toBe(2);
+    expect(old.map.get('a')).toBe(1);
   });
   it('does not publish an update that returns to the last committed snapshot', async () => {
     const { state, pair } = await setup(new SharedMap('number'));
@@ -75,6 +86,21 @@ describe('shared state and session protocol', () => {
     state.update(map => map.set('x', 1)); state.value = original;
     await drain();
     expect(pair.owner.frames.length).toBe(1); expect(state.version).toBe(0);
+  });
+  it('suppresses distinct record captures restored to the last committed handles', async () => {
+    const { state, pair } = await setup({ map: new SharedMap('number') });
+    const original = state.current, seen: number[] = [];
+    state.subscribe((_, version) => seen.push(version));
+    state.update('map', map => map.set('x', 1)); state.value = { ...original };
+    expect(state.current).not.toBe(original); expect(state.current.map).toBe(original.map);
+    await drain();
+    expect(pair.owner.frames.length).toBe(1); expect(state.version).toBe(0);
+    expect(state.flush()).toBe(0); expect(state.flush()).toBe(0);
+    expect(seen).toEqual([]);
+    expect(state.publish({ map: original.map.set('x', 2) })).toBe(1);
+    await drain();
+    expect(pair.owner.frames.length).toBe(2); expect(seen).toEqual([1]);
+    expect(original.map.has('x')).toBe(false);
   });
   it('publishes record roots atomically and preserves unchanged wrapper identity', async () => {
     const { state, reader } = await setup({ map: new SharedMap('number'), list: new SharedList('number').push(1) });
@@ -84,19 +110,52 @@ describe('shared state and session protocol', () => {
     expect(Object.isFrozen(reader.current)).toBe(true);
     expect(reader.current.map.get('a')).toBe(2);
   });
-  it('supports explicit immediate updates and batches them on request', async () => {
-    const { state, reader } = await setup({ map: new SharedMap('number') }, { publish: { strategy: 'immediate' } });
+  it.each(['immediate', 'microtask'] as const)('batches nested and empty updates with %s publication', async strategy => {
+    const { state, reader, pair } = await setup({ map: new SharedMap('number') }, { publish: { strategy } });
+    const seen: number[] = [];
+    state.subscribe((_, version) => seen.push(version));
+    state.batch(() => state.batch(() => {})); await drain();
+    expect(state.version).toBe(0); expect(pair.owner.frames.length).toBe(1);
+    expect(seen).toEqual([]);
     state.batch(() => {
       state.update('map', map => map.set('a', 1));
-      state.update('map', map => map.set('b', 2));
+      state.batch(() => {
+        state.update('map', map => map.set('b', 2));
+        expect(state.flush()).toBe(0);
+      });
       expect(state.version).toBe(0);
+      expect(state.flush()).toBe(0);
     });
-    expect(state.version).toBe(1); await drain(); expect(reader.current.map.size).toBe(2);
+    expect(state.version).toBe(strategy === 'immediate' ? 1 : 0);
+    await drain();
+    expect(state.version).toBe(1); expect(reader.current.map.size).toBe(2);
+    expect(pair.owner.frames.length).toBe(2); expect(seen).toEqual([1]);
+    state.batch(() => state.batch(() => {})); await drain();
+    expect(state.flush()).toBe(1); expect(pair.owner.frames.length).toBe(2);
+    expect(seen).toEqual([1]);
   });
   it('flushes pending publication without a duplicate microtask publication', async () => {
     const { state, pair } = await setup(new SharedMap('number'));
     state.update(map => map.set('a', 1)); expect(state.flush()).toBe(1);
     await drain(); expect(pair.owner.frames.length).toBe(2);
+  });
+  it('flushes newer pending state installed by a publication subscriber', async () => {
+    const original = new SharedMap('number').set('x', 0);
+    const first = original.set('x', 1), pending = first.set('x', 2);
+    const state = createSharedState(original), seen: [number, number][] = [];
+    cleanup.push(() => state.dispose());
+    state.subscribe((map, version) => {
+      seen.push([version, map.get('x')!]);
+      if (version === 1) state.update(() => pending);
+    });
+    expect(state.publish(first)).toBe(1);
+    expect(state.current).toBe(pending); expect(state.version).toBe(1);
+    expect(seen).toEqual([[1, 1]]);
+    expect(state.flush()).toBe(2); expect(state.flush()).toBe(2);
+    await drain();
+    expect(state.version).toBe(2); expect(state.current).toBe(pending);
+    expect(seen).toEqual([[1, 1], [2, 2]]);
+    expect(original.get('x')).toBe(0); expect(first.get('x')).toBe(1);
   });
   it('keeps the manual session API', async () => {
     const pair = ports(), session = createSharedSession(new SharedMap('number'), { copy: false });
@@ -240,7 +299,11 @@ describe('shared state and session protocol', () => {
   });
   it('cancels scheduled publication and closes readers on disposal', async () => {
     const { state, reader, pair } = await setup(new SharedMap('number'));
-    state.update(map => map.set('x', 1)); state.dispose(); await drain();
+    state.update(map => map.set('x', 1)); state.dispose();
+    expect(() => state.flush()).toThrow('Shared session is closed');
+    await drain();
+    expect(() => state.flush()).toThrow('Shared session is closed');
+    expect(state.version).toBe(0);
     expect(pair.owner.frames.length).toBe(1); expect(reader.closed).toBe(true); expect(pair.owner.count).toBe(0); expect(pair.reader.count).toBe(0);
   });
   it('rejects unsupported state without changing the current value', () => {
