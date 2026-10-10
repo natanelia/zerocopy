@@ -822,15 +822,19 @@ export class Arena {
     return input;
   }
   *blocks(root: number, reverse = false): Generator<number> {
+    if (!root) return;
+    // Published blocks already fit this view. Shared-memory growth cannot
+    // detach it, including while a callback or another iterator is running.
+    const dv = this.dv;
     const stack: number[] = []; let node = root;
     const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
     while (node || stack.length) {
-      while (node) { stack.push(node); node = this.dv.getUint32(node + first, true); }
+      while (node) { stack.push(node); node = dv.getUint32(node + first, true); }
       node = stack.pop()!;
-      const data = this.dv.getUint32(node + 16, true), length = this.dv.getUint32(node + 20, true);
-      const next = this.dv.getUint32(node + second, true);
-      if (reverse) for (let i = length - 1; i >= 0; i--) yield this.dv.getFloat64(data + i * 8, true);
-      else for (let i = 0; i < length; i++) yield this.dv.getFloat64(data + i * 8, true);
+      const data = dv.getUint32(node + 16, true), length = dv.getUint32(node + 20, true);
+      const next = dv.getUint32(node + second, true);
+      if (reverse) for (let i = length - 1; i >= 0; i--) yield dv.getFloat64(data + i * 8, true);
+      else for (let i = 0; i < length; i++) yield dv.getFloat64(data + i * 8, true);
       node = next;
     }
   }
