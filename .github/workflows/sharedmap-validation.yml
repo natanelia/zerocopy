@@ -1,0 +1,162 @@
+name: SharedMap validation only
+
+on:
+  push:
+    branches: [validation/sharedmap-memory-20261011]
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: ''
+      FEATURE_MEMORY_SMOKE: '0'
+      GIT_NO_LAZY_FETCH: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - name: Check observable memory limits before expensive setup
+        run: node .github/sharedmap-validation/prepare.mjs --preflight
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Bind all working source to the reviewed commit before building
+        run: node .github/sharedmap-validation/prepare.mjs --source
+      - run: bun run build:wasm && bun run build:browser
+      - name: Check the two corrected guards and offline headroom fixtures
+        run: |
+          timeout --kill-after=2s 30s node --max-old-space-size=128 --test --test-concurrency=1 --test-name-pattern='oracle rejects missing tasks|invalid capacities, missing measurements' website/tests/feature-core.test.mjs proofs/feature-map-memory-checks.mjs
+          timeout --kill-after=2s 30s node --max-old-space-size=128 --test .github/sharedmap-validation/full-memory-headroom.test.mjs
+      - name: Freeze exact hosted inputs
+        run: node .github/sharedmap-validation/prepare.mjs --prepare
+      - name: Record the complete bounded memory matrix once
+        run: node .github/sharedmap-validation/full-controller.mjs
+      - name: Import only the verified full recording and terminal receipt
+        run: |
+          destination="proofs/results/feature-map-memory/hosted-${GITHUB_RUN_ID}"
+          test ! -e "$destination"
+          mkdir -p "$(dirname "$destination")"
+          cp -a "$RUNNER_TEMP/zerocopy-sharedmap-validation/full-results" "$destination"
+          cp -a "$RUNNER_TEMP/zerocopy-sharedmap-validation/full-control" "$destination/controller"
+          node scripts/import-feature-memory.mjs "$destination/summary.json"
+      - name: Retain all recording and preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharedmap-recording-${{ github.sha }}
+          path: ${{ runner.temp }}/zerocopy-sharedmap-validation/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+      - name: Transfer verified charts and complete raw recording
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharedmap-chart-input-${{ github.sha }}
+          path: |
+            proofs/results/feature-map-memory/
+            docs/assets/feature-memory-retained.svg
+            docs/assets/feature-memory-readers.svg
+            docs/assets/feature-memory-rss.svg
+            website/feature-memory-data.json
+          if-no-files-found: error
+          retention-days: 14
+
+  site:
+    needs: record
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_OPTIONS: ''
+      FEATURE_MEMORY_SMOKE: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: sharedmap-chart-input-${{ github.sha }}
+          path: .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types
+      - run: npm --prefix website install --ignore-scripts --no-package-lock
+      - run: bunx playwright install --with-deps chromium webkit
+      - name: Check the published-package Vite starter once
+        timeout-minutes: 5
+        run: node scripts/check-vite-quickstart.mjs
+      - name: Check lazy memory allocation
+        run: node --test proofs/memory-startup.mjs
+      - name: Check deployment safety
+        run: node --test website/tests/preview.test.mjs
+      - name: Check the recorded source and preserved documentation
+        env:
+          NODE_OPTIONS: ''
+          FEATURE_MEMORY_SMOKE: '0'
+        run: |
+          git add -N -- docs/assets/feature-memory-retained.svg docs/assets/feature-memory-readers.svg docs/assets/feature-memory-rss.svg website/feature-memory-data.json proofs/results/feature-map-memory
+          node --test scripts/check-docs.node.mjs
+          node scripts/check-docs.mjs --base d856ff0bd41745ae0e84d9d726d6aaaf7013fc25 --preserve
+          node scripts/check-doc-examples.mjs
+      - name: Check root-hosted site
+        run: |
+          node website/build.mjs
+          node --test website/tests/*.test.mjs
+          node website/tests/docs-browser.mjs
+          node website/tests/memory-charts-browser.mjs
+          node website/tests/feature-browser.mjs
+          node website/tests/isolation-browser.mjs
+          node website/tests/browser.mjs
+          node website/tests/explorer-browser.mjs
+          node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
+      - name: Retain root-site and visual evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharedmap-site-root-${{ github.sha }}
+          path: |
+            website/_site/
+            website/artifacts/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Build and check GitHub Pages subpath
+        env:
+          SITE_BASE: /zerocopy/
+          SITE_ORIGIN: https://natanelia.github.io
+        run: |
+          node website/build.mjs
+          node --test website/tests/*.test.mjs
+          node website/tests/docs-browser.mjs
+          node website/tests/memory-charts-browser.mjs
+          node website/tests/feature-browser.mjs
+          node website/tests/isolation-browser.mjs
+          node website/tests/browser.mjs
+          node website/tests/explorer-browser.mjs
+          node website/tests/comparison-browser.mjs
+          node website/tests/memory-browser.mjs
+      - name: Retain site and visual evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharedmap-site-prefix-${{ github.sha }}
+          path: |
+            website/_site/
+            website/artifacts/
+          include-hidden-files: true
+          retention-days: 14

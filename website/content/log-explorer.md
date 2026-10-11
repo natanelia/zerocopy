@@ -1,4 +1,6 @@
-# A live log explorer
+# Historical SharedList: A live log explorer
+
+This is the original log-column workload. The current example is [feature attributes by ID](maps.md); its SharedMap measurements are a different experiment.
 
 [All use cases](../../docs/use-cases.md) · [Try the explorer](../README.md#log-explorer) · [Compare architectures](../README.md#investigation-benchmark)
 

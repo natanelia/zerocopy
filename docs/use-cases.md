@@ -2,12 +2,13 @@
 
 [Get started](getting-started.md) · [Collections](api.md) · [Memory and ownership](architecture.md)
 
-Zerocopy is a shared-collection library, not a log engine, editor framework, or database. The log explorer is one working demonstration of a general access pattern: **large data, several readers, and versions that must remain stable**.
+Zerocopy is a shared-collection library, not a log engine, editor framework, or database. The feature attribute registry is one working demonstration of a general access pattern: **large data, several readers, and versions that must remain stable**.
 
 ## Start with the problem, not the demo
 
 | Application | What can be shared | Independent work | Why versions matter |
 | --- | --- | --- | --- |
+| Feature attributes by ID | Road metadata and validation inputs | Keyed lookups and record validation | Inspect an earlier revision while sparse edits replace current objects. |
 | Logs, traces, and observability | Event columns and indexes | Search, timeline counts, service summaries, visible-row inspection | Keep an investigation stable while ingestion continues. |
 | Document, diagram, and design editors | Nodes, properties, and document indexes | Layout, validation, export, search | Finish work on an earlier document without blocking new edits. |
 | Large tables and dashboards | Rows or primitive columns | Filters, grouping, charts, export previews | Different views can finish reading one consistent input. |
@@ -39,11 +40,13 @@ One thread allocates in each arena. Several readers can work independently. This
 | Concurrent user editing or conflict resolution | A collaboration protocol or CRDT. Zerocopy does not merge edits. |
 | Audio samples, video frames, tensors, or GPU data | Their native buffer/compute APIs. General collections are not automatically the best representation. |
 
-In particular, a log explorer can work well with a central worker, native column arrays, incremental replication, or a query engine. The live example explains shared access; the benchmark compares alternatives instead of claiming this application can only work with zerocopy.
+A feature registry can also work well with one data-owning worker or native Maps with incremental replicas. The live example explains shared access; the benchmark compares alternatives instead of claiming this application can only work with zerocopy.
 
 ## Explore the implementations
 
-[Log explorer](../website/content/log-explorer.md): an implemented browser demonstration with a generated event stream, two calculation workers, direct UI reads, frozen investigations, and bounded retention.
+[Feature attributes by ID](../website/content/maps.md): the current browser example uses a string-keyed SharedMap of JSON objects, separate lookup and validation workers, sparse replacements and a retained initial revision. It compares native Map, Immutable.js Map and Immer Map with equivalent delta publication.
+
+[Historical log explorer](../website/content/log-explorer.md): the earlier SharedList demonstration and its original measurements remain separate historical references.
 
 [Editors and history](../website/content/editors.md), [large tables](../website/content/data-tables.md), [catalogs](../website/content/analytics.md), [graphs](../website/content/graphs.md), and [simulations](../website/content/simulations.md): application designs with ownership and lifetime guidance. These are not full applications shipped by the library.
 

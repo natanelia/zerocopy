@@ -136,3 +136,7 @@ node proofs/run-comparison.mjs ../zerocopy-base proofs/results/ci.json
 ```
 
 The driver records raw samples and metadata and checks source hashes. `RESUME=1` resumes a checkpoint only when source and harness hashes match. New source builds produce new experiments; keep their results separate from the historical record. Correctness and deterministic allocation checks are gates, not noisy timing ratios.
+
+## SharedMap feature attributes
+
+`node proofs/feature-map-memory.mjs` records the current website's string-keyed object-map workload. It compares SharedMap, native Map, Immutable.js Map and Immer Map, with zero/two/four readers, equivalent sparse deltas and retained initial snapshots. Run it only after building the declared runtime. Keep the output directory new. See [the prospective method and reproduction commands](feature-map-memory-method.md) and [the report](../docs/feature-map-memory.md). Historical investigation-memory recordings remain separate SharedList evidence.

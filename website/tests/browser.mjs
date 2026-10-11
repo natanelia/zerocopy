@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createPreview } from '../serve.mjs';
 const base = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url))).base;
-const screenshots = fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
+const screenshots = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox'] });
 const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;

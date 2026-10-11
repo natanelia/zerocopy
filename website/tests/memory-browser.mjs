@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 
 // A mobile viewport in Chromium is not a WebKit memory test.
 const engine = process.env.BROWSER ?? 'webkit';
 assert.ok(['chromium', 'webkit'].includes(engine));
+const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
+mkdirSync(artifacts, { recursive: true });
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const browser = await ({ chromium, webkit }[engine]).launch({ headless: true });
 let page;
@@ -28,7 +31,7 @@ try {
       page = await context.newPage(); page.setDefaultTimeout(90000);
       page.on('pageerror', error => errors.push(error.stack || error.message));
       page.on('console', message => { if (message.type() === 'error') console.error(message.text()); });
-      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}compare/`);
+      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}historical/log-compare/`);
       if (!isolated) {
         await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#compare-start').disabled);
       }
@@ -83,7 +86,7 @@ try {
         console.log(`Passed: ${engine} ${size} events, freeze/append/resume, Stop/restart (${isolated ? 'headers' : 'service-worker isolation'}).`);
       }
       // Verify the four-path controlled benchmark under both hosting policies.
-      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}investigation-benchmark/`);
+      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}historical/log-benchmark/`);
       if (!isolated) {
         await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#run-investigation-bench').disabled);
       }
@@ -95,11 +98,12 @@ try {
     }
   }
   assert.deepEqual(errors, []);
+  writeFileSync(`${artifacts}/historical-memory-${engine}.json`, JSON.stringify({ status: 'verified', engine, browserVersion: browser.version(), base: meta.base, entries: [1000, 100000, 1000], hosting: ['headers', 'service-worker'] }, null, 2) + '\n');
   console.log(`Memory regression passed in ${engine} ${browser.version()} at ${meta.base}.`);
 } catch (error) {
   if (page && !page.isClosed()) {
-    mkdirSync(new URL('../artifacts/', import.meta.url), { recursive: true });
     console.error(await page.locator('body').innerText());
+    await page.screenshot({ path: `${artifacts}/historical-memory-${engine}-failure.png`, fullPage: true }).catch(() => {});
   }
   throw error;
 } finally { await browser.close(); }

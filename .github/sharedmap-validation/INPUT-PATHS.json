@@ -1,0 +1,19 @@
+[
+  "website/assets/feature-core.mjs",
+  "website/assets/feature-storage.mjs",
+  "website/assets/feature-reference.mjs",
+  "website/tests/feature-core.test.mjs",
+  "proofs/feature-map-memory-agent.mjs",
+  "proofs/feature-map-memory-calibration.mjs",
+  "proofs/feature-map-memory-case.mjs",
+  "proofs/feature-map-memory-checks.mjs",
+  "proofs/feature-map-memory-model.mjs",
+  "proofs/feature-map-memory-runtime.mjs",
+  "proofs/feature-map-memory.mjs",
+  "proofs/feature-map-memory-method.md",
+  "package.json",
+  "node_modules/immutable/package.json",
+  "node_modules/immutable/dist/immutable.es.js",
+  "node_modules/immer/package.json",
+  "node_modules/immer/dist/immer.production.mjs"
+]

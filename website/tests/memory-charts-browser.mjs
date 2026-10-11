@@ -7,7 +7,7 @@ import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 import { chartData } from '../memory-charts.mjs';
 const base = JSON.parse(readFileSync(new URL('../_site/build.json',import.meta.url))).base;
-const artifacts=fileURLToPath(new URL('../artifacts/',import.meta.url)); mkdirSync(artifacts,{recursive:true});
+const artifacts=process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/',import.meta.url)); mkdirSync(artifacts,{recursive:true});
 const server=createPreview({base});server.listen(0,'127.0.0.1');await once(server,'listening');
 const origin=`http://127.0.0.1:${server.address().port}`;
 // Evaluation and browser setup can wait outside Playwright's action timeouts.
@@ -27,7 +27,7 @@ try {
       context.setDefaultTimeout(15_000);
       context.setDefaultNavigationTimeout(15_000);
       const page=await context.newPage();
-      for(const width of [1440,768,390,320]) for(const route of ['docs/memory-comparison/','compare/','investigation-benchmark/']) {
+      for(const width of [1440,768,390,320]) for(const route of ['docs/historical-sharedlist-memory/','historical/log-compare/','historical/log-benchmark/']) {
         console.log(`Checking: ${name}, ${width}px, ${route}, JavaScript disabled.`);
         await page.setViewportSize({width,height:960});await page.goto(origin+base+route);
         const figures=page.locator('[data-memory-chart]');assert.equal(await figures.count(),route.startsWith('docs/')?3:2);
@@ -54,7 +54,7 @@ try {
         assert.ok((await figures.first().locator('details').innerText()).includes('not confidence intervals'));
         await page.keyboard.press('Enter');
         await page.evaluate(() => document.activeElement?.blur());
-        if(route==='docs/memory-comparison/'&&(width===1440||width===390)){
+        if(route==='docs/historical-sharedlist-memory/'&&(width===1440||width===390)){
           // addStyleTag waits for a stylesheet load event that Chromium does
           // not deliver with page JavaScript disabled. Change the existing
           // header style through the test driver instead; no page script runs.
@@ -70,12 +70,12 @@ try {
             }, previousStyle);
           }
         }
-        if(route==='compare/'&&width===1440)await page.locator('.memory-overview').screenshot({path:`${artifacts}/memory-overview-${name}.png`});
+        if(route==='historical/log-compare/'&&width===1440)await page.locator('.memory-overview').screenshot({path:`${artifacts}/memory-overview-${name}.png`});
       }
       const raw=await context.request.get(origin+base+'assets/memory-chart-data.json');assert.equal(raw.status(),200);assert.deepEqual(await raw.json(),chartData);
       for(const chart of ['retained','readers','rss']) {const svg=await context.request.get(origin+base+`assets/memory-${chart}.svg`);assert.equal(svg.status(),200);assert.ok((await svg.text()).includes('Recorded Node.js'));}
       if(name==='chromium'){
-        await page.emulateMedia({forcedColors:'active'});await page.goto(origin+base+'docs/memory-comparison/');
+        await page.emulateMedia({forcedColors:'active'});await page.goto(origin+base+'docs/historical-sharedlist-memory/');
         assert.equal(await page.locator('.memory-bar-label').count(),17);
         assert.ok(await page.locator('#memory-retained').isVisible());
       }
