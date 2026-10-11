@@ -1,0 +1,35 @@
+--- a/redux-codec.ts
++++ b/redux-codec.ts
+@@ -3,17 +3,17 @@
+   SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap,
+   SharedSortedSet, SharedPriorityQueue,
+ } from './shared';
+-import { Arena, arenaOf } from './arena';
++import { Arena } from './arena';
+ import { structureRegistry } from './codec';
+ import { parseNestedType } from './types';
+ import { readReduxHeap, restoreReduxHeap } from './redux-heap-codec';
++import { collectionKind } from './redux-internal';
+ 
+ const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
+   SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap,
+   SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue });
+ export type SharedCollection = InstanceType<(typeof classes)[keyof typeof classes]>;
+ type Kind = keyof typeof classes;
+-const kinds = Object.freeze(Object.keys(classes) as Kind[]);
+ export type EncodedReduxValue = null | boolean | string | number | EncodedReduxValue[];
+ export interface ZerocopyCodecOptions {
+   /** Limits apply to both encoding and decoding. Text length is in UTF-16 units. */
+@@ -29,11 +29,7 @@
+ 
+ /** Exact built-in classes only. A prototype or worker descriptor is not a snapshot. */
+ export function sharedCollectionKind(value: unknown): Kind | undefined {
+-  if (!value || typeof value !== 'object' || !Object.isFrozen(value)) return undefined;
+-  const prototype = Object.getPrototypeOf(value);
+-  const kind = kinds.find(key => prototype === classes[key].prototype);
+-  if (!kind) return undefined;
+-  try { arenaOf(value); return kind; } catch { return undefined; }
++  return collectionKind(value);
+ }
+ export function isSharedCollection(value: unknown): value is SharedCollection {
+   return sharedCollectionKind(value) !== undefined;

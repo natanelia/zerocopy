@@ -1,0 +1,235 @@
+{
+  "status": "prepared-not-executed",
+  "wholeSecondsCap": 360,
+  "cleanupAllowanceSeconds": 8,
+  "commands": [
+    {
+      "id": "01-baseline-portable-build",
+      "kind": "build",
+      "argv": [
+        "@BUN@",
+        "scripts/build-browser.ts"
+      ],
+      "cwd": "@CORRECT@/baseline",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "02-candidate-portable-build",
+      "kind": "build",
+      "argv": [
+        "@BUN@",
+        "scripts/build-browser.ts"
+      ],
+      "cwd": "@CORRECT@/candidate",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "03-baseline-declarations",
+      "kind": "declarations",
+      "argv": [
+        "@NODE@",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "cwd": "@CORRECT@/baseline",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "04-candidate-declarations",
+      "kind": "declarations",
+      "argv": [
+        "@NODE@",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "cwd": "@CORRECT@/candidate",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "05-baseline-redux-types",
+      "kind": "types",
+      "argv": [
+        "@NODE@",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.redux.json"
+      ],
+      "cwd": "@CORRECT@/baseline",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "06-candidate-redux-types",
+      "kind": "types",
+      "argv": [
+        "@NODE@",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.redux.json"
+      ],
+      "cwd": "@CORRECT@/candidate",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {}
+    },
+    {
+      "id": "07-emitted-source-and-declaration-audit",
+      "kind": "audit",
+      "argv": [
+        "@PYTHON@",
+        "@CORRECT@/audit-emitted.py"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 30,
+      "rssMiBCap": 512,
+      "environment": {}
+    },
+    {
+      "id": "08-baseline-existing-redux-tests",
+      "kind": "tests",
+      "argv": [
+        "@BUN@",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "@CORRECT@/baseline/redux.test.ts",
+        "@CORRECT@/baseline/redux-rtk.test.ts",
+        "@CORRECT@/baseline/redux-regression.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=json",
+        "--outputFile=@CORRECT@/execution/tests-baseline.json"
+      ],
+      "cwd": "@CORRECT@/baseline",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "output": "@CORRECT@/execution/tests-baseline.json"
+    },
+    {
+      "id": "09-candidate-existing-redux-tests",
+      "kind": "tests",
+      "argv": [
+        "@BUN@",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "@CORRECT@/candidate/redux.test.ts",
+        "@CORRECT@/candidate/redux-rtk.test.ts",
+        "@CORRECT@/candidate/redux-regression.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--reporter=json",
+        "--outputFile=@CORRECT@/execution/tests-candidate.json"
+      ],
+      "cwd": "@CORRECT@/candidate",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "output": "@CORRECT@/execution/tests-candidate.json"
+    },
+    {
+      "id": "10-bun-source-baseline",
+      "kind": "corpus",
+      "argv": [
+        "@BUN@",
+        "@CORRECT@/classifier-correctness.mjs",
+        "@CORRECT@/baseline",
+        "bun-source",
+        "@CORRECT@/execution/bun-source-baseline.json"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "engine": "bun-source",
+      "output": "@CORRECT@/execution/bun-source-baseline.json"
+    },
+    {
+      "id": "11-bun-source-candidate",
+      "kind": "corpus",
+      "argv": [
+        "@BUN@",
+        "@CORRECT@/classifier-correctness.mjs",
+        "@CORRECT@/candidate",
+        "bun-source",
+        "@CORRECT@/execution/bun-source-candidate.json"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "engine": "bun-source",
+      "output": "@CORRECT@/execution/bun-source-candidate.json"
+    },
+    {
+      "id": "12-node-portable-baseline",
+      "kind": "corpus",
+      "argv": [
+        "@NODE@",
+        "@CORRECT@/classifier-correctness.mjs",
+        "@CORRECT@/baseline",
+        "node-portable",
+        "@CORRECT@/execution/node-portable-baseline.json"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "engine": "node-portable",
+      "output": "@CORRECT@/execution/node-portable-baseline.json"
+    },
+    {
+      "id": "13-node-portable-candidate",
+      "kind": "corpus",
+      "argv": [
+        "@NODE@",
+        "@CORRECT@/classifier-correctness.mjs",
+        "@CORRECT@/candidate",
+        "node-portable",
+        "@CORRECT@/execution/node-portable-candidate.json"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 60,
+      "rssMiBCap": 2048,
+      "environment": {},
+      "engine": "node-portable",
+      "output": "@CORRECT@/execution/node-portable-candidate.json"
+    },
+    {
+      "id": "14-retained-json-reconciliation",
+      "kind": "reconcile",
+      "argv": [
+        "@PYTHON@",
+        "@CORRECT@/reconcile.py"
+      ],
+      "cwd": "@CORRECT@",
+      "secondsCap": 30,
+      "rssMiBCap": 512,
+      "environment": {}
+    }
+  ]
+}

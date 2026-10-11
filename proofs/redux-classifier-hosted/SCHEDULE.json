@@ -1,0 +1,1538 @@
+[
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-serializability-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-serializability-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive-serializability",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-unfrozen-serializability-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-unfrozen-serializability-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "unfrozen-serializability",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-public-entry-import-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-public-entry-import-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "public-entry-import",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-stringify-frozen-state-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-stringify-frozen-state-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "stringify-frozen-state",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-same-root-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-same-root-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-same-root",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-selector-changing-root-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-selector-changing-root-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "selector-changing-root",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  }
+]
