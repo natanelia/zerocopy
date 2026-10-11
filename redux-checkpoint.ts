@@ -1,8 +1,9 @@
-import { Arena, FORMAT_VERSION, HEAP_START, MAX_SIZE, freezeJSON, hashBytes } from './arena';
+import { Arena, FORMAT_VERSION, HEAP_START, MAX_SIZE, freezeJSON, hashBytes, vectorDepth } from './arena';
 import { compactMany, getWorkerData } from './shared';
 import { structureRegistry } from './codec';
 import { collectionConstructors, isPlainRecord, isZerocopyCollection } from './redux-internal';
-import type { SharedCollection } from './redux-internal';
+import type { CollectionKind, SharedCollection } from './redux-internal';
+import { parseNestedType } from './types';
 
 /** Resource limits for trusted, application-generated checkpoints. Not a hostile binary validator. */
 export interface ZerocopyCodecOptions {
@@ -115,18 +116,75 @@ export function encodeZerocopyState(state: unknown, options: ZerocopyCodecOption
   return freezeJSON({ codec: 'zerocopy-redux', version: 1, format: FORMAT_VERSION, tree, arenas, structures: transport.structures }) as ZerocopyStatePacket;
 }
 
-function validDescriptor(value: unknown, used: number): value is Record<string, unknown> {
-  if (!isPlainRecord(value)) return false;
-  for (const [key, item] of Object.entries(value)) {
-    if (['valueType', 'type'].includes(key)) { if (typeof item !== 'string' || !item.length || item.length > 1024) return false; }
-    else if (['isMaxHeap', 'orderStable'].includes(key)) { if (typeof item !== 'boolean') return false; }
-    else if (['root', 'head', 'tail', 'block', 'size', 'depth', 'tailSize'].includes(key)) {
-      if (typeof item !== 'number' || !Number.isSafeInteger(item) || item < 0) return false;
-      if (key === 'size' && item > MAX_SIZE) return false;
-      if (['root', 'head', 'block'].includes(key) && item !== 0 && (item < HEAP_START || item >= used || item % 4 !== 0)) return false;
-    } else return false;
+// Match each public toWorkerData/fromWorkerData contract. Missing fields must
+// never reach constructor defaults: a missing root can otherwise erase data.
+const descriptorFields: Record<CollectionKind, readonly string[]> = {
+  SharedMap: ['root', 'valueType', 'size'],
+  SharedSet: ['root', 'valueType', 'size'],
+  SharedList: ['root', 'depth', 'size', 'type', 'tail'],
+  SharedStack: ['head', 'size', 'type'],
+  SharedQueue: ['head', 'tail', 'size', 'type', 'block', 'depth'],
+  SharedLinkedList: ['head', 'tail', 'tailSize', 'size', 'type'],
+  SharedDoublyLinkedList: ['head', 'tail', 'tailSize', 'size', 'type'],
+  SharedOrderedMap: ['root', 'head', 'tail', 'size', 'valueType'],
+  SharedOrderedSet: ['root', 'head', 'tail', 'size', 'valueType'],
+  SharedSortedMap: ['root', 'size', 'valueType'],
+  SharedSortedSet: ['root', 'size', 'valueType'],
+  SharedPriorityQueue: ['root', 'size', 'type', 'isMaxHeap'],
+};
+function validDescriptor(kind: CollectionKind, value: unknown, used: number): value is Record<string, unknown> {
+  if (!isPlainRecord(value) || Object.getOwnPropertySymbols(value).length) return false;
+  const fields = descriptorFields[kind], properties = Object.getOwnPropertyDescriptors(value);
+  if (!fields.every(key => Object.hasOwn(properties, key))) return false;
+  const ordered = kind === 'SharedOrderedMap' || kind === 'SharedOrderedSet';
+  for (const [key, property] of Object.entries(properties)) {
+    // orderStable is optional in the public ordered-map reader for compatibility.
+    if ((!fields.includes(key) && !(ordered && key === 'orderStable')) || !('value' in property)) return false;
+    const item = property.value;
+    if (key === 'valueType' || key === 'type') {
+      if (typeof item !== 'string' || item.length > 1024
+        || (!['string', 'number', 'boolean', 'object'].includes(item) && !parseNestedType(item))) return false;
+    } else if (key === 'isMaxHeap' || key === 'orderStable') {
+      if (typeof item !== 'boolean') return false;
+    } else if (typeof item !== 'number' || !Number.isSafeInteger(item) || item < 0) return false;
   }
-  return typeof value.size === 'number';
+  const size = value.size as number;
+  if (size > MAX_SIZE) return false;
+  if (['SharedSet', 'SharedOrderedSet', 'SharedSortedSet'].includes(kind) && value.valueType !== 'number') return false;
+  const pointer = (address: unknown, bytes = 4): boolean => address === 0 || typeof address === 'number'
+    && address >= HEAP_START && address % 4 === 0 && address <= used - bytes;
+  const live = (address: unknown, length: number): boolean => (address !== 0) === (length !== 0);
+  // These are descriptor relationships and directly referenced storage bounds,
+  // not a traversal or validation of the underlying WASM graph.
+  switch (kind) {
+    case 'SharedMap': case 'SharedSet':
+      return pointer(value.root, 12) && live(value.root, size);
+    case 'SharedSortedMap': case 'SharedSortedSet':
+      return pointer(value.root, 16) && live(value.root, size);
+    case 'SharedStack':
+      return pointer(value.head, 16) && live(value.head, size);
+    case 'SharedPriorityQueue':
+      return pointer(value.root, 32) && live(value.root, size);
+    case 'SharedOrderedMap': case 'SharedOrderedSet': {
+      const count = value.tail as number;
+      return pointer(value.root, 12) && pointer(value.head, 8) && live(value.root, size) && live(value.head, size)
+        && count >= size && count <= MAX_SIZE && (count === 0) === (size === 0);
+    }
+    case 'SharedList': case 'SharedQueue': {
+      const queue = kind === 'SharedQueue', offset = queue ? value.tail as number : 0;
+      const total = size + offset;
+      if (total > MAX_SIZE || (size === 0 && offset !== 0)) return false;
+      const tailSize = total ? ((total - 1) % 32) + 1 : 0, prefix = total - tailSize;
+      const root = queue ? value.head : value.root, tail = queue ? value.block : value.tail;
+      return value.depth === vectorDepth(prefix) && pointer(root, value.depth === 0 ? 256 : 128) && live(root, prefix)
+        && pointer(tail, tailSize * 8) && live(tail, tailSize);
+    }
+    case 'SharedLinkedList': case 'SharedDoublyLinkedList': {
+      const tailSize = value.tailSize as number;
+      return tailSize <= 32 && tailSize <= size && pointer(value.head, 24) && live(value.head, size - tailSize)
+        && pointer(value.tail, tailSize * 8) && live(value.tail, tailSize);
+    }
+  }
 }
 
 /**
@@ -157,7 +215,7 @@ export function decodeZerocopyState<T = unknown>(input: unknown, options: Zeroco
   for (const [name, item] of Object.entries(input.structures)) {
     if (!/^s(0|[1-9][0-9]*)$/.test(name) || !isPlainRecord(item) || typeof item.type !== 'string'
       || !Object.hasOwn(collectionConstructors, item.type) || typeof item.arena !== 'string' || !copies.has(item.arena)
-      || !validDescriptor(item.data, copies.get(item.arena)!.used)) fail('invalid collection descriptor');
+      || !validDescriptor(item.type as CollectionKind, item.data, copies.get(item.arena)!.used)) fail('invalid collection descriptor');
     descriptors.set(name, item as unknown as StructureRecord);
   }
   // Validate the state tree before reading a single collection node.
