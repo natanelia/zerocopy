@@ -1,0 +1,83 @@
+{
+  "groups": [
+    "shape-and-public-order",
+    "generator-and-continuations",
+    "observer-and-exception-order"
+  ],
+  "shapeCases": [
+    "empty",
+    "single",
+    "canonical-large",
+    "collision",
+    "canonical-old",
+    "late-repeated-overlay",
+    "fork",
+    "journal",
+    "nested-journal"
+  ],
+  "realNodeWorkerCasesPerArm": 2,
+  "snapshotsPerWorker": 10,
+  "testCount": 42,
+  "titlesByFile": {
+    "shared-map.test.ts": [
+      "branching at multiple levels",
+      "empty get returns undefined",
+      "empty string key and value",
+      "hash collision handling",
+      "immutability - original unchanged",
+      "long keys",
+      "many keys",
+      "missing key returns undefined",
+      "multiple keys",
+      "overwrite key",
+      "set and get single value",
+      "structural sharing - nodes reused",
+      "unicode keys and values",
+      "version isolation"
+    ],
+    "shared-set.test.ts": [
+      "add duplicate does not increase size",
+      "add increases size",
+      "addMany",
+      "addMany with existing returns same if no new",
+      "delete non-existent returns same set",
+      "delete removes element",
+      "empty set has size 0",
+      "forEach",
+      "has returns true for existing",
+      "immutability - original unchanged",
+      "many elements",
+      "numeric values",
+      "values iteration"
+    ],
+    "trie-view-capture.test.ts": [
+      "captures after caller growth before first next and survives two interleaved paused traversals",
+      "keeps both generator methods and native iterator prototypes unchanged",
+      "keeps copy attachments and ordinary/sorted sets unchanged",
+      "keeps shared attachments and ordinary/sorted sets unchanged",
+      "matches exact baseline pointer order and independent recursion across all trie shapes",
+      "preserves creation, return-before-next, throw-before-next, and zero-root laziness",
+      "preserves natural UTF-8 byte order independently of baseline traversal",
+      "preserves public projection order, Unicode and SharedList<number> values",
+      "preserves public projection order, Unicode and SharedMap<number> values",
+      "preserves public projection order, Unicode and boolean values",
+      "preserves public projection order, Unicode and number values",
+      "preserves public projection order, Unicode and object values",
+      "preserves public projection order, Unicode and string values",
+      "resumes journal yields across growth and captures each recursive iterator independently",
+      "retains close, throw, callback reentry and fresh iteration after termination"
+    ]
+  },
+  "workerSnapshots": [
+    "empty",
+    "single",
+    "canonical",
+    "late",
+    "fork",
+    "collision",
+    "journal",
+    "nested",
+    "objects",
+    "set"
+  ]
+}

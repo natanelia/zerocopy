@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "files": [
+    {
+      "path": ".github/workflows/lazy-traversal-hosted.yml",
+      "bytes": 2641,
+      "sha256": "2daf84d67b0808645432aece302656d1f3de74b2094d76117435cf53857ca497"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/CONFIG.json",
+      "bytes": 2102,
+      "sha256": "311e642aa1f15153a2517c835e7c775da8bc27002f7e24489121e6f320deee8e"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/EXPECTED.json",
+      "bytes": 2774,
+      "sha256": "998d9c4b3afc69deb62129787cdd2d7ab138ff9dd31f0ea7552bdf8acfde3b39"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/METHOD.md",
+      "bytes": 13499,
+      "sha256": "350da80121039a0d65f38f94989bebc22aa71b9b60819ae5f980718f658562c0"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/README.md",
+      "bytes": 1379,
+      "sha256": "0ae7eff444863292c47daf10f9452bf751e8cb7382ffc7e07253f37d501e5d94"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/SCHEDULE.json",
+      "bytes": 36483,
+      "sha256": "6b535e0d6e86674323c5861dcadbcfb11446ecf27246047591623f4c16fec262"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/SOURCE.json",
+      "bytes": 55150,
+      "sha256": "32767533d3bb5f3b23f93953fcd759f0e621b772d33eafea0767452866a31b6f"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/analyze.py",
+      "bytes": 10019,
+      "sha256": "e817b6d8c2bacacd8395e36624daff4ab65525dfe3de75fae8d07717d4630d46"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/audit-emitted.py",
+      "bytes": 3958,
+      "sha256": "68f3e7cbd4a5585001823bd082e64f77e4e3c9664702e373220f7df68c7b95c7"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/candidate.patch",
+      "bytes": 802,
+      "sha256": "1f9b0c9374ae6ab7b149582a61b9734befea444fb1c0440b6cbf8cdb7500c66d"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/hosted.py",
+      "bytes": 28272,
+      "sha256": "f89d961df4b04fd1b562fbdcb20308b9d6c3dcf149fc8c234a76ada7b7a3bfbd"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/reconcile.py",
+      "bytes": 6679,
+      "sha256": "3a44c74fa49492c0379b2e10e4251c0d62ae76ca1e8fa3f3902a440c7de40442"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/run-correctness.py",
+      "bytes": 10829,
+      "sha256": "6456b29fa809b6513c454e7edf274592f3d41297bd39227fb16c5fab0ceca4f9"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/run-timing.py",
+      "bytes": 22896,
+      "sha256": "731327854fe4cce02ea1ff84e0caed2da9ac3972681bd17c3ffb2dd3bddea6cd"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/supervise.py",
+      "bytes": 6856,
+      "sha256": "480b08c750351e02d6f9945801c5f3f6d94e9a044ee0037da4d9288567ce8f13"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/traversal-correctness.mjs",
+      "bytes": 24636,
+      "sha256": "f224262e087837e6b63aac61c9c554313c261f407a4c0a2738fcb6c4b033b154"
+    },
+    {
+      "path": "proofs/lazy-traversal-hosted/traversal-timing.mjs",
+      "bytes": 13604,
+      "sha256": "44217aa53269b8817ab4c50666544e9e2ef1ddc6b66a630f6972e6af582246e3"
+    }
+  ]
+}

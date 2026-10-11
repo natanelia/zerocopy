@@ -1,0 +1,18 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -715,12 +715,13 @@
+       return;
+     }
+     const stack = root ? [root] : [];
+-    // These two small work arrays belong to this iterator, not shared memory.
+-    const lanes = new Uint32Array(16), patches: number[] = [];
++    // Overlay scratch is allocated on first use and retained by this iterator.
++    let lanes: Uint32Array | undefined, patches: number[] | undefined;
+     while (stack.length) {
+       const p = stack.pop()!, dv = this.dv, tag = dv.getUint32(p, true);
+       if (tag === 0) { yield p; continue; }
+       if (tag & 0x80000000) {
++        lanes ??= new Uint32Array(16); patches ??= [];
+         const bitmap = dv.getUint32(p + 8, true) >>> 16;
+         patches.length = 0; let base = p;
+         while (dv.getUint32(base, true) & 0x80000000) {
