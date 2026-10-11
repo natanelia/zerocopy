@@ -1,10 +1,10 @@
 import {
   Snapshot
-} from "./chunk-8hw6gtrx.js";
+} from "./chunk-t2acd52e.js";
 import {
   getWorkerData2,
   initWorker2
-} from "./chunk-tncfb2ad.js";
+} from "./chunk-enwn105b.js";
 
 // worker-protocol.ts
 var PROTOCOL = "zerocopy/session";
@@ -178,33 +178,7 @@ function endpointOf(value) {
   const endpoint = value?.port ?? value;
   if (!endpoint || typeof endpoint.postMessage !== "function")
     throw new TypeError("Expected a Worker, SharedWorker, or MessagePort");
-  endpoint.start?.();
   return endpoint;
-}
-function listen2(endpoint, receive, fail) {
-  if (endpoint.addEventListener && endpoint.removeEventListener) {
-    const onMessage = (event) => receive(event.data), onError = (event) => fail(event.error instanceof Error ? event.error : new Error(event.message ?? "Worker error"));
-    endpoint.addEventListener("message", onMessage);
-    endpoint.addEventListener("messageerror", onError);
-    endpoint.addEventListener("error", onError);
-    return () => {
-      endpoint.removeEventListener("message", onMessage);
-      endpoint.removeEventListener("messageerror", onError);
-      endpoint.removeEventListener("error", onError);
-    };
-  }
-  if (endpoint.on && endpoint.off) {
-    const onError = (error) => fail(error instanceof Error ? error : new Error(String(error)));
-    endpoint.on("message", receive);
-    endpoint.on("messageerror", onError);
-    endpoint.on("error", onError);
-    return () => {
-      endpoint.off("message", receive);
-      endpoint.off("messageerror", onError);
-      endpoint.off("error", onError);
-    };
-  }
-  throw new TypeError("Endpoint does not support message events");
 }
 function msg(channel, client, fields) {
   return { protocol: PROTOCOL2, version: VERSION, channel, client, ...fields };
@@ -272,8 +246,10 @@ function client(resource, options, owned) {
       releaseResource(resource);
   }
   function fail(error) {
-    close(error);
-    report2(options, error);
+    if (!closed) {
+      close(error);
+      report2(options, error);
+    }
   }
   let stateReady;
   try {
@@ -285,7 +261,7 @@ function client(resource, options, owned) {
     });
     if (closed)
       throw new Error("Shared state initialization failed");
-    remove = listen2(endpoint, (data) => {
+    remove = listen(endpoint, (data) => {
       if (!valid(data, channel) || data.client !== clientId)
         return;
       if (data.kind === "ready") {
@@ -452,79 +428,108 @@ async function atRevision(reader, revision, signal) {
 }
 async function serve2(tasks, options = {}) {
   const endpoint = endpointOf(options.endpoint ?? globalThis), channel = options.channel ?? "default";
-  const readers = new Map, running = new Map;
-  let closed = false;
-  const remove = listen2(endpoint, (data) => {
+  const clients = new Map;
+  let closed = false, remove = () => {};
+  function closeClient(clientId, value, error, notify = true) {
+    if (value.closed)
+      return false;
+    value.closed = true;
+    if (clients.get(clientId) === value)
+      clients.delete(clientId);
+    for (const controller of value.running.values())
+      controller.abort(error);
+    value.running.clear();
+    if (notify) {
+      try {
+        endpoint.postMessage(msg(channel, clientId, { kind: "close", message: error.message }));
+      } catch {}
+    }
+    value.lifetime.abort(error);
+    return true;
+  }
+  function failClient(clientId, value, error) {
+    if (closeClient(clientId, value, error))
+      report2(options, error);
+  }
+  function shutdown(error) {
+    if (closed)
+      return false;
+    closed = true;
+    remove();
+    for (const [clientId, value] of clients)
+      closeClient(clientId, value, error);
+    return true;
+  }
+  function fail(error) {
+    if (shutdown(error))
+      report2(options, error);
+  }
+  remove = listen(endpoint, (data) => {
     if (closed || !valid(data, channel))
       return;
     if (data.kind === "hello") {
-      if (!readers.has(data.client)) {
-        const reader = connectSharedSession2({ endpoint, channel: "tasks:" + channel + ":" + data.client, timeoutMs: options.timeoutMs, onError: options.onError });
-        readers.set(data.client, reader);
-        running.set(data.client, new Map);
-        reader.catch((error) => {
-          try {
-            endpoint.postMessage(msg(channel, data.client, { kind: "close", message: error instanceof Error ? error.message : String(error) }));
-          } catch {}
-          report2(options, error instanceof Error ? error : new Error(String(error)));
-        });
+      if (!clients.has(data.client)) {
+        const value = { lifetime: new AbortController, running: new Map, closed: false };
+        clients.set(data.client, value);
+        try {
+          value.reader = connectSharedSession2({
+            endpoint,
+            channel: "tasks:" + channel + ":" + data.client,
+            timeoutMs: options.timeoutMs,
+            signal: value.lifetime.signal,
+            onError: (error) => failClient(data.client, value, error)
+          });
+          value.reader.catch((error) => failClient(data.client, value, errorOf(error)));
+        } catch (error) {
+          failClient(data.client, value, errorOf(error));
+        }
       }
-      endpoint.postMessage(msg(channel, data.client, { kind: "ready" }));
+      if (clients.has(data.client)) {
+        try {
+          endpoint.postMessage(msg(channel, data.client, { kind: "ready" }));
+        } catch (error) {
+          fail(errorOf(error));
+        }
+      }
       return;
     }
+    const value = clients.get(data.client);
+    if (!value)
+      return;
     if (data.kind === "close") {
-      for (const controller of running.get(data.client)?.values() ?? [])
-        controller.abort(new Error("Task client closed"));
-      readers.get(data.client)?.then((r) => r.dispose()).catch(() => {});
-      readers.delete(data.client);
-      running.delete(data.client);
+      closeClient(data.client, value, new Error("Task client closed"), false);
       return;
     }
     if (data.kind === "cancel" && data.id !== undefined) {
-      running.get(data.client)?.get(data.id)?.abort(new Error("Task aborted"));
+      value.running.get(data.id)?.abort(new Error("Task aborted"));
       return;
     }
-    if (data.kind !== "call" || typeof data.id !== "number" || !Number.isSafeInteger(data.id) || data.id < 1 || typeof data.task !== "string" || !readers.has(data.client))
+    if (data.kind !== "call" || typeof data.id !== "number" || !Number.isSafeInteger(data.id) || data.id < 1 || typeof data.task !== "string")
       return;
     const task = Object.hasOwn(tasks, data.task) ? tasks[data.task] : undefined;
     if (typeof task !== "function") {
-      endpoint.postMessage(msg(channel, data.client, { kind: "error", id: data.id, message: "Unknown task: " + data.task }));
+      try {
+        endpoint.postMessage(msg(channel, data.client, { kind: "error", id: data.id, message: "Unknown task: " + data.task }));
+      } catch (error) {
+        fail(errorOf(error));
+      }
       return;
     }
     const callId = data.id, controller = new AbortController;
-    running.get(data.client)?.set(callId, controller);
-    Promise.resolve(readers.get(data.client)).then((reader) => {
-      if (!reader)
-        throw new Error("Task client has no shared state");
-      return atRevision(reader, data.revision, controller.signal).then((snapshot) => {
-        controller.signal.throwIfAborted();
-        return task({ state: snapshot, signal: controller.signal }, data.input);
-      });
-    }).then((value) => {
-      if (!closed)
-        endpoint.postMessage(msg(channel, data.client, { kind: "result", id: callId, value }));
+    value.running.set(callId, controller);
+    value.reader.then((reader) => atRevision(reader, data.revision, controller.signal)).then((snapshot) => {
+      controller.signal.throwIfAborted();
+      return task({ state: snapshot, signal: controller.signal }, data.input);
+    }).then((result) => {
+      if (!value.closed)
+        endpoint.postMessage(msg(channel, data.client, { kind: "result", id: callId, value: result }));
     }).catch((error) => {
-      if (!closed)
-        endpoint.postMessage(msg(channel, data.client, { kind: "error", id: callId, message: error instanceof Error ? error.message : String(error) }));
-    }).finally(() => running.get(data.client)?.delete(callId)).catch((error) => report2(options, error instanceof Error ? error : new Error(String(error))));
-  }, (error) => options.onError?.(error));
+      if (!value.closed)
+        endpoint.postMessage(msg(channel, data.client, { kind: "error", id: callId, message: errorOf(error).message }));
+    }).finally(() => value.running.delete(callId)).catch((error) => fail(errorOf(error)));
+  }, fail);
   return () => {
-    if (closed)
-      return;
-    closed = true;
-    remove();
-    for (const clientId of readers.keys()) {
-      try {
-        endpoint.postMessage(msg(channel, clientId, { kind: "close", message: "Task server closed" }));
-      } catch {}
-    }
-    for (const m of running.values())
-      for (const c of m.values())
-        c.abort(new Error("Task server closed"));
-    for (const r of readers.values())
-      r.then((x) => x.dispose()).catch(() => {});
-    readers.clear();
-    running.clear();
+    shutdown(new Error("Task server closed"));
   };
 }
 async function pool2(workers, options) {
@@ -557,16 +562,33 @@ async function pool2(workers, options) {
   let closed = false;
   const idle = executors.slice();
   const queue = [];
-  const schedule = (operation) => new Promise((resolve, reject) => {
+  const schedule = (operation, signal) => new Promise((resolve, reject) => {
     if (closed) {
       reject(new Error("Worker pool is closed"));
+      return;
+    }
+    if (signal?.aborted) {
+      reject(signal.reason ?? new Error("Task aborted"));
       return;
     }
     if (!idle.length && queue.length >= max) {
       reject(new Error("Worker pool queue overflow"));
       return;
     }
-    const item = { reject, run(executor) {
+    const cleanup = () => signal?.removeEventListener("abort", abort);
+    const abort = () => {
+      const index = queue.indexOf(item);
+      if (index < 0)
+        return;
+      queue.splice(index, 1);
+      cleanup();
+      reject(signal?.reason ?? new Error("Task aborted"));
+    };
+    const item = { reject(error) {
+      cleanup();
+      reject(error);
+    }, run(executor) {
+      cleanup();
       let released = false;
       const release = () => {
         if (released)
@@ -598,10 +620,14 @@ async function pool2(workers, options) {
     const executor = idle.shift();
     if (executor)
       item.run(executor);
-    else
+    else {
       queue.push(item);
+      signal?.addEventListener("abort", abort, { once: true });
+      if (signal?.aborted)
+        abort();
+    }
   });
-  const run = new Proxy(Object.create(null), { get: (_t, key) => typeof key === "string" ? (input, call) => schedule((e) => e.run[key](input, call)) : undefined });
+  const run = new Proxy(Object.create(null), { get: (_t, key) => typeof key === "string" ? (input, call) => schedule((e) => e.run[key](input, call), call?.signal) : undefined });
   const map = new Proxy(Object.create(null), { get: (_t, key) => typeof key === "string" ? async (inputs, call) => {
     if (closed)
       throw new Error("Worker pool is closed");
@@ -620,7 +646,7 @@ async function pool2(workers, options) {
           const index = next++;
           if (index >= inputs.length)
             return;
-          results[index] = await schedule((e) => e.run[key](inputs[index], call));
+          results[index] = await schedule((e) => e.run[key](inputs[index], call), call?.signal);
         }
       } catch (error) {
         failed = true;
@@ -708,7 +734,7 @@ class Publisher {
   }
   commit() {
     this.assertOpen();
-    if (this.depth || same(this.state, this.published))
+    if (this.depth || this.state === this.published || same(this.state, this.published))
       return this.sequence;
     if (this.sequence === Number.MAX_SAFE_INTEGER)
       throw new RangeError("Session version exhausted");

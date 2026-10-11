@@ -5,7 +5,7 @@ import {
   checkedSize,
   Snapshot,
   Arena
-} from "./chunk-8hw6gtrx.js";
+} from "./chunk-t2acd52e.js";
 
 // text-search.ts
 function compileStringSearch(arena, term, options = {}) {

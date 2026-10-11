@@ -6,15 +6,16 @@ import {
   HEAP_START,
   MAX_SIZE,
   hashBytes,
+  vectorDepth,
   arenaOf,
   Arena
-} from "./chunk-8hw6gtrx.js";
+} from "./chunk-t2acd52e.js";
 import {
   SharedMap2
-} from "./chunk-y3qf8ee4.js";
+} from "./chunk-n1amv1q3.js";
 import {
   SharedList2
-} from "./chunk-q6sd1gxn.js";
+} from "./chunk-jyz2w9p4.js";
 import {
   SharedSet2,
   SharedStack2,
@@ -28,10 +29,10 @@ import {
   SharedPriorityQueue2,
   compactMany2,
   getWorkerData2
-} from "./chunk-tncfb2ad.js";
+} from "./chunk-enwn105b.js";
 import {
   createSharedSession2
-} from "./chunk-ytsz3xpv.js";
+} from "./chunk-4w7mq2zb.js";
 
 // redux-heap-codec.ts
 function readReduxHeap(heap, encode) {
@@ -661,27 +662,79 @@ function encodeZerocopyState(state, options = {}) {
   });
   return freezeJSON({ codec: "zerocopy-redux", version: 1, format: FORMAT_VERSION, tree, arenas, structures: transport.structures });
 }
-function validDescriptor(value, used) {
-  if (!isPlainRecord2(value))
+var descriptorFields = {
+  SharedMap: ["root", "valueType", "size"],
+  SharedSet: ["root", "valueType", "size"],
+  SharedList: ["root", "depth", "size", "type", "tail"],
+  SharedStack: ["head", "size", "type"],
+  SharedQueue: ["head", "tail", "size", "type", "block", "depth"],
+  SharedLinkedList: ["head", "tail", "tailSize", "size", "type"],
+  SharedDoublyLinkedList: ["head", "tail", "tailSize", "size", "type"],
+  SharedOrderedMap: ["root", "head", "tail", "size", "valueType"],
+  SharedOrderedSet: ["root", "head", "tail", "size", "valueType"],
+  SharedSortedMap: ["root", "size", "valueType"],
+  SharedSortedSet: ["root", "size", "valueType"],
+  SharedPriorityQueue: ["root", "size", "type", "isMaxHeap"]
+};
+function validDescriptor(kind, value, used) {
+  if (!isPlainRecord2(value) || Object.getOwnPropertySymbols(value).length)
     return false;
-  for (const [key, item] of Object.entries(value)) {
-    if (["valueType", "type"].includes(key)) {
-      if (typeof item !== "string" || !item.length || item.length > 1024)
+  const fields = descriptorFields[kind], properties = Object.getOwnPropertyDescriptors(value);
+  if (!fields.every((key) => Object.hasOwn(properties, key)))
+    return false;
+  const ordered = kind === "SharedOrderedMap" || kind === "SharedOrderedSet";
+  for (const [key, property] of Object.entries(properties)) {
+    if (!fields.includes(key) && !(ordered && key === "orderStable") || !("value" in property))
+      return false;
+    const item = property.value;
+    if (key === "valueType" || key === "type") {
+      if (typeof item !== "string" || item.length > 1024 || !["string", "number", "boolean", "object"].includes(item) && !parseNestedType(item))
         return false;
-    } else if (["isMaxHeap", "orderStable"].includes(key)) {
+    } else if (key === "isMaxHeap" || key === "orderStable") {
       if (typeof item !== "boolean")
         return false;
-    } else if (["root", "head", "tail", "block", "size", "depth", "tailSize"].includes(key)) {
-      if (typeof item !== "number" || !Number.isSafeInteger(item) || item < 0)
-        return false;
-      if (key === "size" && item > MAX_SIZE)
-        return false;
-      if (["root", "head", "block"].includes(key) && item !== 0 && (item < HEAP_START || item >= used || item % 4 !== 0))
-        return false;
-    } else
+    } else if (typeof item !== "number" || !Number.isSafeInteger(item) || item < 0)
       return false;
   }
-  return typeof value.size === "number";
+  const size = value.size;
+  if (size > MAX_SIZE)
+    return false;
+  if (["SharedSet", "SharedOrderedSet", "SharedSortedSet"].includes(kind) && value.valueType !== "number")
+    return false;
+  const pointer = (address, bytes = 4) => address === 0 || typeof address === "number" && address >= HEAP_START && address % 4 === 0 && address <= used - bytes;
+  const live = (address, length) => address !== 0 === (length !== 0);
+  switch (kind) {
+    case "SharedMap":
+    case "SharedSet":
+      return pointer(value.root, 12) && live(value.root, size);
+    case "SharedSortedMap":
+    case "SharedSortedSet":
+      return pointer(value.root, 16) && live(value.root, size);
+    case "SharedStack":
+      return pointer(value.head, 16) && live(value.head, size);
+    case "SharedPriorityQueue":
+      return pointer(value.root, 32) && live(value.root, size);
+    case "SharedOrderedMap":
+    case "SharedOrderedSet": {
+      const count = value.tail;
+      return pointer(value.root, 12) && pointer(value.head, 8) && live(value.root, size) && live(value.head, size) && count >= size && count <= MAX_SIZE && count === 0 === (size === 0);
+    }
+    case "SharedList":
+    case "SharedQueue": {
+      const queue = kind === "SharedQueue", offset = queue ? value.tail : 0;
+      const total = size + offset;
+      if (total > MAX_SIZE || size === 0 && offset !== 0)
+        return false;
+      const tailSize = total ? (total - 1) % 32 + 1 : 0, prefix = total - tailSize;
+      const root = queue ? value.head : value.root, tail = queue ? value.block : value.tail;
+      return value.depth === vectorDepth(prefix) && pointer(root, value.depth === 0 ? 256 : 128) && live(root, prefix) && pointer(tail, tailSize * 8) && live(tail, tailSize);
+    }
+    case "SharedLinkedList":
+    case "SharedDoublyLinkedList": {
+      const tailSize = value.tailSize;
+      return tailSize <= 32 && tailSize <= size && pointer(value.head, 24) && live(value.head, size - tailSize) && pointer(value.tail, tailSize * 8) && live(value.tail, tailSize);
+    }
+  }
 }
 function decodeZerocopyState(input, options = {}) {
   const bound = limits(options);
@@ -706,7 +759,7 @@ function decodeZerocopyState(input, options = {}) {
   }
   const descriptors = new Map;
   for (const [name, item] of Object.entries(input.structures)) {
-    if (!/^s(0|[1-9][0-9]*)$/.test(name) || !isPlainRecord2(item) || typeof item.type !== "string" || !Object.hasOwn(collectionConstructors, item.type) || typeof item.arena !== "string" || !copies.has(item.arena) || !validDescriptor(item.data, copies.get(item.arena).used))
+    if (!/^s(0|[1-9][0-9]*)$/.test(name) || !isPlainRecord2(item) || typeof item.type !== "string" || !Object.hasOwn(collectionConstructors, item.type) || typeof item.arena !== "string" || !copies.has(item.arena) || !validDescriptor(item.type, item.data, copies.get(item.arena).used))
       fail2("invalid collection descriptor");
     descriptors.set(name, item);
   }

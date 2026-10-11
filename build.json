@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "d856ff0bd41745ae0e84d9d726d6aaaf7013fc25",
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9",
@@ -37,5 +37,5 @@
     "docs/maps/",
     "docs/editors/"
   ],
-  "librarySHA256": "7d72dcbaf65c405c5a585ae1d5b9db94e40783c117dab0b23c6add4749603b23"
+  "librarySHA256": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476"
 }

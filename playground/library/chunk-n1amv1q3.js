@@ -2,7 +2,7 @@ import {
   structureRegistry,
   Snapshot,
   Arena
-} from "./chunk-8hw6gtrx.js";
+} from "./chunk-t2acd52e.js";
 
 // shared-map.ts
 var current;
