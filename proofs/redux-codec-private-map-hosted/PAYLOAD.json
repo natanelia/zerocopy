@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "sourceTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "files": [
+    {
+      "path": ".github/workflows/redux-codec-private-map-hosted.yml",
+      "bytes": 2770,
+      "sha256": "833891dbbc41685318c6bff4096313b76aeef4dce34abbf42f2fd922718448cd",
+      "gitBlobSHA1": "52df3ab8081dc9a6d62ef5aed1b6bb5dc913a88a"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/CONFIG.json",
+      "bytes": 2269,
+      "sha256": "7d18972675eebdc1f5191af03839acc7a03a08b755b50e87b4512d62845ca7eb",
+      "gitBlobSHA1": "32d344d75805fb57395adf93778cfeb96c4867af"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/CORRECTNESS-COMMANDS.json",
+      "bytes": 5949,
+      "sha256": "70b56efd6d7c64cc06a207ad7ce181ecf1759b502570799ac3a211f12d4dfcc6",
+      "gitBlobSHA1": "486ea42738d4943d4bf664a522526ae026cd891c"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/EXPECTED.json",
+      "bytes": 6845,
+      "sha256": "9f3f91880f79c2d8abb0a6fa372f41ae278a998ab7177a8c41dc6e6d83bcf70f",
+      "gitBlobSHA1": "83683e66a64cd78ceeaeb8cd3b272782d8164366"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/METHOD.md",
+      "bytes": 16826,
+      "sha256": "1186ebee947f2bc849ced84f64604f542bb5644257d71126261c39fbb35328a6",
+      "gitBlobSHA1": "b5d7161fd18fcb053f0aeddfbdff2be2c8269abb"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/PRIMITIVE-CEILING-ASSESSMENT.md",
+      "bytes": 6938,
+      "sha256": "58a6e5a1eb219e2779863cefb02e80da9bc7e4912818dc5de94a98d06d2e3083",
+      "gitBlobSHA1": "3aae3747f1505a3912da322687dc7bf93f5c8373"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/README.md",
+      "bytes": 4537,
+      "sha256": "3f66d8f74a9da53c60672c541d1805f2f304a46f64e05f93d1aabc5e19561bd0",
+      "gitBlobSHA1": "bc4a676c76e32912312f88f219e7794494a73932"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/SCHEDULE.json",
+      "bytes": 39427,
+      "sha256": "2a3874dc2713519439e311ce4ad42b6c9fb84f9a26e2b879d42b36fcce3a916b",
+      "gitBlobSHA1": "e5df5b434c7b1dcb94f1e62e2f239d248c59ff25"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/SOURCE.json",
+      "bytes": 55273,
+      "sha256": "55f9addf3c1d45c954216312eff851660ee4014117c67ff469bf807898dd3113",
+      "gitBlobSHA1": "e04615e8330b59eb13af44b2b30d626a65163c38"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/analyze.py",
+      "bytes": 12268,
+      "sha256": "edfea3c19ef9089ca9868977708ab9cc7b427e3eceaaf9b691496a40fd73af36",
+      "gitBlobSHA1": "6e5318ff6c6a0f560bdb0c5e7f6ee378d50820c5"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/audit-emitted.py",
+      "bytes": 4991,
+      "sha256": "caf117314eb3c957d1797819d5f9c470ca092670a5d409ba994323b32c4cfe97",
+      "gitBlobSHA1": "26f79fe8e077460cd7b4679983497500ab6c19c5"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/candidate.patch",
+      "bytes": 1124,
+      "sha256": "3e146d77b6b47d29e413cfb2b4054ff75d88225ce3a62b5a0195017e76c0edd7",
+      "gitBlobSHA1": "ab32597d05c433da3ed343569a9dcf7d5f9df21f"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/classifier-correctness.mjs",
+      "bytes": 14801,
+      "sha256": "579564181dce26825740f39c1dd5f500e97427137e0a0a1aac70dffc5d8aeeb9",
+      "gitBlobSHA1": "dcdc419739f94379218947378b47a5062f38a391"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/classifier-public-consumer.mjs",
+      "bytes": 68,
+      "sha256": "a5876c84e0f73abdbee58ff3795d2cca65dba11795ec5d6f0f37deaf6f74cebd",
+      "gitBlobSHA1": "1f62b31de70651499537ac44d72dfeab3ff7678f"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/hosted.py",
+      "bytes": 28391,
+      "sha256": "0a6c5beae606444e0a62b1cffd46680b35a2928446899658daad0ff5b5abdeb9",
+      "gitBlobSHA1": "a16f5680b2ac9c3c91012cd6f72377a9c069e051"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/reconcile.py",
+      "bytes": 4014,
+      "sha256": "6f3c0c8980dc0932f8e49890c56432cedafed04f58ab288f69dacc93a36bba96",
+      "gitBlobSHA1": "3a1a1fa723cfea38621e7f9983fed667ec744549"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/redux-public-entry.mjs",
+      "bytes": 32,
+      "sha256": "c63bac3af2c9a0a260374d4e0cd182d419e4930e11086c62036c16cd93acf8b9",
+      "gitBlobSHA1": "a28c0c75c7dcf663c269e18d4b3decea96a5ef86"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/redux-timing.mjs",
+      "bytes": 13193,
+      "sha256": "a178eece58cce9a6800f55c5feed21d296f894b96aad286fb96f88f102f97915",
+      "gitBlobSHA1": "88ea02f26a4c3b5b9ebc4b6387b968b3d0658887"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/run-correctness.py",
+      "bytes": 10667,
+      "sha256": "3c876eda5274824de568a0d1750f612b476592262a74865538491148a3454e73",
+      "gitBlobSHA1": "9afa1e961cfcb08167e52c7c6ab13f79defca839"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/run-timing.py",
+      "bytes": 25637,
+      "sha256": "4e050d921d95aff8699ddbd5d4580131078bc04f3e4ded8725b62ad21ed39a20",
+      "gitBlobSHA1": "91894ecaef5a6becd2d48ad6a4f715409997f243"
+    },
+    {
+      "path": "proofs/redux-codec-private-map-hosted/supervise.py",
+      "bytes": 6856,
+      "sha256": "480b08c750351e02d6f9945801c5f3f6d94e9a044ee0037da4d9288567ce8f13",
+      "gitBlobSHA1": "d3d37f3b66f49052cb663e0e6fe29ad28044b003"
+    }
+  ]
+}

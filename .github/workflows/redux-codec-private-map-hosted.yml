@@ -1,0 +1,62 @@
+name: Redux codec private Map hosted screen
+
+on:
+  push:
+    branches: [agent/redux-codec-private-map-hosted-screen-20261011]
+    paths:
+      - 'proofs/redux-codec-private-map-hosted/**'
+      - '.github/workflows/redux-codec-private-map-hosted.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: redux-codec-private-map-hosted-screen-20261011
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.run_number == 1 && github.run_attempt == 1 && github.event.created == true && github.event.forced == false && github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        timeout-minutes: 2
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        timeout-minutes: 2
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        timeout-minutes: 2
+        with:
+          bun-version: '1.4.2'
+      - name: Authenticate source and prepare one clean hosted build
+        timeout-minutes: 7
+        run: python3 proofs/redux-codec-private-map-hosted/hosted.py prepare --work-root "$RUNNER_TEMP/redux-codec-private-map-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Exact source correctness gate
+        timeout-minutes: 7
+        run: python3 proofs/redux-codec-private-map-hosted/hosted.py correctness --work-root "$RUNNER_TEMP/redux-codec-private-map-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Bind passing hosted correctness to the screen
+        timeout-minutes: 1
+        run: python3 proofs/redux-codec-private-map-hosted/hosted.py prepare-timing --work-root "$RUNNER_TEMP/redux-codec-private-map-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: One bounded prospective screen
+        timeout-minutes: 16
+        run: python3 proofs/redux-codec-private-map-hosted/hosted.py timing --work-root "$RUNNER_TEMP/redux-codec-private-map-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Preserve available original evidence
+        if: always()
+        timeout-minutes: 2
+        run: python3 proofs/redux-codec-private-map-hosted/hosted.py export --work-root "$RUNNER_TEMP/redux-codec-private-map-hosted" --repo "$GITHUB_WORKSPACE"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        timeout-minutes: 2
+        if: always()
+        with:
+          name: redux-codec-private-map-hosted-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/redux-codec-private-map-hosted/evidence
+          if-no-files-found: warn
+          retention-days: 90
