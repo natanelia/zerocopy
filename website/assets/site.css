@@ -34,7 +34,7 @@
 }
 @layer responsive {
   @media(max-width:1150px){.mobile-page-menu{display:block}}
-  @media(max-width:520px){.mobile-docs-menu nav,.doc-pagination{grid-template-columns:1fr}.doc-next{grid-column:1}.mobile-page-menu nav{font-size:12px}}
+  @media(max-width:520px){.mobile-docs-menu nav,.doc-pagination{grid-template-columns:1fr}.mobile-docs-menu .sidebar-group h2{font-size:10px}.doc-next{grid-column:1}.mobile-page-menu nav{font-size:12px}}
   @media print{.mobile-docs-menu,.mobile-page-menu,.doc-pagination{display:none}}
   @media(min-width:1500px){.site-header,.site-footer{padding-inline:max(48px,calc((100vw - 1224px)/2))}}
   @media(max-width:1150px){.hero{gap:35px}.hero h1{font-size:60px}.wrap{padding-inline:34px}.site-header{padding-inline:30px}.desktop-nav{gap:22px}.header-actions{gap:18px}.github-link{display:none}.split-section{gap:45px}.docs-layout{grid-template-columns:215px minmax(0,1fr)}.doc-toc{display:none}.doc-main{padding:38px 40px 65px}.snapshot-promo-inner{gap:38px}.snapshot-card{padding:18px 13px}.snapshot-card code{font-size:8px}.lab-promo{margin-inline:34px;padding:45px;gap:35px}.fit-section{gap:50px}}

@@ -46,12 +46,13 @@ const headers = {
 export default defineConfig({
   server: { headers },
   preview: { headers },
+  optimizeDeps: { include: ['zerocopy', 'zerocopy/state', 'zerocopy/worker'] },
   build: { target: 'esnext' },
   worker: { format: 'es' },
 });
 ```
 
-The [response headers](https://vite.dev/config/server-options.html#server-headers) enable shared memory on localhost. The [worker format](https://vite.dev/config/worker-options.html#worker-format) preserves ES modules, including top-level `await`. This setup targets current browsers.
+The [response headers](https://vite.dev/config/server-options.html#server-headers) enable shared memory on localhost. The [dependency list](https://vite.dev/guide/dep-pre-bundling#customizing-the-behavior) includes the worker entry so Vite can pre-bundle it before the first visit, avoiding a reload when the worker starts. The [worker format](https://vite.dev/config/worker-options.html#worker-format) preserves ES modules, including top-level `await`. This setup targets current browsers.
 
 Create **index.html** beside it:
 

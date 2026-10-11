@@ -142,6 +142,11 @@ try {
             await plain.locator('.mobile-docs-menu summary').click();
             assert.equal(await plain.locator('.mobile-docs-menu [aria-current="page"]').count(), 1);
             assert.ok(await plain.locator('.mobile-docs-menu h2').count() > 1);
+            const hierarchy = await plain.locator('.mobile-docs-menu .sidebar-group').evaluateAll(groups => groups.map(group => ({
+              label: parseFloat(getComputedStyle(group.querySelector('h2')).fontSize),
+              link: parseFloat(getComputedStyle(group.querySelector('a')).fontSize),
+            })));
+            assert.ok(hierarchy.every(({ label, link }) => label <= link), 'Mobile guide group labels must not overwhelm navigation links');
           }
           assert.equal(await plain.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
           await plain.screenshot({ path: `${screenshots}/docs-no-js-${width}-${name}.png`, fullPage: true });

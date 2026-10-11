@@ -41,17 +41,33 @@ async function checkBrowsers(phase) {
     let browserFailure;
     try {
       const page = await browser.newPage(); page.setDefaultTimeout(15000);
-      const errors = []; page.on('pageerror', error => errors.push(error.message));
+      const check = { phase, browser: name, version: browser.version(), navigations: [], errors: [] };
+      result.checks.push(check);
+      page.on('pageerror', error => check.errors.push(error.message));
+      page.on('framenavigated', frame => {
+        if (frame === page.mainFrame()) check.navigations.push({ url: frame.url(), at: new Date().toISOString() });
+      });
+      await page.addInitScript(() => { globalThis.__starterDocument = crypto.randomUUID(); });
       const response = await page.goto(origin, { timeout: 15000 });
       assert.equal(response.status(), 200);
-      const headers = response.headers();
+      const headers = check.headers = response.headers();
       assert.equal(headers['cross-origin-opener-policy'], 'same-origin');
       assert.equal(headers['cross-origin-embedder-policy'], 'require-corp');
       assert.equal(await page.evaluate(() => crossOriginIsolated), true);
       await page.waitForFunction(text => document.querySelector('pre[role="status"]')?.textContent === text, expected);
-      assert.deepEqual(errors, []);
+      const observe = () => page.evaluate(() => ({ document: globalThis.__starterDocument,
+        isolated: crossOriginIsolated, output: document.querySelector('pre[role="status"]')?.textContent }));
+      check.beforeScreenshot = await observe();
+      assert.equal(check.beforeScreenshot.output, expected);
+      assert.equal(check.beforeScreenshot.isolated, true);
       await page.screenshot({ path: join(artifacts, `vite-starter-${phase}-${name}.png`) });
-      result.checks.push({ phase, browser: name, version: browser.version(), headers, output: await page.locator('pre[role="status"]').textContent() });
+      check.afterScreenshot = await observe();
+      check.output = check.afterScreenshot.output;
+      assert.equal(check.output, expected, 'Retained starter output must match the expected counts');
+      assert.deepEqual(check.afterScreenshot, check.beforeScreenshot, 'Screenshot and result must come from one completed document');
+      await bounded(page.close(), 'validated starter page cleanup');
+      assert.equal(check.navigations.length, 1, 'The first visit must complete without a full-page reload');
+      assert.deepEqual(check.errors, []);
       console.log(`Passed: published zerocopy ${pins.zerocopy}, Vite ${pins.vite}, ${phase}, ${name}, isolated worker counts.`);
       if (phase === 'development') {
         const plain = await browser.newPage(); plain.setDefaultTimeout(15000);
