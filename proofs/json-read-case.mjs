@@ -7,7 +7,7 @@ import { cpus, release } from 'node:os';
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { jsonReadCases, createJsonReadWorkload, quantile } from './json-read-workloads.mjs';
+import { jsonReadCases, createJsonReadWorkload, quantile, checkJsonReadStorage } from './json-read-workloads.mjs';
 
 const [entryArg, outputArg] = process.argv.slice(2);
 assert(entryArg && outputArg, 'Usage: json-read-case.mjs library-entry output.json');
@@ -59,7 +59,14 @@ for (let sample = -warmups; sample < samples; sample++) {
   assert.deepEqual(evidence(work.storage()), reference, 'Storage changed before a read');
   gc();
   const start = performance.now(), checksum = work.run(), ms = performance.now() - start;
-  assert.deepEqual(evidence(work.verify(checksum)), reference, 'A read changed allocated bytes or descriptors');
+  const checked = work.verify(checksum);
+  checkJsonReadStorage(evidence(checked), reference);
+  if (checked.logical) {
+    const { canonical, ...metadata } = checked.logical;
+    const logical = { ...metadata, canonicalSha256: hash(canonical) };
+    if (report.logical) assert.deepEqual(logical, report.logical, 'Verified map changed between reads');
+    else report.logical = logical;
+  }
   report.verifiedRuns++;
   if (sample >= 0) milliseconds.push(ms);
   save();

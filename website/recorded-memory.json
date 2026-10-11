@@ -4,37 +4,37 @@
   "v8": "12.4.254.21-node.57",
   "platform": "linux",
   "arch": "x64",
-  "cpu": "Intel(R) Xeon(R) 6973P-C",
-  "measuredAt": "2026-10-08T18:16:34.700Z",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "measuredAt": "2026-10-10T00:40:46.644Z",
   "trials": 3,
   "entries": 100000,
-  "runtimeSourceCommit": "9e07669cc1823e171dbd67ff1ed88bb7e045d39e",
-  "summarySHA256": "22268f73f2569f7f99e850ffd6dbb685808a103f59f655057c187b802ba88934",
+  "runtimeSourceCommit": "0f4b4d3388304bb6ba405bbfdac0573880d14f77",
+  "summarySHA256": "e5208c378c42253c459be068269134bcccb80de8edb4483c2325c3ef7c576746",
   "readers": 2,
   "runCount": 90,
   "rows": [
     {
       "fixture": "repeated",
       "label": "Repeated messages",
-      "shared": 4940888,
-      "immutable": 35345816,
-      "native": 24483752,
-      "centralized": 6355632
+      "shared": 4932728,
+      "immutable": 35408376,
+      "native": 24483944,
+      "centralized": 6354912
     },
     {
       "fixture": "unique",
       "label": "Unique messages",
-      "shared": 9539040,
-      "immutable": 46713984,
-      "native": 34976240,
-      "centralized": 14731672
+      "shared": 9539456,
+      "immutable": 46616648,
+      "native": 34976584,
+      "centralized": 14726792
     },
     {
       "fixture": "unicode",
       "label": "Unique messages, 20% Unicode prefix",
-      "shared": 10262192,
-      "immutable": 49142744,
-      "native": 37598504,
+      "shared": 10265656,
+      "immutable": 48919216,
+      "native": 37598696,
       "centralized": 15600688
     }
   ]
