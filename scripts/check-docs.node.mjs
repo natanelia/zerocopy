@@ -67,6 +67,13 @@ test('strict CLI rejects changed rows and evidence, not documentation edits', ()
     writeFileSync(evidence, '{"samples":[1,2,3]}\n');
     writeFileSync(join(root, 'README.md'), readme + '\nA clearer explanation.\n');
     assert.equal(strict().status, 0, 'prose-only edits must pass');
+    writeFileSync(join(root, 'proofs/results/new-recording.json'), '{"samples":[4,5,6]}\n');
+    git('add', 'proofs/results/new-recording.json');
+    assert.equal(strict().status, 0, 'a separate new recording must pass');
+    git('mv', 'proofs/results/sample.json', 'proofs/results/renamed.json');
+    assert.equal(strict().status, 1, 'renaming historical evidence must fail');
+    git('mv', 'proofs/results/renamed.json', 'proofs/results/sample.json');
+    assert.equal(strict().status, 0, 'restoring the historical path must pass');
     const noBase = run('--preserve');
     assert.equal(noBase.status, 1);
     assert.match(noBase.stderr, /--preserve requires --base/);

@@ -1,0 +1,52 @@
+name: SharedMap eight-reader recording only
+
+on:
+  push:
+    branches: [validation/sharedmap-eight-readers-20261011]
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: ''
+      FEATURE_MEMORY_SMOKE: '0'
+      GIT_NO_LAZY_FETCH: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - name: Check observable memory limits before expensive setup
+        run: node .github/sharedmap-validation/prepare.mjs --preflight
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Bind all working source to the reviewed commit before building
+        run: node .github/sharedmap-validation/prepare.mjs --source
+      - run: bun run build:wasm && bun run build:browser
+      - name: Check only pure cohort and headroom fixtures
+        run: |
+          timeout --kill-after=2s 30s node --max-old-space-size=128 --test --test-concurrency=1 .github/sharedmap-validation/eight-cohort.test.mjs
+          timeout --kill-after=2s 30s node --max-old-space-size=128 --test .github/sharedmap-validation/full-memory-headroom.test.mjs
+      - name: Freeze exact hosted inputs
+        run: node .github/sharedmap-validation/prepare.mjs --prepare
+      - name: Record twelve eight-reader cases once
+        run: node .github/sharedmap-validation/full-controller.mjs
+      - name: Retain all recording and preflight evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sharedmap-eight-readers-${{ github.sha }}
+          path: ${{ runner.temp }}/zerocopy-sharedmap-eight-readers/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

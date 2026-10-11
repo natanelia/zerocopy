@@ -26,15 +26,17 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
 
+> The current primary demos use the feature-map workload described under [Feature attribute example](#feature-attribute-example). The log-column sections below describe the preserved historical routes.
+
 ## Log explorer
 
-At `/explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
+At `/historical/log-explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
 
 The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs, simulations, and scientific/spatial tools.
 
 ## Investigation benchmark
 
-At `/investigation-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
+At `/historical/log-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
 
 Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
@@ -140,7 +142,7 @@ Google controls crawl timing, indexing, and ranking. Metadata and a sitemap do n
 
 ## Side-by-side comparison
 
-The `/compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
+The `/historical/log-compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
 
 All three replica baselines use incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. All four can retain this append-only stream: zerocopy, Immutable.js, and Immer keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
 
@@ -186,3 +188,17 @@ The shared owner now calls public `SharedList.pushMany()` once per column and ba
 just as the Immutable.js owner batches with `withMutations`. Query work, generated
 values, independent reference checks, worker counts, and retained versions remain
 the same. See `proofs/query-performance.mjs` and the Query performance workflow.
+
+## Feature attribute example
+
+The current `/explorer/` is a road attribute registry keyed by string IDs. Its central representation is `SharedMap('object')`. One owner publishes to a lookup reader and a validation reader. Every query requests 1,000 IDs, and each edit replaces 100 objects while retaining revision 0. The UI shows bounded record/issue replies. This is attribute lookup and validation, not map rendering or spatial search.
+
+The current `/compare/` applies the same operations to SharedMap, native Map, Immutable.js Map and Immer Map. Native and other replicas receive an initial snapshot once and only changed ID/object pairs on later publications. Native Map shallow-copies its index when it must preserve the retained initial map, then mutates its exclusively owned current index. Records remain immutable in every path.
+
+## Feature-map benchmark
+
+The current `/investigation-benchmark/` creates fresh owner/reader workers for each sample. Two warm-ups and seven measured samples per map rotate path order. Startup and imports finish before timing. Generation, construction, initial publication, first and repeat queries, edits and edit publication are separate phases. Raw JSON includes directly measured edit-plus-publication time and checked current/initial answers. First requests use fresh attachments; repeated requests can use local object caches. No DOM painting or memory measurement is included.
+
+The original log implementations remain at `/historical/log-explorer/`, `/historical/log-compare/` and `/historical/log-benchmark/`. The earlier log-specific sections above describe those historical routes. Their recorded JSON and SVG evidence remain unchanged. Each historical route has its own assets and isolation scope. New SharedMap recordings use separate files, schema and source hashes. See [the feature guide](content/maps.md) and [memory method](../docs/feature-map-memory.md).
+
+Run the new focused browser checks with `node website/tests/feature-browser.mjs` after building. They cover actual workers, replacements, retained reads, Stop/restart, navigation, benchmark export and mobile layout. Historical browser checks continue to exercise the old routes.

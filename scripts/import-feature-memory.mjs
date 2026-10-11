@@ -1,0 +1,23 @@
+/** Import a complete new recording without rewriting any historical evidence. */
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../', import.meta.url));
+assert.ok(process.argv[2], 'Pass the committed raw summary path');
+const path = resolve(root, process.argv[2]), sourceSummary = relative(root, path);
+assert.match(sourceSummary, /^proofs\/results\/feature-map-memory\/[A-Za-z0-9_-]+\/summary\.json$/);
+const source = readFileSync(path), data = JSON.parse(source);
+assert.equal(data.status, 'verified'); assert.equal(data.recordingType, 'full-matrix'); assert.equal(data.chartEligible, true);
+assert.equal(data.entries, 100000); assert.equal(data.trials, 3); assert.equal(data.runCount, 36);
+const sourceTerminal = sourceSummary.replace('summary.json', 'controller/terminal.json');
+const terminalSource = readFileSync(resolve(root, sourceTerminal)), terminal = JSON.parse(terminalSource);
+assert.equal(terminal.status, 'verified'); assert.equal(terminal.chartEligible, true); assert.equal(terminal.verifiedRuns, 36);
+assert.equal(terminal.cleanup.empty, true); assert.deepEqual(terminal.cleanup.final, []); assert.equal(terminal.trigger, null);
+const record = { ...data, sourceSummary, summarySHA256: createHash('sha256').update(source).digest('hex'), sourceTerminal, terminalSHA256: createHash('sha256').update(terminalSource).digest('hex') };
+writeFileSync(resolve(root, 'website/feature-memory-data.json'), JSON.stringify(record, null, 2) + '\n');
+const { validateFeatureMemory, featureMemorySVG } = await import('../website/feature-memory-charts.mjs');
+validateFeatureMemory(record);
+for (const name of ['retained', 'readers', 'rss']) writeFileSync(resolve(root, `docs/assets/feature-memory-${name}.svg`), featureMemorySVG(name));
+console.log(`Imported all 36 source-verified feature-map cases from ${sourceSummary}`);

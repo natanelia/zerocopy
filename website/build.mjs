@@ -6,6 +6,8 @@ import { createHash } from 'node:crypto';
 import { pages, projectName, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
 import { comparison } from './comparison-template.mjs';
+import { featureExplorer, featureBenchmark } from './feature-template.mjs';
+import { writeFeatureMemoryAssets, injectFeatureMemoryCharts } from './feature-memory-charts.mjs';
 import { injectMemoryCharts, writeMemoryChartAssets } from './memory-charts.mjs';
 import { explorer } from './explorer-template.mjs';
 import { investigationBenchmark } from './explorer-benchmark-template.mjs';
@@ -24,6 +26,7 @@ if (!readdirSync(join(root, 'dist')).includes('shared.js')) throw new Error('Bui
 rmSync(out, { recursive: true, force: true }); mkdirSync(out, { recursive: true });
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
 writeMemoryChartAssets(join(out, 'assets'));
+writeFeatureMemoryAssets(join(out, 'assets'));
 mkdirSync(join(out, 'library'));
 for (const file of readdirSync(join(root, 'dist'))) if (file.endsWith('.js')) cpSync(join(root, 'dist', file), join(out, 'library', file));
 // Keep the upstream dependency pinned, local, licensed, and inside demo scopes.
@@ -50,24 +53,31 @@ const demoScripts = new Map([
   ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
   ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
+const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('compare/')], ['historical/log-explorer/', demoScripts.get('explorer/')], ['historical/log-benchmark/', demoScripts.get('investigation-benchmark/')]]);
+const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'feature-reference.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
+demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
+demoScripts.set('explorer/', [...featureScripts, 'feature.mjs']);
+demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);
+for (const [route, scripts] of historicalDemos) demoScripts.set(route, scripts);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
   for (const file of [...scripts, 'search.mjs']) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
   cpSync(join(out, 'library'), join(out, route, 'library'), { recursive: true });
-  if (scripts.includes('immutable-storage.mjs') || scripts.includes('bench-maps.mjs')) cpSync(join(out, 'vendor'), join(out, route, 'vendor'), { recursive: true });
+  if (scripts.includes('immutable-storage.mjs') || scripts.includes('bench-maps.mjs') || scripts.includes('feature-storage.mjs')) cpSync(join(out, 'vendor'), join(out, route, 'vendor'), { recursive: true });
 }
 const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
   let html = shell({ title, description, body, script, base, route, version, sha, origin, noindex: !!preview });
-  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/'].includes(route)) {
+  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
   }
+  if (['compare/', 'explorer/', 'investigation-benchmark/'].includes(route) || route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
+  if (route === 'historical/log-compare/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
   if (preview) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
     html = html.replace('<header class="site-header">', `<aside class="preview-banner">PR #${preview.number} preview · ${preview.headCommit.slice(0, 7)} · Not a release · <a href="${repository}/pull/${preview.number}">Return to PR</a></aside><header class="site-header">`);
   }
-  if (route === 'compare/' && !preview) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
   if (demoScripts.has(route)) {
     // Keep both main.mjs references identical so it registers each UI handler once.
     html = html.replaceAll(`src="${base}assets/`, `src="${base}${route}assets/`);
@@ -76,16 +86,23 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
-writePage('compare/', 'zerocopy vs Immutable.js vs Immer vs native', 'Run shared snapshots, Immutable.js Lists, Immer arrays, and native replicas side by side. Same events, checked outputs, real timings, no artificial delays.', comparison(base), 'comparison.mjs');
-writePage('explorer/', 'Log explorer · one example of shared work', 'Search and summarize 100,000 generated events with real workers. Freeze an investigation while ingestion continues.', explorer(base).replace('<div class="explorer-setup">', `<p><a class="text-link" href="${base}compare/">Compare zerocopy, Immutable.js, Immer, and native arrays →</a></p><div class="explorer-setup">`), 'explorer.mjs');
-writePage('investigation-benchmark/', 'Compare four investigation architectures', 'Measure shared snapshots, Immutable.js Lists, incremental native replicas, and one native data-owning worker with checked results.', investigationBenchmark(base), 'explorer-benchmark.mjs');
+writePage('compare/', 'Compare four feature maps', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same keyed feature attributes, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
+writePage('explorer/', 'Feature attributes by ID', 'Look up and validate generated road attributes with SharedMap and real workers. Replace records while retaining the initial revision.', featureExplorer(base), 'feature.mjs');
+writePage('investigation-benchmark/', 'Feature-map worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse map edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
+function historical(body) {
+  for (const [current, old] of [['compare/', 'historical/log-compare/'], ['explorer/', 'historical/log-explorer/'], ['investigation-benchmark/', 'historical/log-benchmark/'], ['docs/memory-comparison/', 'docs/historical-sharedlist-memory/']]) body = body.replaceAll(`href="${base}${current}"`, `href="${base}${old}"`);
+  return `<aside class="historical-notice">Historical SharedList log workload. These results do not measure SharedMap feature objects. <a href="${base}explorer/">Open the current feature-map example →</a></aside>` + body;
+}
+writePage('historical/log-compare/', 'Historical SharedList comparison', 'Historical log-column workload and its unchanged recorded measurements.', historical(comparison(base)), 'comparison.mjs');
+writePage('historical/log-explorer/', 'Historical SharedList log explorer', 'The original log-column use case, retained as a historical reference.', historical(explorer(base)), 'explorer.mjs');
+writePage('historical/log-benchmark/', 'Historical SharedList investigation benchmark', 'The original log-column timing workload, retained as a historical reference.', historical(investigationBenchmark(base)), 'explorer-benchmark.mjs');
 writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
-writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Logs are one example, not the product. Use zerocopy wherever several threads need local reads of large, versioned collections.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
+writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Feature attributes, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const rendered = renderMarkdown(source, page.source, routes, base);
-  const html = page.slug === 'memory-comparison' ? injectMemoryCharts(rendered.html, base) : rendered.html;
+  const html = page.slug === 'historical-sharedlist-memory' ? injectMemoryCharts(rendered.html, base) : page.slug === 'memory-comparison' ? injectFeatureMemoryCharts(rendered.html, base) : rendered.html;
   const { toc } = rendered;
   writePage(`docs/${page.slug}/`, page.title, page.description, docsLayout(page, html, toc, pages, base, sha));
   mkdirSync(join(out, 'markdown'), { recursive: true }); writeFileSync(join(out, 'markdown', `${page.slug}.md`), source);
@@ -95,7 +112,7 @@ for (const page of pages) {
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
 writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', route: '404.html', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
-for (const route of ['lab', 'playground', 'explorer', 'investigation-benchmark', 'compare']) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
+for (const route of demoScripts.keys()) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');
 writeFileSync(join(out, '_headers'), '/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Resource-Policy: same-origin\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n');
 // Let crawlers fetch preview HTML so they can observe its noindex directive.

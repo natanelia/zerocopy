@@ -57,9 +57,9 @@ Built for applications where several threads need the same large, changing datas
 
 ### See the pattern in action
 
-The **[live log explorer](website/README.md#log-explorer)** searches and summarizes 100,000 generated events with real workers. Freeze an investigation while ingestion continues. The UI still reads records directly. Logs are the demonstration—not the boundary of the library.
+The **[live feature registry](website/README.md#feature-attribute-example)** stores road attributes in a string-keyed SharedMap of objects. Lookup and validation workers read selected IDs. Replace 100 records, then read the retained initial revision to see the earlier values.
 
-[Read its architecture](website/content/log-explorer.md) or [compare three worker designs](website/README.md#investigation-benchmark). The same shared-snapshot pattern applies to the applications above.
+[Read the feature-map design](website/content/maps.md), [compare four map implementations](website/README.md#feature-attribute-example), or [run the worker benchmark](website/README.md#feature-map-benchmark). The [SharedMap memory report](docs/feature-map-memory.md) keeps heap, arena use, backing capacity and RSS separate. The [earlier SharedList example](website/content/log-explorer.md) and its recordings remain historical references.
 
 ## New version. Same simple API.
 
