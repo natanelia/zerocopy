@@ -1,0 +1,1538 @@
+[
+  {
+    "id": "measure-bun-source-map-empty-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-4096-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-4096-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-4096",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-late-overlays-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-late-overlays-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-late-overlays",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-sorted-map-8-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-sorted-map-8-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "sorted-map-8",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-empty-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-empty-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-empty",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-set-empty-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-set-empty-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "set-empty",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-map-canonical-8-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-map-canonical-8-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "map-canonical-8",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  }
+]

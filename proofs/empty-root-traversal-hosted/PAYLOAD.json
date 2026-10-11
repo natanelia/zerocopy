@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "files": [
+    {
+      "path": ".github/workflows/empty-root-traversal-hosted.yml",
+      "bytes": 2719,
+      "sha256": "7fdbd6d48f2ef26bb0ab50da4a938ec9ee57e4be67b4665cd0314333b35b0bf5"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/CONFIG.json",
+      "bytes": 2100,
+      "sha256": "d0929f6a60692b1f50e67db684481f8ffdd161021929961c6011c97fd189c1df"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/EXPECTED.json",
+      "bytes": 3429,
+      "sha256": "998b18d4189b6df99e7cdbda4d50d31b0aba08eedd0331603c28899f8530353f"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/METHOD.md",
+      "bytes": 10091,
+      "sha256": "db7ab463445d840ea65755ead37b8e282526823cd1adf99f6d9a43b1411d6bed"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/README.md",
+      "bytes": 2515,
+      "sha256": "1bd15fcc7e2cb3d3dbd7ef2bd0b9a9ce31de0e0cd50b6c91904043574a4463be"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/SCHEDULE.json",
+      "bytes": 36227,
+      "sha256": "a883feca769db1387d64769013fe0306a7e6d3c9fffe6391494f13aab564bcb3"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/SOURCE.json",
+      "bytes": 55150,
+      "sha256": "d825f56b697080edd217221e0e8bfe4c682a328eef5500059b37ad16cb47817d"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/analyze.py",
+      "bytes": 10019,
+      "sha256": "e817b6d8c2bacacd8395e36624daff4ab65525dfe3de75fae8d07717d4630d46"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/audit-emitted.py",
+      "bytes": 3929,
+      "sha256": "eedfa1f97f34778deb217554f2e62695f9e50d0b64fcab1b39533076c187ca8e"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/candidate.patch",
+      "bytes": 342,
+      "sha256": "5b1961a8b826481a6f7bd4aa356686efaa0753af23f452220de95946f12a1716"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/hosted.py",
+      "bytes": 28288,
+      "sha256": "8aad77d89fbba9e98f594752406e6075e38ed96abf95977acedc1320db05b976"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/reconcile.py",
+      "bytes": 10193,
+      "sha256": "51bbce5d0628d51256a2bb288b1bf669fccaf99c23c748600d2a4850b729d650"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/run-correctness.py",
+      "bytes": 10919,
+      "sha256": "6a6583a25547bfa51678edbf9222ae71f0a3521c0559055c69e824d1a87390cb"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/run-timing.py",
+      "bytes": 22896,
+      "sha256": "731327854fe4cce02ea1ff84e0caed2da9ac3972681bd17c3ffb2dd3bddea6cd"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/supervise.py",
+      "bytes": 6856,
+      "sha256": "480b08c750351e02d6f9945801c5f3f6d94e9a044ee0037da4d9288567ce8f13"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/traversal-correctness.mjs",
+      "bytes": 37152,
+      "sha256": "ba31dca977911b6d50fe1a5bdec7f08c271b8bece97629242083652e196057c2"
+    },
+    {
+      "path": "proofs/empty-root-traversal-hosted/traversal-timing.mjs",
+      "bytes": 12908,
+      "sha256": "bcba549f4f149bf5c270a97f2e37b2ba37002b3e8551b00a2ac644f0e671ab79"
+    }
+  ]
+}

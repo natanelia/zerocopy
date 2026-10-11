@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "status": "prospective-hosted-cohort",
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidateArenaSHA256": "dd3f693928c0d1e2d80c53036e6cced82871606f0f68273ae38eaa173d706c97",
+  "methodSHA256": "db7ab463445d840ea65755ead37b8e282526823cd1adf99f6d9a43b1411d6bed",
+  "wholeSeconds": 900,
+  "cleanupSeconds": 15,
+  "childSeconds": 15,
+  "calibrationSeconds": 25,
+  "analysisSeconds": 30,
+  "rssMiB": 1536,
+  "arenaMaximumBytes": 16777216,
+  "smokeAdmissions": 6,
+  "subjectAdmissions": 1,
+  "smokeCalls": 4,
+  "operationCap": 134217728,
+  "calibrationCumulativeCap": 2147483648,
+  "probeStart": 1024,
+  "probeMultiplier": 4,
+  "probeTargetNs": 100000000,
+  "warmCalibrationMinimumBatches": 8,
+  "warmCalibrationMinimumNs": 1000000000,
+  "warmCalibrationMaximumBatches": 128,
+  "pilotTargetNs": 250000000,
+  "pilotMinimumNs": 100000000,
+  "pilotBatches": 3,
+  "countQuantum": 1024,
+  "measurementTargetNs": 1500000000,
+  "measurementMinimumNs": 500000000,
+  "measurementWarmupBatches": 4,
+  "measurementWarmupDivisor": 8,
+  "measurementWarmupMinimumNs": 350000000,
+  "blocks": 4,
+  "primaryAlpha": 0.025,
+  "guardAlpha": 0.05,
+  "primaryMaximumRatio": 0.95,
+  "guardMaximumRatio": 1.02,
+  "typicalDriftMaximumRatio": 1.05,
+  "tailDriftMaximumRatio": 1.15,
+  "gainDriftMultiple": 2,
+  "engines": [
+    "bun-source",
+    "node-portable"
+  ],
+  "arms": [
+    "baseline",
+    "candidate"
+  ],
+  "endpoints": [
+    {
+      "id": "map-empty",
+      "count": 0,
+      "mode": "empty",
+      "primary": true
+    },
+    {
+      "id": "set-empty",
+      "count": 0,
+      "mode": "empty-set",
+      "primary": false
+    },
+    {
+      "id": "map-canonical-8",
+      "count": 8,
+      "mode": "canonical",
+      "primary": false
+    },
+    {
+      "id": "map-canonical-4096",
+      "count": 4096,
+      "mode": "canonical",
+      "primary": false
+    },
+    {
+      "id": "map-late-overlays",
+      "count": 21,
+      "mode": "overlay",
+      "primary": false
+    },
+    {
+      "id": "sorted-map-8",
+      "count": 8,
+      "mode": "sorted",
+      "primary": false
+    }
+  ]
+}

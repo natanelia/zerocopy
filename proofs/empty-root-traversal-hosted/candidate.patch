@@ -1,0 +1,11 @@
+diff --git a/arena.ts b/arena.ts
+--- a/arena.ts
++++ b/arena.ts
+@@ -714,6 +714,7 @@ export class Arena {
+       }
+       return;
+     }
++    if (!root) return;
+     const stack = root ? [root] : [];
+     // These two small work arrays belong to this iterator, not shared memory.
+     const lanes = new Uint32Array(16), patches: number[] = [];
