@@ -1,0 +1,18 @@
+{
+  "groups": [
+    "table-states-and-aliases",
+    "public-input-trace",
+    "partial-failure-boundaries",
+    "reentry-and-set-dispatch",
+    "collision-and-growth"
+  ],
+  "groupCaseCounts": [
+    12,
+    5,
+    7,
+    null,
+    3
+  ],
+  "realNodeWorkerCasesPerArm": 2,
+  "snapshotsPerWorker": 7
+}

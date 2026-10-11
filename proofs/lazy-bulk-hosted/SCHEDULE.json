@@ -1,0 +1,2050 @@
+[
+  {
+    "id": "measure-b0-bun-source-string-ascii-8-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-8-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-8-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-8-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-number-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-number-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-number-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-number-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-all-64-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-all-64-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-all-64-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-all-64-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-last-64-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-last-64-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-last-64-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-unicode-last-64-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-scalar-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-string-scalar-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-scalar-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-string-scalar-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-empty-setMany-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-empty-setMany-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-empty-setMany-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-empty-setMany-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-object-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-bun-source-object-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-object-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-bun-source-object-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-8-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-8-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-8-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-8-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-number-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-number-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-number-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-number-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-all-64-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-all-64-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-all-64-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-all-64-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-last-64-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-last-64-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-last-64-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-unicode-last-64-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-scalar-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-string-scalar-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-scalar-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-string-scalar-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-empty-setMany-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-empty-setMany-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-empty-setMany-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-empty-setMany-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-object-ascii-64-0-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b0-node-portable-object-ascii-64-1-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-object-ascii-64-2-candidate",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b0-node-portable-object-ascii-64-3-baseline",
+    "block": 0,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-number-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-number-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-number-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-number-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-all-64-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-all-64-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-all-64-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-all-64-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-last-64-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-last-64-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-last-64-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-unicode-last-64-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-scalar-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-scalar-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-scalar-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-scalar-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-empty-setMany-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-empty-setMany-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-empty-setMany-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-empty-setMany-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-object-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-object-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-object-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-object-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-8-0-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-8-1-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-8-2-baseline",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-node-portable-string-ascii-8-3-candidate",
+    "block": 1,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-number-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-number-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-number-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-number-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-all-64-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-all-64-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-all-64-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-all-64-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-last-64-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-last-64-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-last-64-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-unicode-last-64-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-scalar-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-scalar-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-scalar-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-scalar-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-empty-setMany-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-empty-setMany-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-empty-setMany-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-empty-setMany-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-object-ascii-64-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-object-ascii-64-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-object-ascii-64-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-object-ascii-64-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-8-0-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-8-1-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-8-2-baseline",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b1-bun-source-string-ascii-8-3-candidate",
+    "block": 1,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-number-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-number-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-number-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-number-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-all-64-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-all-64-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-all-64-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-all-64-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-last-64-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-last-64-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-last-64-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-unicode-last-64-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-scalar-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-scalar-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-scalar-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-scalar-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-empty-setMany-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-empty-setMany-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-empty-setMany-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-empty-setMany-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-object-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-object-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-object-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-object-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-8-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-8-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-8-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-8-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-bun-source-string-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-number-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-number-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-number-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-number-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-all-64-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-all-64-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-all-64-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-all-64-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-last-64-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-last-64-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-last-64-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-unicode-last-64-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-scalar-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-scalar-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-scalar-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-scalar-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-empty-setMany-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-empty-setMany-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-empty-setMany-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-empty-setMany-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-object-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-object-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-object-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-object-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-8-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-8-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-8-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-8-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-64-0-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-64-1-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-64-2-candidate",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b2-node-portable-string-ascii-64-3-baseline",
+    "block": 2,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-all-64-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-all-64-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-all-64-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-all-64-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-last-64-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-last-64-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-last-64-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-unicode-last-64-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-scalar-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-scalar-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-scalar-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-scalar-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-empty-setMany-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-empty-setMany-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-empty-setMany-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-empty-setMany-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-object-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-object-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-object-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-object-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-8-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-8-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-8-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-8-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-string-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-number-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-node-portable-number-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-number-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-node-portable-number-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "node-portable",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-all-64-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-all-64-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-all-64-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-all-64-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-all-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-last-64-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-last-64-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-last-64-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-unicode-last-64-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-unicode-last-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-scalar-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-scalar-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-scalar-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-scalar-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-scalar",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-empty-setMany-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-empty-setMany-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-empty-setMany-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-empty-setMany-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "empty-setMany",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-object-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-object-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-object-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-object-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "object-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-8-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-8-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-8-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-8-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-8",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-string-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "string-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-number-ascii-64-0-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-b3-bun-source-number-ascii-64-1-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-number-ascii-64-2-baseline",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-b3-bun-source-number-ascii-64-3-candidate",
+    "block": 3,
+    "engine": "bun-source",
+    "endpoint": "number-ascii-64",
+    "slot": 3,
+    "arm": "candidate"
+  }
+]

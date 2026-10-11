@@ -1,0 +1,58 @@
+name: Lazy bulk table hosted screen
+
+on:
+  push:
+    branches: [agent/lazy-bulk-tables-hosted-screen-20261011]
+    paths:
+      - 'proofs/lazy-bulk-hosted/**'
+      - '.github/workflows/lazy-bulk-hosted.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lazy-bulk-tables-hosted-screen-20261011
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Authenticate source and prepare one clean hosted build
+        timeout-minutes: 7
+        run: python3 proofs/lazy-bulk-hosted/hosted.py prepare --work-root "$RUNNER_TEMP/lazy-bulk-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Exact source correctness gate
+        timeout-minutes: 7
+        run: python3 proofs/lazy-bulk-hosted/hosted.py correctness --work-root "$RUNNER_TEMP/lazy-bulk-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Bind passing hosted correctness to the screen
+        timeout-minutes: 1
+        run: python3 proofs/lazy-bulk-hosted/hosted.py prepare-timing --work-root "$RUNNER_TEMP/lazy-bulk-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: One bounded prospective screen
+        timeout-minutes: 11
+        run: python3 proofs/lazy-bulk-hosted/hosted.py timing --work-root "$RUNNER_TEMP/lazy-bulk-hosted" --repo "$GITHUB_WORKSPACE"
+      - name: Preserve available original evidence
+        if: always()
+        timeout-minutes: 1
+        run: python3 proofs/lazy-bulk-hosted/hosted.py export --work-root "$RUNNER_TEMP/lazy-bulk-hosted" --repo "$GITHUB_WORKSPACE"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lazy-bulk-hosted-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/lazy-bulk-hosted/evidence
+          if-no-files-found: warn
+          retention-days: 90

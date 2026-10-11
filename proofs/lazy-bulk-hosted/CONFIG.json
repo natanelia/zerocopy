@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "status": "prospective-hosted-cohort",
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidateArenaSHA256": "aee54d67ba1e1326d84f90978dd1ed91d365b69fd70bda6c189c03729af3b015",
+  "methodSHA256": "8adbf1e5c226fcb9c2b0f596041fea2c11106a5b00078eb217ea4a108a67f011",
+  "wholeSeconds": 600,
+  "cleanupSeconds": 15,
+  "childSeconds": 20,
+  "rssMiB": 1536,
+  "arenaMaximumBytes": 67108864,
+  "epochBudgetBytes": 33554432,
+  "admissionsPerChild": 10,
+  "warmupEpochs": 2,
+  "measurementEpochs": 8,
+  "minimumEpochCalls": 256,
+  "smokeCalls": 128,
+  "probeCounts": [
+    1024,
+    4096,
+    16384,
+    65536,
+    262144,
+    1048576
+  ],
+  "emptyCallCap": 1048576,
+  "probeTargetNs": 25000000,
+  "warmupTargetNs": 50000000,
+  "measurementTargetNs": 250000000,
+  "measurementMinimumNs": 150000000,
+  "blocks": 4,
+  "primaryAlpha": 0.0125,
+  "guardAlpha": 0.05,
+  "primaryMaximumRatio": 0.95,
+  "guardMaximumRatio": 1.02,
+  "typicalDriftMaximumRatio": 1.05,
+  "tailDriftMaximumRatio": 1.15,
+  "gainDriftMultiple": 2,
+  "engines": [
+    "bun-source",
+    "node-portable"
+  ],
+  "arms": [
+    "baseline",
+    "candidate"
+  ],
+  "endpoints": [
+    {
+      "id": "string-ascii-8",
+      "type": "string",
+      "count": 8,
+      "mode": "bulk",
+      "unicode": "none",
+      "primary": true
+    },
+    {
+      "id": "string-ascii-64",
+      "type": "string",
+      "count": 64,
+      "mode": "bulk",
+      "unicode": "none",
+      "primary": true
+    },
+    {
+      "id": "number-ascii-64",
+      "type": "number",
+      "count": 64,
+      "mode": "bulk",
+      "unicode": "none",
+      "primary": false
+    },
+    {
+      "id": "string-unicode-all-64",
+      "type": "string",
+      "count": 64,
+      "mode": "bulk",
+      "unicode": "all",
+      "primary": false
+    },
+    {
+      "id": "string-unicode-last-64",
+      "type": "string",
+      "count": 64,
+      "mode": "bulk",
+      "unicode": "last",
+      "primary": false
+    },
+    {
+      "id": "string-scalar",
+      "type": "string",
+      "count": 64,
+      "mode": "scalar",
+      "unicode": "none",
+      "primary": false
+    },
+    {
+      "id": "empty-setMany",
+      "type": "string",
+      "count": 64,
+      "mode": "empty",
+      "unicode": "none",
+      "primary": false
+    },
+    {
+      "id": "object-ascii-64",
+      "type": "object",
+      "count": 64,
+      "mode": "bulk",
+      "unicode": "none",
+      "primary": false
+    }
+  ]
+}

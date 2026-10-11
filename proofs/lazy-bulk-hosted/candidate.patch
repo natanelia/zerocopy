@@ -1,0 +1,49 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -746,19 +746,19 @@
+     if (type === 'string') {
+       // Prepare UTF-8 only when it is needed. ASCII records go directly into
+       // one fresh allocation. No per-record WASM calls or encoding buffers.
+-      const encodedKeys = new Map<string, Uint8Array>(), encodedValues = new Map<string, Uint8Array>();
++      let encodedKeys: Map<string, Uint8Array> | undefined, encodedValues: Map<string, Uint8Array> | undefined;
+       let total = (latest.size * 4 + 7) & ~7;
+       for (const [key, value] of latest) {
+         if (typeof value !== 'string') throw new TypeError('Expected a string');
+         let keyLength = key.length, valueLength = value.length;
+-        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }
+-        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
++        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); (encodedKeys ??= new Map()).set(key, b); keyLength = b.length; break; }
++        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); (encodedValues ??= new Map()).set(key, b); valueLength = b.length; break; }
+         total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
+       }
+       const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
+       let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+       for (const [key, value] of latest) {
+-        const k = encodedKeys.get(key), v = encodedValues.get(key);
++        const k = encodedKeys?.get(key), v = encodedValues?.get(key);
+         const keyLength = k?.length ?? key.length, valueLength = v?.length ?? value.length;
+         let hash = 2166136261;
+         for (let i = 0; i < keyLength; i++) { const c = k ? k[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+@@ -770,18 +770,19 @@
+       return this.wasm.mapBatch(root, input, latest.size) >>> 0;
+     }
+     if (type === 'number' || type === 'boolean') {
+-      const unicode = new Map<string, Uint8Array>(), length = type === 'number' ? 8 : 1;
++      let unicode: Map<string, Uint8Array> | undefined;
++      const length = type === 'number' ? 8 : 1;
+       let total = (latest.size * 4 + 7) & ~7;
+       for (const key of latest.keys()) {
+         let n = key.length;
+-        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); unicode.set(key, b); n = b.length; break; }
++        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); (unicode ??= new Map()).set(key, b); n = b.length; break; }
+         total += (16 + n + length + 7) & ~7;
+       }
+       const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
+       let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+       for (const [key, value] of latest) {
+         if (typeof value !== type) throw new TypeError(`Expected a ${type}`);
+-        const encoded = unicode.get(key), n = encoded?.length ?? key.length; let hash = 2166136261;
++        const encoded = unicode?.get(key), n = encoded?.length ?? key.length; let hash = 2166136261;
+         for (let i = 0; i < n; i++) { const c = encoded ? encoded[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+         dv.setUint32(p, 0, true); dv.setUint32(p + 4, hash >>> 0, true); dv.setUint32(p + 8, n, true); dv.setUint32(p + 12, length, true);
+         if (type === 'number') dv.setFloat64(p + 16 + n, value, true); else bytes[p + 16 + n] = value ? 1 : 0;

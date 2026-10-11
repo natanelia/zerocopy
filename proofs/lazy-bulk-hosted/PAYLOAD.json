@@ -1,0 +1,90 @@
+{
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "files": [
+    {
+      "path": ".github/workflows/lazy-bulk-hosted.yml",
+      "bytes": 2149,
+      "sha256": "e81dd4395b55242c33279c7195fc622ba13064b92c469e2aecb9a35b63604105"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/CONFIG.json",
+      "bytes": 2435,
+      "sha256": "16e71505ca3c6d07f86ae91607734e84a72167b27201ed00cb376be679f9ab36"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/EXPECTED.json",
+      "bytes": 300,
+      "sha256": "8a36d17cb09b3512887e7257afda3e0a9e7100ee231c32884614390f1b220154"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/METHOD.md",
+      "bytes": 11922,
+      "sha256": "8adbf1e5c226fcb9c2b0f596041fea2c11106a5b00078eb217ea4a108a67f011"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/README.md",
+      "bytes": 5189,
+      "sha256": "8abb5ca9be41113006a20539d1b2e1cac1bf1f2b1d4c026582e1c8334a201681"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/SCHEDULE.json",
+      "bytes": 49411,
+      "sha256": "0b7507f179e22b35ea1c45e15dce529fcceddb7cc7c6efb1f1d69d88a75bc61a"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/SOURCE.json",
+      "bytes": 55150,
+      "sha256": "9b6590442b96197b96ba74d483db87e32e84c0b5b54abe64e519c499da26ed11"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/analyze.py",
+      "bytes": 7798,
+      "sha256": "dfd7295f4df01066ab35dabf53f87c9d806e03fb429760e3ccacdee9d48dfc7a"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/audit-emitted.py",
+      "bytes": 4361,
+      "sha256": "fab2d32376bc68f01d62660970cd149879267422bb089a509ab3a409321e0929"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/bulk-correctness.mjs",
+      "bytes": 18202,
+      "sha256": "fa081f1540fbb8f633cc96b9a6f96466db56ace9b77f48d202edcc3b4bbeb42a"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/bulk-timing.mjs",
+      "bytes": 11160,
+      "sha256": "cdf319081def4341253110d7f2df5c3142a0fde9dea3b6e94f862d0f887b3d67"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/candidate.patch",
+      "bytes": 3790,
+      "sha256": "b474898cdb48af7824bf5339ec1e0726b923aea0c09e05edf94f0273086b57b8"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/hosted.py",
+      "bytes": 24186,
+      "sha256": "e7c99b9e4edc6ad1d1a10d2c9006948610bc0e79306468543d3178d632d2a9f6"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/reconcile.py",
+      "bytes": 3023,
+      "sha256": "4e31edce043a12afbd4fbda73af636a28c1cc7c0559700fe86a4f7caf09bf0f1"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/run-correctness.py",
+      "bytes": 9863,
+      "sha256": "ea8c32e74ff02238b60d39b9865857360a3cb5aaca2273a56c70b6fed2118c30"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/run-timing.py",
+      "bytes": 21113,
+      "sha256": "e75db8a35e399c39332a8a509359c7fc9ab69da7aa0904154b2c49a250da0979"
+    },
+    {
+      "path": "proofs/lazy-bulk-hosted/supervise.py",
+      "bytes": 6856,
+      "sha256": "480b08c750351e02d6f9945801c5f3f6d94e9a044ee0037da4d9288567ce8f13"
+    }
+  ]
+}
