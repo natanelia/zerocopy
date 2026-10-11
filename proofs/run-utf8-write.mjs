@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'nod
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { utf8WriteCases } from './utf8-write-workloads.mjs';
+import { utf8WriteCases, compareUtf8WriteStorage } from './utf8-write-workloads.mjs';
 
 const [beforeArg, afterArg, outputArg] = process.argv.slice(2);
 assert(beforeArg && afterArg && outputArg, 'Usage: run-utf8-write.mjs before-entry after-entry output-directory');
@@ -45,7 +45,7 @@ try {
       for (let sample = 0; sample < pair.before.records.length; sample++) {
         const { ms: beforeMs, ...before } = pair.before.records[sample];
         const { ms: afterMs, ...after } = pair.after.records[sample];
-        assert.deepEqual(after, before, `${spec.name}: baseline storage differs`);
+        compareUtf8WriteStorage(spec, pair.before.operations, before, after);
       }
       console.log(`${runtime} round ${round + 1}: ${spec.name}: ${(pair.before.medianMs / pair.after.medianMs).toFixed(2)}x (${pair.before.medianMs.toFixed(3)} -> ${pair.after.medianMs.toFixed(3)} ms)`);
     }
@@ -68,15 +68,19 @@ try {
     const roundSpeedups = Array.from({ length: rounds }, (_, round) =>
       found.find(run => run.round === round && run.variant === 'before').cases[0].medianMs
       / found.find(run => run.round === round && run.variant === 'after').cases[0].medianMs);
+    const integrity = Object.fromEntries(['before', 'after'].map(variant => {
+      const { ms, ...record } = found.find(run => run.variant === variant).cases[0].records[0];
+      return [variant, record];
+    }));
     const record = found[0].cases[0].records[0];
     rows.push({ runtime: found[0].runtime, name: spec.name, operations: found[0].cases[0].operations, ...summary,
       speedup: summary.before.medianMs / summary.after.medianMs,
       roundSpeedups, usedBytes: record.usedBytes, backingBytes: record.backingBytes,
-      payloadSha256: record.payloadSha256 });
+      payloadSha256: record.payloadSha256, integrityByVariant: integrity });
   }
   writeFileSync(resolve(directory, 'summary.json'), JSON.stringify({ schema: 'zerocopy-utf8-write-summary/v1',
     date: new Date().toISOString(), rounds, buildSha256, cpu: runs[0].cpu,
     platform: runs[0].platform, arch: runs[0].arch, method: runs[0].method,
-    processIsolation: 'One fresh process per runtime, workload, variant, and round; full GC after setup before each timed sample. Alternate variant order across workloads and rounds. Compare all stored payloads, descriptors, used bytes, and backing sizes across variants.',
+    processIsolation: 'One fresh process per runtime, workload, variant, and round; full GC after setup before each timed sample. Alternate variant order across workloads and rounds. Every warm-up and sample must retain its own fresh-arena payload, descriptors, used bytes, and backing sizes. Compare verified actual map contents and structure across variants for bounded generic bulk-map fixtures, including update seeds; compare full physical storage for all other paths. Layout differences can affect performance.',
     rows }, null, 2) + '\n');
 } finally { rmSync(scratch, { recursive: true, force: true }); }

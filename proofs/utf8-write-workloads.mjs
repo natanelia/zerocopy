@@ -26,6 +26,23 @@ export const utf8WriteCases = [
   { name: 'control-list-repeated', collection: 'SharedList', type: 'string', repeated: true },
 ];
 
+// The update fixture seeds its untimed base with the same generic setMany path.
+export function utf8WriteUsesBulkMap(spec, count) {
+  return spec.collection === 'SharedMap' && spec.type === 'object' && (spec.bulk || spec.update)
+    && count > 0 && count <= 12288;
+}
+
+export function checkUtf8WriteStorage(actual, reference) {
+  check(JSON.stringify(actual) === JSON.stringify(reference), 'Fresh-arena storage changed between runs');
+}
+
+export function compareUtf8WriteStorage(spec, count, before, after) {
+  if (utf8WriteUsesBulkMap(spec, count)) {
+    check(before.logical && after.logical, 'Missing verified map evidence');
+    check(JSON.stringify(after.logical) === JSON.stringify(before.logical), `${spec.name}: logical map differs`);
+  } else check(JSON.stringify(after) === JSON.stringify(before), `${spec.name}: baseline storage differs`);
+}
+
 const resetNames = {
   SharedMap: 'resetMap', SharedOrderedMap: 'resetOrderedMap', SharedSortedMap: 'resetSortedMap',
   SharedList: 'resetSharedList', SharedQueue: 'resetQueue', SharedStack: 'resetStack',
@@ -82,8 +99,13 @@ export function createUtf8WriteWorkload(api, spec, requestedCount) {
   }
   function verifyValues(result, expectedValues, size) {
     check(result.size === size, `${spec.name}: wrong size`);
+    const entries = utf8WriteUsesBulkMap(spec, count) ? [] : undefined;
     if (isMap) {
-      for (let i = 0; i < size; i++) check(equalValue(result.get(keys[i]), expectedValues[i]), `${spec.name}: value ${i}`);
+      for (let i = 0; i < size; i++) {
+        const actual = result.get(keys[i]);
+        check(equalValue(actual, expectedValues[i]), `${spec.name}: value ${i}`);
+        if (entries) entries.push([keys[i], actual]);
+      }
     } else if (spec.collection === 'SharedQueue' || spec.collection === 'SharedStack') {
       let cursor = result;
       for (let j = 0; j < size; j++) {
@@ -102,23 +124,46 @@ export function createUtf8WriteWorkload(api, spec, requestedCount) {
     } else {
       for (let i = 0; i < size; i++) check(equalValue(result.get(i), expectedValues[i]), `${spec.name}: value ${i}`);
     }
+    return entries;
+  }
+  function mapEvidence(role, map, entries) {
+    const size = entries.length;
+    const descriptor = map.toWorkerData();
+    check(JSON.stringify(Object.keys(descriptor).sort()) === JSON.stringify(['root', 'size', 'valueType']),
+      `${spec.name}: unexpected map descriptor fields`);
+    check(descriptor.valueType === 'object' && descriptor.size === size && map.size === size,
+      `${spec.name}: map type or size`);
+    check(Number.isSafeInteger(descriptor.root) && (size ? descriptor.root >= 65536 : descriptor.root === 0),
+      `${spec.name}: invalid map root`);
+    check(JSON.stringify([...map.keys()].sort()) === JSON.stringify(keys.slice(0, size).sort()),
+      `${spec.name}: map key set`);
+    return { role, valueType: descriptor.valueType, size: map.size, keyCount: entries.length, entries };
   }
   function verify(result) {
     check(Object.isFrozen(result), `${spec.name}: mutable handle`);
-    verifyValues(result, expected, count);
+    const resultEntries = verifyValues(result, expected, count);
+    let baseEntries, retainedEntries;
     if (spec.update) {
-      verifyValues(base, oldValues, count);
+      baseEntries = verifyValues(base, oldValues, count);
       const partial = oldValues.map((value, i) => i < retainedSize ? expected[i] : value);
-      verifyValues(retained, partial, count);
+      retainedEntries = verifyValues(retained, partial, count);
     } else {
       check(base.size === 0, `${spec.name}: changed empty base`);
-      verifyValues(retained, expected, retainedSize);
+      baseEntries = [];
+      retainedEntries = verifyValues(retained, expected, retainedSize);
+    }
+    let logical;
+    if (utf8WriteUsesBulkMap(spec, count)) {
+      const snapshots = [mapEvidence('result', result, resultEntries),
+        mapEvidence('base', base, baseEntries), mapEvidence('retained', retained, retainedEntries)];
+      logical = { collection: 'SharedMap', snapshotCount: snapshots.length,
+        snapshots: snapshots.map(({ entries, ...metadata }) => metadata), canonical: JSON.stringify(snapshots) };
     }
     const a = api.getWorkerData({ result }, { copy: false }).arenas;
     check(a.length === 1, `${spec.name}: unexpected dependencies`);
     return { usedBytes: a[0].used - 65536, backingBytes: a[0].memory.buffer.byteLength,
       payload: new Uint8Array(a[0].memory.buffer, 65536, a[0].used - 65536),
-      descriptor: result.toWorkerData() };
+      descriptor: result.toWorkerData(), logical };
   }
   return { spec, count, setup, run, verify };
 }

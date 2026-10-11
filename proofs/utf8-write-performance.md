@@ -60,6 +60,8 @@ The local run selects seven workloads: four JSON write cases, a 4 KiB string cas
 
 Every warm-up and sample checks all returned values and retained snapshots against native UTF-8/JSON expectations. Every measured baseline/candidate sample also has matching descriptors, allocated bytes, backing-buffer sizes, and SHA-256 hashes of every allocated byte above the reserved scratch range. Heap validation uses priority traversal, without requiring a particular traversal order. No wall-clock threshold is enforced on a shared runner.
 
+Those exact cross-build storage statements describe the retained historical run. Current CI compares verified actual map contents and exact key sets, type, sizes, retained-snapshot metadata and descriptor fields for bounded generic `setMany` fixtures, including the untimed seed of `map-json-update`. Other paths and batches above 12,288 retain exact cross-build storage checks. Every warm-up and sample must also match its own build's first fresh-arena payload, descriptor and lengths. Summaries preserve historical fields and add both builds under `integrityByVariant`. The added untimed verification changes the harness; do not pool new samples with historical data. Layout differences can affect measured performance.
+
 Small differences need care. CPU affinity and frequency are not controlled. An additional A/A run used two identical baseline bundles to check the measurement floor; its samples are included with the evidence. Review the round ranges and controls before applying a result to another machine or workload.
 
 ## Correctness and package checks

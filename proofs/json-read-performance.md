@@ -174,7 +174,11 @@ A/A evidence:
 
 ## Storage and correctness
 
-Every matched before/after case must have identical allocated payload bytes, snapshot descriptors, used length, and backing-memory length. The runner rejects a mismatch. It checks the same invariants after every warm-up run and measured sample.
+The tables and raw files below retain the original historical run and its byte-identical builds. Current CI also supports the bounded generic-map allocation change: it compares SHA-256 of verified actual key/value contents plus exact map type, size, key set, snapshot count and descriptor fields for generic-map fixtures with 1–12,288 entries. Each build must still preserve its own complete allocated-byte hash, descriptors and lengths before and after every read. Other fixture paths, including larger fallback maps, retain exact cross-build storage equality. Summaries keep the historical fields and additionally record both builds under `integrityByVariant`.
+
+The added verification remains outside timing, but changes the harness. Its results must not be pooled with these historical runs. Different allocation layouts can affect read timing, so an observed read difference is not isolated to decoder code.
+
+In the historical run, every matched before/after case had identical allocated payload bytes, snapshot descriptors, used length, and backing-memory length. The runner rejected a mismatch and checked the same invariants after every warm-up run and measured sample.
 
 | Contract | Result |
 | --- | --- |

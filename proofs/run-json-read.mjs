@@ -7,7 +7,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, mkdte
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { jsonReadCases, quantile } from './json-read-workloads.mjs';
+import { jsonReadCases, quantile, compareJsonReadStorage } from './json-read-workloads.mjs';
 
 const [beforeArg, afterArg, outputArg] = process.argv.slice(2);
 assert(beforeArg && afterArg && outputArg, 'Usage: run-json-read.mjs before-entry after-entry output-directory');
@@ -55,7 +55,7 @@ try {
           throw error;
         }
       }
-      assert.deepEqual(pair.before.integrity, pair.after.integrity, `${spec.name}: baseline storage differs`);
+      compareJsonReadStorage(spec, pair.before.workload.totalValues, pair.before, pair.after);
       assert.deepEqual(pair.before.workload, pair.after.workload, `${spec.name}: workload differs`);
       assert.equal(pair.before.count, pair.after.count); assert.equal(pair.before.passes, pair.after.passes);
       assert.equal(pair.before.requestedCount, pair.after.requestedCount);
@@ -78,12 +78,15 @@ try {
       roundSpeedups: Array.from({ length: rounds }, (_, round) =>
         found.find(run => run.round === round && run.variant === 'before').medianMs /
         found.find(run => run.round === round && run.variant === 'after').medianMs),
-      integrity: found[0].integrity });
+      integrity: found[0].integrity,
+      integrityByVariant: Object.fromEntries(['before', 'after'].map(variant =>
+        [variant, found.find(run => run.variant === variant).integrity])),
+      logical: found[0].logical });
   }
   const first = runs[0];
   writeFileSync(resolve(directory, 'summary.json'), JSON.stringify({ schema: 'zerocopy-json-read-summary/v1',
     date: new Date().toISOString(), rounds, requestedCount: first.requestedCount, passes: first.passes, warmups: first.warmups,
     buildSha256: builds, sourceSha256: sources, harnessSha256, cpu: first.cpu, platform: first.platform,
     arch: first.arch, osRelease: first.osRelease, method: first.method,
-    processIsolation: 'One fresh process per runtime, workload, variant, and round. Variant order alternates by workload and round. Each sample must retain the same allocated-byte hash, descriptor hash, used length, and backing length; matched builds must agree on all invariants.', rows }, null, 2) + '\n');
+    processIsolation: 'One fresh process per runtime, workload, variant, and round. Variant order alternates by workload and round. Each sample must retain the same allocated-byte hash, descriptor hash, used length, and backing length; matched builds must agree on verified logical map contents and structure. Bounded generic-map fixtures may have different allocation layouts; all other fixtures must also agree on physical storage. Layout differences can affect read timing.', rows }, null, 2) + '\n');
 } finally { rmSync(scratch, { recursive: true, force: true }); }
