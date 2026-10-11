@@ -1,9 +1,12 @@
+import { findResults, resultSnippet, validateSearchIndex } from './search.mjs';
+
 const base = document.body.dataset.base;
 const dialog = document.querySelector('.search-dialog');
 const input = document.querySelector('#search-input');
 const resultList = document.querySelector('#search-results');
 const status = document.querySelector('#search-status');
-let searchData, loading, notifyTimer;
+const retry = document.querySelector('#search-retry');
+let searchData, loading, notifyTimer, searchOpener;
 export function notify(text) {
   const toast = document.querySelector('.toast');
   toast.textContent = text; toast.classList.add('visible');
@@ -11,38 +14,50 @@ export function notify(text) {
 }
 async function openSearch() {
   if (dialog.open) return;
+  searchOpener = document.activeElement;
   dialog.showModal(); input.focus();
-  if (!searchData) {
-    status.textContent = 'Loading the local search index…';
-    try {
-      loading ??= fetch(base + 'search.json').then(response => {
-        if (!response.ok) throw new Error('Search index unavailable');
-        return response.json();
-      });
-      searchData = await loading; search();
-    } catch { loading = undefined; status.textContent = 'Search could not load. Open Documentation from the menu, or try again.'; }
-  }
+  if (searchData) search();
+  else await loadSearch();
+}
+async function loadSearch() {
+  retry.hidden = true;
+  status.textContent = 'Loading the local search index…';
+  resultList.setAttribute('aria-busy', 'true');
+  try {
+    loading ??= fetch(base + 'search.json', { cache: 'no-cache' }).then(response => {
+      if (!response.ok) throw new Error('Search index unavailable');
+      return response.json().then(validateSearchIndex);
+    });
+    searchData = await loading;
+    if (dialog.open) search();
+  } catch {
+    searchData = undefined; loading = undefined;
+    status.textContent = 'Search could not load. Retry, or browse the documentation.';
+    retry.hidden = false;
+  } finally { resultList.setAttribute('aria-busy', 'false'); }
 }
 function search() {
   if (!searchData) return;
-  const query = input.value.toLowerCase().trim().slice(0, 150);
-  const terms = query.split(/\s+/).filter(Boolean);
-  const results = searchData.map(page => {
-    const text = (page.title + ' ' + page.description + ' ' + page.text).toLowerCase();
-    return { ...page, score: terms.every(term => text.includes(term))
-      ? terms.reduce((score, term) => score + (page.title.toLowerCase().includes(term) ? 20 : 1), 0) : -1 };
-  }).filter(page => page.score >= 0).sort((a, b) => b.score - a.score).slice(0, 8);
+  const { results, total, terms } = findResults(searchData, input.value);
   resultList.replaceChildren();
   for (const page of results) {
+    const item = document.createElement('li');
     const link = document.createElement('a'); link.className = 'search-result'; link.href = base + page.route;
-    const title = document.createElement('strong'); title.textContent = page.title;
-    const description = document.createElement('p'); description.textContent = page.description;
-    link.append(title, description); resultList.append(link);
+    const title = document.createElement('strong'); title.textContent = page.heading || page.title;
+    const context = document.createElement('span'); context.className = 'search-context';
+    context.textContent = page.heading ? [page.title, page.context].filter(Boolean).join(' › ') : 'Guide';
+    const description = document.createElement('p'); description.textContent = resultSnippet(page, terms);
+    link.append(context, title, description); item.append(link); resultList.append(item);
   }
-  status.textContent = terms.length ? `${results.length} matching guides${results.length === 8 ? ' shown' : ''}.` : 'Start with a guide, or search for a topic.';
+  status.textContent = !terms.length ? 'Start with a guide, or search for a topic or method.'
+    : total ? `${total} matching ${total === 1 ? 'result' : 'results'}${total > results.length ? `; showing ${results.length}` : ''}.`
+    : 'No results. Try a collection name, method, or a shorter phrase.';
 }
 document.querySelectorAll('.search-open').forEach(button => button.addEventListener('click', openSearch));
 document.querySelector('.search-close').addEventListener('click', () => dialog.close());
+retry.addEventListener('click', async () => { input.focus(); await loadSearch(); });
+resultList.addEventListener('click', event => { if (event.target.closest('a')) dialog.close(); });
+dialog.addEventListener('close', () => { if (!dialog.open && searchOpener?.isConnected) searchOpener.focus({ preventScroll: true }); });
 dialog.addEventListener('click', event => { if (event.target === dialog) { const box = dialog.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close(); } });
 input.addEventListener('input', search);
 dialog.addEventListener('keydown', event => {
@@ -51,6 +66,7 @@ dialog.addEventListener('keydown', event => {
   const index = links.indexOf(document.activeElement);
   if (event.key === 'ArrowDown' && links.length) { event.preventDefault(); links[(index + 1) % links.length].focus(); }
   if (event.key === 'ArrowUp' && links.length) { event.preventDefault(); if (index <= 0) input.focus(); else links[index - 1].focus(); }
+  if (event.key === 'Enter' && document.activeElement === input && links.length) { event.preventDefault(); links[0].click(); }
 });
 document.addEventListener('keydown', event => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearch(); } });
 document.querySelector('.menu-toggle').addEventListener('click', event => {
