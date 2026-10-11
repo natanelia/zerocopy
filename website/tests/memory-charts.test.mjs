@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { chartData, chartNames, chartModel, formatMiB, validateChartData, memoryFigure, memorySVG, injectMemoryCharts } from '../memory-charts.mjs';
+import { chartData, recordedDate, chartNames, chartModel, formatMiB, validateChartData, memoryFigure, memorySVG, injectMemoryCharts } from '../memory-charts.mjs';
 
 const clone = () => structuredClone(chartData);
 test('charted samples retain the recorded source, workload, and exact byte medians', () => {
   assert.equal(validateChartData(chartData), chartData);
   assert.equal(chartData.groups.length, 30);
+  assert.equal(recordedDate(), '10 October 2026');
+  assert.equal(recordedDate(chartData, 'short'), '10 Oct 2026');
   assert.deepEqual(chartModel('retained').groups[0].points.map(p=>p.bytes), [9539456,46616648,34976584,14726792]);
   assert.deepEqual(chartModel('rss').groups[0].points.map(p=>p.bytes), [127991808,223334400,172146688,121851904]);
-  assert.equal(formatMiB(9482568), '9.04');
+  assert.equal(formatMiB(9539456), '9.10');
 });
 test('source labels follow the recorded date and runtime', () => {
   const data = clone(); data.measuredAt = '2030-01-02T00:00:00.000Z'; data.runtime = 'v99.0.0';
@@ -46,6 +48,8 @@ test('figures keep units, independent RAM definitions, ranges, and inspectable s
     for(const text of ['Recorded Node.js','MiB','not confidence intervals','Not browser RAM','3 trials','Exact values and trial range','Download chart data','aria-labelledby'])assert.ok(html.includes(text),text);
     assert.ok(!html.includes('<script'));assert.ok(!html.includes('<canvas'));
     assert.ok(html.includes('/zerocopy/previews/pr-13/test/assets/memory-chart-data.json'));
+    assert.ok(html.includes(recordedDate()));
+    assert.ok(html.includes(chartData.runtime));
     for(const p of model.groups.flatMap(g=>g.points))assert.ok(html.includes(`${formatMiB(p.min)}–${formatMiB(p.max)}`));
   }
   assert.ok(memoryFigure('rss').includes('One native owner uses the least RSS'));

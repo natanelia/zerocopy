@@ -26,6 +26,30 @@ export function codeBlock(code, label = 'TypeScript', language = 'ts') {
 export function slug(text) {
   return unescape(text.replace(/<[^>]*>/g, '').replace(/[`*~]/g, '')).toLowerCase().replace(/[^\p{L}\p{N}\p{M}_\-\s]/gu, '').replace(/\s/g, '-');
 }
+/** Text from our checked-in HTML, before code-copy controls are added. */
+function plainText(html) {
+  return unescape(html.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]*>/g, ' '))
+    .replace(/&nbsp;/g, ' ').replace(/&#(x[\da-f]+|\d+);/gi, (match, value) => {
+      const code = value[0].toLowerCase() === 'x' ? parseInt(value.slice(1), 16) : Number(value);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    }).replace(/\s+/g, ' ').trim();
+}
+
+/** Share the renderer's actual heading IDs with the local search index. */
+function searchSections(html) {
+  const headings = [...html.matchAll(/<h([2-6]) id="([^"]+)">([\s\S]*?)<\/h\1>/g)];
+  const sections = [{ id: '', title: '', context: '', text: plainText(html.slice(0, headings[0]?.index ?? html.length)) }];
+  const ancestors = [];
+  for (let index = 0; index < headings.length; index++) {
+    const heading = headings[index], depth = Number(heading[1]);
+    const title = plainText(heading[3].replace(/<a class="heading-link"[\s\S]*?<\/a>/g, ''));
+    while (ancestors.length && ancestors.at(-1).depth >= depth) ancestors.pop();
+    sections.push({ id: heading[2], title, context: ancestors.map(item => item.title).join(' › '),
+      text: plainText(html.slice(heading.index + heading[0].length, headings[index + 1]?.index ?? html.length)) });
+    ancestors.push({ depth, title });
+  }
+  return sections;
+}
 /** Only checked-in Markdown is rendered. Search input never enters this renderer. */
 export function renderMarkdown(source, file, routes, base) {
   const toc = [], used = new Set();
@@ -39,6 +63,7 @@ export function renderMarkdown(source, file, routes, base) {
     if (+depth <= 3) toc.push({ id, text: unescape(text.replace(/<[^>]*>/g, '')), depth: +depth });
     return `<h${depth} id="${id}">${text}<a class="heading-link" href="#${id}" aria-label="Link to ${escape(unescape(text.replace(/<[^>]*>/g, '')))}">#</a></h${depth}>`;
   });
+  const sections = searchSections(html);
   html = html.replace(/href="([^"]*)"/g, (_, raw) => {
     const href = unescape(raw);
     if (/^(https?:|mailto:|#)/.test(href)) return `href="${escape(href)}"`;
@@ -61,5 +86,5 @@ export function renderMarkdown(source, file, routes, base) {
   html = html.replace(/<pre><code(?: class="language-([^"]+)")?>([\s\S]*?)<\/code><\/pre>/g,
     (_, lang = 'text', code) => codeBlock(unescape(code).replace(/\n$/, ''), lang, lang));
   html = html.replace(/<table>/g, '<div class="table-scroll" tabindex="0"><table>').replace(/<\/table>/g, '</table></div>');
-  return { html, toc };
+  return { html, toc, sections };
 }

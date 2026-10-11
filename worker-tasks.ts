@@ -1,4 +1,5 @@
 import { createSharedSession, connectSharedSession, type SharedEndpoint, type SharedShape, type SharedSource, type SharedReader } from './worker';
+import { errorOf, listen } from './worker-protocol';
 export interface TaskContext<S> {
     readonly state: S;
     readonly signal: AbortSignal;
@@ -73,26 +74,7 @@ function endpointOf(value: any): SharedEndpoint {
     const endpoint = value?.port ?? value;
     if (!endpoint || typeof endpoint.postMessage !== 'function')
         throw new TypeError('Expected a Worker, SharedWorker, or MessagePort');
-    endpoint.start?.();
     return endpoint;
-}
-/** Install independent listeners; leave application message handlers intact. */
-function listen(endpoint: SharedEndpoint, receive: (data: any) => void, fail: (error: Error) => void): () => void {
-    if (endpoint.addEventListener && endpoint.removeEventListener) {
-        const onMessage = (event: any) => receive(event.data), onError = (event: any) => fail(event.error instanceof Error ? event.error : new Error(event.message ?? 'Worker error'));
-        endpoint.addEventListener('message', onMessage);
-        endpoint.addEventListener('messageerror', onError);
-        endpoint.addEventListener('error', onError);
-        return () => { endpoint.removeEventListener!('message', onMessage); endpoint.removeEventListener!('messageerror', onError); endpoint.removeEventListener!('error', onError); };
-    }
-    if (endpoint.on && endpoint.off) {
-        const onError = (error: any) => fail(error instanceof Error ? error : new Error(String(error)));
-        endpoint.on('message', receive);
-        endpoint.on('messageerror', onError);
-        endpoint.on('error', onError);
-        return () => { endpoint.off!('message', receive); endpoint.off!('messageerror', onError); endpoint.off!('error', onError); };
-    }
-    throw new TypeError('Endpoint does not support message events');
 }
 /** Build a versioned, namespaced task message. */
 function msg(channel: string, client: string, fields: Omit<Msg, 'protocol' | 'version' | 'channel' | 'client'>): Msg { return { protocol: PROTOCOL, version: VERSION, channel, client, ...fields }; }
@@ -177,7 +159,7 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
             releaseResource(resource);
     }
     /** Transport failures close the executor before calling application code. */
-    function fail(error: Error): void { close(error); report(options, error); }
+    function fail(error: Error): void { if (!closed) { close(error); report(options, error); } }
     let stateReady: Promise<void>;
     try {
         state = createSharedSession({ source }, {
@@ -360,81 +342,111 @@ async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, rev
 /** Serve trusted task clients; each invocation retains one reader snapshot. */
 export async function serve<T extends TaskSet<any>, S extends SharedShape<S> = StateFor<T>>(tasks: T, options: ServeOptions = {}): Promise<() => void> {
     const endpoint = endpointOf(options.endpoint ?? globalThis), channel = options.channel ?? 'default';
-    const readers = new Map<string, Promise<SharedReader<S>>>(), running = new Map<string, Map<number, AbortController>>();
-    let closed = false;
-    const remove = listen(endpoint, data => {
-        if (closed || !valid(data, channel))
-            return;
-        if (data.kind === 'hello') {
-            if (!readers.has(data.client)) {
-                const reader = connectSharedSession<S>({ endpoint, channel: 'tasks:' + channel + ':' + data.client, timeoutMs: options.timeoutMs, onError: options.onError });
-                readers.set(data.client, reader);
-                running.set(data.client, new Map());
-                reader.catch(error => {
-                    try {
-                        endpoint.postMessage(msg(channel, data.client, { kind: 'close', message: error instanceof Error ? error.message : String(error) }));
-                    }
-                    catch { }
-                    report(options, error instanceof Error ? error : new Error(String(error)));
-                });
-            }
-            endpoint.postMessage(msg(channel, data.client, { kind: 'ready' }));
-            return;
-        }
-        if (data.kind === 'close') {
-            for (const controller of running.get(data.client)?.values() ?? [])
-                controller.abort(new Error('Task client closed'));
-            readers.get(data.client)?.then(r => r.dispose()).catch(() => { });
-            readers.delete(data.client);
-            running.delete(data.client);
-            return;
-        }
-        if (data.kind === 'cancel' && data.id !== undefined) {
-            running.get(data.client)?.get(data.id)?.abort(new Error('Task aborted'));
-            return;
-        }
-        if (data.kind !== 'call' || typeof data.id !== 'number' || !Number.isSafeInteger(data.id) || data.id < 1 || typeof data.task !== 'string' || !readers.has(data.client))
-            return;
-        const task = Object.hasOwn(tasks, data.task) ? tasks[data.task] : undefined;
-        if (typeof task !== 'function') {
-            endpoint.postMessage(msg(channel, data.client, { kind: 'error', id: data.id, message: 'Unknown task: ' + data.task }));
-            return;
-        }
-        const callId = data.id, controller = new AbortController();
-        running.get(data.client)?.set(callId, controller);
-        Promise.resolve(readers.get(data.client)).then(reader => {
-            if (!reader)
-                throw new Error('Task client has no shared state');
-            return atRevision(reader, data.revision, controller.signal).then(snapshot => { controller.signal.throwIfAborted(); return task({ state: snapshot, signal: controller.signal }, data.input); });
-        })
-            .then(value => {
-            if (!closed)
-                endpoint.postMessage(msg(channel, data.client, { kind: 'result', id: callId, value }));
-        }).catch(error => {
-            if (!closed)
-                endpoint.postMessage(msg(channel, data.client, { kind: 'error', id: callId, message: error instanceof Error ? error.message : String(error) }));
-        })
-            .finally(() => running.get(data.client)?.delete(callId)).catch(error => report(options, error instanceof Error ? error : new Error(String(error))));
-    }, error => options.onError?.(error));
-    return () => {
-        if (closed)
-            return;
-        closed = true;
-        remove();
-        for (const clientId of readers.keys()) {
+    type Client = {
+        reader?: Promise<SharedReader<S>>;
+        lifetime: AbortController;
+        running: Map<number, AbortController>;
+        closed: boolean;
+    };
+    const clients = new Map<string, Client>();
+    let closed = false, remove = () => { };
+    /** A reader may fail before or after initialization; both paths release it. */
+    function closeClient(clientId: string, value: Client, error: Error, notify = true): boolean {
+        if (value.closed)
+            return false;
+        value.closed = true;
+        if (clients.get(clientId) === value)
+            clients.delete(clientId);
+        for (const controller of value.running.values())
+            controller.abort(error);
+        value.running.clear();
+        if (notify) {
             try {
-                endpoint.postMessage(msg(channel, clientId, { kind: 'close', message: 'Task server closed' }));
+                endpoint.postMessage(msg(channel, clientId, { kind: 'close', message: error.message }));
             }
             catch { }
         }
-        for (const m of running.values())
-            for (const c of m.values())
-                c.abort(new Error('Task server closed'));
-        for (const r of readers.values())
-            r.then(x => x.dispose()).catch(() => { });
-        readers.clear();
-        running.clear();
-    };
+        // Notify first so ordinary server disposal is not reported as a reader
+        // transport error by the client. Abort also cleans up during startup.
+        value.lifetime.abort(error);
+        return true;
+    }
+    function failClient(clientId: string, value: Client, error: Error): void {
+        if (closeClient(clientId, value, error))
+            report(options, error);
+    }
+    /** Transport failure closes every client before calling application code. */
+    function shutdown(error: Error): boolean {
+        if (closed)
+            return false;
+        closed = true;
+        remove();
+        for (const [clientId, value] of clients)
+            closeClient(clientId, value, error);
+        return true;
+    }
+    function fail(error: Error): void {
+        if (shutdown(error))
+            report(options, error);
+    }
+    remove = listen(endpoint, data => {
+        if (closed || !valid(data, channel))
+            return;
+        if (data.kind === 'hello') {
+            if (!clients.has(data.client)) {
+                const value: Client = { lifetime: new AbortController(), running: new Map(), closed: false };
+                clients.set(data.client, value);
+                try {
+                    value.reader = connectSharedSession<S>({
+                        endpoint, channel: 'tasks:' + channel + ':' + data.client,
+                        timeoutMs: options.timeoutMs, signal: value.lifetime.signal,
+                        onError: error => failClient(data.client, value, error),
+                    });
+                    value.reader.catch(error => failClient(data.client, value, errorOf(error)));
+                }
+                catch (error) {
+                    failClient(data.client, value, errorOf(error));
+                }
+            }
+            if (clients.has(data.client)) {
+                try { endpoint.postMessage(msg(channel, data.client, { kind: 'ready' })); }
+                catch (error) { fail(errorOf(error)); }
+            }
+            return;
+        }
+        const value = clients.get(data.client);
+        if (!value)
+            return;
+        if (data.kind === 'close') {
+            closeClient(data.client, value, new Error('Task client closed'), false);
+            return;
+        }
+        if (data.kind === 'cancel' && data.id !== undefined) {
+            value.running.get(data.id)?.abort(new Error('Task aborted'));
+            return;
+        }
+        if (data.kind !== 'call' || typeof data.id !== 'number' || !Number.isSafeInteger(data.id) || data.id < 1 || typeof data.task !== 'string')
+            return;
+        const task = Object.hasOwn(tasks, data.task) ? tasks[data.task] : undefined;
+        if (typeof task !== 'function') {
+            try { endpoint.postMessage(msg(channel, data.client, { kind: 'error', id: data.id, message: 'Unknown task: ' + data.task })); }
+            catch (error) { fail(errorOf(error)); }
+            return;
+        }
+        const callId = data.id, controller = new AbortController();
+        value.running.set(callId, controller);
+        value.reader!.then(reader => atRevision(reader, data.revision, controller.signal))
+            .then(snapshot => { controller.signal.throwIfAborted(); return task({ state: snapshot, signal: controller.signal }, data.input); })
+            .then(result => {
+            if (!value.closed)
+                endpoint.postMessage(msg(channel, data.client, { kind: 'result', id: callId, value: result }));
+        }).catch(error => {
+            if (!value.closed)
+                endpoint.postMessage(msg(channel, data.client, { kind: 'error', id: callId, message: errorOf(error).message }));
+        })
+            .finally(() => value.running.delete(callId)).catch(error => fail(errorOf(error)));
+    }, fail);
+    return () => { shutdown(new Error('Task server closed')); };
 }
 /** Create a bounded pool, or borrow existing endpoints without owning them. */
 export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = StateFor<T>>(workers: readonly any[] | (() => any), options: PoolOptions<S>): Promise<PoolExecutor<T>> {
@@ -473,16 +485,30 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
         run: (executor: Executor<T>) => void;
         reject: (error: Error) => void;
     }[] = [];
-    const schedule = <R>(operation: (executor: Executor<T>) => Promise<R>): Promise<R> => new Promise((resolve, reject) => {
+    const schedule = <R>(operation: (executor: Executor<T>) => Promise<R>, signal?: AbortSignal): Promise<R> => new Promise((resolve, reject) => {
         if (closed) {
             reject(new Error('Worker pool is closed'));
+            return;
+        }
+        if (signal?.aborted) {
+            reject(signal.reason ?? new Error('Task aborted'));
             return;
         }
         if (!idle.length && queue.length >= max) {
             reject(new Error('Worker pool queue overflow'));
             return;
         }
-        const item = { reject, run(executor: Executor<T>) {
+        const cleanup = () => signal?.removeEventListener('abort', abort);
+        const abort = () => {
+            const index = queue.indexOf(item);
+            if (index < 0)
+                return;
+            queue.splice(index, 1);
+            cleanup();
+            reject(signal?.reason ?? new Error('Task aborted'));
+        };
+        const item = { reject(error: Error) { cleanup(); reject(error); }, run(executor: Executor<T>) {
+                cleanup();
                 let released = false;
                 const release = () => {
                     if (released)
@@ -514,10 +540,14 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
         const executor = idle.shift();
         if (executor)
             item.run(executor);
-        else
+        else {
             queue.push(item);
+            signal?.addEventListener('abort', abort, { once: true });
+            if (signal?.aborted)
+                abort();
+        }
     });
-    const run = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? (input?: unknown, call?: CallOptions) => schedule(e => (e.run as any)[key](input, call)) : undefined }) as TaskCalls<T>;
+    const run = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? (input?: unknown, call?: CallOptions) => schedule(e => (e.run as any)[key](input, call), call?.signal) : undefined }) as TaskCalls<T>;
     const map = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? async (inputs: readonly unknown[], call?: CallOptions & {
             chunkSize?: number;
         }) => {
@@ -538,7 +568,7 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
                         const index = next++;
                         if (index >= inputs.length)
                             return;
-                        results[index] = await schedule(e => (e.run as any)[key](inputs[index], call));
+                        results[index] = await schedule(e => (e.run as any)[key](inputs[index], call), call?.signal);
                     }
                 }
                 catch (error) {

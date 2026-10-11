@@ -23,6 +23,22 @@ Map keys are strings. Set values are strings or numbers. Other collections take 
 
 The `'object'` codec is not an arbitrary-object serializer. Functions, prototypes, cycles, and object identity are not preserved as general JavaScript values. Inserting JSON data involves serialization; reading it involves decoding. `toArray()` and entry tuples are detached containers, not shared JavaScript arrays.
 
+## Choose a collection
+
+Choose a task below to find methods and examples. The [update and value rules](#updates-and-values) apply to every collection.
+
+| Task | Collection |
+| --- | --- |
+| Look up values by string key | [SharedMap](#maps) |
+| Keep insertion order | [SharedOrderedMap](#maps) or [SharedOrderedSet](#sets) |
+| Iterate in sorted order | [SharedSortedMap](#maps) or [SharedSortedSet](#sets) |
+| Track string or number membership | [SharedSet](#sets) |
+| Read or update values by index | [SharedList](#lists-stacks-and-queues) |
+| Use last-in, first-out order | [SharedStack](#lists-stacks-and-queues) |
+| Use first-in, first-out order | [SharedQueue](#lists-stacks-and-queues) |
+| Prepend, append, or insert after an index | [SharedLinkedList](#linked-list-interfaces) or [SharedDoublyLinkedList](#linked-list-interfaces) |
+| Remove values by numeric priority | [SharedPriorityQueue](#priority-queues) |
+
 ## Typed JSON objects
 
 Use `json<T>()` to retain an application's object shape through collection reads, writes, callbacks, and immutable updates. Interfaces do not need an index signature. Nested arrays, tuples, optional fields, and discriminated unions retain their types.

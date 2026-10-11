@@ -249,6 +249,8 @@ async function checkBrowser() {
           assert.deepEqual(readerLogs, ['Worker initial: 10000', 'Worker current: 10001', 'Worker retained: 10000']);
           assert.equal(await page.evaluate(() => globalThis.__docTaskFrames), 0,
             'Direct state reads must not use task messages');
+          await page.waitForFunction(() => document.querySelector('pre[role="status"]')?.textContent ===
+            'Owner current: 10001\nWorker current: 10001\nWorker retained: 10000');
         }
         assert.deepEqual(errors, [], `${example.name}: unexpected page errors`);
         assert.deepEqual(await page.evaluate(() => globalThis.__docLogs), example.expected);

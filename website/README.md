@@ -76,10 +76,15 @@ Test this hosting path with `SITE_ISOLATED=false node website/serve.mjs`. Server
 
 The build also provides local search, a 404 page, raw Markdown downloads, `llms.txt`, and a build manifest. All fonts use system stacks. No analytics, remote fonts, or remote runtime scripts are loaded. Immutable.js is served locally for the demos.
 
+Local search indexes each guide introduction and every rendered section, using the renderer's actual heading IDs. Results link directly to sections and show matching text. The index is fetched only when search opens; a failed or outdated response can be retried. Arrow keys move through native result links, Enter opens a result, and Escape closes search.
+
+On narrow screens, **Browse documentation** keeps the sidebar's groups and current-page marker. **On this page** includes second- and third-level headings on desktop, tablet, and mobile. Both narrow-screen menus are native HTML disclosures and work without JavaScript. Previous/next links follow the route registry within each guide group.
+
 ## Tests
 
 ```sh
 node --test website/tests/*.test.mjs
+node website/tests/docs-browser.mjs
 node website/tests/isolation-browser.mjs
 node website/tests/browser.mjs
 node website/tests/explorer-browser.mjs
@@ -90,6 +95,10 @@ node website/tests/memory-browser.mjs
 Build first. Browser tests use the root Playwright dependency with Chromium and WebKit. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
 
 CI uploads the static output, test logs, and desktop/mobile screenshots. Existing library and Markdown checks remain separate and unchanged.
+
+`node --test website/tests/docs-navigation.test.mjs` checks search indexing, ranking, heading targets, and grouped navigation directly from source without building the site. `docs-browser.mjs` uses the built output and checks Chromium and WebKit search failure/retry, Close/reopen, keyboard activation, section scrolling, and no-JavaScript contents at 320px, 390px, and 1024px. The website workflow runs it at root, repository, and commit-preview prefixes.
+
+The hosted workflow separately runs `scripts/check-vite-quickstart.mjs` once. It extracts the quickstart's four marked files into a temporary application, installs the documented npm versions with lifecycle scripts disabled, and checks Vite development and production preview in Chromium and WebKit. It records isolation headers, visible snapshot counts, package versions, screenshots, and the resolved lockfile. This is distinct from checking Markdown worker examples against the repository's own bundles.
 
 ## Automatic PR previews
 

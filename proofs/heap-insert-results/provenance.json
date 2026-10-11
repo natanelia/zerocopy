@@ -1,0 +1,176 @@
+{
+  "schema": "zerocopy-heap-insert-report/v1",
+  "baseline": {
+    "commit": "3773c6e519c7c0958da13727ed1082f449f3ee25"
+  },
+  "runtime": {
+    "commit": "9972561c60e93500ae092c2b752880dca7740fdf",
+    "tree": "33e99353fbc136ea585dec2f9fce47514f4cf543"
+  },
+  "screen": {
+    "proofCommit": "b52aefded8b724e21cd7ddd2713836689ddee299",
+    "proofTree": "1e742055d4da30a7bf29cc7653f78018db96c0e0",
+    "run": 37878315068,
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/37878315068",
+    "artifactId": 11594083423,
+    "artifactUrl": "https://github.com/natanelia/zerocopy/actions/runs/37878315068/artifacts/11594083423",
+    "zipSha256": "0eda58744996e5311350331d2dd09f26adfe671eaff69f2a452779c409df3a16",
+    "tarSha256": "085c5d62848dd38222a2e38c67dbe576ad4765d7782d793e601371dd4c48a09e",
+    "controllerStatus": "completed",
+    "result": "scoped-review-required-inconclusive-cells"
+  },
+  "firstStudy": {
+    "proofCommit": "3f229e1d62bf1f63353c5b90193b172cf039ee09",
+    "proofTree": "60f773f5fb4153d1fc1ac6d5eed655a0fd733b3d",
+    "run": 37876452299,
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/37876452299",
+    "artifactId": 11592397934,
+    "zipSha256": "17a04a6ad73fd07e49bda0980987317d53d58ea2fc65044b80f9ee3b48ecedf0",
+    "tarSha256": "e3bfc8e2b177ffd9c8fca41ffc8df4b1105bc1442c1d9973188cbd6bc85bd112",
+    "measuredProcesses": 0,
+    "result": "global pilot barrier rejected two common warmup plans"
+  },
+  "environment": {
+    "date": "2026-10-09",
+    "node": "22.23.3",
+    "bun": "1.4.2",
+    "os": "Linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC 7763 64-Core Processor",
+    "logicalCpus": 4
+  },
+  "builds": {
+    "baseline": {
+      "sourceSha256": "5e48dceb8beb75a0eaab76a1211f17350cbe97793bac238c9b19d4218a1745b7",
+      "distInventorySha256": "472d1c7a1a9889887f95a188da6b0da9e937df2c31a2912c0e3406acf0e47ec5",
+      "wasmInventorySha256": "2c6e9794a86136f8e26461f119508ebc43f341c41472c60d037bf687b94fcccd",
+      "coreWasm": {
+        "path": "persistent-core.wasm",
+        "bytes": 26118,
+        "sha256": "b4c1f8d06d67abb2ff77fd615d92831ebb6a317cd2e4d8432a2bb09896100ed4"
+      },
+      "publicEntry": "bf206ed59f2b426a9e5cfca9200e1e5a593bd82445290805b04450faeb6c7292"
+    },
+    "candidate": {
+      "sourceSha256": "af17bb3edba0a71a1735e79531d27b7c4ba7fe10529148423f0de32f8cda587d",
+      "distInventorySha256": "da4b38859c62b73a95b0d7b98641fa082364479b5dc2ddc09c1809435ebdbc93",
+      "wasmInventorySha256": "98c36e1ca532dbb1383e8ac7eebd4e748d4b361586d9e4be0c17a0e44317ee98",
+      "coreWasm": {
+        "path": "persistent-core.wasm",
+        "bytes": 26180,
+        "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+      },
+      "publicEntry": "47144d973c59a74fb7f5b881d86b9e1c106847d7db78ebadb266512b7952d091"
+    }
+  },
+  "audit": {
+    "checks": 568476,
+    "discrepancies": 0,
+    "pilotProcesses": 40,
+    "measuredProcesses": 640,
+    "measuredBatches": 13440,
+    "usableCells": 20,
+    "aaDriftCells": 0,
+    "floorMisses": 0,
+    "calibrationExceptions": 0,
+    "materialGains": 5,
+    "withinMargin": 10,
+    "inconclusive": 5
+  },
+  "inputFiles": {
+    "independent-audit.md": {
+      "bytes": 17036,
+      "sha256": "7626756a5b9c8429fe8f762bd2779ffa88ec91167c1b2bb856613607603ede36"
+    },
+    "independent-audit.json": {
+      "bytes": 1809632,
+      "sha256": "901370c8e76a66fbce67d50fb4c7d935ada9aa9123e49d578013589878f36e24"
+    },
+    "independent-audit-manifest.json": {
+      "bytes": 1029399,
+      "sha256": "4770c4380c1d40d6aa257666dc4f54097d6196cc613e495d4cfaea22cde16c41"
+    },
+    "recomputed-cells.csv": {
+      "bytes": 8873,
+      "sha256": "28f700cb540217c7b74934318fdc852c6b91679da6d8dfff79366e81a6b35830"
+    },
+    "recomputed-cells.json": {
+      "bytes": 872226,
+      "sha256": "3b70fc7c3f45718e90e69fc863ee87a7560d64268f0359cb973b541304c2e229"
+    },
+    "recomputed-processes.csv": {
+      "bytes": 315630,
+      "sha256": "821e2eb3dafe5427a1b27f31688af00df95dd516472cfcccae3ce7122935e4d5"
+    },
+    "arena-observations.json": {
+      "bytes": 39868,
+      "sha256": "48f031f3104f19030a8cb58b9a3709b12ae76267772425a41a1cd962d48cbfc1"
+    },
+    "audit.py": {
+      "bytes": 71627,
+      "sha256": "8b1c2b9d3c996e9fa09ad5f9755451078ae151a5cf11559bcba1acd1d2d7dac9"
+    },
+    "render_audit.py": {
+      "bytes": 17677,
+      "sha256": "6a0c93fc46b666ec63f37316f9c1cd06161b762b7bde9963a85e4dc6c5e8a755"
+    },
+    "campaign-observations.json": {
+      "bytes": 250,
+      "sha256": "01205323c44a89b40d383a6b2ccf1198a454177e6265c1b2e87fc6a2fb6b6657"
+    },
+    "archive-verification.json": {
+      "bytes": 542,
+      "sha256": "d717f0de332df0f2e5dc102893cb361bd2b55c6281330db12b07c96610c230bd"
+    },
+    "artifacts.json": {
+      "bytes": 861,
+      "sha256": "c083a71278db5fb628d7ef67e957ae2532ee5ad9ac0f23c189e1cbeb52ea2c60"
+    },
+    "run.json": {
+      "bytes": 13634,
+      "sha256": "596d01b7965bd77a395a416ed332918dd6157c0cc3d6d786380567b8502ef2ae"
+    },
+    "remote-git-commit.json": {
+      "bytes": 1350,
+      "sha256": "717261c7a3a43504e694a47d4a85a3bd6f4a36a59b8c2bf4c48f714f290659df"
+    },
+    "workflow-job.log": {
+      "bytes": 295386,
+      "sha256": "c743a859665a4ba0fd5d5b0383da0cbe8b470611bf9ec1024040906b72c759b2"
+    },
+    "first-study/independent-audit.md": {
+      "bytes": 10042,
+      "sha256": "2e3a924a268ebfb22127c631f49228f0e0c1f74c62cf2c8107af755848f5a4e9"
+    },
+    "first-study/independent-audit.json": {
+      "bytes": 62603,
+      "sha256": "76e840f2c4dcc37dc1aca7a358aa0f78585189d3b955c2475e4b1adec0d0ae26"
+    },
+    "first-study/independent-audit-manifest.json": {
+      "bytes": 953,
+      "sha256": "31677f5ae5e85a89f4b15bc0c975143f02bf1f42ce802e4ff82d1c7d9e56ac00"
+    }
+  },
+  "retainedFiles": {
+    "arena-observations.json": {
+      "bytes": 39868,
+      "sha256": "48f031f3104f19030a8cb58b9a3709b12ae76267772425a41a1cd962d48cbfc1"
+    },
+    "cells.csv": {
+      "bytes": 8852,
+      "sha256": "ce8dbcdfa861c8a8318e6f7ade85a3bedc01a903c4dd718d6c928057ad3c9c4c"
+    },
+    "processes.csv": {
+      "bytes": 314989,
+      "sha256": "63786ae2fef6e9211fc5fd74e9994470fcd4a67c03b00f293e044f381d087d98"
+    }
+  },
+  "limits": [
+    "One x64 host; ARM and browser performance unmeasured",
+    "Pointwise intervals; no claim of simultaneous coverage across all cells",
+    "Used arena bytes and backing capacity do not measure reachable retention or isolated RSS",
+    "Original executable/compiler bytes and temporary neutral package copies are represented by receipts rather than retained bytes"
+  ],
+  "sourceInventoryMeaning": "Full measured checkout inventory, including proof and documentation files; not the forthcoming PR tree.",
+  "retainedCopyFormat": "CSV record line endings are normalized from CRLF to LF for repository whitespace checks. All fields and numeric strings are unchanged. Original input hashes remain recorded above; original audit files remain untouched."
+}

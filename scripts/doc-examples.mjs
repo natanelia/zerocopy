@@ -8,9 +8,14 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 /** Read one named code fence from the documentation, rejecting duplicate markers. */
 export function extract(file, name, language) {
   const text = readFileSync(resolve(root, file), 'utf8');
+  return extractText(text, name, language, file);
+}
+
+/** Keep marker/language validation identical for script and HTML examples. */
+export function extractText(text, name, language, file = 'Markdown') {
   const marker = `<!-- example: ${name} -->`;
   assert.equal(text.split(marker).length, 2, `${file}: expected one ${name} example`);
-  const block = text.slice(text.indexOf(marker) + marker.length).match(/^\s*```(ts|js)\r?\n([\s\S]*?)\r?\n```/);
+  const block = text.slice(text.indexOf(marker) + marker.length).match(/^\s*```(ts|js|html)\r?\n([\s\S]*?)\r?\n```/);
   assert.ok(block && block[1] === language, `${file}: missing ${language} fence after ${name}`);
   return block[2];
 }

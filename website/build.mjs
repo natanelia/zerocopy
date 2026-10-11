@@ -52,7 +52,7 @@ const demoScripts = new Map([
 ]);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
-  for (const file of scripts) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
+  for (const file of [...scripts, 'search.mjs']) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
   cpSync(join(out, 'library'), join(out, route, 'library'), { recursive: true });
   if (scripts.includes('immutable-storage.mjs') || scripts.includes('bench-maps.mjs')) cpSync(join(out, 'vendor'), join(out, route, 'vendor'), { recursive: true });
 }
@@ -89,7 +89,8 @@ for (const page of pages) {
   const { toc } = rendered;
   writePage(`docs/${page.slug}/`, page.title, page.description, docsLayout(page, html, toc, pages, base, sha));
   mkdirSync(join(out, 'markdown'), { recursive: true }); writeFileSync(join(out, 'markdown', `${page.slug}.md`), source);
-  search.push({ title: page.title, description: page.description, route: `docs/${page.slug}/`, text: source.replace(/<!--.*?-->/gs, '').replace(/[`#*]/g, '').slice(0, 28000) });
+  for (const section of rendered.sections) search.push({ title: page.title, description: page.description,
+    heading: section.title, context: section.context, route: `docs/${page.slug}/${section.id ? '#' + section.id : ''}`, text: section.text });
 }
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
 writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));

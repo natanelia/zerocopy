@@ -4,6 +4,7 @@ The [README](../README.md#performance) compares zerocopy with Immutable.js and n
 
 | Report | Comparison |
 | --- | --- |
+| [Heap insertion allocation](heap-insert-allocation.md) | Avoid one discarded node on priority promotion; x64 Node/Bun results with five uncertain controls, October 9, 2026 |
 | [UTF-8 value writes](utf8-write-performance.md) | Reuse a portable encoding buffer; matched Node and Bun rounds, October 7, 2026 |
 | [Scalar map writes](map-set-performance.md) | Three libraries and a paired writer-index experiment, September 14, 2026 |
 | [Revision performance](revision-performance.md) | Block-storage revision against earlier zerocopy versions, September 13, 2026 |

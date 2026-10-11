@@ -65,8 +65,15 @@ test('all static pages have metadata, one main heading, and functioning internal
 });
 test('docs are prerendered and search points to generated pages', () => {
   const index = JSON.parse(readFileSync(join(out, 'search.json'), 'utf8'));
-  assert.equal(index.length, pages.length);
-  for (const page of index) { assert.ok(existsSync(join(out, page.route, 'index.html'))); assert.ok(page.text.length > 100); }
+  assert.equal(index.filter(entry => !entry.heading).length, pages.length);
+  assert.ok(index.length > pages.length);
+  for (const page of index) {
+    const [route, fragment] = page.route.split('#');
+    const file = join(out, route, 'index.html');
+    assert.ok(existsSync(file));
+    if (fragment) assert.ok(readFileSync(file, 'utf8').includes(`id="${fragment}"`));
+    assert.equal(typeof page.text, 'string');
+  }
   assert.ok(readFileSync(join(out, 'docs/collections/index.html'), 'utf8').includes('SharedMap'));
 });
 test('the first screen sells direct reads, not mandatory tasks or invented results', () => {
@@ -91,6 +98,7 @@ test('demo workers and all runtime modules stay inside the automatic isolation s
     assert.ok(existsSync(join(out, route, 'assets', worker)));
     assert.ok(existsSync(join(out, route, 'isolation-sw.js')));
     assert.ok(existsSync(join(out, route, 'assets/isolation.mjs')));
+    assert.ok(existsSync(join(out, route, 'assets/search.mjs')));
     assert.ok(!html.includes('Enable shared memory &amp; reload'));
     assert.ok(!html.includes('Enable shared memory & reload'));
     assert.equal(readFileSync(join(out, route, 'library/shared.js'), 'utf8'), readFileSync(join(out, 'library/shared.js'), 'utf8'));

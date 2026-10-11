@@ -98,7 +98,7 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
   }
   private commit(): number {
     this.assertOpen();
-    if (this.depth || same(this.state!, this.published!)) return this.sequence;
+    if (this.depth || this.state === this.published || same(this.state!, this.published!)) return this.sequence;
     if (this.sequence === Number.MAX_SAFE_INTEGER) throw new RangeError('Session version exhausted');
     const committed = this.state!;
     this.published = committed;

@@ -1,0 +1,1527 @@
+{
+  "note": "Used arena bytes and reserved backing capacity are separate from latency. Process memory snapshots do not identify an isolated RSS effect. No retention or general application memory inference is made.",
+  "measured": [
+    {
+      "runtime": "bun",
+      "case": "empty-single-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 8709536,
+        "median": 8709536.0,
+        "max": 8709536
+      },
+      "finalUsedBytes": {
+        "min": 8775072,
+        "median": 8775072.0,
+        "max": 8775072
+      },
+      "reservedBackingBytes": {
+        "min": 8781824,
+        "median": 8781824.0,
+        "max": 8781824
+      },
+      "capacityGrowthBytes": {
+        "min": 8650752,
+        "median": 8650752.0,
+        "max": 8650752
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "empty-single-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 8709536,
+        "median": 8709536.0,
+        "max": 8709536
+      },
+      "finalUsedBytes": {
+        "min": 8775072,
+        "median": 8775072.0,
+        "max": 8775072
+      },
+      "reservedBackingBytes": {
+        "min": 8781824,
+        "median": 8781824.0,
+        "max": 8781824
+      },
+      "capacityGrowthBytes": {
+        "min": 8650752,
+        "median": 8650752.0,
+        "max": 8650752
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "max-random-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 37683360,
+        "median": 37683360.0,
+        "max": 37683360
+      },
+      "finalUsedBytes": {
+        "min": 37748896,
+        "median": 37748896.0,
+        "max": 37748896
+      },
+      "reservedBackingBytes": {
+        "min": 37814272,
+        "median": 37814272.0,
+        "max": 37814272
+      },
+      "capacityGrowthBytes": {
+        "min": 37683200,
+        "median": 37683200.0,
+        "max": 37683200
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "max-random-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 35414496,
+        "median": 35414496.0,
+        "max": 35414496
+      },
+      "finalUsedBytes": {
+        "min": 35480032,
+        "median": 35480032.0,
+        "max": 35480032
+      },
+      "reservedBackingBytes": {
+        "min": 35520512,
+        "median": 35520512.0,
+        "max": 35520512
+      },
+      "capacityGrowthBytes": {
+        "min": 35389440,
+        "median": 35389440.0,
+        "max": 35389440
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-4096-full-entries",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "finalUsedBytes": {
+        "min": 1066720,
+        "median": 1066720.0,
+        "max": 1066720
+      },
+      "reservedBackingBytes": {
+        "min": 1114112,
+        "median": 1114112.0,
+        "max": 1114112
+      },
+      "capacityGrowthBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-4096-full-entries",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "finalUsedBytes": {
+        "min": 1066720,
+        "median": 1066720.0,
+        "max": 1066720
+      },
+      "reservedBackingBytes": {
+        "min": 1114112,
+        "median": 1114112.0,
+        "max": 1114112
+      },
+      "capacityGrowthBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-4096-pop-256",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 56040512,
+        "median": 56040512.0,
+        "max": 56040512
+      },
+      "finalUsedBytes": {
+        "min": 57107232,
+        "median": 57107232.0,
+        "max": 57107232
+      },
+      "reservedBackingBytes": {
+        "min": 57147392,
+        "median": 57147392.0,
+        "max": 57147392
+      },
+      "capacityGrowthBytes": {
+        "min": 56033280,
+        "median": 56033280.0,
+        "max": 56033280
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-4096-pop-256",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 56040512,
+        "median": 56040512.0,
+        "max": 56040512
+      },
+      "finalUsedBytes": {
+        "min": 57107232,
+        "median": 57107232.0,
+        "max": 57107232
+      },
+      "reservedBackingBytes": {
+        "min": 57147392,
+        "median": 57147392.0,
+        "max": 57147392
+      },
+      "capacityGrowthBytes": {
+        "min": 56033280,
+        "median": 56033280.0,
+        "max": 56033280
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-improving-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 17037280,
+        "median": 17037280.0,
+        "max": 17037280
+      },
+      "finalUsedBytes": {
+        "min": 17102816,
+        "median": 17102816.0,
+        "max": 17102816
+      },
+      "reservedBackingBytes": {
+        "min": 17104896,
+        "median": 17104896.0,
+        "max": 17104896
+      },
+      "capacityGrowthBytes": {
+        "min": 16973824,
+        "median": 16973824.0,
+        "max": 16973824
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-improving-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 8519680,
+        "median": 8519680.0,
+        "max": 8519680
+      },
+      "finalUsedBytes": {
+        "min": 8585216,
+        "median": 8585216.0,
+        "max": 8585216
+      },
+      "reservedBackingBytes": {
+        "min": 8585216,
+        "median": 8585216.0,
+        "max": 8585216
+      },
+      "capacityGrowthBytes": {
+        "min": 8454144,
+        "median": 8454144.0,
+        "max": 8454144
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-random-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 37043808,
+        "median": 37043808.0,
+        "max": 37043808
+      },
+      "finalUsedBytes": {
+        "min": 37109344,
+        "median": 37109344.0,
+        "max": 37109344
+      },
+      "reservedBackingBytes": {
+        "min": 37158912,
+        "median": 37158912.0,
+        "max": 37158912
+      },
+      "capacityGrowthBytes": {
+        "min": 37027840,
+        "median": 37027840.0,
+        "max": 37027840
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-random-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 34923264,
+        "median": 34923264.0,
+        "max": 34923264
+      },
+      "finalUsedBytes": {
+        "min": 34988800,
+        "median": 34988800.0,
+        "max": 34988800
+      },
+      "reservedBackingBytes": {
+        "min": 34996224,
+        "median": 34996224.0,
+        "max": 34996224
+      },
+      "capacityGrowthBytes": {
+        "min": 34865152,
+        "median": 34865152.0,
+        "max": 34865152
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-worsening-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 44709440,
+        "median": 44709440.0,
+        "max": 44709440
+      },
+      "finalUsedBytes": {
+        "min": 44774976,
+        "median": 44774976.0,
+        "max": 44774976
+      },
+      "reservedBackingBytes": {
+        "min": 44826624,
+        "median": 44826624.0,
+        "max": 44826624
+      },
+      "capacityGrowthBytes": {
+        "min": 44695552,
+        "median": 44695552.0,
+        "max": 44695552
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "min-worsening-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 44709440,
+        "median": 44709440.0,
+        "max": 44709440
+      },
+      "finalUsedBytes": {
+        "min": 44774976,
+        "median": 44774976.0,
+        "max": 44774976
+      },
+      "reservedBackingBytes": {
+        "min": 44826624,
+        "median": 44826624.0,
+        "max": 44826624
+      },
+      "capacityGrowthBytes": {
+        "min": 44695552,
+        "median": 44695552.0,
+        "max": 44695552
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-list-push",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 18044216,
+        "median": 18044216.0,
+        "max": 18044216
+      },
+      "finalUsedBytes": {
+        "min": 18109760,
+        "median": 18109760.0,
+        "max": 18109760
+      },
+      "reservedBackingBytes": {
+        "min": 18153472,
+        "median": 18153472.0,
+        "max": 18153472
+      },
+      "capacityGrowthBytes": {
+        "min": 18022400,
+        "median": 18022400.0,
+        "max": 18022400
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-list-push",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 18044216,
+        "median": 18044216.0,
+        "max": 18044216
+      },
+      "finalUsedBytes": {
+        "min": 18109760,
+        "median": 18109760.0,
+        "max": 18109760
+      },
+      "reservedBackingBytes": {
+        "min": 18153472,
+        "median": 18153472.0,
+        "max": 18153472
+      },
+      "capacityGrowthBytes": {
+        "min": 18022400,
+        "median": 18022400.0,
+        "max": 18022400
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-map-set-number",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 25998280,
+        "median": 25998280.0,
+        "max": 25998280
+      },
+      "finalUsedBytes": {
+        "min": 26063844,
+        "median": 26063844.0,
+        "max": 26063844
+      },
+      "reservedBackingBytes": {
+        "min": 26083328,
+        "median": 26083328.0,
+        "max": 26083328
+      },
+      "capacityGrowthBytes": {
+        "min": 25952256,
+        "median": 25952256.0,
+        "max": 25952256
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-map-set-number",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 25998280,
+        "median": 25998280.0,
+        "max": 25998280
+      },
+      "finalUsedBytes": {
+        "min": 26063844,
+        "median": 26063844.0,
+        "max": 26063844
+      },
+      "reservedBackingBytes": {
+        "min": 26083328,
+        "median": 26083328.0,
+        "max": 26083328
+      },
+      "capacityGrowthBytes": {
+        "min": 25952256,
+        "median": 25952256.0,
+        "max": 25952256
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-tied-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 15743168,
+        "median": 15743168.0,
+        "max": 15743168
+      },
+      "finalUsedBytes": {
+        "min": 15808736,
+        "median": 15808736.0,
+        "max": 15808736
+      },
+      "reservedBackingBytes": {
+        "min": 15859712,
+        "median": 15859712.0,
+        "max": 15859712
+      },
+      "capacityGrowthBytes": {
+        "min": 15728640,
+        "median": 15728640.0,
+        "max": 15728640
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "bun",
+      "case": "singleton-tied-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 15743168,
+        "median": 15743168.0,
+        "max": 15743168
+      },
+      "finalUsedBytes": {
+        "min": 15808736,
+        "median": 15808736.0,
+        "max": 15808736
+      },
+      "reservedBackingBytes": {
+        "min": 15859712,
+        "median": 15859712.0,
+        "max": 15859712
+      },
+      "capacityGrowthBytes": {
+        "min": 15728640,
+        "median": 15728640.0,
+        "max": 15728640
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "empty-single-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 13245952,
+        "median": 13245952.0,
+        "max": 13245952
+      },
+      "finalUsedBytes": {
+        "min": 13311488,
+        "median": 13311488.0,
+        "max": 13311488
+      },
+      "reservedBackingBytes": {
+        "min": 13369344,
+        "median": 13369344.0,
+        "max": 13369344
+      },
+      "capacityGrowthBytes": {
+        "min": 13238272,
+        "median": 13238272.0,
+        "max": 13238272
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "empty-single-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 13245952,
+        "median": 13245952.0,
+        "max": 13245952
+      },
+      "finalUsedBytes": {
+        "min": 13311488,
+        "median": 13311488.0,
+        "max": 13311488
+      },
+      "reservedBackingBytes": {
+        "min": 13369344,
+        "median": 13369344.0,
+        "max": 13369344
+      },
+      "capacityGrowthBytes": {
+        "min": 13238272,
+        "median": 13238272.0,
+        "max": 13238272
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "max-random-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 48312000,
+        "median": 48312000.0,
+        "max": 48312000
+      },
+      "finalUsedBytes": {
+        "min": 48377536,
+        "median": 48377536.0,
+        "max": 48377536
+      },
+      "reservedBackingBytes": {
+        "min": 48431104,
+        "median": 48431104.0,
+        "max": 48431104
+      },
+      "capacityGrowthBytes": {
+        "min": 48300032,
+        "median": 48300032.0,
+        "max": 48300032
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "max-random-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 45403200,
+        "median": 45403200.0,
+        "max": 45403200
+      },
+      "finalUsedBytes": {
+        "min": 45468736,
+        "median": 45468736.0,
+        "max": 45468736
+      },
+      "reservedBackingBytes": {
+        "min": 45481984,
+        "median": 45481984.0,
+        "max": 45481984
+      },
+      "capacityGrowthBytes": {
+        "min": 45350912,
+        "median": 45350912.0,
+        "max": 45350912
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-4096-full-entries",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "finalUsedBytes": {
+        "min": 1066720,
+        "median": 1066720.0,
+        "max": 1066720
+      },
+      "reservedBackingBytes": {
+        "min": 1114112,
+        "median": 1114112.0,
+        "max": 1114112
+      },
+      "capacityGrowthBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-4096-full-entries",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "finalUsedBytes": {
+        "min": 1066720,
+        "median": 1066720.0,
+        "max": 1066720
+      },
+      "reservedBackingBytes": {
+        "min": 1114112,
+        "median": 1114112.0,
+        "max": 1114112
+      },
+      "capacityGrowthBytes": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-4096-pop-256",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 54157728,
+        "median": 54157728.0,
+        "max": 54157728
+      },
+      "finalUsedBytes": {
+        "min": 55224448,
+        "median": 55224448.0,
+        "max": 55224448
+      },
+      "reservedBackingBytes": {
+        "min": 55246848,
+        "median": 55246848.0,
+        "max": 55246848
+      },
+      "capacityGrowthBytes": {
+        "min": 54132736,
+        "median": 54132736.0,
+        "max": 54132736
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-4096-pop-256",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 54157728,
+        "median": 54157728.0,
+        "max": 54157728
+      },
+      "finalUsedBytes": {
+        "min": 55224448,
+        "median": 55224448.0,
+        "max": 55224448
+      },
+      "reservedBackingBytes": {
+        "min": 55246848,
+        "median": 55246848.0,
+        "max": 55246848
+      },
+      "capacityGrowthBytes": {
+        "min": 54132736,
+        "median": 54132736.0,
+        "max": 54132736
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-improving-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 30404992,
+        "median": 30404992.0,
+        "max": 30404992
+      },
+      "finalUsedBytes": {
+        "min": 30470528,
+        "median": 30470528.0,
+        "max": 30470528
+      },
+      "reservedBackingBytes": {
+        "min": 30474240,
+        "median": 30474240.0,
+        "max": 30474240
+      },
+      "capacityGrowthBytes": {
+        "min": 30343168,
+        "median": 30343168.0,
+        "max": 30343168
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-improving-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 15204352,
+        "median": 15204352.0,
+        "max": 15204352
+      },
+      "finalUsedBytes": {
+        "min": 15269888,
+        "median": 15269888.0,
+        "max": 15269888
+      },
+      "reservedBackingBytes": {
+        "min": 15269888,
+        "median": 15269888.0,
+        "max": 15269888
+      },
+      "capacityGrowthBytes": {
+        "min": 15138816,
+        "median": 15138816.0,
+        "max": 15138816
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-random-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 50059200,
+        "median": 50059200.0,
+        "max": 50059200
+      },
+      "finalUsedBytes": {
+        "min": 50124736,
+        "median": 50124736.0,
+        "max": 50124736
+      },
+      "reservedBackingBytes": {
+        "min": 50135040,
+        "median": 50135040.0,
+        "max": 50135040
+      },
+      "capacityGrowthBytes": {
+        "min": 50003968,
+        "median": 50003968.0,
+        "max": 50003968
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-random-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 47193600,
+        "median": 47193600.0,
+        "max": 47193600
+      },
+      "finalUsedBytes": {
+        "min": 47259136,
+        "median": 47259136.0,
+        "max": 47259136
+      },
+      "reservedBackingBytes": {
+        "min": 47316992,
+        "median": 47316992.0,
+        "max": 47316992
+      },
+      "capacityGrowthBytes": {
+        "min": 47185920,
+        "median": 47185920.0,
+        "max": 47185920
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-worsening-4096-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 54805120,
+        "median": 54805120.0,
+        "max": 54805120
+      },
+      "finalUsedBytes": {
+        "min": 54870656,
+        "median": 54870656.0,
+        "max": 54870656
+      },
+      "reservedBackingBytes": {
+        "min": 54919168,
+        "median": 54919168.0,
+        "max": 54919168
+      },
+      "capacityGrowthBytes": {
+        "min": 54788096,
+        "median": 54788096.0,
+        "max": 54788096
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "min-worsening-4096-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 54805120,
+        "median": 54805120.0,
+        "max": 54805120
+      },
+      "finalUsedBytes": {
+        "min": 54870656,
+        "median": 54870656.0,
+        "max": 54870656
+      },
+      "reservedBackingBytes": {
+        "min": 54919168,
+        "median": 54919168.0,
+        "max": 54919168
+      },
+      "capacityGrowthBytes": {
+        "min": 54788096,
+        "median": 54788096.0,
+        "max": 54788096
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-list-push",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 9102312,
+        "median": 9102312.0,
+        "max": 9102312
+      },
+      "finalUsedBytes": {
+        "min": 9167856,
+        "median": 9167856.0,
+        "max": 9167856
+      },
+      "reservedBackingBytes": {
+        "min": 9175040,
+        "median": 9175040.0,
+        "max": 9175040
+      },
+      "capacityGrowthBytes": {
+        "min": 9043968,
+        "median": 9043968.0,
+        "max": 9043968
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-list-push",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 9102312,
+        "median": 9102312.0,
+        "max": 9102312
+      },
+      "finalUsedBytes": {
+        "min": 9167856,
+        "median": 9167856.0,
+        "max": 9167856
+      },
+      "reservedBackingBytes": {
+        "min": 9175040,
+        "median": 9175040.0,
+        "max": 9175040
+      },
+      "capacityGrowthBytes": {
+        "min": 9043968,
+        "median": 9043968.0,
+        "max": 9043968
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-map-set-number",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 13613656,
+        "median": 13613656.0,
+        "max": 13613656
+      },
+      "finalUsedBytes": {
+        "min": 13679220,
+        "median": 13679220.0,
+        "max": 13679220
+      },
+      "reservedBackingBytes": {
+        "min": 13697024,
+        "median": 13697024.0,
+        "max": 13697024
+      },
+      "capacityGrowthBytes": {
+        "min": 13565952,
+        "median": 13565952.0,
+        "max": 13565952
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-map-set-number",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 13613656,
+        "median": 13613656.0,
+        "max": 13613656
+      },
+      "finalUsedBytes": {
+        "min": 13679220,
+        "median": 13679220.0,
+        "max": 13679220
+      },
+      "reservedBackingBytes": {
+        "min": 13697024,
+        "median": 13697024.0,
+        "max": 13697024
+      },
+      "capacityGrowthBytes": {
+        "min": 13565952,
+        "median": 13565952.0,
+        "max": 13565952
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-tied-enqueue",
+      "build": "baseline",
+      "batches": 504,
+      "usedDeltaBytes": {
+        "min": 22998016,
+        "median": 22998016.0,
+        "max": 22998016
+      },
+      "finalUsedBytes": {
+        "min": 23063584,
+        "median": 23063584.0,
+        "max": 23063584
+      },
+      "reservedBackingBytes": {
+        "min": 23068672,
+        "median": 23068672.0,
+        "max": 23068672
+      },
+      "capacityGrowthBytes": {
+        "min": 22937600,
+        "median": 22937600.0,
+        "max": 22937600
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    },
+    {
+      "runtime": "node",
+      "case": "singleton-tied-enqueue",
+      "build": "candidate",
+      "batches": 168,
+      "usedDeltaBytes": {
+        "min": 22998016,
+        "median": 22998016.0,
+        "max": 22998016
+      },
+      "finalUsedBytes": {
+        "min": 23063584,
+        "median": 23063584.0,
+        "max": 23063584
+      },
+      "reservedBackingBytes": {
+        "min": 23068672,
+        "median": 23068672.0,
+        "max": 23068672
+      },
+      "capacityGrowthBytes": {
+        "min": 22937600,
+        "median": 22937600.0,
+        "max": 22937600
+      },
+      "interpretation": "Arena used and reserved bytes only. Process memory snapshots are not isolated RSS effects."
+    }
+  ],
+  "untimedTwoIterationFixtures": [
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "min-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2067904,
+      "usedDeltaBytes": 2002368,
+      "reservedBackingBytes": 2097152,
+      "growthBytes": 1966080
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "max-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1998016,
+      "usedDeltaBytes": 1932480,
+      "reservedBackingBytes": 2031616,
+      "growthBytes": 1900544
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "min-improving-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 589760,
+      "usedDeltaBytes": 524224,
+      "reservedBackingBytes": 589824,
+      "growthBytes": 458752
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "empty-single-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 65600,
+      "usedDeltaBytes": 64,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "singleton-tied-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65568,
+      "finalUsedBytes": 65696,
+      "usedDeltaBytes": 128,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "min-worsening-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2950016,
+      "usedDeltaBytes": 2884480,
+      "reservedBackingBytes": 3014656,
+      "growthBytes": 2883584
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "min-4096-pop-256",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1288224,
+      "usedDeltaBytes": 221504,
+      "reservedBackingBytes": 1310720,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "min-4096-full-entries",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1066720,
+      "usedDeltaBytes": 0,
+      "reservedBackingBytes": 1114112,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "singleton-map-set-number",
+      "repeats": 2,
+      "initialUsedBytes": 65564,
+      "finalUsedBytes": 65620,
+      "usedDeltaBytes": 56,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "baseline",
+      "case": "singleton-list-push",
+      "repeats": 2,
+      "initialUsedBytes": 65544,
+      "finalUsedBytes": 65568,
+      "usedDeltaBytes": 24,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "min-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1953280,
+      "usedDeltaBytes": 1887744,
+      "reservedBackingBytes": 1966080,
+      "growthBytes": 1835008
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "max-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1881664,
+      "usedDeltaBytes": 1816128,
+      "reservedBackingBytes": 1900544,
+      "growthBytes": 1769472
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "min-improving-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 327680,
+      "usedDeltaBytes": 262144,
+      "reservedBackingBytes": 327680,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "empty-single-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 65600,
+      "usedDeltaBytes": 64,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "singleton-tied-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65568,
+      "finalUsedBytes": 65696,
+      "usedDeltaBytes": 128,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "min-worsening-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2950016,
+      "usedDeltaBytes": 2884480,
+      "reservedBackingBytes": 3014656,
+      "growthBytes": 2883584
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "min-4096-pop-256",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1288224,
+      "usedDeltaBytes": 221504,
+      "reservedBackingBytes": 1310720,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "min-4096-full-entries",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1066720,
+      "usedDeltaBytes": 0,
+      "reservedBackingBytes": 1114112,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "singleton-map-set-number",
+      "repeats": 2,
+      "initialUsedBytes": 65564,
+      "finalUsedBytes": 65620,
+      "usedDeltaBytes": 56,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "bun",
+      "build": "candidate",
+      "case": "singleton-list-push",
+      "repeats": 2,
+      "initialUsedBytes": 65544,
+      "finalUsedBytes": 65568,
+      "usedDeltaBytes": 24,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "min-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2067904,
+      "usedDeltaBytes": 2002368,
+      "reservedBackingBytes": 2097152,
+      "growthBytes": 1966080
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "max-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1998016,
+      "usedDeltaBytes": 1932480,
+      "reservedBackingBytes": 2031616,
+      "growthBytes": 1900544
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "min-improving-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 589760,
+      "usedDeltaBytes": 524224,
+      "reservedBackingBytes": 589824,
+      "growthBytes": 458752
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "empty-single-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 65600,
+      "usedDeltaBytes": 64,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "singleton-tied-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65568,
+      "finalUsedBytes": 65696,
+      "usedDeltaBytes": 128,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "min-worsening-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2950016,
+      "usedDeltaBytes": 2884480,
+      "reservedBackingBytes": 3014656,
+      "growthBytes": 2883584
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "min-4096-pop-256",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1288224,
+      "usedDeltaBytes": 221504,
+      "reservedBackingBytes": 1310720,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "min-4096-full-entries",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1066720,
+      "usedDeltaBytes": 0,
+      "reservedBackingBytes": 1114112,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "singleton-map-set-number",
+      "repeats": 2,
+      "initialUsedBytes": 65564,
+      "finalUsedBytes": 65620,
+      "usedDeltaBytes": 56,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "baseline",
+      "case": "singleton-list-push",
+      "repeats": 2,
+      "initialUsedBytes": 65544,
+      "finalUsedBytes": 65568,
+      "usedDeltaBytes": 24,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "min-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1953280,
+      "usedDeltaBytes": 1887744,
+      "reservedBackingBytes": 1966080,
+      "growthBytes": 1835008
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "max-random-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 1881664,
+      "usedDeltaBytes": 1816128,
+      "reservedBackingBytes": 1900544,
+      "growthBytes": 1769472
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "min-improving-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 327680,
+      "usedDeltaBytes": 262144,
+      "reservedBackingBytes": 327680,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "empty-single-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 65600,
+      "usedDeltaBytes": 64,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "singleton-tied-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65568,
+      "finalUsedBytes": 65696,
+      "usedDeltaBytes": 128,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "min-worsening-4096-enqueue",
+      "repeats": 2,
+      "initialUsedBytes": 65536,
+      "finalUsedBytes": 2950016,
+      "usedDeltaBytes": 2884480,
+      "reservedBackingBytes": 3014656,
+      "growthBytes": 2883584
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "min-4096-pop-256",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1288224,
+      "usedDeltaBytes": 221504,
+      "reservedBackingBytes": 1310720,
+      "growthBytes": 196608
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "min-4096-full-entries",
+      "repeats": 2,
+      "initialUsedBytes": 1066720,
+      "finalUsedBytes": 1066720,
+      "usedDeltaBytes": 0,
+      "reservedBackingBytes": 1114112,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "singleton-map-set-number",
+      "repeats": 2,
+      "initialUsedBytes": 65564,
+      "finalUsedBytes": 65620,
+      "usedDeltaBytes": 56,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    },
+    {
+      "runtime": "node",
+      "build": "candidate",
+      "case": "singleton-list-push",
+      "repeats": 2,
+      "initialUsedBytes": 65544,
+      "finalUsedBytes": 65568,
+      "usedDeltaBytes": 24,
+      "reservedBackingBytes": 131072,
+      "growthBytes": 0
+    }
+  ]
+}
