@@ -1,0 +1,19 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -324,6 +324,7 @@
+     this.assertWritable();
+     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+     let token = this.keys.get(key);
++    const cached = !!token;
+     if (!token) {
+       // Short ASCII keys need neither a TextEncoder allocation nor a JS byte
+       // copy. Their first immutable leaf becomes the key's interned byte token.
+@@ -353,7 +354,7 @@
+     else this.bytes.set(v!, valuePtr + prefix);
+     this.view.setUint32(p + 4, token.hash, true);
+     if (token.ptr === undefined) token.ptr = p + 16;
+-    this.rememberKey(key, token);
++    if (!cached) this.rememberKey(key, token);
+     return p;
+   }
+   setNumber(root: number, key: string, value: number, size: number): number {

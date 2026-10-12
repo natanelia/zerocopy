@@ -1,0 +1,1282 @@
+[
+  {
+    "id": "measure-bun-source-cached-object-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b0-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b0-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b0-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b0-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b0-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b0-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b0-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b0-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 0,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b1-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b1-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b1-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b1-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b1-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b1-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b1-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b1-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 1,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b2-s0-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b2-s1-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b2-s2-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b2-s3-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b2-s0-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 0,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b2-s1-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 1,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b2-s2-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 2,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b2-s3-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 2,
+    "slot": 3,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-primitive-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-primitive-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-primitive-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-primitive-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "primitive",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-fresh-import-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-fresh-import-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "fresh-import",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-cached-object-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-cached-object-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "cached-object",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-nested-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-nested-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-nested-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-nested-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "nested",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b3-s0-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b3-s1-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b3-s2-baseline",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-node-portable-saturated-miss-b3-s3-candidate",
+    "engine": "node-portable",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b3-s0-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 0,
+    "arm": "candidate"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b3-s1-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 1,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b3-s2-baseline",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 2,
+    "arm": "baseline"
+  },
+  {
+    "id": "measure-bun-source-saturated-miss-b3-s3-candidate",
+    "engine": "bun-source",
+    "endpoint": "saturated-miss",
+    "block": 3,
+    "slot": 3,
+    "arm": "candidate"
+  }
+]

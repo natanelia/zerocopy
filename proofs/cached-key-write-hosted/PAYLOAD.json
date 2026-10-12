@@ -1,0 +1,96 @@
+{
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "sourceTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "files": [
+    {
+      "path": ".github/workflows/cached-key-write-hosted.yml",
+      "bytes": 2651,
+      "sha256": "9c41e00837d0f95c27f42cc08d79e639f833743d02bdfbd962c9f2db57405cc7"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/COMMAND-PLAN.json",
+      "bytes": 46759,
+      "sha256": "6dc45bf5a781ba34027f9eef8af5d4f3daed2955091f9709ee3c4620cdbb46e3"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/CONFIG.json",
+      "bytes": 4750,
+      "sha256": "aef9043d027295c41c97aff66d548779ac7feb45667d3315de474e19a0c9192f"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/EXPECTED.json",
+      "bytes": 3205,
+      "sha256": "f6efd2237387ea71cc0af9930db60f43088e816336a784ce0d3a0c8e65a61cc8"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/METHOD.md",
+      "bytes": 14410,
+      "sha256": "26fe39dbe7faaf6f83dcd0eaa8c1aa85d6ea61c9ed5b879d02a6451039f54a38"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/README.md",
+      "bytes": 6859,
+      "sha256": "738175a03fa13952c1bae57c3f2e229a009784dc81ab7c1ca99c617c79ca2486"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/SCHEDULE.json",
+      "bytes": 29379,
+      "sha256": "ef3949834c3993032d4f40c1dffb876861fc125a56810a733de7d3ea48871179"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/SOURCE.json",
+      "bytes": 56404,
+      "sha256": "1d758b20045c2c72b0216e727dc17c1af6f7873968d44523e156efab26ca9770"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/analyze.py",
+      "bytes": 12538,
+      "sha256": "b8a9ae8092b85affd05a2b032e01d2dc0f475d9304910678d47fe3c86e129ac0"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/audit-emitted.py",
+      "bytes": 4069,
+      "sha256": "1235d7ee54ca9a361f282b93657114f0456a6f5a44581381746d100e806926c7"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/cached-key-correctness.mjs",
+      "bytes": 22290,
+      "sha256": "a276c44a87e51a1b0cfee96589a57409308387cc024fff7d2b58516bae9b4b80"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/cached-key-timing.mjs",
+      "bytes": 16370,
+      "sha256": "90ed8b656794fbfdf619cc44589e880fe88160d0d9a84616c1d3d0d24d1eab63"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/candidate.patch",
+      "bytes": 763,
+      "sha256": "8ee47ba3be76a583131e3e86e165b01302bbaaa40187f8e507e677b81aa8b777"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/hosted.py",
+      "bytes": 28351,
+      "sha256": "22cd90823023594ff5f60b481ed0a3e25b5143d74d5ffe84cf2489b0b041779f"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/reconcile.py",
+      "bytes": 6428,
+      "sha256": "754c7149d69b228fe1967dee972e0be4e2db74fd594b870acc6e4536c1c9bf9a"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/run-correctness.py",
+      "bytes": 10912,
+      "sha256": "f334dd1be5efacf9cc7990cef4b593b242785a3fb9a0118aa75387e26ef7d96b"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/run-timing.py",
+      "bytes": 31614,
+      "sha256": "aa122743157b7217149e7e9baff0490b7e9ca77a104b1366e735f7a545c6c2c0"
+    },
+    {
+      "path": "proofs/cached-key-write-hosted/supervise.py",
+      "bytes": 6856,
+      "sha256": "480b08c750351e02d6f9945801c5f3f6d94e9a044ee0037da4d9288567ce8f13"
+    }
+  ]
+}

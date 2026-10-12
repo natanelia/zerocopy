@@ -1,0 +1,1814 @@
+{
+  "wholeSeconds": 900,
+  "cleanupSeconds": 15,
+  "maximumChildren": 181,
+  "orderedSlots": [
+    {
+      "id": "smoke-bun-source-baseline",
+      "mode": "smoke",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": null,
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "smoke-bun-source-candidate",
+      "mode": "smoke",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": null,
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "smoke-node-portable-baseline",
+      "mode": "smoke",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": null,
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "smoke-node-portable-candidate",
+      "mode": "smoke",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": null,
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-cached-object-baseline",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-cached-object-candidate",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-cached-object-baseline",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-cached-object-candidate",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-nested-candidate",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-nested-baseline",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-nested-candidate",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-nested-baseline",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-saturated-miss-baseline",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-saturated-miss-candidate",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-saturated-miss-baseline",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-saturated-miss-candidate",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-primitive-candidate",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-node-portable-primitive-baseline",
+      "mode": "calibrate",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-primitive-candidate",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "calibrate-bun-source-primitive-baseline",
+      "mode": "calibrate",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 25,
+      "rssMiB": 1536,
+      "conditional": false
+    },
+    {
+      "id": "measure-bun-source-cached-object-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b0-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b0-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b0-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b0-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b0-s0-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b0-s1-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b0-s2-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b0-s3-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b0-s0-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b0-s1-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b0-s2-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b0-s3-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b1-s0-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b1-s1-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b1-s2-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b1-s3-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b1-s0-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b1-s1-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b1-s2-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b1-s3-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b1-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b1-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b1-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b1-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b2-s0-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b2-s1-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b2-s2-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b2-s3-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b2-s0-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b2-s1-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b2-s2-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b2-s3-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b2-s0-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b2-s1-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b2-s2-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b2-s3-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-primitive-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-primitive-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "primitive",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b3-s0-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b3-s1-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b3-s2-baseline",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-fresh-import-b3-s3-candidate",
+      "mode": "fresh",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b3-s0-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b3-s1-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b3-s2-baseline",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-fresh-import-b3-s3-candidate",
+      "mode": "fresh",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "fresh-import",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-cached-object-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-cached-object-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "cached-object",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-nested-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-nested-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "nested",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-node-portable-saturated-miss-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "node-portable",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b3-s0-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b3-s1-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b3-s2-baseline",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "baseline",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "measure-bun-source-saturated-miss-b3-s3-candidate",
+      "mode": "measure",
+      "engine": "bun-source",
+      "arm": "candidate",
+      "endpoint": "saturated-miss",
+      "seconds": 15,
+      "rssMiB": 1536,
+      "conditional": true
+    },
+    {
+      "id": "analyze-retained",
+      "mode": "analysis",
+      "seconds": 30,
+      "rssMiB": 512,
+      "conditional": true
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "status": "prospective-hosted-cohort",
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "methodSHA256": "26fe39dbe7faaf6f83dcd0eaa8c1aa85d6ea61c9ed5b879d02a6451039f54a38",
+  "candidateArenaSHA256": "ad2ef724113e441a2d479da52741a7d92842172b5710a240a53c60281163ab15",
+  "wholeSeconds": 900,
+  "cleanupSeconds": 15,
+  "childSeconds": 15,
+  "calibrationSeconds": 25,
+  "analysisSeconds": 30,
+  "rssMiB": 1536,
+  "parentMaximumBytes": 536870912,
+  "dependencyMaximumBytes": 2097152,
+  "freshMaximumBytes": 16777216,
+  "nativeBackingCapBytes": 536870912,
+  "availableMemoryMinimumBytes": 3221225472,
+  "smokeAdmissions": 6,
+  "smokeCalls": 8,
+  "plannerWarmBatches": 4,
+  "pilotMinimumNs": 20000000,
+  "pilotBatches": 3,
+  "countQuantum": 8,
+  "measurementTargetNs": 1500000000,
+  "measurementMinimumNs": 500000000,
+  "measurementWarmupBatches": 4,
+  "measurementWarmupDivisor": 8,
+  "measurementWarmupMinimumNs": 350000000,
+  "blocks": 4,
+  "primaryAlpha": 0.025,
+  "guardAlpha": 0.05,
+  "primaryMaximumRatio": 0.95,
+  "guardMaximumRatio": 1.02,
+  "typicalDriftMaximumRatio": 1.05,
+  "tailDriftMaximumRatio": 1.15,
+  "gainDriftMultiple": 2,
+  "engines": [
+    "bun-source",
+    "node-portable"
+  ],
+  "arms": [
+    "baseline",
+    "candidate"
+  ],
+  "maximumChildren": 181,
+  "freshAllAdverseBlocks": 4,
+  "endpoints": [
+    {
+      "id": "cached-object",
+      "mode": "object",
+      "primary": true,
+      "admissions": 1,
+      "batchBytes": 4096,
+      "setupBytes": 4096,
+      "measurementCap": 65536,
+      "plannerWarmCalls": 4096,
+      "plannerPilotCalls": 8192,
+      "plannerTotalCalls": 40960,
+      "semanticSHA256": "39c6cd725268e89cd474db2f3711e647430d287d87e4cf81f7e74fdc6fd4b4bd",
+      "inputModelSHA256": "1c9f07de3b5a6efb9e32aa0649daca8227e345f9b046d51f333527b2b5f6b8c1",
+      "logicalSHA256ByRevision": [
+        "d1d18f4e97823db7921212cc987c456cee4d9098d8595450c9a96c225a488ff7",
+        "d72f59899f0a89f53dd1dff8e506654e2fb96b93084a55e8d3bd8c9fbc92d19d"
+      ],
+      "unit": 32.5
+    },
+    {
+      "id": "nested",
+      "mode": "nested",
+      "primary": false,
+      "admissions": 2,
+      "batchBytes": 12288,
+      "setupBytes": 12288,
+      "measurementCap": 16384,
+      "plannerWarmCalls": 1024,
+      "plannerPilotCalls": 2048,
+      "plannerTotalCalls": 10240,
+      "semanticSHA256": "580d3845a890a500a6e6caee21d1a2d0516b1d586a84f3bd8b20da1abee1c6d1",
+      "inputModelSHA256": "c2591ad02a3f1a177fe1eea6a9de2ee62a6166897ecb0cce3cfbd3e193d91d10",
+      "logicalSHA256ByRevision": [
+        "43baf5e40f8eac0c8dc9e57475b681a23b08532def9a357a5cbf20c21300cc26",
+        "37c06eadd4d5589068b5d646c73042762c1d30cd0c7e6a4e0ce875ee076fd34c"
+      ],
+      "unit": 32.5
+    },
+    {
+      "id": "saturated-miss",
+      "mode": "miss",
+      "primary": false,
+      "admissions": 1,
+      "batchBytes": 4096,
+      "setupBytes": 1249280,
+      "measurementCap": 65536,
+      "plannerWarmCalls": 4096,
+      "plannerPilotCalls": 8192,
+      "plannerTotalCalls": 40960,
+      "semanticSHA256": "8a38537bc8161f8a1a1321540649df9df503d6ed4476ec88fdc524983496d7fb",
+      "inputModelSHA256": "49d9236acb768bca960ac3e948d75446e5ac2c040dad32fe2f5b5808a06ab12e",
+      "logicalSHA256ByRevision": [
+        "d1d18f4e97823db7921212cc987c456cee4d9098d8595450c9a96c225a488ff7",
+        "d72f59899f0a89f53dd1dff8e506654e2fb96b93084a55e8d3bd8c9fbc92d19d"
+      ],
+      "unit": 32.5
+    },
+    {
+      "id": "primitive",
+      "mode": "primitive",
+      "primary": false,
+      "admissions": 1,
+      "batchBytes": 4096,
+      "setupBytes": 4096,
+      "measurementCap": 65536,
+      "plannerWarmCalls": 4096,
+      "plannerPilotCalls": 8192,
+      "plannerTotalCalls": 40960,
+      "semanticSHA256": "45bc9682db3af24bf702438b8bd850ed28e50c1ad730a46bf97a1f61fcbb3682",
+      "inputModelSHA256": "bf2e48eae33226fb636bc4a5bb52c6cfd8a5dba0d76757c8faf5410faca4874a",
+      "logicalSHA256ByRevision": [
+        "410d44596e0c1aa1a449c768b5b2eafc568dcaebc047eff83ac5f4eaa7cae97e",
+        "eca4983f4698eea7b45cc51b54757e58879cfb237544fee9c9fce1c5e9427504"
+      ],
+      "unit": 32.5
+    },
+    {
+      "id": "fresh-import",
+      "mode": "fresh",
+      "primary": false,
+      "admissions": 1,
+      "batchBytes": 0,
+      "setupBytes": 0,
+      "measurementCap": 1,
+      "freshPayloadBytes": 5560000,
+      "semanticSHA256": "b4315c2c989cd9326efccb0821272ef78c603c39a0c784e0dae51db76fc5fc1c",
+      "inputModelSHA256": "c8d16ac0f949154e9bd0a880b75fd05582d0afb7556b6a72f9ac7380981bf125",
+      "logicalSHA256ByRevision": [
+        "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "6a9075ba1b73bac8c0d0f4708d317f21af1f8396d989318e1c14010016da961c"
+      ],
+      "unit": 5000
+    }
+  ]
+}
