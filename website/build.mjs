@@ -54,7 +54,7 @@ const demoScripts = new Map([
   ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('compare/')], ['historical/log-explorer/', demoScripts.get('explorer/')], ['historical/log-benchmark/', demoScripts.get('investigation-benchmark/')]]);
-const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
+const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'catalog-timings.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
 demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
 demoScripts.delete('explorer/');
 demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);

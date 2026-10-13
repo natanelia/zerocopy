@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
+import { formatMilliseconds, compareElapsed } from '../assets/catalog-timings.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(artifacts, { recursive: true });
 const server = createPreview({ base: meta.base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -13,17 +14,19 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 // the cleared stopped page. Both must have no record data or active session.
 async function assertEmptySession(page, panels) {
   await page.locator('#feature-load:not([disabled])').waitFor();
-  for (const id of ['feature-stop', 'feature-id', 'feature-query', 'feature-view', 'feature-edit']) {
+  for (const id of ['feature-stop', 'feature-id', 'feature-query', 'feature-view', 'feature-edit', 'feature-phase']) {
     assert.equal(await page.locator(`#${id}`).isDisabled(), true, `${id} must be disabled after navigation`);
   }
   assert.equal(await page.locator('#feature-count').isDisabled(), false);
   assert.equal(await page.locator('#feature-detail').innerText(), 'No product loaded.');
   assert.equal(await page.locator('#feature-revision').innerText(), '—');
   assert.equal(await page.locator('#feature-view-label').innerText(), '—');
-  for (const field of ['found', 'invalid', 'unavailable', 'read']) {
+  for (const field of ['found', 'invalid', 'unavailable', 'read', 'build', 'handoff', 'update', 'timing']) {
     assert.deepEqual(await page.locator(`[data-${field}]`).allTextContents(), Array(panels).fill('—'));
   }
   assert.deepEqual(await page.locator('[data-checked]').allTextContents(), Array(panels).fill('No result yet'));
+  assert.equal(await page.locator('[data-timing][data-elapsed-ms]').count(), 0);
+  assert.deepEqual(await page.locator('[data-delta]').allTextContents(), Array(panels).fill('Run an operation to compare.'));
   assert.match(await page.locator('#feature-status').innerText(), /^(Load the sample to start the workers\.|Stopped\. Owner and reader workers are terminated\. Load a new session to continue\.)$/);
   const rows = page.locator('#feature-rows tr'), count = await rows.count();
   assert.ok(count <= 1, 'No result rows may survive navigation');
@@ -32,6 +35,27 @@ async function assertEmptySession(page, panels) {
     assert.equal(await rows.innerText(), 'Load products to inspect the catalog.');
     assert.equal(await rows.locator('td[colspan="5"]').count(), 1);
     assert.equal(await rows.locator('td').count(), 1, 'The placeholder is the only cell');
+  }
+}
+async function assertTimings(page, phase) {
+  await page.waitForFunction(() => !document.querySelector('#feature-phase').disabled);
+  assert.equal(await page.locator('#feature-phase').inputValue(), phase);
+  const entries = await page.locator('[data-feature-kind]').evaluateAll(panels => panels.map(panel => ({
+    kind: panel.dataset.featureKind,
+    value: Number(panel.querySelector('[data-timing]').dataset.elapsedMs),
+    text: panel.querySelector('[data-timing]').textContent,
+    operation: panel.querySelector('[data-timing]').dataset.operation,
+    delta: panel.querySelector('[data-delta]').textContent,
+    context: panel.querySelector('[data-timing-context]').textContent,
+  })));
+  assert.equal(new Set(entries.map(entry => entry.operation)).size, 1);
+  assert.ok(entries.every(entry => entry.operation.startsWith(phase + ':') && Number.isFinite(entry.value) && entry.value >= 0));
+  assert.equal(new Set(entries.map(entry => entry.context)).size, 1);
+  const native = entries.find(entry => entry.kind === 'native').value;
+  for (const entry of entries) {
+    assert.equal(entry.text, formatMilliseconds(entry.value));
+    const comparison = compareElapsed(entry.value, native);
+    assert.equal(entry.delta, entry.kind === 'native' ? 'Native baseline · this run' : comparison === '—' ? 'Relative comparison unavailable at this precision.' : `${comparison}. Native: ${formatMilliseconds(native)}.`);
   }
 }
 const deadline = setTimeout(() => { console.error('Feature browser gate exceeded 240 seconds'); process.exit(1); }, 240000); deadline.unref();
@@ -72,12 +96,32 @@ try {
         assert.equal(await page.locator('[data-feature-kind]').count(), panels);
         assert.deepEqual(await page.locator('[data-found]').allTextContents(), Array(panels).fill('910 / 1000'));
         assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 0/);
+        await assertTimings(page, 'read');
+        assert.match(await page.locator('#feature-timing-context').innerText(), /First read.*current revision 0/);
+        assert.equal(await page.locator('.feature-correctness[open]').count(), 0);
+        await page.locator('.feature-correctness summary').first().focus(); await page.keyboard.press('Enter');
+        assert.equal(await page.locator('.feature-correctness[open]').count(), 1);
+        await page.keyboard.press('Enter'); assert.equal(await page.locator('.feature-correctness[open]').count(), 0);
+        for (const phase of ['build', 'handoff']) {
+          await page.locator('#feature-phase').selectOption(phase); await assertTimings(page, phase);
+          assert.match(await page.locator('#feature-timing-context').innerText(), /Initial load.*revision 0/);
+        }
+        await page.locator('#feature-phase').selectOption('update');
+        assert.deepEqual(await page.locator('[data-timing]').allTextContents(), Array(4).fill('—'));
+        assert.equal(await page.locator('[data-timing][data-elapsed-ms]').count(), 0);
+
         await page.locator('#feature-edit').click();
         await page.waitForFunction(() => document.querySelector('#feature-revision').textContent === '1');
         assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 2500/);
         assert.deepEqual(await page.locator('[data-unavailable]').allTextContents(), Array(panels).fill('100'));
+        await assertTimings(page, 'update');
+        assert.match(await page.locator('#feature-timing-context').innerText(), /Replaced 100 products.*current revision 1/);
+        await page.locator('#feature-phase').selectOption('build'); await assertTimings(page, 'build');
+        assert.match(await page.locator('#feature-timing-context').innerText(), /Initial load.*revision 0/);
         await page.locator('#feature-view').selectOption('initial');
         await page.waitForFunction(() => document.querySelector('#feature-view-label').textContent === 'Initial · revision 0');
+        await assertTimings(page, 'read');
+        assert.match(await page.locator('#feature-timing-context').innerText(), /retained revision 0/);
         assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 0/);
         await page.locator('#feature-edit').click();
         await page.waitForFunction(() => document.querySelector('#feature-revision').textContent === '2');
@@ -90,6 +134,13 @@ try {
         assert.deepEqual(await page.locator('[data-found]').allTextContents(), Array(panels).fill('909 / 1000'));
         await page.locator('#feature-id').fill('product/000000'); await page.locator('#feature-query').click();
         await page.waitForFunction(() => document.querySelector('#feature-detail').textContent.includes('"id": "product/000000"'));
+        await assertTimings(page, 'read');
+        const pending = await page.evaluate(() => {
+          document.querySelector('#feature-query-form').requestSubmit();
+          return { times: [...document.querySelectorAll('[data-timing]')].map(node => node.textContent), raw: document.querySelectorAll('[data-timing][data-elapsed-ms]').length, disabled: document.querySelector('#feature-phase').disabled };
+        });
+        assert.deepEqual(pending, { times: Array(4).fill('—'), raw: 0, disabled: true });
+        await assertTimings(page, 'read');
         await page.screenshot({ path: `${artifacts}/feature-${route.slice(0, -1)}-${name}-desktop.png`, fullPage: true });
         await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
         assert.equal(await page.locator('#feature-rows tr').count(), 0);
@@ -145,7 +196,7 @@ try {
         for (const route of ['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'historical/log-explorer/']) {
           await page.goto(origin + meta.base + route);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px ${route}`);
-          for (const field of await page.locator('.feature-controls input, .feature-controls select').all()) {
+          for (const field of await page.locator('.feature-controls input, .feature-controls select, .feature-timing-controls select').all()) {
             assert.ok((await field.boundingBox()).width >= 200, `${name} ${width}px ${route} usable form control`);
           }
         }
@@ -154,6 +205,7 @@ try {
       await page.waitForFunction(() => document.querySelector('#feature-status').textContent.startsWith('Loaded and verified'));
       assert.deepEqual(await page.locator('[data-found]').allTextContents(), Array(4).fill('910 / 1000'));
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} loaded comparison at 320px`);
+      await assertTimings(page, 'read');
       await page.screenshot({ path: `${artifacts}/feature-compare-${name}-mobile.png`, fullPage: true });
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
       await page.goto(origin + meta.base + 'compare/'); await page.locator('#feature-load:not([disabled])').waitFor(); await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-load').click();

@@ -84,3 +84,9 @@ The separate [recorded memory report](../../docs/feature-map-memory.md) preserve
 The sample accepts no uploads. It has at most 100,000 products and 12 sparse edit revisions per session. Stop and navigation terminate the owner and reader workers. Releasing references permits collection; it does not promise immediate GC or per-node arena reclamation.
 
 One allocating owner writes each arena. Compare a single native owner first if the UI only needs small answers and other workers do not need local data access.
+
+## Read the live timings
+
+The comparison highlights milliseconds for one selected phase: the latest read and validation, collection construction, initial handoff, or replacing 100 products and handing the revision to readers. Each relative result compares that phase with native Map in the same operation. “Less time” and “more time” describe this observation only; all four implementations run concurrently. Initial-load values remain labeled revision 0 after later edits.
+
+Worker startup and module loading are excluded. Build and handoff have separate timers. The combined replace-and-handoff value comes from its own direct timer; it does not add parallel worker times. Reads include the lookup and validation replies, but exclude the owner’s reference check and UI rendering. Matching counts and fingerprints appear under the verification details. Use the separate benchmark for repeated samples.
