@@ -1,10 +1,10 @@
 import { checkCapability } from './capability.mjs';
-import { KINDS, LABELS } from './feature-core.mjs';
+import { KINDS, LABELS } from './catalog-core.mjs';
 import { Peer } from './feature-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
 const $ = id => document.getElementById(id);
 const WARMUPS = 2, SAMPLES = 7;
-const PHASES = { generationMs: 'Generate the input', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 feature objects', editPublicationMs: 'Publish the sparse edit', updatePublicationMs: 'Replace and publish 100 features', updatedQueryMs: 'Query the edited revision' };
+const PHASES = { generationMs: 'Generate the catalog', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 product objects', editPublicationMs: 'Publish the sparse edit', updatePublicationMs: 'Replace and publish 100 products', updatedQueryMs: 'Query the edited revision' };
 let current, generation = 0, result, ready = false, running = false;
 checkCapability(() => { ready = true; controls(); });
 function controls() { $('feature-run').disabled = !ready || running; $('feature-count').disabled = running; $('feature-cancel').hidden = !running; $('feature-export').disabled = !result || running; }
@@ -62,10 +62,10 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
       }
     }
     const measured = raw.filter(record => !record.warmup);
-    result = { schema: 'zerocopy-feature-map-browser/v1', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
+    result = { schema: 'zerocopy-product-catalog-browser/v1', workload: 'product-catalog', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
       dependencies: { immutable: immutableVersion, immer: immerVersion }, environment: { userAgent: navigator.userAgent, crossOriginIsolated, hardwareConcurrency: navigator.hardwareConcurrency },
-      config: { entries: count, readers: 2, requestedIds: 1000, edits: 100, warmups: WARMUPS, samplesPerKind: SAMPLES, retainedRevisions: [0, 1] },
-      method: 'Fresh owner and two reader workers per sample. Worker/module startup excluded. Generation and construction separated. Initial publication includes encoding, delivery and attachment. First query accesses fresh reader attachments; repeated query uses the same IDs and may use local JSON caches. Edits replace 100 objects; replica workers receive only changed pairs. Native copies its index once to retain initial revision. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent reference. Paths rotate; all warmups and samples retained. No DOM paint or memory measurement.',
+      config: { entries: count, readers: 2, requestedIds: 1000, foundIds: 910, missingIds: 90, edits: 100, unicodeNameFraction: 0.2, warmups: WARMUPS, samplesPerKind: SAMPLES, retainedRevisions: [0, 1] },
+      method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. Generation and construction separated. Initial publication includes encoding, delivery and attachment. First query accesses fresh reader attachments; repeated query uses the same IDs and may use local JSON caches. Edits replace 100 product objects; replica workers receive only changed pairs. Native copies its index once to retain initial revision. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Paths rotate; all warmups and samples retained. No DOM paint or memory measurement.',
       summary: Object.fromEntries(KINDS.map(kind => [kind, Object.fromEntries(Object.keys(PHASES).map(phase => [phase, summarize(measured.filter(record => record.kind === kind).map(record => record[phase]))]))])), raw };
     render(result); $('feature-benchmark-status').textContent = 'Complete. All 28 measured samples and 8 warm-ups passed current and retained-revision checks.';
   } catch (error) { if (token === generation) $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; }
@@ -78,7 +78,7 @@ $('feature-cancel').addEventListener('click', () => {
 $('feature-export').addEventListener('click', () => {
   if (!result) return;
   const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
-  const link = document.createElement('a'); link.href = url; link.download = 'zerocopy-feature-map-benchmark.json'; link.click();
+  const link = document.createElement('a'); link.href = url; link.download = 'zerocopy-product-catalog-benchmark.json'; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 window.addEventListener('pagehide', () => {

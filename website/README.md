@@ -26,13 +26,13 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
 
-> The current primary demos use the feature-map workload described under [Feature attribute example](#feature-attribute-example). The log-column sections below describe the preserved historical routes.
+> The current primary demos use the product-catalog workload described under [Product catalog comparison](#product-catalog-comparison). The log-column sections below describe the preserved historical routes.
 
 ## Log explorer
 
 At `/historical/log-explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
 
-The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs, simulations, and scientific/spatial tools.
+The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs and simulations.
 
 ## Investigation benchmark
 
@@ -189,16 +189,16 @@ just as the Immutable.js owner batches with `withMutations`. Query work, generat
 values, independent reference checks, worker counts, and retained versions remain
 the same. See `proofs/query-performance.mjs` and the Query performance workflow.
 
-## Feature attribute example
+## Product catalog comparison
 
-The current `/explorer/` is a road attribute registry keyed by string IDs. Its central representation is `SharedMap('object')`. One owner publishes to a lookup reader and a validation reader. Every query requests 1,000 IDs, and each edit replaces 100 objects while retaining revision 0. The UI shows bounded record/issue replies. This is attribute lookup and validation, not map rendering or spatial search.
+The current `/compare/` is the direct live comparison. A writer worker owns a product catalog keyed by string IDs; lookup and validation workers read its snapshots. All four implementations receive the same products, sparse replacements and retained initial revision. Product records include a name, category, SKU, price, stock and availability. The UI displays bounded record/issue replies. `/explorer/` forwards directly to this comparison for old links.
 
-The current `/compare/` applies the same operations to SharedMap, native Map, Immutable.js Map and Immer Map. Native and other replicas receive an initial snapshot once and only changed ID/object pairs on later publications. Native Map shallow-copies its index when it must preserve the retained initial map, then mutates its exclusively owned current index. Records remain immutable in every path.
+SharedMap, native Map, Immutable.js Map and Immer Map use equivalent operations. Replicas receive an initial snapshot once and only changed ID/object pairs later. Native Map copies its index only when retaining its initial version. Records remain immutable in every path.
 
-## Feature-map benchmark
+## Catalog benchmark
 
-The current `/investigation-benchmark/` creates fresh owner/reader workers for each sample. Two warm-ups and seven measured samples per map rotate path order. Startup and imports finish before timing. Generation, construction, initial publication, first and repeat queries, edits and edit publication are separate phases. Raw JSON includes directly measured edit-plus-publication time and checked current/initial answers. First requests use fresh attachments; repeated requests can use local object caches. No DOM painting or memory measurement is included.
+The current `/investigation-benchmark/` uses the product catalog and creates fresh owner/reader workers for each sample. Two warm-ups and seven measured samples per implementation rotate path order. Startup and imports finish before timing. Generation, construction, publication, first/repeated queries and sparse edits have separate timers. The export uses `zerocopy-product-catalog-browser/v1`; it includes every sample and checked current/initial answers. It measures no browser memory.
 
-The original log implementations remain at `/historical/log-explorer/`, `/historical/log-compare/` and `/historical/log-benchmark/`. The earlier log-specific sections above describe those historical routes. Their recorded JSON and SVG evidence remain unchanged. Each historical route has its own assets and isolation scope. New SharedMap recordings use separate files, schema and source hashes. See [the feature guide](content/maps.md) and [memory method](../docs/feature-map-memory.md).
+The displayed historical memory charts use the earlier synthetic-record fixture and runtime, not this product catalog. Original data, source hashes, proof drivers and fixture modules remain unchanged. The separate catalog model prevents changing the old proof workload when the live example evolves. See [the catalog guide](content/catalog.md) and [recorded memory method](../docs/feature-map-memory.md).
 
-Run the new focused browser checks with `node website/tests/feature-browser.mjs` after building. They cover actual workers, replacements, retained reads, Stop/restart, navigation, benchmark export and mobile layout. Historical browser checks continue to exercise the old routes.
+The original log implementations remain at `/historical/log-explorer/`, `/historical/log-compare/` and `/historical/log-benchmark/`. The earlier sections describe those historical routes. Run `node website/tests/feature-browser.mjs` after building to check real product workers, replacements, retained reads, Stop/restart/navigation, export and mobile layout.

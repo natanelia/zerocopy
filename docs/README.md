@@ -2,7 +2,7 @@
 
 Read the [zerocopy documentation website](https://natanelia.github.io/zerocopy/) for searchable guides, the collection API, and live worker demos.
 
-Zerocopy is a shared-collection library for many kinds of applications. Start with [use cases and alternatives](use-cases.md), or explore the [feature attribute registry](../website/content/maps.md), its four map implementations and its [memory measurements](feature-map-memory.md).
+Zerocopy is a shared-collection library for many kinds of applications. Start with [use cases and alternatives](use-cases.md), or explore the [product catalog](../website/content/catalog.md), its four implementations and its [memory measurements](feature-map-memory.md).
 
 Start with the [two-file quickstart](getting-started.md). It shares state with a dedicated worker and uses direct, synchronous reads on both threads.
 

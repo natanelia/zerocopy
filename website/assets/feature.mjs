@@ -1,5 +1,5 @@
 import { checkCapability } from './capability.mjs';
-import { KINDS, MAX_REVISION } from './feature-core.mjs';
+import { KINDS, MAX_REVISION } from './catalog-core.mjs';
 import { Peer } from './feature-peer.mjs';
 const $ = id => document.getElementById(id);
 const kinds = document.querySelector('[data-feature-mode]').dataset.featureMode === 'compare' ? KINDS : ['shared'];
@@ -15,10 +15,10 @@ function controls() {
 function status(text, error = false) { $('feature-status').textContent = text; $('feature-status').classList.toggle('feature-error', error); }
 function clearResults() {
   $('feature-revision').textContent = $('feature-view-label').textContent = '—';
-  $('feature-detail').textContent = 'No feature loaded.';
+  $('feature-detail').textContent = 'No product loaded.';
   $('feature-rows').replaceChildren(); $('feature-issues').replaceChildren();
   for (const panel of document.querySelectorAll('.feature-design')) {
-    for (const field of ['found', 'invalid', 'closed', 'read']) panel.querySelector(`[data-${field}]`).textContent = '—';
+    for (const field of ['found', 'invalid', 'unavailable', 'read']) panel.querySelector(`[data-${field}]`).textContent = '—';
     panel.querySelector('[data-checked]').textContent = 'No result yet';
     panel.querySelector('[data-cost]').textContent = 'Costs appear after real operations.';
   }
@@ -28,7 +28,7 @@ function render(values) {
     const panel = document.querySelector(`[data-feature-kind="${kind}"]`), { lookup, validation } = result.answer;
     panel.querySelector('[data-found]').textContent = `${lookup.found} / ${lookup.requested}`;
     panel.querySelector('[data-invalid]').textContent = validation.invalid.toLocaleString();
-    panel.querySelector('[data-closed]').textContent = validation.closed.toLocaleString();
+    panel.querySelector('[data-unavailable]').textContent = validation.unavailable.toLocaleString();
     panel.querySelector('[data-read]').textContent = `${result.ms.toFixed(2)} ms`;
     panel.querySelector('[data-checked]').textContent = `${result.verifiedReplies} worker replies verified · fingerprint ${lookup.fingerprint.toString(16)}`;
   }
@@ -40,7 +40,7 @@ function render(values) {
     const row = document.createElement('tr');
     const key = document.createElement('td'), button = document.createElement('button'); button.type = 'button'; button.textContent = id;
     button.addEventListener('click', () => { if (!busy) { $('feature-id').value = id; void runQuery(); } }); key.append(button); row.append(key);
-    for (const text of [value.name, value.status, value.attributes.lanes, value.revision]) { const cell = document.createElement('td'); cell.textContent = String(text); row.append(cell); }
+    for (const text of [value.name, value.status, value.attributes.priceCents, value.revision]) { const cell = document.createElement('td'); cell.textContent = String(text); row.append(cell); }
     return row;
   }));
   $('feature-issues').replaceChildren(...(validation.issues.length ? validation.issues.map(issue => `${issue.id}: ${issue.errors.join('; ')}`) : ['No invalid records in this selection.']).map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
@@ -81,13 +81,13 @@ $('feature-load-form').addEventListener('submit', event => {
     for (const [kind, setup] of setups) document.querySelector(`[data-feature-kind="${kind}"] [data-cost]`).textContent = `Generate ${setup.generationMs.toFixed(2)} ms · construct ${setup.constructionMs.toFixed(2)} ms · publish ${setup.publicationMs.toFixed(2)} ms`;
     $('feature-view').value = 'current'; revision = 0;
     const values = await answers(); if (token !== generation) return;
-    render(values); status('Loaded and verified. Replace 100 features, then switch to the retained initial revision.');
+    render(values); status('Loaded and verified. Replace 100 products, then switch to the retained initial revision.');
   });
 });
 $('feature-query-form').addEventListener('submit', event => { event.preventDefault(); void runQuery(); });
 $('feature-view').addEventListener('change', () => void runQuery());
 $('feature-edit').addEventListener('click', () => void operation(async token => {
-  status('Replacing 100 feature records and publishing the new revision…');
+  status('Replacing 100 product records and publishing the new revision…');
   const updates = await Promise.all([...peers].map(async ([kind, peer]) => [kind, await peer.request('edit')]));
   if (token !== generation) return;
   revision = updates[0][1].revision;

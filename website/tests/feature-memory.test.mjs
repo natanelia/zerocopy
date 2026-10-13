@@ -48,7 +48,7 @@ test('reader-only RSS chart uses exact whole-process bytes and every measured ma
 });
 test('retained headline is scoped to two readers and directly paired with that case’s RSS', () => {
   const html = featureMemoryHighlights();
-  for (const text of ['84.7% less retained data with two reader workers', '22.27 MiB', '145.39 MiB', '46.7% lower process RSS in the same two-reader case', '186.40 MiB', '349.68 MiB', 'different accounting', '100,000 road features', '100 replacements']) assert.ok(html.includes(text), text);
+  for (const text of ['84.7% less retained data with two reader workers', '22.27 MiB', '145.39 MiB', '46.7% lower process RSS in the same two-reader case', '186.40 MiB', '349.68 MiB', 'different accounting', '100,000 synthetic records', '100 replacements']) assert.ok(html.includes(text), text);
 });
 test('eight readers retain a separate complete cohort, source binding and native comparison', () => {
   assert.ok(eight, 'Import the separately verified eight-reader cohort before publishing');
@@ -72,7 +72,7 @@ test('eight readers retain a separate complete cohort, source binding and native
   assert.ok(html.includes('Separate 8-reader run · AMD EPYC 7763'));
   assert.ok(html.includes('70.75% lower median RSS'));
   const section = featureMemory('/zerocopy/');
-  for (const note of ['Recorded runtime baselines: 8ad5788', 'f140ebe', 'predate the later main-branch optimizations, including PR30', 'do not measure the current live example build']) assert.ok(section.includes(note), note);
+  for (const note of ['Recorded runtime baselines: 8ad5788', 'f140ebe', 'predate the later main-branch optimizations, including PR30', 'do not measure the current live example build', 'earlier synthetic-record fixture, not the current product catalog']) assert.ok(section.includes(note), note);
   for (const mutate of [value => value.recordingType = 'full-matrix', value => value.runCount = 36, value => value.summary.pop(), value => value.summary[0].readers = 4, value => value.referenceRecording.summarySHA256 = '0'.repeat(64), value => value.hashes['library/shared.js'] = '0'.repeat(64)]) {
     const value = structuredClone(eight); mutate(value); assert.throws(() => validateEightReaderMemory(value));
   }

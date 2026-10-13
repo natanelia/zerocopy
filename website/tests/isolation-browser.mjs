@@ -11,7 +11,7 @@ const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('..
 mkdirSync(artifacts, { recursive: true });
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const demos = [
-  ['compare/', 'feature-load'], ['explorer/', 'feature-load'],
+  ['compare/', 'feature-load'],
   ['investigation-benchmark/', 'feature-run'],
   ['lab/', 'run-benchmark'], ['playground/', 'start-playground'],
 ];

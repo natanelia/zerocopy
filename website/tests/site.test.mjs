@@ -82,7 +82,7 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
   assert.ok(home.includes('Conceptual storage model. Not a memory measurement.'));
   for (const text of ['One writer on the main thread or in a worker', 'Main thread or worker', 'one allocating writer', 'Writer worker', 'Reader workers', 'snapshot delivery runs from the writer worker to reader workers', 'Example: main-thread writer']) assert.ok(home.includes(text), text);
   assert.ok(home.includes('id="worker-architecture"'));
-  assert.ok(home.includes(`href="${meta.base}explorer/"`));
+  assert.ok(home.includes(`href="${meta.base}compare/"`));
   const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
   assert.match(lab, /Immutable\.js Map/); assert.match(lab, /Immer Map/);
@@ -93,7 +93,7 @@ test('the first screen sells direct reads, not mandatory tasks or invented resul
 });
 
 test('demo workers and all runtime modules stay inside the automatic isolation scope', () => {
-  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['explorer', 'feature.mjs', 'feature-owner.mjs'], ['compare', 'feature.mjs', 'feature-owner.mjs'], ['investigation-benchmark', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['historical/log-explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['historical/log-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
+  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['compare', 'feature.mjs', 'feature-owner.mjs'], ['investigation-benchmark', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['historical/log-explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['historical/log-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
     assert.ok(html.includes(`src="${meta.base}${route}/assets/main.mjs"`));
@@ -109,22 +109,22 @@ test('demo workers and all runtime modules stay inside the automatic isolation s
 });
 
 
-test('feature attribute example and separate catalog tutorial have clear scopes', () => {
+test('product catalog and small snapshot tutorial have clear scopes', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.match(home, /feature registry/i); assert.doesNotMatch(home, /headphones/);
+  assert.match(home, /product catalog/i); assert.doesNotMatch(home, /headphones/);
   assert.doesNotMatch(home, /100,000 generated events|immutable columns|LOG EXPLORER/);
-  const guide = readFileSync(join(out, 'docs/maps/index.html'), 'utf8');
-  assert.match(guide, /does not render a map or perform spatial search/);
+  const guide = readFileSync(join(out, 'docs/catalog/index.html'), 'utf8');
+  assert.match(guide, /prices, stock and availability/);
   const playground = readFileSync(join(out, 'playground/index.html'), 'utf8');
   assert.match(playground, /Headphones in stock/);
 });
 
-test('primary pages use feature maps while the old log workload is clearly historical', () => {
+test('the catalog is the sole live comparison and old workloads stay historical', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  for (const slug of ['maps', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) assert.ok(home.includes(`docs/${slug}/`));
-  for (const route of ['explorer', 'compare']) {
+  for (const slug of ['catalog', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) assert.ok(home.includes(`docs/${slug}/`));
+  for (const route of ['compare']) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
-    assert.match(html, /Replace 100 features/); assert.match(html, /Initial · retained/);
+    assert.match(html, /Replace 100 products/); assert.match(html, /Initial · retained/);
     assert.doesNotMatch(html, /Freeze investigation|live events|Five immutable columns/);
   }
   for (const route of ['historical/log-explorer', 'historical/log-compare', 'historical/log-benchmark']) {
@@ -138,4 +138,21 @@ test('primary pages use feature maps while the old log workload is clearly histo
 test('feature benchmark discloses sparse replicas, retained history and separate query phases', () => {
   const html = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
   for (const text of ['only changed pairs', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(html.includes(text), text);
+});
+
+test('old demo and guide routes redirect directly without allocating demo workers', () => {
+  for (const [route, target] of [['explorer/', 'compare/'], ['docs/maps/', 'docs/catalog/']]) {
+    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    assert.ok(html.includes(`http-equiv="refresh" content="0;url=${meta.base}${target}"`));
+    assert.ok(html.includes(`href="${meta.base}${target}">Continue directly`));
+    assert.ok(html.includes('location.replace('));
+    assert.ok(html.includes('location.search + location.hash'));
+    assert.doesNotMatch(html, /feature-load|feature\.mjs|capability\.mjs/);
+  }
+  const home = readFileSync(join(out, 'index.html'), 'utf8');
+  assert.ok(!home.includes(`href="${meta.base}explorer/"`));
+  for (const route of ['', 'compare/', 'investigation-benchmark/', 'docs/catalog/']) {
+    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    assert.doesNotMatch(html, /road\/|road attributes|road features|\blanes\b|geospatial|cartograph|spatial index/i);
+  }
 });

@@ -1,6 +1,6 @@
 # Feature-map retained memory
 
-The feature-map proof measures the same synthetic road registry used by the primary website example. It is a separate experiment from the historical SharedList investigation. Existing recordings are never rewritten.
+The feature-map proof preserves the earlier synthetic-record fixture. The current website uses a separate product catalog; these recordings do not measure that catalog. It is a separate experiment from the historical SharedList investigation. Existing recordings are never rewritten.
 
 ## Work and retained revisions
 

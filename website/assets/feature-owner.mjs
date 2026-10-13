@@ -1,5 +1,5 @@
-import { integer, validateCount, entriesFor, editsFor, queryIds, calculate, MAX_REVISION } from './feature-core.mjs';
-import { reference, verifyAnswer } from './feature-reference.mjs';
+import { integer, validateCount, entriesFor, editsFor, queryIds, calculate, MAX_REVISION } from './catalog-core.mjs';
+import { reference, verifyAnswer } from './catalog-reference.mjs';
 import { createStorage } from './feature-storage.mjs';
 import { Peer, listen } from './feature-peer.mjs';
 let storage, current, retained, count = 0, revision = 0;
@@ -54,5 +54,5 @@ listen(async data => {
   }
   if (data.type === 'release') { retained = undefined; await Promise.all(readers.map(reader => reader.request('release'))); return true; }
   if (data.type === 'stop') { for (const reader of readers) reader.close(); readers.length = 0; current = retained = undefined; return true; }
-  throw new Error('Unknown feature owner operation');
+  throw new Error('Unknown product catalog owner operation');
 });

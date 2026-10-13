@@ -54,9 +54,9 @@ const demoScripts = new Map([
   ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('compare/')], ['historical/log-explorer/', demoScripts.get('explorer/')], ['historical/log-benchmark/', demoScripts.get('investigation-benchmark/')]]);
-const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'feature-reference.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
+const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
 demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
-demoScripts.set('explorer/', [...featureScripts, 'feature.mjs']);
+demoScripts.delete('explorer/');
 demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);
 for (const [route, scripts] of historicalDemos) demoScripts.set(route, scripts);
 for (const [route, scripts] of demoScripts) {
@@ -85,20 +85,28 @@ function writePage(route, title, description, body, script) {
   writeFileSync(join(destination, 'index.html'), html);
   siteRoutes.push(route);
 }
-writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base).replace(`href="${base}explorer/">See it work`, `href="${base}compare/">Compare it live`), 'home.mjs');
-writePage('compare/', 'Compare four feature maps', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same keyed feature attributes, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
-writePage('explorer/', 'Feature attributes by ID', 'Look up and validate generated road attributes with SharedMap and real workers. Replace records while retaining the initial revision.', featureExplorer(base), 'feature.mjs');
-writePage('investigation-benchmark/', 'Feature-map worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse map edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
+writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base), 'home.mjs');
+writePage('compare/', 'Compare the shared product catalog', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same product records, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
+writePage('investigation-benchmark/', 'Product catalog worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse product edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
 function historical(body) {
   for (const [current, old] of [['compare/', 'historical/log-compare/'], ['explorer/', 'historical/log-explorer/'], ['investigation-benchmark/', 'historical/log-benchmark/'], ['docs/memory-comparison/', 'docs/historical-sharedlist-memory/']]) body = body.replaceAll(`href="${base}${current}"`, `href="${base}${old}"`);
-  return `<aside class="historical-notice">Historical SharedList log workload. These results do not measure SharedMap feature objects. <a href="${base}explorer/">Open the current feature-map example →</a></aside>` + body;
+  return `<aside class="historical-notice">Historical SharedList log workload. These results do not measure the current product catalog. <a href="${base}compare/">Open the live product comparison →</a></aside>` + body;
 }
+function writeRedirect(route, target, title) {
+  const destination = join(out, route); mkdirSync(destination, { recursive: true });
+  const href = base + target;
+  let html = shell({ title, description: title, body: `<main id="main" class="wrap"><h1>${title}</h1><p><a href="${href}">Continue directly →</a></p></main>`, base, route: target, version, sha, origin, noindex: true });
+  html = html.replace('</head>', `<meta http-equiv="refresh" content="0;url=${href}"><script>location.replace(${JSON.stringify(href)} + location.search + location.hash)</script></head>`);
+  writeFileSync(join(destination, 'index.html'), html);
+}
+writeRedirect('explorer/', 'compare/', 'Live product comparison');
+writeRedirect('docs/maps/', 'docs/catalog/', 'Product catalog guide');
 writePage('historical/log-compare/', 'Historical SharedList comparison', 'Historical log-column workload and its unchanged recorded measurements.', historical(comparison(base)), 'comparison.mjs');
 writePage('historical/log-explorer/', 'Historical SharedList log explorer', 'The original log-column use case, retained as a historical reference.', historical(explorer(base)), 'explorer.mjs');
 writePage('historical/log-benchmark/', 'Historical SharedList investigation benchmark', 'The original log-column timing workload, retained as a historical reference.', historical(investigationBenchmark(base)), 'explorer-benchmark.mjs');
 writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
-writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Feature attributes, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
+writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Product records, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const rendered = renderMarkdown(source, page.source, routes, base);

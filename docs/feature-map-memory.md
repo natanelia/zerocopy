@@ -1,6 +1,6 @@
-# SharedMap feature-map memory
+# SharedMap recorded memory
 
-This report measures string-keyed maps of road attribute objects. It uses the same records, keyed reads, sparse replacements and retained initial revision as the [live feature example](../website/content/maps.md). The [historical SharedList report](memory-comparison.md) measures log columns and remains unchanged.
+This report preserves an earlier synthetic-record workload with keyed reads, sparse replacements and retained revisions. It does not measure the current [product catalog](../website/content/catalog.md). Original fixture fields and source hashes remain in the [recorded method](../proofs/feature-map-memory-method.md). The [historical SharedList report](memory-comparison.md) measures log columns and remains unchanged.
 
 ## Results with reader workers
 
@@ -10,7 +10,7 @@ This report measures string-keyed maps of road attribute objects. It uses the sa
 
 **46.7% lower process RSS in the same two-reader case.** SharedMap: 186.40 MiB; native Map: 349.68 MiB. This is absolute whole-process resident memory at the post-GC endpoint, without subtracting a startup baseline.
 
-Both compare medians from three fresh trials with 100,000 road features, 100 replacements and initial/current revisions retained. Retained data and RSS use different accounting; they cannot be added or subtracted to explain the rest of the process. These are endpoint measurements, not peak memory.
+Both compare medians from three fresh trials with 100,000 synthetic records, 100 replacements and initial/current revisions retained. Retained data and RSS use different accounting; they cannot be added or subtracted to explain the rest of the process. These are endpoint measurements, not peak memory.
 
 <!-- feature-memory:highlights:end -->
 

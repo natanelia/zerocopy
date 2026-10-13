@@ -21,7 +21,7 @@ export const pages = [
   { source: 'website/content/graphs.md', slug: 'graphs', title: 'Graphs & developer tools', group: 'Use cases', description: 'Stable versions for traversal, layout, and diagnostics.' },
   { source: 'website/content/simulations.md', slug: 'simulations', title: 'Simulation & world state', group: 'Use cases', description: 'Separate simulation ownership from analysis and rendering.' },
   { source: 'website/content/analytics.md', slug: 'analytics', title: 'Product catalogs & filtering', group: 'Use cases', description: 'Read stock directly and filter a large catalog in workers.' },
-  { source: 'website/content/maps.md', slug: 'maps', title: 'Feature attributes by ID', group: 'Use cases', description: 'Use SharedMap object values for keyed feature lookup, validation and sparse edits with retained history.' },
+  { source: 'website/content/catalog.md', slug: 'catalog', title: 'Shared product catalog', group: 'Use cases', description: 'Look up products, validate prices and stock, and retain earlier catalog revisions across workers.' },
   { source: 'website/content/editors.md', slug: 'editors', title: 'Editors & history', group: 'Use cases', description: 'Read an earlier version without stopping new edits.' },
 ];
 export const projectName = 'natanelia/zerocopy';

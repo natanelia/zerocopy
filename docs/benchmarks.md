@@ -1,6 +1,6 @@
 # Benchmarks
 
-For the current object-map use case, see the [feature-map worker benchmark](../website/README.md#feature-map-benchmark) and [SharedMap memory report](feature-map-memory.md). The collection timing tables below retain their original historical values and methods.
+For the current product catalog use case, see the [product-catalog worker benchmark](../website/README.md#catalog-benchmark) and [SharedMap memory report](feature-map-memory.md). The collection timing tables below retain their original historical values and methods.
 
 [README](../README.md) · [Documentation](README.md)
 

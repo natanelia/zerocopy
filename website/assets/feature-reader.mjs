@@ -1,4 +1,4 @@
-import { calculate } from './feature-core.mjs';
+import { calculate } from './catalog-core.mjs';
 import { createStorage } from './feature-storage.mjs';
 import { listen } from './feature-peer.mjs';
 let storage, current, retained;
@@ -11,5 +11,5 @@ listen(async data => {
     const map = data.frozen ? retained : current; if (!map) throw new Error('Snapshot is missing');
     return calculate(map, data.ids, data.task);
   }
-  throw new Error('Unknown feature reader operation');
+  throw new Error('Unknown product catalog reader operation');
 });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createStorage } from '../_site/explorer/assets/feature-storage.mjs';
+import { createStorage } from '../_site/compare/assets/feature-storage.mjs';
 import { KINDS, entriesFor, editsFor, queryIds, calculate } from '../assets/feature-core.mjs';
 import { reference, verifyAnswer } from '../assets/feature-reference.mjs';
 

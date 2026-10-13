@@ -57,9 +57,9 @@ Built for applications where several threads need the same large, changing datas
 
 ### See the pattern in action
 
-The **[live feature registry](website/README.md#feature-attribute-example)** stores road attributes in a string-keyed SharedMap of objects. Lookup and validation workers read selected IDs. Replace 100 records, then read the retained initial revision to see the earlier values.
+The **[live product catalog](website/README.md#product-catalog-comparison)** stores product records in a string-keyed SharedMap of objects. Lookup and validation workers read selected IDs. Replace 100 records, then read the retained initial revision to see the earlier values.
 
-[Read the feature-map design](website/content/maps.md), [compare four map implementations](website/README.md#feature-attribute-example), or [run the worker benchmark](website/README.md#feature-map-benchmark). The [SharedMap memory report](docs/feature-map-memory.md) keeps heap, arena use, backing capacity and RSS separate. The [earlier SharedList example](website/content/log-explorer.md) and its recordings remain historical references.
+[Read the catalog design](website/content/catalog.md), [compare four implementations](website/README.md#product-catalog-comparison), or [run the worker benchmark](website/README.md#catalog-benchmark). The [SharedMap memory report](docs/feature-map-memory.md) keeps heap, arena use, backing capacity and RSS separate. The [earlier SharedList example](website/content/log-explorer.md) and its recordings remain historical references.
 
 ## New version. Same simple API.
 
