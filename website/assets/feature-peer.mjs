@@ -13,15 +13,14 @@ export class Peer {
       this.pending.delete(data.id); clearTimeout(item.timer);
       data.error ? item.reject(new Error(data.error)) : item.resolve(data.value);
     };
-    this.worker.onerror = event => {
-      globalThis.__featurePeerDiagnostic?.({ type: 'peer-onerror', worker: this.worker, closed: this.closed, message: event.message, cancelable: event.cancelable, defaultPrevented: event.defaultPrevented });
-      // Terminating a loading worker can leave a late module-load error.
-      // Only an already closed connection owns that cancellation; live errors
-      // still reject pending requests and keep normal error propagation.
-      if (this.closed) { event.preventDefault(); return; }
-      this.close(new Error(event.message || 'Feature worker could not load'));
-    };
+    this.worker.onerror = event => this.close(new Error(event.message || 'Feature worker could not load'));
     this.worker.onmessageerror = () => this.close(new Error('Unreadable feature worker reply'));
+    // Release before navigation aborts a worker's pending module fetches.
+    // pagehide still resets the page state when the document is left or cached.
+    if (typeof window !== 'undefined') {
+      this.releaseOnNavigation = () => this.close();
+      window.addEventListener('beforeunload', this.releaseOnNavigation);
+    }
   }
   request(type, body = {}, timeout = 60_000) {
     if (this.closed) return Promise.reject(new Error('Worker connection is closed'));
@@ -34,9 +33,10 @@ export class Peer {
     });
   }
   close(error = new Error('Worker connection is closed')) {
-    globalThis.__featurePeerDiagnostic?.({ type: 'peer-close', worker: this.worker, closed: this.closed, reason: error.message, stack: new Error().stack });
     if (this.closed) return;
-    this.closed = true; this.worker.terminate();
+    this.closed = true;
+    if (this.releaseOnNavigation) window.removeEventListener('beforeunload', this.releaseOnNavigation);
+    this.worker.terminate();
     if (this.moduleURL) URL.revokeObjectURL(this.moduleURL);
     for (const item of this.pending.values()) { clearTimeout(item.timer); item.reject(error); }
     this.pending.clear();
