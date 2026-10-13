@@ -59,6 +59,7 @@ function clearResults() {
     for (const field of ['found', 'invalid', 'unavailable', 'read', 'build', 'handoff', 'update']) panel.querySelector(`[data-${field}]`).textContent = '—';
     panel.querySelector('[data-checked]').textContent = 'No result yet';
     panel.querySelector('[data-fingerprint]').textContent = 'No fingerprint yet.';
+    panel.querySelector('[data-read-context]').textContent = 'No completed read yet.';
   }
   renderTiming();
 }
@@ -68,8 +69,9 @@ function render(values) {
     panel.querySelector('[data-found]').textContent = `${lookup.found} / ${lookup.requested}`;
     panel.querySelector('[data-invalid]').textContent = validation.invalid.toLocaleString();
     panel.querySelector('[data-unavailable]').textContent = validation.unavailable.toLocaleString();
-    panel.querySelector('[data-checked]').textContent = `Verified · ${result.verifiedReplies} worker replies`;
+    panel.querySelector('[data-checked]').textContent = `Latest read verified · ${result.verifiedReplies} worker replies`;
     panel.querySelector('[data-fingerprint]').textContent = `Fingerprint ${lookup.fingerprint.toString(16)}`;
+    panel.querySelector('[data-read-context]').textContent = timingSnapshots.get('read').context;
   }
   const result = values[0][1], { lookup, validation } = result.answer;
   $('feature-revision').textContent = String(revision); $('feature-view-label').textContent = `${result.revision === 0 && $('feature-view').value === 'initial' ? 'Initial' : 'Current'} · revision ${result.revision}`;

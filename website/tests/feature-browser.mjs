@@ -26,6 +26,7 @@ async function assertEmptySession(page, panels) {
   }
   assert.deepEqual(await page.locator('[data-checked]').allTextContents(), Array(panels).fill('No result yet'));
   assert.equal(await page.locator('[data-timing][data-elapsed-ms]').count(), 0);
+  assert.deepEqual(await page.locator('[data-read-context]').allTextContents(), Array(panels).fill('No completed read yet.'));
   assert.deepEqual(await page.locator('[data-delta]').allTextContents(), Array(panels).fill('Run an operation to compare.'));
   assert.match(await page.locator('#feature-status').innerText(), /^(Load the sample to start the workers\.|Stopped\. Owner and reader workers are terminated\. Load a new session to continue\.)$/);
   const rows = page.locator('#feature-rows tr'), count = await rows.count();
@@ -118,10 +119,13 @@ try {
         assert.match(await page.locator('#feature-timing-context').innerText(), /Replaced 100 products.*current revision 1/);
         await page.locator('#feature-phase').selectOption('build'); await assertTimings(page, 'build');
         assert.match(await page.locator('#feature-timing-context').innerText(), /Initial load.*revision 0/);
+        assert.deepEqual(await page.locator('[data-checked]').allTextContents(), Array(4).fill('Latest read verified · 2 worker replies'));
+        for (const text of await page.locator('[data-read-context]').allTextContents()) assert.match(text, /Latest read.*current revision 1.*selected product\/000000/);
         await page.locator('#feature-view').selectOption('initial');
         await page.waitForFunction(() => document.querySelector('#feature-view-label').textContent === 'Initial · revision 0');
         await assertTimings(page, 'read');
         assert.match(await page.locator('#feature-timing-context').innerText(), /retained revision 0/);
+        for (const text of await page.locator('[data-read-context]').allTextContents()) assert.match(text, /Latest read.*retained revision 0.*selected product\/000000/);
         assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 0/);
         await page.locator('#feature-edit').click();
         await page.waitForFunction(() => document.querySelector('#feature-revision').textContent === '2');
