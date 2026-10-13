@@ -13,7 +13,13 @@ export class Peer {
       this.pending.delete(data.id); clearTimeout(item.timer);
       data.error ? item.reject(new Error(data.error)) : item.resolve(data.value);
     };
-    this.worker.onerror = event => this.close(new Error(event.message || 'Feature worker could not load'));
+    this.worker.onerror = event => {
+      // Terminating a loading worker can leave a late module-load error.
+      // Only an already closed connection owns that cancellation; live errors
+      // still reject pending requests and keep normal error propagation.
+      if (this.closed) { event.preventDefault(); return; }
+      this.close(new Error(event.message || 'Feature worker could not load'));
+    };
     this.worker.onmessageerror = () => this.close(new Error('Unreadable feature worker reply'));
   }
   request(type, body = {}, timeout = 60_000) {
