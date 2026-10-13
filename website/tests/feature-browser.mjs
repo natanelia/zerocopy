@@ -119,6 +119,9 @@ try {
         for (const route of ['explorer/', 'compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'historical/log-explorer/']) {
           await page.goto(origin + meta.base + route);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px ${route}`);
+          for (const field of await page.locator('.feature-controls input, .feature-controls select').all()) {
+            assert.ok((await field.boundingBox()).width >= 200, `${name} ${width}px ${route} usable form control`);
+          }
         }
       }
       await page.goto(origin + meta.base + 'compare/'); await page.locator('#feature-load:not([disabled])').waitFor(); await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-load').click();
