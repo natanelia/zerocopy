@@ -43,15 +43,18 @@ try {
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const page = activePage = await context.newPage(), errors = [], diagnostics = [];
-      const record = entry => {
-        diagnostics.push({ at: new Date().toISOString(), page: page.url(), ...entry });
+      const record = (entry, source = page) => {
+        diagnostics.push({ at: new Date().toISOString(), page: source.url(), ...entry });
         writeFileSync(`${artifacts}/feature-events-${name}.json`, JSON.stringify(diagnostics, null, 2));
       };
-      page.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }); });
-      page.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }));
-      page.on('response', response => { if (response.status() >= 400) record({ type: 'response', url: response.url(), status: response.status() }); });
-      page.on('framenavigated', frame => { if (frame === page.mainFrame()) record({ type: 'navigation', url: frame.url() }); });
-      page.on('worker', worker => { record({ type: 'worker-start', url: worker.url() }); worker.on('close', () => record({ type: 'worker-close', url: worker.url() })); });
+      const observe = observed => {
+        observed.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }, observed); });
+        observed.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }, observed));
+        observed.on('response', response => { if (response.status() >= 400) record({ type: 'response', url: response.url(), status: response.status() }, observed); });
+        observed.on('framenavigated', frame => { if (frame === observed.mainFrame()) record({ type: 'navigation', url: frame.url() }, observed); });
+        observed.on('worker', worker => { record({ type: 'worker-start', url: worker.url() }, observed); worker.on('close', () => record({ type: 'worker-close', url: worker.url() }, observed)); });
+      };
+      observe(page);
       page.setDefaultTimeout(20000);
       await page.goto(origin + meta.base);
       assert.equal(await page.locator('.hero-buttons a').last().getAttribute('href'), meta.base + 'compare/');
@@ -170,6 +173,7 @@ try {
       const staticServer = createPreview({ base: meta.base, isolated: false }); staticServer.listen(0, '127.0.0.1'); await once(staticServer, 'listening');
       try {
         const staticContext = await browser.newContext(), staticPage = activePage = await staticContext.newPage(); staticPage.setDefaultTimeout(25000);
+        observe(staticPage); record({ type: 'phase', name: 'headerless comparison: service-worker isolation' }, staticPage);
         await staticPage.goto(`http://127.0.0.1:${staticServer.address().port}${meta.base}compare/`);
         await staticPage.waitForFunction(() => crossOriginIsolated && !document.querySelector('#feature-load').disabled);
         await staticPage.locator('#feature-count').selectOption('1000'); await staticPage.locator('#feature-load').click();
@@ -178,7 +182,7 @@ try {
         await staticPage.locator('#feature-view').selectOption('initial'); await staticPage.waitForFunction(() => document.querySelector('#feature-view-label').textContent === 'Initial · revision 0');
         assert.match(await staticPage.locator('#feature-detail').innerText(), /"priceCents": 0/);
         await staticPage.locator('#feature-stop').click(); await staticPage.locator('#feature-load:not([disabled])').waitFor();
-        await staticContext.close();
+        assert.deepEqual(errors, []); await staticContext.close();
       } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
       console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 36 benchmark records, headerless workers, no-JS charts and mobile layout at ${meta.base}`);
     } catch (error) {
