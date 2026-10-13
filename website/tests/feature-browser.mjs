@@ -42,11 +42,31 @@ try {
     let activePage;
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
+      await context.addInitScript(() => {
+        const emit = entry => console.debug('FEATURE_WORKER_DIAGNOSTIC ' + JSON.stringify(entry));
+        window.addEventListener('error', event => emit({ type: 'window-error', message: event.message, filename: event.filename, line: event.lineno, column: event.colno, target: event.target?.constructor?.name, src: event.target?.src, cancelable: event.cancelable, defaultPrevented: event.defaultPrevented }));
+        window.addEventListener('pagehide', () => emit({ type: 'pagehide' }));
+        const workerURLs = new WeakMap();
+        window.__featurePeerDiagnostic = ({ worker, ...entry }) => emit({ ...entry, url: workerURLs.get(worker) });
+        const NativeWorker = Worker;
+        window.Worker = new Proxy(NativeWorker, {
+          construct(Target, args, newTarget) {
+            const worker = Reflect.construct(Target, args, newTarget);
+            const url = String(args[0]), terminate = worker.terminate.bind(worker);
+            let terminated = false;
+            worker.terminate = () => { terminated = true; emit({ type: 'explicit-terminate', url, stack: new Error().stack }); return terminate(); };
+            worker.addEventListener('error', event => emit({ type: 'worker-error', url, terminated, message: event.message, filename: event.filename, target: event.target?.constructor?.name, cancelable: event.cancelable, defaultPrevented: event.defaultPrevented }));
+            workerURLs.set(worker, url);
+            return worker;
+          },
+        });
+      });
       const page = activePage = await context.newPage(), errors = [], diagnostics = [];
       const record = entry => {
         diagnostics.push({ at: new Date().toISOString(), page: page.url(), ...entry });
         writeFileSync(`${artifacts}/feature-events-${name}.json`, JSON.stringify(diagnostics, null, 2));
       };
+      page.on('console', message => { const value = message.text(); if (value.startsWith('FEATURE_WORKER_DIAGNOSTIC ')) record(JSON.parse(value.slice('FEATURE_WORKER_DIAGNOSTIC '.length))); });
       page.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }); });
       page.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }));
       page.on('response', response => { if (response.status() >= 400) record({ type: 'response', url: response.url(), status: response.status() }); });

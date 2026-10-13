@@ -14,6 +14,7 @@ export class Peer {
       data.error ? item.reject(new Error(data.error)) : item.resolve(data.value);
     };
     this.worker.onerror = event => {
+      globalThis.__featurePeerDiagnostic?.({ type: 'peer-onerror', worker: this.worker, closed: this.closed, message: event.message, cancelable: event.cancelable, defaultPrevented: event.defaultPrevented });
       // Terminating a loading worker can leave a late module-load error.
       // Only an already closed connection owns that cancellation; live errors
       // still reject pending requests and keep normal error propagation.
@@ -33,6 +34,7 @@ export class Peer {
     });
   }
   close(error = new Error('Worker connection is closed')) {
+    globalThis.__featurePeerDiagnostic?.({ type: 'peer-close', worker: this.worker, closed: this.closed, reason: error.message, stack: new Error().stack });
     if (this.closed) return;
     this.closed = true; this.worker.terminate();
     if (this.moduleURL) URL.revokeObjectURL(this.moduleURL);
