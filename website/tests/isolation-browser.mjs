@@ -100,9 +100,9 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         assert.equal(requests.filter(url => url.includes('/library/')).length, 0, 'Setup must not allocate a dataset or load WASM');
         await page.goto(origin + base + 'docs/getting-started/');
         assert.equal(await page.evaluate(() => navigator.serviceWorker.controller), null, 'Demo workers must not control the guides');
-        assert.equal(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), isolated ? 0 : 5);
+        assert.deepEqual(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).map(value => value.scope).sort()), isolated ? [] : demos.map(([route]) => origin + base + route).sort());
         await context.close();
-        console.log(`Passed: ${name}, all five demos, automatic first visit, return visit, preserved URL, no data work (${isolated ? 'headers' : 'no headers'}).`);
+        console.log(`Passed: ${name}, all ${demos.length} demos, automatic first visit, return visit, preserved URL, no data work (${isolated ? 'headers' : 'no headers'}).`);
 
         if (isolated) continue;
         // A real first visit while all web-storage access throws. No storage-based loop guard.
