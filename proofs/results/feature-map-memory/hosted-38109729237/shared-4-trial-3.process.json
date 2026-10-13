@@ -1,0 +1,12 @@
+{
+  "command": "/opt/hostedtoolcache/node/22.23.3/x64/bin/node",
+  "args": [
+    "--expose-gc",
+    "/home/runner/work/zerocopy/zerocopy/proofs/feature-map-memory-case.mjs",
+    "{\"kind\":\"shared\",\"readers\":4,\"entries\":100000,\"runtime\":\"/tmp/zerocopy-feature-map-memory-k83mbE\"}"
+  ],
+  "timeoutMs": 180000,
+  "status": 0,
+  "signal": null,
+  "error": null
+}

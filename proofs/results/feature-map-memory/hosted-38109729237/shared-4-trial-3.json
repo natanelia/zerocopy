@@ -1,0 +1,4970 @@
+{
+  "trial": 3,
+  "kind": "shared",
+  "readers": 4,
+  "entries": 100000,
+  "records": [
+    {
+      "type": "config",
+      "kind": "shared",
+      "readers": 4,
+      "entries": 100000,
+      "pid": 3209
+    },
+    {
+      "type": "baseline",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 117624832,
+            "heapTotal": 10854400,
+            "heapUsed": 5508744,
+            "external": 2916523,
+            "arrayBuffers": 18699
+          },
+          "arenas": [],
+          "count": 0,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 118018048,
+            "heapTotal": 10854400,
+            "heapUsed": 5499600,
+            "external": 2916523,
+            "arrayBuffers": 18699
+          },
+          "arenas": [],
+          "count": 0,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 118542336,
+            "heapTotal": 10854400,
+            "heapUsed": 5499528,
+            "external": 2916523,
+            "arrayBuffers": 18699
+          },
+          "arenas": [],
+          "count": 0,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 118935552,
+            "heapTotal": 10854400,
+            "heapUsed": 5499456,
+            "external": 2916523,
+            "arrayBuffers": 18699
+          },
+          "arenas": [],
+          "count": 0,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 119328768,
+            "heapTotal": 10854400,
+            "heapUsed": 5499456,
+            "external": 2916523,
+            "arrayBuffers": 18699
+          },
+          "arenas": [],
+          "count": 0,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 119590912,
+            "heapTotal": 7184384,
+            "heapUsed": 4451592,
+            "external": 1779387,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 119590912,
+      "processHighWaterRSSBytes": 119590912
+    },
+    {
+      "type": "stage",
+      "name": "loaded",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 40476672,
+            "heapUsed": 6043064,
+            "external": 2965755,
+            "arrayBuffers": 67891
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": false
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 4,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 11116544,
+            "heapUsed": 5595048,
+            "external": 2916603,
+            "arrayBuffers": 18739
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 11116544,
+            "heapUsed": 5594976,
+            "external": 2916603,
+            "arrayBuffers": 18739
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 11116544,
+            "heapUsed": 5594904,
+            "external": 2916603,
+            "arrayBuffers": 18739
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 11116544,
+            "heapUsed": 5594904,
+            "external": 2916603,
+            "arrayBuffers": 18739
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 213200896,
+            "heapTotal": 7446528,
+            "heapUsed": 4457392,
+            "external": 1779427,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 213200896,
+      "processHighWaterRSSBytes": 219545600,
+      "memory": {
+        "heapUsed": 32880288,
+        "arrayBuffers": 153326,
+        "external": 16411594,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20644524,
+        "arenaCount": 1,
+        "arenas": [
+          {
+            "id": "mv3afeau-bf8ui3iqrz6-1",
+            "capacityBytes": 20709376,
+            "usedBytes": 20644524
+          }
+        ],
+        "heapDelta": 921912,
+        "arrayBufferDelta": 49352,
+        "retainedBytes": 21680640,
+        "resolved": true
+      }
+    },
+    {
+      "type": "answer",
+      "retained": false,
+      "phase": "cold",
+      "value": {
+        "revision": 0,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "answer",
+      "retained": false,
+      "phase": "warm",
+      "value": {
+        "revision": 0,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "stage",
+      "name": "queried",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 218783744,
+            "heapTotal": 41000960,
+            "heapUsed": 6086584,
+            "external": 2965755,
+            "arrayBuffers": 67891
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": false
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 4,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 219045888,
+            "heapTotal": 11378688,
+            "heapUsed": 6000456,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 219308032,
+            "heapTotal": 11378688,
+            "heapUsed": 6006048,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 219439104,
+            "heapTotal": 11640832,
+            "heapUsed": 6000312,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 219439104,
+            "heapTotal": 11640832,
+            "heapUsed": 6005976,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20644524,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 0,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 219439104,
+            "heapTotal": 6397952,
+            "heapUsed": 4507848,
+            "external": 1808552,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 219439104,
+      "processHighWaterRSSBytes": 219545600,
+      "memory": {
+        "heapUsed": 34607224,
+        "arrayBuffers": 286446,
+        "external": 16573839,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20644524,
+        "arenaCount": 1,
+        "arenas": [
+          {
+            "id": "mv3afeau-bf8ui3iqrz6-1",
+            "capacityBytes": 20709376,
+            "usedBytes": 20644524
+          }
+        ],
+        "heapDelta": 2648848,
+        "arrayBufferDelta": 182472,
+        "retainedBytes": 23540696,
+        "resolved": true
+      }
+    },
+    {
+      "type": "answer",
+      "retained": false,
+      "phase": "validation",
+      "value": {
+        "revision": 1,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 1,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 1,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 1,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 1,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "answer",
+      "retained": true,
+      "phase": "validation",
+      "value": {
+        "revision": 0,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 0,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 0,
+                        "speedLimit": 30,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 40,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 60,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 80,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 30,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 1,
+                        "speedLimit": 50,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 4,
+                        "speedLimit": 70,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 3,
+                        "speedLimit": 90,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "open",
+                      "revision": 0,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 40,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 0,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 10,
+                "closed": 0,
+                "revisionSum": 0,
+                "fingerprint": 1278034112,
+                "issues": [
+                  {
+                    "id": "road/000000",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/067221",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "stage",
+      "name": "edited-retained",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 228233216,
+            "heapTotal": 41000960,
+            "heapUsed": 6104560,
+            "external": 2965755,
+            "arrayBuffers": 67891
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": false
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": 0,
+          "transport": {
+            "initialPublications": 4,
+            "editPublications": 4,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 228364288,
+            "heapTotal": 16097280,
+            "heapUsed": 6409680,
+            "external": 2983203,
+            "arrayBuffers": 85339
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": 0,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 227614720,
+            "heapTotal": 16097280,
+            "heapUsed": 6418872,
+            "external": 2983203,
+            "arrayBuffers": 85339
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": 0,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 227258368,
+            "heapTotal": 16097280,
+            "heapUsed": 6409536,
+            "external": 2983203,
+            "arrayBuffers": 85339
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": 0,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 16097280,
+            "heapUsed": 6418800,
+            "external": 2983203,
+            "arrayBuffers": 85339
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": 0,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 7708672,
+            "heapUsed": 4517336,
+            "external": 1808552,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 225910784,
+      "processHighWaterRSSBytes": 228823040,
+      "memory": {
+        "heapUsed": 36278784,
+        "arrayBuffers": 419726,
+        "external": 16707119,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20678956,
+        "arenaCount": 1,
+        "arenas": [
+          {
+            "id": "mv3afeau-bf8ui3iqrz6-1",
+            "capacityBytes": 20709376,
+            "usedBytes": 20678956
+          }
+        ],
+        "heapDelta": 4320408,
+        "arrayBufferDelta": 315752,
+        "retainedBytes": 25345536,
+        "resolved": true
+      }
+    },
+    {
+      "type": "answer",
+      "retained": false,
+      "phase": "validation",
+      "value": {
+        "revision": 1,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 1,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 1,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 1,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 1,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 1,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 100,
+                "fingerprint": 2128757937,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "stage",
+      "name": "released",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 41000960,
+            "heapUsed": 6104848,
+            "external": 2965755,
+            "arrayBuffers": 67891
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": false
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 4,
+            "editPublications": 4,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 15835136,
+            "heapUsed": 6072392,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 15835136,
+            "heapUsed": 6081136,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 15572992,
+            "heapUsed": 6072248,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 15572992,
+            "heapUsed": 6081064,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20678956,
+              "capacityBytes": 20709376,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 1,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 225910784,
+            "heapTotal": 7708672,
+            "heapUsed": 4542312,
+            "external": 1808552,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 225910784,
+      "processHighWaterRSSBytes": 228823040,
+      "memory": {
+        "heapUsed": 34954000,
+        "arrayBuffers": 286446,
+        "external": 16573839,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20678956,
+        "arenaCount": 1,
+        "arenas": [
+          {
+            "id": "mv3afeau-bf8ui3iqrz6-1",
+            "capacityBytes": 20709376,
+            "usedBytes": 20678956
+          }
+        ],
+        "heapDelta": 2995624,
+        "arrayBufferDelta": 182472,
+        "retainedBytes": 23887472,
+        "resolved": true
+      }
+    },
+    {
+      "type": "answer",
+      "retained": false,
+      "phase": "validation",
+      "value": {
+        "revision": 11,
+        "answers": [
+          {
+            "role": "reader-0",
+            "revision": 11,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 1100,
+                "fingerprint": 1982265759,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-1",
+            "revision": 11,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 1100,
+                "fingerprint": 1982265759,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-2",
+            "revision": 11,
+            "task": "lookup",
+            "answer": {
+              "lookup": {
+                "requested": 1000,
+                "found": 910,
+                "missing": 90,
+                "revisionSum": 1100,
+                "fingerprint": 1982265759,
+                "rows": [
+                  {
+                    "id": "road/000000",
+                    "value": {
+                      "name": "道路 · 0",
+                      "roadClass": "local",
+                      "bounds": [
+                        0,
+                        0,
+                        0.75,
+                        0.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/007919",
+                    "value": {
+                      "name": "Road 7919",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        919,
+                        7,
+                        919.75,
+                        7.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/015838",
+                    "value": {
+                      "name": "Road 15838",
+                      "roadClass": "collector",
+                      "bounds": [
+                        838,
+                        15,
+                        838.75,
+                        15.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/023757",
+                    "value": {
+                      "name": "Road 23757",
+                      "roadClass": "local",
+                      "bounds": [
+                        757,
+                        23,
+                        757.75,
+                        23.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/031676",
+                    "value": {
+                      "name": "Road 31676",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        676,
+                        31,
+                        676.75,
+                        31.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/039595",
+                    "value": {
+                      "name": "道路 · 39595",
+                      "roadClass": "collector",
+                      "bounds": [
+                        595,
+                        39,
+                        595.75,
+                        39.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/047514",
+                    "value": {
+                      "name": "Road 47514",
+                      "roadClass": "local",
+                      "bounds": [
+                        514,
+                        47,
+                        514.75,
+                        47.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/055433",
+                    "value": {
+                      "name": "Road 55433",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        433,
+                        55,
+                        433.75,
+                        55.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/063352",
+                    "value": {
+                      "name": "Road 63352",
+                      "roadClass": "collector",
+                      "bounds": [
+                        352,
+                        63,
+                        352.75,
+                        63.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/071271",
+                    "value": {
+                      "name": "Road 71271",
+                      "roadClass": "local",
+                      "bounds": [
+                        271,
+                        71,
+                        271.75,
+                        71.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/079190",
+                    "value": {
+                      "name": "道路 · 79190",
+                      "roadClass": "arterial",
+                      "bounds": [
+                        190,
+                        79,
+                        190.75,
+                        79.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "public"
+                      }
+                    }
+                  },
+                  {
+                    "id": "road/087109",
+                    "value": {
+                      "name": "Road 87109",
+                      "roadClass": "collector",
+                      "bounds": [
+                        109,
+                        87,
+                        109.75,
+                        87.35
+                      ],
+                      "status": "closed",
+                      "revision": 11,
+                      "attributes": {
+                        "lanes": 2,
+                        "speedLimit": 0,
+                        "access": "private"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "role": "reader-3",
+            "revision": 11,
+            "task": "validate",
+            "answer": {
+              "validation": {
+                "requested": 1000,
+                "found": 910,
+                "invalid": 8,
+                "closed": 100,
+                "revisionSum": 1100,
+                "fingerprint": 1982265759,
+                "issues": [
+                  {
+                    "id": "road/060043",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/052865",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/045687",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/038509",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/031331",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/098552",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/024153",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  },
+                  {
+                    "id": "road/091374",
+                    "errors": [
+                      "Lane count must be positive"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "stage",
+      "name": "streamed",
+      "threads": [
+        {
+          "role": "owner",
+          "usage": {
+            "rss": 228417536,
+            "heapTotal": 41000960,
+            "heapUsed": 6165496,
+            "external": 2965755,
+            "arrayBuffers": 67891
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20968292,
+              "capacityBytes": 20971520,
+              "readOnly": false
+            }
+          ],
+          "count": 100000,
+          "revision": 11,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 4,
+            "editPublications": 44,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-0",
+          "usage": {
+            "rss": 228679680,
+            "heapTotal": 16097280,
+            "heapUsed": 6108224,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20968292,
+              "capacityBytes": 20971520,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 11,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-1",
+          "usage": {
+            "rss": 228810752,
+            "heapTotal": 16097280,
+            "heapUsed": 6116944,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20968292,
+              "capacityBytes": 20971520,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 11,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-2",
+          "usage": {
+            "rss": 228241408,
+            "heapTotal": 16097280,
+            "heapUsed": 6109112,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20968292,
+              "capacityBytes": 20971520,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 11,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "reader-3",
+          "usage": {
+            "rss": 227168256,
+            "heapTotal": 16097280,
+            "heapUsed": 6106600,
+            "external": 2949883,
+            "arrayBuffers": 52019
+          },
+          "arenas": [
+            {
+              "id": "mv3afeau-bf8ui3iqrz6-1",
+              "usedBytes": 20968292,
+              "capacityBytes": 20971520,
+              "readOnly": true
+            }
+          ],
+          "count": 100000,
+          "revision": 11,
+          "retainedRevision": null,
+          "transport": {
+            "initialPublications": 0,
+            "editPublications": 0,
+            "clonedEntryPairs": 0
+          }
+        },
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 227168256,
+            "heapTotal": 7708672,
+            "heapUsed": 4548584,
+            "external": 1808552,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 227168256,
+      "processHighWaterRSSBytes": 229453824,
+      "memory": {
+        "heapUsed": 35154960,
+        "arrayBuffers": 286446,
+        "external": 16573839,
+        "wasmCapacityBytes": 20971520,
+        "arenaUsedBytes": 20968292,
+        "arenaCount": 1,
+        "arenas": [
+          {
+            "id": "mv3afeau-bf8ui3iqrz6-1",
+            "capacityBytes": 20971520,
+            "usedBytes": 20968292
+          }
+        ],
+        "heapDelta": 3196584,
+        "arrayBufferDelta": 182472,
+        "retainedBytes": 24350576,
+        "resolved": true
+      }
+    },
+    {
+      "type": "stopped",
+      "threads": [
+        {
+          "role": "controller",
+          "usage": {
+            "rss": 73232384,
+            "heapTotal": 7970816,
+            "heapUsed": 4578872,
+            "external": 1808552,
+            "arrayBuffers": 10479
+          },
+          "arenas": []
+        }
+      ],
+      "rssBytes": 73232384,
+      "processHighWaterRSSBytes": 229453824
+    }
+  ]
+}

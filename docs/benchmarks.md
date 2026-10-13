@@ -1,5 +1,7 @@
 # Benchmarks
 
+For the current product catalog use case, see the [product-catalog worker benchmark](../website/README.md#catalog-benchmark) and [SharedMap memory report](feature-map-memory.md). The collection timing tables below retain their original historical values and methods.
+
 [README](../README.md) · [Documentation](README.md)
 
 Historical collection measurements, including slower workloads, memory costs, and reproduction commands. These are not measurements of task dispatch or worker-pool overhead.

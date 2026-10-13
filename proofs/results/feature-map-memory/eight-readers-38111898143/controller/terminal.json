@@ -1,0 +1,21 @@
+{
+  "status": "verified",
+  "startedAt": "2026-10-11T04:32:33.184Z",
+  "endedAt": "2026-10-11T04:34:04.184Z",
+  "elapsedMs": 90998.954567,
+  "verifiedRuns": 12,
+  "chartEligible": true,
+  "trigger": null,
+  "peakGroupRSSBytes": 1196007424,
+  "peakEvidenceBytes": 5967101,
+  "cleanup": {
+    "at": "2026-10-11T04:34:04.030Z",
+    "groupId": 3135,
+    "first": [],
+    "final": [],
+    "empty": true,
+    "observationBudgetMs": 5000,
+    "elapsedMs": 0.024856000003637746,
+    "killEvents": []
+  }
+}

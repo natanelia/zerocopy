@@ -1,0 +1,22 @@
+{
+  "launchedAt": "2026-10-11T03:51:46.574Z",
+  "endedAt": "2026-10-11T03:53:02.463Z",
+  "pid": 2863,
+  "processGroupId": 2863,
+  "status": 0,
+  "signal": null,
+  "spawnError": null,
+  "trigger": null,
+  "peakGroupRSSBytes": 733532160,
+  "peakEvidenceBytes": 6096504,
+  "cleanup": {
+    "at": "2026-10-11T03:53:02.463Z",
+    "groupId": 2863,
+    "first": [],
+    "final": [],
+    "empty": true,
+    "observationBudgetMs": 5000,
+    "elapsedMs": 0.01863799999409821,
+    "killEvents": []
+  }
+}

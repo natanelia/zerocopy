@@ -7,7 +7,7 @@ import { createPreview } from '../serve.mjs';
 import { generateColumns } from '../assets/explorer-core.mjs';
 import { reference } from '../assets/explorer-reference.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
-const base = meta.base, artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
+const base = meta.base, artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
 const paths = ['shared', 'immutable', 'immer', 'native'];
 mkdirSync(artifacts, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox'] });
@@ -24,7 +24,7 @@ async function match(expected) {
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1100 }, reducedMotion: 'reduce' });
   page = await context.newPage(); page.setDefaultTimeout(90000); page.on('pageerror', error => errors.push(error.message));
-  await page.goto(origin + base + 'compare/');
+  await page.goto(origin + base + 'historical/log-compare/');
   assert.equal(await page.locator('#compare-mode').inputValue(), 'incremental');
   await page.locator('#compare-start').click(); await complete(100000);
   assert.equal(await page.locator('.comparison-lane').count(), 4);
@@ -90,7 +90,7 @@ try {
   try {
     const ctx = await browser.newContext(); page = await ctx.newPage(); page.setDefaultTimeout(90000); page.on('pageerror', error => errors.push(error.message));
     const host = `http://127.0.0.1:${plain.address().port}`;
-    await page.goto(host + base + 'compare/');
+    await page.goto(host + base + 'historical/log-compare/');
     await page.waitForFunction(() => crossOriginIsolated && !document.querySelector('#compare-start').disabled);
     await page.locator('#compare-size').selectOption('1000'); await page.locator('#compare-start').click(); await complete(1000); await page.locator('#compare-stop').click();
     await page.goto(host + base + 'docs/getting-started/'); assert.equal(await page.evaluate(() => navigator.serviceWorker.controller), null);

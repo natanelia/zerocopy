@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createPreview } from '../serve.mjs';
 const base = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url))).base;
-const screenshots = fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
+const screenshots = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox'] });
 const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
@@ -17,6 +17,8 @@ try {
   const requested = []; page.on('request', request => requested.push(request.url()));
   await page.goto(origin + base); await page.locator('.reader-node').first().waitFor();
   assert.equal(await page.locator('.reader-node').count(), 3);
+  assert.match(await page.locator('.owner-node').innerText(), /Writer\s+Main thread or worker/);
+  assert.deepEqual(await page.locator('#worker-architecture li strong').allTextContents(), ['UI · main thread', 'Writer worker', 'Reader workers']);
   await page.getByRole('button', { name: 'Cloned', exact: true }).click(); assert.equal(await page.locator('#storage-count').innerText(), '4 separate stores');
   await page.getByRole('button', { name: 'Shared', exact: true }).click();
   await page.locator('#worker-count').focus(); await page.keyboard.press('ArrowRight'); assert.equal(await page.locator('.reader-node').count(), 4);
@@ -69,6 +71,10 @@ try {
     assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, 'Horizontal overflow at ' + route);
   }
   await mobile.goto(origin + base); await mobile.screenshot({ path: screenshots + '/home-mobile.png', fullPage: true });
+  await mobile.setViewportSize({ width: 320, height: 844 });
+  assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Homepage architecture at 320px');
+  assert.deepEqual(await mobile.locator('#worker-architecture li strong').allTextContents(), ['UI · main thread', 'Writer worker', 'Reader workers']);
+  await mobile.setViewportSize({ width: 390, height: 844 });
   await mobile.getByRole('button', { name: 'Menu', exact: true }).click(); assert.equal(await mobile.locator('#mobile-nav').isVisible(), true);
   await mobile.setViewportSize({ width: 1200, height: 900 });
   await mobile.locator('#mobile-nav').waitFor({ state: 'hidden' });
@@ -80,6 +86,9 @@ try {
   assert.match(await plain.title(), /^natanelia\/zerocopy:/);
   assert.equal(await plain.locator('.hero a[href="https://github.com/natanelia/zerocopy"]').innerText(), 'natanelia/zerocopy');
   assert.match(await plain.locator('.hero-description').innerText(), /JavaScript and TypeScript/);
+  assert.match(await plain.locator('.hero-description').innerText(), /One writer on the main thread or in a worker/);
+  assert.equal(await plain.locator('#worker-architecture').isVisible(), true);
+  assert.match(await plain.locator('#worker-architecture').innerText(), /one allocating writer/);
   assert.equal(await plain.locator('a[href="https://www.npmjs.com/package/zerocopy"]').isVisible(), true);
   await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap')); await noJs.close();
   await context.close();

@@ -59,7 +59,7 @@ Lead with what a reader needs to do. Use complete imports, name the file in a wo
 
 Keep one source of truth for each topic. Put setup and navigation in the README, detailed contracts in guides, and historical methods in benchmark reports. Do not add delivery notes, generated progress reports, repeated feature claims, or test-count badges to user documentation.
 
-`node scripts/check-docs.mjs` checks local Markdown links, heading targets, and the main benchmark table structure. It does not check external websites. `node scripts/check-docs.mjs --base <commit> --preserve` also rejects changed numerical README rows and recorded evidence files. Pull-request CI uses this strict mode. Omit `--preserve` only for a report without enforcement; strict mode requires a base commit.
+`node scripts/check-docs.mjs` checks local Markdown links, heading targets, and the main benchmark table structure. It does not check external websites. `node scripts/check-docs.mjs --base <commit> --preserve` also rejects changed numerical README rows and modified, deleted, renamed or type-changed recorded evidence files. New recordings must use new paths and retain their own method and source identity. Pull-request CI uses this strict mode. Omit `--preserve` only for a report without enforcement; strict mode requires a base commit.
 
 `node scripts/check-doc-examples.mjs` extracts marked examples directly from Markdown. It type-checks the TypeScript examples against the built package, executes the collection examples, and runs the documented Node worker pair. Update the example and its expected result together. The check does not execute arbitrary shell fences or browser examples in Node.
 

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { immerVersion } from '../_site/compare/vendor/version.mjs';
-import { fromColumns, attachColumns, appendImmer, immerView } from '../_site/compare/assets/immer-storage.mjs';
+import { immerVersion } from '../_site/historical/log-compare/vendor/version.mjs';
+import { fromColumns, attachColumns, appendImmer, immerView } from '../_site/historical/log-compare/assets/immer-storage.mjs';
 import { FIELDS, MAX_EVENTS, generateColumns, rowAt } from '../assets/explorer-core.mjs';
 
 test('pinned upstream Immer builds frozen columns without freezing the native input', () => {
