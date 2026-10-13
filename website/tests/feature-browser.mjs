@@ -42,8 +42,19 @@ try {
     let activePage;
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
-      const page = activePage = await context.newPage(), errors = []; page.on('pageerror', error => errors.push(error.message)); page.setDefaultTimeout(20000);
+      const page = activePage = await context.newPage(), errors = [], diagnostics = [];
+      const record = entry => {
+        diagnostics.push({ at: new Date().toISOString(), page: page.url(), ...entry });
+        writeFileSync(`${artifacts}/feature-events-${name}.json`, JSON.stringify(diagnostics, null, 2));
+      };
+      page.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }); });
+      page.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }));
+      page.on('response', response => { if (response.status() >= 400) record({ type: 'response', url: response.url(), status: response.status() }); });
+      page.on('framenavigated', frame => { if (frame === page.mainFrame()) record({ type: 'navigation', url: frame.url() }); });
+      page.on('worker', worker => { record({ type: 'worker-start', url: worker.url() }); worker.on('close', () => record({ type: 'worker-close', url: worker.url() })); });
+      page.setDefaultTimeout(20000);
       for (const route of ['explorer/', 'compare/']) {
+        record({ type: 'phase', name: `feature lifecycle: ${route}` });
         await page.goto(origin + meta.base + route); await page.locator('#feature-load:not([disabled])').waitFor();
         await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-load').click();
         await page.waitForFunction(() => document.querySelector('#feature-status').textContent.startsWith('Loaded and verified'));
@@ -82,6 +93,7 @@ try {
         await page.goBack(); await page.goForward();
         await assertEmptySession(page, panels);
       }
+      record({ type: 'phase', name: '100k feature registry' });
       await page.goto(origin + meta.base + 'explorer/'); await page.locator('#feature-load:not([disabled])').waitFor();
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-load').click();
       await page.waitForFunction(() => document.querySelector('#feature-status').textContent.startsWith('Loaded and verified'), undefined, { timeout: 60000 });
@@ -90,6 +102,7 @@ try {
       await page.locator('#feature-view').selectOption('initial'); await page.waitForFunction(() => document.querySelector('#feature-view-label').textContent === 'Initial · revision 0');
       assert.match(await page.locator('#feature-detail').innerText(), /"lanes": 0/);
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
+      record({ type: 'phase', name: 'complete benchmark and export' });
       await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 90000 });
@@ -105,6 +118,7 @@ try {
         assert.ok(record.updatePublicationMs >= record.updateMs && record.updatePublicationMs >= record.editPublicationMs);
       }
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(raw, null, 2));
+      record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), true);
       await page.locator('#feature-run').click(); await page.goto(origin + meta.base + 'docs/maps/'); await page.goBack();
@@ -114,6 +128,7 @@ try {
       await page.goBack(); await page.goForward();
       await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);
       assert.equal(await page.locator('#feature-benchmark-results').innerText(), '');
+      record({ type: 'phase', name: 'mobile layout and loaded registry' });
       for (const width of [390, 320]) {
         await page.setViewportSize({ width, height: 844 });
         for (const route of ['explorer/', 'compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'historical/log-explorer/']) {
