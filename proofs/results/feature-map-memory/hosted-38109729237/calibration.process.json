@@ -1,0 +1,11 @@
+{
+  "command": "/opt/hostedtoolcache/node/22.23.3/x64/bin/node",
+  "args": [
+    "--expose-gc",
+    "/home/runner/work/zerocopy/zerocopy/proofs/feature-map-memory-calibration.mjs"
+  ],
+  "timeoutMs": 60000,
+  "status": 0,
+  "signal": null,
+  "error": null
+}

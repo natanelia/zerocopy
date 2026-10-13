@@ -17,7 +17,7 @@ test('both comparison pages include the recorded table and its documentation rou
     assert.ok(source.includes("import { recordedMemory } from './memory-template.mjs'"));
     assert.ok(source.includes('${recordedMemory(base)}'));
   }
-  assert.ok(pages.some(page=>page.source==='docs/memory-comparison.md'&&page.slug==='memory-comparison'));
+  assert.ok(pages.some(page=>page.source==='docs/memory-comparison.md'&&page.slug==='historical-sharedlist-memory'));
 });
 test('recorded figures retain identity and all four architecture values',()=>{
   const data=JSON.parse(readFileSync(new URL('../recorded-memory.json',import.meta.url),'utf8'));

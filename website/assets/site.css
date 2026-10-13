@@ -43,3 +43,5 @@
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
   @media print{.site-header,.site-footer,.docs-sidebar,.doc-toc,.search-dialog,.doc-meta button{display:none}.doc-main{padding:0}.prose{font-size:12px}.code-block{break-inside:avoid}.code-block pre{white-space:pre-wrap}body{background:white}}
 }
+
+.writer-topology{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;list-style:none;padding:0;margin:24px 0}.writer-topology li{min-width:0;padding:22px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.writer-topology strong,.writer-topology span{display:block}.writer-topology strong{margin-bottom:10px}.writer-topology span{line-height:1.6}@media(max-width:760px){.writer-topology{grid-template-columns:1fr;gap:12px}}

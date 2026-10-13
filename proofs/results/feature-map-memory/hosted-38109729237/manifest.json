@@ -1,0 +1,73 @@
+{
+  "schema": "zerocopy-feature-map-memory/v1",
+  "method": "Sum of signed post-GC JavaScript heap and tracked ArrayBuffer changes across the controller, owner, and every reader, plus unique shared WASM backing capacity counted once by arena identity. Empty imported workers and connected MessageChannels are the baseline. Includes caches, spare capacity, and unreclaimed arena history. External memory is diagnostic and is not added twice. Process RSS and high-water RSS are reported separately. Not live payload size, browser memory, or peak temporary allocation.",
+  "startedAt": "2026-10-11T03:51:46.603Z",
+  "sourceCommit": "8ad5788648db93c18994fdde9b8fdb12e3a4957b",
+  "workingTreeDirty": true,
+  "runtimeSourceCommit": "8ad5788648db93c18994fdde9b8fdb12e3a4957b",
+  "recordingType": "full-matrix",
+  "intendedRunCount": 36,
+  "chartEligible": false,
+  "runtime": "v22.23.3",
+  "v8": "12.4.254.21-node.57",
+  "platform": "linux",
+  "osRelease": "6.17.0-1022-azure",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "logicalCPUs": 4,
+  "systemMemoryBytes": 16766410752,
+  "trials": 3,
+  "entries": 100000,
+  "readerCounts": [
+    0,
+    2,
+    4
+  ],
+  "kinds": [
+    "shared",
+    "native",
+    "immutable",
+    "immer"
+  ],
+  "readCount": 1000,
+  "editCount": 100,
+  "streamEdits": 10,
+  "chartStage": "edited-retained",
+  "warmup": "Imported workers and MessageChannels; no collection allocation before baseline. Cold and warm denote the first and repeated request, not a process/JIT reset. The zero-reader owner can reuse decoded objects between its two jobs within the first request.",
+  "retainedAnswers": "Each data isolate retains its latest bounded answer; the controller retains baseline usage records but no dataset or reference map.",
+  "nativeLifetime": "Clone the current Map only if it is the retained initial root; mutate the exclusively owned latest Map on subsequent replacements.",
+  "dependencies": {
+    "immutable": "5.1.9",
+    "immer": "11.1.21"
+  },
+  "hashes": {
+    "assets/feature-core.mjs": "2507d69a7cbec0f390a91d8ffb0d2e53e734849818cdf7d2064d7d166677d5d9",
+    "assets/feature-reference.mjs": "9f80c888a935c1486cc3727284cf3408ed31b03fdc1d6c0e4e379c6f8ff17382",
+    "assets/feature-storage.mjs": "be7541e583dd9f02d8521c56111ca42d0ac315bf8d8e20a17e94f40db169ddb9",
+    "library/chunk-8hw6gtrx.js": "dd9603ec6782953a9ff492e8265b9196fc8be0a280686430d0867f76ff249afd",
+    "library/chunk-q6sd1gxn.js": "e2b96fa2ba6152de28d87a6a25db7b9f64bff7623257dfcdb0148d9027ef3b0d",
+    "library/chunk-tncfb2ad.js": "04b634d0a59bea5cda8e27d556fe8a374a3ee42ab14e9e304a742fb116a88a40",
+    "library/chunk-y3qf8ee4.js": "93605a6432d97d43bf59b6c6a42127ccf6d6d065701118925829f0314cd75b7e",
+    "library/chunk-ytsz3xpv.js": "569e46c9ca71db3755e9eaac5a7ce3c991f8abe31bb9071d42dbfb8d9d9d5080",
+    "library/geometry.js": "398fd975301ff6d2e6f6eccf1c31951eecf61e54c8630e67eb12d3bf0806ac02",
+    "library/numeric.js": "8759a1530936da1453fa0c2156b683db1b226d8f8cfd67706d5af69832970dc3",
+    "library/redux.js": "d7fbcd75a03c2840acaccf864dcf7ab96568d772035123f3175137618fb788a6",
+    "library/shared.js": "7d72dcbaf65c405c5a585ae1d5b9db94e40783c117dab0b23c6add4749603b23",
+    "library/state.js": "d835f57aa4b3558e0d21d5e0ebaa8cf5954cf4f1ff0e96702c9260300d8bdab0",
+    "library/tanstack-db-collection.js": "bcc30d04eb5d824bdae9e71cc5107a55e0fde1461ea5286dba206231e413dd5f",
+    "library/worker.js": "c39ce8c588b76680130e83cecb7df9304696abbbc7921ab08d99b56aaeb9d089",
+    "vendor/immer.mjs": "25b6f977bce9f776b18fa555a1e4fb5b9589f1ea0de06c45d63efed2875394d2",
+    "vendor/immutable.mjs": "521270c998410a0c1835fc027620308acd97dc090584c44225d8d9dabb6f300c",
+    "vendor/version.mjs": "1ac55c72fcc3e0112d2af8c87bac15ff781e3fe4d1316ed8a06e4ee0565b70a9"
+  },
+  "proofHashes": {
+    "feature-map-memory-agent.mjs": "5148de9d8e754c333998e5ae0869d55fa94be17f923b441a1d2e6f4f99ee400f",
+    "feature-map-memory-calibration.mjs": "1738cc3af4f023aa57af3178a62fe736594146996a06ec5b6e5df73efd252537",
+    "feature-map-memory-case.mjs": "35773f2654f496a9a48f28c15e9c0c4c2ce4b82a0f6417f95459f0b0fb15e520",
+    "feature-map-memory-checks.mjs": "034086caa92f63fd44137429c0f46c85f08cfdb71fc1893febfa884c0397e3ca",
+    "feature-map-memory-method.md": "15d03a03bd00ee2b334b85dbd178936c7dd8e303fe67981d08d1c8069d8a03e1",
+    "feature-map-memory-model.mjs": "80eef8790286e6c3eaee647f5c30b279890a1375e0fbd46f3968a429274e0bfc",
+    "feature-map-memory-runtime.mjs": "d513b94750e4f5cea23327f0de2cbb4c44627f7292bfee1ca6eeaf5cf92d838c",
+    "feature-map-memory.mjs": "9840c18eeb16a7d5d70a2e336fd2d90f1771e176f79755b721c3d0e7df602351"
+  }
+}

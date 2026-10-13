@@ -1,0 +1,235 @@
+{
+  "status": "verified",
+  "startedAt": "2026-10-11T04:32:22.456Z",
+  "endedAt": "2026-10-11T04:32:22.460Z",
+  "observed": {
+    "totalBytes": 16766414848,
+    "availableBytes": 15357272064,
+    "effectiveHeadroomBytes": 15357272064,
+    "limitingSource": {
+      "kind": "host",
+      "path": "/proc/meminfo",
+      "field": "MemAvailable",
+      "headroomBytes": "15357272064"
+    },
+    "cgroup": {
+      "version": 2,
+      "membershipPath": "/system.slice/hosted-compute-agent.service",
+      "mountId": "36",
+      "mountRoot": "/",
+      "mountPoint": "/sys/fs/cgroup",
+      "rootProof": {
+        "status": "proved-actual-v2-root",
+        "method": "Readable cgroup2 core files plus CFTYPE_NOT_ON_ROOT type/events absence; memory interfaces absent; no obscuring mounts",
+        "directory": "/sys/fs/cgroup",
+        "mountAncestry": [
+          "36",
+          "30",
+          "27"
+        ],
+        "controllers": [
+          "cpuset",
+          "cpu",
+          "io",
+          "memory",
+          "hugetlb",
+          "pids",
+          "rdma",
+          "misc",
+          "dmem"
+        ],
+        "subtreeControl": [
+          "cpuset",
+          "cpu",
+          "io",
+          "memory",
+          "pids"
+        ],
+        "statistics": {
+          "nr_descendants": "55",
+          "nr_subsys_cpuset": "46",
+          "nr_subsys_cpu": "51",
+          "nr_subsys_io": "46",
+          "nr_subsys_memory": "55",
+          "nr_subsys_perf_event": "56",
+          "nr_subsys_hugetlb": "1",
+          "nr_subsys_pids": "55",
+          "nr_subsys_rdma": "1",
+          "nr_subsys_misc": "1",
+          "nr_subsys_dmem": "1",
+          "nr_dying_descendants": "50",
+          "nr_dying_subsys_cpuset": "0",
+          "nr_dying_subsys_cpu": "0",
+          "nr_dying_subsys_io": "5",
+          "nr_dying_subsys_memory": "50",
+          "nr_dying_subsys_perf_event": "0",
+          "nr_dying_subsys_hugetlb": "0",
+          "nr_dying_subsys_pids": "0",
+          "nr_dying_subsys_rdma": "0",
+          "nr_dying_subsys_misc": "0",
+          "nr_dying_subsys_dmem": "0"
+        },
+        "reads": {
+          "cgroup.controllers": {
+            "path": "/sys/fs/cgroup/cgroup.controllers",
+            "value": "cpuset cpu io memory hugetlb pids rdma misc dmem"
+          },
+          "cgroup.subtree_control": {
+            "path": "/sys/fs/cgroup/cgroup.subtree_control",
+            "value": "cpuset cpu io memory pids"
+          },
+          "cgroup.stat": {
+            "path": "/sys/fs/cgroup/cgroup.stat",
+            "value": "nr_descendants 55\nnr_subsys_cpuset 46\nnr_subsys_cpu 51\nnr_subsys_io 46\nnr_subsys_memory 55\nnr_subsys_perf_event 56\nnr_subsys_hugetlb 1\nnr_subsys_pids 55\nnr_subsys_rdma 1\nnr_subsys_misc 1\nnr_subsys_dmem 1\nnr_dying_descendants 50\nnr_dying_subsys_cpuset 0\nnr_dying_subsys_cpu 0\nnr_dying_subsys_io 5\nnr_dying_subsys_memory 50\nnr_dying_subsys_perf_event 0\nnr_dying_subsys_hugetlb 0\nnr_dying_subsys_pids 0\nnr_dying_subsys_rdma 0\nnr_dying_subsys_misc 0\nnr_dying_subsys_dmem 0"
+          }
+        },
+        "absent": [
+          {
+            "name": "cgroup.type",
+            "path": "/sys/fs/cgroup/cgroup.type",
+            "code": "ENOENT",
+            "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/cgroup.type'"
+          },
+          {
+            "name": "cgroup.events",
+            "path": "/sys/fs/cgroup/cgroup.events",
+            "code": "ENOENT",
+            "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/cgroup.events'"
+          },
+          {
+            "name": "memory.max",
+            "path": "/sys/fs/cgroup/memory.max",
+            "code": "ENOENT",
+            "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/memory.max'"
+          },
+          {
+            "name": "memory.current",
+            "path": "/sys/fs/cgroup/memory.current",
+            "code": "ENOENT",
+            "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/memory.current'"
+          }
+        ]
+      },
+      "ancestry": "Own group through proved actual hierarchy root, inclusive; namespace, subtree-only, obscured or unreadable ancestry is rejected.",
+      "groups": [
+        {
+          "hierarchyPath": "/system.slice/hosted-compute-agent.service",
+          "directory": "/sys/fs/cgroup/system.slice/hosted-compute-agent.service",
+          "limitPath": "/sys/fs/cgroup/system.slice/hosted-compute-agent.service/memory.max",
+          "currentPath": "/sys/fs/cgroup/system.slice/hosted-compute-agent.service/memory.current",
+          "limitKind": "explicit-unlimited",
+          "limitBytes": null,
+          "currentBytes": "412766208",
+          "headroomBytes": null
+        },
+        {
+          "hierarchyPath": "/system.slice",
+          "directory": "/sys/fs/cgroup/system.slice",
+          "limitPath": "/sys/fs/cgroup/system.slice/memory.max",
+          "currentPath": "/sys/fs/cgroup/system.slice/memory.current",
+          "limitKind": "explicit-unlimited",
+          "limitBytes": null,
+          "currentBytes": "2974384128",
+          "headroomBytes": null
+        },
+        {
+          "hierarchyPath": "/",
+          "directory": "/sys/fs/cgroup",
+          "limitKind": "proved-unconstrained-root",
+          "rootProof": {
+            "status": "proved-actual-v2-root",
+            "method": "Readable cgroup2 core files plus CFTYPE_NOT_ON_ROOT type/events absence; memory interfaces absent; no obscuring mounts",
+            "directory": "/sys/fs/cgroup",
+            "mountAncestry": [
+              "36",
+              "30",
+              "27"
+            ],
+            "controllers": [
+              "cpuset",
+              "cpu",
+              "io",
+              "memory",
+              "hugetlb",
+              "pids",
+              "rdma",
+              "misc",
+              "dmem"
+            ],
+            "subtreeControl": [
+              "cpuset",
+              "cpu",
+              "io",
+              "memory",
+              "pids"
+            ],
+            "statistics": {
+              "nr_descendants": "55",
+              "nr_subsys_cpuset": "46",
+              "nr_subsys_cpu": "51",
+              "nr_subsys_io": "46",
+              "nr_subsys_memory": "55",
+              "nr_subsys_perf_event": "56",
+              "nr_subsys_hugetlb": "1",
+              "nr_subsys_pids": "55",
+              "nr_subsys_rdma": "1",
+              "nr_subsys_misc": "1",
+              "nr_subsys_dmem": "1",
+              "nr_dying_descendants": "50",
+              "nr_dying_subsys_cpuset": "0",
+              "nr_dying_subsys_cpu": "0",
+              "nr_dying_subsys_io": "5",
+              "nr_dying_subsys_memory": "50",
+              "nr_dying_subsys_perf_event": "0",
+              "nr_dying_subsys_hugetlb": "0",
+              "nr_dying_subsys_pids": "0",
+              "nr_dying_subsys_rdma": "0",
+              "nr_dying_subsys_misc": "0",
+              "nr_dying_subsys_dmem": "0"
+            },
+            "reads": {
+              "cgroup.controllers": {
+                "path": "/sys/fs/cgroup/cgroup.controllers",
+                "value": "cpuset cpu io memory hugetlb pids rdma misc dmem"
+              },
+              "cgroup.subtree_control": {
+                "path": "/sys/fs/cgroup/cgroup.subtree_control",
+                "value": "cpuset cpu io memory pids"
+              },
+              "cgroup.stat": {
+                "path": "/sys/fs/cgroup/cgroup.stat",
+                "value": "nr_descendants 55\nnr_subsys_cpuset 46\nnr_subsys_cpu 51\nnr_subsys_io 46\nnr_subsys_memory 55\nnr_subsys_perf_event 56\nnr_subsys_hugetlb 1\nnr_subsys_pids 55\nnr_subsys_rdma 1\nnr_subsys_misc 1\nnr_subsys_dmem 1\nnr_dying_descendants 50\nnr_dying_subsys_cpuset 0\nnr_dying_subsys_cpu 0\nnr_dying_subsys_io 5\nnr_dying_subsys_memory 50\nnr_dying_subsys_perf_event 0\nnr_dying_subsys_hugetlb 0\nnr_dying_subsys_pids 0\nnr_dying_subsys_rdma 0\nnr_dying_subsys_misc 0\nnr_dying_subsys_dmem 0"
+              }
+            },
+            "absent": [
+              {
+                "name": "cgroup.type",
+                "path": "/sys/fs/cgroup/cgroup.type",
+                "code": "ENOENT",
+                "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/cgroup.type'"
+              },
+              {
+                "name": "cgroup.events",
+                "path": "/sys/fs/cgroup/cgroup.events",
+                "code": "ENOENT",
+                "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/cgroup.events'"
+              },
+              {
+                "name": "memory.max",
+                "path": "/sys/fs/cgroup/memory.max",
+                "code": "ENOENT",
+                "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/memory.max'"
+              },
+              {
+                "name": "memory.current",
+                "path": "/sys/fs/cgroup/memory.current",
+                "code": "ENOENT",
+                "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/memory.current'"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

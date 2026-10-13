@@ -1,0 +1,65 @@
+{
+  "before": {
+    "rss": 63524864,
+    "heapTotal": 6922240,
+    "heapUsed": 4221808,
+    "external": 1779387,
+    "arrayBuffers": 10479
+  },
+  "ordinary": {
+    "rss": 63524864,
+    "heapTotal": 6922240,
+    "heapUsed": 4233664,
+    "external": 10168035,
+    "arrayBuffers": 8399087
+  },
+  "wasm": {
+    "rss": 64049152,
+    "heapTotal": 6922240,
+    "heapUsed": 4242808,
+    "external": 10168035,
+    "arrayBuffers": 8399087
+  },
+  "grown": {
+    "rss": 64180224,
+    "heapTotal": 6922240,
+    "heapUsed": 4243104,
+    "external": 10168035,
+    "arrayBuffers": 8399087
+  },
+  "readerBefore": {
+    "id": 1,
+    "usage": {
+      "rss": 63262720,
+      "heapTotal": 10067968,
+      "heapUsed": 4942624,
+      "external": 2875324,
+      "arrayBuffers": 10379
+    },
+    "capacityBytes": 0
+  },
+  "readerAttached": {
+    "id": 2,
+    "usage": {
+      "rss": 64180224,
+      "heapTotal": 10330112,
+      "heapUsed": 4961920,
+      "external": 2875364,
+      "arrayBuffers": 10379
+    },
+    "capacityBytes": 8388608
+  },
+  "readerGrown": {
+    "id": 3,
+    "usage": {
+      "rss": 64180224,
+      "heapTotal": 10330112,
+      "heapUsed": 4970504,
+      "external": 2875364,
+      "arrayBuffers": 10379
+    },
+    "capacityBytes": 16777216
+  },
+  "ordinaryCapacityBytes": 8388608,
+  "wasmCapacityBytes": 16777216
+}

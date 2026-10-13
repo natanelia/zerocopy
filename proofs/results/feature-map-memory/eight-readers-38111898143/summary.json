@@ -1,0 +1,2184 @@
+{
+  "schema": "zerocopy-feature-map-memory/v1",
+  "method": "Sum of signed post-GC JavaScript heap and tracked ArrayBuffer changes across the controller, owner, and every reader, plus unique shared WASM backing capacity counted once by arena identity. Empty imported workers and connected MessageChannels are the baseline. Includes caches, spare capacity, and unreclaimed arena history. External memory is diagnostic and is not added twice. Process RSS and high-water RSS are reported separately. Not live payload size, browser memory, or peak temporary allocation.",
+  "startedAt": "2026-10-11T04:32:33.383Z",
+  "sourceCommit": "f140ebe650d536c9b88bd412c291a3cd91614454",
+  "workingTreeDirty": true,
+  "runtimeSourceCommit": "f140ebe650d536c9b88bd412c291a3cd91614454",
+  "recordingType": "eight-reader-cohort",
+  "intendedRunCount": 12,
+  "chartEligible": true,
+  "referenceRecording": {
+    "sourceCommit": "8ad5788648db93c18994fdde9b8fdb12e3a4957b",
+    "runtimeSourceCommit": "8ad5788648db93c18994fdde9b8fdb12e3a4957b",
+    "runtime": "v22.23.3",
+    "v8": "12.4.254.21-node.57",
+    "platform": "linux",
+    "arch": "x64",
+    "dependencies": {
+      "immutable": "5.1.9",
+      "immer": "11.1.21"
+    },
+    "hashes": {
+      "assets/feature-core.mjs": "2507d69a7cbec0f390a91d8ffb0d2e53e734849818cdf7d2064d7d166677d5d9",
+      "assets/feature-reference.mjs": "9f80c888a935c1486cc3727284cf3408ed31b03fdc1d6c0e4e379c6f8ff17382",
+      "assets/feature-storage.mjs": "be7541e583dd9f02d8521c56111ca42d0ac315bf8d8e20a17e94f40db169ddb9",
+      "library/chunk-8hw6gtrx.js": "dd9603ec6782953a9ff492e8265b9196fc8be0a280686430d0867f76ff249afd",
+      "library/chunk-q6sd1gxn.js": "e2b96fa2ba6152de28d87a6a25db7b9f64bff7623257dfcdb0148d9027ef3b0d",
+      "library/chunk-tncfb2ad.js": "04b634d0a59bea5cda8e27d556fe8a374a3ee42ab14e9e304a742fb116a88a40",
+      "library/chunk-y3qf8ee4.js": "93605a6432d97d43bf59b6c6a42127ccf6d6d065701118925829f0314cd75b7e",
+      "library/chunk-ytsz3xpv.js": "569e46c9ca71db3755e9eaac5a7ce3c991f8abe31bb9071d42dbfb8d9d9d5080",
+      "library/geometry.js": "398fd975301ff6d2e6f6eccf1c31951eecf61e54c8630e67eb12d3bf0806ac02",
+      "library/numeric.js": "8759a1530936da1453fa0c2156b683db1b226d8f8cfd67706d5af69832970dc3",
+      "library/redux.js": "d7fbcd75a03c2840acaccf864dcf7ab96568d772035123f3175137618fb788a6",
+      "library/shared.js": "7d72dcbaf65c405c5a585ae1d5b9db94e40783c117dab0b23c6add4749603b23",
+      "library/state.js": "d835f57aa4b3558e0d21d5e0ebaa8cf5954cf4f1ff0e96702c9260300d8bdab0",
+      "library/tanstack-db-collection.js": "bcc30d04eb5d824bdae9e71cc5107a55e0fde1461ea5286dba206231e413dd5f",
+      "library/worker.js": "c39ce8c588b76680130e83cecb7df9304696abbbc7921ab08d99b56aaeb9d089",
+      "vendor/immer.mjs": "25b6f977bce9f776b18fa555a1e4fb5b9589f1ea0de06c45d63efed2875394d2",
+      "vendor/immutable.mjs": "521270c998410a0c1835fc027620308acd97dc090584c44225d8d9dabb6f300c",
+      "vendor/version.mjs": "1ac55c72fcc3e0112d2af8c87bac15ff781e3fe4d1316ed8a06e4ee0565b70a9"
+    },
+    "proofHashes": {
+      "feature-map-memory-agent.mjs": "5148de9d8e754c333998e5ae0869d55fa94be17f923b441a1d2e6f4f99ee400f",
+      "feature-map-memory-calibration.mjs": "1738cc3af4f023aa57af3178a62fe736594146996a06ec5b6e5df73efd252537",
+      "feature-map-memory-case.mjs": "35773f2654f496a9a48f28c15e9c0c4c2ce4b82a0f6417f95459f0b0fb15e520",
+      "feature-map-memory-checks.mjs": "034086caa92f63fd44137429c0f46c85f08cfdb71fc1893febfa884c0397e3ca",
+      "feature-map-memory-method.md": "15d03a03bd00ee2b334b85dbd178936c7dd8e303fe67981d08d1c8069d8a03e1",
+      "feature-map-memory-model.mjs": "80eef8790286e6c3eaee647f5c30b279890a1375e0fbd46f3968a429274e0bfc",
+      "feature-map-memory-runtime.mjs": "d513b94750e4f5cea23327f0de2cbb4c44627f7292bfee1ca6eeaf5cf92d838c",
+      "feature-map-memory.mjs": "9840c18eeb16a7d5d70a2e336fd2d90f1771e176f79755b721c3d0e7df602351"
+    },
+    "schema": "zerocopy-feature-map-reference/v1",
+    "runId": 38109729237,
+    "summarySHA256": "24790a4e2f18bb71a15c0245bbdf73822daa5cf3607fdaf866059a8fdb368803",
+    "terminalSHA256": "d5f7c60691e1726b9c72f98e5e66c0b04abebc2ba4460a59759977c82650ce1c",
+    "readerCounts": [
+      0,
+      2,
+      4
+    ],
+    "runCount": 36
+  },
+  "runtime": "v22.23.3",
+  "v8": "12.4.254.21-node.57",
+  "platform": "linux",
+  "osRelease": "6.17.0-1022-azure",
+  "arch": "x64",
+  "cpu": "AMD EPYC 7763 64-Core Processor",
+  "logicalCPUs": 4,
+  "systemMemoryBytes": 16766414848,
+  "trials": 3,
+  "entries": 100000,
+  "readerCounts": [
+    8
+  ],
+  "kinds": [
+    "shared",
+    "native",
+    "immutable",
+    "immer"
+  ],
+  "readCount": 1000,
+  "editCount": 100,
+  "streamEdits": 10,
+  "chartStage": "edited-retained",
+  "warmup": "Imported workers and MessageChannels; no collection allocation before baseline. Cold and warm denote the first and repeated request, not a process/JIT reset. The zero-reader owner can reuse decoded objects between its two jobs within the first request.",
+  "retainedAnswers": "Each data isolate retains its latest bounded answer; the controller retains baseline usage records but no dataset or reference map.",
+  "nativeLifetime": "Clone the current Map only if it is the retained initial root; mutate the exclusively owned latest Map on subsequent replacements.",
+  "dependencies": {
+    "immutable": "5.1.9",
+    "immer": "11.1.21"
+  },
+  "hashes": {
+    "assets/feature-core.mjs": "2507d69a7cbec0f390a91d8ffb0d2e53e734849818cdf7d2064d7d166677d5d9",
+    "assets/feature-reference.mjs": "9f80c888a935c1486cc3727284cf3408ed31b03fdc1d6c0e4e379c6f8ff17382",
+    "assets/feature-storage.mjs": "be7541e583dd9f02d8521c56111ca42d0ac315bf8d8e20a17e94f40db169ddb9",
+    "library/chunk-8hw6gtrx.js": "dd9603ec6782953a9ff492e8265b9196fc8be0a280686430d0867f76ff249afd",
+    "library/chunk-q6sd1gxn.js": "e2b96fa2ba6152de28d87a6a25db7b9f64bff7623257dfcdb0148d9027ef3b0d",
+    "library/chunk-tncfb2ad.js": "04b634d0a59bea5cda8e27d556fe8a374a3ee42ab14e9e304a742fb116a88a40",
+    "library/chunk-y3qf8ee4.js": "93605a6432d97d43bf59b6c6a42127ccf6d6d065701118925829f0314cd75b7e",
+    "library/chunk-ytsz3xpv.js": "569e46c9ca71db3755e9eaac5a7ce3c991f8abe31bb9071d42dbfb8d9d9d5080",
+    "library/geometry.js": "398fd975301ff6d2e6f6eccf1c31951eecf61e54c8630e67eb12d3bf0806ac02",
+    "library/numeric.js": "8759a1530936da1453fa0c2156b683db1b226d8f8cfd67706d5af69832970dc3",
+    "library/redux.js": "d7fbcd75a03c2840acaccf864dcf7ab96568d772035123f3175137618fb788a6",
+    "library/shared.js": "7d72dcbaf65c405c5a585ae1d5b9db94e40783c117dab0b23c6add4749603b23",
+    "library/state.js": "d835f57aa4b3558e0d21d5e0ebaa8cf5954cf4f1ff0e96702c9260300d8bdab0",
+    "library/tanstack-db-collection.js": "bcc30d04eb5d824bdae9e71cc5107a55e0fde1461ea5286dba206231e413dd5f",
+    "library/worker.js": "c39ce8c588b76680130e83cecb7df9304696abbbc7921ab08d99b56aaeb9d089",
+    "vendor/immer.mjs": "25b6f977bce9f776b18fa555a1e4fb5b9589f1ea0de06c45d63efed2875394d2",
+    "vendor/immutable.mjs": "521270c998410a0c1835fc027620308acd97dc090584c44225d8d9dabb6f300c",
+    "vendor/version.mjs": "1ac55c72fcc3e0112d2af8c87bac15ff781e3fe4d1316ed8a06e4ee0565b70a9"
+  },
+  "proofHashes": {
+    "feature-map-memory-agent.mjs": "5148de9d8e754c333998e5ae0869d55fa94be17f923b441a1d2e6f4f99ee400f",
+    "feature-map-memory-calibration.mjs": "1738cc3af4f023aa57af3178a62fe736594146996a06ec5b6e5df73efd252537",
+    "feature-map-memory-case.mjs": "35773f2654f496a9a48f28c15e9c0c4c2ce4b82a0f6417f95459f0b0fb15e520",
+    "feature-map-memory-checks.mjs": "034086caa92f63fd44137429c0f46c85f08cfdb71fc1893febfa884c0397e3ca",
+    "feature-map-memory-method.md": "15d03a03bd00ee2b334b85dbd178936c7dd8e303fe67981d08d1c8069d8a03e1",
+    "feature-map-memory-model.mjs": "3dc8287c6308a10bb0a3ba170f4da5ba18af98329c79b30184093e638940cc3e",
+    "feature-map-memory-runtime.mjs": "d513b94750e4f5cea23327f0de2cbb4c44627f7292bfee1ca6eeaf5cf92d838c",
+    "feature-map-memory.mjs": "ea952c4bf8e42608e51dc54f72279533589f8c5ddcf928559cdb29fd4da04a0a"
+  },
+  "status": "verified",
+  "measuredAt": "2026-10-11T04:34:04.013Z",
+  "runCount": 12,
+  "calibration": {
+    "before": {
+      "rss": 63553536,
+      "heapTotal": 6922240,
+      "heapUsed": 4221736,
+      "external": 1779387,
+      "arrayBuffers": 10479
+    },
+    "ordinary": {
+      "rss": 63553536,
+      "heapTotal": 6922240,
+      "heapUsed": 4233592,
+      "external": 10168035,
+      "arrayBuffers": 8399087
+    },
+    "wasm": {
+      "rss": 63983616,
+      "heapTotal": 6922240,
+      "heapUsed": 4242736,
+      "external": 10168035,
+      "arrayBuffers": 8399087
+    },
+    "grown": {
+      "rss": 63983616,
+      "heapTotal": 6922240,
+      "heapUsed": 4243032,
+      "external": 10168035,
+      "arrayBuffers": 8399087
+    },
+    "readerBefore": {
+      "id": 1,
+      "usage": {
+        "rss": 63291392,
+        "heapTotal": 10330112,
+        "heapUsed": 4942768,
+        "external": 2875324,
+        "arrayBuffers": 10379
+      },
+      "capacityBytes": 0
+    },
+    "readerAttached": {
+      "id": 2,
+      "usage": {
+        "rss": 63983616,
+        "heapTotal": 10330112,
+        "heapUsed": 4962064,
+        "external": 2875364,
+        "arrayBuffers": 10379
+      },
+      "capacityBytes": 8388608
+    },
+    "readerGrown": {
+      "id": 3,
+      "usage": {
+        "rss": 64114688,
+        "heapTotal": 10330112,
+        "heapUsed": 4970648,
+        "external": 2875364,
+        "arrayBuffers": 10379
+      },
+      "capacityBytes": 16777216
+    },
+    "ordinaryCapacityBytes": 8388608,
+    "wasmCapacityBytes": 16777216
+  },
+  "dispersion": "Median and observed minimum–maximum over fresh processes; no confidence interval or performance gate.",
+  "summary": [
+    {
+      "kind": "shared",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "loaded",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 55371056,
+          "arrayBuffers": 228282,
+          "external": 28078006,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3budbq-pv9p5nlucx-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 1311568,
+          "arrayBufferDelta": 49512,
+          "retainedBytes": 22070456,
+          "resolved": true,
+          "rssBytes": 259973120,
+          "processHighWaterRSSBytes": 265928704
+        },
+        {
+          "trial": 2,
+          "heapUsed": 55372240,
+          "arrayBuffers": 228282,
+          "external": 28078006,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bvmsc-zalhokriws-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 1311640,
+          "arrayBufferDelta": 49512,
+          "retainedBytes": 22070528,
+          "resolved": true,
+          "rssBytes": 268521472,
+          "processHighWaterRSSBytes": 274370560
+        },
+        {
+          "trial": 3,
+          "heapUsed": 55344624,
+          "arrayBuffers": 228282,
+          "external": 28078006,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bw3px-s0wegri1dyk-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 1284832,
+          "arrayBufferDelta": 49512,
+          "retainedBytes": 22043720,
+          "resolved": true,
+          "rssBytes": 268419072,
+          "processHighWaterRSSBytes": 274345984
+        }
+      ],
+      "medians": {
+        "retainedBytes": 22070456,
+        "heapDelta": 1311568,
+        "arrayBufferDelta": 49512,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20644524,
+        "rssBytes": 268419072,
+        "processHighWaterRSSBytes": 274345984
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 22043720,
+          "max": 22070528
+        },
+        "heapDelta": {
+          "min": 1284832,
+          "max": 1311640
+        },
+        "arrayBufferDelta": {
+          "min": 49512,
+          "max": 49512
+        },
+        "wasmCapacityBytes": {
+          "min": 20709376,
+          "max": 20709376
+        },
+        "arenaUsedBytes": {
+          "min": 20644524,
+          "max": 20644524
+        },
+        "rssBytes": {
+          "min": 259973120,
+          "max": 268521472
+        },
+        "processHighWaterRSSBytes": {
+          "min": 265928704,
+          "max": 274370560
+        }
+      }
+    },
+    {
+      "kind": "shared",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "queried",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 58760464,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3budbq-pv9p5nlucx-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 4700976,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 25726104,
+          "resolved": true,
+          "rssBytes": 273825792,
+          "processHighWaterRSSBytes": 273825792
+        },
+        {
+          "trial": 2,
+          "heapUsed": 58761648,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bvmsc-zalhokriws-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 4701048,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 25726176,
+          "resolved": true,
+          "rssBytes": 281092096,
+          "processHighWaterRSSBytes": 281092096
+        },
+        {
+          "trial": 3,
+          "heapUsed": 58734032,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20644524,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bw3px-s0wegri1dyk-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20644524
+            }
+          ],
+          "heapDelta": 4674240,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 25699368,
+          "resolved": true,
+          "rssBytes": 280522752,
+          "processHighWaterRSSBytes": 280522752
+        }
+      ],
+      "medians": {
+        "retainedBytes": 25726104,
+        "heapDelta": 4700976,
+        "arrayBufferDelta": 315752,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20644524,
+        "rssBytes": 280522752,
+        "processHighWaterRSSBytes": 280522752
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 25699368,
+          "max": 25726176
+        },
+        "heapDelta": {
+          "min": 4674240,
+          "max": 4701048
+        },
+        "arrayBufferDelta": {
+          "min": 315752,
+          "max": 315752
+        },
+        "wasmCapacityBytes": {
+          "min": 20709376,
+          "max": 20709376
+        },
+        "arenaUsedBytes": {
+          "min": 20644524,
+          "max": 20644524
+        },
+        "rssBytes": {
+          "min": 273825792,
+          "max": 281092096
+        },
+        "processHighWaterRSSBytes": {
+          "min": 273825792,
+          "max": 281092096
+        }
+      }
+    },
+    {
+      "kind": "shared",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "edited-retained",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 62060648,
+          "arrayBuffers": 761082,
+          "external": 28639931,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3budbq-pv9p5nlucx-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 8001160,
+          "arrayBufferDelta": 582312,
+          "retainedBytes": 29292848,
+          "resolved": true,
+          "rssBytes": 287752192,
+          "processHighWaterRSSBytes": 290004992
+        },
+        {
+          "trial": 2,
+          "heapUsed": 62059256,
+          "arrayBuffers": 761082,
+          "external": 28639931,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bvmsc-zalhokriws-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 7998656,
+          "arrayBufferDelta": 582312,
+          "retainedBytes": 29290344,
+          "resolved": true,
+          "rssBytes": 295211008,
+          "processHighWaterRSSBytes": 297267200
+        },
+        {
+          "trial": 3,
+          "heapUsed": 62034144,
+          "arrayBuffers": 761082,
+          "external": 28639931,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bw3px-s0wegri1dyk-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 7974352,
+          "arrayBufferDelta": 582312,
+          "retainedBytes": 29266040,
+          "resolved": true,
+          "rssBytes": 294838272,
+          "processHighWaterRSSBytes": 296341504
+        }
+      ],
+      "medians": {
+        "retainedBytes": 29290344,
+        "heapDelta": 7998656,
+        "arrayBufferDelta": 582312,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20678956,
+        "rssBytes": 294838272,
+        "processHighWaterRSSBytes": 296341504
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 29266040,
+          "max": 29292848
+        },
+        "heapDelta": {
+          "min": 7974352,
+          "max": 8001160
+        },
+        "arrayBufferDelta": {
+          "min": 582312,
+          "max": 582312
+        },
+        "wasmCapacityBytes": {
+          "min": 20709376,
+          "max": 20709376
+        },
+        "arenaUsedBytes": {
+          "min": 20678956,
+          "max": 20678956
+        },
+        "rssBytes": {
+          "min": 287752192,
+          "max": 295211008
+        },
+        "processHighWaterRSSBytes": {
+          "min": 290004992,
+          "max": 297267200
+        }
+      }
+    },
+    {
+      "kind": "shared",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "released",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 59387368,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3budbq-pv9p5nlucx-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 5327880,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26353008,
+          "resolved": true,
+          "rssBytes": 288014336,
+          "processHighWaterRSSBytes": 290004992
+        },
+        {
+          "trial": 2,
+          "heapUsed": 59385976,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bvmsc-zalhokriws-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 5325376,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26350504,
+          "resolved": true,
+          "rssBytes": 295084032,
+          "processHighWaterRSSBytes": 297267200
+        },
+        {
+          "trial": 3,
+          "heapUsed": 59360864,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20709376,
+          "arenaUsedBytes": 20678956,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bw3px-s0wegri1dyk-1",
+              "capacityBytes": 20709376,
+              "usedBytes": 20678956
+            }
+          ],
+          "heapDelta": 5301072,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26326200,
+          "resolved": true,
+          "rssBytes": 295100416,
+          "processHighWaterRSSBytes": 296341504
+        }
+      ],
+      "medians": {
+        "retainedBytes": 26350504,
+        "heapDelta": 5325376,
+        "arrayBufferDelta": 315752,
+        "wasmCapacityBytes": 20709376,
+        "arenaUsedBytes": 20678956,
+        "rssBytes": 295084032,
+        "processHighWaterRSSBytes": 296341504
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 26326200,
+          "max": 26353008
+        },
+        "heapDelta": {
+          "min": 5301072,
+          "max": 5327880
+        },
+        "arrayBufferDelta": {
+          "min": 315752,
+          "max": 315752
+        },
+        "wasmCapacityBytes": {
+          "min": 20709376,
+          "max": 20709376
+        },
+        "arenaUsedBytes": {
+          "min": 20678956,
+          "max": 20678956
+        },
+        "rssBytes": {
+          "min": 288014336,
+          "max": 295100416
+        },
+        "processHighWaterRSSBytes": {
+          "min": 290004992,
+          "max": 297267200
+        }
+      }
+    },
+    {
+      "kind": "shared",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "streamed",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 59724280,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20971520,
+          "arenaUsedBytes": 20968292,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3budbq-pv9p5nlucx-1",
+              "capacityBytes": 20971520,
+              "usedBytes": 20968292
+            }
+          ],
+          "heapDelta": 5664792,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26952064,
+          "resolved": true,
+          "rssBytes": 291471360,
+          "processHighWaterRSSBytes": 291926016
+        },
+        {
+          "trial": 2,
+          "heapUsed": 59732872,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20971520,
+          "arenaUsedBytes": 20968292,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bvmsc-zalhokriws-1",
+              "capacityBytes": 20971520,
+              "usedBytes": 20968292
+            }
+          ],
+          "heapDelta": 5672272,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26959544,
+          "resolved": true,
+          "rssBytes": 297635840,
+          "processHighWaterRSSBytes": 299159552
+        },
+        {
+          "trial": 3,
+          "heapUsed": 59683968,
+          "arrayBuffers": 494522,
+          "external": 28373371,
+          "wasmCapacityBytes": 20971520,
+          "arenaUsedBytes": 20968292,
+          "arenaCount": 1,
+          "arenas": [
+            {
+              "id": "mv3bw3px-s0wegri1dyk-1",
+              "capacityBytes": 20971520,
+              "usedBytes": 20968292
+            }
+          ],
+          "heapDelta": 5624176,
+          "arrayBufferDelta": 315752,
+          "retainedBytes": 26911448,
+          "resolved": true,
+          "rssBytes": 297705472,
+          "processHighWaterRSSBytes": 299192320
+        }
+      ],
+      "medians": {
+        "retainedBytes": 26952064,
+        "heapDelta": 5664792,
+        "arrayBufferDelta": 315752,
+        "wasmCapacityBytes": 20971520,
+        "arenaUsedBytes": 20968292,
+        "rssBytes": 297635840,
+        "processHighWaterRSSBytes": 299159552
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 26911448,
+          "max": 26959544
+        },
+        "heapDelta": {
+          "min": 5624176,
+          "max": 5672272
+        },
+        "arrayBufferDelta": {
+          "min": 315752,
+          "max": 315752
+        },
+        "wasmCapacityBytes": {
+          "min": 20971520,
+          "max": 20971520
+        },
+        "arenaUsedBytes": {
+          "min": 20968292,
+          "max": 20968292
+        },
+        "rssBytes": {
+          "min": 291471360,
+          "max": 297705472
+        },
+        "processHighWaterRSSBytes": {
+          "min": 291926016,
+          "max": 299192320
+        }
+      }
+    },
+    {
+      "kind": "native",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "loaded",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 513876088,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463619712,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463619712,
+          "resolved": true,
+          "rssBytes": 972947456,
+          "processHighWaterRSSBytes": 1027051520
+        },
+        {
+          "trial": 2,
+          "heapUsed": 513876024,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463619792,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463619792,
+          "resolved": true,
+          "rssBytes": 968445952,
+          "processHighWaterRSSBytes": 1023176704
+        },
+        {
+          "trial": 3,
+          "heapUsed": 513875288,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463619792,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463619792,
+          "resolved": true,
+          "rssBytes": 976474112,
+          "processHighWaterRSSBytes": 1029144576
+        }
+      ],
+      "medians": {
+        "retainedBytes": 463619792,
+        "heapDelta": 463619792,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 972947456,
+        "processHighWaterRSSBytes": 1027051520
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 463619712,
+          "max": 463619792
+        },
+        "heapDelta": {
+          "min": 463619712,
+          "max": 463619792
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 968445952,
+          "max": 976474112
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1023176704,
+          "max": 1029144576
+        }
+      }
+    },
+    {
+      "kind": "native",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "queried",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 514237120,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463980744,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463980744,
+          "resolved": true,
+          "rssBytes": 973602816,
+          "processHighWaterRSSBytes": 1027051520
+        },
+        {
+          "trial": 2,
+          "heapUsed": 514237056,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463980824,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463980824,
+          "resolved": true,
+          "rssBytes": 969363456,
+          "processHighWaterRSSBytes": 1023176704
+        },
+        {
+          "trial": 3,
+          "heapUsed": 514236320,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463980824,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463980824,
+          "resolved": true,
+          "rssBytes": 976998400,
+          "processHighWaterRSSBytes": 1029144576
+        }
+      ],
+      "medians": {
+        "retainedBytes": 463980824,
+        "heapDelta": 463980824,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 973602816,
+        "processHighWaterRSSBytes": 1027051520
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 463980744,
+          "max": 463980824
+        },
+        "heapDelta": {
+          "min": 463980744,
+          "max": 463980824
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 969363456,
+          "max": 976998400
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1023176704,
+          "max": 1029144576
+        }
+      }
+    },
+    {
+      "kind": "native",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "edited-retained",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 548004688,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 497748312,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 497748312,
+          "resolved": true,
+          "rssBytes": 1008033792,
+          "processHighWaterRSSBytes": 1038610432
+        },
+        {
+          "trial": 2,
+          "heapUsed": 548004544,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 497748312,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 497748312,
+          "resolved": true,
+          "rssBytes": 1004109824,
+          "processHighWaterRSSBytes": 1034641408
+        },
+        {
+          "trial": 3,
+          "heapUsed": 548003808,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 497748312,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 497748312,
+          "resolved": true,
+          "rssBytes": 1012248576,
+          "processHighWaterRSSBytes": 1042128896
+        }
+      ],
+      "medians": {
+        "retainedBytes": 497748312,
+        "heapDelta": 497748312,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1008033792,
+        "processHighWaterRSSBytes": 1038610432
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 497748312,
+          "max": 497748312
+        },
+        "heapDelta": {
+          "min": 497748312,
+          "max": 497748312
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1004109824,
+          "max": 1012248576
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1034641408,
+          "max": 1042128896
+        }
+      }
+    },
+    {
+      "kind": "native",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "released",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 514601744,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464345368,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464345368,
+          "resolved": true,
+          "rssBytes": 975044608,
+          "processHighWaterRSSBytes": 1038610432
+        },
+        {
+          "trial": 2,
+          "heapUsed": 514601600,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464345368,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464345368,
+          "resolved": true,
+          "rssBytes": 973471744,
+          "processHighWaterRSSBytes": 1034641408
+        },
+        {
+          "trial": 3,
+          "heapUsed": 514600864,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464345368,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464345368,
+          "resolved": true,
+          "rssBytes": 979300352,
+          "processHighWaterRSSBytes": 1042128896
+        }
+      ],
+      "medians": {
+        "retainedBytes": 464345368,
+        "heapDelta": 464345368,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 975044608,
+        "processHighWaterRSSBytes": 1038610432
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 464345368,
+          "max": 464345368
+        },
+        "heapDelta": {
+          "min": 464345368,
+          "max": 464345368
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 973471744,
+          "max": 979300352
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1034641408,
+          "max": 1042128896
+        }
+      }
+    },
+    {
+      "kind": "native",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "streamed",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 514623704,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464367328,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464367328,
+          "resolved": true,
+          "rssBytes": 975175680,
+          "processHighWaterRSSBytes": 1038610432
+        },
+        {
+          "trial": 2,
+          "heapUsed": 514623560,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464367328,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464367328,
+          "resolved": true,
+          "rssBytes": 973733888,
+          "processHighWaterRSSBytes": 1034641408
+        },
+        {
+          "trial": 3,
+          "heapUsed": 514622824,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464367328,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464367328,
+          "resolved": true,
+          "rssBytes": 979431424,
+          "processHighWaterRSSBytes": 1042128896
+        }
+      ],
+      "medians": {
+        "retainedBytes": 464367328,
+        "heapDelta": 464367328,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 975175680,
+        "processHighWaterRSSBytes": 1038610432
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 464367328,
+          "max": 464367328
+        },
+        "heapDelta": {
+          "min": 464367328,
+          "max": 464367328
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 973733888,
+          "max": 979431424
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1034641408,
+          "max": 1042128896
+        }
+      }
+    },
+    {
+      "kind": "immutable",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "loaded",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 639003168,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583406464,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583406464,
+          "resolved": true,
+          "rssBytes": 1094713344,
+          "processHighWaterRSSBytes": 1133916160
+        },
+        {
+          "trial": 2,
+          "heapUsed": 638978000,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583381152,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583381152,
+          "resolved": true,
+          "rssBytes": 1092325376,
+          "processHighWaterRSSBytes": 1113739264
+        },
+        {
+          "trial": 3,
+          "heapUsed": 639004304,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583407976,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583407976,
+          "resolved": true,
+          "rssBytes": 1110024192,
+          "processHighWaterRSSBytes": 1129525248
+        }
+      ],
+      "medians": {
+        "retainedBytes": 583406464,
+        "heapDelta": 583406464,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1094713344,
+        "processHighWaterRSSBytes": 1129525248
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 583381152,
+          "max": 583407976
+        },
+        "heapDelta": {
+          "min": 583381152,
+          "max": 583407976
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1092325376,
+          "max": 1110024192
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1113739264,
+          "max": 1133916160
+        }
+      }
+    },
+    {
+      "kind": "immutable",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "queried",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 639458576,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583861872,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583861872,
+          "resolved": true,
+          "rssBytes": 1094844416,
+          "processHighWaterRSSBytes": 1133916160
+        },
+        {
+          "trial": 2,
+          "heapUsed": 639434152,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583837304,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583837304,
+          "resolved": true,
+          "rssBytes": 1092718592,
+          "processHighWaterRSSBytes": 1113739264
+        },
+        {
+          "trial": 3,
+          "heapUsed": 639460216,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583863888,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583863888,
+          "resolved": true,
+          "rssBytes": 1110286336,
+          "processHighWaterRSSBytes": 1129525248
+        }
+      ],
+      "medians": {
+        "retainedBytes": 583861872,
+        "heapDelta": 583861872,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1094844416,
+        "processHighWaterRSSBytes": 1129525248
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 583837304,
+          "max": 583863888
+        },
+        "heapDelta": {
+          "min": 583837304,
+          "max": 583863888
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1092718592,
+          "max": 1110286336
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1113739264,
+          "max": 1133916160
+        }
+      }
+    },
+    {
+      "kind": "immutable",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "edited-retained",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 640554312,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 584957608,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 584957608,
+          "resolved": true,
+          "rssBytes": 1095368704,
+          "processHighWaterRSSBytes": 1133916160
+        },
+        {
+          "trial": 2,
+          "heapUsed": 640531032,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 584934184,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 584934184,
+          "resolved": true,
+          "rssBytes": 1093242880,
+          "processHighWaterRSSBytes": 1113739264
+        },
+        {
+          "trial": 3,
+          "heapUsed": 640561384,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 584965056,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 584965056,
+          "resolved": true,
+          "rssBytes": 1110941696,
+          "processHighWaterRSSBytes": 1129525248
+        }
+      ],
+      "medians": {
+        "retainedBytes": 584957608,
+        "heapDelta": 584957608,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1095368704,
+        "processHighWaterRSSBytes": 1129525248
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 584934184,
+          "max": 584965056
+        },
+        "heapDelta": {
+          "min": 584934184,
+          "max": 584965056
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1093242880,
+          "max": 1110941696
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1113739264,
+          "max": 1133916160
+        }
+      }
+    },
+    {
+      "kind": "immutable",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "released",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 639431000,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583834296,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583834296,
+          "resolved": true,
+          "rssBytes": 1095368704,
+          "processHighWaterRSSBytes": 1133916160
+        },
+        {
+          "trial": 2,
+          "heapUsed": 639412672,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583815824,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583815824,
+          "resolved": true,
+          "rssBytes": 1093242880,
+          "processHighWaterRSSBytes": 1113739264
+        },
+        {
+          "trial": 3,
+          "heapUsed": 639447976,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583851648,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583851648,
+          "resolved": true,
+          "rssBytes": 1110941696,
+          "processHighWaterRSSBytes": 1129525248
+        }
+      ],
+      "medians": {
+        "retainedBytes": 583834296,
+        "heapDelta": 583834296,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1095368704,
+        "processHighWaterRSSBytes": 1129525248
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 583815824,
+          "max": 583851648
+        },
+        "heapDelta": {
+          "min": 583815824,
+          "max": 583851648
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1093242880,
+          "max": 1110941696
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1113739264,
+          "max": 1133916160
+        }
+      }
+    },
+    {
+      "kind": "immutable",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "streamed",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 639587112,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583990408,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583990408,
+          "resolved": true,
+          "rssBytes": 1095630848,
+          "processHighWaterRSSBytes": 1133916160
+        },
+        {
+          "trial": 2,
+          "heapUsed": 639587792,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 583990944,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 583990944,
+          "resolved": true,
+          "rssBytes": 1093373952,
+          "processHighWaterRSSBytes": 1113739264
+        },
+        {
+          "trial": 3,
+          "heapUsed": 639610288,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 584013960,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 584013960,
+          "resolved": true,
+          "rssBytes": 1110941696,
+          "processHighWaterRSSBytes": 1129525248
+        }
+      ],
+      "medians": {
+        "retainedBytes": 583990944,
+        "heapDelta": 583990944,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1095630848,
+        "processHighWaterRSSBytes": 1129525248
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 583990408,
+          "max": 584013960
+        },
+        "heapDelta": {
+          "min": 583990408,
+          "max": 584013960
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1093373952,
+          "max": 1110941696
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1113739264,
+          "max": 1133916160
+        }
+      }
+    },
+    {
+      "kind": "immer",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "loaded",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 514724040,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463774520,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463774520,
+          "resolved": true,
+          "rssBytes": 968359936,
+          "processHighWaterRSSBytes": 1031286784
+        },
+        {
+          "trial": 2,
+          "heapUsed": 514724160,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463774440,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463774440,
+          "resolved": true,
+          "rssBytes": 977539072,
+          "processHighWaterRSSBytes": 1038270464
+        },
+        {
+          "trial": 3,
+          "heapUsed": 514722616,
+          "arrayBuffers": 105042,
+          "external": 27954766,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 463774440,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 463774440,
+          "resolved": true,
+          "rssBytes": 986243072,
+          "processHighWaterRSSBytes": 1043165184
+        }
+      ],
+      "medians": {
+        "retainedBytes": 463774440,
+        "heapDelta": 463774440,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 977539072,
+        "processHighWaterRSSBytes": 1038270464
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 463774440,
+          "max": 463774520
+        },
+        "heapDelta": {
+          "min": 463774440,
+          "max": 463774520
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 968359936,
+          "max": 986243072
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1031286784,
+          "max": 1043165184
+        }
+      }
+    },
+    {
+      "kind": "immer",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "queried",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 515086592,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464137072,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464137072,
+          "resolved": true,
+          "rssBytes": 969277440,
+          "processHighWaterRSSBytes": 1031286784
+        },
+        {
+          "trial": 2,
+          "heapUsed": 515086712,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464136992,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464136992,
+          "resolved": true,
+          "rssBytes": 978456576,
+          "processHighWaterRSSBytes": 1038270464
+        },
+        {
+          "trial": 3,
+          "heapUsed": 515085168,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464136992,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464136992,
+          "resolved": true,
+          "rssBytes": 986636288,
+          "processHighWaterRSSBytes": 1043165184
+        }
+      ],
+      "medians": {
+        "retainedBytes": 464136992,
+        "heapDelta": 464136992,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 978456576,
+        "processHighWaterRSSBytes": 1038270464
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 464136992,
+          "max": 464137072
+        },
+        "heapDelta": {
+          "min": 464136992,
+          "max": 464137072
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 969277440,
+          "max": 986636288
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1031286784,
+          "max": 1043165184
+        }
+      }
+    },
+    {
+      "kind": "immer",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "edited-retained",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 549058024,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 498108504,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 498108504,
+          "resolved": true,
+          "rssBytes": 1004687360,
+          "processHighWaterRSSBytes": 1034424320
+        },
+        {
+          "trial": 2,
+          "heapUsed": 549041688,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 498091968,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 498091968,
+          "resolved": true,
+          "rssBytes": 1014562816,
+          "processHighWaterRSSBytes": 1043542016
+        },
+        {
+          "trial": 3,
+          "heapUsed": 549062168,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 498113992,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 498113992,
+          "resolved": true,
+          "rssBytes": 1022160896,
+          "processHighWaterRSSBytes": 1051873280
+        }
+      ],
+      "medians": {
+        "retainedBytes": 498108504,
+        "heapDelta": 498108504,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 1014562816,
+        "processHighWaterRSSBytes": 1043542016
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 498091968,
+          "max": 498113992
+        },
+        "heapDelta": {
+          "min": 498091968,
+          "max": 498113992
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 1004687360,
+          "max": 1022160896
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1034424320,
+          "max": 1051873280
+        }
+      }
+    },
+    {
+      "kind": "immer",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "released",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 515654504,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464704984,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464704984,
+          "resolved": true,
+          "rssBytes": 971943936,
+          "processHighWaterRSSBytes": 1034424320
+        },
+        {
+          "trial": 2,
+          "heapUsed": 515638168,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464688448,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464688448,
+          "resolved": true,
+          "rssBytes": 981667840,
+          "processHighWaterRSSBytes": 1043542016
+        },
+        {
+          "trial": 3,
+          "heapUsed": 515658648,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464710472,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464710472,
+          "resolved": true,
+          "rssBytes": 989302784,
+          "processHighWaterRSSBytes": 1051873280
+        }
+      ],
+      "medians": {
+        "retainedBytes": 464704984,
+        "heapDelta": 464704984,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 981667840,
+        "processHighWaterRSSBytes": 1043542016
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 464688448,
+          "max": 464710472
+        },
+        "heapDelta": {
+          "min": 464688448,
+          "max": 464710472
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 971943936,
+          "max": 989302784
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1034424320,
+          "max": 1051873280
+        }
+      }
+    },
+    {
+      "kind": "immer",
+      "readers": 8,
+      "entries": 100000,
+      "stage": "streamed",
+      "samples": [
+        {
+          "trial": 1,
+          "heapUsed": 515945184,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464995664,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464995664,
+          "resolved": true,
+          "rssBytes": 974454784,
+          "processHighWaterRSSBytes": 1120628736
+        },
+        {
+          "trial": 2,
+          "heapUsed": 515946976,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464997256,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464997256,
+          "resolved": true,
+          "rssBytes": 984911872,
+          "processHighWaterRSSBytes": 1118355456
+        },
+        {
+          "trial": 3,
+          "heapUsed": 515943456,
+          "arrayBuffers": 105042,
+          "external": 27983891,
+          "wasmCapacityBytes": 0,
+          "arenaUsedBytes": 0,
+          "arenaCount": 0,
+          "arenas": [],
+          "heapDelta": 464995280,
+          "arrayBufferDelta": 0,
+          "retainedBytes": 464995280,
+          "resolved": true,
+          "rssBytes": 991666176,
+          "processHighWaterRSSBytes": 1135804416
+        }
+      ],
+      "medians": {
+        "retainedBytes": 464995664,
+        "heapDelta": 464995664,
+        "arrayBufferDelta": 0,
+        "wasmCapacityBytes": 0,
+        "arenaUsedBytes": 0,
+        "rssBytes": 984911872,
+        "processHighWaterRSSBytes": 1120628736
+      },
+      "ranges": {
+        "retainedBytes": {
+          "min": 464995280,
+          "max": 464997256
+        },
+        "heapDelta": {
+          "min": 464995280,
+          "max": 464997256
+        },
+        "arrayBufferDelta": {
+          "min": 0,
+          "max": 0
+        },
+        "wasmCapacityBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "arenaUsedBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "rssBytes": {
+          "min": 974454784,
+          "max": 991666176
+        },
+        "processHighWaterRSSBytes": {
+          "min": 1118355456,
+          "max": 1135804416
+        }
+      }
+    }
+  ]
+}
