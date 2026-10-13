@@ -1,6 +1,6 @@
 import { calculate } from './catalog-core.mjs';
 import { createStorage } from './feature-storage.mjs';
-import { listen } from './feature-peer.mjs';
+import { listen } from './catalog-peer.mjs';
 let storage, current, retained;
 listen(async data => {
   if (data.type === 'prepare') { storage = await createStorage(data.kind); return true; }

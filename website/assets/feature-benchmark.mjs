@@ -1,6 +1,6 @@
 import { checkCapability } from './capability.mjs';
 import { KINDS, LABELS } from './catalog-core.mjs';
-import { Peer } from './feature-peer.mjs';
+import { Peer } from './catalog-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
 const $ = id => document.getElementById(id);
 const WARMUPS = 2, SAMPLES = 7;

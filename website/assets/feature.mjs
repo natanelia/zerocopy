@@ -1,6 +1,6 @@
 import { checkCapability } from './capability.mjs';
 import { KINDS, MAX_REVISION } from './catalog-core.mjs';
-import { Peer } from './feature-peer.mjs';
+import { Peer } from './catalog-peer.mjs';
 const $ = id => document.getElementById(id);
 const kinds = document.querySelector('[data-feature-mode]').dataset.featureMode === 'compare' ? KINDS : ['shared'];
 let peers = new Map(), generation = 0, busy = false, stopping = false, ready = false, revision = 0;
@@ -72,7 +72,7 @@ async function stop(showMessage = true) {
 $('feature-load-form').addEventListener('submit', event => {
   event.preventDefault(); if (peers.size || !ready) return;
   void operation(async token => {
-    status('Starting map owners and real reader workers…');
+    status('Starting catalog owners and real reader workers…');
     for (const kind of kinds) peers.set(kind, new Peer(new URL('./feature-owner.mjs', import.meta.url)));
     controls();
     await Promise.all([...peers].map(([kind, peer]) => peer.request('prepare', { kind, readers: 2 })));
@@ -93,7 +93,7 @@ $('feature-edit').addEventListener('click', () => void operation(async token => 
   revision = updates[0][1].revision;
   for (const [kind, update] of updates) document.querySelector(`[data-feature-kind="${kind}"] [data-cost]`).textContent = `Edit ${update.updateMs.toFixed(2)} ms · publish ${update.publicationMs.toFixed(2)} ms · 100 replacements`;
   const values = await answers(); if (token !== generation) return;
-  render(values); status(`Revision ${revision} published and verified. Initial revision 0 remains available in every map.`);
+  render(values); status(`Revision ${revision} published and verified. Initial revision 0 remains available in every implementation.`);
 }));
 $('feature-stop').addEventListener('click', () => void stop());
 window.addEventListener('pagehide', () => { void stop(); });

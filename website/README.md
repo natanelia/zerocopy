@@ -158,6 +158,9 @@ The library now creates default arenas only when used. New writable arenas start
 
 Nested demo workers use a small local ES module wrapper. This lets them inherit the parent worker's isolation on WebKit while importing the original worker module. The wrapper URL is released with the worker. Hosts with a custom Content Security Policy must permit `blob:` in `worker-src` for these nested demos.
 
+The product catalog uses the same small Blob module bootstrap for document-owned writers and nested readers, so each worker inherits its creator’s isolation before importing the same-origin module. Each bootstrap URL is revoked when its worker closes or fails to start. Custom Content Security Policies must permit `blob:` in `worker-src` for this demo; the demo does not relax the policy or change the service-worker scope.
+
+
 `node --test proofs/memory-startup.mjs` checks allocation counts in fresh workers, bounded defaults, configuration, read-only copies, growth, reset, and retained snapshots. `node website/tests/memory-browser.mjs` runs the browser regression.
 
 ## Immutable.js comparison

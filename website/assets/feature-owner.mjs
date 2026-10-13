@@ -1,7 +1,7 @@
 import { integer, validateCount, entriesFor, editsFor, queryIds, calculate, MAX_REVISION } from './catalog-core.mjs';
 import { reference, verifyAnswer } from './catalog-reference.mjs';
 import { createStorage } from './feature-storage.mjs';
-import { Peer, listen } from './feature-peer.mjs';
+import { Peer, listen } from './catalog-peer.mjs';
 let storage, current, retained, count = 0, revision = 0;
 const readers = [];
 async function publish(initial, changes) {
