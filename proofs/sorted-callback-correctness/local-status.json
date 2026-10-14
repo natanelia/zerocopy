@@ -1,0 +1,32 @@
+{
+  "candidatePatchSha256": "2f11252bd6ea9eeee68265f07bf6be2e63b055e52965b85520477ad574856aa9",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "focused": {
+    "baselineCasesPerEngine": 14,
+    "candidateCasesPerEngine": 78,
+    "sharedAndCopyRealWorkerPassed": true,
+    "completionReceiptSha256": "aaeaa8d53aa8c54c6bb99d0e983e7d1515739caf198c2aa3b9af09b6cc16054a",
+    "interruptedCountValidation": "First gate retained as failed after a checker expected13 attachment cases instead of26; all78 candidate Bun assertions passed. Only never-run Node/worker commands continued after independent audit."
+  },
+  "normalGate": {
+    "status": "incomplete",
+    "fiveTypeChecksPassed": true,
+    "fullBunCapSeconds": 300,
+    "fullBunTimedOut": true,
+    "exitCode": 143,
+    "remainingProcessGroup": false,
+    "reportPresent": false,
+    "logBytes": 0,
+    "fullSuiteTestProgress": "unknown",
+    "neverRun": [
+      "redux-node",
+      "typed-json-worker",
+      "real-worker-tasks",
+      "packed-package-consumer"
+    ],
+    "failureReceiptSha256": "be5d85b881ce804c8394a6be25aa4e3832fa82ae6ef67310e6e2bbabf62688a1",
+    "failureSealSha256": "389208748fb77d710faace0eeb9d28c46ca07fa7c3a029ecc27991a9679fd9ee"
+  },
+  "localRerun": false,
+  "performanceOrMemoryResult": false
+}

@@ -1,0 +1,288 @@
+diff --git a/shared-sorted-map.ts b/shared-sorted-map.ts
+--- a/shared-sorted-map.ts
++++ b/shared-sorted-map.ts
+@@ -61,11 +61,28 @@
+     if (this.comparator) { for (const [, value] of this.entries()) yield value; }
+     else { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield a.leafValue(this.valueType, leaf); }
+   }
+-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [key, value] of this.entries()) fn(value, key); }
++  forEach(fn: (value: ValueOf<T>, key: string) => void): void {
++    const entries = this.entries;
++    if (entries === originalEntries && Object.getPrototypeOf(this) === sortedMapPrototype && !this.comparator) {
++      const natural = Object.getOwnPropertyDescriptor(sortedMapPrototype, 'naturalEntries');
++      if (natural && Object.hasOwn(natural, 'value') && natural.value === originalNaturalEntries) {
++        const a = this.arena;
++        for (const leaf of a.radixLeaves(this.root)) {
++          const key = a.leafKey(leaf);
++          fn(a.leafValue(this.valueType, leaf), key);
++        }
++        return;
++      }
++    }
++    for (const [key, value] of Reflect.apply(entries, this, [])) fn(value, key);
++  }
+   toWorkerData() {
+     if (this.comparator) throw new Error('Custom comparator functions cannot be sent to workers');
+     return Object.freeze({ root: this.root, size: this.size, valueType: this.valueType });
+   }
+   static fromWorkerData<T extends string>(d: { root: number; size: number; valueType: T }, source: Arena = defaultArena()): SharedSortedMap<T> { return new SharedSortedMap(d.valueType, undefined, d.root, d.size, source); }
+ }
++const sortedMapPrototype = SharedSortedMap.prototype;
++const originalEntries = sortedMapPrototype.entries;
++const originalNaturalEntries = Object.getOwnPropertyDescriptor(sortedMapPrototype, 'naturalEntries')!.value;
+ structureRegistry.SharedSortedMap = { fromWorkerData: (d, a) => SharedSortedMap.fromWorkerData(d, a) };
+diff --git a/shared-sorted-callback.test.ts b/shared-sorted-callback.test.ts
+new file mode 100644
+--- /dev/null
++++ b/shared-sorted-callback.test.ts
+@@ -0,0 +1,210 @@
++import assert from 'node:assert/strict';
++import { afterEach, describe, it } from 'vitest';
++import { Arena, arenaOf, HEAP_START } from './arena';
++import { SharedMap, SharedSortedMap, getWorkerData, initWorker, resetSortedMap } from './shared';
++
++const prototype = SharedSortedMap.prototype;
++const entriesDescriptor = Object.getOwnPropertyDescriptor(prototype, 'entries')!;
++const naturalDescriptor = Object.getOwnPropertyDescriptor(prototype, 'naturalEntries')!;
++const originalFactory = SharedMap.fromWorkerData;
++afterEach(() => {
++  Object.defineProperty(prototype, 'entries', entriesDescriptor);
++  Object.defineProperty(prototype, 'naturalEntries', naturalDescriptor);
++  SharedMap.fromWorkerData = originalFactory;
++});
++
++function numbers(comparator?: any) {
++  return new SharedSortedMap('number', comparator, 0, 0, new Arena()).set('b', 2).set('a', 1).set('c', 3);
++}
++function collect(map: SharedSortedMap<any>): unknown[][] {
++  const result: unknown[][] = [];
++  map.forEach((value, key) => result.push([key, value]));
++  return result;
++}
++
++// Supported handles and ordinary standard intrinsics; Array/generator prototype
++// instrumentation, forged receivers and private Arena overrides are not a contract.
++describe('SharedSortedMap callback traversal', () => {
++  it('keeps empty calls lazy and callback arguments, binding and ignored returns intact', () => {
++    assert.equal(new SharedSortedMap('number', undefined, 0, 0, new Arena()).forEach(null as any), undefined);
++    const map = new SharedSortedMap('string', undefined, 0, 0, new Arena()).set('🙂', 'face').set('', 'payload').set('é', 'accent');
++    const seen: unknown[][] = [];
++    const result = map.forEach(function (this: unknown, value, key) {
++      assert.equal(this, undefined);
++      assert.equal(arguments.length, 2);
++      seen.push([key, value]);
++      return 'ignored';
++    });
++    assert.equal(result, undefined);
++    assert.deepEqual(seen, [['', 'payload'], ['é', 'accent'], ['🙂', 'face']]);
++  });
++
++  it('calls an entries replacement with its receiver, ignores its call property and closes on callback failure', () => {
++    const map = numbers(), error = new Error('callback'), events: string[] = [];
++    const replacement = function* (this: unknown) {
++      assert.equal(this, map);
++      events.push('open');
++      try { yield ['override', 9]; events.push('second'); yield ['later', 10]; }
++      finally { events.push('close'); }
++    };
++    Object.defineProperty(replacement, 'call', { get() { throw new Error('unexpected .call lookup'); } });
++    Object.defineProperty(prototype, 'entries', { ...entriesDescriptor, value: replacement });
++    assert.throws(() => map.forEach((value, key) => {
++      assert.deepEqual([value, key], [9, 'override']); events.push('callback'); throw error;
++    }), e => e === error);
++    assert.deepEqual(events, ['open', 'callback', 'close']);
++  });
++
++  it('reads entries once before observing a naturalEntries accessor installed by that getter', () => {
++    const map = numbers(), events: string[] = [];
++    Object.defineProperty(prototype, 'entries', {
++      configurable: true,
++      get() {
++        assert.equal(this, map); events.push('entries:get');
++        Object.defineProperty(prototype, 'naturalEntries', {
++          configurable: true,
++          get() {
++            assert.equal(this, map); events.push('natural:get');
++            return function* (this: unknown) {
++              assert.equal(this, map); events.push('natural:call'); yield ['accessor', 7];
++            };
++          },
++        });
++        return entriesDescriptor.value;
++      },
++    });
++    map.forEach((value, key) => { assert.deepEqual([key, value], ['accessor', 7]); events.push('callback'); });
++    assert.deepEqual(events, ['entries:get', 'natural:get', 'natural:call', 'callback']);
++  });
++
++  it('preserves entries getter and method exceptions before any callback', () => {
++    const map = numbers(), error = new Error('entries');
++    let reads = 0;
++    Object.defineProperty(prototype, 'entries', { configurable: true, get() { reads++; throw error; } });
++    assert.throws(() => map.forEach(() => assert.fail('callback')), e => e === error);
++    assert.equal(reads, 1);
++    Object.defineProperty(prototype, 'entries', { ...entriesDescriptor, value: function (this: unknown) {
++      assert.equal(this, map); throw error;
++    } });
++    assert.throws(() => map.forEach(() => assert.fail('callback')), e => e === error);
++  });
++
++  it('retains naturalEntries replacement cleanup and accessor exceptions', () => {
++    const map = numbers(), error = new Error('stop');
++    let closes = 0, reads = 0;
++    Object.defineProperty(prototype, 'naturalEntries', { ...naturalDescriptor, value: function* (this: unknown) {
++      assert.equal(this, map);
++      try { yield ['natural', 8]; yield ['later', 9]; } finally { closes++; }
++    } });
++    assert.throws(() => map.forEach((value, key) => {
++      assert.deepEqual([key, value], ['natural', 8]); throw error;
++    }), e => e === error);
++    assert.equal(closes, 1);
++    Object.defineProperty(prototype, 'naturalEntries', { configurable: true, get() { reads++; throw error; } });
++    assert.throws(() => map.forEach(() => assert.fail('callback')), e => e === error);
++    assert.equal(reads, 1);
++  });
++
++  it('preserves ordinary subclasses and inherited entries with subclass natural traversal', () => {
++    class Derived extends SharedSortedMap<'number'> {}
++    const base = numbers(), map = new Derived('number', undefined, base.root, base.size, arenaOf(base));
++    assert.equal(Object.isFrozen(map), true);
++    assert.deepEqual(collect(map), [['a', 1], ['b', 2], ['c', 3]]);
++    Object.defineProperty(Derived.prototype, 'naturalEntries', { value: function* (this: unknown) {
++      assert.equal(this, map); yield ['subclass', 11];
++    } });
++    assert.deepEqual(collect(map), [['subclass', 11]]);
++  });
++
++  it('keeps reverse ordering, stable comparator ties and the existing truthiness rule', () => {
++    assert.deepEqual(collect(numbers((a: string, b: string) => a < b ? 1 : a > b ? -1 : 0)), [['c', 3], ['b', 2], ['a', 1]]);
++    assert.deepEqual(collect(numbers(() => 0)), [['a', 1], ['b', 2], ['c', 3]]);
++    for (const comparator of [undefined, null, false, 0, NaN, '']) {
++      assert.deepEqual(collect(numbers(comparator)), [['a', 1], ['b', 2], ['c', 3]]);
++    }
++    assert.throws(() => numbers(true).forEach(() => assert.fail('callback')), TypeError);
++  });
++
++  it('finishes nested decoding before sorting and calls no callback when the comparator throws', () => {
++    const a = new Arena(), child = new SharedMap('number', 0, 0, a).set('child', 1);
++    const events: string[] = [], error = new Error('compare');
++    const map = new SharedSortedMap('SharedMap<number>', () => {
++      events.push('compare'); throw error;
++    }, 0, 0, a).set('b', child).set('a', child).set('c', child);
++    SharedMap.fromWorkerData = function (root, valueType, size, source) {
++      events.push('decode'); return Reflect.apply(originalFactory, this, [root, valueType, size, source]);
++    };
++    assert.throws(() => map.forEach(() => events.push('callback')), e => e === error);
++    assert.deepEqual(events, ['decode', 'decode', 'decode', 'compare']);
++  });
++
++  for (const method of ['entries', 'naturalEntries'] as const) {
++    it(`keeps the current traversal while a callback replaces ${method} for reentry`, () => {
++      const map = numbers(), seen: unknown[][] = [];
++      map.forEach((value, key) => {
++        seen.push([key, value]);
++        if (seen.length === 1) {
++          Object.defineProperty(prototype, method, { configurable: true, writable: true, value: function* () { yield ['new', 12]; } });
++          assert.deepEqual(collect(map), [['new', 12]]);
++        }
++      });
++      assert.deepEqual(seen, [['a', 1], ['b', 2], ['c', 3]]);
++      assert.deepEqual(collect(map), [['new', 12]]);
++    });
++  }
++
++  it('decodes a nested value before callback validation and preserves factory exceptions', () => {
++    const a = new Arena(), child = new SharedMap('number', 0, 0, a).set('child', 1);
++    const map = new SharedSortedMap('SharedMap<number>', undefined, 0, 0, a).set('key', child);
++    const events: string[] = [], error = new Error('factory');
++    SharedMap.fromWorkerData = function (data, source) {
++      events.push('decode'); assert.deepEqual([...map.keys()], ['key']); throw error;
++    };
++    assert.throws(() => map.forEach(null as any), e => e === error);
++    assert.deepEqual(events, ['decode']);
++    SharedMap.fromWorkerData = function (root, valueType, size, source) {
++      events.push('decode'); return Reflect.apply(originalFactory, this, [root, valueType, size, source]);
++    };
++    assert.throws(() => map.forEach(null as any), TypeError);
++    assert.deepEqual(events, ['decode', 'decode']);
++    map.forEach((value, key) => { assert.equal(value.get('child'), 1); assert.equal(key, 'key'); });
++  });
++
++  it('keeps snapshot and fork values through callback reentry, writes, arena growth and reset', () => {
++    const base = numbers(), a = arenaOf(base), fork = base.set('b', 20).delete('c');
++    const before = a.buf.slice(HEAP_START, a.used), oldBuffer = a.memory.buffer;
++    const seen: unknown[][] = [], error = new Error('callback');
++    assert.throws(() => base.forEach(() => { throw error; }), e => e === error);
++    base.forEach((value, key) => {
++      seen.push([key, value]);
++      if (seen.length === 1) {
++        assert.deepEqual(collect(base), [['a', 1], ['b', 2], ['c', 3]]);
++        assert.deepEqual(collect(fork), [['a', 1], ['b', 20]]);
++        new SharedMap('string', 0, 0, a).set('growth', 'x'.repeat(oldBuffer.byteLength * 2));
++        resetSortedMap();
++        new SharedSortedMap('number').set('elsewhere', 99);
++      }
++    });
++    assert.notEqual(a.memory.buffer, oldBuffer);
++    assert.deepEqual(seen, [['a', 1], ['b', 2], ['c', 3]]);
++    assert.deepEqual(collect(fork), [['a', 1], ['b', 20]]);
++    assert.deepEqual(a.buf.subarray(HEAP_START, HEAP_START + before.length), before);
++  });
++
++  for (const copy of [false, true]) {
++    it(`traverses read-only ${copy ? 'copy' : 'shared'} attachments without allocation or source changes`, async () => {
++      const map = new SharedSortedMap('object', undefined, 0, 0, new Arena())
++        .set('é', { text: '🙂', nested: [null, false] }).set('', { text: 'empty', nested: [1] });
++      const attached = await initWorker(getWorkerData({ map }, { copy }));
++      const a = arenaOf(attached.map), used = a.used, before = a.buf.slice(HEAP_START, used);
++      assert.deepEqual(collect(attached.map), [
++        ['', { text: 'empty', nested: [1] }], ['é', { text: '🙂', nested: [null, false] }],
++      ]);
++      attached.map.forEach(value => { assert.equal(Object.isFrozen(value), true); });
++      assert.throws(() => attached.map.set('forbidden', {}), /read-only/);
++      assert.equal(a.used, used);
++      assert.deepEqual(a.buf.subarray(HEAP_START, used), before);
++    });
++
++  }
++});
+diff --git a/proofs/node-worker.mjs b/proofs/node-worker.mjs
+--- a/proofs/node-worker.mjs
++++ b/proofs/node-worker.mjs
+@@ -19,12 +19,16 @@
+   assert.deepEqual([...s.ordered.entries()], [['b', 2], ['a', 1]]);
+   assert.deepEqual([...s.orderedSet.values()], ['b', 'a']);
+   assert.deepEqual([...s.sorted.entries()], [['a', 1], ['b', 2]]);
++  const sortedRows = [];
++  s.sorted.forEach((value, key) => sortedRows.push([key, value]));
++  assert.deepEqual(sortedRows, [['a', 1], ['b', 2]]);
+   assert.deepEqual([...s.sortedSet.values()], ['a', 'b']);
+   assert.equal(s.heap.peek(), 20);
+   assert.deepEqual(s.nested.get('list').toArray(), [1, 2, 3]);
+   if (readOnly) {
+     assert.throws(() => s.list.push(8), /read-only/);
+     assert.throws(() => s.map.set('new', 8), /read-only/);
++    assert.throws(() => s.sorted.set('new', 8), /read-only/);
+     assert.throws(() => s.nested.get('list').push(8), /read-only/);
+   }
+ }
+@@ -41,6 +45,9 @@
+         const source = message.data.arenas.find(a => a.id === message.data.structures.map.arena);
+         Atomics.store(new Int32Array(source.memory.buffer), 15000, 37);
+         parentPort.postMessage({ type: 'ready' });
++      } else if (message.type === 'copy') {
++        readAll(await S.initWorker(message.data));
++        parentPort.postMessage({ type: 'copy-ok' });
+       } else if (message.type === 'concurrent') {
+         const control = new Int32Array(workerData.control);
+         Atomics.store(control, 0, 1); Atomics.notify(control, 0);
+@@ -96,6 +103,9 @@
+     const initial = S.getWorkerData(items, { copy: false });
+     assert(initial.arenas.every(a => a.memory && !a.copy));
+     assert.equal((await exchange({ type: 'initial', data: initial })).type, 'ready');
++    const copied = S.getWorkerData(items, { copy: true });
++    assert(copied.arenas.every(a => a.copy && !a.memory));
++    assert.equal((await exchange({ type: 'copy', data: copied })).type, 'copy-ok');
+     const arena = initial.arenas.find(a => a.id === initial.structures.map.arena);
+     assert.equal(Atomics.load(new Int32Array(arena.memory.buffer), 15000), 37);
+     const response = once(worker, 'message'); worker.postMessage({ type: 'concurrent' });

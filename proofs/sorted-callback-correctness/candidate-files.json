@@ -1,0 +1,11 @@
+{
+  "baseline": {
+    "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+    "proofs/node-worker.mjs": "415cf7624f7797d175be6b4236e718ba3486489a18bcd121b5af18538dba613a"
+  },
+  "candidate": {
+    "shared-sorted-map.ts": "d1af6aeb860ec45698798bfa3a3fa97b5ae5e7580435c4a0665f9019a83793ba",
+    "shared-sorted-callback.test.ts": "3ac9589a38aea8840f4276defdb240112c49db52302481bef6aafa3c8e423c7e",
+    "proofs/node-worker.mjs": "d097594caecd89a957e44308d70bd6f7d11f725db4f34960a9b5b52f746be398"
+  }
+}
