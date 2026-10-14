@@ -1,0 +1,372 @@
+diff --git a/baseline/arena.ts b/candidate/arena.ts
+index 8a9f39d..c786bc7 100644
+--- a/baseline/arena.ts
++++ b/candidate/arena.ts
+@@ -377,6 +377,51 @@ export class Arena {
+     else { this.valueRoot = next; this.valueCode = 2; }
+     return next;
+   }
++  /** Internal set fast path; only positive entries from the exact root count. */
++  hasCachedSetKey(root: number, key: string): boolean {
++    if (!root) return false;
++    if (root === this.valueRoot) return this.valueMap?.has(key) ?? false;
++    if (!this.valueRoot) return false;
++    const slot = this.reads?.slot(key);
++    return slot !== undefined && this.reads!.root(slot) === root && this.reads!.leaf(slot) !== 0;
++  }
++  /** Internal set insertion. Undefined retains the existing long/journal path. */
++  addSetKey(root: number, key: string, size: number): number | undefined {
++    this.assertWritable();
++    if (root && this.dv.getUint32(root, true) === 0xffffffff) return undefined;
++    let n = key.length, ascii = true;
++    if (n > 49144) return undefined;
++    for (let i = 0; i < n; i++) {
++      const c = key.charCodeAt(i);
++      if (c > 127) {
++        const bytes = encoder.encode(key); n = bytes.length; ascii = false;
++        if (n > 49144) return undefined;
++        this.bytes.set(bytes, 16384); break;
++      }
++      this.bytes[16384 + i] = c;
++    }
++    // Match contains' lazy membership-cache initialization. No new fields or
++    // larger budgets are needed, and a cache hit never reaches native work.
++    if (root && !this.valueRoot) this.valueRoot = root;
++    if (root && root === this.valueRoot) this.valueMap ??= new Map();
++    const next = this.wasm.setAddStaged(root, n) >>> 0;
++    if (next === root) {
++      if (root === this.valueRoot) {
++        if (this.valueMap!.size < 16384) {
++          if (ascii) this.cacheRead(key, PRESENT, false);
++          else this.cachePrimitive(root, root, key, PRESENT, this.valueCode);
++        }
++      } else {
++        this.reads ??= new ReadCache();
++        this.reads.remember(key, root, this.view.getUint32(0, true));
++      }
++    } else {
++      this.writeSize = size + 1;
++      if (this.valueMap) this.cachePrimitive(root, next, key, 0, 2);
++      else { this.valueRoot = next; this.valueCode = 2; }
++    }
++    return next;
++  }
+   setString(root: number, key: string, value: string, size: number): number {
+     this.assertWritable();
+     if (typeof key !== 'string' || typeof value !== 'string') throw new TypeError('Expected a string key and a string value');
+diff --git a/baseline/persistent-core.as.ts b/candidate/persistent-core.as.ts
+index 6fff801..f5731a9 100644
+--- a/baseline/persistent-core.as.ts
++++ b/candidate/persistent-core.as.ts
+@@ -835,6 +835,48 @@ export function writeOrderedNumber(root: u32, len: u32, head: u32, count: u32):
+ export function mapSetNumber(root: u32, keyLen: u32, size: u32): u32 { return mapSetStaged(root, keyLen, 8, true, size); }
+ export function mapSetBytes(root: u32, keyLen: u32, valueLen: u32, size: u32): u32 { return mapSetStaged(root, keyLen, valueLen, false, size); }
+ 
++// Set-only insertion. The key is staged, but no leaf is allocated until a
++// missing key is proved. Existing Map writers and node allocators are unchanged.
++function setLeaf(keyLen: u32, hash: u32): u32 {
++  const leaf = mapLeaf(keyLen, 8);
++  store<u32>(leaf + 4, hash);
++  copyBytes(leaf + 16, WRITE_STAGE, keyLen);
++  store<f64>(leaf + 16 + keyLen, 0);
++  return leaf;
++}
++function setInsertAt(root: u32, keyLen: u32, hash: u32, shift: u32): u32 {
++  if (!root) return setLeaf(keyLen, hash);
++  const kind = tag(root);
++  if (!isBranch(root)) {
++    if (load<u32>(root + 4) != hash) return mergeHashed(root, setLeaf(keyLen, hash), shift);
++    if (kind == 0) {
++      if (load<u32>(root + 8) == keyLen && equalKeyBytes(root + 16, WRITE_STAGE, keyLen)) {
++        store<u32>(0, root); return root;
++      }
++      const leaf = setLeaf(keyLen, hash), p = bucket(hash, 2);
++      store<u32>(p + 16, root); store<u32>(p + 20, leaf); return p;
++    }
++    const count = mapSize(root);
++    for (let i: u32 = 0; i < count; i++) {
++      const leaf = load<u32>(root + 16 + i * 4);
++      if (load<u32>(leaf + 8) == keyLen && memory.compare(leaf + 16, WRITE_STAGE, keyLen) == 0) {
++        store<u32>(0, leaf); return root;
++      }
++    }
++    const leaf = setLeaf(keyLen, hash), p = bucket(hash, count + 1);
++    copyWords(p + 16, root + 16, count * 4);
++    store<u32>(p + 16 + count * 4, leaf); return p;
++  }
++  const digit = (hash >> shift) & 15, bitmap = branchBitmap(root), old = branchChild(root, digit);
++  const child = setInsertAt(old, keyLen, hash, shift + 4);
++  return child == old ? root : replaceChild(root, bitmap | (1 << digit), 1, digit, child);
++}
++// Internal canonical-root command. Callers retain the old journal/long-key and
++// read-only paths. Scratch word 0 reports the existing leaf on a duplicate.
++export function setAddStaged(root: u32, keyLen: u32): u32 {
++  return setInsertAt(root, keyLen, hashAt(WRITE_STAGE, keyLen), 0);
++}
++
+ // Private bulk builders: only freshly allocated branches can be changed.
+ export function radixBuild(input: u32, count: u32): u32 {
+   const mark = heapEnd; let root: u32 = 0;
+diff --git a/baseline/shared-map.ts b/candidate/shared-map.ts
+index 3ea01e7..7f178f6 100644
+--- a/baseline/shared-map.ts
++++ b/candidate/shared-map.ts
+@@ -77,6 +77,21 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+ }
+ structureRegistry.SharedMap = { fromWorkerData: (d, a) => SharedMap.fromWorkerData(d.root, d.valueType, d.size, a) };
+ 
++// Capture the original methods in their defining module. This helper is not
++// re-exported by a package entry point and adds no public collection method.
++const setMapHas = SharedMap.prototype.has, setMapSet = SharedMap.prototype.set;
++export function tryAddSetKey(map: SharedMap<'number'>, key: string, has: SharedMap<'number'>['has']): SharedMap<'number'> | undefined {
++  if (has !== setMapHas || Object.getPrototypeOf(map) !== SharedMap.prototype || map.valueType !== 'number') return undefined;
++  const a = arenaOf(map);
++  if (a.readOnly || key.length > 49144) return undefined;
++  if (a.hasCachedSetKey(map.root, key)) return map;
++  // Descriptor inspection does not invoke a setter getter on an existing key.
++  // An accessor or overridden method must retain the original public calls.
++  if (Object.getOwnPropertyDescriptor(SharedMap.prototype, 'set')?.value !== setMapSet) return undefined;
++  const root = a.addSetKey(map.root, key, map.size);
++  return root === undefined ? undefined : root === map.root ? map : new SharedMap('number', root, a.writeSize, a);
++}
++
+ /** Compatibility wrapper for internal numeric-key users. */
+ export class SharedMapNumeric<T extends string = ValueType> {
+   private readonly map: SharedMap<T>;
+diff --git a/candidate/shared-set-insert.test.ts b/candidate/shared-set-insert.test.ts
+new file mode 100644
+index 0000000..1860c87
+--- /dev/null
++++ b/candidate/shared-set-insert.test.ts
+@@ -0,0 +1,203 @@
++import { describe, expect, it } from 'vitest';
++import { Arena, HEAP_START, arenaOf } from './arena';
++import { SharedMap } from './shared-map';
++import { SharedSet } from './shared-set';
++
++function fresh(a = new Arena()) { return new SharedSet(new SharedMap('number', 0, 0, a)); }
++function payload(a: Arena) { return a.buf.slice(HEAP_START, a.used); }
++function unchanged(a: Arena, before: Uint8Array) {
++  expect(a.buf.slice(HEAP_START, HEAP_START + before.length)).toEqual(before);
++}
++
++// Setup only: discover a collision for the actual type-prefixed key, rather
++// than assuming an unprefixed Map fixture remains a collision for Set.
++function encodedCollision(): [string, string] {
++  const seen = new Map<number, string>();
++  for (let i = 0; i < 1_000_000; i++) {
++    const value = `collision/${i}`, key = `s:${value}`;
++    let hash = 2166136261;
++    for (let j = 0; j < key.length; j++) hash = Math.imul(hash ^ key.charCodeAt(j), 16777619);
++    const previous = seen.get(hash);
++    if (previous !== undefined) return [previous, value];
++    seen.set(hash, value);
++  }
++  throw new Error('Bounded encoded-key collision setup found no pair');
++}
++
++describe('set-only absent insertion', () => {
++  it('preserves key equivalence, duplicate identity, and published bytes', () => {
++    const values = [1, '1', 0, -0, NaN, 'NaN', Infinity, -Infinity, '', '\0', '🙂', '\ud800', '\ufffd'];
++    const encoder = new TextEncoder(), decoder = new TextDecoder();
++    const expected = new Set(values.map(value => typeof value === 'string' ? decoder.decode(encoder.encode(value)) : value));
++    let set = fresh();
++    for (const value of values) set = set.add(value);
++    expect(new Set(set.values())).toEqual(expected);
++    expect(set.size).toBe(expected.size);
++    const a = arenaOf(set), used = a.used, before = payload(a);
++    for (const value of values) { expect(set.add(value)).toBe(set); expect(set.has(value)).toBe(true); }
++    expect(a.used).toBe(used); unchanged(a, before);
++    expect(Object.isFrozen(set)).toBe(true);
++    for (const value of [null, undefined, {}, true]) expect(() => set.add(value as any)).toThrow(TypeError);
++  });
++
++  it('handles exact encoded-key collisions, forks, and interleaved maps', () => {
++    const [left, right] = encodedCollision(), a = new Arena();
++    let set = fresh(a);
++    for (let i = 0; i < 96; i++) set = set.add(`k${i}`);
++    const old = set, before = payload(a);
++    set = set.add(left).add(right);
++    expect(set.size).toBe(98); expect(set.has(left)).toBe(true); expect(set.has(right)).toBe(true);
++    const used = a.used;
++    expect(set.add(left)).toBe(set); expect(set.add(right)).toBe(set); expect(a.used).toBe(used);
++    // Move the current-root cache forward. Neither collision key has a
++    // historical ReadCache entry, so both duplicates must search the bucket.
++    const advanced = set.add('advanced'), coldUsed = a.used, coldPayload = payload(a);
++    expect(set.add(left)).toBe(set); expect(set.add(right)).toBe(set);
++    expect(a.used).toBe(coldUsed); unchanged(a, coldPayload);
++    expect(a.leafKey(a.dv.getUint32(0, true))).toBe(`s:${right}`);
++    expect(set.add(left)).toBe(set); expect(set.add(right)).toBe(set);
++    expect(a.used).toBe(coldUsed); expect(advanced.size).toBe(99);
++    const other = new SharedMap('number', 0, 0, a).set('other', 17);
++    const fork = old.add('fork'), next = set.delete(left).add('after');
++    expect(fork.size).toBe(97); expect(old.has('fork')).toBe(false);
++    expect(next.has(left)).toBe(false); expect(set.has(left)).toBe(true);
++    expect(other.get('other')).toBe(17); unchanged(a, before);
++    // Exercise the ordinary indexed writer after the new native command.
++    expect(other.set('later', 19).get('later')).toBe(19);
++  });
++
++  it('preserves nonzero supplied values and positive historical-root caches', () => {
++    const a = new Arena(), map = new SharedMap('number', 0, 0, a).set('s:present', 17);
++    const set = new SharedSet(map), used = a.used;
++    expect(set.add('present')).toBe(set); expect(a.used).toBe(used);
++    expect(map.get('s:present')).toBe(17);
++    const next = set.add('later');
++    expect(set.has('present')).toBe(true);
++    expect(set.add('present')).toBe(set); expect(map.get('s:present')).toBe(17);
++    expect(next.size).toBe(2); expect(set.size).toBe(1);
++  });
++
++  it('retains long-key and imported-journal behavior', () => {
++    let set = fresh();
++    for (const value of ['x'.repeat(49142), 'x'.repeat(49143), '界'.repeat(16381)]) {
++      set = set.add(value);
++      const a = arenaOf(set), used = a.used;
++      expect(set.has(value)).toBe(true); expect(set.add(value)).toBe(set); expect(a.used).toBe(used);
++    }
++    const a = new Arena(), base = new SharedMap('number', 0, 0, a).set('s:base', 11);
++    const leaf = a.leaf('number', 's:pending', 19), root = a.alloc(20), view = a.dv;
++    view.setUint32(root, 0xffffffff, true); view.setUint32(root + 4, base.root, true);
++    view.setUint32(root + 8, 2, true); view.setUint32(root + 12, 1, true); view.setUint32(root + 16, leaf, true);
++    const journal = SharedSet.fromWorkerData({ root, size: 2 }, a), used = a.used, before = payload(a);
++    expect(journal.add('pending')).toBe(journal); expect(journal.add('base')).toBe(journal); expect(a.used).toBe(used);
++    const next = journal.add('added');
++    expect(new Set(next.values())).toEqual(new Set(['base', 'pending', 'added']));
++    expect(journal.size).toBe(2); unchanged(a, before);
++  });
++
++  it('keeps shared and copied attachments read-only, including scratch', () => {
++    const owner = fresh().add('present'), source = arenaOf(owner);
++    for (const a of [new Arena({ memory: source.memory, used: source.used, readOnly: true }), new Arena({ copy: source.copy(), used: source.used, readOnly: true })]) {
++      const set = SharedSet.fromWorkerData(owner.toWorkerData(), a), before = a.copy();
++      expect(set.add('present')).toBe(set);
++      expect(() => set.add('absent')).toThrow(/read-only/);
++      expect(a.copy()).toEqual(before);
++    }
++  });
++
++  it('reads a has accessor once and never reads a set accessor on a hit', () => {
++    const set = fresh().add('present'), events: string[] = [];
++    const has = Object.getOwnPropertyDescriptor(SharedMap.prototype, 'has')!;
++    const write = Object.getOwnPropertyDescriptor(SharedMap.prototype, 'set')!;
++    try {
++      Object.defineProperty(SharedMap.prototype, 'has', { configurable: true, get() { events.push('get has'); return has.value; } });
++      Object.defineProperty(SharedMap.prototype, 'set', { configurable: true, get() { events.push('get set'); return write.value; } });
++      expect(() => set.add({} as any)).toThrow(TypeError); expect(events).toEqual([]);
++      expect(set.add('present')).toBe(set); expect(events).toEqual(['get has']);
++      events.length = 0;
++      expect(set.add('absent').has('absent')).toBe(true);
++      expect(events).toEqual(['get has', 'get set', 'get has']);
++    } finally {
++      Object.defineProperty(SharedMap.prototype, 'has', has);
++      Object.defineProperty(SharedMap.prototype, 'set', write);
++    }
++  });
++
++  it('uses ordinary invocation when a custom has function owns call', () => {
++    const set = fresh().add('present'), events: string[] = [];
++    const descriptor = Object.getOwnPropertyDescriptor(SharedMap.prototype, 'has')!;
++    const has = function(this: SharedMap<'number'>, key: string) {
++      events.push(key); return Reflect.apply(descriptor.value, this, [key]);
++    };
++    Object.defineProperty(has, 'call', { value() { throw new Error('Own call must not run'); } });
++    try {
++      Object.defineProperty(SharedMap.prototype, 'has', { ...descriptor, value: has });
++      expect(set.add('present')).toBe(set);
++      expect(set.add('absent').size).toBe(2);
++      expect(events).toEqual(['s:present', 's:absent']);
++    } finally { Object.defineProperty(SharedMap.prototype, 'has', descriptor); }
++  });
++
++  it('preserves public receivers and has failures before any set getter', () => {
++    const map = new SharedMap('number').set('s:present', 0), set = new SharedSet(map), events: string[] = [];
++    const has = Object.getOwnPropertyDescriptor(SharedMap.prototype, 'has')!;
++    const write = Object.getOwnPropertyDescriptor(SharedMap.prototype, 'set')!, failure = new Error('has failed');
++    try {
++      Object.defineProperty(SharedMap.prototype, 'has', { ...has, value(this: SharedMap<'number'>, key: string) {
++        expect(this).toBe(map); events.push('call has'); return Reflect.apply(has.value, this, [key]);
++      } });
++      Object.defineProperty(SharedMap.prototype, 'set', { configurable: true, get() {
++        events.push('get set'); return function(this: SharedMap<'number'>, key: string, value: number) {
++          expect(this).toBe(map); events.push('call set'); return Reflect.apply(write.value, this, [key, value]);
++        };
++      } });
++      expect(set.add('present')).toBe(set); expect(events).toEqual(['call has']);
++      events.length = 0;
++      expect(set.add('absent').size).toBe(2); expect(events).toEqual(['call has', 'get set', 'call set']);
++      events.length = 0;
++      Object.defineProperty(SharedMap.prototype, 'has', { configurable: true, get() { events.push('get has'); throw failure; } });
++      expect(() => set.add('absent')).toThrow(failure); expect(events).toEqual(['get has']);
++      events.length = 0;
++      Object.defineProperty(SharedMap.prototype, 'has', { ...has, value() { events.push('call has'); throw failure; } });
++      expect(() => set.add('absent')).toThrow(failure); expect(events).toEqual(['call has']);
++      events.length = 0;
++      Object.defineProperty(SharedMap.prototype, 'has', { ...has, value: null });
++      expect(() => set.add('absent')).toThrow(TypeError); expect(events).toEqual([]);
++    } finally {
++      Object.defineProperty(SharedMap.prototype, 'has', has);
++      Object.defineProperty(SharedMap.prototype, 'set', write);
++    }
++  });
++
++  it('retains supplied-subclass and factory dispatch, even when set returns itself', () => {
++    const events: string[] = [];
++    class CustomMap extends SharedMap<'number'> {
++      override has(key: string) { events.push(`has ${key}`); return false; }
++      override set(key: string, value: number) { events.push(`set ${key} ${value}`); return this; }
++    }
++    const map = new CustomMap('number'), factory = SharedMap.fromWorkerData;
++    try {
++      SharedMap.fromWorkerData = ((..._args: unknown[]) => { events.push('factory'); return map; }) as typeof factory;
++      const set = SharedSet.fromWorkerData({ root: 0, size: 0 });
++      expect(set.add('new')).not.toBe(set);
++      expect(events).toEqual(['factory', 'has s:new', 'set s:new 0']);
++    } finally { SharedMap.fromWorkerData = factory; }
++  });
++
++  it('does not allocate duplicates after a partial native allocation failure', () => {
++    const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true }), a = new Arena({ memory });
++    let set = fresh(a);
++    for (let i = 0; i < 64; i++) set = set.add(`k${i}`);
++    const before = payload(a), aligned = (a.used + 7) & ~7;
++    a.alloc(memory.buffer.byteLength - aligned - 32);
++    const mark = a.used;
++    expect(() => set.add('newkey')).toThrow(WebAssembly.RuntimeError);
++    expect(a.used).toBeGreaterThan(mark); unchanged(a, before);
++    const failedEnd = a.used;
++    expect(failedEnd).toBe(memory.buffer.byteLength);
++    // k0 was added before the membership Map was lazily created.
++    expect(set.add('k0')).toBe(set); expect(a.used).toBe(failedEnd);
++    expect(set.has('newkey')).toBe(false); expect(set.size).toBe(64);
++    unchanged(a, before);
++  });
++});
+diff --git a/baseline/shared-set.ts b/candidate/shared-set.ts
+index 67952e8..277e48b 100644
+--- a/baseline/shared-set.ts
++++ b/candidate/shared-set.ts
+@@ -1,13 +1,21 @@
+-import { SharedMap } from './shared-map';
++import { SharedMap, tryAddSetKey } from './shared-map';
+ import { Arena, Snapshot, arenaOf } from './arena';
+ import { structureRegistry } from './codec';
+ import { encodeSetKey, decodeSetKey } from './set-key';
++const invoke = Reflect.apply;
+ export class SharedSet<T extends string | number = string | number> extends Snapshot {
+   private readonly _map: SharedMap<'number'>;
+   constructor(map?: SharedMap<'number'>) {
+     const data = map ?? new SharedMap('number'); super(arenaOf(data)); this._map = data; Object.freeze(this);
+   }
+-  add(value: T): SharedSet<T> { const key = encodeSetKey(value); return this._map.has(key) ? this : new SharedSet(this._map.set(key, 0)); }
++  add(value: T): SharedSet<T> {
++    const key = encodeSetKey(value), map = this._map, has = map.has;
++    const next = tryAddSetKey(map, key, has);
++    if (next !== undefined) return next === map ? this : new SharedSet(next);
++    // Read has once and preserve method-call semantics, including functions
++    // with an own call property. Only an absent result may read map.set.
++    return invoke(has, map, [key]) ? this : new SharedSet(map.set(key, 0));
++  }
+   has(value: T): boolean { return this._map.has(encodeSetKey(value)); }
+   delete(value: T): SharedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedSet(map); }
+   get size(): number { return this._map.size; }

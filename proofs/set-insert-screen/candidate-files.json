@@ -1,0 +1,17 @@
+{
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "patchSha256": "44d29c932a4a14b420d382c062dcaa057f2f67813556b158dc57934dba77d0ac",
+  "baseline": {
+    "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+    "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+    "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+    "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae"
+  },
+  "candidate": {
+    "arena.ts": "5b772169fc76223e97f008ab60b6e5c37e40090fadfa79f69c4ddd7141d59113",
+    "persistent-core.as.ts": "6b3870b694a72daeee66e3976a40eb7cfb5862de08172d3684b7f5051cafe161",
+    "shared-map.ts": "da98896392ccfe8395be6f4ad60dd30e55d310f4988aaf39f89fbbd1a5c627f5",
+    "shared-set.ts": "b279408437cc34bccfd3e29bf59884d5638676842188043de9dfb4bede29c506",
+    "shared-set-insert.test.ts": "f24fa3b1fef7708e1e170bd30db91cac6485d3267d089d44f5dfcb5452d851c6"
+  }
+}
