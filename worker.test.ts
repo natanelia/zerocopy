@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SharedMap, SharedList, SharedSet, resetMap, compact } from './shared';
 import { arenaOf } from './arena';
 import { createSharedState, createSharedSession, connectSharedSession, shareWithWorker, receiveShared, type SharedValue, type StateOptions } from './worker';
@@ -42,6 +42,57 @@ async function setup<T extends SharedValue>(initial: T, options: StateOptions = 
 }
 
 describe('shared state and session protocol', () => {
+  it('reuses unchanged JSON across session revisions while retaining old snapshots', async () => {
+    const { state, reader } = await setup(new SharedMap('object').set('stable', { nested: [1] }).set('changed', { n: 0 }));
+    const old = reader.current, stable = old.get('stable'), changed = old.get('changed');
+    const reports: unknown[] = [];
+    reader.subscribe(value => reports.push(value.get('stable')));
+    state.update(map => map.set('changed', { n: 1 })); await drain();
+    expect(reader.current.get('stable')).toBe(stable);
+    expect(reports).toEqual([stable]);
+    expect(reader.current.get('changed')).toEqual({ n: 1 });
+    expect(reader.current.get('changed')).not.toBe(changed);
+    expect(old.get('changed')).toBe(changed);
+    expect(arenaOf(reader.current)).not.toBe(arenaOf(old));
+    expect(arenaOf(reader.current).wasm).not.toBe(arenaOf(old).wasm);
+    state.value = compact(state.current); await drain();
+    expect(reader.current.get('stable')).toEqual(stable);
+    expect(reader.current.get('stable')).not.toBe(stable);
+    reader.dispose();
+    expect(old.get('stable')).toBe(stable);
+    expect(old.get('changed')).toBe(changed);
+  });
+  it('keeps decode caches independent when two connections receive the same memory object', async () => {
+    const source = new SharedMap('object').set('stable', { n: 1 });
+    const a = await setup(source), b = await setup(source);
+    const av = a.reader.current.get('stable'), bv = b.reader.current.get('stable');
+    expect(av).not.toBe(bv);
+    const next = source.set('revision', 1);
+    a.state.value = next; b.state.value = next; await drain();
+    expect(a.reader.current.get('stable')).toBe(av);
+    expect(b.reader.current.get('stable')).toBe(bv);
+    const retained = a.reader.current;
+    a.reader.subscribe(() => a.reader.dispose());
+    a.state.value = next.set('revision', 2); await drain();
+    expect(a.reader.closed).toBe(true);
+    expect(retained.get('stable')).toBe(av);
+    expect(b.reader.closed).toBe(false);
+  });
+  it('retires shared values on disconnect while retained snapshots keep ordinary local caching', async () => {
+    const { state, reader } = await setup(new SharedMap('object').set('deferred', { nested: [7] }));
+    const retained = reader.current;
+    state.update(map => map.set('revision', 1)); await drain();
+    const later = reader.current.get('deferred');
+    reader.dispose();
+    const parse = vi.spyOn(JSON, 'parse');
+    try {
+      const first = retained.get('deferred');
+      expect(first).toEqual(later); expect(first).not.toBe(later);
+      expect(parse).toHaveBeenCalledTimes(1);
+      expect(retained.get('deferred')).toBe(first);
+      expect(parse).toHaveBeenCalledTimes(1);
+    } finally { parse.mockRestore(); }
+  });
   it('automatically publishes a single collection and preserves old snapshots', async () => {
     const { state, reader } = await setup(new SharedMap('number').set('a', 1));
     const old = reader.current;

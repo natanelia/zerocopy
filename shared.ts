@@ -11,8 +11,8 @@ import { SharedOrderedSet } from './shared-ordered-set';
 import { SharedSortedMap } from './shared-sorted-map';
 import { SharedSortedSet } from './shared-sorted-set';
 import { SharedPriorityQueue } from './shared-priority-queue';
-import { Arena, arenaOf, createArenaRegistry, FORMAT_VERSION } from './arena';
-import { structureRegistry } from './codec';
+import { Arena, arenaOf, FORMAT_VERSION } from './arena';
+import { constructors, reconstructWorkerData } from './worker-attachment';
 
 export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
 export { resetMap } from './shared-map';
@@ -32,22 +32,6 @@ export type { TextSearchOptions } from './text-search';
 export { json, map, list, stack, queue, linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue, set, orderedSet, sortedSet } from './types';
 export type { DeepReadonly, JsonValue, JsonObject, JsonType, NestedType, ValueOf, WireType } from './types';
 
-// The registry checks class identity, not its generic value parameter.
-// Explicit erasure avoids InstanceType inferring string (whose ValueOf is never).
-const constructors = {
-  SharedMap: SharedMap<any>,
-  SharedList: SharedList<any>,
-  SharedSet: SharedSet<string | number>,
-  SharedStack: SharedStack<any>,
-  SharedQueue: SharedQueue<any>,
-  SharedLinkedList: SharedLinkedList<any>,
-  SharedDoublyLinkedList: SharedDoublyLinkedList<any>,
-  SharedOrderedMap: SharedOrderedMap<any>,
-  SharedOrderedSet: SharedOrderedSet<string | number>,
-  SharedSortedMap: SharedSortedMap<any>,
-  SharedSortedSet: SharedSortedSet<string | number>,
-  SharedPriorityQueue: SharedPriorityQueue<any>,
-};
 const constructorEntries = Object.entries(constructors);
 export type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
 // Named interfaces do not need a string index signature. Symbol keys cannot be
@@ -117,26 +101,7 @@ export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>): P
 /** Legacy untyped payloads require the caller to supply the application type. */
 export function initWorker<T extends StructureRecord<T>>(data: WorkerData): Promise<Readonly<T>>;
 export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
-  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
-  const arenas = new Map<string, Arena>();
-  // A solitary reader needs only its original empty owned dependency Map.
-  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
-  for (const source of data.arenas) {
-    if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
-    if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    const arena = new Arena({ ...source, readOnly: true, registry });
-    arenas.set(source.id, arena);
-    registry?.members.push(arena);
-  }
-  // The complete registry is available before reconstructing any nested value.
-  // It belongs only to this payload; later attachments cannot change old views.
-  const result: Record<string, SharedStructure> = Object.create(null);
-  for (const [name, item] of Object.entries(data.structures) as [string, SerializedStructure][]) {
-    const arena = arenas.get(item.arena), factory = structureRegistry[item.type];
-    if (!arena || !Object.hasOwn(constructors, item.type) || !factory) throw new Error(`Invalid structure: ${name}`);
-    result[name] = factory.fromWorkerData(item.data, arena);
-  }
-  return Object.freeze(result) as Readonly<T>;
+  return reconstructWorkerData(data as WorkerData) as Readonly<T>;
 }
 
 export { compact, compactMany } from './compaction';

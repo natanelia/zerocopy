@@ -1,0 +1,93 @@
+name: Reader values correctness
+
+on:
+  push:
+    branches: [proof/reader-values-correctness-20261014]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        arm: [baseline, candidate]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.arm == 'baseline' && 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e' || github.sha }}
+      - name: Verify exact source
+        env:
+          EXPECTED_SHA: ${{ matrix.arm == 'baseline' && 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e' || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          git archive --format=tar HEAD > tested-source.tar
+      - name: Verify candidate source seal
+        if: matrix.arm == 'candidate'
+        run: |
+          sha256sum --check <<'SOURCE_SHA256'
+          0402bc945a0b1edad678c28b75360dd1fb96669783bb36bffc63177d9a823ff6  arena.ts
+          6e0ef59c12848d9344a0ec62bf51962299eed0fba734b2560b27ba68f0756880  docs/worker-sessions.md
+          4918aa4dcaf844a41c45fcdb1fcee2ba02f3582e6fc4f20e9885f736f8551758  proofs/session-reader-values.node.mjs
+          ef565ad82997a421848408fe41f833a4c7b360c5af66e8a988a7ea1570e3f757  reader-values.test.ts
+          145a608410b817cf6a6c36039eca504411907415b435a3273bb5163300d6c9d8  reader-values.ts
+          7d1f0254c56fe4bd00a664a86687749eec1b71f55d920d9938823b809a1c3bdf  shared.ts
+          ec92605f4b0785ab1179da4cc4a44636bb727ad2a8ede37cfbbddd6b6e160246  worker-attachment.ts
+          3de54846f797ea8134a65e03ac121855fb9c15a50112e2daede431e7accfa073  worker.test.ts
+          c73d0a712077c921bafc27a6c36a0dec817beb2f95e08364bdd7abb716b4c975  worker.ts
+          SOURCE_SHA256
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install exact declared dependencies
+        run: timeout --kill-after=5s 180s bun install 2>&1 | tee dependency-install.log
+      - name: Build native and portable artifacts
+        run: |
+          timeout --kill-after=5s 180s bun run build:wasm
+          timeout --kill-after=5s 90s bun run build:browser
+      - name: Check candidate declarations and types
+        if: matrix.arm == 'candidate'
+        run: |
+          timeout --kill-after=5s 60s bun run build:types
+          timeout --kill-after=5s 45s bun run typecheck
+          timeout --kill-after=5s 45s bun run typecheck:redux
+          timeout --kill-after=5s 90s bun run typecheck:values
+          timeout --kill-after=5s 45s bun run typecheck:geometry
+          timeout --kill-after=5s 45s bunx tsc --noEmit -p tsconfig.worker.json
+      - name: Run ordinary full Bun suite
+        run: timeout --kill-after=5s 300s bun run test 2>&1 | tee vitest.log
+      - name: Run candidate focused Node suite
+        if: matrix.arm == 'candidate'
+        run: timeout --kill-after=5s 180s node node_modules/vitest/vitest.mjs run reader-values.test.ts worker.test.ts worker-attachment.test.ts json-read-cache.test.ts --maxWorkers=1 2>&1 | tee node-focused.log
+      - name: Verify candidate session and Redux workers
+        if: matrix.arm == 'candidate'
+        run: |
+          timeout --kill-after=5s 45s node proofs/worker-sessions.mjs 2>&1 | tee session-proof.log
+          timeout --kill-after=5s 45s node --test --test-concurrency=1 --test-timeout=15000 proofs/session-reader-values.node.mjs 2>&1 | tee reader-values-proof.log
+          timeout --kill-after=5s 45s node proofs/redux-node.mjs 2>&1 | tee redux-proof.log
+      - name: Check candidate installed package
+        if: matrix.arm == 'candidate'
+        run: timeout --kill-after=5s 180s bun run check:package 2>&1 | tee package-check.log
+      - name: Retain source and test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ matrix.arm == 'baseline' && 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e' || github.sha }}
+          path: |
+            tested-source.tar
+            *.log
+            dist/
+            package.json
+            bun.lock
+          retention-days: 7
+          if-no-files-found: error
