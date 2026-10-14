@@ -5,6 +5,7 @@ import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
 import { freezeJSON } from './freeze-json';
+import type { ReaderValues } from './reader-values';
 export { freezeJSON } from './freeze-json';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
@@ -159,8 +160,9 @@ export class Arena {
   private internedStringBytes = 0;
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
+  private readonly readerValues: ReaderValues | undefined;
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; readerValues?: ReaderValues } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
@@ -171,6 +173,7 @@ export class Arena {
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
     this.view = new DataView(this.buffer);
+    this.readerValues = this.readOnly && !options.copy ? options.readerValues : undefined;
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }
@@ -268,6 +271,14 @@ export class Arena {
     if (type === 'string') return this.string(ptr, len);
     const cached = this.objects.get(ptr);
     if (cached !== undefined) return cached;
+    // The ordinary combined JSON/nested budget still governs this view. Only
+    // plain JSON can cross revisions; nested values depend on this registry.
+    const shared = this.readerValues && type === 'object' && this.objects.size < 2048 && this.objectBytes + len <= 2097152
+      ? this.readerValues.json.get(ptr, len) : undefined;
+    if (shared) {
+      this.objects.set(ptr, shared.value); this.objectBytes += len;
+      return shared.value;
+    }
     this.refresh();
     const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
@@ -279,13 +290,22 @@ export class Arena {
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
-    if (this.objects.size < 2048 && this.objectBytes + len <= 2097152) { this.objects.set(ptr, result); this.objectBytes += len; }
+    if (this.objects.size < 2048 && this.objectBytes + len <= 2097152) {
+      this.objects.set(ptr, result); this.objectBytes += len;
+      if (type === 'object') this.readerValues?.json.remember(ptr, len, result);
+    }
     return result;
   }
   string(ptr: number, len: number): string {
     if (!len) return '';
     const cached = this.strings.get(ptr);
     if (cached !== undefined) return cached;
+    const shared = this.readerValues && this.strings.size < 2048 && this.stringBytes + len <= 2097152
+      ? this.readerValues.strings.get(ptr, len) : undefined;
+    if (shared) {
+      this.strings.set(ptr, shared.value); this.stringBytes += len;
+      return shared.value;
+    }
     this.refresh();
     let value = '';
     if (len <= 32) {
@@ -296,7 +316,10 @@ export class Arena {
       }
     } else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
     // Empty byte ranges can share an address with a following allocation.
-    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
+    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) {
+      this.strings.set(ptr, value); this.stringBytes += len;
+      this.readerValues?.strings.remember(ptr, len, value);
+    }
     return value;
   }
   private rememberKey(key: string, token: KeyToken): KeyToken {

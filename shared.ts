@@ -124,7 +124,8 @@ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    const arena = new Arena({ ...source, readOnly: true, registry });
+    // Cache state is internal to sessions, never accepted from transport data.
+    const arena = new Arena({ ...source, readOnly: true, registry, readerValues: undefined });
     arenas.set(source.id, arena);
     registry?.members.push(arena);
   }

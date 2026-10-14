@@ -1,5 +1,6 @@
 /** Typed, single-writer snapshot sessions. No polling, shared locks, or store dependency. */
-import { initWorker, type WorkerData } from './shared';
+import { type WorkerData } from './shared';
+import { attachSessionWorker, retireReaderAttachments, type ReaderAttachments } from './worker-attachment';
 import {
   capture, same, identities, message, isMessage, listen, reserve, settings, strategy,
   uniqueId, defaultEndpoint, report, errorOf, notify, WIRE_VERSION,
@@ -368,6 +369,7 @@ export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOp
   let owner: string | undefined, closed = false, initialized = false;
   let remove = () => {};
   let arenas = new Map<string, ArenaWire>();
+  let readerAttachments: ReaderAttachments = new Map();
   let previous: Readonly<Record<string, string>> = Object.create(null);
   let previousSingle: boolean | undefined;
   let chain = Promise.resolve();
@@ -379,7 +381,7 @@ export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOp
     if (closed) return;
     closed = true; clearTimeout(timer); remove(); release(); options.signal?.removeEventListener('abort', abort);
     if (!remote) { try { send({ kind: error ? 'error' : 'close', message: error?.message }); } catch {} }
-    arenas.clear(); previous = Object.create(null); reader.finish(error);
+    arenas.clear(); retireReaderAttachments(readerAttachments); readerAttachments.clear(); previous = Object.create(null); reader.finish(error);
     if (!initialized) reject(error ?? new Error('Shared reader closed before initialization'));
     else if (error) report(options.onError, error);
   };
@@ -402,20 +404,28 @@ export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOp
       if (known?.memory && source.memory) throw new Error('An existing arena cannot replace its memory');
       next.set(source.id, source.memory || source.copy ? source : { ...source, memory: known!.memory });
     }
-    const values = await initWorker<Record<string, SharedCollection>>({ ...payload, arenas: [...next.values()] });
-    if (closed) return;
-    const ids = identities(payload);
-    const result: Record<string, SharedCollection> = Object.create(null);
-    for (const [key, value] of Object.entries(values)) {
-      const oldValue = initialized ? (data.single ? reader.current : (reader.current as any)[key]) : undefined;
-      result[key] = previous[key] === ids[key] && oldValue !== undefined ? oldValue : value;
+    const nextAttachments: ReaderAttachments = new Map();
+    try {
+      const values = await attachSessionWorker({ ...payload, arenas: [...next.values()] }, readerAttachments, nextAttachments);
+      if (closed) return;
+      const ids = identities(payload);
+      const result: Record<string, SharedCollection> = Object.create(null);
+      for (const [key, value] of Object.entries(values)) {
+        const oldValue = initialized ? (data.single ? reader.current : (reader.current as any)[key]) : undefined;
+        result[key] = previous[key] === ids[key] && oldValue !== undefined ? oldValue : value;
+      }
+      if (data.single && (Object.keys(result).length !== 1 || !Object.hasOwn(result, 'value'))) throw new Error('Invalid single-collection snapshot');
+      retireReaderAttachments(readerAttachments, nextAttachments);
+      arenas = next; readerAttachments = nextAttachments; previous = ids; previousSingle = data.single;
+      reader.accept((data.single ? result.value : Object.freeze(result)) as T, data.sequence!);
+      if (closed) return;
+      send({ kind: 'ack', sequence: data.sequence });
+      if (!initialized) { initialized = true; clearTimeout(timer); resolve(reader); }
+    } finally {
+      if (readerAttachments !== nextAttachments) {
+        retireReaderAttachments(nextAttachments, readerAttachments); nextAttachments.clear();
+      }
     }
-    if (data.single && (Object.keys(result).length !== 1 || !Object.hasOwn(result, 'value'))) throw new Error('Invalid single-collection snapshot');
-    arenas = next; previous = ids; previousSingle = data.single;
-    reader.accept((data.single ? result.value : Object.freeze(result)) as T, data.sequence!);
-    if (closed) return;
-    send({ kind: 'ack', sequence: data.sequence });
-    if (!initialized) { initialized = true; clearTimeout(timer); resolve(reader); }
   };
   try {
     remove = listen(endpoint, data => {

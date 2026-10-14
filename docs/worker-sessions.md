@@ -152,9 +152,15 @@ Retained snapshots remain readable. Worker writes to an attached arena throw a r
 
 With `copy: false`, each newly needed memory handle is shared with a connection. Later frames carry root descriptors, arena IDs, and used lengths. Reset, compaction, and new nested arenas cause new attachment. Backing storage is shared, not transferred or detached.
 
+Within a shared connection, later snapshots can reuse decoded JSON and strings from the same immutable arena. Each publication still creates fresh read-only attachments and dependency lookups; nested collection handles are reconstructed for that publication. Reuse is bounded per arena by 2,048 entries and 2 MiB of encoded input for each value category, in addition to the ordinary per-snapshot caches. These are admission limits, not JavaScript heap measurements. Copy connections and standalone `initWorker()` calls do not share these caches across publications.
+
+Published bytes must remain immutable for the arena's lifetime. Do not overwrite them through a raw memory view or by attaching a payload that combines an existing memory with replacement copied bytes. Use owner updates or compaction to publish a new snapshot.
+
+While an arena remains active in a connection, a retained old snapshot shares a bounded cache that may contain values first read in later revisions. Removing the arena or disconnecting clears and disables that shared cache. Each retained snapshot keeps its own already decoded values and remains readable. Separate connections have independent caches, and a reintroduced arena starts fresh. The encoded-byte limits do not bound total retained heap or backing storage.
+
 Bun defaults to `copy: true`; Node and supported browsers default to shared mode. Copy mode copies used arena prefixes and is not zero-copy. A page-to-SharedWorker connection cannot share backing memory across the agent-cluster boundary; see the [SharedWorker task example](workers.md#connect-a-sharedworker). Copy mode still requires an environment able to create the engine's shared WASM arenas.
 
-Transport cost depends on roots and reachable arena dependencies. Each received publication currently uses `initWorker()` and creates read-only arena views/WASM instances. Memory handles and unchanged top-level handles are reused, but attachment work is not eliminated. Strings and JSON values still require decoding and can allocate in every reader.
+Transport cost depends on roots and reachable arena dependencies. Each received publication creates fresh read-only arena views and WASM instances. Memory handles and unchanged top-level handles are reused, but attachment work is not eliminated. Uncached strings and JSON values still require decoding and can allocate in every reader.
 
 Connection registries drop memory handles absent from their latest acknowledged snapshot. Retained snapshots and historical arena dependencies can still keep full arenas alive. Release unused holders and compact explicitly at an application boundary. Sessions do not reclaim individual arena nodes.
 
