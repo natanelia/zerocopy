@@ -1,0 +1,14 @@
+{
+  "main": {
+    "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+    "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285"
+  },
+  "baseline": {
+    "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+    "bulk-input-storage.test.ts": "b2f494be15095fe9cb135cbfe0c82b4896978afdec536416a61a8116e36e003f"
+  },
+  "candidate": {
+    "persistent-core.as.ts": "eacf630af6466cf4a8bfaa8eadaf32f155fa027a41dd2a2d69965662b7d9caec",
+    "bulk-input-storage.test.ts": "b2f494be15095fe9cb135cbfe0c82b4896978afdec536416a61a8116e36e003f"
+  }
+}

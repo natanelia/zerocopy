@@ -1,0 +1,57 @@
+--- a/persistent-core.as.ts
++++ b/persistent-core.as.ts
+@@ -442,8 +442,11 @@
+   start = 0;
+   for (let digit: u32 = 0; digit < 16; digit++) {
+     const n = load<u32>(frame + digit * 4);
+-    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 4, mark);
+-    added += batchChange;
++    let child = childAt(old, digit, shift);
++    if (n) {
++      child = batchAt(child, input + start * 4, n, shift + 4, mark);
++      added += batchChange;
++    }
+     if (child) {
+       bitmap |= 1 << digit;
+       store<u32>(frame + 128 + children++ * 4, child);
+--- a/bulk-input-storage.test.ts
++++ b/bulk-input-storage.test.ts
+@@ -185,6 +185,38 @@
+   });
+ }
+ 
++for (const type of ['number', 'string', 'object']) test(`sparse batch partitions preserve sizes and snapshots ${type}`, () => {
++  // Five keys share digits 1,1: the first two partition levels have empty
++  // digits after additions. The last two keys occupy untouched old children.
++  const keys = ['sparse17', 'sparse165', 'sparse239', 'sparse569', 'sparse671', 'sparse194', 'sparse378', 'sparse367', 'sparse97'];
++  expect(keys.map(k => fnv(k) & 255)).toEqual([0x11, 0x11, 0x11, 0x11, 0x11, 0x31, 0x15, 0x91, 0x19]);
++  const value = (n: number) => type === 'number' ? n : type === 'string' ? `v${n}` : { n };
++  const a = new Arena(), empty = fresh(type, a);
++  const initial = [0, 2, 7, 8].map(i => [keys[i]!, value(-i)] as const);
++  const old = empty.setMany(initial as any), oldValues = logical(old), end = a.used, before = payload(a);
++  const entries = [4, 0, 6, 1, 2, 5, 3].map(i => [keys[i]!, value(i)] as const);
++  entries.push([keys[0]!, value(100)], [keys[5]!, value(105)]);
++  const next = old.setMany(entries as any), expected = new Map(initial);
++  for (const [k, v] of entries) expected.set(k, v);
++  const nextValues = [...expected].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
++  expect(empty.size).toBe(0); expect(logical(empty)).toEqual([]);
++  expect(old.size).toBe(4); expect(logical(old)).toEqual(oldValues);
++  expect(next.size).toBe(9); expect(logical(next)).toEqual(nextValues);
++  for (const [k, v] of expected) expect(next.get(k)).toEqual(v);
++  expect(old.get(keys[1]!)).toBeUndefined(); expect(next.get('missing')).toBeUndefined();
++  expect(payload(a, end)).toEqual(before);
++  const nextEnd = a.used, nextBytes = payload(a);
++  const replacements = keys.slice(0, 7).map((k, i) => [k, value(i + 200)] as const);
++  const replaced = next.setMany(replacements as any);
++  for (const [k, v] of replacements) expected.set(k, v);
++  expect(replaced.size).toBe(9);
++  expect(logical(replaced)).toEqual([...expected].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));
++  expect(next.size).toBe(9); expect(logical(next)).toEqual(nextValues);
++  expect(old.size).toBe(4); expect(logical(old)).toEqual(oldValues);
++  expect(payload(a, nextEnd)).toEqual(nextBytes);
++  record(`sparse/${type}`, a, { root: replaced.root, size: replaced.size, values: logical(replaced) });
++});
++
+ test('eight full FNV collisions reach terminal buckets and preserve forks', () => {
+   expect(collisions.keys.length).toBe(8); expect(new Set(collisions.keys).size).toBe(8);
+   for (const k of collisions.keys) expect(fnv(k)).toBe(collisions.target);
