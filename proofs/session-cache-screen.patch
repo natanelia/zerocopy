@@ -1,0 +1,829 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -5,6 +5,7 @@
+ import { structureRegistry } from './codec';
+ import { parseNestedType } from './types';
+ import { freezeJSON } from './freeze-json';
++import type { ReaderValues } from './reader-values';
+ export { freezeJSON } from './freeze-json';
+ 
+ const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
+@@ -159,8 +160,9 @@
+   private internedStringBytes = 0;
+   private readonly scalar = new Uint8Array(8);
+   private readonly scalarView = new DataView(this.scalar.buffer);
+-
+-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
++  private readonly readerValues: ReaderValues | undefined;
++
++  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; readerValues?: ReaderValues } = {}) {
+     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
+     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
+     this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+@@ -171,6 +173,7 @@
+     this.buffer = this.memory.buffer;
+     this.bytes = new Uint8Array(this.buffer);
+     this.view = new DataView(this.buffer);
++    this.readerValues = this.readOnly && !options.copy ? options.readerValues : undefined;
+   }
+   get buf(): Uint8Array { this.refresh(); return this.bytes; }
+   get dv(): DataView { this.refresh(); return this.view; }
+@@ -268,6 +271,14 @@
+     if (type === 'string') return this.string(ptr, len);
+     const cached = this.objects.get(ptr);
+     if (cached !== undefined) return cached;
++    // The ordinary combined JSON/nested budget still governs this view. Only
++    // plain JSON can cross revisions; nested values depend on this registry.
++    const shared = this.readerValues && type === 'object' && this.objects.size < 2048 && this.objectBytes + len <= 2097152
++      ? this.readerValues.json.get(ptr, len) : undefined;
++    if (shared) {
++      this.objects.set(ptr, shared.value); this.objectBytes += len;
++      return shared.value;
++    }
+     this.refresh();
+     const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
+     const nested = parseNestedType(type);
+@@ -279,13 +290,22 @@
+       if (!source) throw new Error('Missing nested arena in worker data');
+       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
+     } else result = freezeJSON(parsed);
+-    if (this.objects.size < 2048 && this.objectBytes + len <= 2097152) { this.objects.set(ptr, result); this.objectBytes += len; }
++    if (this.objects.size < 2048 && this.objectBytes + len <= 2097152) {
++      this.objects.set(ptr, result); this.objectBytes += len;
++      if (type === 'object') this.readerValues?.json.remember(ptr, len, result);
++    }
+     return result;
+   }
+   string(ptr: number, len: number): string {
+     if (!len) return '';
+     const cached = this.strings.get(ptr);
+     if (cached !== undefined) return cached;
++    const shared = this.readerValues && this.strings.size < 2048 && this.stringBytes + len <= 2097152
++      ? this.readerValues.strings.get(ptr, len) : undefined;
++    if (shared) {
++      this.strings.set(ptr, shared.value); this.stringBytes += len;
++      return shared.value;
++    }
+     this.refresh();
+     let value = '';
+     if (len <= 32) {
+@@ -296,7 +316,10 @@
+       }
+     } else value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
+     // Empty byte ranges can share an address with a following allocation.
+-    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) { this.strings.set(ptr, value); this.stringBytes += len; }
++    if (len && this.strings.size < 2048 && this.stringBytes + len <= 2097152) {
++      this.strings.set(ptr, value); this.stringBytes += len;
++      this.readerValues?.strings.remember(ptr, len, value);
++    }
+     return value;
+   }
+   private rememberKey(key: string, token: KeyToken): KeyToken {
+--- a/docs/worker-sessions.md
++++ b/docs/worker-sessions.md
+@@ -152,9 +152,15 @@
+ 
+ With `copy: false`, each newly needed memory handle is shared with a connection. Later frames carry root descriptors, arena IDs, and used lengths. Reset, compaction, and new nested arenas cause new attachment. Backing storage is shared, not transferred or detached.
+ 
++Within a shared connection, later snapshots can reuse decoded JSON and strings from the same immutable arena. Each publication still creates fresh read-only attachments and dependency lookups; nested collection handles are reconstructed for that publication. Reuse is bounded per arena by 2,048 entries and 2 MiB of encoded input for each value category, in addition to the ordinary per-snapshot caches. These are admission limits, not JavaScript heap measurements. Copy connections and standalone `initWorker()` calls do not share these caches across publications.
++
++Published bytes must remain immutable for the arena's lifetime. Do not overwrite them through a raw memory view or by attaching a payload that combines an existing memory with replacement copied bytes. Use owner updates or compaction to publish a new snapshot.
++
++While an arena remains active in a connection, a retained old snapshot shares a bounded cache that may contain values first read in later revisions. Removing the arena or disconnecting clears and disables that shared cache. Each retained snapshot keeps its own already decoded values and remains readable. Separate connections have independent caches, and a reintroduced arena starts fresh. The encoded-byte limits do not bound total retained heap or backing storage.
++
+ Bun defaults to `copy: true`; Node and supported browsers default to shared mode. Copy mode copies used arena prefixes and is not zero-copy. A page-to-SharedWorker connection cannot share backing memory across the agent-cluster boundary; see the [SharedWorker task example](workers.md#connect-a-sharedworker). Copy mode still requires an environment able to create the engine's shared WASM arenas.
+ 
+-Transport cost depends on roots and reachable arena dependencies. Each received publication currently uses `initWorker()` and creates read-only arena views/WASM instances. Memory handles and unchanged top-level handles are reused, but attachment work is not eliminated. Strings and JSON values still require decoding and can allocate in every reader.
++Transport cost depends on roots and reachable arena dependencies. Each received publication creates fresh read-only arena views and WASM instances. Memory handles and unchanged top-level handles are reused, but attachment work is not eliminated. Uncached strings and JSON values still require decoding and can allocate in every reader.
+ 
+ Connection registries drop memory handles absent from their latest acknowledged snapshot. Retained snapshots and historical arena dependencies can still keep full arenas alive. Release unused holders and compact explicitly at an application boundary. Sessions do not reclaim individual arena nodes.
+ 
+--- /dev/null
++++ b/proofs/session-reader-values.node.mjs
+@@ -0,0 +1,84 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
++import { SharedMap, SharedList, compactMany, getWorkerData, resetMap, resetSharedList } from '../dist/shared.js';
++import { createSharedState, connectSharedSession } from '../dist/worker.js';
++
++if (!isMainThread) {
++  const reader = await connectSharedSession({ endpoint: parentPort, channel: 'decoded-values' });
++  const original = reader.current, first = original.map.get('stable');
++  const report = (value, version) => {
++    const stable = value.map.get('stable');
++    parentPort.postMessage({
++      proof: 'decoded-values', version,
++      same: stable === first,
++      stable, changed: value.map.get('changed'),
++      tail: value.strings.get(value.strings.size - 1),
++      oldChanged: original.map.get('changed'),
++      oldString: original.strings.get(1),
++      frozen: Object.isFrozen(stable) && Object.isFrozen(stable.nested),
++    });
++    if (version === 2) {
++      reader.dispose();
++      assert.deepEqual(original.map.get('stable'), first);
++      parentPort.postMessage({ proof: 'retained-after-close', copy: workerData.copy });
++    }
++  };
++  report(reader.current, reader.version);
++  reader.subscribe(report);
++} else {
++  function response(worker, version, proof = 'decoded-values') {
++    return new Promise((resolve, reject) => {
++      const timer = setTimeout(() => finish(new Error(`Missing decoded-values version ${version}`)), 10000);
++      const onError = error => finish(error);
++      const onExit = code => finish(new Error(`Worker exited before ${proof} ${version}: ${code}`));
++      const onMessage = value => {
++        if (value.proof === proof && value.version === version) finish(undefined, value);
++      };
++      function finish(error, value) {
++        clearTimeout(timer); worker.off('error', onError); worker.off('exit', onExit); worker.off('message', onMessage);
++        error ? reject(error) : resolve(value);
++      }
++      worker.on('error', onError); worker.on('exit', onExit); worker.on('message', onMessage);
++    });
++  }
++
++  for (const copy of [false, true]) test(`real session decode reuse, copy=${copy}`, async () => {
++    resetMap(); resetSharedList();
++    const state = createSharedState({
++      map: new SharedMap('object').set('stable', { nested: [1, false, null] }).set('changed', { n: 0 }),
++      strings: new SharedList('string').pushMany(['', 'Å🙂'.repeat(40)]),
++    }, { copy, channel: 'decoded-values' });
++    const worker = new Worker(new URL(import.meta.url), { workerData: { copy } });
++    try {
++      const first = response(worker, 0);
++      await state.connect(worker);
++      const initial = await first;
++      assert.equal(initial.same, true); assert.equal(initial.frozen, true);
++      const memory = getWorkerData({ strings: state.current.strings }, { copy: false }).arenas[0].memory;
++      const capacity = memory.buffer.byteLength;
++      const next = response(worker, 1);
++      state.update(value => ({
++        map: value.map.set('changed', { n: 1 }),
++        strings: value.strings.push('x'.repeat(300000)),
++      }));
++      const updated = await next;
++      assert.equal(updated.same, !copy);
++      assert.deepEqual(updated.changed, { n: 1 });
++      assert.deepEqual(updated.oldChanged, { n: 0 });
++      assert.equal(updated.oldString, 'Å🙂'.repeat(40));
++      assert.equal(updated.tail.length, 300000);
++      assert.ok(memory.buffer.byteLength > capacity);
++      assert.equal(updated.frozen, true);
++      const compacted = response(worker, 2);
++      const closed = response(worker, undefined, 'retained-after-close');
++      state.value = compactMany(state.current);
++      const result = await compacted;
++      assert.equal(result.same, false);
++      assert.deepEqual(result.stable, initial.stable);
++      assert.deepEqual(result.oldChanged, { n: 0 });
++      assert.equal(result.frozen, true);
++      assert.equal((await closed).copy, copy);
++    } finally { state.dispose(); await worker.terminate(); }
++  });
++}
+--- /dev/null
++++ b/reader-values.test.ts
+@@ -0,0 +1,313 @@
++import { describe, expect, it, vi } from 'vitest';
++import { Arena, arenaOf } from './arena';
++import { SharedMap, SharedList, compact, getWorkerData, initWorker, type SharedStructure, type WorkerData } from './shared';
++import { attachSessionWorker, retireReaderAttachments, type ReaderAttachments } from './worker-attachment';
++import { DecodedValues, ReaderValues } from './reader-values';
++
++type Shape<T> = Record<keyof T, SharedStructure> & Record<Extract<keyof T, symbol>, never>;
++function reader() {
++  let current: ReaderAttachments = new Map();
++  return {
++    get current() { return current; },
++    clear() { retireReaderAttachments(current); current.clear(); },
++    async attach<T extends Shape<T>>(data: WorkerData<T>): Promise<Readonly<T>> {
++      const next: ReaderAttachments = new Map();
++      const values = await attachSessionWorker(data, current, next);
++      retireReaderAttachments(current, next);
++      current = next;
++      return values as Readonly<T>;
++    },
++  };
++}
++
++const jsonMap = (value: unknown, arena = new Arena()) => new SharedMap('object', 0, 0, arena).set('value', value as any);
++const wire = <T extends Shape<T>>(value: T, copy = false) => getWorkerData(value, { copy });
++
++describe('session-only decoded values', () => {
++  it('reuses unchanged plain JSON while preserving old roots, local state, and used prefixes', async () => {
++    const source = jsonMap({ nested: [1, 2] }), stream = reader();
++    const old = (await stream.attach(wire({ map: source }))).map;
++    const original = old.get('value'), oldArena = arenaOf(old), used = oldArena.used;
++    const updated = source.set('new', { marker: 'x'.repeat(300000) });
++    const next = (await stream.attach(wire({ map: updated }))).map;
++    const nextArena = arenaOf(next);
++    expect(next.get('value')).toBe(original);
++    expect(next.get('new')).toEqual({ marker: 'x'.repeat(300000) });
++    expect(old.has('new')).toBe(false);
++    expect(old.get('value')).toBe(original);
++    expect(Object.isFrozen((original as any).nested)).toBe(true);
++    expect(nextArena).not.toBe(oldArena);
++    expect(nextArena.wasm).not.toBe(oldArena.wasm);
++    expect(oldArena.used).toBe(used);
++    expect(nextArena.used).toBeGreaterThan(used);
++    const oldCopy = getWorkerData({ old }, { copy: true }), nextCopy = getWorkerData({ next }, { copy: true });
++    expect(oldCopy.arenas[0].copy!.byteLength).toBe(used);
++    expect(nextCopy.arenas[0].copy!.byteLength).toBe(nextArena.used);
++    const restoredOld = (await initWorker(oldCopy)).old, restoredNext = (await initWorker(nextCopy)).next;
++    expect(restoredOld.get('value')).toEqual(original);
++    expect(restoredOld.has('new')).toBe(false);
++    expect(restoredNext.get('value')).toEqual(original);
++    expect(restoredNext.get('new')).toEqual(next.get('new'));
++    expect(() => next.set('no', {})).toThrow(/read-only/);
++  });
++
++  it('does not share raw attachments, copied payloads, or separate connection contexts', async () => {
++    const source = jsonMap({ value: 1 }), data = wire({ source });
++    const plainA = await initWorker(data), plainB = await initWorker(data);
++    expect(plainA.source.get('value')).not.toBe(plainB.source.get('value'));
++    const a = reader(), b = reader();
++    const first = await a.attach(data), separate = await b.attach(data);
++    expect(first.source.get('value')).not.toBe(separate.source.get('value'));
++    const copies = reader(), copy = wire({ source }, true);
++    const copyA = await copies.attach(copy), copyB = await copies.attach(copy);
++    expect(copyA.source.get('value')).not.toBe(copyB.source.get('value'));
++    expect(copies.current.size).toBe(0);
++  });
++
++  it('separates changed values, compaction, overlapping IDs, and removed/reintroduced memory', async () => {
++    const a = jsonMap({ value: 1 }, new Arena({ id: 'same' }));
++    const b = jsonMap({ value: 2 }, new Arena({ id: 'same' }));
++    expect(a.root).toBe(b.root);
++    const stream = reader();
++    const old = (await stream.attach(wire({ map: a }))).map, value = old.get('value');
++    const changed = (await stream.attach(wire({ map: a.set('value', { value: 3 }) }))).map;
++    expect(changed.get('value')).toEqual({ value: 3 });
++    expect(changed.get('value')).not.toBe(value);
++    const replacement = (await stream.attach(wire({ map: b }))).map;
++    expect(replacement.get('value')).toEqual({ value: 2 });
++    expect(old.get('value')).toBe(value);
++    const compacted = (await stream.attach(wire({ map: compact(a) }))).map;
++    expect(compacted.get('value')).toEqual(value);
++    expect(compacted.get('value')).not.toBe(value);
++    await stream.attach(wire({}));
++    expect(stream.current.size).toBe(0);
++    const again = (await stream.attach(wire({ map: a }))).map;
++    expect(again.get('value')).toEqual(value);
++    expect(again.get('value')).not.toBe(value);
++    const retained = again.get('value'); stream.clear();
++    expect(again.get('value')).toBe(retained);
++    expect((await stream.attach(wire({ map: a }))).map.get('value')).not.toBe(retained);
++  });
++
++  it('separates arena IDs even when their exact memory object is the same', async () => {
++    const source = jsonMap({ n: 1 }), data = wire({ source }), stream = reader();
++    const descriptor = data.arenas[0], alias = 'same-memory-alias';
++    const aliased = { ...data,
++      arenas: [descriptor, { ...descriptor, id: alias }],
++      structures: { a: data.structures.source, b: { ...data.structures.source, arena: alias } },
++    };
++    const first = await stream.attach(aliased), av = first.a.get('value'), bv = first.b.get('value');
++    expect(arenaOf(first.a).memory).toBe(arenaOf(first.b).memory);
++    expect(av).toEqual(bv); expect(av).not.toBe(bv);
++    const next = await stream.attach(aliased);
++    expect(next.a.get('value')).toBe(av); expect(next.b.get('value')).toBe(bv);
++  });
++
++  it('keeps nested reconstruction local to each complete dependency registry', async () => {
++    const leafA = new SharedMap('number', 0, 0, new Arena({ id: 'leaf' })).set('n', 1);
++    const leafB = new SharedMap('number', 0, 0, new Arena({ id: 'leaf' })).set('n', 2);
++    expect(leafA.root).toBe(leafB.root);
++    const parent = new SharedMap('SharedMap<number>', 0, 0, new Arena({ id: 'parent' })).set('child', leafA);
++    const first = wire({ parent });
++    const leafWire = wire({ leafB }).arenas[0];
++    const second = { ...first, arenas: first.arenas.map(source => source.id === 'leaf' ? leafWire : source) };
++    const stream = reader(), old = (await stream.attach(first)).parent;
++    const next = (await stream.attach(second)).parent;
++    expect(next.get('child')!.get('n')).toBe(2);
++    expect(old.get('child')!.get('n')).toBe(1); // First old nested read is deferred.
++    expect(next.get('child')).not.toBe(old.get('child'));
++    expect(Object.is(arenaOf(next).transportDependencies, arenaOf(old).transportDependencies)).toBe(false);
++    const missing = { ...first, arenas: first.arenas.filter(source => source.id !== 'leaf') };
++    const incomplete = (await stream.attach(missing)).parent;
++    expect(() => incomplete.get('child')).toThrow(/Missing nested arena/);
++  });
++
++  it('calls current public factories on every attachment and nested reconstruction', async () => {
++    const source = jsonMap({ value: 1 }), stream = reader(), data = wire({ source });
++    const original = SharedMap.fromWorkerData;
++    const factory = vi.spyOn(SharedMap, 'fromWorkerData');
++    try {
++      const old = await stream.attach(data); old.source.get('value');
++      await stream.attach(data);
++      expect(factory).toHaveBeenCalledTimes(2);
++      factory.mockImplementationOnce(() => { throw new Error('factory failure'); });
++      await expect(stream.attach(data)).rejects.toThrow('factory failure');
++      expect(factory).toHaveBeenCalledTimes(3);
++      expect(old.source.get('value')).toEqual({ value: 1 });
++      factory.mockImplementation(original);
++      const nested = new SharedMap('SharedMap<object>').set('child', source);
++      const a = (await stream.attach(wire({ nested }))).nested;
++      a.get('child');
++      const b = (await stream.attach(wire({ nested }))).nested;
++      factory.mockImplementationOnce(() => { throw new Error('nested factory failure'); });
++      expect(() => b.get('child')).toThrow('nested factory failure');
++      expect(a.get('child')!.get('value')).toEqual({ value: 1 });
++    } finally { factory.mockRestore(); }
++  });
++
++  it('does not commit a failed frame, while permitting bounded warming of an existing cache', async () => {
++    const source = jsonMap({ n: 1 }), extra = jsonMap({ n: 2 }), stream = reader();
++    const retained = (await stream.attach(wire({ source }))).source;
++    const committed = stream.current, original = SharedMap.fromWorkerData;
++    const factory = vi.spyOn(SharedMap, 'fromWorkerData');
++    let warmed: unknown;
++    try {
++      factory.mockImplementationOnce((root, type, size, arena) => {
++        const value = original(root, type, size, arena);
++        warmed = value.get('value');
++        return value;
++      });
++      factory.mockImplementationOnce(() => { throw new Error('later factory failure'); });
++      await expect(stream.attach(wire({ source, extra }))).rejects.toThrow('later factory failure');
++      expect(stream.current).toBe(committed);
++      expect(stream.current.size).toBe(1);
++      expect(retained.get('value')).toBe(warmed);
++    } finally { factory.mockRestore(); }
++  });
++
++  it('deactivates dropped and abandoned caches without clearing local decoded values', async () => {
++    const source = jsonMap({ n: 1 }), extra = jsonMap({ n: 2 }), stream = reader();
++    const old = (await stream.attach(wire({ source }))).source, stable = old.get('value');
++    const previous = stream.current, entry = [...previous.values()][0];
++    const next = new Map([[arenaOf(source).id, { memory: entry.memory, values: entry.values }]]);
++    retireReaderAttachments(previous, next); // New metadata record, same live handle.
++    const leaf = arenaOf(source).find(source.root, 'value');
++    const ptr = leaf + 16 + arenaOf(source).dv.getUint32(leaf + 8, true);
++    const len = arenaOf(source).dv.getUint32(leaf + 12, true);
++    expect(entry.values.json.get(ptr, len)!.value).toBe(stable);
++    await stream.attach(wire({ extra }));
++    expect(entry.values.json.get(ptr, len)).toBeUndefined();
++    entry.values.json.remember(ptr, len, stable);
++    expect(entry.values.json.get(ptr, len)).toBeUndefined();
++    expect(old.get('value')).toBe(stable);
++
++    const original = SharedMap.fromWorkerData, factory = vi.spyOn(SharedMap, 'fromWorkerData');
++    let captured: SharedMap<any> | undefined, abandoned: ReaderValues | undefined;
++    const staged: ReaderAttachments = new Map();
++    try {
++      factory.mockImplementationOnce((root, type, size, arena) => {
++        captured = original(root, type, size, arena);
++        captured.get('value');
++        abandoned = [...staged.values()][0].values;
++        return captured;
++      });
++      factory.mockImplementationOnce(() => { throw new Error('abandon new cache'); });
++      await expect(attachSessionWorker(wire({ source, extra }), new Map(), staged)).rejects.toThrow('abandon new cache');
++      expect(staged.size).toBe(0);
++      expect(abandoned!.json.get(ptr, len)).toBeUndefined();
++      abandoned!.json.remember(ptr, len, stable);
++      expect(abandoned!.json.get(ptr, len)).toBeUndefined();
++      expect(captured!.get('value')).toEqual(stable);
++    } finally { factory.mockRestore(); }
++  });
++
++  it('distinguishes plain JSON, nested descriptors, and record lengths at one address', async () => {
++    const child = jsonMap({ n: 1 }), nested = new SharedMap('SharedMap<object>').set('child', child);
++    const data = wire({ nested }), stream = reader();
++    const plain = { ...data, structures: { nested: { ...data.structures.nested, data: { ...data.structures.nested.data, valueType: 'object' } } } } as any;
++    const decoded = (await stream.attach(plain) as any).nested.get('child');
++    expect(decoded.__t).toBe('SharedMap');
++    const restored = (await stream.attach(data)).nested.get('child')!;
++    expect(restored).toBeInstanceOf(SharedMap);
++    expect(restored.get('value')).toEqual({ n: 1 });
++    const values = new DecodedValues<unknown>();
++    values.remember(65536, 10, Object.freeze({ n: 1 }));
++    expect(values.get(65536, 9)).toBeUndefined();
++    expect(values.get(65536, 10)!.value).toEqual({ n: 1 });
++  });
++
++  it('caches JSON scalar values without confusing false-like values with misses', async () => {
++    const values = [null, false, 0, '', true, 7, 'text'];
++    const source = new SharedList('object').pushMany(values), stream = reader();
++    const a = (await stream.attach(wire({ source }))).source;
++    expect(a.toArray()).toEqual(values);
++    const parse = vi.spyOn(JSON, 'parse');
++    try {
++      const b = (await stream.attach(wire({ source }))).source;
++      expect(b.toArray()).toEqual(values);
++      expect(parse).not.toHaveBeenCalled();
++    } finally { parse.mockRestore(); }
++  });
++
++  it('keeps the original local JSON budget even when a shared value exists', async () => {
++    const source = new SharedList('object').pushMany(Array.from({ length: 2049 }, (_, n) => ({ n })));
++    const stream = reader(), a = (await stream.attach(wire({ source }))).source;
++    const sharedLast = a.get(2048);
++    const b = (await stream.attach(wire({ source }))).source;
++    for (let i = 0; i < 2048; i++) b.get(i);
++    const first = b.get(2048), second = b.get(2048);
++    expect(first).toEqual(sharedLast);
++    expect(first).not.toBe(sharedLast);
++    expect(second).not.toBe(first);
++    expect(Object.isFrozen(second)).toBe(true);
++  });
++
++  it('keeps the exact encoded-byte admission limit and leaves oversized values uncached', async () => {
++    const limit = 2097152, overhead = JSON.stringify({ payload: '' }).length;
++    const source = new SharedList('object').pushMany([{ payload: 'x'.repeat(limit - overhead) }, { n: 1 }]);
++    const stream = reader(), a = (await stream.attach(wire({ source }))).source, exact = a.get(0);
++    const b = (await stream.attach(wire({ source }))).source;
++    expect(b.get(0)).toBe(exact);
++    expect(b.get(1)).not.toBe(b.get(1));
++    const big = new SharedList('object').push({ payload: 'x'.repeat(limit) });
++    const c = (await stream.attach(wire({ big }))).big, first = c.get(0);
++    const d = (await stream.attach(wire({ big }))).big;
++    expect(d.get(0)).toEqual(first);
++    expect(d.get(0)).not.toBe(first);
++  });
++
++  it('retains Unicode strings through growth and does not cache empty ranges', async () => {
++    const source = new SharedList('string').pushMany(['', 'Å🙂'.repeat(40)]), stream = reader();
++    const a = (await stream.attach(wire({ source }))).source;
++    expect(a.toArray()).toEqual(['', 'Å🙂'.repeat(40)]);
++    const next = source.push('x'.repeat(300000));
++    const b = (await stream.attach(wire({ source: next }))).source;
++    expect(b.toArray()).toEqual(['', 'Å🙂'.repeat(40), 'x'.repeat(300000)]);
++    expect(a.toArray()).toEqual(['', 'Å🙂'.repeat(40)]);
++    const values = new DecodedValues<string>();
++    values.remember(65536, 0, ''); values.remember(65536, 1, 'a');
++    expect(values.get(65536, 1)!.value).toBe('a');
++    expect(values.get(65536, 0)).toBeUndefined();
++  });
++
++  it('keeps a string view uncached after its own entry budget is full', async () => {
++    const source = new SharedList('string').pushMany(Array.from({ length: 2049 }, (_, n) => `é-${n}`));
++    const stream = reader(), a = (await stream.attach(wire({ source }))).source;
++    expect(a.get(2048)).toBe('é-2048');
++    const b = (await stream.attach(wire({ source }))).source;
++    for (let i = 0; i < 2048; i++) b.get(i);
++    const decode = vi.spyOn(TextDecoder.prototype, 'decode');
++    try {
++      expect(b.get(2048)).toBe('é-2048');
++      const firstCalls = decode.mock.calls.length;
++      expect(firstCalls).toBeGreaterThan(0);
++      expect(b.get(2048)).toBe('é-2048');
++      expect(decode.mock.calls.length).toBeGreaterThan(firstCalls);
++    } finally { decode.mockRestore(); }
++  });
++
++  it('bounds shared entry and encoded-byte counts without eviction', () => {
++    const values = new DecodedValues<number>();
++    for (let i = 0; i < 2049; i++) values.remember(i, 1, i);
++    expect(values.get(0, 1)!.value).toBe(0);
++    expect(values.get(2047, 1)!.value).toBe(2047);
++    expect(values.get(2048, 1)).toBeUndefined();
++    const bytes = new DecodedValues<string>();
++    bytes.remember(1, 2097153, 'oversized'); bytes.remember(2, 2097152, 'exact'); bytes.remember(3, 1, 'later');
++    expect(bytes.get(1, 2097153)).toBeUndefined();
++    expect(bytes.get(2, 2097152)!.value).toBe('exact');
++    expect(bytes.get(3, 1)).toBeUndefined();
++    const session = new ReaderValues();
++    session.json.remember(1, 1, false); session.strings.remember(2, 1, 'a');
++    session.deactivate(); session.deactivate();
++    session.json.remember(1, 1, true); session.strings.remember(2, 1, 'b');
++    expect(session.json.get(1, 1)).toBeUndefined();
++    expect(session.strings.get(2, 1)).toBeUndefined();
++    const retiredBeforeFirstRead = new ReaderValues();
++    retiredBeforeFirstRead.deactivate();
++    retiredBeforeFirstRead.json.remember(1, 1, false);
++    retiredBeforeFirstRead.strings.remember(2, 1, 'a');
++    expect(retiredBeforeFirstRead.json.get(1, 1)).toBeUndefined();
++    expect(retiredBeforeFirstRead.strings.get(2, 1)).toBeUndefined();
++  });
++});
+--- /dev/null
++++ b/reader-values.ts
+@@ -0,0 +1,35 @@
++/** Pure decoded values shared only by successive attachments in one session.
++ * The byte budget counts encoded input, not JavaScript heap usage. There is no
++ * eviction: values admitted by an earlier view remain immutable cache hits.
++ * Entries never contain an Arena, memory handle, registry, or nested snapshot.
++ * This relies on the supported append-only lifetime: published bytes must not
++ * be overwritten through raw memory or a memory-plus-copy transport payload.
++ */
++export class DecodedValues<T> {
++  private readonly entries = new Map<number, { length: number; value: T }>();
++  private bytes = 0;
++  private active: boolean;
++  constructor(active = true) { this.active = active; }
++  get(ptr: number, length: number): { length: number; value: T } | undefined {
++    const entry = this.entries.get(ptr);
++    return entry?.length === length ? entry : undefined;
++  }
++  remember(ptr: number, length: number, value: T): void {
++    if (!this.active || !length || this.entries.has(ptr) || this.entries.size >= 2048 || this.bytes + length > 2097152) return;
++    this.entries.set(ptr, { length, value }); this.bytes += length;
++  }
++  deactivate(): void {
++    this.active = false; this.entries.clear(); this.bytes = 0;
++  }
++}
++
++export class ReaderValues {
++  private active = true;
++  private jsonValues: DecodedValues<unknown> | undefined;
++  private stringValues: DecodedValues<string> | undefined;
++  get json(): DecodedValues<unknown> { return this.jsonValues ??= new DecodedValues(this.active); }
++  get strings(): DecodedValues<string> { return this.stringValues ??= new DecodedValues(this.active); }
++  deactivate(): void {
++    this.active = false; this.jsonValues?.deactivate(); this.stringValues?.deactivate();
++  }
++}
+--- a/shared.ts
++++ b/shared.ts
+@@ -11,8 +11,8 @@
+ import { SharedSortedMap } from './shared-sorted-map';
+ import { SharedSortedSet } from './shared-sorted-set';
+ import { SharedPriorityQueue } from './shared-priority-queue';
+-import { Arena, arenaOf, createArenaRegistry, FORMAT_VERSION } from './arena';
+-import { structureRegistry } from './codec';
++import { Arena, arenaOf, FORMAT_VERSION } from './arena';
++import { constructors, reconstructWorkerData } from './worker-attachment';
+ 
+ export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
+ export { resetMap } from './shared-map';
+@@ -32,22 +32,6 @@
+ export { json, map, list, stack, queue, linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue, set, orderedSet, sortedSet } from './types';
+ export type { DeepReadonly, JsonValue, JsonObject, JsonType, NestedType, ValueOf, WireType } from './types';
+ 
+-// The registry checks class identity, not its generic value parameter.
+-// Explicit erasure avoids InstanceType inferring string (whose ValueOf is never).
+-const constructors = {
+-  SharedMap: SharedMap<any>,
+-  SharedList: SharedList<any>,
+-  SharedSet: SharedSet<string | number>,
+-  SharedStack: SharedStack<any>,
+-  SharedQueue: SharedQueue<any>,
+-  SharedLinkedList: SharedLinkedList<any>,
+-  SharedDoublyLinkedList: SharedDoublyLinkedList<any>,
+-  SharedOrderedMap: SharedOrderedMap<any>,
+-  SharedOrderedSet: SharedOrderedSet<string | number>,
+-  SharedSortedMap: SharedSortedMap<any>,
+-  SharedSortedSet: SharedSortedSet<string | number>,
+-  SharedPriorityQueue: SharedPriorityQueue<any>,
+-};
+ const constructorEntries = Object.entries(constructors);
+ export type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
+ // Named interfaces do not need a string index signature. Symbol keys cannot be
+@@ -117,26 +101,7 @@
+ /** Legacy untyped payloads require the caller to supply the application type. */
+ export function initWorker<T extends StructureRecord<T>>(data: WorkerData): Promise<Readonly<T>>;
+ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
+-  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
+-  const arenas = new Map<string, Arena>();
+-  // A solitary reader needs only its original empty owned dependency Map.
+-  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
+-  for (const source of data.arenas) {
+-    if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
+-    if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
+-    const arena = new Arena({ ...source, readOnly: true, registry });
+-    arenas.set(source.id, arena);
+-    registry?.members.push(arena);
+-  }
+-  // The complete registry is available before reconstructing any nested value.
+-  // It belongs only to this payload; later attachments cannot change old views.
+-  const result: Record<string, SharedStructure> = Object.create(null);
+-  for (const [name, item] of Object.entries(data.structures) as [string, SerializedStructure][]) {
+-    const arena = arenas.get(item.arena), factory = structureRegistry[item.type];
+-    if (!arena || !Object.hasOwn(constructors, item.type) || !factory) throw new Error(`Invalid structure: ${name}`);
+-    result[name] = factory.fromWorkerData(item.data, arena);
+-  }
+-  return Object.freeze(result) as Readonly<T>;
++  return reconstructWorkerData(data as WorkerData) as Readonly<T>;
+ }
+ 
+ export { compact, compactMany } from './compaction';
+--- /dev/null
++++ b/worker-attachment.ts
+@@ -0,0 +1,86 @@
++/** Internal attachment implementation. Public one-shot readers have no reuse context. */
++import { SharedMap } from './shared-map';
++import { SharedList } from './shared-list';
++import { SharedSet } from './shared-set';
++import { SharedStack } from './shared-stack';
++import { SharedQueue } from './shared-queue';
++import { SharedLinkedList } from './shared-linked-list';
++import { SharedDoublyLinkedList } from './shared-doubly-linked-list';
++import { SharedOrderedMap } from './shared-ordered-map';
++import { SharedOrderedSet } from './shared-ordered-set';
++import { SharedSortedMap } from './shared-sorted-map';
++import { SharedSortedSet } from './shared-sorted-set';
++import { SharedPriorityQueue } from './shared-priority-queue';
++import { Arena, createArenaRegistry, FORMAT_VERSION } from './arena';
++import { structureRegistry } from './codec';
++import { ReaderValues } from './reader-values';
++import type { SharedStructure, WorkerData } from './shared';
++
++// The registry checks class identity, not its generic value parameter.
++// Explicit erasure avoids InstanceType inferring string (whose ValueOf is never).
++export const constructors = {
++  SharedMap: SharedMap<any>,
++  SharedList: SharedList<any>,
++  SharedSet: SharedSet<string | number>,
++  SharedStack: SharedStack<any>,
++  SharedQueue: SharedQueue<any>,
++  SharedLinkedList: SharedLinkedList<any>,
++  SharedDoublyLinkedList: SharedDoublyLinkedList<any>,
++  SharedOrderedMap: SharedOrderedMap<any>,
++  SharedOrderedSet: SharedOrderedSet<string | number>,
++  SharedSortedMap: SharedSortedMap<any>,
++  SharedSortedSet: SharedSortedSet<string | number>,
++  SharedPriorityQueue: SharedPriorityQueue<any>,
++};
++
++export type ReaderAttachments = Map<string, { memory: WebAssembly.Memory; values: ReaderValues }>;
++interface AttachmentContext { previous: ReaderAttachments; next: ReaderAttachments }
++
++/** Retire only cache handles that no longer belong to the live publication. */
++export function retireReaderAttachments(previous: ReaderAttachments, next?: ReaderAttachments): void {
++  for (const [id, entry] of previous) if (next?.get(id)?.values !== entry.values) entry.values.deactivate();
++}
++
++/** Synchronous core keeps public and session entry points to one async boundary. */
++export function reconstructWorkerData(data: WorkerData, context?: AttachmentContext): Readonly<Record<string, SharedStructure>> {
++  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
++  const arenas = new Map<string, Arena>();
++  // A solitary reader needs only its original empty owned dependency Map.
++  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
++  for (const source of data.arenas) {
++    if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
++    if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
++    // Use the same single source spread as one-shot attachment. Inspect the
++    // captured fields for reuse; do not observe transport getters again.
++    const options = { ...source, readOnly: true, registry, readerValues: undefined as ReaderValues | undefined };
++    if (context && options.memory && !options.copy) {
++      const previous = context.previous.get(options.id);
++      options.readerValues = previous?.memory === options.memory ? previous.values : new ReaderValues();
++      context.next.set(options.id, { memory: options.memory, values: options.readerValues });
++    }
++    const arena = new Arena(options);
++    arenas.set(source.id, arena);
++    registry?.members.push(arena);
++  }
++  // The complete registry is available before reconstructing any nested value.
++  // It belongs only to this payload; later attachments cannot change old views.
++  const result: Record<string, SharedStructure> = Object.create(null);
++  for (const [name, item] of Object.entries(data.structures)) {
++    const arena = arenas.get(item.arena), factory = structureRegistry[item.type];
++    if (!arena || !Object.hasOwn(constructors, item.type) || !factory) throw new Error(`Invalid structure: ${name}`);
++    result[name] = factory.fromWorkerData(item.data, arena);
++  }
++  return Object.freeze(result);
++}
++
++export async function attachSessionWorker(data: WorkerData, previous: ReaderAttachments, next: ReaderAttachments): Promise<Readonly<Record<string, SharedStructure>>> {
++  // Reconstruction may warm an existing pure-value cache before a later error.
++  // The budget remains bounded; only the caller commits next after all checks.
++  try { return reconstructWorkerData(data, { previous, next }); }
++  catch (error) {
++    // A factory can retain a new attachment before a later factory fails.
++    // Keep its local cache usable, but do not leave an orphan reusable cache.
++    retireReaderAttachments(next, previous); next.clear();
++    throw error;
++  }
++}
+--- a/worker.test.ts
++++ b/worker.test.ts
+@@ -1,4 +1,4 @@
+-import { afterEach, describe, expect, it } from 'vitest';
++import { afterEach, describe, expect, it, vi } from 'vitest';
+ import { SharedMap, SharedList, SharedSet, resetMap, compact } from './shared';
+ import { arenaOf } from './arena';
+ import { createSharedState, createSharedSession, connectSharedSession, shareWithWorker, receiveShared, type SharedValue, type StateOptions } from './worker';
+@@ -42,6 +42,57 @@
+ }
+ 
+ describe('shared state and session protocol', () => {
++  it('reuses unchanged JSON across session revisions while retaining old snapshots', async () => {
++    const { state, reader } = await setup(new SharedMap('object').set('stable', { nested: [1] }).set('changed', { n: 0 }));
++    const old = reader.current, stable = old.get('stable'), changed = old.get('changed');
++    const reports: unknown[] = [];
++    reader.subscribe(value => reports.push(value.get('stable')));
++    state.update(map => map.set('changed', { n: 1 })); await drain();
++    expect(reader.current.get('stable')).toBe(stable);
++    expect(reports).toEqual([stable]);
++    expect(reader.current.get('changed')).toEqual({ n: 1 });
++    expect(reader.current.get('changed')).not.toBe(changed);
++    expect(old.get('changed')).toBe(changed);
++    expect(arenaOf(reader.current)).not.toBe(arenaOf(old));
++    expect(arenaOf(reader.current).wasm).not.toBe(arenaOf(old).wasm);
++    state.value = compact(state.current); await drain();
++    expect(reader.current.get('stable')).toEqual(stable);
++    expect(reader.current.get('stable')).not.toBe(stable);
++    reader.dispose();
++    expect(old.get('stable')).toBe(stable);
++    expect(old.get('changed')).toBe(changed);
++  });
++  it('keeps decode caches independent when two connections receive the same memory object', async () => {
++    const source = new SharedMap('object').set('stable', { n: 1 });
++    const a = await setup(source), b = await setup(source);
++    const av = a.reader.current.get('stable'), bv = b.reader.current.get('stable');
++    expect(av).not.toBe(bv);
++    const next = source.set('revision', 1);
++    a.state.value = next; b.state.value = next; await drain();
++    expect(a.reader.current.get('stable')).toBe(av);
++    expect(b.reader.current.get('stable')).toBe(bv);
++    const retained = a.reader.current;
++    a.reader.subscribe(() => a.reader.dispose());
++    a.state.value = next.set('revision', 2); await drain();
++    expect(a.reader.closed).toBe(true);
++    expect(retained.get('stable')).toBe(av);
++    expect(b.reader.closed).toBe(false);
++  });
++  it('retires shared values on disconnect while retained snapshots keep ordinary local caching', async () => {
++    const { state, reader } = await setup(new SharedMap('object').set('deferred', { nested: [7] }));
++    const retained = reader.current;
++    state.update(map => map.set('revision', 1)); await drain();
++    const later = reader.current.get('deferred');
++    reader.dispose();
++    const parse = vi.spyOn(JSON, 'parse');
++    try {
++      const first = retained.get('deferred');
++      expect(first).toEqual(later); expect(first).not.toBe(later);
++      expect(parse).toHaveBeenCalledTimes(1);
++      expect(retained.get('deferred')).toBe(first);
++      expect(parse).toHaveBeenCalledTimes(1);
++    } finally { parse.mockRestore(); }
++  });
+   it('automatically publishes a single collection and preserves old snapshots', async () => {
+     const { state, reader } = await setup(new SharedMap('number').set('a', 1));
+     const old = reader.current;
+--- a/worker.ts
++++ b/worker.ts
+@@ -1,5 +1,6 @@
+ /** Typed, single-writer snapshot sessions. No polling, shared locks, or store dependency. */
+-import { initWorker, type WorkerData } from './shared';
++import { type WorkerData } from './shared';
++import { attachSessionWorker, retireReaderAttachments, type ReaderAttachments } from './worker-attachment';
+ import {
+   capture, same, identities, message, isMessage, listen, reserve, settings, strategy,
+   uniqueId, defaultEndpoint, report, errorOf, notify, WIRE_VERSION,
+@@ -368,6 +369,7 @@
+   let owner: string | undefined, closed = false, initialized = false;
+   let remove = () => {};
+   let arenas = new Map<string, ArenaWire>();
++  let readerAttachments: ReaderAttachments = new Map();
+   let previous: Readonly<Record<string, string>> = Object.create(null);
+   let previousSingle: boolean | undefined;
+   let chain = Promise.resolve();
+@@ -379,7 +381,7 @@
+     if (closed) return;
+     closed = true; clearTimeout(timer); remove(); release(); options.signal?.removeEventListener('abort', abort);
+     if (!remote) { try { send({ kind: error ? 'error' : 'close', message: error?.message }); } catch {} }
+-    arenas.clear(); previous = Object.create(null); reader.finish(error);
++    arenas.clear(); retireReaderAttachments(readerAttachments); readerAttachments.clear(); previous = Object.create(null); reader.finish(error);
+     if (!initialized) reject(error ?? new Error('Shared reader closed before initialization'));
+     else if (error) report(options.onError, error);
+   };
+@@ -402,20 +404,28 @@
+       if (known?.memory && source.memory) throw new Error('An existing arena cannot replace its memory');
+       next.set(source.id, source.memory || source.copy ? source : { ...source, memory: known!.memory });
+     }
+-    const values = await initWorker<Record<string, SharedCollection>>({ ...payload, arenas: [...next.values()] });
+-    if (closed) return;
+-    const ids = identities(payload);
+-    const result: Record<string, SharedCollection> = Object.create(null);
+-    for (const [key, value] of Object.entries(values)) {
+-      const oldValue = initialized ? (data.single ? reader.current : (reader.current as any)[key]) : undefined;
+-      result[key] = previous[key] === ids[key] && oldValue !== undefined ? oldValue : value;
++    const nextAttachments: ReaderAttachments = new Map();
++    try {
++      const values = await attachSessionWorker({ ...payload, arenas: [...next.values()] }, readerAttachments, nextAttachments);
++      if (closed) return;
++      const ids = identities(payload);
++      const result: Record<string, SharedCollection> = Object.create(null);
++      for (const [key, value] of Object.entries(values)) {
++        const oldValue = initialized ? (data.single ? reader.current : (reader.current as any)[key]) : undefined;
++        result[key] = previous[key] === ids[key] && oldValue !== undefined ? oldValue : value;
++      }
++      if (data.single && (Object.keys(result).length !== 1 || !Object.hasOwn(result, 'value'))) throw new Error('Invalid single-collection snapshot');
++      retireReaderAttachments(readerAttachments, nextAttachments);
++      arenas = next; readerAttachments = nextAttachments; previous = ids; previousSingle = data.single;
++      reader.accept((data.single ? result.value : Object.freeze(result)) as T, data.sequence!);
++      if (closed) return;
++      send({ kind: 'ack', sequence: data.sequence });
++      if (!initialized) { initialized = true; clearTimeout(timer); resolve(reader); }
++    } finally {
++      if (readerAttachments !== nextAttachments) {
++        retireReaderAttachments(nextAttachments, readerAttachments); nextAttachments.clear();
++      }
+     }
+-    if (data.single && (Object.keys(result).length !== 1 || !Object.hasOwn(result, 'value'))) throw new Error('Invalid single-collection snapshot');
+-    arenas = next; previous = ids; previousSingle = data.single;
+-    reader.accept((data.single ? result.value : Object.freeze(result)) as T, data.sequence!);
+-    if (closed) return;
+-    send({ kind: 'ack', sequence: data.sequence });
+-    if (!initialized) { initialized = true; clearTimeout(timer); resolve(reader); }
+   };
+   try {
+     remove = listen(endpoint, data => {
