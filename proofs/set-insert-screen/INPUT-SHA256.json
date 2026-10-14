@@ -1,0 +1,14 @@
+{
+  "README.md": "fe176ec8fc1d5b5c699507fc9033c06e8c96a38e5d5250ec5102e427657b5088",
+  "SCREEN-PLAN.md": "8aa4d7ca9d85eb207db95e407265c805cd8add6043dc33f3f40b88922224aa49",
+  "candidate-files.json": "9e5d1f9329a315ec547665c5d865e981392a242b3f8393a9fe6ad4e5a9d8e1b6",
+  "candidate.patch": "44d29c932a4a14b420d382c062dcaa057f2f67813556b158dc57934dba77d0ac",
+  "draft-workload.mjs": "ae7e8f5756e3d616a211579d1b7f6c2379bae0272e6d607ba51aacb198a6827d",
+  "local-feasibility.json": "5d5dbb1bb6b120e418e3be2378368eb784b055fc6ad647b927100094a7cf7398",
+  "run-hosted.py": "bb26a9f0038cf5d50782a2f940501aca16d04c319a49a2529abfe79b4c523ac9",
+  "screen-child.mjs": "956c69862b1639ddd20339eb01237ae62bd5f928bf9b035a155ac1dfb7d01700",
+  "screen-controller.mjs": "5a166aee4c71361db0a6d45db970f321706b768d161ebb261a6d4e4842617a3c",
+  "toolchain/package-lock.json": "9532894191d1645619b4a2c76c376b4f71ffc8d5e43e3d9177cececd305ba3f9",
+  "toolchain/package.json": "33d431e5a40c9dc7859a0cd8b2b6562d7378b19fb6d191cb0543064c2590c8c9",
+  "../../.github/workflows/set-insert-screen.yml": "d59010adecc5ca1703309e1ea2e449043fca9981b1d15fdfda84e3caa7b2201f"
+}

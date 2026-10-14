@@ -1,0 +1,15 @@
+{
+  "cohort": "initial-local-feasibility-only",
+  "complete": false,
+  "baselineCalibrationChildren": 36,
+  "candidateTimingChildren": 0,
+  "pairedMeasurements": 0,
+  "projectedTotalMilliseconds": 610818.7125587501,
+  "screenCapMilliseconds": 300000,
+  "nodeCachedAsciiDuplicatePilotBatchMillisecondsRange": [
+    1.2325359999999819,
+    625.6170610000001
+  ],
+  "originalStudySha256": "a40606dd1b4e395bcabd05694d18873373f7d08e5e0c70b206ea69be447575a6",
+  "timingSamplesOrCountsReused": false
+}

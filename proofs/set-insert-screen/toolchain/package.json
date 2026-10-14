@@ -1,0 +1,24 @@
+{
+  "name": "zerocopy-set-insert-screen-toolchain",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "bun": "1.4.2",
+    "@turf/bbox": "7.4.0",
+    "@reduxjs/toolkit": "2.12.0",
+    "@redux-devtools/instrument": "3.0.0",
+    "@vitest/browser": "4.1.11",
+    "@vitest/browser-playwright": "4.1.11",
+    "assemblyscript": "0.28.20",
+    "bun-types": "1.4.2",
+    "immutable": "5.1.9",
+    "immer": "11.1.21",
+    "jsan": "3.1.14",
+    "playwright": "1.63.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-redux": "9.2.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}
