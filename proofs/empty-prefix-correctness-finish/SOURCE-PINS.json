@@ -1,0 +1,39 @@
+{
+  "repository": "natanelia/zerocopy",
+  "branch": "proof/empty-prefix-correctness-finish-20261015",
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "baseTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "candidatePatchSha256": "77f05fa906d9ccfc6d0afdaebc04cf181f3a7dea23d8b88b82c2a9d11a6077bb",
+  "baselineSourcesSha256": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "candidateSourcesSha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986",
+  "baselineNativeSha256": "f33f5629be3963564ca7d3c675161f3489878ea558d9fb64d239a9c8ba65bdc2",
+  "candidateGeneratedSha256": "01e199bfd54f18e01b12bd0850e3a9ac21c056a45924ffda2a9006250aa38c41",
+  "engines": {
+    "Node": {
+      "version": "22.16.0",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "bytes": 121509208
+    },
+    "Bun": {
+      "version": "1.4.2",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "bytes": 79500640
+    }
+  },
+  "npmCliSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+  "toolchainPackageSha256": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "toolchainLockSha256": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "sourceRuntimeSha256": "fad8b54107a1f672bacbf6d5c9e9cb22a7e0d715b528212fbc4f906e5692292c",
+  "sourceTestSha256": "51e3850277791fc7b6308c2467039e789445dabd55ce74179434bb3f3d65b1dd",
+  "wholeControllerSeconds": 1500,
+  "preparationSeconds": 300,
+  "correctnessSeconds": 1200,
+  "cleanupPreservationReserveSeconds": 60,
+  "sampledGroupRssLimitBytes": 4294967296,
+  "minimumAvailableMemoryBytes": 5368709120,
+  "noBenchmark": true,
+  "noRetries": true,
+  "priorHostedArtifactManifestSha256": "ac254b7276ac1b4112984e57204ae0f0083992f3c359b1206d335ff48aae9bef",
+  "priorHostedResultSha256": "d4fbe06501cd55c5a63f228369a1babeff18f19f112e23467430b21b6f46e707",
+  "priorHostedFullReportSha256": "d08df62385886d0a6cb170ee26239ef0938aa3ef30d79c9ab50d0c43bc98cb4d"
+}
