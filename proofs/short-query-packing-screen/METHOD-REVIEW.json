@@ -1,0 +1,27 @@
+{
+  "decision": "method accepted for source-only implementation",
+  "methodSha256": "f32eadded0fd6618754184f42339054c7efb8bdbef0709e512524043cc28df4d",
+  "scope": "One hosted six-workload public compile-and-use screen",
+  "fixedDesign": {
+    "engines": 2,
+    "pairsPerEngine": 16,
+    "calibrationChildren": 2,
+    "comparisonChildren": 64,
+    "totalChildren": 66,
+    "workloads": 6,
+    "setupSeconds": 900,
+    "screenSeconds": 900,
+    "calibrationChildSeconds": 30,
+    "comparisonChildSeconds": 15,
+    "sampledRssBytes": 2147483648
+  },
+  "observations": [
+    "Same warmed public operation selects common baseline-only K, then counts remain frozen for both arms.",
+    "All four measured batches retain equal arithmetic weight, with process pairs as replicates.",
+    "Primary useful-gain threshold is separate from simultaneous2% material-regression clearance; all adverse and unresolved controls remain visible.",
+    "Whole-study budget prospectively accounts for doubling overshoot without adding samples.",
+    "Exact corpus/checksums must be frozen and independently verified before any timing."
+  ],
+  "executionReleased": false,
+  "publicationReleased": false
+}

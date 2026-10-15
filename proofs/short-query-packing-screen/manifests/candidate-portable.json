@@ -1,0 +1,50 @@
+{
+  "chunk-1zdmdqbj.js": {
+    "sha256": "6995185e02b1115c3c0d674e928211337cb4f3588fb2602833e43f73d703ce39",
+    "bytes": 43116
+  },
+  "chunk-4120qxf8.js": {
+    "sha256": "20421442d021b82052323832ba81ce798651ad1f890f2ab6935067333a318805",
+    "bytes": 12396
+  },
+  "chunk-d4yzdmye.js": {
+    "sha256": "4aa5c7e093fe794e882e866e7e03dda6109526ebde5d71190239ed1e77cabcc2",
+    "bytes": 39495
+  },
+  "chunk-n1amv1q3.js": {
+    "sha256": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+    "bytes": 3129
+  },
+  "chunk-t2acd52e.js": {
+    "sha256": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+    "bytes": 83457
+  },
+  "geometry.js": {
+    "sha256": "acfffc04224c9ac008f357fcd493174c65aef20301916b50c52659270e6b61a3",
+    "bytes": 2072
+  },
+  "numeric.js": {
+    "sha256": "cbdf51d6c54884bd5a4d22a00c8006a1493051d1171ab9687383b690e789082e",
+    "bytes": 4303
+  },
+  "redux.js": {
+    "sha256": "dd3c12d591e9341a23854b26f07a4bc998d9fccb53c2002e12e8d49d5bdc50ea",
+    "bytes": 38023
+  },
+  "shared.js": {
+    "sha256": "a98c8ba22bd968b45bae6cca1f29ce2303a6a6d2e7c4e9d3d1ceb54692e3181d",
+    "bytes": 2141
+  },
+  "state.js": {
+    "sha256": "dcddfd60026aa1077a2cfb5543d1573c3143855eb8b6d1095a5a00e15717b772",
+    "bytes": 224
+  },
+  "tanstack-db-collection.js": {
+    "sha256": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+    "bytes": 3707
+  },
+  "worker.js": {
+    "sha256": "2a97a27007959cc5abfa900f0babc12ba3f89e67ae2c7a3049a8e30ff8b560d9",
+    "bytes": 682
+  }
+}
