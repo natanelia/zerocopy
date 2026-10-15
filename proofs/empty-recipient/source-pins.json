@@ -1,0 +1,15 @@
+{
+  ".github/workflows/empty-recipient.yml": "9f33dfb2f67542410581da0d7f558560013250d25b0dd6aa51b12ee7d4724c85",
+  "proofs/empty-recipient/METHOD.md": "552387a3eb0494ccb90e75052c2205d21822bbbadbd604fe3e21742e52e70d79",
+  "proofs/empty-recipient/README.md": "8dc4b7f74176fe011dde96d9af59c03f2b1e505467c6d5e9ffd1813a2f5d86ab",
+  "proofs/empty-recipient/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/empty-recipient/dependencies/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "proofs/empty-recipient/dependencies/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "proofs/empty-recipient/harness.node.mjs": "a4c674f2827526fee7b7bf8a57aa615e9b0fd4444f4a56e47572bd39a8a0d1e5",
+  "proofs/empty-recipient/harness_test.py": "8eec1738eb260b80fe0d1b620accce3b00cf8b66846ed23a5a2a1596fce00354",
+  "proofs/empty-recipient/latency.mjs": "4615d77ee8999fd66ea0b178bf51e6eaa79bcac6426c3adddfff5b2a20d0c00f",
+  "proofs/empty-recipient/run.py": "52adf8db9c84e6c096b46dabb082733f8d5af659cdef96dd52d027eb9786d61b",
+  "worker-empty-recipient.test.ts": "9c7445f4c2955925b65123a4a3e939901c3a4e8619f9e0969929c11aa07e8619",
+  "worker-protocol.ts": "693fbcdc1d40a505c1d49e7716bdf66531562cf8c45436c9507224c17e65261c",
+  "worker.ts": "cdd49268cc3d91a66b1728e8bc6e2d5f76a0d0c4308546788f94a3d2de4aaaef"
+}

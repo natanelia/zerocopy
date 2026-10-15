@@ -103,8 +103,10 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
     const committed = this.state!;
     this.published = committed;
     const version = ++this.sequence;
-    const frame: Frame = { ...committed, sequence: version };
-    for (const peer of [...this.peers.values()]) peer.send(frame);
+    if (this.peers.size) {
+      const frame: Frame = { ...committed, sequence: version };
+      for (const peer of [...this.peers.values()]) peer.send(frame);
+    }
     notify(this.listeners, committed.value, version, this.options.onError);
     return version;
   }

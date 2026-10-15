@@ -62,6 +62,7 @@ export function report(handler: SessionOptions['onError'], error: unknown): void
   catch (failure) { console.error('[zerocopy/worker] onError failed', failure); }
 }
 export function notify<T>(listeners: Set<(value: T, version: number) => void>, value: T, version: number, onError?: SessionOptions['onError']): void {
+  if (!listeners.size) return;
   for (const listener of [...listeners]) {
     try {
       // Also observe a rejected Promise from an accidentally async subscriber.
