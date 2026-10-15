@@ -1,0 +1,27 @@
+{
+  "status": "stopped-before-materialization-or-tests",
+  "failure": "Preparation assertion: retained baseline source-files inventory differs from the supplied current-main baseline manifest.",
+  "manifestCounts": {
+    "retained": 502,
+    "current": 502
+  },
+  "onlyRetained": [],
+  "onlyCurrent": [],
+  "different": [
+    {
+      "path": "bulk-input-storage.test.ts",
+      "retained": "b2f494be15095fe9cb135cbfe0c82b4896978afdec536416a61a8116e36e003f",
+      "current": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285"
+    }
+  ],
+  "artifactRecordHashes": {
+    "retained/baseline/source-files.json": true,
+    "retained/baseline/generated.json": true,
+    "baseline-build-v1/generated.json": true,
+    "correctness-v1/final-generated.json": true,
+    "correctness-v1/result.json": true
+  },
+  "testExecutionStarted": false,
+  "sourceEdits": false,
+  "retryStarted": false
+}

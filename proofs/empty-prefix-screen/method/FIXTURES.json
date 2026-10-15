@@ -1,0 +1,183 @@
+{
+  "status": "proposed fixed definitions pending independent method review; no execution",
+  "key_formula": "ASCII k + identifier as exactly seven zero-padded base-10 digits",
+  "numeric_value_formula": "identifier + 1",
+  "range_convention": "start inclusive, stop exclusive; ascending order; no filtering",
+  "absent_query_identifiers": [
+    100000,
+    104096
+  ],
+  "expansion_hash_preimage": "UTF-8 compact JSON with no spaces and no trailing newline: ordered [[key,value],...] for entries; ordered [key,...] for queries",
+  "construction": "public new SharedMap(number).setMany(entries), then getWorkerData({map},{copy:true}) and initWorker; fresh reader per case",
+  "case_order": [
+    "P1",
+    "P2",
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+  ],
+  "cases": [
+    {
+      "id": "P1",
+      "role": "sole-primary",
+      "public_operation": "get",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 128,
+      "query_id_start_inclusive": 100000,
+      "query_id_stop_exclusive": 104096,
+      "query_count": 4096,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 0,
+      "entry_array_sha256": "4dbaddaae9a6652f48eac1be0d1f29f7516d6d4f6748c2ceb31052093c94b694",
+      "query_array_sha256": "637f3d4acc8590ffbafc3a6b4247e6e72a423aee4abccc1b3f8ead8d7307ede2",
+      "expected_checksum_per_full_query_pass": 4096
+    },
+    {
+      "id": "P2",
+      "role": "supporting-miss",
+      "public_operation": "has",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 256,
+      "query_id_start_inclusive": 100000,
+      "query_id_stop_exclusive": 104096,
+      "query_count": 4096,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 0,
+      "entry_array_sha256": "cc389e4e6112337e00a2df4e3a88d398013a8d8c7dbc58a08057a6a257a677d5",
+      "query_array_sha256": "637f3d4acc8590ffbafc3a6b4247e6e72a423aee4abccc1b3f8ead8d7307ede2",
+      "expected_checksum_per_full_query_pass": 0
+    },
+    {
+      "id": "C1",
+      "role": "dense-nonzero-miss-control",
+      "public_operation": "get",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 8192,
+      "query_id_start_inclusive": 100000,
+      "query_id_stop_exclusive": 104096,
+      "query_count": 4096,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 0,
+      "entry_array_sha256": "cf12e855c52cdda1e5d98f36102b3123e90f49dee0c6e058087a29b99bb8cdda",
+      "query_array_sha256": "637f3d4acc8590ffbafc3a6b4247e6e72a423aee4abccc1b3f8ead8d7307ede2",
+      "expected_checksum_per_full_query_pass": 4096
+    },
+    {
+      "id": "C2",
+      "role": "saturated-hit-control",
+      "public_operation": "get",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 32768,
+      "query_id_start_inclusive": 16384,
+      "query_id_stop_exclusive": 32768,
+      "query_count": 16384,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 16384,
+      "entry_array_sha256": "d26d73428a9d9ddaa8327122e2b54645e275d05458b6ccf01d920bb73abde737",
+      "query_array_sha256": "9f2b8afd0d61bc16dda9da2bd49a821d43ceaf62e32b06ea2ce66c6b928f9076",
+      "expected_checksum_per_full_query_pass": 402661376
+    },
+    {
+      "id": "C3",
+      "role": "cached-hit-control",
+      "public_operation": "get",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 128,
+      "query_id_start_inclusive": 0,
+      "query_id_stop_exclusive": 128,
+      "query_count": 128,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 128,
+      "entry_array_sha256": "4dbaddaae9a6652f48eac1be0d1f29f7516d6d4f6748c2ceb31052093c94b694",
+      "query_array_sha256": "c8345917d3d4671442cc10dfb0b3416bd439b0c71014536d0a5ad1f6d969ca56",
+      "expected_checksum_per_full_query_pass": 8256
+    },
+    {
+      "id": "C4",
+      "role": "empty-control",
+      "public_operation": "get",
+      "entry_id_start_inclusive": 0,
+      "entry_id_stop_exclusive": 0,
+      "query_id_start_inclusive": 100000,
+      "query_id_stop_exclusive": 104096,
+      "query_count": 4096,
+      "public_seed_id_start_inclusive": 0,
+      "public_seed_id_stop_exclusive": 0,
+      "entry_array_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "query_array_sha256": "637f3d4acc8590ffbafc3a6b4247e6e72a423aee4abccc1b3f8ead8d7307ede2",
+      "expected_checksum_per_full_query_pass": 4096
+    }
+  ],
+  "checksum_rules": {
+    "missing_get": "sum 1 when result === undefined, else 0",
+    "missing_has": "sum 1 when true, else 0; expected zero",
+    "hits": "sum numeric returned values",
+    "batch": "per-full-query-pass checksum times N/query_count; validate after timer"
+  },
+  "sampling": {
+    "paired_rounds": 16,
+    "engines": [
+      "Node 22.16.0",
+      "Bun 1.4.2"
+    ],
+    "variants": [
+      "baseline",
+      "candidate"
+    ],
+    "one_case_per_child": true,
+    "warmup_batches": 8,
+    "measured_batches": 4,
+    "baseline_target_ms": 20,
+    "read_count_alignment": 16384,
+    "maximum_reads_per_batch": 16777216,
+    "validation_children": 4,
+    "baseline_calibration_children": 12,
+    "main_study_children": 384,
+    "total_children": 400
+  },
+  "resource_caps": {
+    "stored_fixture_entries_per_main_or_calibration_process": 32768,
+    "additional_query_strings_per_process": 4096,
+    "rss_bytes_per_child": 1073741824,
+    "child_seconds": 10,
+    "study_seconds": 600,
+    "validation_only": {
+      "base_fixture_input_entries_per_validator": 41472,
+      "fork_set_operations": 12,
+      "fork_delete_operations": 6,
+      "writer_snapshot_handles_including_intermediates_maximum": 30,
+      "retained_original_and_final_writer_handles": 12,
+      "retained_reader_handles": 12,
+      "startup_snapshot_handles": 2,
+      "snapshot_handles_including_intermediates_maximum": 44,
+      "original_and_final_writer_logical_memberships": 82946,
+      "reader_logical_memberships": 82946,
+      "startup_logical_memberships": 1,
+      "transport_before_image_buffers": 12,
+      "after_read_image_buffers": 12,
+      "total_retained_payload_buffers": 24,
+      "retained_reader_memory_buffers": 12,
+      "separate_comparison_buffers": 0,
+      "aggregate_payload_and_reader_bytes_maximum": 268435456,
+      "reader_preallocation_bytes_formula": "max(2, ceil(used / 65536)) * 65536",
+      "before_each_copy": "Precheck cumulative budget using public copy:false used length; verify and charge actual copy bytes.",
+      "before_each_reader": "Precheck page-rounded allocation; verify and charge actual public reader memory byteLength.",
+      "retention": "All originals, final forks, readers, payloads and startup snapshots remain reachable through validator exit; no GC or reference-release assumption.",
+      "writer_arena_and_other_storage": "Covered separately by sampled RSS and terminal high-water reporting; logical memberships are not physical allocation estimates.",
+      "constructor_empty_snapshot_handles_maximum": 6,
+      "original_and_fork_operation_result_slots_maximum": 24
+    }
+  },
+  "startup_smoke": {
+    "phase": "identical pre-case-dispatch routine, no fixture generation",
+    "steps": [
+      "Construct and retain one empty SharedMap(number); its get(k0100000) is undefined",
+      "Derive singleton from that retained empty snapshot with set(k0000000,1); retain singleton",
+      "singleton.get(k0000000) equals 1",
+      "singleton.get(k0100000) is undefined"
+    ],
+    "cohort": "main study only; six equivalent pre-setup starts per round and variant/engine",
+    "independent_units": "16 round blocks per engine; two separate metrics: supervisor spawn-to-ready and child import-to-ready"
+  }
+}

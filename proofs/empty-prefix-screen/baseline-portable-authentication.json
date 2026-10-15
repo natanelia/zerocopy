@@ -1,0 +1,14 @@
+{
+  "coreSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+  "coreBytes": 26180,
+  "embeddedFile": "chunk-t2acd52e.js",
+  "embeddedFileSha256": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+  "sharedEntryReachableFiles": [
+    "chunk-enwn105b.js",
+    "chunk-jyz2w9p4.js",
+    "chunk-n1amv1q3.js",
+    "chunk-t2acd52e.js",
+    "shared.js"
+  ],
+  "embeddedBytesEqualNative": true
+}

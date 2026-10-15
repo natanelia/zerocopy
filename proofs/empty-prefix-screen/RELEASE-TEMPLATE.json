@@ -1,0 +1,148 @@
+{
+  "approved": true,
+  "subjectChildren": 400,
+  "methodSha256": "86214bef6beb0eddb320d1240cab3d535736c10ae944305da1b3bf16a7b9f3c8",
+  "implementationFiles": {
+    "child.mjs": "0119bf61d8db4e1889662b6f6e875fbafe0fdd04ce74bdbea46bb2c6a6df481b",
+    "protocol.mjs": "6885c4b91be382f8f41715d51942d9ccd1df802dfda719d6ccd80c428ebd542a",
+    "protocol.py": "688dea5f058ba2d3d62ac496e40c2763d801089f5f4b92692f5704fba555bf1a",
+    "supervisor.py": "d809def51101c3432ff04de7ef15f34ff377de60fb6c9432fb7b508893595733",
+    "hosted-adapter.py": "b39394cd64c84d8bf89d80c27c9d7b40ee8bb9859f8992ed2ff013919daa1b34"
+  },
+  "evidence": {
+    "method": {
+      "path": "${BUNDLE_ROOT}/method/METHOD.md",
+      "sha256": "86214bef6beb0eddb320d1240cab3d535736c10ae944305da1b3bf16a7b9f3c8"
+    },
+    "fixtures": {
+      "path": "${BUNDLE_ROOT}/method/FIXTURES.json",
+      "sha256": "019cc30dd93c240a6b6387dcdda642a6284f1789591a6552efb60bd1c7a4696a"
+    },
+    "staticCoverage": {
+      "path": "${BUNDLE_ROOT}/method/STATIC-COVERAGE.json",
+      "sha256": "43be33df8f74c54356030aa8f81ad6ef95790de4fc76d41f289b787808b0bfda"
+    },
+    "sourcePins": {
+      "path": "${BUNDLE_ROOT}/method/SOURCE-PINS.json",
+      "sha256": "5e882d7567ee22438eadca0d75be41df785141ae913fc6f68781fa2d915fa9be"
+    },
+    "methodReview": {
+      "path": "${BUNDLE_ROOT}/reviews/PERFORMANCE-METHOD-REVIEW-V5.md",
+      "sha256": "ed0d9ab61f688d395de2a5b2043e74e26fc2bae0bd98a2dd88d935f85ac143e4"
+    },
+    "driverReview": {
+      "path": "${BUNDLE_ROOT}/reviews/DRIVER-REVIEW-V4.md",
+      "sha256": "c0dce3b2b64acaef39214e7de89201cc6746a7b6feb8dfa5cbb4a109c176bf1c"
+    },
+    "focusedCorrectness": {
+      "path": "${BUNDLE_ROOT}/reviews/CORRECTNESS-AUDIT.md",
+      "sha256": "aa2d7b19034e4b341383c621480acabdaaed51c899cb629f4eeb5eaa66f87af7"
+    },
+    "sourceReview": {
+      "path": "${BUNDLE_ROOT}/reviews/SOURCE-REVIEW.md",
+      "sha256": "7686ddae4a601e95c283fe5729fe3b4b1a478702bc8d442a191d3708e2e568f9"
+    },
+    "ordinaryStage1Result": {
+      "path": "${BUNDLE_ROOT}/evidence/stage1/hosted-result.json",
+      "sha256": "d4fbe06501cd55c5a63f228369a1babeff18f19f112e23467430b21b6f46e707"
+    },
+    "ordinaryStage1Manifest": {
+      "path": "${BUNDLE_ROOT}/evidence/stage1/ARTIFACT-SHA256.json",
+      "sha256": "ac254b7276ac1b4112984e57204ae0f0083992f3c359b1206d335ff48aae9bef"
+    },
+    "ordinaryStage2Result": {
+      "path": "${BUNDLE_ROOT}/evidence/stage2/hosted-result.json",
+      "sha256": "6883c78c33f4c25a1230fa840b26e4d843aafad0f772f2c6498cf5cab57057e1"
+    },
+    "ordinaryStage2Manifest": {
+      "path": "${BUNDLE_ROOT}/evidence/stage2/ARTIFACT-SHA256.json",
+      "sha256": "bc51f318a71b71b6bd4d7c0dc3e9060dde007b63222be0ee30c28242c66f8932"
+    },
+    "ordinaryComposite": {
+      "path": "${BUNDLE_ROOT}/evidence/ORDINARY-COMPOSITE.json",
+      "sha256": "22891beaf07bb0407cef3eb3ce6120c4a9a2ffe768b7abd8c01d5ea97b868fe5"
+    }
+  },
+  "arms": {
+    "baseline": {
+      "root": "${PROVISION_ROOT}/arms/baseline",
+      "sources": {
+        "path": "${BUNDLE_ROOT}/baseline-sources.json",
+        "sha256": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59"
+      },
+      "generated": {
+        "path": "${BUNDLE_ROOT}/baseline-generated.json",
+        "sha256": "150f24ca0978fbb8ba5b4d21e64d103c3264c77267dc1a5d96cc9623d5bdc509"
+      },
+      "portableAuthentication": {
+        "path": "${BUNDLE_ROOT}/baseline-portable-authentication.json",
+        "sha256": "fd04c9c84db5f8a10a0d7237ab5658fcd4b1a8388c9deb16f1d29f2324e2c165"
+      },
+      "bunSourceClosure": {
+        "path": "${BUNDLE_ROOT}/baseline-bun-source-closure.json",
+        "sha256": "a93ff3f8bccaa1a3926eb47cf66a2ade5be3c6988064515ed24ac48b2e991d18"
+      },
+      "entries": {
+        "node": {
+          "relativePath": "dist/shared.js",
+          "sha256": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476"
+        },
+        "bun": {
+          "relativePath": "shared.ts",
+          "sha256": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3"
+        }
+      }
+    },
+    "candidate": {
+      "root": "${PROVISION_ROOT}/arms/candidate",
+      "sources": {
+        "path": "${BUNDLE_ROOT}/candidate-sources.json",
+        "sha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986"
+      },
+      "generated": {
+        "path": "${BUNDLE_ROOT}/candidate-generated.json",
+        "sha256": "01e199bfd54f18e01b12bd0850e3a9ac21c056a45924ffda2a9006250aa38c41"
+      },
+      "portableAuthentication": {
+        "path": "${BUNDLE_ROOT}/candidate-portable-authentication.json",
+        "sha256": "9bb2c3f58c73d91426f492a41a152da172d0fb8b7771950e41f477d7de566f0d"
+      },
+      "bunSourceClosure": {
+        "path": "${BUNDLE_ROOT}/candidate-bun-source-closure.json",
+        "sha256": "9a6a22a1b5bf0aec4e50c815ffca4b92d9790da618a26b89cc6f9433b81c18bd"
+      },
+      "entries": {
+        "node": {
+          "relativePath": "dist/shared.js",
+          "sha256": "ac9c18dfebacb1ab9796dcdf1bd2f4d7438a6d0f714caa71a087bdf62163f703"
+        },
+        "bun": {
+          "relativePath": "shared.ts",
+          "sha256": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3"
+        }
+      }
+    }
+  },
+  "executables": {
+    "node": {
+      "path": "${NODE}",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d"
+    },
+    "bun": {
+      "path": "${BUN}",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c"
+    }
+  },
+  "proofHead": "${PROOF_HEAD}",
+  "publicationBranch": "proof/empty-prefix-read-screen-20261015",
+  "publicationRequiresFinalCoordinatorRelease": true,
+  "scope": "One fixed reviewed screen; no retries, diagnostics, resampling, merge or deployment.",
+  "provisioningPlan": {
+    "path": "${BUNDLE_ROOT}/reviews/PROVISIONING-PLAN.md",
+    "sha256": "215f1b0559c54e3c9fd7d5d5815de34403b0221c684d3f8a937c8b99e4bc9e79"
+  },
+  "provisioningPlanReview": {
+    "path": "${BUNDLE_ROOT}/reviews/HOSTED-PROVISIONING-PLAN-REVIEW-V2.md",
+    "sha256": "1328f96bcea78e115fe88c964a2febf9e9c9c66a9d30dadd97251f04a7f10947"
+  }
+}

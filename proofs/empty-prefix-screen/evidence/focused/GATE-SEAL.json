@@ -1,0 +1,31 @@
+{
+  "status": "focused-correctness-passed",
+  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "sourceReviewPinsSha256": "acecd28397fc87fd661ba2df4c68b7f56ec384a1bce972ba45c17ac3bc8fd98c",
+  "testSha256": "51e3850277791fc7b6308c2467039e789445dabd55ce74179434bb3f3d65b1dd",
+  "baselineRuntimeSha256": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+  "candidateRuntimeSha256": "fad8b54107a1f672bacbf6d5c9e9cb22a7e0d715b528212fbc4f906e5692292c",
+  "runtimeFilesDifferent": [
+    "arena.ts"
+  ],
+  "commands": 4,
+  "casesPerCommand": 8,
+  "totalCaseExecutions": 32,
+  "executablePinsSha256": "33fb0e85237b77c79e90279fe843d6349469189435455f5b943a95d80b7dd1b2",
+  "nativeArtifactPinsSha256": "d309509c04138c2b388282be7b8a292d7fbc215b623d5a6ef0932484ba7ca759",
+  "nativeInputsSha256": "7e844e832d2db259ce1782c36ced7fcb78a2709abbdfa050f03baac6758eb568",
+  "preparationSha256": "d051316fd728e12f9651a7ad4668d3fb2cdd86ae664ed77d184cd6343ac6720c",
+  "originalPreflightFailureSha256": "e0615ae6c55a9a7e583813add27648daca55b98005a14d4e7e0b2be5c6b21109",
+  "receiptSha256": "b4545c7902db6e2af8906abe2cdd3886837968b544a0aa203317a53fbcbc75e8",
+  "resultSha256": "80e858871b181947bd65a0fe1e946be1438d728d17dd15f82a30c62fba5d72f2",
+  "summarySha256": "adde6360d48d2ffcdc7118e37e2ca8ec83456f9fd28058ee406de1ce3ffe51b9",
+  "runnerSha256": "17c6a2dd25cddadc25672e832ca93e36d5679c92dda1ca8a8551567f73ba52e8",
+  "processCleanup": "All descendants absent before leader reap; no signals needed; no signaling authority after reap.",
+  "memoryCap": "1 GiB sampled RSS threshold, not a hard cgroup cap",
+  "noAdditionalBuild": true,
+  "noTestRetry": true,
+  "sourcePinsPreserved": true,
+  "fullSuiteClearance": false,
+  "performanceInference": false,
+  "publicationRelease": false
+}

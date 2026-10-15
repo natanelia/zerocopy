@@ -1,0 +1,99 @@
+{
+  "kind": "remaining-ordinary-correctness",
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidatePatchSha256": "77f05fa906d9ccfc6d0afdaebc04cf181f3a7dea23d8b88b82c2a9d11a6077bb",
+  "complete": true,
+  "passingCommands": [
+    "docs-links",
+    "docs-examples",
+    "node-worker-integration",
+    "node-redux-integration",
+    "node-typed-json-worker-integration",
+    "package-dry-run",
+    "package-archive",
+    "package-consumer"
+  ],
+  "preparationBuildsPassed": [
+    "native-build",
+    "portable-build",
+    "declarations"
+  ],
+  "failedCommand": null,
+  "unrunCommands": [],
+  "benchmarksRun": false,
+  "memoryRegressionClearance": false,
+  "entireRepositoryCIClearance": false,
+  "publicationRelease": false,
+  "runId": "38672615849",
+  "attempt": "1",
+  "priorEvidenceSha256": "abfca5874f6960b8c2f36e97274d4984c2ffc1f80525852c3b4553b380fc433d",
+  "carriedForwardHostedGate": {
+    "runId": 38668352050,
+    "attempt": 1,
+    "artifactId": 11942087972,
+    "proofCommit": "e768726f66c2d140b08921c300968ca57de273e5",
+    "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+    "artifactZipSha256": "dc444b788ea0016daddfd680c32d765d74d3e3a7f3fc16370968f4aa30c878db",
+    "artifactManifestSha256": "ac254b7276ac1b4112984e57204ae0f0083992f3c359b1206d335ff48aae9bef",
+    "resultSha256": "d4fbe06501cd55c5a63f228369a1babeff18f19f112e23467430b21b6f46e707",
+    "receiptsSha256": "7da36a46bdf6f8320d882e7451a203e64cbb6845b6c06eae0153f4a76ed9b728",
+    "candidateSourcesSha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986",
+    "candidateGeneratedSha256": "01e199bfd54f18e01b12bd0850e3a9ac21c056a45924ffda2a9006250aa38c41",
+    "runtimeSha256": "fad8b54107a1f672bacbf6d5c9e9cb22a7e0d715b528212fbc4f906e5692292c",
+    "testSha256": "51e3850277791fc7b6308c2467039e789445dabd55ce74179434bb3f3d65b1dd",
+    "engines": {
+      "Node": {
+        "version": "22.16.0",
+        "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+        "bytes": 121509208
+      },
+      "Bun": {
+        "version": "1.4.2",
+        "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "bytes": 79500640
+      }
+    },
+    "complete": false,
+    "passingCommands": [
+      "native-build",
+      "portable-build",
+      "declarations",
+      "full-bun",
+      "docs-script-tests"
+    ],
+    "failedCommand": "docs-links",
+    "failure": "Missing Git metadata in archive-materialized candidate; git ls-files -z *.md exited 1.",
+    "failureLogSha256": "4ff2a6f14db35a642d0da297a1463c5164d40bbdd15261e03fcf900d2760d3d8",
+    "unrunCommands": [
+      "docs-examples",
+      "node-worker-integration",
+      "node-redux-integration",
+      "node-typed-json-worker-integration",
+      "package-dry-run",
+      "package-archive",
+      "package-consumer"
+    ],
+    "fullSuite": {
+      "files": 51,
+      "passedCases": 1063,
+      "focusedCases": 8,
+      "reportSha256": "d08df62385886d0a6cb170ee26239ef0938aa3ef30d79c9ab50d0c43bc98cb4d"
+    },
+    "docsScriptTestsPassed": 6,
+    "cleanupVerified": true,
+    "finalIntegrityVerified": true,
+    "terminalSealSha256": "ba9010e96904516b7be66a83ca74fd12f58b62ea050c3bc6057fc9dc24663081",
+    "fullSuiteMustNotRerun": true
+  },
+  "activeCommand": null,
+  "activeCommandStarted": null,
+  "proofCommit": "853555d82283f4daf43c09aebd4267fbe64c92ef",
+  "packageArchive": {
+    "filename": "zerocopy-0.2.1.tgz",
+    "sha256": "08b0c3c8a3db302fe5990fd7f640b2f876cfd4f1d90d41692e4b6e0b5481e847",
+    "bytes": 209506
+  },
+  "allOrdinaryCommandsPassed": true,
+  "cleanupVerified": true,
+  "finalIntegrityVerified": true
+}
