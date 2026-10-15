@@ -1,0 +1,95 @@
+{
+  "actions": {
+    "checkout": "11bd71901bbe5b1630ceea73d27597364c9af683",
+    "setupNode": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "uploadArtifact": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+  },
+  "arms": {
+    "baseline": {
+      "bunSourceClosure": "manifests/baseline-bun-closure.json",
+      "generated": "manifests/baseline-generated.json",
+      "portableAuthentication": "manifests/baseline-portable.json",
+      "sources": "manifests/baseline-sources.json"
+    },
+    "candidate": {
+      "bunSourceClosure": "manifests/candidate-bun-closure.json",
+      "generated": "manifests/candidate-generated.json",
+      "portableAuthentication": "manifests/candidate-portable.json",
+      "sources": "manifests/candidate-sources.json"
+    }
+  },
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidatePatch": "candidate.patch",
+  "commonOverlays": [
+    {
+      "source": "overlays/proofs/node-worker.mjs",
+      "target": "proofs/node-worker.mjs"
+    },
+    {
+      "source": "overlays/shared-ordered-map-checkpoints.test.ts",
+      "target": "shared-ordered-map-checkpoints.test.ts"
+    }
+  ],
+  "criticalValues": {
+    "review": "statistics/REVIEW.md",
+    "reviewSha256": "683981d2560217f6888a5bf7a36f4ea523c4d5de9d16139bfa06a6d74a938bdc",
+    "seal": "statistics/SEAL.json",
+    "sealSha256": "b02e40abb6dd0228c76f7e7e076d410ec306693f637d9680ed46507cf663e122",
+    "values": "statistics/VALUES.json",
+    "valuesSha256": "6e74f6614f9e06da46208927c366766b594b173e40d216fc11a0091525865efe"
+  },
+  "executables": {
+    "bun": {
+      "bytes": 79500640,
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "version": "1.4.2"
+    },
+    "node": {
+      "bytes": 121509208,
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "version": "22.16.0"
+    }
+  },
+  "focusedEvidence": {
+    "acceptanceSummary": "evidence/focused-acceptance.json",
+    "files": {
+      "evidence/SELECTION.json": "7a44ff96a67c40704823e9fa50b8c6241bc6fd17f48edfe87f9d08fa680e4112",
+      "evidence/baseline-node-worker.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/baseline-node-worker.stdout": "2fc5c4000052a054ac64bfd3c7b7a44a5edd24a5da6d980b953e4316fa5a905a",
+      "evidence/candidate-node-worker.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/candidate-node-worker.stdout": "2fc5c4000052a054ac64bfd3c7b7a44a5edd24a5da6d980b953e4316fa5a905a",
+      "evidence/focused-acceptance.json": "5d485befd793dad94e889f8fbee1cbddce573b1aa7a9c8209afdff9dbfa64952",
+      "evidence/focused-result.json": "19af157c551146f4d14608bd1862cbf450dac9a15a1e9348f3ab1c77343e3bd8",
+      "evidence/focused-source-seal.json": "8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd"
+    },
+    "selection": "evidence/SELECTION.json",
+    "sourceSeal": {
+      "path": "evidence/focused-source-seal.json",
+      "sha256": "8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd"
+    },
+    "terminalSeal": {
+      "localOnly": true,
+      "sha256": "032cc8ea776c348d6445481f4071aea464566d2e18be335908b1391da06d0615"
+    }
+  },
+  "implementationPlan": {
+    "narrowMethodRevision": "v3 timer-resolution clarification; counts/caps unchanged",
+    "sealSha256": "deee84655b4cc47f72dce47e7e7592030a386fffcdce688e4dca52b9aa26672f",
+    "sha256": "e7cb5299851ab4fa8eb6c908a5eb242aa7e53c3e40f7d85139984b8c9cebe308"
+  },
+  "method": {
+    "path": "method/METHOD.md",
+    "reviewLocalOnly": true,
+    "reviewSealSha256": "aa4bc1d04e2a65ffd031cca69065f6c46f9a7f74200b4a3a152c251cfb530c08",
+    "reviewSha256": "f95a332bb440241651a127546c028761a53da10d9f4a2127407d915acb8f4b76",
+    "revisionDiffSha256": "7621da7e176c903497fc73ff2c36fe62820e53972906ef177ef83573814782c7",
+    "sha256": "25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43"
+  },
+  "npmCliSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+  "pristineSources": "manifests/pristine-sources.json",
+  "schema": 1,
+  "toolchain": {
+    "lock": "toolchain/package-lock.json",
+    "package": "toolchain/package.json"
+  }
+}

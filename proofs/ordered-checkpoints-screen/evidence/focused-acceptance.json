@@ -1,0 +1,26 @@
+{
+  "caseExecutions": 228,
+  "checkpointCasesPerArmAndEngine": 25,
+  "commandsPassed": 10,
+  "disposition": "independently accepted focused correctness",
+  "fullOrdinaryCorrectness": false,
+  "independentTerminalReviewSealSha256": "ef1aa175ce80367a5efcaa312ae5c055c818c920fc487126f7fc1259ddd9deca",
+  "independentTerminalReviewSha256": "eb3b823e90389d75eaa0fb1b1cd236a1ed97c10b5a082050054e3d085181d551",
+  "kind": "derived-factual-focused-acceptance-summary",
+  "matchingCasesPerArmAndEngine": 57,
+  "notOriginalRawReceipt": true,
+  "originalReceiptsSha256": "7a52e4d6960a1440672411aab632cd7353fcaf9d56232a44aa2ce3be0b18b03c",
+  "originalReportHashes": {
+    "baseline-bun-focused.json": "2df2e2fe7411ad24012d89535d166caed1ba0fa77ec2beb07ae3def2aeab2dff",
+    "baseline-node-focused.json": "ccf2d81c055ecf5035945ecd74b7e5f263830ffa545a90808baf99fd44e80240",
+    "candidate-bun-focused.json": "e65253a096661d04b95dc1f6eb76139160370e55f91b130b52a2f8789b99f8e2",
+    "candidate-node-focused.json": "f853691122ade24d95aa707d3ed5da16451d2eeb57b1c9c1b8bba29d64ac5d84"
+  },
+  "originalSourceSealSha256": "8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd",
+  "originalTerminalSealSha256": "032cc8ea776c348d6445481f4071aea464566d2e18be335908b1391da06d0615",
+  "performanceInference": false,
+  "publicationRelease": false,
+  "realWorkerRuns": 2,
+  "sharedCopiedSuspensionGrowthReset": true,
+  "workerOrderedEntries": 769
+}

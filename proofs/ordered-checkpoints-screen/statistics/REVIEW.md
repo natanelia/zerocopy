@@ -1,0 +1,13 @@
+# Independent df=7 critical-value verification
+
+**Verified.** The three supplied constants agree with independent calculation within 1.5e-14 and pass an absolute 1e-12 inert check. No method correction is needed. More accurately rounded binary64 literals are `2.3646242515927853` (m=1), `4.883865032805824` (m=28), and `4.029337177642485` (m=10). Use one fixed set consistently in the eventual implementation.
+
+Trusted provenance: [NIST t-distribution definition](https://www.itl.nist.gov/div898/handbook/eda/section3/eda3664.htm) gives density `(1+t²/nu)^(-(nu+1)/2) / (sqrt(nu) B(1/2,nu/2))`. With nu=7, `B(1/2,7/2)=5*pi/16`, giving `f(t)=16/(5*pi*sqrt(7))*(1+t²/7)^(-4)`. For eight process-pair observations, df is 7. The two-sided 95% Bonferroni quantile for m comparisons has upper-tail probability `1/(40*m)`: m=1 ordinary, m=28 latency clearance, m=10 memory contrasts.
+
+The coordinator's CDF is correct. Substitute `t=sqrt(7)*tan(theta)`; the transformed density is `16/(5*pi)*cos(theta)^6`. Expanding `cos(theta)^6=(10+15*cos(2theta)+6*cos(4theta)+cos(6theta))/32` and integrating from zero yields the supplied expression. It is 1/2 at t=0, has the correct density derivative and tends to 1 at positive infinity.
+
+Independent numeric route 1 did not invert that CDF: integrate the upper tail after `s=1/t`, whose integrand is `16/(5*pi*sqrt(7))*7^4*s^6/(1+7*s²)^4`, from 0 to `1/t`. Bounded adaptive Simpson integration and 60 bisections gave 2.364624251592785, 4.883865032805824 and 4.029337177642486. At the supplied constants, upper-tail residual magnitudes were at most 4.9e-17. A separate positive-half density normalization returned 0.5.
+
+Independent numeric route 2 used only Python's Decimal arithmetic at 70-digit working precision. Set `z=7/(7+t²)`. The upper tail equals `(8/(5*pi))*z^(7/2)*sum[a_n*z^n/(n+7/2)]`, where `a_0=1` and `a_(n+1)=a_n*(2n+1)/(2n+2)`. The positive series used at most 600 terms, terminating below 1e-72; pi came from `16*atan(1/5)-4*atan(1/239)` with finite arctangent series; 230 bisections solved the exact rational tail. The resulting decimal roots are in VALUES.json. Extra displayed digits document the check, not a claim that every printed digit is independently certified. The first 15 significant digits corroborate the binary64 constants. The supplied m=10 value differs by approximately 1.4974e-14, consistent with cancellation/rounding when inverting a CDF near one.
+
+This was finite mathematical verification only: no target import, build, test, benchmark, scientific dependency installation, or general proof framework. These constants do not establish the validity of a real sample or its model assumptions; the fixed eight-pair/all-sample rules remain essential.

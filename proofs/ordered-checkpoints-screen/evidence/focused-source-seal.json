@@ -1,0 +1,17 @@
+{
+  "checksums_sha256": "88da8102eee6b926020736ce428898ee74e57a0dc5ee1606eb9870fdf960ef7b",
+  "files": {
+    "BASELINE-SOURCES.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+    "CANDIDATE-SOURCES.json": "cc7b481f879ef1849f1aab53813d7dc34c540f28dfbe1748a92be9552038924e",
+    "CORRECTNESS-COMMANDS-PROPOSED.json": "05ba9732d8d7416dba3cabdfa947039084996ba417d2573daab70e29153e4a38",
+    "RUNTIME.patch": "7009e240e8280c8f4808265e69a3bd05fccab1def422304c68fdec4d3bbbe501",
+    "SOURCE-PINS.json": "65ae84fc7a49e1b2134db03b2a6d173830fd0862140254a898ebdee4a86a56f8",
+    "SOURCE-REVIEW.md": "0978ad4a6e3139359561083a03916116bad010e60afad9843f72a2ec86b4cd8f",
+    "SOURCE.patch": "785ae9836073ea6994e8c8b04ca904dc747fe4fc791c9be719a83cef3171fcee",
+    "executables.json": "33fb0e85237b77c79e90279fe843d6349469189435455f5b943a95d80b7dd1b2",
+    "native-artifacts.json": "d309509c04138c2b388282be7b8a292d7fbc215b623d5a6ef0932484ba7ca759",
+    "native-inputs.json": "7e844e832d2db259ce1782c36ced7fcb78a2709abbdfa050f03baac6758eb568"
+  },
+  "preparation_only": true,
+  "subject_commands_executed": 0
+}

@@ -1,0 +1,433 @@
+--- a/shared-ordered-map.ts
++++ b/shared-ordered-map.ts
+@@ -1,4 +1,4 @@
+-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
++import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, MAX_SIZE } from './arena';
+ import { structureRegistry } from './codec';
+ import type { ValueOf } from './types';
+ // Registering a collection must not allocate an unused writer in every reader.
+@@ -51,6 +51,36 @@
+   }
+   *entries(): Generator<[string, ValueOf<T>]> {
+     const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
++    const tail = this.tail;
++    if (typeof tail === 'number' && (tail >>> 0) === tail && tail > 256 && tail <= MAX_SIZE && typeof p === 'number') {
++      const checkpoints: number[] = []; let length = 0, start = p;
++      // Scan every link before decoding, retaining the oldest block and starts
++      // of preceding full blocks. Metadata is only a routing hint.
++      while (p) {
++        if (length === 256) { checkpoints.push(start); start = p; length = 0; }
++        order[length++] = view.getUint32(p + 4, true); p = view.getUint32(p, true);
++      }
++      let block = checkpoints.length;
++      // Capture the reader before callbacks can replace it. Keep all buffer
++      // slots owned, even when the oldest block is partial.
++      const read = block ? view.getUint32.bind(view) : undefined;
++      for (;;) {
++        for (let i = length - 1; i >= 0; i--) {
++          const old = order[i];
++          if (this.orderStable) { yield [a.leafKey(old), a.leafValue(this.valueType, old, 4)]; continue; }
++          const dv = a.dv, length = dv.getUint32(old + 8, true);
++          const leaf = a.wasm.mapFind(this.root, old + 16, length, dv.getUint32(old + 4, true)) >>> 0;
++          if (leaf && a.dv.getUint32(leaf + 16 + length, true) === a.dv.getUint32(old + 16 + length, true)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf, 4)];
++        }
++        if (!block) return;
++        p = checkpoints[--block];
++        for (let i = 0; i < 256; i++) {
++          order[i] = read!(p + 4, true);
++          if (i < 255) p = read!(p, true);
++        }
++        length = 256;
++      }
++    }
+     while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
+     for (let i = order.length - 1; i >= 0; i--) {
+       const old = order[i];
+--- /dev/null
++++ b/shared-ordered-map-checkpoints.test.ts
+@@ -0,0 +1,272 @@
++import assert from 'node:assert/strict';
++import { describe, expect, test, vi } from 'vitest';
++import { Arena, arenaOf, MAX_SIZE } from './arena';
++import { structureRegistry } from './codec';
++import { SharedOrderedMap, SharedOrderedSet, SharedList, resetOrderedMap, getWorkerData, initWorker } from './shared';
++
++function numbers(count: number) {
++  let map = new SharedOrderedMap('number', 0, 0, 0, 0, new Arena());
++  const model = new Map<string, number>();
++  for (let i = 0; i < count; i++) { map = map.set(`key-${i}`, i); model.set(`key-${i}`, i); }
++  return { map, model };
++}
++
++function logNodes(map: SharedOrderedMap<any>): number[] {
++  const nodes: number[] = [], view = arenaOf(map).dv;
++  for (let p = map.head; p; p = view.getUint32(p, true)) nodes.push(p);
++  return nodes;
++}
++
++describe('ordered iteration across log blocks', () => {
++  test.each([0, 1, 255, 256, 257, 511, 512, 513, 769])('keeps all projections in insertion order for %i entries', count => {
++    const { map, model } = numbers(count), expected = [...model];
++    expect(map.orderStable).toBe(true);
++    expect([...map.entries()]).toEqual(expected);
++    expect([...map.keys()]).toEqual([...model.keys()]);
++    expect([...map.values()]).toEqual([...model.values()]);
++    const seen: Array<[string, number]> = [];
++    map.forEach((value, key) => seen.push([key, value]));
++    expect(seen).toEqual(expected);
++  });
++
++  test('filters overwrites, deletions and reinsertions while retaining both forks', () => {
++    const { map: old, model: original } = numbers(769);
++    let changed = old, model = new Map(original);
++    for (const i of [0, 1, 255, 256, 511, 512, 768]) {
++      changed = changed.set(`key-${i}`, -i - 1); model.set(`key-${i}`, -i - 1);
++    }
++    for (const i of [1, 254, 255, 256, 510, 511, 512, 767]) {
++      changed = changed.delete(`key-${i}`); model.delete(`key-${i}`);
++    }
++    for (const i of [767, 512, 255, 1]) {
++      changed = changed.set(`key-${i}`, i + 1000); model.set(`key-${i}`, i + 1000);
++    }
++    const fork = old.delete('key-0').set('🙂\u0000', 900);
++    const forkModel = new Map(original); forkModel.delete('key-0'); forkModel.set('🙂\u0000', 900);
++    expect(changed.orderStable).toBe(false);
++    expect([...changed.entries()]).toEqual([...model]);
++    expect([...old.entries()]).toEqual([...original]);
++    expect([...fork.entries()]).toEqual([...forkModel]);
++    // A long historical log may have only one remaining live entry.
++    for (const key of model.keys()) if (key !== 'key-0') changed = changed.delete(key);
++    expect([...changed.entries()]).toEqual([['key-0', -1]]);
++    const empty = changed.delete('key-0');
++    expect([...empty.entries()]).toEqual([]);
++    expect([...empty.set('again', 4).entries()]).toEqual([['again', 4]]);
++  });
++
++  test('preserves generator identity and remains lazy before next, return or throw', () => {
++    const { map, model } = numbers(769), a = arenaOf(map), view = vi.spyOn(a, 'dv', 'get');
++    try {
++      assert.equal(Object.getPrototypeOf(map.entries), Object.getPrototypeOf(function* () {}));
++      assert.equal(map.entries.name, 'entries'); assert.equal(map.entries.length, 0);
++      const iterator = map.entries(), closed = map.entries();
++      assert.equal(Object.getPrototypeOf(iterator), map.entries.prototype);
++      assert.deepEqual(closed.return('closed'), { done: true, value: 'closed' });
++      const error = new Error('before start');
++      assert.throws(() => map.entries().throw(error), caught => caught === error);
++      assert.equal(view.mock.calls.length, 0);
++      a.alloc(1024 * 1024); resetOrderedMap();
++      assert.deepEqual([...iterator], [...model]);
++      assert.deepEqual(closed.next(), { done: true, value: undefined });
++    } finally { view.mockRestore(); }
++  });
++
++  test.each(['return', 'throw', 'break'] as const)('stops decoding after an early %s', completion => {
++    const { map } = numbers(769), a = arenaOf(map);
++    const keyRead = vi.spyOn(a, 'leafKey'), valueRead = vi.spyOn(a, 'leafValue');
++    try {
++      const iterator = map.entries();
++      if (completion === 'break') { for (const _ of iterator) break; }
++      else {
++        expect(iterator.next()).toEqual({ done: false, value: ['key-0', 0] });
++        if (completion === 'return') expect(iterator.return('closed')).toEqual({ done: true, value: 'closed' });
++        else {
++          const error = new Error('after start');
++          assert.throws(() => iterator.throw(error), caught => caught === error);
++        }
++      }
++      expect(keyRead).toHaveBeenCalledTimes(1); expect(valueRead).toHaveBeenCalledTimes(1);
++      expect(iterator.next()).toEqual({ done: true, value: undefined });
++      expect(valueRead).toHaveBeenCalledTimes(1);
++    } finally { keyRead.mockRestore(); valueRead.mockRestore(); }
++  });
++
++  test('keeps iterator state local during recursive and interleaved forEach callbacks', () => {
++    const { map, model } = numbers(769), expected = [...model], second = map.entries();
++    const interleaved: Array<[string, number]> = [], outer: Array<[string, number]> = [];
++    map.forEach((value, key) => {
++      outer.push([key, value]); interleaved.push(second.next().value!);
++      if (value === 1 || value === 256 || value === 512) {
++        const recursive: Array<[string, number]> = [];
++        map.forEach((v, k) => recursive.push([k, v]));
++        expect(recursive).toEqual(expected);
++      }
++    });
++    expect(outer).toEqual(expected); expect(interleaved).toEqual(expected);
++    expect(second.next().done).toBe(true);
++  });
++
++  test('nested factories can reenter iteration and ordered keys still decode values after keys', () => {
++    const child = new SharedList('number').pushMany([3, 4]);
++    let map = new SharedOrderedMap('SharedList<number>', 0, 0, 0, 0, new Arena());
++    for (let i = 0; i < 769; i++) map = map.set(`key-${i}`, child);
++    const a = arenaOf(map), factory = structureRegistry.SharedList, original = factory.fromWorkerData;
++    const keyRead = vi.spyOn(a, 'leafKey'), valueRead = vi.spyOn(a, 'leafValue');
++    let entered = false, recursiveKey: unknown, factoryCalls = 0;
++    factory.fromWorkerData = (data, source) => {
++      factoryCalls++;
++      if (!entered) {
++        entered = true;
++        const recursive = map.entries(); recursiveKey = recursive.next().value![0]; recursive.return();
++      }
++      return original(data, source);
++    };
++    try {
++      expect([...map.keys()]).toEqual(Array.from({ length: 769 }, (_, i) => `key-${i}`));
++      expect(recursiveKey).toBe('key-0'); expect(factoryCalls).toBeGreaterThanOrEqual(769);
++      expect(valueRead).toHaveBeenCalledTimes(770);
++      expect(keyRead.mock.invocationCallOrder[0]).toBeLessThan(valueRead.mock.invocationCallOrder[0]);
++      const values = [...map.values()];
++      expect(values.every(value => value.toArray().join(',') === '3,4')).toBe(true);
++    } finally { factory.fromWorkerData = original; keyRead.mockRestore(); valueRead.mockRestore(); }
++  });
++
++  test('resume tolerates decoder-installed array setters and replacement array/DataView methods', () => {
++    const child = new SharedList('number').push(1);
++    let map = new SharedOrderedMap('SharedList<number>', 0, 0, 0, 0, new Arena());
++    for (let i = 0; i < 769; i++) map = map.set(`key-${i}`, child);
++    const view = arenaOf(map).dv, fields = new Set<number>();
++    for (const node of logNodes(map)) { fields.add(node); fields.add(node + 4); }
++    const originalRead = view.getUint32, ownRead = Object.getOwnPropertyDescriptor(view, 'getUint32');
++    const push = Array.prototype.push, pop = Array.prototype.pop, splice = Array.prototype.splice;
++    const iterate = Array.prototype[Symbol.iterator], index = Object.getOwnPropertyDescriptor(Array.prototype, '200');
++    const factory = structureRegistry.SharedList, originalFactory = factory.fromWorkerData;
++    const unexpected = new Error('new observable operation after decoding');
++    let installed = false, count = 0;
++    function fail(): never { throw unexpected; }
++    factory.fromWorkerData = (data, source) => {
++      if (!installed) {
++        installed = true;
++        const replacement = function (this: DataView, offset: number, littleEndian?: boolean) {
++          if (fields.has(offset)) throw unexpected;
++          return originalRead.call(this, offset, littleEndian);
++        };
++        Object.defineProperty(replacement, 'bind', { value: fail });
++        Object.defineProperty(view, 'getUint32', { configurable: true, value: replacement });
++        Object.defineProperty(Array.prototype, '200', { configurable: true, set: fail });
++        Array.prototype.push = fail; Array.prototype.pop = fail; Array.prototype.splice = fail;
++        Array.prototype[Symbol.iterator] = fail;
++      }
++      return originalFactory(data, source);
++    };
++    try {
++      const iterator = map.entries();
++      for (;;) {
++        const item = iterator.next();
++        if (item.done) break;
++        if (item.value[0] !== `key-${count}`) throw new Error('wrong order');
++        count++;
++      }
++    } finally {
++      factory.fromWorkerData = originalFactory;
++      Array.prototype.push = push; Array.prototype.pop = pop; Array.prototype.splice = splice;
++      Array.prototype[Symbol.iterator] = iterate;
++      if (index) Object.defineProperty(Array.prototype, '200', index); else delete Array.prototype[200];
++      if (ownRead) Object.defineProperty(view, 'getUint32', ownRead); else delete (view as any).getUint32;
++    }
++    expect(installed).toBe(true); expect(count).toBe(769);
++  });
++
++  test.each([false, true])('retains shared/copied readers across growth, reset and new attachments (copy=%s)', async copy => {
++    const { map: stable, model } = numbers(769), a = arenaOf(stable);
++    const changed = stable.set('key-256', -1).delete('key-0').set('key-0', 900);
++    const expectedChanged = new Map(model); expectedChanged.set('key-256', -1); expectedChanged.delete('key-0'); expectedChanged.set('key-0', 900);
++    const readers = await initWorker(getWorkerData({ stable, changed }, { copy }));
++    const first = readers.stable.entries(), second = readers.changed.entries();
++    const actual = [first.next().value!], actualChanged = [second.next().value!];
++    const before = a.memory.buffer.byteLength;
++    a.alloc(before + 65536);
++    expect(a.memory.buffer.byteLength).toBeGreaterThan(before);
++    const newer = changed.set('later', 1000);
++    resetOrderedMap();
++    const attached = await initWorker(getWorkerData({ newer }, { copy }));
++    actual.push(...first); actualChanged.push(...second);
++    expect(actual).toEqual([...model]); expect(actualChanged).toEqual([...expectedChanged]);
++    expect([...readers.stable.entries()]).toEqual([...model]);
++    expect(attached.newer.get('later')).toBe(1000);
++    expect(() => readers.stable.set('forbidden', 1)).toThrow(/read-only/);
++    expect(new SharedOrderedMap('number').size).toBe(0);
++  });
++
++  test('ordered sets preserve insertion order and old snapshots across several blocks', async () => {
++    let set = new SharedOrderedSet(new SharedOrderedMap('number', 0, 0, 0, 0, new Arena()));
++    const model = new Set<string | number>();
++    for (let i = 0; i < 769; i++) { const value = i % 2 ? `${i}` : i; set = set.add(value); model.add(value); }
++    const old = set, original = [...model];
++    for (const value of [0, '255', 256, '511', 512]) { set = set.delete(value).add(value); model.delete(value); model.add(value); }
++    expect([...old.values()]).toEqual(original); expect([...set.values()]).toEqual([...model]);
++    const seen: Array<string | number> = []; set.forEach(value => seen.push(value));
++    expect(seen).toEqual([...model]);
++    for (const copy of [false, true]) {
++      const restored = await initWorker(getWorkerData({ old, set }, { copy }));
++      expect([...restored.old.values()]).toEqual(original); expect([...restored.set.values()]).toEqual([...model]);
++    }
++  });
++
++  test('uses actual log length with misleading tail and size metadata without coercing tail', () => {
++    const { map, model } = numbers(769), source = arenaOf(map), data = map.toWorkerData();
++    let coercions = 0;
++    const hostile = { valueOf() { coercions++; throw new Error('tail coercion'); } };
++    for (const tail of [0, 1, 255, 256, 257, MAX_SIZE, MAX_SIZE + 1, -1, 257.5, NaN, Infinity, '769', 769n, Symbol('tail'), hostile]) {
++      const restored = SharedOrderedMap.fromWorkerData({ ...data, tail: tail as number, size: 0 }, source);
++      expect([...restored.entries()]).toEqual([...model]);
++    }
++    expect(coercions).toBe(0);
++    for (const count of [0, 1, 255, 256]) {
++      const small = numbers(count);
++      const restored = SharedOrderedMap.fromWorkerData({ ...small.map.toWorkerData(), tail: MAX_SIZE }, arenaOf(small.map));
++      expect([...restored.entries()]).toEqual([...small.model]);
++    }
++  });
++
++  test('preserves the old nonnumeric-head coercion and error path', () => {
++    const { map, model } = numbers(257), source = arenaOf(map), data = map.toWorkerData();
++    const hints: string[] = [];
++    const head = { [Symbol.toPrimitive](hint: string) { hints.push(hint); return map.head; } };
++    const restored = SharedOrderedMap.fromWorkerData({ ...data, head: head as unknown as number }, source);
++    expect([...restored.entries()]).toEqual([...model]);
++    expect(hints).toEqual(['default', 'number']);
++    for (const head of [Symbol('head'), 1n]) {
++      const malformed = SharedOrderedMap.fromWorkerData({ ...data, head: head as unknown as number }, source);
++      expect(() => malformed.entries().next()).toThrow(TypeError);
++    }
++    const empty = SharedOrderedMap.fromWorkerData({ ...data, head: '' as unknown as number }, source);
++    expect([...empty.entries()]).toEqual([]);
++  });
++
++  test('rejects a static malformed log before any output or leaf decoding', () => {
++    const { map } = numbers(769), a = arenaOf(map), nodes = logNodes(map), view = a.dv;
++    const oldest = nodes[nodes.length - 1], previous = view.getUint32(oldest, true);
++    // At this address the next-link word fits, but the earlier leaf-pointer
++    // read does not. The entire scan must still happen before the first yield.
++    view.setUint32(oldest, view.byteLength - 4, true);
++    const keyRead = vi.spyOn(a, 'leafKey'), valueRead = vi.spyOn(a, 'leafValue');
++    try {
++      expect(() => map.entries().next()).toThrow(RangeError);
++      expect(keyRead).not.toHaveBeenCalled(); expect(valueRead).not.toHaveBeenCalled();
++    } finally { view.setUint32(oldest, previous, true); keyRead.mockRestore(); valueRead.mockRestore(); }
++  });
++
++  test.each([true, false])('defers a static malformed leaf to its old output position (stable=%s)', stable => {
++    const { map } = numbers(769), a = arenaOf(map), nodes = logNodes(map), view = a.dv;
++    const node = nodes[nodes.length - 1 - 300], original = view.getUint32(node + 4, true);
++    view.setUint32(node + 4, view.byteLength, true);
++    const reader = SharedOrderedMap.fromWorkerData({ ...map.toWorkerData(), orderStable: stable }, a);
++    try {
++      const iterator = reader.entries();
++      for (let i = 0; i < 300; i++) expect(iterator.next()).toEqual({ done: false, value: [`key-${i}`, i] });
++      expect(() => iterator.next()).toThrow(RangeError);
++    } finally { view.setUint32(node + 4, original, true); }
++  });
++});
+--- a/proofs/node-worker.mjs
++++ b/proofs/node-worker.mjs
+@@ -2,6 +2,26 @@
+ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+ import { once } from 'node:events';
+ import * as S from '../dist/shared.js';
++
++const orderedExpected = Array.from({ length: 769 }, (_, i) => [`key-${i}`, i]);
++const orderedChangedModel = new Map(orderedExpected);
++orderedChangedModel.set('key-256', -1); orderedChangedModel.delete('key-0'); orderedChangedModel.set('key-0', 900);
++const orderedChangedExpected = [...orderedChangedModel];
++const orderedSetExpected = Array.from({ length: 769 }, (_, i) => i).filter(i => i !== 256).concat(256);
++
++function suspendOrdered(s) {
++  return [
++    [s.orderedBlocks.entries(), orderedExpected],
++    [s.orderedChanged.entries(), orderedChangedExpected],
++    [s.orderedSetBlocks.values(), orderedSetExpected],
++  ].map(([iterator, expected]) => ({ iterator, expected, seen: [iterator.next().value] }));
++}
++
++function resumeOrdered(readers) {
++  for (const { iterator, expected, seen } of readers) {
++    seen.push(...iterator); assert.deepEqual(seen, expected);
++  }
++}
+ 
+ function readAll(s, readOnly = true) {
+   assert.equal(s.map.get('old'), 7);
+@@ -18,6 +38,9 @@
+   assert.deepEqual(s.doubly.toArrayReverse(), [2, 1]);
+   assert.deepEqual([...s.ordered.entries()], [['b', 2], ['a', 1]]);
+   assert.deepEqual([...s.orderedSet.values()], ['b', 'a']);
++  assert.deepEqual([...s.orderedBlocks.entries()], orderedExpected);
++  assert.deepEqual([...s.orderedChanged.entries()], orderedChangedExpected);
++  assert.deepEqual([...s.orderedSetBlocks.values()], orderedSetExpected);
+   assert.deepEqual([...s.sorted.entries()], [['a', 1], ['b', 2]]);
+   assert.deepEqual([...s.sortedSet.values()], ['a', 'b']);
+   assert.equal(s.heap.peek(), 20);
+@@ -30,7 +53,7 @@
+ }
+ 
+ if (!isMainThread) {
+-  let old;
++  let old, sharedOrdered, copiedOrdered;
+   parentPort.on('message', async message => {
+     try {
+       if (message.type === 'initial') {
+@@ -40,7 +63,13 @@
+         // seen by the parent proves shared backing, not merely equal data copies.
+         const source = message.data.arenas.find(a => a.id === message.data.structures.map.arena);
+         Atomics.store(new Int32Array(source.memory.buffer), 15000, 37);
++        sharedOrdered = suspendOrdered(old);
+         parentPort.postMessage({ type: 'ready' });
++      } else if (message.type === 'ordered-copy') {
++        const copied = await S.initWorker(message.data);
++        copiedOrdered = suspendOrdered(copied);
++        assert.throws(() => copied.orderedBlocks.set('forbidden', 1), /read-only/);
++        parentPort.postMessage({ type: 'copy-ready' });
+       } else if (message.type === 'concurrent') {
+         const control = new Int32Array(workerData.control);
+         Atomics.store(control, 0, 1); Atomics.notify(control, 0);
+@@ -60,6 +89,8 @@
+         assert.equal(next.largeList.size, 6145); assert.equal(next.largeList.get(6144), 6144);
+         assert.equal(next.largeLinked.get(6144), 6144); assert.equal(next.largeDoubly.get(6144), 6144);
+         assert.equal(next.largeQueue.size, 6145);
++        assert.deepEqual([...next.ordered.entries()], [...orderedChangedExpected, ['later', 1000]]);
++        resumeOrdered(sharedOrdered); resumeOrdered(copiedOrdered);
+         readAll(old);
+         parentPort.postMessage({ type: 'ok', oldValue: old.map.get('old'), nextValue: next.map.get('old') });
+       }
+@@ -71,7 +102,12 @@
+   let largeLinked = new S.SharedLinkedList('number'), largeDoubly = new S.SharedDoublyLinkedList('number'), largeQueue = new S.SharedQueue('number');
+   for (const value of large) { largeLinked = largeLinked.append(value); largeDoubly = largeDoubly.append(value); largeQueue = largeQueue.enqueue(value); }
+   let largeList = new S.SharedList('number').pushMany(large);
++  let orderedBlocks = new S.SharedOrderedMap('number'), orderedSetBlocks = new S.SharedOrderedSet();
++  for (let i = 0; i < 769; i++) { orderedBlocks = orderedBlocks.set(`key-${i}`, i); orderedSetBlocks = orderedSetBlocks.add(i); }
++  const orderedChanged = orderedBlocks.set('key-256', -1).delete('key-0').set('key-0', 900);
++  orderedSetBlocks = orderedSetBlocks.delete(256).add(256);
+   const items = { largeList, largeLinked, largeDoubly, largeQueue,
++    orderedBlocks, orderedChanged, orderedSetBlocks,
+     map: new S.SharedMap('object').set('old', 7), list,
+     set: new S.SharedSet().add(1).add('1'),
+     stack: new S.SharedStack('number').push(1).push(2),
+@@ -98,16 +134,25 @@
+     assert.equal((await exchange({ type: 'initial', data: initial })).type, 'ready');
+     const arena = initial.arenas.find(a => a.id === initial.structures.map.arena);
+     assert.equal(Atomics.load(new Int32Array(arena.memory.buffer), 15000), 37);
++    const copy = S.getWorkerData({ orderedBlocks, orderedChanged, orderedSetBlocks }, { copy: true });
++    assert(copy.arenas.every(a => a.copy && !a.memory));
++    assert.equal((await exchange({ type: 'ordered-copy', data: copy })).type, 'copy-ready');
++    const orderedArena = initial.arenas.find(a => a.id === initial.structures.orderedBlocks.arena);
++    const orderedBytes = orderedArena.memory.buffer.byteLength;
+     const response = once(worker, 'message'); worker.postMessage({ type: 'concurrent' });
+     assert.notEqual(Atomics.wait(new Int32Array(control), 0, 0, 10000), 'timed-out');
+     const next = items.map.setMany(Array.from({ length: 5000 }, (_, i) => [`k${i}`, i])).set('old', 8).set('long', '🙂'.repeat(18000));
+     for (let i = 2049; i < 6145; i++) { largeList = largeList.push(i); largeLinked = largeLinked.append(i); largeDoubly = largeDoubly.append(i); largeQueue = largeQueue.enqueue(i); }
++    const growth = new S.SharedOrderedMap('string').set('growth', '🙂'.repeat(300000));
++    assert.equal(growth.get('growth').length, 600000);
++    assert(orderedArena.memory.buffer.byteLength > orderedBytes);
++    const ordered = orderedChanged.set('later', 1000);
+     Atomics.store(new Int32Array(control), 1, 1);
+     const [concurrent] = await response; if (concurrent.error) throw new Error(concurrent.error);
+     assert.equal(concurrent.type, 'concurrent-ok');
+-    S.resetMap(); S.resetSharedList();
+-    const result = await exchange({ type: 'new', data: S.getWorkerData({ map: next, largeList, largeLinked, largeDoubly, largeQueue }, { copy: false }) });
++    S.resetMap(); S.resetSharedList(); S.resetOrderedMap();
++    const result = await exchange({ type: 'new', data: S.getWorkerData({ map: next, largeList, largeLinked, largeDoubly, largeQueue, ordered }, { copy: false }) });
+     assert.equal(result.type, 'ok'); readAll(items, false);
+-    console.log(JSON.stringify({ passed: true, runtime: process.version, structures: 12, nested: true, concurrentReadsAtLeast: 10000, largeRetainedSequences: 4, workerSharesBackingMemory: true, repeatedAttachment: true, resetKeepsOldSnapshots: true }));
++    console.log(JSON.stringify({ passed: true, runtime: process.version, structures: 12, nested: true, concurrentReadsAtLeast: 10000, largeRetainedSequences: 4, workerSharesBackingMemory: true, repeatedAttachment: true, resetKeepsOldSnapshots: true, orderedBlockEntries: 769, orderedSharedAndCopyResume: true }));
+   } finally { clearTimeout(timer); await worker.terminate(); }
+ }

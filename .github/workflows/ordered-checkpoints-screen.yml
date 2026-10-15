@@ -1,0 +1,58 @@
+name: Ordered-checkpoint temporary-storage screen
+
+on:
+  push:
+    branches: [proof/ordered-checkpoints-screen-20261015]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ordered-checkpoints-screen-20261015
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.repository == 'natanelia/zerocopy' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - name: Read the exact released proof commit
+        timeout-minutes: 2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          fetch-tags: false
+          persist-credentials: false
+      - name: Install the pinned official Node release
+        timeout-minutes: 3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+          check-latest: false
+      - name: Prepare the exact two execution arms
+        timeout-minutes: 16
+        env:
+          ORDERED_PROVISION_ROOT: ${{ runner.temp }}/ordered-checkpoints-provisioned
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 proofs/ordered-checkpoints-screen/run-hosted.py prepare "$ORDERED_PROVISION_ROOT"
+      - name: Run the released fixed 36-child screen
+        timeout-minutes: 41
+        env:
+          ORDERED_PROVISION_ROOT: ${{ runner.temp }}/ordered-checkpoints-provisioned
+          ORDERED_SCREEN_ROOT: ${{ runner.temp }}/ordered-checkpoints-screen-result
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 proofs/ordered-checkpoints-screen/run-hosted.py screen "$ORDERED_SCREEN_ROOT" "$ORDERED_PROVISION_ROOT"
+      - name: Preserve preparation and screen evidence, including partial failures
+        if: ${{ always() }}
+        timeout-minutes: 3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ordered-checkpoints-screen-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/ordered-checkpoints-provisioned/artifact/
+            ${{ runner.temp }}/ordered-checkpoints-screen-result/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
