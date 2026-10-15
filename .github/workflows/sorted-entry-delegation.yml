@@ -1,0 +1,72 @@
+name: Sorted-entry delegation latency screen
+
+on:
+  push:
+    branches: [proof/sorted-entry-delegation-20261015]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.ref == 'refs/heads/proof/sorted-entry-delegation-20261015'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify inert harness and workflow context
+        run: |
+          node --test proofs/sorted-entry-delegation/harness.node.mjs
+          PYTHONDONTWRITEBYTECODE=1 python3 proofs/sorted-entry-delegation/harness_test.py
+      - name: Provision the pinned shared dependencies once
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-entry-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-entry-evidence
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(node --version)" = v22.16.0
+          test "$(bun --version)" = 1.4.2
+          npm ci --prefix proofs/sorted-entry-delegation/dependencies --no-audit --no-fund
+          git worktree add --detach "$BASELINE_DIRECTORY" afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-entry-delegation/dependencies/node_modules" node_modules
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-entry-delegation/dependencies/node_modules" "$BASELINE_DIRECTORY/node_modules"
+      - name: Admit exact sources and run the fixed latency screen
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-entry-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-entry-evidence
+          CI: '1'
+          NO_COLOR: '1'
+        run: python3 proofs/sorted-entry-delegation/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY"
+      - name: Preserve partial or complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorted-entry-delegation-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/sorted-entry-evidence/
+            proofs/sorted-entry-delegation/*.mjs
+            proofs/sorted-entry-delegation/*.py
+            proofs/sorted-entry-delegation/*.md
+            proofs/sorted-entry-delegation/*.json
+            proofs/sorted-entry-delegation/dependencies/package*.json
+            dist/
+            *.wasm
+            ${{ runner.temp }}/sorted-entry-baseline/dist/
+            ${{ runner.temp }}/sorted-entry-baseline/*.wasm
+            shared-sorted-map.ts
+            sorted-entry-lifecycle.test.ts
+            .github/workflows/sorted-entry-delegation.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

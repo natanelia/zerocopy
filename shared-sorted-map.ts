@@ -46,7 +46,8 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
   }
   private *naturalEntries(): Generator<[string, ValueOf<T>]> { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
   *entries(): Generator<[string, ValueOf<T>]> {
-    if (this.comparator) yield* [...this.naturalEntries()].sort((a, b) => this.comparator!(a[0], b[0])); else yield* this.naturalEntries();
+    if (this.comparator) yield* [...this.naturalEntries()].sort((a, b) => this.comparator!(a[0], b[0]));
+    else { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)]; }
   }
   *keys(): Generator<string> {
     const a = this.arena;

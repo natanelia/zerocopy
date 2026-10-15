@@ -1,0 +1,14 @@
+{
+  ".github/workflows/sorted-entry-delegation.yml": "ec55c9a726a929a6198dabbd49f402c1cbf6362c558c80ca93d21a6897b66b0a",
+  "proofs/sorted-entry-delegation/METHOD.md": "0d334355130a3d09b2e1cd9b166239f23d09251412e48b5974711fc0abab182c",
+  "proofs/sorted-entry-delegation/README.md": "7112bdd5f71c1e0f6355c75f1446c8dce9882139c251d192637c501aacb90b0f",
+  "proofs/sorted-entry-delegation/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/sorted-entry-delegation/dependencies/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "proofs/sorted-entry-delegation/dependencies/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "proofs/sorted-entry-delegation/harness.node.mjs": "a01b4007f274cb322af68d56eee58a07fe7596ff9f5170d64866d7c3b2fc1e82",
+  "proofs/sorted-entry-delegation/harness_test.py": "3de0aeb6cf83a83ede357714cffb6a05d5f518e7ec4ae8ae4e9033ab8b1f2fa5",
+  "proofs/sorted-entry-delegation/latency.mjs": "02e33969de960e824914a9076c976f6f8a7e0b27c3895ce8466b57ea00767603",
+  "proofs/sorted-entry-delegation/run.py": "50124dd8b69f694fed2bd098924e56cd256c2380331aefe1281343cecae58d79",
+  "shared-sorted-map.ts": "d37e4b520af3dd632ca4b7dfa023a1cb92e4f5172c5cea4276f5ac88e7f176ff",
+  "sorted-entry-lifecycle.test.ts": "d4edc7a4155f891a9e271b01942dcd7dd6c02fcdcffa0270cbb54ae99c248419"
+}
