@@ -1,0 +1,45 @@
+{
+  "approved": true,
+  "arms": {
+    "baseline": {
+      "generated": "manifests/baseline-generated.json",
+      "root": "${PROVISION_ROOT}/arms/baseline",
+      "sources": "manifests/baseline-sources.json"
+    },
+    "candidate": {
+      "generated": "manifests/candidate-generated.json",
+      "root": "${PROVISION_ROOT}/arms/candidate",
+      "sources": "manifests/candidate-sources.json"
+    }
+  },
+  "evidence": {
+    "criticalReviewSha256": "683981d2560217f6888a5bf7a36f4ea523c4d5de9d16139bfa06a6d74a938bdc",
+    "focusedSourceSealSha256": "8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd",
+    "focusedTerminalSealSha256": "032cc8ea776c348d6445481f4071aea464566d2e18be335908b1391da06d0615",
+    "methodSha256": "25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43"
+  },
+  "executables": {
+    "bun": {
+      "bytes": 79500640,
+      "path": "${BUN}",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "version": "1.4.2"
+    },
+    "node": {
+      "bytes": 121509208,
+      "path": "${NODE}",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "version": "22.16.0"
+    }
+  },
+  "expectedHostedHead": "${PROOF_HEAD}",
+  "implementationFiles": {
+    "analysis.py": "7d8b12a0a43622d7009e1e28a43fbdb0da6080d30e51f1a5c48128cccb833aa4",
+    "run-hosted.py": "a240be0112ef8bdc6d459d5df61b25aa8d37264a37078495fc31636b2ee98712",
+    "subject.mjs": "3e7f25cc7349815aa67461a29af26bd1028fd76d9429b83c90a1ab7d0030b1b7"
+  },
+  "preparationSeconds": 900,
+  "schema": 1,
+  "screenSeconds": 2400,
+  "subjectChildren": 36
+}

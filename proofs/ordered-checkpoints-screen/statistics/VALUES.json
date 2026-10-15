@@ -1,0 +1,35 @@
+{
+  "df": 7,
+  "tail_probability": "1/(40*m)",
+  "source": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda3664.htm",
+  "methods": [
+    "independent adaptive Simpson integration of transformed upper-tail density, followed by 60 bisections",
+    "70-digit Decimal beta power series and 230 bisections, with pi from bounded Machin arctangent series"
+  ],
+  "constant_check_tolerance": 1e-12,
+  "decimal_working_precision": 70,
+  "subject_execution": false,
+  "rows": [
+    {
+      "m": 1,
+      "coordinator_constant": "2.364624251592784",
+      "independent_decimal": "2.364624251592785341680901473780490283130290883489564918705253683970452",
+      "recommended_binary64_literal": "2.3646242515927853",
+      "passes_1e_12_check": true
+    },
+    {
+      "m": 28,
+      "coordinator_constant": "4.883865032805824",
+      "independent_decimal": "4.883865032805824313291094667345944112903372375705338252826360386010462",
+      "recommended_binary64_literal": "4.883865032805824",
+      "passes_1e_12_check": true
+    },
+    {
+      "m": 10,
+      "coordinator_constant": "4.02933717764247",
+      "independent_decimal": "4.029337177642484973916695399177774247653783489772487383811346136020338",
+      "recommended_binary64_literal": "4.029337177642485",
+      "passes_1e_12_check": true
+    }
+  ]
+}

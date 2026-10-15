@@ -1,0 +1,63 @@
+{
+  "coreSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+  "embeddedFile": "chunk-t2acd52e.js",
+  "sharedEntryReachableFiles": [
+    "chunk-enwn105b.js",
+    "chunk-jyz2w9p4.js",
+    "chunk-n1amv1q3.js",
+    "chunk-t2acd52e.js",
+    "shared.js"
+  ],
+  "generated": {
+    "chunk-4w7mq2zb.js": {
+      "sha256": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+      "bytes": 43116
+    },
+    "chunk-enwn105b.js": {
+      "sha256": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+      "bytes": 39495
+    },
+    "chunk-jyz2w9p4.js": {
+      "sha256": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+      "bytes": 11887
+    },
+    "chunk-n1amv1q3.js": {
+      "sha256": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+      "bytes": 3129
+    },
+    "chunk-t2acd52e.js": {
+      "sha256": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+      "bytes": 83457
+    },
+    "geometry.js": {
+      "sha256": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+      "bytes": 2072
+    },
+    "numeric.js": {
+      "sha256": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+      "bytes": 4303
+    },
+    "redux.js": {
+      "sha256": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+      "bytes": 38023
+    },
+    "shared.js": {
+      "sha256": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+      "bytes": 2141
+    },
+    "state.js": {
+      "sha256": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+      "bytes": 224
+    },
+    "tanstack-db-collection.js": {
+      "sha256": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+      "bytes": 3707
+    },
+    "worker.js": {
+      "sha256": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66",
+      "bytes": 682
+    }
+  },
+  "sourceManifestSha256": "5684f65b0bea218102de117d4437f950cca7a58f415548cf6ee474bfb92cf966",
+  "commandPlanSha256": "05ba9732d8d7416dba3cabdfa947039084996ba417d2573daab70e29153e4a38"
+}

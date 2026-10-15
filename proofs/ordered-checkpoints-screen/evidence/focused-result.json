@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "commandsCompleted": 10,
+  "performanceInference": false,
+  "casesPerFocusedCommand": 57,
+  "totalFocusedCaseExecutions": 228,
+  "sourceNativeAndExecutableHashes": "unchanged",
+  "pinnedDependencyFilesAndLinksUnchanged": true,
+  "fullSuiteClearance": false,
+  "publicationRelease": false,
+  "budgetSecondsForSafetyOnly": {
+    "metadata": 15.84292767502484,
+    "command": 36.20069170498755,
+    "cleanup": 0.011560201004613191,
+    "whole": 52.05518386501353
+  }
+}

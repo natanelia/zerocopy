@@ -1,0 +1,258 @@
+{
+  "derived": [
+    {
+      "packetPath": "manifests/baseline-generated.json",
+      "purpose": "25-output union of unchanged13-native main pins and independently accepted12-module focused portable inventory",
+      "sourceHashes": {
+        "native": "f33f5629be3963564ca7d3c675161f3489878ea558d9fb64d239a9c8ba65bdc2",
+        "portable": "c170a8196d3d49f092554a86b7f692ef24f11eb3e414c130dea9fa2c9cdb6fbf"
+      }
+    },
+    {
+      "packetPath": "manifests/baseline-bun-closure.json",
+      "purpose": "Static relative-import closure from shared.ts, no import or execution",
+      "sourceManifestSha256": "5684f65b0bea218102de117d4437f950cca7a58f415548cf6ee474bfb92cf966"
+    },
+    {
+      "packetPath": "manifests/candidate-generated.json",
+      "purpose": "25-output union of unchanged13-native main pins and independently accepted12-module focused portable inventory",
+      "sourceHashes": {
+        "native": "f33f5629be3963564ca7d3c675161f3489878ea558d9fb64d239a9c8ba65bdc2",
+        "portable": "9c14b7e1b31498425fb64fce78cbdd41da991fe351ec203d2dca145784f05f0a"
+      }
+    },
+    {
+      "packetPath": "manifests/candidate-bun-closure.json",
+      "purpose": "Static relative-import closure from shared.ts, no import or execution",
+      "sourceManifestSha256": "cc7b481f879ef1849f1aab53813d7dc34c540f28dfbe1748a92be9552038924e"
+    },
+    {
+      "packetPath": "evidence/focused-acceptance.json",
+      "purpose": "Factual acceptance summary with explicit original-source hashes; not raw receipts"
+    }
+  ],
+  "included": [
+    {
+      "bytes": 21229,
+      "packetPath": "method/METHOD.md",
+      "sha256": "25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43",
+      "sourceArtifactRelativePath": "method-v3/METHOD.md",
+      "transformation": "none"
+    },
+    {
+      "bytes": 563,
+      "packetPath": "method/SHA256SUMS",
+      "sha256": "126c505afc4c03116fa301caae5242385c04baf909ae521045bc602e64d6d935",
+      "sourceArtifactRelativePath": "method-v3/SHA256SUMS",
+      "transformation": "none"
+    },
+    {
+      "bytes": 2728,
+      "packetPath": "statistics/REVIEW.md",
+      "sha256": "683981d2560217f6888a5bf7a36f4ea523c4d5de9d16139bfa06a6d74a938bdc",
+      "sourceArtifactRelativePath": "independent-critical-values-v1/REVIEW.md",
+      "transformation": "none"
+    },
+    {
+      "bytes": 1307,
+      "packetPath": "statistics/VALUES.json",
+      "sha256": "6e74f6614f9e06da46208927c366766b594b173e40d216fc11a0091525865efe",
+      "sourceArtifactRelativePath": "independent-critical-values-v1/VALUES.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 280,
+      "packetPath": "statistics/SEAL.json",
+      "sha256": "b02e40abb6dd0228c76f7e7e076d410ec306693f637d9680ed46507cf663e122",
+      "sourceArtifactRelativePath": "independent-critical-values-v1/SEAL.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 25191,
+      "packetPath": "candidate.patch",
+      "sha256": "785ae9836073ea6994e8c8b04ca904dc747fe4fc791c9be719a83cef3171fcee",
+      "sourceArtifactRelativePath": "source-review-v1/SOURCE.patch",
+      "transformation": "none"
+    },
+    {
+      "bytes": 1121,
+      "packetPath": "evidence/focused-source-seal.json",
+      "sha256": "8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd",
+      "sourceArtifactRelativePath": "source-review-v1/PACKET-SEAL.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 52123,
+      "packetPath": "manifests/pristine-sources.json",
+      "sha256": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+      "sourceArtifactRelativePath": "source-review-v1/BASELINE-SOURCES.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 492,
+      "packetPath": "evidence/focused-result.json",
+      "sha256": "19af157c551146f4d14608bd1862cbf450dac9a15a1e9348f3ab1c77343e3bd8",
+      "sourceArtifactRelativePath": "correctness-v1/result.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 52235,
+      "packetPath": "manifests/baseline-sources.json",
+      "sha256": "5684f65b0bea218102de117d4437f950cca7a58f415548cf6ee474bfb92cf966",
+      "sourceArtifactRelativePath": "correctness-v1/baseline-sources.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 2106,
+      "packetPath": "manifests/baseline-portable.json",
+      "sha256": "c170a8196d3d49f092554a86b7f692ef24f11eb3e414c130dea9fa2c9cdb6fbf",
+      "sourceArtifactRelativePath": "correctness-v1/baseline-portable-authentication.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 274,
+      "packetPath": "evidence/baseline-node-worker.stdout",
+      "sha256": "2fc5c4000052a054ac64bfd3c7b7a44a5edd24a5da6d980b953e4316fa5a905a",
+      "sourceArtifactRelativePath": "correctness-v1/logs/baseline-node-worker.stdout",
+      "transformation": "none"
+    },
+    {
+      "bytes": 0,
+      "packetPath": "evidence/baseline-node-worker.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceArtifactRelativePath": "correctness-v1/logs/baseline-node-worker.stderr",
+      "transformation": "none"
+    },
+    {
+      "bytes": 52235,
+      "packetPath": "manifests/candidate-sources.json",
+      "sha256": "cc7b481f879ef1849f1aab53813d7dc34c540f28dfbe1748a92be9552038924e",
+      "sourceArtifactRelativePath": "correctness-v1/candidate-sources.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 2106,
+      "packetPath": "manifests/candidate-portable.json",
+      "sha256": "9c14b7e1b31498425fb64fce78cbdd41da991fe351ec203d2dca145784f05f0a",
+      "sourceArtifactRelativePath": "correctness-v1/candidate-portable-authentication.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 274,
+      "packetPath": "evidence/candidate-node-worker.stdout",
+      "sha256": "2fc5c4000052a054ac64bfd3c7b7a44a5edd24a5da6d980b953e4316fa5a905a",
+      "sourceArtifactRelativePath": "correctness-v1/logs/candidate-node-worker.stdout",
+      "transformation": "none"
+    },
+    {
+      "bytes": 0,
+      "packetPath": "evidence/candidate-node-worker.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceArtifactRelativePath": "correctness-v1/logs/candidate-node-worker.stderr",
+      "transformation": "none"
+    },
+    {
+      "bytes": 9535,
+      "packetPath": "overlays/proofs/node-worker.mjs",
+      "sha256": "11ce9ce74f773c410bb9cb3460746a1a34e1425ac7e53cb54c19b1eccb933a32",
+      "sourceArtifactRelativePath": "candidate/proofs/node-worker.mjs",
+      "transformation": "none"
+    },
+    {
+      "bytes": 15193,
+      "packetPath": "overlays/shared-ordered-map-checkpoints.test.ts",
+      "sha256": "e30ec3e77db768e3b5d3abf974796e686d33c34c25ba38fb735a60166b38a1a1",
+      "sourceArtifactRelativePath": "candidate/shared-ordered-map-checkpoints.test.ts",
+      "transformation": "none"
+    },
+    {
+      "bytes": 602,
+      "packetPath": "toolchain/package.json",
+      "sha256": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+      "sourceArtifactRelativePath": "pinned-toolchain/package.json",
+      "transformation": "none"
+    },
+    {
+      "bytes": 60535,
+      "packetPath": "toolchain/package-lock.json",
+      "sha256": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+      "sourceArtifactRelativePath": "pinned-toolchain/package-lock.json",
+      "transformation": "none"
+    }
+  ],
+  "localOnly": [
+    {
+      "bytes": 41976,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "7a52e4d6960a1440672411aab632cd7353fcaf9d56232a44aa2ce3be0b18b03c",
+      "sourceArtifactRelativePath": "correctness-v1/command-receipts.json"
+    },
+    {
+      "bytes": 1113,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "032cc8ea776c348d6445481f4071aea464566d2e18be335908b1391da06d0615",
+      "sourceArtifactRelativePath": "correctness-v1/results-review-v1/SEAL.json"
+    },
+    {
+      "bytes": 3598,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "eb3b823e90389d75eaa0fb1b1cd236a1ed97c10b5a082050054e3d085181d551",
+      "sourceArtifactRelativePath": "independent-review/terminal-review-v1/REVIEW.md"
+    },
+    {
+      "bytes": 574,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "ef1aa175ce80367a5efcaa312ae5c055c818c920fc487126f7fc1259ddd9deca",
+      "sourceArtifactRelativePath": "independent-review/terminal-review-v1/SEAL.json"
+    },
+    {
+      "bytes": 1887,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "f95a332bb440241651a127546c028761a53da10d9f4a2127407d915acb8f4b76",
+      "sourceArtifactRelativePath": "independent-review/method-clearance-v3/REVIEW.md"
+    },
+    {
+      "bytes": 274,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "aa4bc1d04e2a65ffd031cca69065f6c46f9a7f74200b4a3a152c251cfb530c08",
+      "sourceArtifactRelativePath": "independent-review/method-clearance-v3/SEAL.json"
+    },
+    {
+      "bytes": 11909,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "e7cb5299851ab4fa8eb6c908a5eb242aa7e53c3e40f7d85139984b8c9cebe308",
+      "sourceArtifactRelativePath": "screen-implementation-plan-v1/PLAN.md"
+    },
+    {
+      "bytes": 648,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "deee84655b4cc47f72dce47e7e7592030a386fffcdce688e4dca52b9aa26672f",
+      "sourceArtifactRelativePath": "screen-implementation-plan-v1/SEAL.json"
+    },
+    {
+      "bytes": 19386,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "2df2e2fe7411ad24012d89535d166caed1ba0fa77ec2beb07ae3def2aeab2dff",
+      "sourceArtifactRelativePath": "correctness-v1/reports/baseline-bun-focused.json"
+    },
+    {
+      "bytes": 19392,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "ccf2d81c055ecf5035945ecd74b7e5f263830ffa545a90808baf99fd44e80240",
+      "sourceArtifactRelativePath": "correctness-v1/reports/baseline-node-focused.json"
+    },
+    {
+      "bytes": 19387,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "e65253a096661d04b95dc1f6eb76139160370e55f91b130b52a2f8789b99f8e2",
+      "sourceArtifactRelativePath": "correctness-v1/reports/candidate-bun-focused.json"
+    },
+    {
+      "bytes": 19407,
+      "reason": "Original preserved locally; exact hash binds provenance without publishing local host paths or redundant metadata",
+      "sha256": "f853691122ade24d95aa707d3ed5da16451d2eeb57b1c9c1b8bba29d64ac5d84",
+      "sourceArtifactRelativePath": "correctness-v1/reports/candidate-node-focused.json"
+    }
+  ],
+  "scope": "Prospective selected evidence. Original focused raw receipts and reports remain unchanged locally; derived summaries are not raw receipts."
+}
