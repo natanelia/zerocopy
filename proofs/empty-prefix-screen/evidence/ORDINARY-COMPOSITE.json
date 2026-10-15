@@ -1,0 +1,144 @@
+{
+  "kind": "ordinary-correctness-composite",
+  "complete": true,
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidatePatchSha256": "77f05fa906d9ccfc6d0afdaebc04cf181f3a7dea23d8b88b82c2a9d11a6077bb",
+  "requiredCommands": [
+    "native-build",
+    "portable-build",
+    "declarations",
+    "full-bun",
+    "docs-script-tests",
+    "docs-links",
+    "docs-examples",
+    "node-worker-integration",
+    "node-redux-integration",
+    "node-typed-json-worker-integration",
+    "package-dry-run",
+    "package-archive",
+    "package-consumer"
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "runId": "38668352050",
+      "resultSha256": "d4fbe06501cd55c5a63f228369a1babeff18f19f112e23467430b21b6f46e707",
+      "artifactManifestSha256": "ac254b7276ac1b4112984e57204ae0f0083992f3c359b1206d335ff48aae9bef",
+      "commandReceiptsSha256": "7da36a46bdf6f8320d882e7451a203e64cbb6845b6c06eae0153f4a76ed9b728",
+      "sourceManifestSha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986",
+      "generatedManifestSha256": "01e199bfd54f18e01b12bd0850e3a9ac21c056a45924ffda2a9006250aa38c41"
+    },
+    {
+      "stage": 2,
+      "runId": "38672615849",
+      "resultSha256": "6883c78c33f4c25a1230fa840b26e4d843aafad0f772f2c6498cf5cab57057e1",
+      "artifactManifestSha256": "bc51f318a71b71b6bd4d7c0dc3e9060dde007b63222be0ee30c28242c66f8932",
+      "commandReceiptsSha256": "aa60cdeaa60960d667d8e48598809868a6a900e0235ffa69a601d5faa0744011",
+      "sourceManifestSha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986",
+      "generatedManifestSha256": "01e199bfd54f18e01b12bd0850e3a9ac21c056a45924ffda2a9006250aa38c41"
+    }
+  ],
+  "commandCoverage": {
+    "native-build": {
+      "stage": 1,
+      "result": "passed"
+    },
+    "portable-build": {
+      "stage": 1,
+      "result": "passed"
+    },
+    "declarations": {
+      "stage": 1,
+      "result": "passed"
+    },
+    "full-bun": {
+      "stage": 1,
+      "result": "passed"
+    },
+    "docs-script-tests": {
+      "stage": 1,
+      "result": "passed"
+    },
+    "docs-links": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "docs-examples": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "node-worker-integration": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "node-redux-integration": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "node-typed-json-worker-integration": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "package-dry-run": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "package-archive": {
+      "stage": 2,
+      "result": "passed"
+    },
+    "package-consumer": {
+      "stage": 2,
+      "result": "passed"
+    }
+  },
+  "preservedFailure": {
+    "stage": 1,
+    "command": "docs-links",
+    "complete": false,
+    "classification": "archived-candidate-missing-git-context",
+    "unrunCommands": [
+      "docs-examples",
+      "node-worker-integration",
+      "node-redux-integration",
+      "node-typed-json-worker-integration",
+      "package-dry-run",
+      "package-archive",
+      "package-consumer"
+    ]
+  },
+  "secondStageBuildPrerequisites": [
+    "native-build",
+    "portable-build",
+    "declarations"
+  ],
+  "independentAudits": [
+    {
+      "stage": 1,
+      "runId": "38668352050",
+      "reviewSha256": "ee1ea8b31208336752701b88a50d95ce72f08adc2ab528e05251b7b4d5ec1e6b",
+      "auditChecksSha256": "8332b60e1fcab94b521f90301e356d2a3cdd2e17d81e2c1b146c4e1adf1f3221",
+      "checksumsSha256": "c8abeb8f2f983468cdf9bf08a5120d9339c00e132a52476ddd97912a949921b2",
+      "auditResult": "authenticated-partial-failure"
+    },
+    {
+      "stage": 2,
+      "runId": "38672615849",
+      "reviewSha256": "59803298e8a3367d414ecd0bd1ef3af2a8cb3021f3631611efcb598c46d84ef9",
+      "auditChecksSha256": "ff24b334cfe7fc609c2c7326b0a124f907b7daa237ae1629052ca3db4d85f89e",
+      "checksumsSha256": "72825fad779f701326225945b221cd9b6c596e56c548170ca672024c2a418c91",
+      "auditResult": "authenticated-completion-and-composition"
+    }
+  ],
+  "terminalSeals": [
+    {
+      "stage": 1,
+      "terminalSealSha256": "ba9010e96904516b7be66a83ca74fd12f58b62ea050c3bc6057fc9dc24663081"
+    },
+    {
+      "stage": 2,
+      "terminalSealSha256": "4ae063174bd04647a1d748e8b12ecb3d322a2d3208da9e943bb8337e6ec9d735"
+    }
+  ],
+  "scope": "The 13 planned ordinary commands only; original failed records remain failed. No additional CI/browser or historical-scope clearance, performance conclusion, or timing/publication release."
+}

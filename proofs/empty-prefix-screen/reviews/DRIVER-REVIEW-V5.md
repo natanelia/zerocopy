@@ -1,0 +1,13 @@
+# Driver v5 independent review
+
+No blocker in the narrow method-v6 binding. This clears the exact driver for wrapper binding and final packet review only; it is not execution or publication release.
+
+Reviewed PREPARATION.json `d072e14ed9ddc30b5c1a8f6e4535dea101ec506bc26af8dd321ed93f18adde20`, complete v4-to-v5 delta `ead5558c02fec549ba071ed78ad1bb455544133d4007ce4273a7a5dab37d76b0`, and manifest `ebfb698137d7522fe4a965d3ddbfcd8b994dd8dac0918dc148f92ced44c91e66`. Both old and new seals verify. Method v6 and its exact independent review bind correctly in child/controller/preparation.
+
+The child visits the fixed baseline count ladder. Each stage records eight warmups, computes the existing readiness rule, and takes three pilots only after readiness passes. It breaks immediately after a pilot above 200 ms. Selection uses the first usable median, with existing target, alignment and cap; only a below-5-ms median advances. Clock, checksum, readiness or sequence failure cannot extend or restart selection. Python independently recomputes the selected result from raw stages before the controller can freeze all twelve cells and reach main-study launch.
+
+Global pilotWarmup/pilots arrays, nested pilotStages and fsynced stage/batch/count-selection events retain every completed observation. Stage indices distinguish selection history from final warmup/verification. Partial recovery preserves completed batches without inventing interrupted observations or an N, and is idempotent. Failed final verification remains unresolved. The current-state late-failure invalidation, sampled-descendant rejection, ordinary composite authentication and endpoint-local decision quality are unchanged.
+
+Direct public timed loops, final verification and main quality block, statistical/readiness functions, fixtures, schedule, all thresholds and budgets are byte-identical. Supervisor function changes are confined to recovery and the explicit calibration audit in study(). The final adapter and disabled standalone execution template are byte-identical. Production candidate source was independently reverified as exactly 503 matching files during the immediately preceding method review.
+
+All 18 static integrity checks pass. Independent inert reruns passed 24 protocol tests each under Node, Bun and Python plus 12 controller tests (84 total); Node child parsing and Python syntax checks pass. Tests use synthetic data and mock process control only. No repository import, subject execution, ordinary correctness rerun, build, calibration or measurement occurred. Original run 38676734117 and all prior packets remain preserved. The additive independent raw-audit extension and final visible-workflow wrapper binding remain separate pending deliverables.

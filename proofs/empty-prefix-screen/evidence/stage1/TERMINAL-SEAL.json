@@ -1,0 +1,14 @@
+{
+  "runId": 38668352050,
+  "attempt": 1,
+  "status": "terminal-failure-preserved",
+  "authenticationSha256": "c14bda619e2512c7e7116a1cff2b954fa1f55de174a9de838774e79eb372b652",
+  "summarySha256": "21dc1a5be002bc284998f8148edebad88a96abfe4c6f46d069d901fcd473b3a4",
+  "artifactManifestSha256": "ac254b7276ac1b4112984e57204ae0f0083992f3c359b1206d335ff48aae9bef",
+  "artifactZipSha256": "dc444b788ea0016daddfd680c32d765d74d3e3a7f3fc16370968f4aa30c878db",
+  "rawResultSha256": "d4fbe06501cd55c5a63f228369a1babeff18f19f112e23467430b21b6f46e707",
+  "rawReceiptsSha256": "7da36a46bdf6f8320d882e7451a203e64cbb6845b6c06eae0153f4a76ed9b728",
+  "fullReportSha256": "d08df62385886d0a6cb170ee26239ef0938aa3ef30d79c9ab50d0c43bc98cb4d",
+  "failureLogSha256": "4ff2a6f14db35a642d0da297a1463c5164d40bbdd15261e03fcf900d2760d3d8",
+  "noRetry": true
+}

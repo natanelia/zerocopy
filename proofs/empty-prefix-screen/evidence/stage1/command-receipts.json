@@ -1,0 +1,625 @@
+[
+  {
+    "label": "proof-head",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/home/runner/work/zerocopy/zerocopy",
+    "capSeconds": 10,
+    "effectiveCapSeconds": 10.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2220,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03727190199992947,
+    "seenPids": [
+      2220
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19881984,
+    "stdout": {
+      "sha256": "4046d4de2955e687db0ba2756f89560dd164048caf62fc7974092529bdc71aff",
+      "bytes": 41
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "proof-parent",
+    "argv": [
+      "git",
+      "rev-list",
+      "--parents",
+      "-n",
+      "1",
+      "HEAD"
+    ],
+    "cwd": "/home/runner/work/zerocopy/zerocopy",
+    "capSeconds": 10,
+    "effectiveCapSeconds": 10.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2221,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03206092599998556,
+    "seenPids": [
+      2221
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19881984,
+    "stdout": {
+      "sha256": "68b19a70df260d4cfc545b3026e5f7176fd598a4be4827cc4bbaeaaf716b0612",
+      "bytes": 82
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "locked-dependencies",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "/opt/hostedtoolcache/node/22.16.0/x64/lib/node_modules/npm/bin/npm-cli.js",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain",
+    "capSeconds": 180,
+    "effectiveCapSeconds": 180.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 271351808,
+    "peakObservedProcessHwmBytes": 271351808,
+    "cleanupSignals": [],
+    "environmentOverrides": {
+      "npm_config_offline": "false",
+      "npm_config_registry": "https://registry.npmjs.org/"
+    },
+    "ownedProcessGroup": 2222,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 3.324611365999999,
+    "seenPids": [
+      2222
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 270991360,
+    "stdout": {
+      "sha256": "b614a298b1271e26bce7bd19a658e8828e30a9807e2be64539c96d95f1a54984",
+      "bytes": 25
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "Node-version",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain",
+    "capSeconds": 5,
+    "effectiveCapSeconds": 5.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2233,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03247367100004794,
+    "seenPids": [
+      2233
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19951616,
+    "stdout": {
+      "sha256": "256a8e08ee35cb8ad36ae16385257192c3dbe7d80cfdeff9eaa886531b2f83bc",
+      "bytes": 9
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "Node-identity",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "-p",
+      "JSON.stringify({execPath:process.execPath,version:process.version,versions:process.versions})"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain",
+    "capSeconds": 5,
+    "effectiveCapSeconds": 5.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 25956352,
+    "peakObservedProcessHwmBytes": 25956352,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2234,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.032498126000064076,
+    "seenPids": [
+      2234
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 46055424,
+    "stdout": {
+      "sha256": "394d3c6f6170802fe74c07520c4fe2b58dffee6bd37fe32d85cfdd0c7d678218",
+      "bytes": 575
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "Bun-version",
+    "argv": [
+      "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain",
+    "capSeconds": 5,
+    "effectiveCapSeconds": 5.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2241,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.0336451840000791,
+    "seenPids": [
+      2241
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19881984,
+    "stdout": {
+      "sha256": "b99b4c7cdf236f59bc9f65d963deaecae3b16a7dad87939cacb9057f7664daee",
+      "bytes": 6
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "Bun-identity",
+    "argv": [
+      "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "-p",
+      "JSON.stringify({execPath:process.execPath,version:process.version,versions:process.versions})"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain",
+    "capSeconds": 5,
+    "effectiveCapSeconds": 5.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2242,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03421823799999402,
+    "seenPids": [
+      2242
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19881984,
+    "stdout": {
+      "sha256": "83c39a897046057b5119e228ee1ace2adfc1d2abcb99612f3df7ccd090c5a765",
+      "bytes": 1140
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "archive-exact-main",
+    "argv": [
+      "git",
+      "archive",
+      "--format=tar",
+      "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+      "-o",
+      "/home/runner/work/_temp/empty-prefix-correctness-20261015/main.tar"
+    ],
+    "cwd": "/home/runner/work/zerocopy/zerocopy",
+    "capSeconds": 30,
+    "effectiveCapSeconds": 30.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 6848512,
+    "peakObservedProcessHwmBytes": 6848512,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2243,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03515976699998191,
+    "seenPids": [
+      2243
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 19881984,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "check-fixed-patch",
+    "argv": [
+      "git",
+      "apply",
+      "--check",
+      "-p1",
+      "/home/runner/work/zerocopy/zerocopy/proofs/empty-prefix-correctness/candidate.patch"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 10,
+    "effectiveCapSeconds": 10.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2244,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03276776799998515,
+    "seenPids": [
+      2244
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 20668416,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "apply-fixed-patch",
+    "argv": [
+      "git",
+      "apply",
+      "-p1",
+      "/home/runner/work/zerocopy/zerocopy/proofs/empty-prefix-correctness/candidate.patch"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 10,
+    "effectiveCapSeconds": 10.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 0,
+    "peakObservedProcessHwmBytes": 0,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2245,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03307164099999227,
+    "seenPids": [
+      2245
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 20668416,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  {
+    "label": "native-build",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "scripts/build-wasm.mjs"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 90,
+    "effectiveCapSeconds": 90.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 475336704,
+    "peakObservedProcessHwmBytes": 378720256,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2246,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 4.805003403000001,
+    "seenPids": [
+      2246,
+      2257,
+      2268,
+      2284,
+      2295,
+      2306,
+      2317,
+      2328,
+      2339
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 378720256,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validationPassed": true
+  },
+  {
+    "label": "portable-build",
+    "argv": [
+      "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "scripts/build-browser.ts"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 60,
+    "effectiveCapSeconds": 60.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 19374080,
+    "peakObservedProcessHwmBytes": 19374080,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2352,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.03514651700004379,
+    "seenPids": [
+      2352
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 37429248,
+    "stdout": {
+      "sha256": "5ab174c4b84796bbd746e70fe9e1e0a5705bf6c840e0cb72ae8e5a642d4642b5",
+      "bytes": 40
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validationPassed": true
+  },
+  {
+    "label": "declarations",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "--emitDeclarationOnly",
+      "--noEmit",
+      "false",
+      "--declarationMap",
+      "false",
+      "--outDir",
+      "dist/types"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 60,
+    "effectiveCapSeconds": 60.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 274485248,
+    "peakObservedProcessHwmBytes": 274485248,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2360,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 1.7953412289999733,
+    "seenPids": [
+      2360
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 274595840,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validationPassed": true
+  },
+  {
+    "label": "full-bun",
+    "argv": [
+      "/home/runner/work/_temp/empty-prefix-correctness-20261015/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "--bun",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile.json=/home/runner/work/_temp/empty-prefix-correctness-20261015/artifact/reports/full-bun.json"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 300,
+    "effectiveCapSeconds": 299.9999999999999,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 1245483008,
+    "peakObservedProcessHwmBytes": 1245593600,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2367,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 40.94084622399998,
+    "seenPids": [
+      2367
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 1245593600,
+    "stdout": {
+      "sha256": "3b705d927caae7387b83e0e5b49e7eb2d6572eaccb386abbd15a9a1b17bd970d",
+      "bytes": 181867
+    },
+    "stderr": {
+      "sha256": "7a771561a3f3ed7895683ca8de26f9c52621bede325ede9a607bef20654b9da5",
+      "bytes": 509
+    },
+    "validationPassed": true
+  },
+  {
+    "label": "docs-script-tests",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "--test",
+      "scripts/check-docs.node.mjs"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 60,
+    "effectiveCapSeconds": 60.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 158453760,
+    "peakObservedProcessHwmBytes": 59281408,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2453,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.6393543860000364,
+    "seenPids": [
+      2453,
+      2459,
+      2476,
+      2491,
+      2506,
+      2521,
+      2536,
+      2551,
+      2566,
+      2584,
+      2599,
+      2614,
+      2629,
+      2646,
+      2661
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 59387904,
+    "stdout": {
+      "sha256": "ccaf04da23919cbb7735c7c0e47f0ea388d10a0163019e2917d2488740df4fe5",
+      "bytes": 1321
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validationPassed": true
+  },
+  {
+    "label": "docs-links",
+    "argv": [
+      "/opt/hostedtoolcache/node/22.16.0/x64/bin/node",
+      "scripts/check-docs.mjs"
+    ],
+    "cwd": "/home/runner/work/_temp/empty-prefix-correctness-20261015/candidate",
+    "capSeconds": 60,
+    "effectiveCapSeconds": 60.0,
+    "sampledGroupRssLimitBytes": 4294967296,
+    "hardCgroupCap": false,
+    "peakObservedGroupRssBytes": 25612288,
+    "peakObservedProcessHwmBytes": 25612288,
+    "cleanupSignals": [],
+    "environmentOverrides": {},
+    "ownedProcessGroup": 2676,
+    "exitCode": 1,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 0.05804639599989514,
+    "seenPids": [
+      2676
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 48889856,
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "4ff2a6f14db35a642d0da297a1463c5164d40bbdd15261e03fcf900d2760d3d8",
+      "bytes": 176
+    }
+  }
+]

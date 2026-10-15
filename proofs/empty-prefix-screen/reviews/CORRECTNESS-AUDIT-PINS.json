@@ -1,0 +1,60 @@
+{
+  "packet": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1",
+  "source_commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "review_mode": "retained evidence reading and hashing only",
+  "outcome": "Four focused commands passed eight cases each; no wider clearance",
+  "files": {
+    "GATE-SEAL.json": {
+      "sha256": "7ec194642262cfb517ee6c211f8bb8dc8e2241d07e9b889d94b04b95cca106e3",
+      "bytes": 1789
+    },
+    "command-receipts.json": {
+      "sha256": "b4545c7902db6e2af8906abe2cdd3886837968b544a0aa203317a53fbcbc75e8",
+      "bytes": 12178
+    },
+    "CORRECTNESS-RESULT.md": {
+      "sha256": "adde6360d48d2ffcdc7118e37e2ca8ec83456f9fd28058ee406de1ce3ffe51b9",
+      "bytes": 5397
+    },
+    "PACKET-SHA256SUMS": {
+      "sha256": "008795a8c3b5cf4948e81d0ee43a40acfad6feb0e3cc26712efced2ad4f2bca0",
+      "bytes": 3343
+    },
+    "PREPARATION.json": {
+      "sha256": "d051316fd728e12f9651a7ad4668d3fb2cdd86ae664ed77d184cd6343ac6720c",
+      "bytes": 5225
+    },
+    "PREPARATION-FAILURE.json": {
+      "sha256": "e0615ae6c55a9a7e583813add27648daca55b98005a14d4e7e0b2be5c6b21109",
+      "bytes": 898
+    },
+    "executables.json": {
+      "sha256": "33fb0e85237b77c79e90279fe843d6349469189435455f5b943a95d80b7dd1b2",
+      "bytes": 3199
+    },
+    "native-inputs.json": {
+      "sha256": "7e844e832d2db259ce1782c36ced7fcb78a2709abbdfa050f03baac6758eb568",
+      "bytes": 1600
+    },
+    "native-artifacts.json": {
+      "sha256": "d309509c04138c2b388282be7b8a292d7fbc215b623d5a6ef0932484ba7ca759",
+      "bytes": 1595
+    },
+    "reports/baseline-bun.json": {
+      "sha256": "b6be6e6748dd9c654140619b0a5c425abbc28d93a40246613f3a3555e1f51860",
+      "bytes": 3533
+    },
+    "reports/baseline-node.json": {
+      "sha256": "88877fd85c20c6cc69f5fcb8bdf1d68a9c4389063308484c15ee5fdae502ba59",
+      "bytes": 3542
+    },
+    "reports/candidate-bun.json": {
+      "sha256": "65a049183b76bbfa18ec22f1e1481697c832efa29934aa7843a4e6d27bc949d0",
+      "bytes": 3543
+    },
+    "reports/candidate-node.json": {
+      "sha256": "2ee14f8c08106764ce4e53cf69114db4b296e261c0d437b4bc1b9638893a5691",
+      "bytes": 3543
+    }
+  }
+}

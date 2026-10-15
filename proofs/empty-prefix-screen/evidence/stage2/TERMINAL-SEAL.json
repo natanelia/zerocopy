@@ -1,0 +1,16 @@
+{
+  "status": "terminal-success-authenticated-independent-audit-pending",
+  "runId": 38672615849,
+  "attempt": 1,
+  "artifactId": 11943723900,
+  "artifactZipSha256": "07e96b7a892b1f63556ab65f98cfc97c425ab59100729f5f4faa2910bddec8b2",
+  "artifactManifestSha256": "bc51f318a71b71b6bd4d7c0dc3e9060dde007b63222be0ee30c28242c66f8932",
+  "authenticationSha256": "7f0294ca73ab5a0c35ad330b3eb1f9d13d9a16fc64cb2e7fc5f9d15f13607045",
+  "summarySha256": "6aed1f8cfa16a8062fef36a867aa5a69c67def09cc807055387d4e118f3adf45",
+  "resultSha256": "6883c78c33f4c25a1230fa840b26e4d843aafad0f772f2c6498cf5cab57057e1",
+  "receiptsSha256": "aa60cdeaa60960d667d8e48598809868a6a900e0235ffa69a601d5faa0744011",
+  "packageInventorySha256": "3b20a0b7961a638186ce1b9da38887dc54875432a1b8fbf64080ec7ae977b371",
+  "sourceIndexSha256": "e7ec9261abbc154cf3b762fd3fa48cec22cc7cc871ed0edea6a99e0da04fa056",
+  "gitContextSha256": "62ffed09bcfd9de4a598d4f9f3808be9412672fd7702ec706377d14ce270c0b5",
+  "priorStageTerminalSealSha256": "ba9010e96904516b7be66a83ca74fd12f58b62ea050c3bc6057fc9dc24663081"
+}

@@ -1,0 +1,4 @@
+fatal: not a git repository (or any of the parent directories): .git
+Command failed: git ls-files -z *.md
+fatal: not a git repository (or any of the parent directories): .git
+

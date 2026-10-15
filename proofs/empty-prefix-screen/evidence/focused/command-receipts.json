@@ -1,0 +1,252 @@
+[
+  {
+    "label": "baseline-bun",
+    "arm": "baseline",
+    "engine": "bun",
+    "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/baseline",
+    "argv": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "--bun",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "map-empty-prefix.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/baseline-bun.json"
+    ],
+    "report": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/baseline-bun.json",
+    "wallLimitSeconds": 60,
+    "sampledRssLimitBytes": 1073741824,
+    "memoryCapIsSampled": true,
+    "peakObservedGroupRssBytes": 186445824,
+    "peakObservedProcessHwmBytes": 186445824,
+    "cleanupSignals": [],
+    "startedUnix": 1792024522.9646456,
+    "ownedProcessGroup": 5,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 1.8509742179885507,
+    "seenPids": [
+      5
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 186097664,
+    "stdout": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/baseline-bun.stdout",
+      "bytes": 127,
+      "sha256": "2b6cd838be99c9446209538de41aedf21c1b3d98a656ab129c718cf64ee136b2"
+    },
+    "stderr": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/baseline-bun.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "testCounts": {
+      "numTotalTests": 8,
+      "numPassedTests": 8,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "reportSha256": "b6be6e6748dd9c654140619b0a5c425abbc28d93a40246613f3a3555e1f51860",
+    "caseNames": [
+      "lookups through empty hash prefixes keeps misses root-specific across retained roots, forks and deletion",
+      "lookups through empty hash prefixes keeps old and new reads correct when directory width grows and shrinks",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=false)",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=true)",
+      "lookups through empty hash prefixes checks complete hashes and key bytes for early leaves and collision buckets",
+      "lookups through empty hash prefixes keeps Unicode aliases, ordered values and object reads correct after misses",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=false)",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=true)"
+    ],
+    "sourceNativeAndExecutableHashesAfterCommand": "verified unchanged"
+  },
+  {
+    "label": "baseline-node",
+    "arm": "baseline",
+    "engine": "node",
+    "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/baseline",
+    "argv": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node-v22.16.0-linux-x64/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "map-empty-prefix.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/baseline-node.json"
+    ],
+    "report": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/baseline-node.json",
+    "wallLimitSeconds": 60,
+    "sampledRssLimitBytes": 1073741824,
+    "memoryCapIsSampled": true,
+    "peakObservedGroupRssBytes": 201166848,
+    "peakObservedProcessHwmBytes": 201166848,
+    "cleanupSignals": [],
+    "startedUnix": 1792024525.9025855,
+    "ownedProcessGroup": 61,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 1.9864230810198933,
+    "seenPids": [
+      61
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 200368128,
+    "stdout": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/baseline-node.stdout",
+      "bytes": 128,
+      "sha256": "137c46782c5d94e087c0c9d5e70c44ee45f440c1f31b7fba87b5f094a0b60ddf"
+    },
+    "stderr": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/baseline-node.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "testCounts": {
+      "numTotalTests": 8,
+      "numPassedTests": 8,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "reportSha256": "88877fd85c20c6cc69f5fcb8bdf1d68a9c4389063308484c15ee5fdae502ba59",
+    "caseNames": [
+      "lookups through empty hash prefixes keeps misses root-specific across retained roots, forks and deletion",
+      "lookups through empty hash prefixes keeps old and new reads correct when directory width grows and shrinks",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=false)",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=true)",
+      "lookups through empty hash prefixes checks complete hashes and key bytes for early leaves and collision buckets",
+      "lookups through empty hash prefixes keeps Unicode aliases, ordered values and object reads correct after misses",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=false)",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=true)"
+    ],
+    "sourceNativeAndExecutableHashesAfterCommand": "verified unchanged"
+  },
+  {
+    "label": "candidate-bun",
+    "arm": "candidate",
+    "engine": "bun",
+    "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/candidate",
+    "argv": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "--bun",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "map-empty-prefix.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/candidate-bun.json"
+    ],
+    "report": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/candidate-bun.json",
+    "wallLimitSeconds": 60,
+    "sampledRssLimitBytes": 1073741824,
+    "memoryCapIsSampled": true,
+    "peakObservedGroupRssBytes": 189911040,
+    "peakObservedProcessHwmBytes": 189947904,
+    "cleanupSignals": [],
+    "startedUnix": 1792024528.9433622,
+    "ownedProcessGroup": 96,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 1.859685592004098,
+    "seenPids": [
+      96
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 189947904,
+    "stdout": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/candidate-bun.stdout",
+      "bytes": 128,
+      "sha256": "a78a66cdb1d34349fdeaeb830a6a6aac00c2054bbadf29e933d872b4127421fa"
+    },
+    "stderr": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/candidate-bun.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "testCounts": {
+      "numTotalTests": 8,
+      "numPassedTests": 8,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "reportSha256": "65a049183b76bbfa18ec22f1e1481697c832efa29934aa7843a4e6d27bc949d0",
+    "caseNames": [
+      "lookups through empty hash prefixes keeps misses root-specific across retained roots, forks and deletion",
+      "lookups through empty hash prefixes keeps old and new reads correct when directory width grows and shrinks",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=false)",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=true)",
+      "lookups through empty hash prefixes checks complete hashes and key bytes for early leaves and collision buckets",
+      "lookups through empty hash prefixes keeps Unicode aliases, ordered values and object reads correct after misses",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=false)",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=true)"
+    ],
+    "sourceNativeAndExecutableHashesAfterCommand": "verified unchanged"
+  },
+  {
+    "label": "candidate-node",
+    "arm": "candidate",
+    "engine": "node",
+    "cwd": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/candidate",
+    "argv": [
+      "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node-v22.16.0-linux-x64/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "map-empty-prefix.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/candidate-node.json"
+    ],
+    "report": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/reports/candidate-node.json",
+    "wallLimitSeconds": 60,
+    "sampledRssLimitBytes": 1073741824,
+    "memoryCapIsSampled": true,
+    "peakObservedGroupRssBytes": 200769536,
+    "peakObservedProcessHwmBytes": 200769536,
+    "cleanupSignals": [],
+    "startedUnix": 1792024531.8703394,
+    "ownedProcessGroup": 153,
+    "exitCode": 0,
+    "failure": null,
+    "elapsedSecondsForCapOnly": 1.4047209589916747,
+    "seenPids": [
+      153
+    ],
+    "leftoverDescendantsBeforeCleanup": [],
+    "descendantsAfterCleanup": [],
+    "leaderReapedAfterCleanup": true,
+    "wait4MaxRssBytes": 200105984,
+    "stdout": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/candidate-node.stdout",
+      "bytes": 129,
+      "sha256": "a4db63d686897d59b4d3b9a5b03afb09d752952eaeab5716a24785888372d8b7"
+    },
+    "stderr": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/correctness-v1/logs/candidate-node.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "testCounts": {
+      "numTotalTests": 8,
+      "numPassedTests": 8,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "reportSha256": "2ee14f8c08106764ce4e53cf69114db4b296e261c0d437b4bc1b9638893a5691",
+    "caseNames": [
+      "lookups through empty hash prefixes keeps misses root-specific across retained roots, forks and deletion",
+      "lookups through empty hash prefixes keeps old and new reads correct when directory width grows and shrinks",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=false)",
+      "lookups through empty hash prefixes scans imported pending entries before a cached empty base (copy=true)",
+      "lookups through empty hash prefixes checks complete hashes and key bytes for early leaves and collision buckets",
+      "lookups through empty hash prefixes keeps Unicode aliases, ordered values and object reads correct after misses",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=false)",
+      "lookups through empty hash prefixes keeps warmed misses and retained values after owner memory growth (copy=true)"
+    ],
+    "sourceNativeAndExecutableHashesAfterCommand": "verified unchanged"
+  }
+]

@@ -1,0 +1,108 @@
+{
+  "status": "source-only method proposal; no executable validation or performance run by this preparation task",
+  "repository": "natanelia/zerocopy",
+  "base_commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "base_git_tree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "candidate_directory": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/candidate-v2",
+  "source_review_directory": "/workspace/scratch/e7ec22ef2609/zerocopy-empty-prefix-20261015/source-review-v2",
+  "baseline_manifest_sha256": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "candidate_manifest_sha256": "c6ee127afa2abdb09602f0dfaef2826970c371e5ce561bed12f234ae65d93986",
+  "source_review_sha256": "03167792dfcea352b2928e4372412104ebee85eafb6ab00aa44529ea9557dd37",
+  "source_review_pins_sha256": "acecd28397fc87fd661ba2df4c68b7f56ec384a1bce972ba45c17ac3bc8fd98c",
+  "patch_sha256": "77f05fa906d9ccfc6d0afdaebc04cf181f3a7dea23d8b88b82c2a9d11a6077bb",
+  "directly_verified_source_files": {
+    "arena.ts": {
+      "baseline_sha256": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+      "candidate_sha256": "fad8b54107a1f672bacbf6d5c9e9cb22a7e0d715b528212fbc4f906e5692292c",
+      "candidate_bytes": 45282
+    },
+    "read-cache.ts": {
+      "baseline_sha256": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+      "candidate_sha256": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+      "candidate_bytes": 2598
+    },
+    "shared-map.ts": {
+      "baseline_sha256": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+      "candidate_sha256": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+      "candidate_bytes": 5895
+    },
+    "shared.ts": {
+      "baseline_sha256": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+      "candidate_sha256": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+      "candidate_bytes": 8421
+    },
+    "memory.ts": {
+      "baseline_sha256": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+      "candidate_sha256": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+      "candidate_bytes": 1381
+    },
+    "wasm-utils.ts": {
+      "baseline_sha256": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+      "candidate_sha256": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+      "candidate_bytes": 1417
+    },
+    "scripts/build-browser.ts": {
+      "baseline_sha256": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+      "candidate_sha256": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+      "candidate_bytes": 2187
+    },
+    "package.json": {
+      "baseline_sha256": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "candidate_sha256": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "candidate_bytes": 4029
+    },
+    "map-empty-prefix.test.ts": {
+      "baseline_sha256": null,
+      "candidate_sha256": "51e3850277791fc7b6308c2467039e789445dabd55ce74179434bb3f3d65b1dd",
+      "candidate_bytes": 9793
+    }
+  },
+  "runtime_pins_copied_from_authenticated_correctness_plan": {
+    "node": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node-v22.16.0-linux-x64/bin/node",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "bytes": 121509208,
+      "versionOutput": "v22.16.0"
+    },
+    "bun": {
+      "path": "/workspace/scratch/e7ec22ef2609/zerocopy-attachment-reuse-20261014/toolchain/node_modules/@oven/bun-linux-x64/bin/bun",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "bytes": 79500640,
+      "versionOutput": "1.4.2"
+    }
+  },
+  "runtime_binary_execution_performed": false,
+  "runtime_binary_rehash_required_before_execution": true,
+  "toolchain_lock_sha256": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "execution_pins_still_required": [
+    "reviewed driver/supervisor hashes",
+    "actual resolved Node-import and Bun-source entry paths/hashes for both variants",
+    "both Node portable-output manifests",
+    "both Bun source manifests/import closures",
+    "matching native-output manifest and Node embedded-core/Bun loaded-core byte equality",
+    "approved method packet hashes",
+    "completed ordinary correctness receipt",
+    "fixed schedule/environment/host record",
+    "baseline calibration counts and complete-study feasibility receipt"
+  ],
+  "historical_holds_released": false,
+  "native_bulk_result": "Completed without qualifying gain; no eligibility, resampling or pooled measurements.",
+  "public_entry_binding": {
+    "status": "Prospective explicit endpoint amendment; resolved paths/artifact hashes still require review before subject execution.",
+    "node": {
+      "engine": "Node 22.16.0",
+      "package_condition": "import",
+      "entry_relative_path": "dist/shared.js",
+      "required_pins": "Actual resolved entry path/hash and complete portable-output manifest for each variant."
+    },
+    "bun": {
+      "engine": "Bun 1.4.2",
+      "package_condition": "bun",
+      "entry_relative_path": "shared.ts",
+      "required_pins": "Actual resolved entry path/hash and source manifest/import closure for each variant."
+    },
+    "within_engine_parity": "Baseline and candidate use the same endpoint type within each engine.",
+    "native_core_equality": "Require identical persistent-core bytes in both variants, including Node embedded core equality with the file loaded by Bun source.",
+    "package_export_conditions_sha256": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9"
+  }
+}
