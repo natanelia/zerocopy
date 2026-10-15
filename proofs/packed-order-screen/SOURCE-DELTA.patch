@@ -1,0 +1,2805 @@
+--- accepted-lifetime/subject.mjs
++++ packed-prospective/subject.mjs
+@@ -1,9 +1,13 @@
+-/** Fixed ordered-checkpoint screen. No library import occurs in probe mode. */
++/** Prospective packed ordered-pointer screen. No library import occurs in probe mode. */
+ import { readFileSync } from 'node:fs';
+ import { pathToFileURL, fileURLToPath } from 'node:url';
+ 
+ export const CASES = ['P', 'E0', 'F128', 'F513', 'F100k', 'D100k', 'O32k'];
+-const COUNTS = { P: 100000, E0: 0, F128: 128, F513: 513, F100k: 100000, D100k: 12500, O32k: 32768 };
++export const MEMORY_CASES = ['E0', 'N1', 'N32', 'N4096', 'N4097', 'N8192', 'N8193', 'P'];
++export const CLOSE_CASES = ['N4096', 'N4097', 'N8193', 'P'];
++const SNAPSHOT_SIZES = [1, 32, 4096, 4097, 8192, 8193];
++const ALL_CASES = [...CASES, ...MEMORY_CASES.filter(id => !CASES.includes(id))];
++const COUNTS = { N1: 1, N32: 32, N4096: 4096, N4097: 4097, N8192: 8192, N8193: 8193, P: 100000, E0: 0, F128: 128, F513: 513, F100k: 100000, D100k: 12500, O32k: 32768 };
+ const SMALL = new Set(['E0', 'F128', 'F513']);
+ const LADDER = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536];
+ const FNV = 2166136261;
+@@ -71,7 +75,7 @@
+       iterator.return();
+       iterator = null;
+     }
+-  } else if (endpoint === 'first') {
++  } else if (endpoint === 'first' || endpoint === 'close') {
+     const before = now();
+     for (let repeat = 0; repeat < k; repeat++) {
+       const iterator = map.entries();
+@@ -152,7 +156,7 @@
+   }
+   async function collect() { for (let i = 0; i < 4; i++) { await new Promise(setImmediate); gc(); } }
+   function record(row) { return Object.fromEntries(fields.map((field, index) => [field, row[index]])); }
+-  return { fields, gc, now, sampleInto, collect, record, primaryIndex: bun ? 7 : 0 };
++  return { fields, gc, now, sampleInto, collect, record, primaryIndex: bun ? 7 : 0, engine }; 
+ }
+ 
+ async function build(S) {
+@@ -173,26 +177,31 @@
+   for (let i = 0; i < 513; i += 4) { F513 = F513.set(keyOf(i), i + 1000000); writes++; }
+   S.resetOrderedMap(); let O32k = new S.SharedOrderedMap(S.json());
+   for (let i = 0; i < 32768; i++) { O32k = O32k.set(keyOf(i), { id: i, group: i % 32, active: true }); writes++; }
+-  require(writes === 227320, 'construction operation count');
+-  let owners = { P, E0, F128, F513, F100k, D100k, O32k };
++  S.resetOrderedMap(); let stable = new S.SharedOrderedMap('number'), snapshots = {};
++  for (let index = 0; index < 8193; index++) {
++    stable = stable.set(keyOf(index), index); writes++;
++    if (SNAPSHOT_SIZES.includes(index + 1)) snapshots['N' + (index + 1)] = stable;
++  }
++  require(writes === 235513, 'construction operation count');
++  let owners = { P, E0, F128, F513, F100k, D100k, O32k, ...snapshots };
+   let wire = S.getWorkerData(owners, { copy: false });
+-  require(wire.arenas.length === 5, 'expected five arenas');
++  require(wire.arenas.length === 6, 'expected six arenas');
+   require(wire.arenas.every(row => row.memory instanceof WebAssembly.Memory && row.memory.buffer instanceof SharedArrayBuffer && !row.copy), 'copy fallback');
+-  require(new Set(wire.arenas.map(row => row.memory)).size === 5, 'duplicate memory descriptor');
++  require(new Set(wire.arenas.map(row => row.memory)).size === 6, 'duplicate memory descriptor');
+   const arenas = wire.arenas.map(row => ({ id: row.id, used: row.used, memory: row.memory }));
+   const maps = await S.initWorker(wire);
+-  for (const id of CASES) {
++  for (const id of ALL_CASES) {
+     require(Object.isFrozen(maps[id]) && maps[id] instanceof S.SharedOrderedMap, 'not genuine frozen attachment');
+     // Diagnostic only: no setter, cache manipulation or extra public write call.
+     require(maps[id].arena.readOnly === true, 'attachment is not read-only');
+   }
+   // No owner, input descriptor or intermediate snapshot survives this function.
+-  P = F100k = D100k = E0 = F128 = F513 = O32k = owners = wire = null;
++  P = F100k = D100k = E0 = F128 = F513 = O32k = stable = snapshots = owners = wire = null;
+   return { maps, arenas, writes };
+ }
+ function arenaState(S, maps, arenas) {
+   const wire = S.getWorkerData(maps, { copy: false });
+-  require(wire.arenas.length === 5, 'arena count changed');
++  require(wire.arenas.length === 6, 'arena count changed');
+   const rows = wire.arenas.map(row => {
+     const original = arenas.find(item => item.id === row.id);
+     require(original && row.memory === original.memory && row.used === original.used && !row.copy, 'arena identity/used changed');
+@@ -201,39 +210,101 @@
+   return { rows, used: rows.reduce((sum, row) => sum + row.used, 0), capacity: rows.reduce((sum, row) => sum + row.capacity, 0) };
+ }
+ 
+-function pretouchMemoryIterator(map) {
++export function pretouchMemoryIterator(map, id) {
+   let iterator = map.entries(), result = iterator.next();
+-  checkFirst('P', result); result = null; iterator.return(); iterator = null;
+-}
+-function pauseMemoryIterator(holder, map) {
++  checkFirst(id, result); result = null; iterator.return(); iterator = null;
++}
++export function pauseMemoryIterator(holder, map, id) {
+   holder.value = map.entries();
+   let result = holder.value.next();
+-  checkFirst('P', result); result = null;
+-}
+-function resumeAndReleaseMemoryIterator(holder) {
++  checkFirst(id, result); result = null;
++}
++export function resumeAndReleaseMemoryIterator(holder, id) {
+   let iterator = holder.value, result = iterator.next();
+-  require(result.done === false, 'paused iterator lost continuation');
+-  checkPair('P', result.value, 1); result = null;
+-  iterator.return(); iterator = null; holder.value = null;
++  if (COUNTS[id] <= 1) require(result.done === true, id + ' should complete after its first result');
++  else {
++    require(result.done === false, id + ' paused iterator lost continuation');
++    checkPair(id, result.value, 1);
++  }
++  result = null; iterator.return(); iterator = null; holder.value = null;
+   return true;
+ }
+-async function memoryCycles(map, arenas, instrument) {
+-  const { fields, collect, sampleInto, record, primaryIndex } = instrument;
+-  // All small result storage exists before the first barrier; only numbers persist.
+-  const rows = Array.from({ length: 6 }, () => new Float64Array(fields.length));
+-  const resumed = [false, false], holder = { value: null };
+-  for (let touch = 0; touch < 2; touch++) pretouchMemoryIterator(map);
+-  for (let cycle = 0; cycle < 2; cycle++) {
+-    await collect(); sampleInto(rows[cycle * 3], arenas);
+-    pauseMemoryIterator(holder, map);
+-    await collect(); sampleInto(rows[cycle * 3 + 1], arenas);
+-    resumed[cycle] = resumeAndReleaseMemoryIterator(holder);
+-    await collect(); sampleInto(rows[cycle * 3 + 2], arenas);
+-  }
+-  const cycles = [0, 1].map(cycle => ({ before: record(rows[3 * cycle]), paused: record(rows[3 * cycle + 1]),
+-    released: record(rows[3 * cycle + 2]), resumed_ok: resumed[cycle] }));
+-  const valid = [0, 1].every(cycle => Math.abs(rows[3 * cycle + 2][primaryIndex] - rows[3 * cycle][primaryIndex]) <= 65536);
+-  return { eligible: valid, invalid_reasons: valid ? [] : ['release drift exceeds 64 KiB'], cycles };
++export function retentionTotal(state, engine) {
++  return engine === 'node' ? state.heapUsed + state.external : state.heapSize;
++}
++function numericTotal(row, engine) { return engine === 'node' ? row[0] + row[2] : row[7]; }
++function stateRecord(fields) { return Object.fromEntries(fields.map(field => [field, 0])); }
++function copyRecord(fields, row, target) { for (let i = 0; i < fields.length; i++) target[fields[i]] = row[i]; }
++export function endpointPlan(caseOrder, endpointOrder) {
++  const result = caseOrder.flatMap(id => endpointOrder.map(endpoint => [id, endpoint]));
++  const closeOrder = endpointOrder[0] === 'full' ? [...CLOSE_CASES].reverse() : CLOSE_CASES;
++  for (const id of closeOrder) result.push([id, 'close']);
++  return result;
++}
++export function attributionOK(before, released, engine, limit) {
++  const indexes = engine === 'node' ? [0, 2] : [7, 9];
++  return Math.abs(numericTotal(released, engine) - numericTotal(before, engine)) <= limit &&
++    indexes.every(index => Math.abs(released[index] - before[index]) <= limit);
++}
++function prepareLedger(fields, plan) {
++  // Every retained measurement row, holder, result object and numeric chunk slot is
++  // allocated before the startup before-import sample. Only numbers/flags change.
++  const state = () => stateRecord(fields), row = () => new Float64Array(fields.length);
++  const memory = { eligible: true, invalid_reasons: [], cases: {} }, memoryRows = {};
++  const holders = {};
++  for (const id of MEMORY_CASES) {
++    const count = id === 'P' ? 2 : 1;
++    const raw = id === 'P' || SNAPSHOT_SIZES.slice(2).some(size => id === 'N' + size);
++    const cycles = Array.from({ length: count }, () => ({ before: state(), rawPaused: raw ? state() : null,
++      paused: state(), released: state(), resumed_ok: false }));
++    memory.cases[id] = { eligible: true, invalid_reasons: [], cycles };
++    memoryRows[id] = Array.from({ length: count }, () => [row(), row(), row(), row()]);
++    holders[id] = { value: null };
++  }
++  const endpoints = {};
++  for (const [id, endpoint] of plan) endpoints[id + ':' + endpoint] = {
++    eligible: false, invalid_reasons: [], k: 0, warmup_ms: new Array(4).fill(0),
++    measured_ms: new Array(6).fill(0), clock_ok: false, checksum_ok: false,
++    overhead_ms_per_call: 0, clock_resolution_ms: 0 };
++  endpoints['startup:import'] = { eligible: false, invalid_reasons: [], k: 1,
++    warmup_ms: [], measured_ms: [0], clock_ok: false, checksum_ok: true,
++    overhead_ms_per_call: 0, clock_resolution_ms: 0 };
++  return { memory, memoryRows, holders, endpoints, emptyArenas: [], startupRows: [row(), row()],
++    startup: { before: state(), after: state(), eligible: true, invalid_reasons: [] } };
++}
++async function memoryCycles(maps, arenas, instrument, ledger) {
++  const { fields, collect, sampleInto, engine } = instrument;
++  for (const id of MEMORY_CASES) {
++    const output = ledger.memory.cases[id], holder = ledger.holders[id], rows = ledger.memoryRows[id];
++    require(maps[id].size === COUNTS[id], id + ' memory fixture size mismatch');
++    for (let touch = 0; touch < 2; touch++) pretouchMemoryIterator(maps[id], id);
++    for (let cycle = 0; cycle < rows.length; cycle++) {
++      const record = output.cycles[cycle], samples = rows[cycle];
++      await collect(); sampleInto(samples[0], arenas);
++      pauseMemoryIterator(holder, maps[id], id);
++      // Fixed raw diagnostic only; never an endpoint or peak observation.
++      if (record.rawPaused !== null) sampleInto(samples[1], arenas);
++      await collect(); sampleInto(samples[2], arenas);
++      record.resumed_ok = resumeAndReleaseMemoryIterator(holder, id);
++      await collect(); sampleInto(samples[3], arenas);
++      const limit = id === 'P' ? 65536 : (COUNTS[id] <= 32 ? 512 : 2048);
++      if (!attributionOK(samples[0], samples[3], engine, limit)) {
++        output.eligible = false;
++        output.invalid_reasons.push('closed-minus-before component/total drift exceeds ' + limit + ' bytes at cycle ' + cycle);
++      }
++      const checkedStates = record.rawPaused === null ? [0, 2, 3] : [0, 1, 2, 3];
++      for (const position of checkedStates) {
++        require(samples[position][5] === samples[0][5] && samples[position][6] === samples[0][6], 'arena changed during memory cycle');
++      }
++      copyRecord(fields, samples[0], record.before);
++      if (record.rawPaused !== null) copyRecord(fields, samples[1], record.rawPaused);
++      copyRecord(fields, samples[2], record.paused);
++      copyRecord(fields, samples[3], record.released);
++    }
++  }
++  // Attribution eligibility is per case. Invalid small attribution cannot be
++  // silently converted into a passed control or poison valid harm elsewhere.
++  return ledger.memory;
+ }
+ 
+ function touchBytes(view) { for (let i = 0; i < view.length; i += 4096) view[i] = 1; }
+@@ -242,6 +313,11 @@
+   let held = null;
+   if (kind === 'arrayBuffer') { held = new ArrayBuffer(length); touchBytes(new Uint8Array(held)); }
+   else if (kind === 'typedArray') { held = new Uint8Array(length); touchBytes(held); }
++  else if (kind === 'packedBlocks') {
++    held = Array.from({ length: 25 }, () => new Uint32Array(4096));
++    for (let block = 0; block < held.length; block++)
++      for (let index = 0; index < held[block].length; index++) held[block][index] = index + 1;
++  }
+   else if (kind === 'sharedWasm') { held = new WebAssembly.Memory({ initial: 128, maximum: 128, shared: true }); touchBytes(new Uint8Array(held.buffer)); }
+   else { held = Array.from({ length: 131072 }, (_, index) => ({ index, active: true })); }
+   holder.value = held; held = null;
+@@ -250,6 +326,13 @@
+   let held = holder.value;
+   if (kind === 'arrayBuffer') require(held.byteLength === length && touched(new Uint8Array(held), length), 'ArrayBuffer probe lost contents');
+   else if (kind === 'typedArray') require(held.byteLength === length && touched(held, length), 'typed array probe lost contents'); // Never expose .buffer.
++  else if (kind === 'packedBlocks') {
++    require(held.length === 25, 'packed probe block count');
++    for (let block = 0; block < held.length; block++) {
++      require(held[block].length === 4096 && held[block].byteLength === 16384, 'packed probe shape');
++      for (let index = 0; index < 4096; index++) require(held[block][index] === index + 1, 'packed probe contents');
++    }
++  }
+   else if (kind === 'sharedWasm') require(held.buffer instanceof SharedArrayBuffer && held.buffer.byteLength === length && touched(new Uint8Array(held.buffer), length), 'shared WASM probe lost contents');
+   else require(held.length === 131072 && held.every((value, index) => value.index === index && value.active === true), 'object probe lost contents');
+   held = null; holder.value = null;
+@@ -258,8 +341,10 @@
+   const { fields, collect, sampleInto, record, primaryIndex, now } = instrument;
+   const clock = clockDiagnostics(now), records = [];
+   const length = 8 * 1024 * 1024, holder = { value: null };
+-  for (const kind of ['arrayBuffer', 'typedArray', 'sharedWasm', 'objects']) {
+-    const rows = Array.from({ length: 3 }, () => new Float64Array(fields.length));
++  const kinds = ['arrayBuffer', 'typedArray', 'sharedWasm', 'objects', 'packedBlocks'];
++  const allRows = kinds.map(() => Array.from({ length: 3 }, () => new Float64Array(fields.length)));
++  for (let kindIndex = 0; kindIndex < kinds.length; kindIndex++) {
++    const kind = kinds[kindIndex], rows = allRows[kindIndex];
+     await collect(); sampleInto(rows[0], []);
+     allocateProbePayload(holder, kind, length);
+     await collect(); sampleInto(rows[1], []);
+@@ -269,6 +354,15 @@
+     // No numeric substitution. Shared WASM's explicit 8 MiB capacity is authoritative;
+     // runtime heap buckets need not count it. Owned heap objects must be visible/releasable.
+     try {
++      if (kind === 'packedBlocks') {
++        const requested = 409600;
++        require(numericTotal(rows[1], engine) - numericTotal(rows[0], engine) >= .9 * requested, 'packed payload retained total under 90%');
++        require(Math.abs(numericTotal(rows[2], engine) - numericTotal(rows[0], engine)) <= 65536, 'packed payload total release exceeds 64 KiB');
++        if (engine === 'node') {
++          require(rows[1][2] - rows[0][2] >= .9 * requested, 'packed payload external under 90%');
++          require(Math.abs(rows[2][2] - rows[0][2]) <= 65536, 'packed payload external release exceeds 64 KiB');
++        }
++      }
+       if (kind === 'objects') require(primaryIncrement > 0 && rows[2][primaryIndex] < rows[1][primaryIndex], 'unaccountable object heap response');
+       if (kind === 'arrayBuffer' || kind === 'typedArray') {
+         require(engine === 'bun' ? primaryIncrement > 0 : rows[1][2] > rows[0][2] || rows[1][3] > rows[0][3], 'unaccountable owned buffer response');
+@@ -276,12 +370,12 @@
+     } catch (error) {
+       try {
+         process.stdout.write(JSON.stringify({ event: 'probe-accounting-diagnostic', diagnosticOnly: true, scientificAdmission: false,
+-          hostScope: 'github-hosted-runner', engine, sourceRunId: '38693245323', primaryField: fields[primaryIndex], primaryIncrement,
+-          clock, completedRecords: records, failedRecord: { kind, expectedBytes: kind === 'objects' ? null : length,
++          hostScope: 'github-hosted-runner', engine, sourceRunId: null, primaryField: fields[primaryIndex], primaryIncrement,
++          clock, completedRecords: records, failedRecord: { kind, expectedBytes: kind === 'objects' ? null : (kind === 'packedBlocks' ? 409600 : length),
+             objectCount: kind === 'objects' ? 131072 : null, before: record(rows[0]), retained: record(rows[1]), released: record(rows[2]) } }) + '\n');
+       } finally { throw error; }
+     }
+-    records.push({ kind, expectedBytes: kind === 'objects' ? null : length, objectCount: kind === 'objects' ? 131072 : null,
++    records.push({ kind, expectedBytes: kind === 'objects' ? null : (kind === 'packedBlocks' ? 409600 : length), objectCount: kind === 'objects' ? 131072 : null,
+       before: record(rows[0]), retained: record(rows[1]), released: record(rows[2]) });
+   }
+   return { mode: 'probe', engine, accountable: true, clock_resolution_ms: clock.resolutionMs,
+@@ -295,15 +389,17 @@
+     return bracket > 0 && resolution <= 0.005 * bracket;
+   });
+ }
+-function overheadOK(id, endpoint, k, duration, overhead) {
+-  return endpoint !== 'first' || SMALL.has(id) || overhead <= 0.005 * (duration / k);
+-}
++export function overheadOK(id, endpoint, k, duration, overhead) {
++  const bracket = endpoint === 'first' && !SMALL.has(id) ? duration / k : duration;
++  return bracket > 0 && overhead <= 0.005 * bracket;
++}
++function ladderFor(id, endpoint) { return SMALL.has(id) || endpoint === 'close' ? [...LADDER, 262144, 1048576] : LADDER; }
+ 
+ export async function main(job) {
+   require(job.schema === 1 && typeof job.jobId === 'string', 'bad job input');
+   const emit = row => process.stdout.write(JSON.stringify({ schema: 1, jobId: job.jobId, ...row }) + '\n');
+   const phase = (name, extra = {}) => emit({ event: 'phase', phase: name, ...extra });
+-  phase(job.mode === 'probe' ? 'probe' : 'setup');
++  phase(job.mode === 'probe' ? 'probe' : job.mode === 'comparison' ? 'startup' : 'setup');
+   const instrument = await instrumentation(job.engine);
+   if (job.mode === 'probe') {
+     require(job.entrypoint === null, 'probe must have no library entry');
+@@ -314,79 +410,100 @@
+   require(job.mode !== 'calibration' || job.arm === 'baseline', 'candidate calibration forbidden');
+   require(Array.isArray(job.caseOrder) && job.caseOrder.length === 7 && new Set(job.caseOrder).size === 7 && job.caseOrder.every(id => CASES.includes(id)), 'bad case order');
+   require(job.endpointOrder.join(',') === 'first,full' || job.endpointOrder.join(',') === 'full,first', 'bad endpoint order');
+-  const S = await import(pathToFileURL(job.entrypoint).href);
++  const plan = endpointPlan(job.caseOrder, job.endpointOrder);
++  const ledger = prepareLedger(instrument.fields, plan);
++  const expected = Object.fromEntries(ALL_CASES.map(id => [id, oracle(id)]));
++  const clock = clockDiagnostics(instrument.now);
++  const targetURL = pathToFileURL(job.entrypoint).href;
++  const calibration = Object.fromEntries(ALL_CASES.map(id => [id, {}]));
++  let S = null;
++  if (job.mode === 'comparison') {
++    await instrument.collect(); instrument.sampleInto(ledger.startupRows[0], ledger.emptyArenas);
++    const before = instrument.now();
++    S = await import(targetURL); // First and only target import in this fresh process.
++    const after = instrument.now();
++    require(after >= before, 'import clock reversed');
++    const duration = after - before;
++    await instrument.collect(); instrument.sampleInto(ledger.startupRows[1], ledger.emptyArenas);
++    copyRecord(instrument.fields, ledger.startupRows[0], ledger.startup.before);
++    copyRecord(instrument.fields, ledger.startupRows[1], ledger.startup.after);
++    const endpoint = ledger.endpoints['startup:import'];
++    endpoint.measured_ms[0] = duration;
++    endpoint.clock_resolution_ms = clock.resolutionMs;
++    endpoint.overhead_ms_per_call = clock.overheadMs;
++    endpoint.clock_ok = duration > 0 && clock.resolutionMs <= .005 * duration && clock.overheadMs <= .005 * duration;
++    endpoint.eligible = endpoint.clock_ok;
++    if (!endpoint.eligible) endpoint.invalid_reasons.push('single import resolution/bracket overhead unresolved');
++    emit({ event: 'startup', startup: ledger.startup, endpoint });
++    phase('setup');
++  } else S = await import(targetURL); // Calibration setup is untimed and is not an import observation.
+   const { maps, arenas, writes } = await build(S);
+   const beforeArena = arenaState(S, maps, arenas);
+-  const expected = Object.fromEntries(CASES.map(id => [id, oracle(id)]));
+-  const clock = clockDiagnostics(instrument.now);
+   const admission = { postFixtureRssBytes: process.memoryUsage().rss, uniqueArenaCapacityBytes: beforeArena.capacity,
+     uniqueArenaUsedBytes: beforeArena.used };
+   require(admission.postFixtureRssBytes <= 1073741824 && beforeArena.capacity <= 536870912, 'measurement admission limit');
+   let memory = null;
+   if (job.mode === 'comparison') {
+     phase('memory', admission);
+-    memory = await memoryCycles(maps.P, arenas, instrument);
+-    // Memory results are emitted only after both cycles released every iterator.
+-    emit({ event: 'memory', memory });
++    memory = await memoryCycles(maps, arenas, instrument, ledger);
++    emit({ event: 'memory', memory }); // Every iterator is closed and released.
+     phase('latency');
+   }
+-  for (const id of job.caseOrder) { validateCase(maps[id], id); validateCase(maps[id], id); }
++  const validationOrder = [...job.caseOrder, ...CLOSE_CASES.filter(id => !CASES.includes(id))];
++  for (const id of validationOrder) { validateCase(maps[id], id); validateCase(maps[id], id); }
+   if (job.mode === 'calibration') {
+-    // Baseline setup includes complete validation/cache establishment.
+     admission.postFixtureRssBytes = process.memoryUsage().rss;
+     require(admission.postFixtureRssBytes <= 1073741824, 'calibration admission RSS limit');
+     phase('calibration', admission);
+   }
+-  const endpoints = {}, calibration = {};
+-  for (const id of job.caseOrder) {
+-    calibration[id] = {};
+-    for (const endpoint of job.endpointOrder) {
+-      if (job.mode === 'calibration') {
+-        const ladder = SMALL.has(id) ? [...LADDER, 262144, 1048576] : LADDER;
+-        const observed = [];
+-        let k = ladder[ladder.length - 1];
+-        for (const rung of ladder) {
+-          const result = chunk(maps[id], id, endpoint, rung, expected[id], instrument.now);
+-          observed.push({ k: rung, milliseconds: result.milliseconds });
+-          emit({ event: 'calibration-chunk', case: id, endpoint, kind: 'ladder', k: rung, ...result });
+-          if (result.milliseconds >= 20) { k = rung; break; }
+-        }
+-        const verification = [];
+-        for (let index = 0; index < 3; index++) {
+-          const result = chunk(maps[id], id, endpoint, k, expected[id], instrument.now);
+-          verification.push(result.milliseconds);
+-          emit({ event: 'calibration-chunk', case: id, endpoint, kind: 'verification', index, k, ...result });
+-        }
+-        const average = verification.reduce((sum, value) => sum + value, 0) / 3;
+-        calibration[id][endpoint] = { k, resolved: average >= 5 && resolutionOK(id, endpoint, k, verification, clock.resolutionMs) &&
+-          overheadOK(id, endpoint, k, average, clock.overheadMs),
+-          verification_ms: verification, ladder: observed, clock_resolution_ms: clock.resolutionMs, overhead_ms_per_call: clock.overheadMs };
+-      } else {
+-        const frozen = job.calibration?.[id]?.[endpoint];
+-        require(frozen && Number.isSafeInteger(frozen.k) && (SMALL.has(id) ? [...LADDER, 262144, 1048576] : LADDER).includes(frozen.k), 'missing frozen baseline K');
+-        const k = frozen.k, warmup = [], measured = [];
+-        for (let index = 0; index < 10; index++) {
+-          const result = chunk(maps[id], id, endpoint, k, expected[id], instrument.now);
+-          (index < 4 ? warmup : measured).push(result.milliseconds);
+-          emit({ event: 'sample', case: id, endpoint, kind: index < 4 ? 'warmup' : 'measured', index: index < 4 ? index : index - 4, k, ...result });
+-        }
+-        const mean = measured.reduce((sum, value) => sum + value, 0) / 6;
+-        const clockOK = resolutionOK(id, endpoint, k, [...warmup, ...measured], clock.resolutionMs) &&
+-          overheadOK(id, endpoint, k, mean, clock.overheadMs);
+-        const valid = frozen.resolved === true && clockOK;
+-        endpoints[id + ':' + endpoint] = { eligible: valid, invalid_reasons: valid ? [] : ['baseline calibration or timer resolution unresolved'],
+-          k, warmup_ms: warmup, measured_ms: measured, clock_ok: clockOK, checksum_ok: true,
+-          overhead_ms_per_call: clock.overheadMs, clock_resolution_ms: clock.resolutionMs };
+-      }
++  for (const [id, endpoint] of plan) {
++    if (job.mode === 'calibration') {
++      const ladder = ladderFor(id, endpoint), observed = [];
++      let k = ladder[ladder.length - 1];
++      for (const rung of ladder) {
++        const result = chunk(maps[id], id, endpoint, rung, expected[id], instrument.now);
++        observed.push({ k: rung, milliseconds: result.milliseconds });
++        emit({ event: 'calibration-chunk', case: id, endpoint, kind: 'ladder', k: rung, ...result });
++        if (result.milliseconds >= 20) { k = rung; break; }
++      }
++      const verification = [];
++      for (let index = 0; index < 3; index++) {
++        const result = chunk(maps[id], id, endpoint, k, expected[id], instrument.now);
++        verification.push(result.milliseconds);
++        emit({ event: 'calibration-chunk', case: id, endpoint, kind: 'verification', index, k, ...result });
++      }
++      const average = verification.reduce((sum, value) => sum + value, 0) / 3;
++      calibration[id][endpoint] = { k, resolved: average >= 5 && resolutionOK(id, endpoint, k, verification, clock.resolutionMs) &&
++        verification.every(duration => overheadOK(id, endpoint, k, duration, clock.overheadMs)),
++        verification_ms: verification, ladder: observed, clock_resolution_ms: clock.resolutionMs, overhead_ms_per_call: clock.overheadMs };
++    } else {
++      const frozen = job.calibration?.[id]?.[endpoint];
++      require(frozen && Number.isSafeInteger(frozen.k) && ladderFor(id, endpoint).includes(frozen.k), 'missing frozen baseline K');
++      const output = ledger.endpoints[id + ':' + endpoint], k = frozen.k;
++      for (let index = 0; index < 10; index++) {
++        const result = chunk(maps[id], id, endpoint, k, expected[id], instrument.now);
++        (index < 4 ? output.warmup_ms : output.measured_ms)[index < 4 ? index : index - 4] = result.milliseconds;
++        emit({ event: 'sample', case: id, endpoint, kind: index < 4 ? 'warmup' : 'measured', index: index < 4 ? index : index - 4, k, ...result });
++      }
++      const durations = [...output.warmup_ms, ...output.measured_ms];
++      output.k = k;
++      output.clock_ok = resolutionOK(id, endpoint, k, durations, clock.resolutionMs) &&
++        durations.every(duration => overheadOK(id, endpoint, k, duration, clock.overheadMs));
++      output.eligible = frozen.resolved === true && output.clock_ok;
++      if (!output.eligible) output.invalid_reasons.push('baseline calibration or timer resolution/bracket overhead unresolved');
++      output.checksum_ok = true; output.overhead_ms_per_call = clock.overheadMs; output.clock_resolution_ms = clock.resolutionMs;
+     }
+   }
+   phase('final');
+   const afterArena = arenaState(S, maps, arenas);
+   require(JSON.stringify(beforeArena) === JSON.stringify(afterArena), 'backing changed during experiment');
+-  const metadata = Object.fromEntries(CASES.map(id => [id, maps[id].toWorkerData()]));
++  const metadata = Object.fromEntries(ALL_CASES.map(id => [id, maps[id].toWorkerData()]));
+   const common = { engine: job.engine, arm: job.arm, mode: job.mode, writes, arenaBefore: beforeArena, arenaAfter: afterArena,
+     fixtures: metadata, identity_ok: true, oracle_ok: true, backing_ok: true, eligible: true, invalid_reasons: [] };
+-  emit({ event: 'result', result: job.mode === 'calibration' ? { ...common, calibration } : { ...common, pair: job.pairIndex, endpoints, memory } });
++  // Do not export unused empty calibration case keys.
++  const usedCalibration = Object.fromEntries(Object.entries(calibration).filter(([, endpoints]) => Object.keys(endpoints).length));
++  emit({ event: 'result', result: job.mode === 'calibration' ? { ...common, calibration: usedCalibration } :
++    { ...common, pair: job.pairIndex, endpoints: ledger.endpoints, memory, startup: ledger.startup } });
+   if (job.mode === 'comparison') phase('exit');
+ }
+ 
+--- accepted-lifetime/subject-check.mjs
++++ packed-prospective/subject-check.mjs
+@@ -40,4 +40,52 @@
+ assert.equal(resolutionOK('P', 'first', 2, [400, 399], 1), false);
+ assert.equal(resolutionOK('F128', 'first', 2, [200, 201], 1), true);
+ assert.equal(resolutionOK('F128', 'first', 2, [200, 0], 1), false);
+-console.log(JSON.stringify({ kind: 'inert-subject-check', passed: true, libraryImported: false, clocks: 'synthetic' }));
++
++// Added packed-storage controls use synthetic maps, counters and clock values only.
++const extra = await import('./subject.mjs');
++assert.equal(extra.retentionTotal({heapUsed: 10, external: 20, arrayBuffers: 17}, 'node'), 30);
++assert.equal(extra.retentionTotal({heapSize: 40, extraMemorySize: 17, external: 20}, 'bun'), 40);
++const beforeState = new Array(10).fill(10000), releasedState = [...beforeState];
++releasedState[0] += 1000; releasedState[2] -= 1000;
++assert.equal(extra.attributionOK(beforeState, releasedState, 'node', 512), false, 'offsetting residues do not clear');
++releasedState[0] = beforeState[0] + 512; releasedState[2] = beforeState[2];
++assert.equal(extra.attributionOK(beforeState, releasedState, 'node', 512), true);
++releasedState[7] += 1000; releasedState[9] -= 1000;
++assert.equal(extra.attributionOK(beforeState, releasedState, 'bun', 512), false);
++
++function syntheticNumeric(size) {
++  return { size, *entries() { for (let index = 0; index < size; index++) yield [extra.keyOf(index), index]; } };
++}
++for (const [id, size] of [['E0', 0], ['N1', 1], ['N32', 32], ['N4096', 4096], ['N4097', 4097], ['N8192', 8192], ['N8193', 8193]]) {
++  const map = syntheticNumeric(size), holder = { value: null };
++  validateCase(map, id);
++  extra.pretouchMemoryIterator(map, id);
++  extra.pauseMemoryIterator(holder, map, id);
++  assert.notEqual(holder.value, null);
++  assert.equal(extra.resumeAndReleaseMemoryIterator(holder, id), true);
++  assert.equal(holder.value, null);
++}
++const brokenOne = { entries() { return { next() { return { done: false, value: ['event:000000', 0] }; }, return() {} }; } };
++const badHolder = { value: null };
++extra.pauseMemoryIterator(badHolder, brokenOne, 'N1');
++assert.throws(() => extra.resumeAndReleaseMemoryIterator(badHolder, 'N1'), /should complete/);
++for (const id of extra.CLOSE_CASES) {
++  events.length = 0; at = 0; times = [2, 12];
++  const lifecycle = chunk(firstMap, id, 'close', 2, oracle(id), () => { events.push('clock'); return times[at++]; });
++  assert.equal(lifecycle.milliseconds, 10);
++  assert.equal(lifecycle.yieldedCount, 2);
++  assert.deepEqual(events, ['clock', 'entries', 'next', 'return', 'entries', 'next', 'return', 'clock']);
++}
++const forward = extra.endpointPlan(extra.CASES, ['first', 'full']);
++const reverse = extra.endpointPlan(extra.CASES, ['full', 'first']);
++assert.equal(forward.length, 18);
++assert.equal(new Set(forward.map(([id, endpoint]) => id + ':' + endpoint)).size, 18);
++assert.deepEqual(forward.slice(14), extra.CLOSE_CASES.map(id => [id, 'close']));
++assert.deepEqual(reverse.slice(14), [...extra.CLOSE_CASES].reverse().map(id => [id, 'close']));
++assert.equal(extra.overheadOK('P', 'first', 2, 400, 1), true);
++assert.equal(extra.overheadOK('P', 'first', 2, 399, 1), false);
++assert.equal(extra.overheadOK('P', 'close', 2, 200, 1), true);
++assert.equal(extra.overheadOK('P', 'close', 2, 199, 1), false);
++assert.equal(resolutionOK('P', 'close', 4096, [200], 1), true);
++console.log(JSON.stringify({kind: 'inert-packed-subject-check', passed: true,
++  libraryImported: false, clocks: 'synthetic', measurementOrAllocationProbeRun: false}));
+--- accepted-lifetime/analysis.py
++++ packed-prospective/analysis.py
+@@ -1,52 +1,73 @@
+-"""Prospective ordered-checkpoint analysis. Importing this module performs no work.
+-
+-Only analyze(data) is the supervisor entry point. See
+-INERT-CHECKS-PROPOSED.md for the pending inert-check gate.
+-All samples remain in the input artifact. Eligibility is about measurement
+-validity, never speed, GC, CV, drift, order effects, or sensitivity diagnostics.
++"""Prospective packed ordered storage analysis; SOURCE PREPARATION ONLY.
++
++Adapted from the accepted ordered-checkpoint analysis and synthetic checks.
++Importing this module does not calculate critical values or analyze observations.
++The entry point is analyze(data). Independent mathematical values are available;
++exact-packet validation and synthetic execution remain pending. See
++STATISTICS-PENDING.md.
++
++An inferential endpoint always has eight complete adjacent process pairs.
++Invalid observations remain in raw_processes and never produce subset inference.
++Slow chunks, natural GC, order and sensitivity diagnostics cannot exclude data.
+ """
+ 
+ import math
+ 
+ 
+-METHOD_SHA256 = "25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43"
+-SCHEMA = "ordered-checkpoint-analysis/v1"
++METHOD_SHA256 = "2d0b63aded485237c820bb2abc301d38e5a1b874b591da365812b1be0c5b9eb9"
++SCHEMA = "packed-ordered-storage-analysis/v1"
+ ENGINES = ("node", "bun")
+ ARMS = ("baseline", "candidate")
+ CASES = ("P", "E0", "F128", "F513", "F100k", "D100k", "O32k")
+-ENDPOINTS = tuple(case + ":" + kind for case in CASES for kind in ("first", "full"))
++MEMORY_CASES = ("E0", "N1", "N32", "N4096", "N4097", "N8192", "N8193", "P")
++RAW_PAUSE_CASES = frozenset(("N4096", "N4097", "N8192", "N8193", "P"))
++ITERATION_ENDPOINTS = tuple(case + ":" + kind for case in CASES for kind in ("first", "full")) + (
++    "N4096:close", "N4097:close", "N8193:close", "P:close")
++ENDPOINTS = ITERATION_ENDPOINTS + ("startup:import",)
+ ISOLATED_FIRST = frozenset(case + ":first" for case in ("P", "F100k", "D100k", "O32k"))
+ BUCKETS = ("heapUsed", "heapTotal", "external", "arrayBuffers", "rss",
+            "arenaUsedBytes", "arenaCapacityBytes")
+ BUN_BUCKETS = ("heapSize", "heapCapacity", "extraMemorySize")
+-RELEASE_LIMIT = 64 * 1024
+-MATERIALITY = {"baseline_heap": 512 * 1024, "heap_saving": 256 * 1024,
+-               "half_baseline_minus_candidate": 0}
++ARENA_BUCKETS = ("arenaUsedBytes", "arenaCapacityBytes")
++RELEASE_LIMITS = {"E0": 512, "N1": 512, "N32": 512,
++                  "N4096": 2048, "N4097": 2048, "N8192": 2048,
++                  "N8193": 2048, "P": 65536}
++MEMORY_MARGINS = {"E0": 1024, "N1": 1024, "N32": 1024,
++                  "N4096": 4096, "N4097": 4096, "N8192": 4096,
++                  "N8193": 4096, "startup:import": 4096}
++MATERIALITY = {"baseline_increment": 512 * 1024,
++               "retained_saving": 128 * 1024,
++               "twenty_percent_reduction": 0}
+ QUANTILES = {"pointwise95": 1 - 0.05 / 2,
+-             "latency28": 1 - 0.05 / (2 * 28),
+-             "memory10": 1 - 0.05 / (2 * 10)}
+-# NIST Student-t density: https://www.itl.nist.gov/div898/handbook/eda/section3/eda3664.htm
+-# For df=7, f(t)=16/(5*pi*sqrt(7))*(1+t*t/7)**(-4). Substitution
+-# t=sqrt(7)*tan(theta) gives F7(t)=1/2+[theta+3*sin(2theta)/4+
+-# 3*sin(4theta)/20+sin(6theta)/60]/pi. The specialization is our derivation.
+-# Independently verified 2026-10-15 by transformed-tail quadrature AND a
+-# 70-digit Decimal incomplete-beta series, not by this source writer.
+-# t-critical-values-v1/SEAL.json SHA256:
+-CRITICAL_PROVENANCE_SHA256 = "b02e40abb6dd0228c76f7e7e076d410ec306693f637d9680ed46507cf663e122"
++             "latency38": 1 - 0.05 / (2 * 38),
++             "memory22": 1 - 0.05 / (2 * 22)}
++CRITICAL_VALIDATION_STATUS = "independent_values_verified_exact_packet_validation_pending"
++# SHA-256 of statistics/SHA256SUMS, binding the independent REVIEW.md and VALUES.json.
++CRITICAL_PROVENANCE_SHA256 = "f7b3d7535e2f1887519e9867e07c585d920c04ffecb3cedd662ebb43885b6752"
+ CRITICAL_VALUES = {"pointwise95": 2.3646242515927853,
+-                   "latency28": 4.883865032805824,
+-                   "memory10": 4.029337177642485}
++                   "memory22": 4.6755214023824,
++                   "latency38": 5.155633357451718}
+ K_LADDER = (1, 4, 16, 64, 256, 1024, 4096, 16384, 65536)
++EXTENDED_K_LADDER = K_LADDER + (262144, 1048576)
+ 
+ 
+ def fixed_critical_values():
+-    """Return the same prospectively authenticated df=7 constants every time."""
++    """Return prospectively fixed, independently derived two-sided df=7 values.
++
++    Family sizes never shrink after invalid observations. The independent math
++    audit used no scientific samples; exact-packet inert verification is pending.
++    """
+     return dict(CRITICAL_VALUES)
+ 
+ 
+ def _number(value, *, positive=False):
+     return (type(value) in (int, float) and math.isfinite(value)
+             and (value > 0 if positive else value >= 0))
++
++
++def _sha256(value):
++    return (isinstance(value, str) and len(value) == 64
++            and all(character in "0123456789abcdef" for character in value))
+ 
+ 
+ def _mean(values):
+@@ -64,19 +85,21 @@
+ 
+ 
+ def _ratio(log_value):
+-    # Extreme synthetic inputs must remain JSON-safe. Decisions use log bounds.
+     try:
+         return math.exp(log_value)
+     except OverflowError:
+         return None
+ 
+ 
+-def _ratio_interval(log_interval):
+-    return {"geometric_mean": _ratio(log_interval["estimate"]),
+-            "lower": _ratio(log_interval["lower"]),
+-            "upper": _ratio(log_interval["upper"]),
+-            "log_interval": log_interval,
+-            "null_ratio_means_float_overflow": True}
++def _ratio_interval(interval):
++    return {"geometric_mean": _ratio(interval["estimate"]),
++            "lower": _ratio(interval["lower"]), "upper": _ratio(interval["upper"]),
++            "log_interval": interval, "null_ratio_means_float_overflow": True}
++
++
++def _reasons(record, label):
++    reasons = record.get("invalid_reasons", [])
++    return list(reasons) if isinstance(reasons, list) else ["Malformed " + label + " invalid_reasons"]
+ 
+ 
+ def _index_processes(processes):
+@@ -90,7 +113,7 @@
+                 or key[1] not in range(8) or key[2] not in ARMS):
+             errors.append("Invalid process identity")
+         elif key in index:
+-            index[key] = None  # Ambiguous identity is never resolved by selection.
++            index[key] = None
+             errors.append("Duplicate process identity: " + repr(key))
+         else:
+             index[key] = process
+@@ -100,8 +123,7 @@
+ def _process_errors(process):
+     if not isinstance(process, dict):
+         return ["Missing or duplicate process"]
+-    reasons = process.get("invalid_reasons", [])
+-    errors = list(reasons) if isinstance(reasons, list) else ["Malformed process invalid_reasons"]
++    errors = _reasons(process, "process")
+     for field in ("eligible", "identity_ok", "oracle_ok", "backing_ok"):
+         if process.get(field) is not True:
+             errors.append("Process check failed: " + field)
+@@ -110,26 +132,30 @@
+ 
+ def _endpoint(process, name):
+     errors = _process_errors(process)
+-    endpoints = process.get("endpoints", {}) if process else {}
++    endpoints = process.get("endpoints", {}) if isinstance(process, dict) else {}
+     endpoint = endpoints.get(name, {}) if isinstance(endpoints, dict) else {}
+     if not isinstance(endpoint, dict):
+         return None, errors + ["Malformed endpoint"]
+-    reasons = endpoint.get("invalid_reasons", [])
+-    errors.extend(reasons if isinstance(reasons, list) else ["Malformed endpoint invalid_reasons"])
++    errors.extend(_reasons(endpoint, "endpoint"))
+     for field in ("eligible", "clock_ok", "checksum_ok"):
+         if endpoint.get(field) is not True:
+             errors.append("Endpoint check failed: " + field)
++    if endpoint.get("calibration_eligible") is False:
++        errors.append("Baseline calibration eligibility failed for this endpoint")
+     k = endpoint.get("k")
+     warmup, measured = endpoint.get("warmup_ms", []), endpoint.get("measured_ms", [])
+-    ladder = K_LADDER + ((262144, 1048576) if name.split(":")[0] in ("E0", "F128", "F513") else ())
+-    if type(k) is not int or k not in ladder:
+-        errors.append("Invalid fixed calibration K")
+-    if (not isinstance(warmup, list) or len(warmup) != 4
++    importing = name == "startup:import"
++    aggregate_lifecycle = name.endswith(":close") or name.split(":")[0] in ("E0", "F128", "F513")
++    ladder = EXTENDED_K_LADDER if aggregate_lifecycle else K_LADDER
++    if type(k) is not int or (k != 1 if importing else k not in ladder):
++        errors.append("Import requires K=1" if importing else "Invalid fixed calibration K")
++    warmup_count, measured_count = (0, 1) if importing else (4, 6)
++    if (not isinstance(warmup, list) or len(warmup) != warmup_count
+             or not all(_number(value, positive=True) for value in warmup)):
+-        errors.append("Exactly four finite positive warm-up durations required")
+-    if (not isinstance(measured, list) or len(measured) != 6
++        errors.append("Expected " + str(warmup_count) + " finite positive warm-up durations")
++    if (not isinstance(measured, list) or len(measured) != measured_count
+             or not all(_number(value, positive=True) for value in measured)):
+-        errors.append("Exactly six finite positive measured durations required")
++        errors.append("Expected " + str(measured_count) + " finite positive measured durations")
+     overhead = endpoint.get("overhead_ms_per_call")
+     if not _number(overhead):
+         errors.append("Invalid independently recorded empty-bracket overhead")
+@@ -139,17 +165,18 @@
+         return None, errors
+     chunks = [value / k for value in measured]
+     mean = _mean(chunks)
+-    observed_brackets = ([value / k for value in warmup + measured]
+-                         if name in ISOLATED_FIRST else warmup + measured)
+-    if endpoint["clock_resolution_ms"] > 0.005 * min(observed_brackets):
+-        return None, ["Clock resolution exceeds 0.5% of a relevant chunk duration"]
+-    timed_bracket_mean = mean if name in ISOLATED_FIRST else _mean(measured)
+-    overhead_ratio = overhead / timed_bracket_mean
+-    if name in ISOLATED_FIRST and overhead_ratio > 0.005:
+-        return None, ["Empty-bracket overhead exceeds 0.5% of observed bracket time"]
++    brackets = ([value / k for value in warmup + measured]
++                if name in ISOLATED_FIRST else warmup + measured)
++    if endpoint["clock_resolution_ms"] > 0.005 * min(brackets):
++        return None, ["Clock resolution exceeds 0.5% of a relevant bracket duration"]
++    # The subject applies both timer tests to every relevant bracket, including
++    # aggregate warm-up/measured brackets and the single import observation.
++    overhead_ratio = overhead / min(brackets)
++    if overhead_ratio > 0.005:
++        return None, ["Empty-bracket overhead exceeds 0.5% of a relevant bracket duration"]
+     return {"k": k, "mean_ms": mean, "chunk_means_ms": chunks,
+             "warmup_ms": warmup, "measured_ms": measured,
+-            "overhead_ratio": overhead_ratio,
++            "overhead_ratio": overhead_ratio, "overhead_rule_applied": True,
+             "clock_resolution_ms": endpoint["clock_resolution_ms"],
+             "diagnostics": endpoint.get("diagnostics", {})}, []
+ 
+@@ -161,20 +188,19 @@
+         for arm in ARMS:
+             row, row_errors = _endpoint(index.get((engine, pair, arm)), name)
+             rows[arm] = row
+-            errors.extend({"pair": pair, "arm": arm, "reason": reason}
+-                          for reason in row_errors)
+-        if rows["baseline"] is not None and rows["candidate"] is not None:
++            errors.extend({"pair": pair, "arm": arm, "reason": reason} for reason in row_errors)
++        if all(rows[arm] is not None for arm in ARMS):
+             if rows["baseline"]["k"] != rows["candidate"]["k"]:
+                 errors.append({"pair": pair, "reason": "Paired K differs"})
+-            pairs.append({"pair": pair, "arm_order": "AB" if pair % 2 == 0 else "BA",
+-                          **rows})
++            pairs.append({"pair": pair, "arm_order": "AB" if pair % 2 == 0 else "BA", **rows})
+     if len({row[arm]["k"] for row in pairs for arm in ARMS}) > 1:
+         errors.append({"reason": "K was not frozen across all process pairs"})
++    unit = ("ms per fresh-process public-module import" if name == "startup:import" else
++            "ms per first next" if name in ISOLATED_FIRST else
++            "ms per first-item-and-close cycle" if name.endswith((":first", ":close")) else
++            "ms per complete traversal")
+     output = {"engine": engine, "endpoint": name, "status": "unresolved",
+-              "pairs": pairs, "invalid_reasons": errors,
+-              "unit": "ms per first next" if name in ISOLATED_FIRST else
+-                      ("ms per first-item-and-close cycle" if name.endswith(":first")
+-                       else "ms per complete traversal")}
++              "valid": False, "pairs": pairs, "invalid_reasons": errors, "unit": unit}
+     if errors or len(pairs) != 8 or critical is None:
+         return output
+     ratios = [row["candidate"]["mean_ms"] / row["baseline"]["mean_ms"] for row in pairs]
+@@ -183,17 +209,16 @@
+         return output
+     logs = [math.log(ratio) for ratio in ratios]
+     pointwise = _interval(logs, critical["pointwise95"])
+-    simultaneous = _interval(logs, critical["latency28"])
++    simultaneous = _interval(logs, critical["latency38"])
+     if pointwise["lower"] > math.log(1.02):
+         output["status"] = "adverse"
+     elif simultaneous["upper"] <= math.log(1.02):
+         output["status"] = "cleared"
+-    output.update({"paired_ratios": ratios, "paired_log_ratios": logs,
++    output.update({"valid": True, "paired_ratios": ratios, "paired_log_ratios": logs,
+                    "pointwise_95": _ratio_interval(pointwise),
+-                   "bonferroni_95_across_28": _ratio_interval(simultaneous),
++                   "bonferroni_95_across_38": _ratio_interval(simultaneous),
+                    "leave_one_pair_out_geometric_means": [
+-                       {"omitted_pair": pair,
+-                        "geometric_mean": _ratio(_mean(logs[:pair] + logs[pair + 1:]))}
++                       {"omitted_pair": pair, "geometric_mean": _ratio(_mean(logs[:pair] + logs[pair + 1:]))}
+                        for pair in range(8)],
+                    "order_diagnostic_geometric_means": {
+                        "AB": _ratio(_mean(logs[::2])), "BA": _ratio(_mean(logs[1::2]))},
+@@ -201,192 +226,359 @@
+     return output
+ 
+ 
+-def _memory_process(process, engine):
++def _buckets(engine):
++    return BUCKETS + (BUN_BUCKETS if engine == "bun" else ())
++
++
++def _retained_total(state, engine):
++    # arrayBuffers is contained in Node external; Bun extra is in heapSize.
++    return state["heapUsed"] + state["external"] if engine == "node" else state["heapSize"]
++
++
++def _state_errors(state, engine, label):
++    if not isinstance(state, dict):
++        return ["Malformed memory state: " + label]
++    return ["Missing/invalid memory counter: " + label + "/" + bucket
++            for bucket in _buckets(engine) if not _number(state.get(bucket))]
++
++
++def _memory_process(process, engine, case):
+     errors = _process_errors(process)
+-    memory = process.get("memory", {}) if process else {}
++    memory = process.get("memory", {}) if isinstance(process, dict) else {}
+     if not isinstance(memory, dict):
+         return None, errors + ["Malformed memory record"]
+-    reasons = memory.get("invalid_reasons", [])
+-    errors.extend(reasons if isinstance(reasons, list) else ["Malformed memory invalid_reasons"])
++    errors.extend(_reasons(memory, "memory"))
+     if memory.get("eligible") is not True:
+         errors.append("Memory attribution/accounting not eligible")
+-    cycles = memory.get("cycles", [])
+-    buckets = BUCKETS + (BUN_BUCKETS if engine == "bun" else ())
+-    primary = "heapUsed" if engine == "node" else "heapSize"
+-    if not isinstance(cycles, list) or len(cycles) != 2:
+-        return None, errors + ["Exactly two memory cycles required"]
++    cases = memory.get("cases", {})
++    record = cases.get(case, {}) if isinstance(cases, dict) else {}
++    if not isinstance(record, dict):
++        return None, errors + ["Malformed memory case"]
++    errors.extend(_reasons(record, "memory case"))
++    if record.get("eligible") is not True:
++        errors.append("Case attribution/accounting not eligible")
++    cycles = record.get("cycles", [])
++    expected_count = 2 if case == "P" else 1
++    if not isinstance(cycles, list) or len(cycles) != expected_count:
++        return None, errors + ["Expected exactly " + str(expected_count) + " memory cycles"]
+     for cycle in cycles:
+         if not isinstance(cycle, dict):
+             errors.append("Malformed memory cycle")
+             continue
+         if cycle.get("resumed_ok") is not True:
+-            errors.append("Paused iterator resumability not verified")
++            errors.append("Same iterator resumption/completion not verified")
+         for state in ("before", "paused", "released"):
+-            if not isinstance(cycle.get(state), dict):
+-                errors.append("Malformed memory state: " + state)
+-                continue
+-            for bucket in buckets:
+-                if not _number(cycle.get(state, {}).get(bucket)):
+-                    errors.append("Missing/invalid memory counter: " + state + "/" + bucket)
+-    high_water = process.get("terminal_high_water_rss_bytes") if process else None
++            errors.extend(_state_errors(cycle.get(state), engine, state))
++        if case in RAW_PAUSE_CASES:
++            errors.extend(_state_errors(cycle.get("rawPaused"), engine, "rawPaused"))
++        elif cycle.get("rawPaused") is not None:
++            errors.append("Raw-pause row is outside the fixed diagnostic cases")
++    high_water = process.get("terminal_high_water_rss_bytes") if isinstance(process, dict) else None
+     if not _number(high_water, positive=True):
+         errors.append("Missing terminal process high-water RSS")
+     if errors:
+         return None, errors
++    guarded = ("heapUsed", "external") if engine == "node" else ("heapSize", "extraMemorySize")
+     for cycle in cycles:
+-        if abs(cycle["released"][primary] - cycle["before"][primary]) > RELEASE_LIMIT:
+-            errors.append("Primary heap release drift exceeds 64 KiB in one cycle")
+-    for bucket in ("arenaUsedBytes", "arenaCapacityBytes"):
+-        values = [cycle[state][bucket] for cycle in cycles
+-                  for state in ("before", "paused", "released")]
++        before, released = cycle["before"], cycle["released"]
++        if abs(_retained_total(released, engine) - _retained_total(before, engine)) > RELEASE_LIMITS[case]:
++            errors.append("Retained endpoint release drift exceeds fixed case limit")
++        for bucket in guarded:
++            if abs(released[bucket] - before[bucket]) > RELEASE_LIMITS[case]:
++                errors.append("Component release drift exceeds fixed case limit: " + bucket)
++    states = ("before", "rawPaused", "paused", "released") if case in RAW_PAUSE_CASES else (
++        "before", "paused", "released")
++    for bucket in ARENA_BUCKETS:
++        values = [cycle[state][bucket] for cycle in cycles for state in states]
+         if any(value != values[0] for value in values):
+-            errors.append("Backing memory changed through iteration: " + bucket)
++            errors.append("Unique backing memory changed through iteration: " + bucket)
++        # All fixtures are live before memory. A different arena snapshot in
++        # any fixed case is a backing-integrity failure, never ordinary noise.
++        for other in cases.values():
++            if not isinstance(other, dict) or not isinstance(other.get("cycles"), list):
++                continue
++            for other_cycle in other["cycles"]:
++                if not isinstance(other_cycle, dict):
++                    continue
++                for other_state in ("before", "rawPaused", "paused", "released"):
++                    snapshot = other_cycle.get(other_state)
++                    if isinstance(snapshot, dict) and _number(snapshot.get(bucket)) and snapshot[bucket] != values[0]:
++                        errors.append("Unique backing memory changed across cases: " + bucket)
+     if errors:
+         return None, errors
+-    increments = {bucket: _mean([cycle["paused"][bucket] - cycle["before"][bucket]
+-                                for cycle in cycles]) for bucket in buckets}
+-    return {"increments": increments,
+-            "paused": {bucket: _mean([cycle["paused"][bucket] for cycle in cycles])
+-                       for bucket in buckets},
+-            "cycles": cycles, "terminal_high_water_rss_bytes": high_water}, []
+-
+-
+-def _memory(index, engine, critical):
+-    primary = "heapUsed" if engine == "node" else "heapSize"
++    metrics = {state: {bucket: _mean([cycle[state][bucket] for cycle in cycles])
++                       for bucket in _buckets(engine)} for state in states}
++    metrics["increments"] = {bucket: _mean([cycle["paused"][bucket] - cycle["before"][bucket]
++                                           for cycle in cycles]) for bucket in _buckets(engine)}
++    metrics["release_deltas"] = {bucket: _mean([cycle["released"][bucket] - cycle["before"][bucket]
++                                               for cycle in cycles]) for bucket in _buckets(engine)}
++    return {"retained_increment": _mean([_retained_total(cycle["paused"], engine)
++                                         - _retained_total(cycle["before"], engine) for cycle in cycles]),
++            "endpoint_release_deltas": [_retained_total(cycle["released"], engine)
++                                        - _retained_total(cycle["before"], engine) for cycle in cycles],
++            **metrics, "cycles": cycles, "terminal_high_water_rss_bytes": high_water}, []
++
++
++def _startup_process(process, engine):
++    errors = _process_errors(process)
++    record = process.get("startup", {}) if isinstance(process, dict) else {}
++    if not isinstance(record, dict):
++        return None, errors + ["Malformed startup record"]
++    errors.extend(_reasons(record, "startup"))
++    if record.get("eligible") is not True:
++        errors.append("Startup import-footprint accounting not eligible")
++    for state in ("before", "after"):
++        errors.extend(_state_errors(record.get(state), engine, "startup/" + state))
++    if errors:
++        return None, errors
++    for bucket in ARENA_BUCKETS:
++        if record["before"][bucket] != record["after"][bucket]:
++            errors.append("Arena allocation during module-only import: " + bucket)
++    if errors:
++        return None, errors
++    increments = {bucket: record["after"][bucket] - record["before"][bucket] for bucket in _buckets(engine)}
++    return {"retained_increment": _retained_total(record["after"], engine)
++                                 - _retained_total(record["before"], engine),
++            "before": record["before"], "after": record["after"], "increments": increments}, []
++
++
++def _paired_memory(index, engine, case, critical):
+     pairs, errors = [], []
+     for pair in range(8):
+         rows = {}
+         for arm in ARMS:
+-            row, row_errors = _memory_process(index.get((engine, pair, arm)), engine)
++            process = index.get((engine, pair, arm))
++            row, row_errors = (_startup_process(process, engine) if case == "startup:import"
++                               else _memory_process(process, engine, case))
+             rows[arm] = row
+-            errors.extend({"pair": pair, "arm": arm, "reason": reason}
+-                          for reason in row_errors)
++            errors.extend({"pair": pair, "arm": arm, "reason": reason} for reason in row_errors)
+         if all(rows[arm] is not None for arm in ARMS):
+             pairs.append({"pair": pair, **rows})
+-    output = {"engine": engine, "primary": primary, "status": "unresolved",
+-              "pairs": pairs, "invalid_reasons": errors,
+-              "accounting": "Bun heapSize includes extraMemorySize; external and "
+-                            "arrayBuffers overlap. No buckets are added or pooled across engines.",
+-              "accounting_review_required": []}
+-    if errors or len(pairs) != 8 or critical is None:
++    return {"engine": engine, "case": case, "valid": not errors and len(pairs) == 8 and critical is not None,
++            "pairs": pairs, "invalid_reasons": errors}
++
++
++def _contrast(observation, name, values, threshold, benefit, critical):
++    output = {"engine": observation["engine"], "endpoint": observation["case"] + ":" + name,
++              "case": observation["case"], "contrast": name, "status": "unresolved",
++              "valid": observation["valid"], "threshold_bytes": threshold,
++              "direction": "strictly_above" if benefit else "at_or_below",
++              "invalid_reasons": observation["invalid_reasons"]}
++    if not observation["valid"]:
+         return output
+-    b = [row["baseline"]["increments"][primary] for row in pairs]
+-    c = [row["candidate"]["increments"][primary] for row in pairs]
+-    contrasts = {"baseline_heap": b,
+-                 "heap_saving": [left - right for left, right in zip(b, c)],
+-                 "half_baseline_minus_candidate": [0.5 * left - right for left, right in zip(b, c)]}
+-    for bucket in ("external", "arrayBuffers"):
+-        contrasts[bucket + "_increase"] = [row["candidate"]["increments"][bucket]
+-                                            - row["baseline"]["increments"][bucket] for row in pairs]
+-    intervals = {name: _interval(values, critical["memory10"])
+-                 for name, values in contrasts.items()}
+-    material = all(intervals[name]["lower"] > threshold
+-                   for name, threshold in MATERIALITY.items())
+-    guards = all(intervals[bucket + "_increase"]["upper"] <= RELEASE_LIMIT
+-                 for bucket in ("external", "arrayBuffers"))
+-    ruled_out = [name for name, threshold in MATERIALITY.items()
+-                 if intervals[name]["upper"] <= threshold]
+-    if ruled_out:
+-        output["status"] = "materiality_rejected"
+-    elif material and guards:
+-        output["status"] = "conditions_satisfied"
+-    output.update({"bonferroni_95_across_10": intervals,
+-                   "paired_arithmetic_contrasts_bytes": contrasts,
+-                   "materiality_ruled_out": ruled_out,
+-                   "guard_conditions_satisfied": guards})
+-    # These are explicitly pointwise diagnostics, outside the ten decision contrasts.
+-    # They neither exclude samples nor upgrade the prespecified memory/latency tests.
+-    diagnostics = {}
+-    buckets = BUCKETS + (BUN_BUCKETS if engine == "bun" else ())
+-    for bucket in buckets:
+-        metrics = {}
+-        for state in ("increments", "paused"):
+-            baseline = [row["baseline"][state][bucket] for row in pairs]
+-            candidate = [row["candidate"][state][bucket] for row in pairs]
+-            difference = _interval([right - left for left, right in zip(baseline, candidate)],
+-                                   critical["pointwise95"])
+-            metrics[state] = {"baseline_pointwise_95": _interval(baseline, critical["pointwise95"]),
+-                              "candidate_pointwise_95": _interval(candidate, critical["pointwise95"]),
+-                              "candidate_minus_baseline_pointwise_95": difference}
+-            if difference["lower"] > 0:
+-                output["accounting_review_required"].append(bucket + ":" + state + ":positive_shift")
+-        diagnostics[bucket] = metrics
+-    high_water_b = [row["baseline"]["terminal_high_water_rss_bytes"] for row in pairs]
+-    high_water_c = [row["candidate"]["terminal_high_water_rss_bytes"] for row in pairs]
+-    high_water_difference = _interval([right - left for left, right in zip(high_water_b, high_water_c)],
+-                                      critical["pointwise95"])
+-    diagnostics["terminal_high_water_rss_bytes"] = {
+-        "baseline_pointwise_95": _interval(high_water_b, critical["pointwise95"]),
+-        "candidate_pointwise_95": _interval(high_water_c, critical["pointwise95"]),
+-        "candidate_minus_baseline_pointwise_95": high_water_difference}
+-    if high_water_difference["lower"] > 0:
+-        output["accounting_review_required"].append("terminal_high_water_rss:positive_shift")
+-    output["bucket_diagnostics_bytes"] = diagnostics
++    pointwise = _interval(values, critical["pointwise95"])
++    simultaneous = _interval(values, critical["memory22"])
++    if benefit:
++        if simultaneous["lower"] > threshold:
++            output["status"] = "cleared"
++        elif simultaneous["upper"] <= threshold:
++            output["status"] = "materiality_rejected"
++    elif pointwise["lower"] > threshold:
++        output["status"] = "adverse"
++    elif simultaneous["upper"] <= threshold:
++        output["status"] = "cleared"
++    output.update({"paired_arithmetic_contrasts_bytes": values,
++                   "pointwise_95": pointwise, "bonferroni_95_across_22": simultaneous,
++                   "leave_one_pair_out_means_bytes": [
++                       {"omitted_pair": pair, "mean": _mean(values[:pair] + values[pair + 1:])}
++                       for pair in range(8)],
++                   "diagnostics_do_not_change_full_sample_decision": True})
+     return output
+ 
+ 
++def _memory_diagnostics(observation, engine, critical):
++    """Pointwise component diagnostics cannot upgrade the fixed 22 decisions."""
++    if not observation["valid"]:
++        return {}, []
++    pairs, case = observation["pairs"], observation["case"]
++    states = (("before", "after", "increments") if case == "startup:import" else
++              ("before", "paused", "released", "increments", "release_deltas")
++              + (("rawPaused",) if case in RAW_PAUSE_CASES else ()))
++    diagnostics, signals = {}, []
++    for bucket in _buckets(engine):
++        diagnostics[bucket] = {}
++        for state in states:
++            b = [row["baseline"][state][bucket] for row in pairs]
++            c = [row["candidate"][state][bucket] for row in pairs]
++            delta = _interval([right - left for left, right in zip(b, c)], critical["pointwise95"])
++            diagnostics[bucket][state] = {
++                "baseline_pointwise_95": _interval(b, critical["pointwise95"]),
++                "candidate_pointwise_95": _interval(c, critical["pointwise95"]),
++                "candidate_minus_baseline_pointwise_95": delta}
++            if bucket not in ARENA_BUCKETS and delta["lower"] > 0:
++                signals.append(engine + ":" + case + ":" + bucket + ":" + state + ":positive_shift")
++    return diagnostics, signals
++
++
++def _memory(index, engine, critical):
++    observations = [_paired_memory(index, engine, case, critical)
++                    for case in MEMORY_CASES + ("startup:import",)]
++    contrasts, signals = [], []
++    for observation in observations:
++        case = observation["case"]
++        b = [row["baseline"]["retained_increment"] for row in observation["pairs"]]
++        c = [row["candidate"]["retained_increment"] for row in observation["pairs"]]
++        if case == "P":
++            values = {"baseline_increment": b,
++                      "retained_saving": [left - right for left, right in zip(b, c)],
++                      "twenty_percent_reduction": [0.8 * left - right for left, right in zip(b, c)]}
++            contrasts.extend(_contrast(observation, name, values[name], threshold, True, critical)
++                             for name, threshold in MATERIALITY.items())
++        else:
++            contrasts.append(_contrast(observation, "candidate_minus_baseline",
++                                       [right - left for left, right in zip(b, c)],
++                                       MEMORY_MARGINS[case], False, critical))
++        diagnostics, discovered = _memory_diagnostics(observation, engine, critical)
++        observation["bucket_diagnostics_bytes"] = diagnostics
++        signals.extend(discovered)
++        if not observation["valid"]:
++            # Invalid attribution has no inferred component intervals. Its raw
++            # states must still be reviewed; absence of diagnostics is no pass.
++            signals.append(engine + ":" + case + ":invalid_attribution_review_required")
++    p = next(row for row in observations if row["case"] == "P")
++    high_water = {}
++    if p["valid"]:
++        b = [row["baseline"]["terminal_high_water_rss_bytes"] for row in p["pairs"]]
++        c = [row["candidate"]["terminal_high_water_rss_bytes"] for row in p["pairs"]]
++        delta = _interval([right - left for left, right in zip(b, c)], critical["pointwise95"])
++        high_water = {"baseline_pointwise_95": _interval(b, critical["pointwise95"]),
++                      "candidate_pointwise_95": _interval(c, critical["pointwise95"]),
++                      "candidate_minus_baseline_pointwise_95": delta}
++        if delta["lower"] > 0:
++            signals.append(engine + ":terminal_high_water_rss:positive_shift")
++    benefit = all(row["status"] == "cleared" for row in contrasts if row["case"] == "P")
++    all_clear = all(row["status"] == "cleared" for row in contrasts)
++    return {"engine": engine, "primary": "heapUsed+external" if engine == "node" else "heapSize",
++            "status": "conditions_satisfied" if all_clear else "unresolved",
++            "material_primary_benefit": benefit, "all_11_contrasts_cleared": all_clear,
++            "all_memory_attribution_valid": all(row["valid"] for row in observations),
++            "cases": observations, "contrasts": contrasts,
++            "terminal_high_water_rss_diagnostics_bytes": high_water,
++            "accounting_review_required": sorted(set(signals)),
++            "accounting": ("Node T=heapUsed+external is V8-used heap plus tracked external allocation; "
++                           "arrayBuffers is already inside external. Bun J=heapSize already includes "
++                           "extraMemorySize. No other buckets are added, and engines are never pooled.")}
++
++
+ def analyze(data):
+-    """Pure in-process analysis; no file access, subprocesses, or target imports.
+-
+-    The supervisor owns receipt authenticity, calibration/probe checks, source
+-    identity, phase/resource limits, raw preservation and terminal evidence seals.
+-    A failed later job does not invalidate otherwise valid complete process pairs.
++    """Pure analysis of this candidate's fixed current study; no file/target access.
++
++    The supervisor authenticates admissions, baseline calibration, identity,
++    process/resource custody, correctness, raw preservation and terminal seals.
++    Critical values need an independent exact-packet audit before any execution.
++    A later failed job cannot erase an independently complete valid harm result.
+     """
+-    prior = data.get("prior_adverse_evidence", [])
+-    prior_vetoes = [item for item in prior if isinstance(item, dict)
+-                   and item.get("valid") is True and item.get("source")
+-                   and item.get("demonstrated_over_two_percent") is True]
+     issues = []
+     critical = fixed_critical_values()
+-    schema_ok = data.get("schema") == SCHEMA and data.get("method_sha256") == METHOD_SHA256
+-    if not schema_ok:
++    if data.get("schema") != SCHEMA or data.get("method_sha256") != METHOD_SHA256:
+         issues.append("Analysis schema or accepted method identity mismatch")
+         critical = None
++    if data.get("prior_adverse_evidence"):
++        issues.append("Historical/prior-candidate evidence is outside this study and was not pooled")
+     processes = data.get("processes", [])
+     if not isinstance(processes, list):
+         processes = []
+         issues.append("Process records must be an array")
+     index, index_errors = _index_processes(processes)
+     issues.extend(index_errors)
+-    latency = [_latency(index, engine, endpoint, critical)
+-               for engine in ENGINES for endpoint in ENDPOINTS]
++    process_validity_failures = [
++        {"engine": engine, "pair": pair, "arm": arm, "invalid_reasons": errors}
++        for engine in ENGINES for pair in range(8) for arm in ARMS
++        if (errors := _process_errors(index.get((engine, pair, arm))))]
++    latency = [_latency(index, engine, endpoint, critical) for engine in ENGINES for endpoint in ENDPOINTS]
+     memory = [_memory(index, engine, critical) for engine in ENGINES]
+-    adverse = [{"engine": row["engine"], "endpoint": row["endpoint"]}
+-               for row in latency if row["status"] == "adverse"]
+-    veto = bool(adverse or prior_vetoes)
+-    all_clear = all(row["status"] == "cleared" for row in latency)
+-    memory_pass = all(row["status"] == "conditions_satisfied" for row in memory)
+-    rejected = any(row["status"] == "materiality_rejected" for row in memory)
+-    accounting_review = any(row["accounting_review_required"] for row in memory)
+-    complete = data.get("complete") is True and data.get("first_failure") is None and not issues
++    contrasts = [row for engine in memory for row in engine["contrasts"]]
++    adverse_latency = [{"engine": row["engine"], "endpoint": row["endpoint"]}
++                       for row in latency if row["status"] == "adverse"]
++    adverse_memory = [{"engine": row["engine"], "endpoint": row["endpoint"],
++                       "margin_bytes": row["threshold_bytes"]}
++                      for row in contrasts if row["status"] == "adverse"]
++    veto = bool(adverse_latency or adverse_memory)
++    all_signals = sorted({signal for engine in memory for signal in engine["accounting_review_required"]})
++    reviews = data.get("accounting_shift_reviews", [])
++    if not isinstance(reviews, list):
++        reviews = []
++        issues.append("Accounting-shift reviews must be an array")
++    explained = {review.get("signal") for review in reviews if isinstance(review, dict)
++                 and isinstance(review.get("signal"), str) and review.get("explained") is True
++                 and isinstance(review.get("rationale"), str) and review["rationale"].strip()
++                 and isinstance(review.get("source"), str) and review["source"].strip()}
++    unexplained = [signal for signal in all_signals if signal not in explained]
++    raw_review = data.get("raw_accounting_review")
++    raw_evidence_sha256 = data.get("raw_evidence_sha256")
++    raw_review_accepted = (
++        isinstance(raw_review, dict) and raw_review.get("accepted") is True
++        and raw_review.get("method_sha256") == METHOD_SHA256
++        and _sha256(raw_evidence_sha256)
++        and raw_review.get("raw_evidence_sha256") == raw_evidence_sha256
++        and isinstance(raw_review.get("source"), str) and bool(raw_review["source"].strip())
++        and isinstance(raw_review.get("rationale"), str) and bool(raw_review["rationale"].strip()))
++    complete = (data.get("complete") is True and data.get("first_failure") is None
++                and not issues and not process_validity_failures)
++    all_attribution = all(row["all_memory_attribution_valid"] for row in memory)
++    node_benefit, bun_benefit = (row["material_primary_benefit"] for row in memory)
++    all_latency = all(row["status"] == "cleared" for row in latency)
++    all_memory = all(row["status"] == "cleared" for row in contrasts)
++    # A valid full-eight-pair Node P benefit is required. A reviewed invalid
++    # nonprimary/Bun case stays invalid and uncleared but need not suppress a
++    # strictly Node-only provisional lead. Raw accounting review is mandatory
++    # even when diagnostics found no positive shifts. It grants no publication.
++    scoped = complete and node_benefit and not veto and not unexplained and raw_review_accepted
++    strong = scoped and all_attribution and all_memory and all_latency
+     if veto:
+-        disposition = "adverse_latency_veto"
+-    elif rejected:
+-        disposition = "cross_engine_memory_materiality_rejected"
+-    elif memory_pass and complete:
+-        disposition = ("memory_conditions_met_accounting_review_required" if accounting_review
+-                       else "promising_temporary_heap_lead")
++        disposition = "material_adverse_control_veto"
++    elif not complete:
++        disposition = "inconclusive_or_incomplete"
++    elif node_benefit and (unexplained or not raw_review_accepted):
++        disposition = "node_benefit_accounting_review_required"
++    elif strong:
++        disposition = "strong_scoped_screen_clearance"
++    elif scoped:
++        disposition = "scoped_node_retained_memory_lead"
+     else:
+-        disposition = "inconclusive_or_incomplete"
+-    return {"schema": SCHEMA, "method_sha256": METHOD_SHA256,
+-            "disposition": disposition, "unchanged_candidate_advancement_veto": veto,
+-            "valid_adverse_latency_controls": adverse,
+-            "prior_adverse_evidence": prior,
+-            "prior_adverse_evidence_vetoes": prior_vetoes,
+-            "all_28_iteration_controls_cleared": all_clear,
+-            "both_engine_memory_conditions_satisfied": memory_pass,
++        disposition = "inconclusive_or_materiality_not_met"
++    return {"schema": SCHEMA, "method_sha256": METHOD_SHA256, "disposition": disposition,
++            "unchanged_candidate_advancement_veto": veto,
++            "valid_adverse_latency_controls": adverse_latency,
++            "valid_adverse_memory_controls": adverse_memory,
++            "scoped_node_lead_eligible": scoped, "strong_scoped_screen_clearance": strong,
++            "bun_material_benefit_corroborated": (complete and memory[1]["all_memory_attribution_valid"]
++                                                 and bun_benefit and raw_review_accepted
++                                                 and not unexplained and not veto),
++            "all_38_latency_controls_cleared": complete and all_latency,
++            "all_22_memory_contrasts_cleared": complete and all_memory,
+             "complete": complete, "first_failure": data.get("first_failure"),
+-            "analysis_issues": issues, "critical_values": critical,
++            "analysis_issues": issues, "process_validity_failures": process_validity_failures,
++            "critical_values": critical, "critical_quantiles": dict(QUANTILES),
++            "critical_values_validation_status": CRITICAL_VALIDATION_STATUS,
+             "critical_values_provenance_sha256": CRITICAL_PROVENANCE_SHA256,
+-            "latency": latency, "memory": memory,
+-            "accounting_explanation_required": accounting_review,
+-            "assumptions": ["Eight independent process pairs per engine; paired Student-t model.",
+-                            "The ordinary 95% latency harm veto is not family-error controlled.",
++            "separate_95_percent_families": {"latency": 38, "memory": 22},
++            "latency": latency, "memory": memory, "memory_contrasts": contrasts,
++            "unresolved_latency_controls": [{"engine": row["engine"], "endpoint": row["endpoint"],
++                                               "valid": row["valid"], "invalid_reasons": row["invalid_reasons"]}
++                                              for row in latency if row["status"] == "unresolved"],
++            "uncleared_memory_contrasts": [{"engine": row["engine"], "endpoint": row["endpoint"],
++                                              "status": row["status"], "valid": row["valid"],
++                                              "invalid_reasons": row["invalid_reasons"]}
++                                             for row in contrasts if row["status"] != "cleared"],
++            "accounting_shift_signals": all_signals, "accounting_shift_reviews": reviews,
++            "unexplained_accounting_shifts": unexplained,
++            "raw_evidence_sha256": raw_evidence_sha256,
++            "raw_accounting_review": raw_review,
++            "raw_accounting_review_accepted": raw_review_accepted,
++            "accounting_explanation_required": bool(unexplained) or not raw_review_accepted,
++            "raw_processes": processes,
++            "historical_evidence_not_pooled": True,
++            "assumptions": ["Eight independent process pairs per engine; paired Student-t model, df=7.",
++                            "Memory22 and latency38 are separate 95% families, not a joint 95% guarantee.",
++                            "Ordinary 95% adverse-control vetoes are not family-error controlled.",
+                             "Slow/GC samples, order and leave-one-pair-out diagnostics cannot remove harm."],
+-            "limits": ["Exploratory raw screen only; independent terminal audit is still required.",
+-                       "No production promotion or further performance execution is authorized.",
+-                       "Unresolved controls are not evidence of no regression.",
+-                       "Startup, import, initialization, descriptor creation and attachment latency are untested.",
+-                       "A temporary-heap lead is not a total-RAM saving or a cross-engine total-memory estimate.",
+-                       "RSS and bucket shifts require explanation before calling the lead useful.",
+-                       "No resampling, replacement processes, interval selection or sample extension."]}
++            "limits": ["Source-only preparation; exact-packet statistical validation is pending.",
++                       "No execution, publication, promotion or follow-on performance study is authorized.",
++                       "Terminal integrity and scientific interpretation require independent audit.",
++                       "Unresolved controls are not passes; invalid evidence supplies no positive support.",
++                       "A scoped Node lead is provisional and must list every unresolved control and Bun limitation.",
++                       "Node T and Bun J are bounded accounting scopes, neither complete process RAM nor pooled totals.",
++                       "Raw-pause rows, sampled RSS and high-water RSS cannot establish conversion peak reduction.",
++                       "Import endpoints measure fresh-process module import, not machine-cold application startup.",
++                       "No resampling, replacement processes, reduced families or sample extension."]}
+--- accepted-lifetime/analysis_checks.py
++++ packed-prospective/analysis_checks.py
+@@ -1,7 +1,9 @@
+-"""Inert synthetic checks. Execution requires the separate bounded-check release.
+-
+-No target imports, fixtures, clocks, GC, subprocesses, network, or filesystem
+-mutation. The one import below is this packet's standard-library-only analysis.
++"""Synthetic analysis checks, prepared as source and NOT EXECUTED.
++
++Execution/import needs the separate bounded inert-check release. These checks
++contain no target imports, fixtures, clocks, GC, subprocesses or scientific data.
++The only local import is this packet's standard-library-only analysis module.
++Independent exact-packet statistical validation remains a separate future step.
+ """
+ 
+ import copy
+@@ -9,6 +11,23 @@
+ import unittest
+ 
+ import analysis
++
++
++def snapshot(engine, *, startup=False):
++    state = {"heapUsed": 10 * 1024 * 1024, "heapTotal": 20 * 1024 * 1024,
++             "external": 4096, "arrayBuffers": 2048, "rss": 30 * 1024 * 1024,
++             "arenaUsedBytes": 0 if startup else 4096,
++             "arenaCapacityBytes": 0 if startup else 8192}
++    if engine == "bun":
++        state.update(heapSize=10 * 1024 * 1024,
++                     heapCapacity=20 * 1024 * 1024, extraMemorySize=1024)
++    return state
++
++
++def change_owned_heap(state, engine, delta):
++    state["heapUsed"] += delta
++    if engine == "bun":
++        state["heapSize"] += delta
+ 
+ 
+ def synthetic_study():
+@@ -16,47 +35,103 @@
+     for engine in analysis.ENGINES:
+         for pair in range(8):
+             for arm in analysis.ARMS:
+-                increment = 1024 * 1024 if arm == "baseline" else 128 * 1024
+-                before = {"heapUsed": 10 * 1024 * 1024, "heapTotal": 20 * 1024 * 1024,
+-                          "external": 4096, "arrayBuffers": 2048, "rss": 30 * 1024 * 1024,
+-                          "arenaUsedBytes": 4096, "arenaCapacityBytes": 8192}
+-                if engine == "bun":
+-                    before.update(heapSize=10 * 1024 * 1024,
+-                                  heapCapacity=20 * 1024 * 1024, extraMemorySize=1024)
+-                paused = dict(before)
+-                paused["heapUsed"] += increment
+-                if engine == "bun":
+-                    paused["heapSize"] += increment
+-                cycle = {"before": before, "paused": paused, "released": dict(before),
+-                         "resumed_ok": True}
++                cases = {}
++                for case in analysis.MEMORY_CASES:
++                    increment = ((1024 * 1024 if arm == "baseline" else 512 * 1024)
++                                 if case == "P" else 4096)
++                    before = snapshot(engine)
++                    paused = dict(before)
++                    change_owned_heap(paused, engine, increment)
++                    cycle = {"before": before, "paused": paused, "released": dict(before),
++                             "rawPaused": dict(paused) if case in analysis.RAW_PAUSE_CASES else None,
++                             "resumed_ok": True}
++                    cases[case] = {"eligible": True, "invalid_reasons": [],
++                                   "cycles": [copy.deepcopy(cycle) for unused in range(2 if case == "P" else 1)]}
+                 endpoint = {"eligible": True, "invalid_reasons": [], "k": 1,
+                             "warmup_ms": [10.0] * 4, "measured_ms": [10.0] * 6,
+                             "clock_ok": True, "checksum_ok": True,
+                             "overhead_ms_per_call": 0.000001, "clock_resolution_ms": 0.000001}
++                endpoints = {name: copy.deepcopy(endpoint) for name in analysis.ENDPOINTS}
++                endpoints["startup:import"].update(k=1, warmup_ms=[], measured_ms=[1.0])
++                before_import = snapshot(engine, startup=True)
++                after_import = dict(before_import)
++                change_owned_heap(after_import, engine, 128 * 1024)
+                 processes.append({"engine": engine, "pair": pair, "arm": arm,
+                                   "eligible": True, "invalid_reasons": [],
+                                   "identity_ok": True, "oracle_ok": True, "backing_ok": True,
+-                                  "endpoints": {name: copy.deepcopy(endpoint) for name in analysis.ENDPOINTS},
+-                                  "memory": {"eligible": True, "invalid_reasons": [],
+-                                             "cycles": [copy.deepcopy(cycle), copy.deepcopy(cycle)]},
++                                  "endpoints": endpoints,
++                                  "memory": {"eligible": True, "invalid_reasons": [], "cases": cases},
++                                  "startup": {"before": before_import, "after": after_import,
++                                              "eligible": True, "invalid_reasons": []},
+                                   "terminal_high_water_rss_bytes": 40 * 1024 * 1024})
+     return {"schema": analysis.SCHEMA, "method_sha256": analysis.METHOD_SHA256,
+             "complete": True, "first_failure": None, "processes": processes,
+-            "prior_adverse_evidence": []}
+-
+-
+-def endpoint_result(result, engine="node", name="P:first"):
++            "accounting_shift_reviews": [], "raw_evidence_sha256": "a" * 64,
++            "raw_accounting_review": {"accepted": True, "method_sha256": analysis.METHOD_SHA256,
++                                      "raw_evidence_sha256": "a" * 64,
++                                      "source": "synthetic:current-raw-accounting-review",
++                                      "rationale": "Synthetic review fixture only; no real review is claimed"}}
++
++
++def latency_result(result, engine="node", name="P:first"):
+     return next(row for row in result["latency"] if row["engine"] == engine and row["endpoint"] == name)
+ 
+ 
++def memory_result(result, engine="node", case="P"):
++    engine_row = next(row for row in result["memory"] if row["engine"] == engine)
++    return next(row for row in engine_row["cases"] if row["case"] == case)
++
++
++def contrast_result(result, engine="node", name="P:retained_saving"):
++    return next(row for row in result["memory_contrasts"]
++                if row["engine"] == engine and row["endpoint"] == name)
++
++
++def selected_processes(study, engine="node", arm="candidate"):
++    return [row for row in study["processes"] if row["engine"] == engine and row["arm"] == arm]
++
++
++def closed_form_critical_values():
++    """Unexecuted secondary check, independent of the sealed values' derivation.
++
++    The df=7 density substitution t=sqrt(7)*tan(theta) integrates cos(theta)**6.
++    NIST: https://www.itl.nist.gov/div898/handbook/eda/section3/eda3664.htm
++    This CDF inversion is synthetic-check source only, never production analysis.
++    """
++    values = {}
++    for name, probability in analysis.QUANTILES.items():
++        lower, upper = 0.0, 32.0
++        for unused in range(96):
++            middle = (lower + upper) / 2
++            theta = math.atan(middle / math.sqrt(7))
++            cdf = 0.5 + (theta + 0.75 * math.sin(2 * theta)
++                         + 0.15 * math.sin(4 * theta)
++                         + math.sin(6 * theta) / 60) / math.pi
++            if cdf < probability:
++                lower = middle
++            else:
++                upper = middle
++        values[name] = (lower + upper) / 2
++    return values
++
++
+ class AnalysisChecks(unittest.TestCase):
+-    def test_fixed_critical_literals_and_independent_density_integral(self):
++    def test_exact_two_sided_families_and_independent_density_integral(self):
++        values = analysis.fixed_critical_values()
++        self.assertEqual(analysis.QUANTILES["latency38"], 1 - 0.05 / 76)
++        self.assertEqual(analysis.QUANTILES["memory22"], 1 - 0.05 / 44)
++        self.assertAlmostEqual(values["pointwise95"], 2.3646242515927853, places=12)
++        self.assertGreater(values["latency38"], values["memory22"])
++        self.assertGreater(values["memory22"], values["pointwise95"])
+         expected = {"pointwise95": 2.3646242515927853,
+-                    "latency28": 4.883865032805824, "memory10": 4.029337177642485}
+-        for name, value in analysis.fixed_critical_values().items():
+-            self.assertLessEqual(abs(value - expected[name]), 1e-12)
+-            # Composite Simpson directly integrates NIST's density. This does not
+-            # use the closed-form CDF used to derive the original candidate values.
++                    "memory22": 4.6755214023824, "latency38": 5.155633357451718}
++        secondary = closed_form_critical_values()
++        for name in expected:
++            self.assertEqual(values[name], expected[name])
++            self.assertLessEqual(abs(secondary[name] - expected[name]), 1e-11)
++        # Composite Simpson integrates the density directly; it does not call
++        # the closed-form CDF used to select the proposed critical values.
++        for name, value in values.items():
+             panels = 20000
+             step = value / panels
+             factor = 16 / (5 * math.pi * math.sqrt(7))
+@@ -67,169 +142,376 @@
+                 terms.append(weight * factor * (1 + x * x / 7) ** -4)
+             cdf = 0.5 + step * math.fsum(terms) / 3
+             self.assertLessEqual(abs(cdf - analysis.QUANTILES[name]), 1e-12)
+-
+-    def test_all_clear_is_only_narrow_lead(self):
+-        study = synthetic_study()
+-        result = analysis.analyze(study)
+-        self.assertEqual(result["disposition"], "promising_temporary_heap_lead")
+-        self.assertTrue(result["all_28_iteration_controls_cleared"])
+-        self.assertTrue(result["both_engine_memory_conditions_satisfied"])
+-        study["first_failure"] = "Synthetic terminal failure despite complete flag"
+-        failed = analysis.analyze(study)
+-        self.assertFalse(failed["complete"])
+-        self.assertEqual(failed["disposition"], "inconclusive_or_incomplete")
+-        study["first_failure"] = None
+-        for process in study["processes"]:
+-            if process["arm"] == "candidate":
+-                for cycle in process["memory"]["cycles"]:
+-                    cycle["paused"]["rss"] += 1048576
+-        shifted = analysis.analyze(study)
+-        self.assertTrue(shifted["both_engine_memory_conditions_satisfied"])
+-        self.assertTrue(shifted["accounting_explanation_required"])
+-        self.assertEqual(shifted["disposition"], "memory_conditions_met_accounting_review_required")
+-
+-    def test_pointwise_harm_survives_simultaneous_overlap_and_failed_peer(self):
+-        study = synthetic_study()
+-        for process in study["processes"]:
+-            if process["engine"] == "node" and process["arm"] == "candidate":
+-                log_ratio = 0.04 + (0.014 if process["pair"] % 2 else -0.014)
+-                process["endpoints"]["P:first"]["measured_ms"] = [10 * math.exp(log_ratio)] * 6
+-            if process["engine"] == "bun" and process["pair"] == 0:
+-                process["endpoints"]["F128:full"]["eligible"] = False
+-        study["complete"] = False
+-        study["first_failure"] = "Synthetic unrelated endpoint failure"
+-        result = analysis.analyze(study)
+-        endpoint = endpoint_result(result)
++        self.assertIn("pending", analysis.CRITICAL_VALIDATION_STATUS)
++        self.assertEqual(analysis.CRITICAL_PROVENANCE_SHA256,
++                         "f7b3d7535e2f1887519e9867e07c585d920c04ffecb3cedd662ebb43885b6752")
++
++    def test_fixed_matrix_and_strong_scoped_clearance(self):
++        study = synthetic_study()
++        result = analysis.analyze(study)
++        self.assertEqual(len(result["latency"]), 38)
++        self.assertEqual(len(result["memory_contrasts"]), 22)
++        self.assertEqual(len(analysis.ITERATION_ENDPOINTS), 18)
++        self.assertNotIn("N8192:close", analysis.ENDPOINTS)
++        self.assertEqual(result["separate_95_percent_families"], {"memory": 22, "latency": 38})
++        self.assertEqual(result["disposition"], "strong_scoped_screen_clearance")
++        self.assertTrue(result["scoped_node_lead_eligible"])
++        self.assertTrue(result["all_38_latency_controls_cleared"])
++        self.assertTrue(result["all_22_memory_contrasts_cleared"])
++        self.assertEqual(result["raw_processes"], study["processes"])
++
++    def test_scoped_node_lead_does_not_require_bun_benefit_or_full_clearance(self):
++        study = synthetic_study()
++        for process in selected_processes(study, engine="bun"):
++            for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                change_owned_heap(cycle["paused"], "bun", 512 * 1024)
++                change_owned_heap(cycle["rawPaused"], "bun", 512 * 1024)
++        for process in selected_processes(study):
++            log_ratio = 0.03 if process["pair"] % 2 else -0.03
++            process["endpoints"]["N4097:close"]["measured_ms"] = [10 * math.exp(log_ratio)] * 6
++        result = analysis.analyze(study)
++        self.assertTrue(result["scoped_node_lead_eligible"])
++        self.assertFalse(result["strong_scoped_screen_clearance"])
++        self.assertFalse(result["bun_material_benefit_corroborated"])
++        self.assertFalse(result["all_22_memory_contrasts_cleared"])
++        self.assertEqual(result["disposition"], "scoped_node_retained_memory_lead")
++        self.assertTrue(any(row["endpoint"] == "N4097:close" for row in result["unresolved_latency_controls"]))
++
++    def test_pointwise_latency_harm_survives_simultaneous_overlap_and_failed_peer(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            log_ratio = 0.04 + (0.014 if process["pair"] % 2 else -0.014)
++            process["endpoints"]["P:first"]["measured_ms"] = [10 * math.exp(log_ratio)] * 6
++        selected_processes(study, engine="bun")[0]["endpoints"]["F128:full"]["eligible"] = False
++        study.update(complete=False, first_failure="Synthetic unrelated later failure")
++        result = analysis.analyze(study)
++        endpoint = latency_result(result)
+         self.assertGreater(endpoint["pointwise_95"]["lower"], 1.02)
+-        self.assertLess(endpoint["bonferroni_95_across_28"]["lower"], 1.02)
++        self.assertLess(endpoint["bonferroni_95_across_38"]["lower"], 1.02)
++        self.assertTrue(result["unchanged_candidate_advancement_veto"])
++        self.assertEqual(result["disposition"], "material_adverse_control_veto")
++        self.assertFalse(result["scoped_node_lead_eligible"])
++
++    def test_nonprimary_and_startup_memory_harms_veto_without_prior_pooling(self):
++        for engine, case, delta in (("node", "N1", 2048), ("bun", "startup:import", 8192)):
++            study = synthetic_study()
++            for process in selected_processes(study, engine=engine):
++                if case == "startup:import":
++                    change_owned_heap(process["startup"]["after"], engine, delta)
++                else:
++                    change_owned_heap(process["memory"]["cases"][case]["cycles"][0]["paused"], engine, delta)
++            result = analysis.analyze(study)
++            self.assertEqual(contrast_result(result, engine, case + ":candidate_minus_baseline")["status"], "adverse")
++            self.assertTrue(result["unchanged_candidate_advancement_veto"])
++        study = synthetic_study()
++        study["prior_adverse_evidence"] = [{"valid": True, "source": "synthetic:old-candidate",
++                                             "demonstrated_over_two_percent": True}]
++        result = analysis.analyze(study)
++        self.assertFalse(result["unchanged_candidate_advancement_veto"])
++        self.assertFalse(result["complete"])
++        self.assertTrue(result["historical_evidence_not_pooled"])
++
++    def test_all_chunks_equal_weight_and_k_precedes_log_ratio(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            endpoint = process["endpoints"]["P:first"]
++            endpoint["measured_ms"] = [10, 10, 10, 10, 10, 70]
++            endpoint["diagnostics"] = {"gc": True, "unstable": True, "slow_chunk": 5}
++        endpoint = latency_result(analysis.analyze(study))
++        self.assertEqual(endpoint["pairs"][0]["candidate"]["mean_ms"], 20)
+         self.assertEqual(endpoint["status"], "adverse")
+-        self.assertTrue(result["unchanged_candidate_advancement_veto"])
+-
+-    def test_all_six_chunks_have_equal_weight_and_gc_is_not_excluded(self):
+-        study = synthetic_study()
+-        for process in study["processes"]:
+-            if process["engine"] == "node" and process["arm"] == "candidate":
+-                endpoint = process["endpoints"]["P:first"]
+-                endpoint["measured_ms"] = [10, 10, 10, 10, 10, 70]
+-                endpoint["diagnostics"] = {"gc": True, "unstable": True, "slow_chunk": 5}
+-        endpoint = endpoint_result(analysis.analyze(study))
+-        self.assertEqual(endpoint["pairs"][0]["candidate"]["mean_ms"], 20)
+         self.assertAlmostEqual(endpoint["paired_log_ratios"][0], math.log(2))
+-        self.assertEqual(endpoint["status"], "adverse")
+-
+-    def test_mean_is_per_operation_before_paired_logs(self):
+-        study = synthetic_study()
+         for process in study["processes"]:
+             endpoint = process["endpoints"]["F513:full"]
+             endpoint["k"] = 4
+             endpoint["measured_ms"] = ([4, 8, 12, 16, 20, 24] if process["arm"] == "baseline"
+                                         else [8, 16, 24, 32, 40, 48])
+-        endpoint = endpoint_result(analysis.analyze(study), name="F513:full")
++        endpoint = latency_result(analysis.analyze(study), name="F513:full")
+         self.assertEqual(endpoint["pairs"][0]["baseline"]["mean_ms"], 3.5)
+         self.assertEqual(endpoint["pairs"][0]["candidate"]["mean_ms"], 7)
+-        self.assertAlmostEqual(endpoint["paired_log_ratios"][0], math.log(2))
+-
+-    def test_missing_pair_never_yields_subset_inference(self):
+-        study = synthetic_study()
+-        study["processes"] = [process for process in study["processes"]
+-                              if not (process["engine"] == "node" and process["pair"] == 7
+-                                      and process["arm"] == "candidate")]
+-        result = analysis.analyze(study)
+-        self.assertEqual(endpoint_result(result)["status"], "unresolved")
+-        self.assertNotIn("pointwise_95", endpoint_result(result))
+-        self.assertEqual(result["memory"][0]["status"], "unresolved")
+-        self.assertEqual(result["memory"][1]["status"], "conditions_satisfied")
+-
+-    def test_release_boundary_and_failed_attribution(self):
+-        study = synthetic_study()
+-        process = study["processes"][0]
+-        process["memory"]["cycles"][0]["released"]["heapUsed"] += 65536
+-        self.assertEqual(analysis.analyze(study)["memory"][0]["status"], "conditions_satisfied")
+-        process["memory"]["cycles"][0]["released"]["heapUsed"] += 1
+-        memory = analysis.analyze(study)["memory"][0]
+-        self.assertEqual(memory["status"], "unresolved")
+-        self.assertNotIn("bonferroni_95_across_10", memory)
+-
+-    def test_signed_cycles_are_averaged_not_clamped_or_replicated(self):
++
++    def test_any_bad_pair_or_chunk_invalidates_entire_endpoint_without_subset_inference(self):
++        for failure in ("missing", "duplicate", "timer", "calibration", "k"):
++            study = synthetic_study()
++            process = selected_processes(study)[-1]
++            if failure == "missing":
++                study["processes"].remove(process)
++            elif failure == "duplicate":
++                study["processes"].append(copy.deepcopy(process))
++            elif failure == "timer":
++                process["endpoints"]["P:first"]["measured_ms"][-1] = 0
++            elif failure == "calibration":
++                process["endpoints"]["P:first"]["calibration_eligible"] = False
++            else:
++                process["endpoints"]["P:first"]["k"] = 4
++            result = analysis.analyze(study)
++            endpoint = latency_result(result)
++            self.assertFalse(endpoint["valid"])
++            self.assertEqual(endpoint["status"], "unresolved")
++            self.assertNotIn("pointwise_95", endpoint)
++            self.assertEqual(latency_result(result, engine="bun")["status"], "cleared")
++            self.assertEqual(len(result["raw_processes"]), len(study["processes"]))
++
++    def test_import_single_observation_no_warmup_no_five_ms_floor(self):
+         study = synthetic_study()
+         for process in study["processes"]:
+-            if process["engine"] == "node" and process["arm"] == "candidate":
+-                for cycle, delta in zip(process["memory"]["cycles"], (-131072, 0)):
+-                    cycle["paused"]["heapUsed"] = cycle["before"]["heapUsed"] + delta
+-        memory = analysis.analyze(study)["memory"][0]
+-        self.assertEqual(memory["pairs"][0]["candidate"]["increments"]["heapUsed"], -65536)
+-        self.assertEqual(memory["bonferroni_95_across_10"]["heap_saving"]["n"], 8)
+-
+-    def test_zero_variance_strict_materiality_and_nonstrict_guard(self):
++            process["endpoints"]["startup:import"]["measured_ms"] = [0.01]
++        result = analysis.analyze(study)
++        self.assertEqual(latency_result(result, name="startup:import")["status"], "cleared")
++        endpoint = selected_processes(study)[0]["endpoints"]["startup:import"]
++        endpoint["warmup_ms"] = [0.01]
++        self.assertFalse(latency_result(analysis.analyze(study), name="startup:import")["valid"])
++        endpoint["warmup_ms"] = []
++        endpoint["measured_ms"] = [0.01, 0.01]
++        self.assertFalse(latency_result(analysis.analyze(study), name="startup:import")["valid"])
++        endpoint["measured_ms"] = [0.01]
++        endpoint["k"] = 4
++        self.assertFalse(latency_result(analysis.analyze(study), name="startup:import")["valid"])
++
++    def test_each_timer_bracket_resolution_and_overhead_limits(self):
++        for name in ("P:first", "P:full", "N4097:close", "startup:import"):
++            for timer_field in ("clock_resolution_ms", "overhead_ms_per_call"):
++                study = synthetic_study()
++                for process in study["processes"]:
++                    endpoint = process["endpoints"][name]
++                    endpoint["measured_ms"] = [10.0] * (1 if name == "startup:import" else 6)
++                    endpoint[timer_field] = 0.05
++                self.assertTrue(latency_result(analysis.analyze(study), name=name)["valid"])
++                endpoint = selected_processes(study)[0]["endpoints"][name]
++                endpoint["measured_ms"][-1] = 9.999
++                self.assertFalse(latency_result(analysis.analyze(study), name=name)["valid"])
++                self.assertEqual(endpoint["measured_ms"][-1], 9.999)
++                endpoint["measured_ms"][-1] = 10
++                if name != "startup:import":
++                    endpoint["warmup_ms"][0] = 9.999
++                    self.assertFalse(latency_result(analysis.analyze(study), name=name)["valid"])
+         study = synthetic_study()
+         for process in study["processes"]:
+-            if process["engine"] == "node" and process["arm"] == "candidate":
+-                for cycle in process["memory"]["cycles"]:
+-                    cycle["paused"]["external"] += 65536
+-        self.assertEqual(analysis.analyze(study)["memory"][0]["status"], "conditions_satisfied")
++            process["endpoints"]["P:first"].update(k=4, clock_resolution_ms=0.02)
++        self.assertFalse(latency_result(analysis.analyze(study))["valid"])
++
++    def test_aggregate_extended_ladder_and_frozen_k(self):
++        study = synthetic_study()
+         for process in study["processes"]:
+-            if process["engine"] == "node" and process["arm"] == "candidate":
+-                for cycle in process["memory"]["cycles"]:
+-                    cycle["paused"]["heapUsed"] = cycle["before"]["heapUsed"] + 524288
+-        memory = analysis.analyze(study)["memory"][0]
+-        self.assertEqual(memory["status"], "materiality_rejected")
+-        self.assertIn("half_baseline_minus_candidate", memory["materiality_ruled_out"])
++            process["endpoints"]["N4097:close"]["k"] = 1048576
++        self.assertTrue(latency_result(analysis.analyze(study), name="N4097:close")["valid"])
++        selected_processes(study)[0]["endpoints"]["N4097:close"]["k"] = 262144
++        self.assertFalse(latency_result(analysis.analyze(study), name="N4097:close")["valid"])
++
++    def test_node_moved_backing_charged_once_and_bun_extra_not_double_counted(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                for state in ("paused", "rawPaused"):
++                    cycle[state]["external"] += 409600
++                    cycle[state]["arrayBuffers"] += 409600
++        result = analysis.analyze(study)
++        row = memory_result(result)["pairs"][0]["candidate"]
++        self.assertEqual(row["retained_increment"], 512 * 1024 + 409600)
++        self.assertEqual(contrast_result(result)["paired_arithmetic_contrasts_bytes"][0], 1024 * 1024 - 512 * 1024 - 409600)
++        self.assertFalse(result["scoped_node_lead_eligible"])
++        for process in selected_processes(study, engine="bun"):
++            for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                cycle["paused"]["extraMemorySize"] += 409600
++                cycle["rawPaused"]["extraMemorySize"] += 409600
++        bun = memory_result(analysis.analyze(study), engine="bun")["pairs"][0]["candidate"]
++        self.assertEqual(bun["retained_increment"], 512 * 1024)
++
++    def test_per_component_release_guards_reject_cancelling_residue(self):
++        for engine in analysis.ENGINES:
++            study = synthetic_study()
++            cycle = selected_processes(study, engine=engine)[0]["memory"]["cases"]["N1"]["cycles"][0]
++            if engine == "node":
++                cycle["released"]["heapUsed"] += 513
++                cycle["released"]["external"] -= 513
++            else:
++                cycle["released"]["extraMemorySize"] += 513
++            result = analysis.analyze(study)
++            self.assertFalse(memory_result(result, engine, "N1")["valid"])
++            self.assertTrue(memory_result(result, engine, "P")["valid"])
++            self.assertNotIn("pointwise_95", contrast_result(result, engine, "N1:candidate_minus_baseline"))
++            self.assertFalse(result["scoped_node_lead_eligible"])
++
++    def test_release_guard_boundaries_and_raw_pause_requirements(self):
++        for case, limit in analysis.RELEASE_LIMITS.items():
++            study = synthetic_study()
++            cycle = selected_processes(study)[0]["memory"]["cases"][case]["cycles"][0]
++            cycle["released"]["heapUsed"] += limit
++            self.assertTrue(memory_result(analysis.analyze(study), case=case)["valid"])
++            cycle["released"]["heapUsed"] += 1
++            self.assertFalse(memory_result(analysis.analyze(study), case=case)["valid"])
++        study = synthetic_study()
++        cycle = selected_processes(study)[0]["memory"]["cases"]["N4097"]["cycles"][0]
++        cycle["rawPaused"] = None
++        self.assertFalse(memory_result(analysis.analyze(study), case="N4097")["valid"])
++
++    def test_signed_p_cycles_average_once_and_release_is_not_subtracted(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            for cycle, delta in zip(process["memory"]["cases"]["P"]["cycles"], (-131072, 0)):
++                cycle["paused"]["heapUsed"] = cycle["before"]["heapUsed"] + delta
++                cycle["released"]["heapUsed"] += 32768
++        result = analysis.analyze(study)
++        row = memory_result(result)["pairs"][0]["candidate"]
++        self.assertEqual(row["retained_increment"], -65536)
++        self.assertEqual(row["endpoint_release_deltas"], [32768, 32768])
++        self.assertEqual(contrast_result(result)["bonferroni_95_across_22"]["n"], 8)
++
++    def test_material_benefit_strict_and_control_margin_nonstrict(self):
++        study = synthetic_study()
++        for process in study["processes"]:
++            for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                target = 512 * 1024 if process["arm"] == "baseline" else 256 * 1024
++                cycle["paused"]["heapUsed"] = cycle["before"]["heapUsed"] + target
++                if process["engine"] == "bun":
++                    cycle["paused"]["heapSize"] = cycle["before"]["heapSize"] + target
++        result = analysis.analyze(study)
++        self.assertEqual(contrast_result(result, name="P:baseline_increment")["status"], "materiality_rejected")
++        self.assertFalse(result["scoped_node_lead_eligible"])
++        for case, margin in analysis.MEMORY_MARGINS.items():
++            study = synthetic_study()
++            for process in selected_processes(study):
++                state = (process["startup"]["after"] if case == "startup:import"
++                         else process["memory"]["cases"][case]["cycles"][0]["paused"])
++                state["heapUsed"] += margin
++            result = analysis.analyze(study)
++            self.assertEqual(contrast_result(result, name=case + ":candidate_minus_baseline")["status"], "cleared")
++            self.assertFalse(result["unchanged_candidate_advancement_veto"])
++
++    def test_absolute_and_percentage_benefit_boundaries_are_strict(self):
++        for baseline, candidate, contrast in (
++                (1048576, 917504, "retained_saving"),
++                (1310720, 1048576, "twenty_percent_reduction")):
++            study = synthetic_study()
++            for process in study["processes"]:
++                target = baseline if process["arm"] == "baseline" else candidate
++                for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                    for state in ("paused", "rawPaused"):
++                        cycle[state]["heapUsed"] = cycle["before"]["heapUsed"] + target
++                        if process["engine"] == "bun":
++                            cycle[state]["heapSize"] = cycle["before"]["heapSize"] + target
++            result = analysis.analyze(study)
++            row = contrast_result(result, name="P:" + contrast)
++            self.assertEqual(row["bonferroni_95_across_22"]["lower"], row["threshold_bytes"])
++            self.assertEqual(row["status"], "materiality_rejected")
++            self.assertFalse(result["scoped_node_lead_eligible"])
++
++    def test_ordinary_memory_harm_survives_simultaneous_overlap(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            delta = 2048 + (1024 if process["pair"] % 2 else -1024)
++            process["memory"]["cases"]["N1"]["cycles"][0]["paused"]["heapUsed"] += delta
++        result = analysis.analyze(study)
++        row = contrast_result(result, name="N1:candidate_minus_baseline")
++        self.assertGreater(row["pointwise_95"]["lower"], 1024)
++        self.assertLess(row["bonferroni_95_across_22"]["lower"], 1024)
++        self.assertEqual(row["status"], "adverse")
++        self.assertTrue(result["unchanged_candidate_advancement_veto"])
+ 
+     def test_zero_variance_latency_boundary(self):
+         study = synthetic_study()
+         for baseline in (1.0, 2.0):
+             for process in study["processes"]:
+-                duration = baseline if process["arm"] == "baseline" else baseline * 1.02
+-                process["endpoints"]["P:first"]["measured_ms"] = [duration] * 6
+-            endpoint = endpoint_result(analysis.analyze(study))
++                value = baseline if process["arm"] == "baseline" else baseline * 1.02
++                process["endpoints"]["P:first"]["measured_ms"] = [value] * 6
++            endpoint = latency_result(analysis.analyze(study))
+             self.assertEqual(endpoint["status"], "cleared")
+             self.assertEqual(endpoint["paired_ratios"], [1.02] * 8)
+             self.assertEqual(endpoint["pointwise_95"]["log_interval"]["standard_error"], 0)
+ 
+-    def test_overhead_rule_only_applies_to_isolated_first(self):
+-        study = synthetic_study()
+-        for process in study["processes"]:
+-            for endpoint in process["endpoints"].values():
+-                endpoint["overhead_ms_per_call"] = 1
+-        result = analysis.analyze(study)
+-        self.assertEqual(endpoint_result(result)["status"], "unresolved")
+-        self.assertEqual(endpoint_result(result, name="P:full")["status"], "cleared")
+-        self.assertEqual(endpoint_result(result, name="F128:first")["status"], "cleared")
+-
+-    def test_resolution_boundary_covers_each_chunk_and_correct_units(self):
+-        study = synthetic_study()
+-        for process in study["processes"]:
+-            process["endpoints"]["P:first"]["clock_resolution_ms"] = 0.05
+-            for name in ("P:full", "F128:first"):
+-                process["endpoints"][name]["k"] = 4
+-                process["endpoints"][name]["clock_resolution_ms"] = 0.05
+-        result = analysis.analyze(study)
+-        self.assertEqual(endpoint_result(result)["status"], "cleared")
+-        self.assertEqual(endpoint_result(result, name="P:full")["status"], "cleared")
+-        self.assertEqual(endpoint_result(result, name="F128:first")["status"], "cleared")
+-        endpoint = study["processes"][0]["endpoints"]["P:first"]
+-        for field in ("warmup_ms", "measured_ms"):
+-            endpoint[field][0] = 9.999
+-            self.assertEqual(endpoint_result(analysis.analyze(study))["status"], "unresolved")
+-            self.assertEqual(endpoint[field][0], 9.999)  # Invalid sample remains intact.
+-            endpoint[field][0] = 10
+-        for process in study["processes"]:
+-            process["endpoints"]["P:first"]["k"] = 4
+-        self.assertEqual(endpoint_result(analysis.analyze(study))["status"], "unresolved")
+-        for process in study["processes"]:
+-            process["endpoints"]["P:first"]["k"] = 1
+-        endpoint["clock_resolution_ms"] = 0
+-        self.assertEqual(endpoint_result(analysis.analyze(study))["status"], "unresolved")
+-
+-    def test_prior_harm_survives_incomplete_or_mismatched_screen(self):
+-        study = synthetic_study()
+-        study["method_sha256"] = "synthetic-mismatch"
+-        study["processes"] = []
+-        study["prior_adverse_evidence"] = [{"valid": True, "source": "synthetic:authorized-prior",
+-                                             "demonstrated_over_two_percent": True}]
++    def test_unexplained_accounting_shifts_block_both_positive_terminal_results(self):
++        study = synthetic_study()
++        for process in selected_processes(study):
++            for cycle in process["memory"]["cases"]["P"]["cycles"]:
++                cycle["paused"]["rss"] += 1048576
++        result = analysis.analyze(study)
++        self.assertTrue(result["all_22_memory_contrasts_cleared"])
++        self.assertTrue(result["accounting_explanation_required"])
++        self.assertFalse(result["scoped_node_lead_eligible"])
++        self.assertFalse(result["strong_scoped_screen_clearance"])
++        self.assertEqual(result["disposition"], "node_benefit_accounting_review_required")
++        study["accounting_shift_reviews"] = [
++            {"signal": signal, "explained": True, "rationale": "Synthetic review fixture only",
++             "source": "synthetic:independent-review"} for signal in result["accounting_shift_signals"]]
++        self.assertTrue(analysis.analyze(study)["strong_scoped_screen_clearance"])
++
++    def test_current_raw_accounting_review_required_even_without_shift_signals(self):
++        for failure in ("missing", "stale_evidence", "wrong_method", "unaccepted", "missing_source"):
++            study = synthetic_study()
++            if failure == "missing":
++                del study["raw_accounting_review"]
++            elif failure == "stale_evidence":
++                study["raw_accounting_review"]["raw_evidence_sha256"] = "b" * 64
++            elif failure == "wrong_method":
++                study["raw_accounting_review"]["method_sha256"] = "b" * 64
++            elif failure == "unaccepted":
++                study["raw_accounting_review"]["accepted"] = False
++            else:
++                study["raw_accounting_review"]["source"] = ""
++            result = analysis.analyze(study)
++            self.assertEqual(result["accounting_shift_signals"], [])
++            self.assertTrue(result["all_22_memory_contrasts_cleared"])
++            self.assertFalse(result["scoped_node_lead_eligible"])
++            self.assertFalse(result["strong_scoped_screen_clearance"])
++            self.assertEqual(result["disposition"], "node_benefit_accounting_review_required")
++
++    def test_reviewed_invalid_bun_or_small_node_case_allows_only_node_provisional_lead(self):
++        for engine in analysis.ENGINES:
++            study = synthetic_study()
++            case = "P" if engine == "bun" else "N1"
++            selected_processes(study, engine=engine)[0]["memory"]["cases"][case]["eligible"] = False
++            result = analysis.analyze(study)
++            signal = engine + ":" + case + ":invalid_attribution_review_required"
++            self.assertIn(signal, result["unexplained_accounting_shifts"])
++            self.assertFalse(result["scoped_node_lead_eligible"])
++            study["accounting_shift_reviews"] = [{"signal": signal, "explained": True,
++                                                  "rationale": "Synthetic scoped limitation review",
++                                                  "source": "synthetic:raw-case-review"}]
++            reviewed = analysis.analyze(study)
++            self.assertTrue(reviewed["scoped_node_lead_eligible"])
++            self.assertFalse(reviewed["strong_scoped_screen_clearance"])
++            self.assertFalse(memory_result(reviewed, engine, case)["valid"])
++            if engine == "bun":
++                self.assertFalse(reviewed["bun_material_benefit_corroborated"])
++            self.assertEqual(reviewed["disposition"], "scoped_node_retained_memory_lead")
++
++    def test_custody_failure_withholds_lead_without_erasing_valid_harm(self):
++        study = synthetic_study()
++        study.update(complete=False, first_failure="Synthetic custody failure")
++        result = analysis.analyze(study)
++        self.assertFalse(result["scoped_node_lead_eligible"])
++        self.assertFalse(result["strong_scoped_screen_clearance"])
++        self.assertEqual(result["disposition"], "inconclusive_or_incomplete")
++        self.assertFalse(result["all_38_latency_controls_cleared"])
++        self.assertFalse(result["all_22_memory_contrasts_cleared"])
++        self.assertEqual(latency_result(result)["status"], "cleared")
++        self.assertEqual(contrast_result(result)["status"], "cleared")
++        for process in selected_processes(study):
++            process["endpoints"]["startup:import"]["measured_ms"] = [2]
+         result = analysis.analyze(study)
+         self.assertTrue(result["unchanged_candidate_advancement_veto"])
+-        self.assertEqual(result["disposition"], "adverse_latency_veto")
++        self.assertEqual(latency_result(result, name="startup:import")["status"], "adverse")
++
++    def test_invalid_memory_case_cannot_erase_other_fixed_memory_harm(self):
++        study = synthetic_study()
++        selected_processes(study)[0]["memory"]["cases"]["N4097"]["eligible"] = False
++        for process in selected_processes(study):
++            process["memory"]["cases"]["N1"]["cycles"][0]["paused"]["heapUsed"] += 2048
++        result = analysis.analyze(study)
++        self.assertFalse(memory_result(result, case="N4097")["valid"])
++        self.assertEqual(contrast_result(result, name="N1:candidate_minus_baseline")["status"], "adverse")
++        self.assertTrue(result["unchanged_candidate_advancement_veto"])
++
++    def test_backing_changes_and_method_mismatch_never_support_positive_inference(self):
++        study = synthetic_study()
++        selected_processes(study)[0]["memory"]["cases"]["N8193"]["cycles"][0]["paused"]["arenaUsedBytes"] += 1
++        self.assertFalse(analysis.analyze(study)["scoped_node_lead_eligible"])
++        study = synthetic_study()
++        study["method_sha256"] = "synthetic:mismatched-method"
++        result = analysis.analyze(study)
++        self.assertFalse(result["complete"])
++        self.assertNotIn("pointwise_95", latency_result(result))
++        self.assertNotIn("pointwise_95", contrast_result(result))
+ 
+ 
+ if __name__ == "__main__":
+--- accepted-lifetime/run-hosted.py
++++ packed-prospective/run-hosted.py
+@@ -1,4 +1,4 @@
+-"""Prospective ordered-checkpoint preparation and fixed 36-child screen.
++"""Prospective packed-ordered-storage preparation and fixed 36-child screen.
+ 
+ This source has not been executed. A separately sealed publication and explicit
+ execution release are required. Importing it launches no processes.
+@@ -13,6 +13,7 @@
+ import re
+ import shutil
+ import signal
++import stat
+ import subprocess
+ import sys
+ import tarfile
+@@ -20,27 +21,31 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ REPO = HERE.parents[1]
+-PREFIX = 'proofs/ordered-checkpoints-screen'
+-WORKFLOW = '.github/workflows/ordered-checkpoints-screen.yml'
+-BRANCH = 'proof/ordered-checkpoints-screen-lifetime-20261015'
++PREFIX = 'proofs/packed-order-screen'
++WORKFLOW = '.github/workflows/packed-order-screen.yml'
++BRANCH = 'proof/packed-order-screen-20261015'
+ BASE = 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+-METHOD_SHA = '25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43'
+-CANDIDATE_SOURCE_SHA = '51ad17da4924dacef264441388d0bb875773a34f1f3a2373e9d1693fef20b5bf'
+-FOCUSED_SOURCE_SEAL = '8d05bb19b8d903ce6dcb65301e6b7bcec9ff35f52eff5704f3027409a61c91fd'
+-FOCUSED_TERMINAL_SEAL = '032cc8ea776c348d6445481f4071aea464566d2e18be335908b1391da06d0615'
++METHOD_SHA = '2d0b63aded485237c820bb2abc301d38e5a1b874b591da365812b1be0c5b9eb9'
++CANDIDATE_SOURCE_SHA = '817bfb4fa24e6968d7699e7eec20a6bce9d55cd9484afe17d196ee1ab2883642'
++FOCUSED_SOURCE_SEAL = 'f62fe13c044cbf13b066c674d42e7fa02a533812233bf229c38a471c4cfae1f4'
++MEMORY_CASES = ('E0', 'N1', 'N32', 'N4096', 'N4097', 'N8192', 'N8193', 'P')
++CLOSE_CASES = ('N4096', 'N4097', 'N8193', 'P')
+ CASES = ('P', 'E0', 'F128', 'F513', 'F100k', 'D100k', 'O32k')
+ ENGINES = ('node', 'bun')
+ ARMS = ('baseline', 'candidate')
+ GIB = 1 << 30
+-PHASES = {'probe': [('probe', 15)],
+-          'calibration': [('setup', 20), ('calibration', 60), ('final', 10)],
+-          'comparison': [('setup', 20), ('memory', 8), ('latency', 22), ('final', 5), ('exit', 5)]}
++PHASES = {'probe': [('probe', 20)],
++          'calibration': [('setup', 20), ('calibration', 90), ('final', 10)],
++          'comparison': [('startup', 5), ('setup', 20), ('memory', 30), ('latency', 25), ('final', 5), ('exit', 5)]}
++CORRECTNESS_PLAN = [(arm, kind, cap) for kind, cap in
++                    [('bun-full-suite', 240), ('typecheck', 60), ('node-worker', 60)] for arm in ARMS]
+ BUILD_PLAN = [('baseline', 'native', 90), ('baseline', 'portable', 60),
+               ('candidate', 'native', 90), ('candidate', 'portable', 60)]
+ PREP_COMMANDS = ['proof-head', 'proof-parent', 'proof-tree', 'proof-delta',
+                  'locked-dependencies', 'node-version', 'node-identity', 'bun-version', 'bun-identity',
+                  'archive-exact-main', 'check-fixed-patch', 'apply-fixed-patch',
+-                 'baseline-native', 'baseline-portable', 'candidate-native', 'candidate-portable']
++                 'baseline-native', 'baseline-portable', 'candidate-native', 'candidate-portable'] + \
++                [arm + '-' + kind for arm, kind, _ in CORRECTNESS_PLAN]
+ 
+ 
+ def require(condition, message):
+@@ -152,6 +157,47 @@
+     require({path.name: {'sha256': sha(path), 'bytes': path.stat().st_size}
+              for path in sorted((folder / 'dist').glob('*.js'))} == expected['generated'],
+             'portable modules differ from focused outputs')
++
++
++def dependency_inventory(root, check=lambda: None):
++    """Observe regular files, symlink targets and unsupported types without following links."""
++    observed = {'files': {}, 'symlinks': {}, 'other': {}}
++    if not stat.S_ISDIR(root.lstat().st_mode):
++        observed['other']['.'] = stat.S_IFMT(root.lstat().st_mode)
++        return observed
++    def failed(error):
++        raise error
++    for folder, directories, files in os.walk(root, followlinks=False, onerror=failed):
++        for name in directories[:] + files:
++            check()
++            path = Path(folder) / name
++            relative = str(path.relative_to(root))
++            mode = path.lstat().st_mode
++            if stat.S_ISLNK(mode):
++                observed['symlinks'][relative] = os.readlink(path)
++                if name in directories:
++                    directories.remove(name)
++            elif stat.S_ISREG(mode):
++                observed['files'][relative] = sha(path)
++            elif stat.S_ISDIR(mode):
++                if relative in ('.vite', '.vite-temp'):
++                    directories.remove(name)
++            else:
++                observed['other'][relative] = stat.S_IFMT(mode)
++    return observed
++
++
++def validate_dependency_inventory(observed, manifest, metadata_sha):
++    """Only npm's generated root hidden lock receives a per-run content binding."""
++    assert manifest['mutable_cache_exclusions'] == ['.vite', '.vite-temp']
++    assert re.fullmatch('[0-9a-f]{64}', metadata_sha)
++    assert '.package-lock.json' in manifest['files']
++    expected = dict(manifest['files'])
++    expected['.package-lock.json'] = metadata_sha
++    assert observed['other'] == {}, 'unsupported dependency entry type'
++    assert observed['files'] == expected, 'dependency file paths, types or bytes changed'
++    assert observed['symlinks'] == manifest['symlinks'], 'dependency link paths, types or targets changed'
++
+ 
+ 
+ def effective_memory():
+@@ -263,18 +309,40 @@
+     return jobs
+ 
+ 
++def iteration_order(job):
++    close_cases = CLOSE_CASES[::-1] if job['endpointOrder'][0] == 'full' else CLOSE_CASES
++    return [(case, endpoint) for case in job['caseOrder'] for endpoint in job['endpointOrder']] + \
++           [(case, 'close') for case in close_cases]
++
++
++def calibration_endpoint_set():
++    result = {case: {'first', 'full'} for case in CASES}
++    for case in CLOSE_CASES:
++        result.setdefault(case, set()).add('close')
++    return result
++
++
++def fixed_ladder(case, endpoint):
++    ladder = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536]
++    if endpoint == 'close' or case in ('E0', 'F128', 'F513'):
++        ladder += [262144, 1048576]
++    return ladder
++
++
+ def validate_comparison_records(job, records):
+-    """Every fixed raw chunk must match its final untrimmed summary."""
++    """Keep complete raw chunks, startup states and each fixed memory cycle in custody."""
+     results = [row['result'] for row in records if row.get('event') == 'result']
+     require(len(results) == 1, 'missing or duplicate comparison result')
+     result = results[0]
++    require([row.get('event') for row in records] ==
++            ['phase', 'startup', 'phase', 'phase', 'memory', 'phase'] + ['sample'] * 180 +
++            ['phase', 'result', 'phase'], 'comparison record sequence or unexpected record differs')
+     samples = [row for row in records if row.get('event') == 'sample']
+-    expected = [(case, endpoint, kind, index) for case in job['caseOrder']
+-                for endpoint in job['endpointOrder'] for kind, count in [('warmup', 4), ('measured', 6)]
+-                for index in range(count)]
+-    require(len(samples) == len(expected) == 140, 'comparison raw chunk count differs')
+-    require(set(result['endpoints']) == {case + ':' + endpoint for case in CASES for endpoint in ('first', 'full')},
+-            'comparison endpoint set differs')
++    expected = [(case, endpoint, kind, index) for case, endpoint in iteration_order(job)
++                for kind, count in [('warmup', 4), ('measured', 6)] for index in range(count)]
++    require(len(samples) == len(expected) == 180, 'comparison raw chunk count differs')
++    require(set(result['endpoints']) == {case + ':' + endpoint for case, endpoint in iteration_order(job)} |
++            {'startup:import'}, 'comparison endpoint set differs')
+     for sample, (case, endpoint, kind, index) in zip(samples, expected):
+         summary = result['endpoints'][case + ':' + endpoint]
+         frozen = job['calibration'][case][endpoint]
+@@ -282,67 +350,87 @@
+                 (case, endpoint, kind, index), 'raw chunk identity/order differs')
+         require(sample['k'] == summary['k'] == frozen['k'] and
+                 sample['milliseconds'] == summary[kind + '_ms'][index], 'raw chunk and process summary differ')
++        require(type(sample['milliseconds']) in (int, float) and math.isfinite(sample['milliseconds']) and
++                sample['milliseconds'] >= 0, 'invalid comparison raw duration')
+         require(len(summary['warmup_ms']) == 4 and len(summary['measured_ms']) == 6, 'fixed chunk arrays differ')
+         if frozen.get('resolved') is not True:
+             require(summary.get('eligible') is False, 'unresolved baseline calibration was cleared')
++    startup = [row for row in records if row.get('event') == 'startup']
++    require(len(startup) == 1 and startup[0]['startup'] == result['startup'] and
++            startup[0]['endpoint'] == result['endpoints']['startup:import'], 'startup raw/summary custody differs')
++    endpoint = startup[0]['endpoint']
++    require(endpoint['k'] == 1 and endpoint['warmup_ms'] == [] and len(endpoint['measured_ms']) == 1,
++            'fresh import must contain one observation and no warmup')
++    duration = endpoint['measured_ms'][0]
++    require(type(duration) in (int, float) and math.isfinite(duration) and duration >= 0,
++            'invalid fresh import raw duration')
++    require(set(startup[0]['startup']) == {'before', 'after', 'eligible', 'invalid_reasons'},
++            'startup memory state set differs')
+     memory = [row['memory'] for row in records if row.get('event') == 'memory']
+     require(len(memory) == 1 and memory[0] == result['memory'], 'raw memory and process summary differ')
++    require(set(memory[0]['cases']) == set(MEMORY_CASES), 'memory case set differs')
++    for case in MEMORY_CASES:
++        cycles = memory[0]['cases'][case]['cycles']
++        require(len(cycles) == (2 if case == 'P' else 1), 'memory cycle count differs: ' + case)
++        for cycle in cycles:
++            require(set(cycle) == {'before', 'rawPaused', 'paused', 'released', 'resumed_ok'},
++                    'memory cycle state set differs: ' + case)
++            require((cycle['rawPaused'] is not None) == (case in ('N4096', 'N4097', 'N8192', 'N8193', 'P')),
++                    'fixed raw-pause diagnostic presence differs: ' + case)
+ 
+ 
+ def validate_calibration_records(job, records):
+     results = [row['result'] for row in records if row.get('event') == 'result']
+     require(len(results) == 1, 'missing or duplicate calibration result')
+     calibration = results[0]['calibration']
+-    require(set(calibration) == set(CASES), 'calibration case set differs')
++    expected_set = calibration_endpoint_set()
++    require(set(calibration) == set(expected_set), 'calibration case set differs')
++    require(not any(row.get('event') == 'startup' for row in records), 'calibration must not measure import')
++    for case, endpoints in expected_set.items():
++        require(set(calibration[case]) == endpoints, 'calibration endpoint set differs')
+     raw = [row for row in records if row.get('event') == 'calibration-chunk']
++    require([row.get('event') for row in records] == ['phase', 'phase'] +
++            ['calibration-chunk'] * len(raw) + ['phase', 'result'],
++            'calibration raw record sequence differs')
+     position = 0
+-    for case in job['caseOrder']:
+-        require(set(calibration[case]) == {'first', 'full'}, 'calibration endpoint set differs')
+-        ladder = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536]
+-        if case in ('E0', 'F128', 'F513'):
+-            ladder += [262144, 1048576]
+-        for endpoint in job['endpointOrder']:
+-            summary = calibration[case][endpoint]
+-            observed, verification = summary['ladder'], summary['verification_ms']
+-            require(observed and len(observed) <= len(ladder) and len(verification) == 3, 'calibration chunk count differs')
+-            require([row['k'] for row in observed] == ladder[:len(observed)] and
+-                    all(row['milliseconds'] < 20 for row in observed[:-1]) and
+-                    (observed[-1]['milliseconds'] >= 20 or len(observed) == len(ladder)) and
+-                    summary['k'] == observed[-1]['k'], 'calibration did not select first qualifying fixed rung')
+-            expected = [(row['k'], row['milliseconds'], 'ladder', None) for row in observed] + \
+-                       [(summary['k'], value, 'verification', index) for index, value in enumerate(verification)]
+-            for k, milliseconds, kind, index in expected:
+-                require(position < len(raw), 'missing calibration raw chunk')
+-                row = raw[position]
+-                position += 1
+-                require((row.get('case'), row.get('endpoint'), row.get('kind'), row.get('k'), row.get('milliseconds')) ==
+-                        (case, endpoint, kind, k, milliseconds), 'calibration raw/summary mismatch')
+-                require(index is None or row.get('index') == index, 'calibration verification order differs')
+-                require(type(milliseconds) in (int, float) and math.isfinite(milliseconds) and milliseconds >= 0,
+-                        'invalid calibration duration')
+-            if sum(verification) / 3 < 5:
+-                require(summary.get('resolved') is False, 'calibration below the 5 ms floor was cleared')
++    for case, endpoint in iteration_order(job):
++        ladder = fixed_ladder(case, endpoint)
++        summary = calibration[case][endpoint]
++        observed, verification = summary['ladder'], summary['verification_ms']
++        require(observed and len(observed) <= len(ladder) and len(verification) == 3, 'calibration chunk count differs')
++        require([row['k'] for row in observed] == ladder[:len(observed)] and
++                all(row['milliseconds'] < 20 for row in observed[:-1]) and
++                (observed[-1]['milliseconds'] >= 20 or len(observed) == len(ladder)) and
++                summary['k'] == observed[-1]['k'], 'calibration did not select first qualifying fixed rung')
++        expected = [(row['k'], row['milliseconds'], 'ladder', None) for row in observed] + \
++                   [(summary['k'], value, 'verification', index) for index, value in enumerate(verification)]
++        for k, milliseconds, kind, index in expected:
++            require(position < len(raw), 'missing calibration raw chunk')
++            row = raw[position]
++            position += 1
++            require((row.get('case'), row.get('endpoint'), row.get('kind'), row.get('k'), row.get('milliseconds')) ==
++                    (case, endpoint, kind, k, milliseconds), 'calibration raw/summary mismatch')
++            require(index is None or row.get('index') == index, 'calibration verification order differs')
++            require(type(milliseconds) in (int, float) and math.isfinite(milliseconds) and milliseconds >= 0,
++                    'invalid calibration duration')
++        if sum(verification) / 3 < 5:
++            require(summary.get('resolved') is False, 'calibration below the 5 ms floor was cleared')
+     require(position == len(raw), 'unexpected calibration raw chunks')
+ 
+ 
+ def invalidate_positive_summary(analysis, reason):
+-    """Keep adverse statistics/vetoes; revoke positive terminal conclusions."""
++    """Revoke positive terminal conclusions without erasing valid adverse statistics."""
+     analysis['complete'] = False
+-    analysis['all_28_iteration_controls_cleared'] = False
+-    analysis['both_engine_memory_conditions_satisfied'] = False
++    analysis['all_38_latency_controls_cleared'] = False
++    analysis['all_22_memory_contrasts_cleared'] = False
++    analysis['scoped_node_lead_eligible'] = False
++    analysis['strong_scoped_screen_clearance'] = False
++    analysis['bun_material_benefit_corroborated'] = False
+     analysis['terminal_eligibility_verified'] = False
+     analysis['terminal_failure'] = reason
+-    if analysis.get('disposition') in ('promising_temporary_heap_lead',
+-                                       'memory_conditions_met_accounting_review_required'):
+-        analysis['disposition'] = 'inconclusive_or_incomplete'
+-    for row in analysis.get('latency', []):
+-        if row.get('status') == 'cleared':
+-            row['preterminal_status'] = 'cleared'
+-            row['status'] = 'unresolved_terminal_failure'
+-    for row in analysis.get('memory', []):
+-        if row.get('status') == 'conditions_satisfied':
+-            row['preterminal_status'] = 'conditions_satisfied'
+-            row['status'] = 'unresolved_terminal_failure'
++    if analysis.get('disposition') in ('scoped_node_retained_memory_lead', 'strong_scoped_screen_clearance'):
++        analysis['disposition'] = ('material_adverse_control_veto' if analysis.get('unchanged_candidate_advancement_veto')
++                                   else 'inconclusive_or_incomplete')
+ 
+ 
+ class Run:
+@@ -350,22 +438,23 @@
+         self.mode, self.root, self.provision = mode, root, provision
+         require(not root.exists() and not root.is_relative_to(REPO), 'fresh external output root required')
+         self.start = time.monotonic()
+-        self.end = self.start + (900 if mode == 'prepare' else 2400)
+-        self.deadline = self.end - (60 if mode == 'prepare' else 2280)
++        self.end = self.start + (1620 if mode == 'prepare' else 3430)
++        self.deadline = self.start + (840 if mode == 'prepare' else 120)
+         self.stage, self.active, self.interrupted = mode, None, None
+         self.root.mkdir(parents=True)
+         self.artifact = root / 'artifact' if mode == 'prepare' else root
+         self.artifact.mkdir(exist_ok=True)
+         self.receipts, self.sources, self.outputs, self.executables, self.jobs = [], {}, {}, {}, []
+         self.config, self.payload, self.payload_sha = {}, {}, None
++        self.hidden_lock_sha = None
+         self.arms = {arm: (root if mode == 'prepare' else provision) / 'arms' / arm for arm in ARMS}
+         self.env = {key: os.environ[key] for key in ('PATH', 'HOME', 'TMPDIR', 'LANG', 'LC_ALL', 'TZ')
+                     if key in os.environ}
+         self.env.update(CI='1', NODE_OPTIONS='', BUN_OPTIONS='', npm_config_audit='false',
+                         npm_config_fund='false', npm_config_offline='true')
+-        self.result = {'kind': 'ordered-checkpoints-' + mode, 'complete': False, 'firstFailure': None,
++        self.result = {'kind': 'packed-order-' + mode, 'complete': False, 'firstFailure': None,
+                        'baseCommit': BASE, 'methodSha256': METHOD_SHA, 'scientificChildrenStarted': 0,
+-                       'plannedScientificChildren': 36, 'preparationSeconds': 900, 'screenSeconds': 2400,
++                       'plannedScientificChildren': 36, 'preparationSeconds': 1620, 'screenSeconds': 3430,
+                        'sampledGroupRssBytes': (4 if mode == 'prepare' else 2) * GIB,
+                        'rssSamplePeriodSeconds': .05, 'hardCgroupCap': False,
+                        'runId': os.environ.get('GITHUB_RUN_ID'), 'attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+@@ -424,6 +513,10 @@
+         if toolchain.exists():
+             for key, name in [('package', 'package.json'), ('lock', 'package-lock.json')]:
+                 require(sha(toolchain / name) == sha(self.packet(self.config['toolchain'][key])), 'toolchain pin changed')
++            if self.hidden_lock_sha is not None:
++                metadata = toolchain / 'node_modules/.package-lock.json'
++                require(stat.S_ISREG(metadata.lstat().st_mode), 'hidden lock must remain a regular file')
++                require(sha(metadata) == self.hidden_lock_sha, 'hidden lock changed within this run')
+ 
+     def begin(self):
+         self.payload = read(HERE / 'INPUT-SHA256.json')
+@@ -434,30 +527,48 @@
+         self.config = read(HERE / 'inputs.json')
+         self.authenticate_inputs()
+         require(self.config['schema'] == 1 and self.config['baseCommit'] == BASE, 'input identity differs')
++        require(sha(self.packet(self.config['toolchain']['dependencyInventory'])) ==
++                self.config['toolchain']['dependencyInventorySha256'], 'hosted dependency inventory identity differs')
+         execution_template, release_template = read(HERE / 'EXECUTION-TEMPLATE.json'), read(HERE / 'RELEASE-TEMPLATE.json')
+         require(execution_template.get('executionReleased') is True and release_template.get('approved') is True,
+                 'preparation/screen execution has not been released')
++        require(re.fullmatch('[0-9a-f]{40}', os.environ.get('PACKED_ORDER_EXPECTED_HEAD', '')) is not None and
++                os.environ['PACKED_ORDER_EXPECTED_HEAD'] == os.environ.get('GITHUB_SHA'),
++                'externally approved exact proof HEAD pin absent or different')
++        for template in (execution_template, release_template):
++            for name in ('run-hosted.py', 'subject.mjs', 'analysis.py'):
++                pin = template.get('implementationFiles', {}).get(name)
++                require(isinstance(pin, str) and re.fullmatch('[0-9a-f]{64}', pin) and
++                        sha(self.packet(name)) == pin, 'released exact implementation pin absent/different: ' + name)
+         for template in (execution_template, release_template):
+             require(template.get('schema') == 1 and template.get('subjectChildren') == 36 and
+-                    template.get('screenSeconds') == 2400 and template.get('preparationSeconds') == 900,
++                    template.get('screenSeconds') == 3430 and template.get('preparationSeconds') == 1620,
+                     'released finite scope differs')
+         require(self.config['method']['sha256'] == METHOD_SHA and
+                 sha(self.packet(self.config['method']['path'])) == METHOD_SHA, 'method differs')
+-        for key, expected in [('sourceSeal', FOCUSED_SOURCE_SEAL), ('terminalSeal', FOCUSED_TERMINAL_SEAL)]:
+-            pin = self.config['focusedEvidence'][key]
+-            require(pin['sha256'] == expected, 'focused seal identity differs')
+-            if key == 'terminalSeal' and pin.get('localOnly') is True:
+-                require('path' not in pin and 'selection' in self.config['focusedEvidence'],
+-                        'local-only focused evidence needs explicit selection provenance')
+-                self.packet(self.config['focusedEvidence']['selection'])
+-            else:
+-                require(sha(self.packet(pin['path'])) == expected, 'focused seal bytes differ')
+-        for name, digest in self.config['focusedEvidence']['files'].items():
+-            self.budget()
+-            require(sha(self.packet(name)) == digest, 'focused raw evidence differs: ' + name)
++        for supplement in (self.config['method']['implementationNote'], self.config['focusedEvidence']['localFullSuiteSummary']):
++            require(sha(self.packet(supplement['path'])) == supplement['sha256'], 'method/correctness supplement changed')
++        seal = self.config['focusedEvidence']['sourceSeal']
++        require(seal['sha256'] == FOCUSED_SOURCE_SEAL and sha(self.packet(seal['path'])) == FOCUSED_SOURCE_SEAL,
++                'focused packed-candidate source seal differs')
++        require(set(self.config['requiredReviews']) ==
++                {'controller', 'subject', 'analysis', 'correctness', 'hostedCorrectnessRunner'},
++                'required independent review set differs')
++        require(self.config['hostedCorrectness'].get('runnerReviewed') is True,
++                'hosted correctness source has not passed independent review')
++        require(self.config['criticalValues'].get('independentlyValidated') is True,
++                'new critical values lack independent validation')
++        for review_name, review in self.config['requiredReviews'].items():
++            require(review.get('approved') is True and isinstance(review.get('sha256'), str) and
++                    re.fullmatch('[0-9a-f]{64}', review['sha256']), 'missing approved independent review: ' + review_name)
++            require(sha(self.packet(review['path'])) == review['sha256'], 'independent review differs: ' + review_name)
+         for key in ('review', 'seal', 'values'):
+-            require(sha(self.packet(self.config['criticalValues'][key])) == self.config['criticalValues'][key + 'Sha256'],
++            pin = self.config['criticalValues'].get(key + 'Sha256')
++            require(isinstance(pin, str) and re.fullmatch('[0-9a-f]{64}', pin), 'critical-value exact pin absent: ' + key)
++            require(sha(self.packet(self.config['criticalValues'][key])) == pin,
+                     'independent critical-value provenance differs')
++        require(self.config['criticalValues']['latencyContrasts'] == 38 and
++                self.config['criticalValues']['memoryContrasts'] == 22, 'critical-value multiplicity differs')
+         require(os.environ.get('GITHUB_REPOSITORY') == 'natanelia/zerocopy', 'repository differs')
+         require(os.environ.get('GITHUB_EVENT_NAME') == 'push' and
+                 os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH, 'unreleased event or branch')
+@@ -476,7 +587,7 @@
+         require(admission['effectiveAvailableBytes'] >= (5 if self.mode == 'prepare' else 4) * GIB,
+                 'insufficient effective host/container memory headroom')
+ 
+-    def command(self, label, argv, cwd, cap, extra_env=None, job=None):
++    def command(self, label, argv, cwd, cap, extra_env=None, job=None, rss_limit=None):
+         self.budget()
+         require(self.active is None and not self.interrupted, 'previous process still owned')
+         started = time.monotonic()
+@@ -485,7 +596,7 @@
+         logs.mkdir(exist_ok=True)
+         receipt = {'label': label, 'argv': [str(item) for item in argv], 'cwd': str(cwd),
+                    'capSeconds': cap, 'effectiveCapSeconds': limit - started, 'valid': False,
+-                   'sampledGroupRssLimitBytes': (4 if job is None else 2) * GIB,
++                   'sampledGroupRssLimitBytes': rss_limit if rss_limit is not None else (4 if job is None else 2) * GIB,
+                    'peakObservedGroupRssBytes': 0, 'peakObservedProcessHwmBytes': 0,
+                    'samplePeriodSeconds': .05, 'hardCgroupCap': False, 'cleanupSignals': [],
+                    'environmentOverrides': extra_env or {}, 'phaseEvents': []}
+@@ -618,6 +729,8 @@
+             reason = reason or 'incomplete child phase sequence'
+         if job and len([row for row in records if row.get('event') == 'result']) != 1:
+             reason = reason or 'missing or duplicate subject result'
++        if job and job['mode'] == 'probe' and [row.get('event') for row in records] != ['phase', 'result']:
++            reason = reason or 'probe raw record sequence differs'
+         if job and job['mode'] == 'comparison':
+             try:
+                 validate_comparison_records(job, records)
+@@ -674,6 +787,14 @@
+         self.env['PATH'] = str(self.node.parent) + os.pathsep + self.env['PATH']
+         self.command('locked-dependencies', [self.node, npm, 'ci', '--ignore-scripts', '--no-audit', '--no-fund'],
+                      toolchain, 180, {'npm_config_offline': 'false', 'npm_config_registry': 'https://registry.npmjs.org/'})
++        observed = dependency_inventory(toolchain / 'node_modules', self.budget)
++        metadata = toolchain / 'node_modules/.package-lock.json'
++        require(stat.S_ISREG(metadata.lstat().st_mode), 'hidden lock must be a regular file')
++        self.hidden_lock_sha = sha(metadata)
++        validate_dependency_inventory(observed, read(self.packet(self.config['toolchain']['dependencyInventory'])),
++                                      self.hidden_lock_sha)
++        write(self.artifact / 'dependency-inventory.json', observed)
++        shutil.copyfile(metadata, self.artifact / 'npm-hidden-lock.json')
+         self.bun = (toolchain / 'node_modules/@oven/bun-linux-x64/bin/bun').resolve(strict=True)
+         require(sha(self.bun) == self.config['executables']['bun']['sha256'], 'Bun executable differs')
+         self.env['PATH'] = str(self.bun.parent) + os.pathsep + str(toolchain / 'node_modules/.bin') + os.pathsep + self.env['PATH']
+@@ -709,7 +830,7 @@
+                 target.parent.mkdir(parents=True, exist_ok=True)
+                 shutil.copyfile(self.packet(overlay['source']), target)
+             self.sources[arm] = read(self.packet(self.config['arms'][arm]['sources']))
+-            require(len(self.sources[arm]) == 503 and inventory(folder, check=self.budget) == self.sources[arm],
++            require(len(self.sources[arm]) == 504 and inventory(folder, check=self.budget) == self.sources[arm],
+                     'execution source inventory differs: ' + arm)
+             (folder / 'node_modules').symlink_to(toolchain / 'node_modules', target_is_directory=True)
+         require(set(self.sources['baseline']) == set(self.sources['candidate']) and
+@@ -722,18 +843,116 @@
+                          [self.node, 'scripts/build-wasm.mjs'] if kind == 'native' else [self.bun, 'scripts/build-browser.ts'],
+                          self.arms[arm], cap)
+             expected = read(self.packet(self.config['arms'][arm]['generated']))
+-            require(len(expected) == 25, 'expected output count differs')
++            require(len(expected) == 24, 'expected output count differs')
++            if kind == 'native':
++                # Native build emits diagnostic WAT; authenticate then retain outside the runtime arm.
++                extra = read(self.packet(self.config['nativeBuildExtra']))
++                for name, pin in extra.items():
++                    path = self.arms[arm] / name
++                    require(sha(path) == pin['sha256'] and path.stat().st_size == pin['bytes'],
++                            'native diagnostic output differs')
++                    destination = self.artifact / ('native-diagnostics-' + arm) / name
++                    destination.parent.mkdir(parents=True, exist_ok=True)
++                    shutil.move(path, destination)
+             actual = inventory(self.arms[arm], True, self.budget)
+             require(actual == ({name: pin for name, pin in expected.items() if '/' not in name}
+                                if kind == 'native' else expected), 'fresh build outputs differ: ' + arm + '/' + kind)
+             if kind == 'portable':
+                 self.outputs[arm] = expected
+-        require([row['label'] for row in self.receipts] == PREP_COMMANDS, 'preparation is not exactly 16 commands')
++        self.authenticate_closures()
++        self.hosted_correctness()
++        require([row['label'] for row in self.receipts] == PREP_COMMANDS, 'preparation is not exactly 22 commands')
+         self.authenticate_closures()
+         self.bind()
+ 
++    def hosted_correctness(self):
++        """Six ordinary correctness commands; never run the scientific subject here."""
++        self.stage_until('hosted correctness prerequisites', min(self.end - 60, time.monotonic() + 720))
++        gate = self.config['hostedCorrectness']
++        plan = read(self.packet(gate['commandPlan']))
++        require(sha(self.packet(gate['commandPlan'])) == gate['commandPlanSha256'], 'correctness command plan differs')
++        expected_files = read(self.packet(plan['expectedFullSuiteFiles']))
++        expected_cases = read(self.packet(plan['expectedFullSuiteCases']))
++        require(len(expected_files) == 51 and len(expected_cases) == 1088,
++                'fixed ordinary correctness identity inventory differs')
++        # The unchanged suite has repeated fullName strings; preserve their exact multiplicities.
++        require(plan['individualSuiteTestTimeoutMilliseconds'] == 5000 and plan['scientificChildren'] == 0 and
++                plan['subjectTimingExecuted'] is False and len(plan['commands']) == 6,
++                'correctness scope differs')
++        report_root = self.artifact / 'reports'
++        report_root.mkdir(exist_ok=True)
++        bindings = {'${PROVISION_ROOT}': str(self.root), '${ARTIFACT_ROOT}': str(self.artifact),
++                    '${NODE}': str(self.node), '${BUN}': str(self.bun)}
++        accepted = []
++        for specification, (arm, kind, cap) in zip(plan['commands'], CORRECTNESS_PLAN):
++            label = arm + '-' + kind
++            report_path = report_root / (label + '.json')
++            argv = ([str(self.bun), '--bun', 'node_modules/vitest/vitest.mjs', 'run', '--cache=false',
++                     '--reporter=default', '--reporter=json', '--outputFile.json=' + str(report_path)]
++                    if kind == 'bun-full-suite' else
++                    [str(self.node), 'node_modules/typescript/bin/tsc', '--noEmit', '-p', 'tsconfig.json']
++                    if kind == 'typecheck' else
++                    [str(self.node), '--test', '--test-concurrency=1', '--test-timeout=20000',
++                     'proofs/ordered-map-packed-worker.node.mjs'])
++            require(substitute(specification, bindings) == {'label': label, 'arm': arm, 'kind': kind,
++                    'argv': argv, 'cwd': str(self.arms[arm]), 'capSeconds': cap,
++                    'sampledGroupRssLimitBytes': 2 * GIB}, 'correctness command differs: ' + label)
++            self.authenticate_closures()
++            receipt, _ = self.command(label, argv, self.arms[arm], cap, {'NO_COLOR': '1'}, rss_limit=2 * GIB)
++            if kind == 'bun-full-suite':
++                report = read(report_path)
++                require(report.get('success') is True, 'ordinary correctness report failed: ' + label)
++                for key, expected in [('numTotalTests', 1088), ('numPassedTests', 1088), ('numFailedTests', 0),
++                                      ('numPendingTests', 0), ('numTodoTests', 0)]:
++                    require(report.get(key) == expected, 'ordinary correctness count differs: ' + label + '/' + key)
++                suites = report['testResults']
++                assertions = [case for suite in suites for case in suite['assertionResults']]
++                require(len(suites) == 51 and len(assertions) == 1088 and
++                        all(case.get('status') == 'passed' for case in assertions),
++                        'ordinary correctness has skipped/pending/todo/failed cases')
++                files = sorted(Path(suite['name']).relative_to(self.arms[arm]).as_posix() for suite in suites)
++                cases = sorted([{'file': Path(suite['name']).relative_to(self.arms[arm]).as_posix(),
++                                 'fullName': case['fullName']} for suite in suites for case in suite['assertionResults']],
++                               key=lambda item: (item['file'], item['fullName']))
++                require(files == expected_files and cases == expected_cases, 'ordinary correctness exact identities differ')
++                receipt['correctness'] = {'passed': True, 'cases': 1088, 'files': 51,
++                                         'report': 'reports/' + report_path.name, 'reportSha256': sha(report_path)}
++            elif kind == 'node-worker':
++                output = self.output(label)
++                names = re.findall(r'^ok \d+ - (.+)$', output, re.M)
++                require(names == plan['expectedWorkerCases'] ==
++                        ['packed ordered histories in a real worker (copy=false)',
++                         'packed ordered histories in a real worker (copy=true)'], 'worker case identities differ')
++                for key, expected in [('tests', 2), ('suites', 0), ('pass', 2), ('fail', 0),
++                                      ('cancelled', 0), ('skipped', 0), ('todo', 0)]:
++                    require(re.findall(r'^# ' + key + r' (\d+)$', output, re.M) == [str(expected)],
++                            'worker count differs: ' + key)
++                require(receipt['stderr']['bytes'] == 0, 'worker stderr is not empty')
++                receipt['correctness'] = {'passed': True, 'cases': 2, 'caseNames': names}
++            else:
++                require(kind == 'typecheck', 'unrecognized correctness command')
++                receipt['correctness'] = {'passed': True, 'noEmit': True}
++            self.authenticate_closures()
++            accepted.append(label)
++            write(self.artifact / 'command-receipts.json', self.receipts)
++        require(accepted == [arm + '-' + kind for arm, kind, _ in CORRECTNESS_PLAN] and
++                self.result['scientificChildrenStarted'] == 0, 'hosted correctness prerequisite sequence incomplete')
++        write(self.artifact / 'hosted-correctness-receipt.json', {
++            'schema': 'packed-order-hosted-correctness/v1', 'complete': True, 'passed': True,
++            'proofHead': self.head, 'runId': self.result['runId'], 'runAttempt': '1',
++            'inputManifestSha256': self.payload_sha, 'sources': self.sources, 'outputs': self.outputs,
++            'executables': self.executables, 'hiddenLockSha256': self.hidden_lock_sha,
++            'commandPlanSha256': gate['commandPlanSha256'], 'acceptedCommands': accepted,
++            'fullSuiteFilesPerArm': 51, 'fullSuiteCasesPerArm': 1088, 'workerCasesPerArm': 2,
++            'skippedPendingTodo': 0, 'scientificChildrenStarted': 0, 'subjectTimingExecuted': False})
++        self.result['ordinaryCorrectnessClearance'] = True
++
+     def authenticate_closures(self):
+         self.authenticate_inputs()
++        if self.hidden_lock_sha is not None:
++            toolchain = (self.root if self.mode == 'prepare' else self.provision) / 'toolchain'
++            validate_dependency_inventory(dependency_inventory(toolchain / 'node_modules', self.budget),
++                                          read(self.packet(self.config['toolchain']['dependencyInventory'])), self.hidden_lock_sha)
+         for arm, folder in self.arms.items():
+             authenticate_portable(folder, read(self.packet(self.config['arms'][arm]['portableAuthentication'])), self.budget)
+             require(source_closure(folder, self.budget) == read(self.packet(self.config['arms'][arm]['bunSourceClosure'])),
+@@ -742,6 +961,7 @@
+                 (self.arms['candidate'] / 'persistent-core.wasm').read_bytes(), 'cross-arm native cores differ')
+ 
+     def bind(self):
++        require(self.result.get('ordinaryCorrectnessClearance') is True, 'hosted correctness did not pass')
+         bindings = {'${PROVISION_ROOT}': str(self.root), '${BUNDLE_ROOT}': str(HERE),
+                     '${NODE}': str(self.node), '${BUN}': str(self.bun), '${PROOF_HEAD}': self.head}
+         pins = substitute(read(HERE / 'EXECUTION-TEMPLATE.json'), bindings)
+@@ -750,7 +970,7 @@
+         require(pins.get('expectedHostedHead') == self.head and release.get('expectedHostedHead') == self.head,
+                 'released proof HEAD differs')
+         require(pins.get('subjectChildren') == 36 and release.get('subjectChildren') == 36 and
+-                pins.get('screenSeconds') == 2400 and release.get('screenSeconds') == 2400,
++                pins.get('screenSeconds') == 3430 and release.get('screenSeconds') == 3430,
+                 'released scientific scope differs')
+         for key in ('arms', 'executables', 'implementationFiles', 'evidence'):
+             require(pins[key] == release[key], 'release/execution template mismatch: ' + key)
+@@ -765,13 +985,17 @@
+                     for name in ('run-hosted.py', 'subject.mjs', 'analysis.py')}, 'released implementation differs')
+         require(pins['evidence'] == {'methodSha256': METHOD_SHA,
+                     'focusedSourceSealSha256': FOCUSED_SOURCE_SEAL,
+-                    'focusedTerminalSealSha256': FOCUSED_TERMINAL_SEAL,
+-                    'criticalReviewSha256': self.config['criticalValues']['reviewSha256']}, 'released evidence differs')
++                    'correctnessReviewSha256': self.config['requiredReviews']['correctness']['sha256'],
++                    'criticalReviewSha256': self.config['criticalValues']['reviewSha256'],
++                    'implementationNoteSha256': self.config['method']['implementationNote']['sha256'],
++                    'localFullSuiteSummarySha256': self.config['focusedEvidence']['localFullSuiteSummary']['sha256']},
++                'released evidence differs')
+         write(self.root / 'EXECUTION-RELEASE.json', release)
+         write(self.root / 'EXECUTION-PINS.json', pins)
+         write(self.root / 'prepared-state.json', {'schema': 1, 'head': self.head,
+               'inputManifestSha256': self.payload_sha, 'sources': self.sources, 'outputs': self.outputs,
+-              'executables': self.executables, 'executionPinsSha256': sha(self.root / 'EXECUTION-PINS.json'),
++              'executables': self.executables, 'hiddenLockSha256': self.hidden_lock_sha,
++              'hostedCorrectnessReceiptSha256': sha(self.artifact / 'hosted-correctness-receipt.json'), 'executionPinsSha256': sha(self.root / 'EXECUTION-PINS.json'),
+               'executionReleaseSha256': sha(self.root / 'EXECUTION-RELEASE.json')})
+         self.result['readyForScreen'] = True
+ 
+@@ -781,7 +1005,8 @@
+         write(self.artifact / 'planned-jobs.json', self.plan)
+         previous = read(self.provision / 'artifact/result.json')
+         require(previous.get('complete') is True and previous.get('readyForScreen') is True and
+-                previous.get('cleanupVerified') is True and previous.get('finalIntegrityVerified') is True,
++                previous.get('cleanupVerified') is True and previous.get('finalIntegrityVerified') is True and
++                previous.get('ordinaryCorrectnessClearance') is True,
+                 'preparation was not authenticated and complete')
+         require(previous.get('runId') == self.result['runId'] and previous.get('attempt') == '1', 'preparation run differs')
+         manifest_path = self.provision / 'artifact/ARTIFACT-SHA256.json'
+@@ -815,7 +1040,11 @@
+         for engine in ENGINES:
+             require(all(self.executables[engine][key] == value for key, value in self.config['executables'][engine].items()),
+                     'prepared executable pin differs')
++        self.hidden_lock_sha = state['hiddenLockSha256']
++        validate_dependency_inventory(dependency_inventory(self.provision / 'toolchain/node_modules', self.budget),
++                                      read(self.packet(self.config['toolchain']['dependencyInventory'])), self.hidden_lock_sha)
+         self.authenticate_closures()
++        self.authenticate_hosted_correctness(state)
+         self.stage_until('scientific children', self.end - 150)
+         calibrations = {}
+         probe_resolution = {}
+@@ -840,14 +1069,12 @@
+                 probe_resolution[job['engine']] = result['clock_resolution_ms']
+             elif job['mode'] == 'calibration':
+                 calibration = result['calibration']
+-                require(set(calibration) == set(CASES), 'calibration case set differs')
+-                for case in CASES:
+-                    require(set(calibration[case]) == {'first', 'full'}, 'calibration endpoint set differs')
+-                    ladder = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536]
+-                    if case in ('E0', 'F128', 'F513'):
+-                        ladder += [262144, 1048576]
+-                    for endpoint in ('first', 'full'):
+-                        require(calibration[case][endpoint]['k'] in ladder, 'calibration K outside fixed ladder')
++                require(set(calibration) == set(calibration_endpoint_set()), 'calibration case set differs')
++                for case, endpoints in calibration_endpoint_set().items():
++                    require(set(calibration[case]) == endpoints, 'calibration endpoint set differs')
++                    for endpoint in endpoints:
++                        require(calibration[case][endpoint]['k'] in fixed_ladder(case, endpoint),
++                                'calibration K outside fixed ladder')
+                 calibrations[job['engine']] = calibration
+                 write(self.artifact / ('calibration-' + job['engine'] + '.json'), calibration)
+             else:
+@@ -855,6 +1082,34 @@
+                 require(result.get('eligible') is True, 'comparison process reported a non-noise failure')
+             write(self.artifact / 'raw-jobs.json', self.jobs)
+         self.result['scientificScheduleComplete'] = True
++
++    def authenticate_hosted_correctness(self, state):
++        """Require all six source-bound ordinary correctness receipts before any scientific child."""
++        gate = self.config['hostedCorrectness']
++        path = self.provision / 'artifact/hosted-correctness-receipt.json'
++        require(sha(path) == state['hostedCorrectnessReceiptSha256'], 'hosted correctness receipt changed')
++        receipt = read(path)
++        require(receipt.get('schema') == 'packed-order-hosted-correctness/v1' and
++                receipt.get('complete') is True and receipt.get('passed') is True,
++                'hosted correctness prerequisite is incomplete')
++        require(receipt.get('proofHead') == state['head'] and receipt.get('runId') == self.result['runId'] and
++                receipt.get('runAttempt') == '1' and receipt.get('inputManifestSha256') == self.payload_sha,
++                'hosted correctness identity binding differs')
++        require(receipt.get('sources') == self.sources and receipt.get('outputs') == self.outputs and
++                receipt.get('executables') == self.executables and receipt.get('hiddenLockSha256') == self.hidden_lock_sha,
++                'hosted correctness source/output/runtime/dependency binding differs')
++        require(receipt.get('scientificChildrenStarted') == 0 and receipt.get('subjectTimingExecuted') is False and
++                receipt.get('commandPlanSha256') == gate['commandPlanSha256'] and
++                receipt.get('acceptedCommands') == [arm + '-' + kind for arm, kind, _ in CORRECTNESS_PLAN] and
++                receipt.get('fullSuiteFilesPerArm') == 51 and receipt.get('fullSuiteCasesPerArm') == 1088 and
++                receipt.get('workerCasesPerArm') == 2 and receipt.get('skippedPendingTodo') == 0,
++                'hosted correctness command/count/no-timing binding differs')
++        commands = read(self.provision / 'artifact/command-receipts.json')[-6:]
++        require([row['label'] for row in commands] == receipt['acceptedCommands'] and
++                all(row.get('valid') is True and row.get('correctness', {}).get('passed') is True for row in commands),
++                'hosted correctness command-level pass receipt missing')
++        shutil.copyfile(path, self.artifact / 'hosted-correctness-receipt.json')
++        self.result['ordinaryCorrectnessClearance'] = True
+ 
+     def analyze(self):
+         self.stage_until('analysis and sealing', min(self.end - 60, time.monotonic() + 90))
+@@ -874,16 +1129,15 @@
+             process['terminal_high_water_rss_bytes'] = job['receipt'].get('wait4MaxRssBytes')
+             process['jobId'] = job['input']['jobId']
+             processes.append(process)
+-        data = {'schema': 'ordered-checkpoint-analysis/v1', 'method_sha256': METHOD_SHA,
++        data = {'schema': 'packed-ordered-storage-analysis/v1', 'method_sha256': METHOD_SHA,
+                 'processes': processes, 'first_failure': self.result['firstFailure'],
+-                'complete': self.result.get('scientificScheduleComplete') is True,
+-                'prior_adverse_evidence': self.config.get('priorAdverseEvidence', [])}
++                'complete': self.result.get('scientificScheduleComplete') is True}
+         write(self.artifact / 'analysis-input.json', data)
+         write(self.artifact / 'raw-jobs.json', self.jobs)
+         # One small standard-library analysis module, inside this supervisor.
+         # No additional scientific child and no dependency installation.
+         self.packet('analysis.py')
+-        spec = importlib.util.spec_from_file_location('ordered_checkpoint_analysis', HERE / 'analysis.py')
++        spec = importlib.util.spec_from_file_location('packed_ordered_storage_analysis', HERE / 'analysis.py')
+         module = importlib.util.module_from_spec(spec)
+         spec.loader.exec_module(module)
+         analysis = module.analyze(data)
+--- accepted-lifetime/supervisor_checks.py
++++ packed-prospective/supervisor_checks.py
+@@ -13,7 +13,7 @@
+ 
+ 
+ def load_supervisor():
+-    spec = importlib.util.spec_from_file_location('ordered_supervisor', Path(__file__).with_name('run-hosted.py'))
++    spec = importlib.util.spec_from_file_location('packed_order_supervisor', Path(__file__).with_name('run-hosted.py'))
+     module = importlib.util.module_from_spec(spec)
+     with patch('subprocess.Popen', side_effect=AssertionError('a real process must never start')):
+         spec.loader.exec_module(module)
+@@ -27,12 +27,14 @@
+ 
+     def test_fixed_scientific_schedule(self):
+         self.assertEqual(self.module.PHASES, {
+-            'probe': [('probe', 15)],
+-            'calibration': [('setup', 20), ('calibration', 60), ('final', 10)],
+-            'comparison': [('setup', 20), ('memory', 8), ('latency', 22), ('final', 5), ('exit', 5)]})
++            'probe': [('probe', 20)],
++            'calibration': [('setup', 20), ('calibration', 90), ('final', 10)],
++            'comparison': [('startup', 5), ('setup', 20), ('memory', 30), ('latency', 25), ('final', 5), ('exit', 5)]})
+         jobs = self.module.planned_jobs()
+         self.assertEqual([job['mode'] for job in jobs[:4]], ['probe', 'probe', 'calibration', 'calibration'])
+         self.assertEqual(len(jobs), 36)
++        self.assertEqual(sum(sum(cap for _, cap in self.module.PHASES[job['mode']]) for job in jobs), 3160)
++        self.assertEqual(120 + 3160 + 90 + 60, 3430)
+         self.assertEqual(len({job['jobId'] for job in jobs}), 36)
+         self.assertTrue(all(job['arm'] == 'baseline' for job in jobs[2:4]))
+         for pair in range(8):
+@@ -44,6 +46,20 @@
+             rotation = pair % 7
+             expected_cases = list(self.module.CASES[rotation:] + self.module.CASES[:rotation])
+             self.assertTrue(all(job['pairIndex'] == pair and job['caseOrder'] == expected_cases for job in block))
++            for job in block:
++                order = self.module.iteration_order(job)
++                self.assertEqual(len(order), 18)
++                closes = self.module.CLOSE_CASES[::-1] if pair % 2 else self.module.CLOSE_CASES
++                self.assertEqual(order[-4:], [(case, 'close') for case in closes])
++
++    def test_fixed_correctness_commands_are_separate(self):
++        self.assertEqual(self.module.CORRECTNESS_PLAN, [
++            ('baseline', 'bun-full-suite', 240), ('candidate', 'bun-full-suite', 240),
++            ('baseline', 'typecheck', 60), ('candidate', 'typecheck', 60),
++            ('baseline', 'node-worker', 60), ('candidate', 'node-worker', 60)])
++        self.assertEqual(sum(cap for _, _, cap in self.module.CORRECTNESS_PLAN), 720)
++        self.assertEqual(len(self.module.PREP_COMMANDS), 22)
++        self.assertFalse(any('subject' in label for label in self.module.PREP_COMMANDS))
+ 
+     def test_interrupted_prepare_still_cleans_original_group(self):
+         module = self.module
+@@ -85,25 +101,92 @@
+         run.preserve.assert_called_once()
+ 
+     def test_terminal_failure_revokes_positive_summary_keeps_harm(self):
+-        analysis = {'complete': True, 'disposition': 'promising_temporary_heap_lead',
+-                    'all_28_iteration_controls_cleared': True, 'both_engine_memory_conditions_satisfied': True,
++        analysis = {'complete': True, 'disposition': 'scoped_node_retained_memory_lead',
++                    'scoped_node_lead_eligible': True, 'strong_scoped_screen_clearance': True,
++                    'bun_material_benefit_corroborated': True, 'all_38_latency_controls_cleared': True,
++                    'all_22_memory_contrasts_cleared': True,
+                     'unchanged_candidate_advancement_veto': True,
+                     'valid_adverse_latency_controls': [{'engine': 'node', 'endpoint': 'P:first'}],
+-                    'latency': [{'status': 'adverse', 'statistic': 1.2}, {'status': 'cleared', 'statistic': .9}],
++                    'latency': [{'status': 'adverse', 'statistic': 1.2}],
+                     'memory': [{'status': 'conditions_satisfied', 'saving_bytes': 600000}]}
+         self.module.invalidate_positive_summary(analysis, 'final source hash failed')
+         self.assertFalse(analysis['complete'])
+-        self.assertFalse(analysis['all_28_iteration_controls_cleared'])
+-        self.assertFalse(analysis['both_engine_memory_conditions_satisfied'])
+-        self.assertEqual(analysis['disposition'], 'inconclusive_or_incomplete')
++        self.assertFalse(analysis['scoped_node_lead_eligible'])
++        self.assertFalse(analysis['strong_scoped_screen_clearance'])
++        self.assertFalse(analysis['bun_material_benefit_corroborated'])
++        self.assertFalse(analysis['all_38_latency_controls_cleared'])
++        self.assertFalse(analysis['all_22_memory_contrasts_cleared'])
++        self.assertEqual(analysis['disposition'], 'material_adverse_control_veto')
+         self.assertTrue(analysis['unchanged_candidate_advancement_veto'])
+         self.assertEqual(analysis['latency'][0], {'status': 'adverse', 'statistic': 1.2})
+         self.assertEqual(analysis['memory'][0]['saving_bytes'], 600000)
+-        analysis['disposition'] = 'memory_conditions_met_accounting_review_required'
+-        self.module.invalidate_positive_summary(analysis, 'final preservation failed')
+-        self.assertEqual(analysis['disposition'], 'inconclusive_or_incomplete')
+-        self.assertEqual(analysis['latency'][0], {'status': 'adverse', 'statistic': 1.2})
+-        self.assertEqual(analysis['memory'][0]['saving_bytes'], 600000)
++        self.assertEqual(analysis['valid_adverse_latency_controls'], [{'engine': 'node', 'endpoint': 'P:first'}])
++        clean = {'complete': True, 'disposition': 'strong_scoped_screen_clearance',
++                 'unchanged_candidate_advancement_veto': False}
++        self.module.invalidate_positive_summary(clean, 'final preservation failed')
++        self.assertEqual(clean['disposition'], 'inconclusive_or_incomplete')
++        self.assertFalse(clean['strong_scoped_screen_clearance'])
++
++    def synthetic_comparison(self):
++        """Synthetic custody records only: no target, subject, clock or fixture call."""
++        module = self.module
++        job = dict(module.planned_jobs()[4])
++        job['calibration'] = {case: {endpoint: {'k': 1, 'resolved': True} for endpoint in endpoints}
++                              for case, endpoints in module.calibration_endpoint_set().items()}
++        endpoints, chunks = {}, []
++        for case, endpoint in module.iteration_order(job):
++            endpoints[case + ':' + endpoint] = {'k': 1, 'warmup_ms': [20.] * 4,
++                                                'measured_ms': [20.] * 6, 'eligible': True}
++            for kind, count in [('warmup', 4), ('measured', 6)]:
++                for index in range(count):
++                    chunks.append({'event': 'sample', 'case': case, 'endpoint': endpoint,
++                                   'kind': kind, 'index': index, 'k': 1, 'milliseconds': 20.})
++        startup = {'before': {}, 'after': {}, 'eligible': True, 'invalid_reasons': []}
++        import_endpoint = {'k': 1, 'warmup_ms': [], 'measured_ms': [1.], 'eligible': True}
++        endpoints['startup:import'] = import_endpoint
++        cases = {}
++        for case in module.MEMORY_CASES:
++            raw = {} if case in ('N4096', 'N4097', 'N8192', 'N8193', 'P') else None
++            cases[case] = {'cycles': [{'before': {}, 'rawPaused': raw, 'paused': {}, 'released': {},
++                                      'resumed_ok': True} for _ in range(2 if case == 'P' else 1)]}
++        memory = {'cases': cases}
++        result = {'endpoints': endpoints, 'startup': startup, 'memory': memory}
++        phase = lambda name: {'event': 'phase', 'phase': name}
++        records = [phase('startup'), {'event': 'startup', 'startup': startup, 'endpoint': import_endpoint},
++                   phase('setup'), phase('memory'), {'event': 'memory', 'memory': memory}, phase('latency')]
++        records += chunks + [phase('final'), {'event': 'result', 'result': result}, phase('exit')]
++        return job, records
++
++    def test_synthetic_complete_custody_and_missing_chunk(self):
++        job, records = self.synthetic_comparison()
++        self.module.validate_comparison_records(job, records)
++        del records[6]
++        with self.assertRaises(ValueError):
++            self.module.validate_comparison_records(job, records)
++
++    def test_synthetic_startup_and_unresolved_calibration(self):
++        job, records = self.synthetic_comparison()
++        records[1]['endpoint'] = {'k': 1, 'warmup_ms': [], 'measured_ms': [2.], 'eligible': True}
++        with self.assertRaises(ValueError):
++            self.module.validate_comparison_records(job, records)
++        job, records = self.synthetic_comparison()
++        job['calibration']['N4097']['close']['resolved'] = False
++        with self.assertRaises(ValueError):
++            self.module.validate_comparison_records(job, records)
++        records[-2]['result']['endpoints']['N4097:close']['eligible'] = False
++        self.module.validate_comparison_records(job, records)
++
++    def test_hosted_dependency_custody_keeps_reviewed_hidden_lock_exception(self):
++        module = self.module
++        manifest = {'mutable_cache_exclusions': ['.vite', '.vite-temp'],
++                    'files': {'.package-lock.json': 'a' * 64, 'package/file': 'b' * 64},
++                    'symlinks': {'.bin/bun': '../bun/bin/bun.exe'}}
++        observed = {'files': {'.package-lock.json': 'c' * 64, 'package/file': 'b' * 64},
++                    'symlinks': dict(manifest['symlinks']), 'other': {}}
++        module.validate_dependency_inventory(observed, manifest, 'c' * 64)
++        observed['files']['package/file'] = 'd' * 64
++        with self.assertRaises(AssertionError):
++            module.validate_dependency_inventory(observed, manifest, 'c' * 64)
+ 
+ 
+ if __name__ == '__main__':

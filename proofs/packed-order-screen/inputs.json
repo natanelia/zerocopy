@@ -1,0 +1,146 @@
+{
+  "actions": {
+    "checkout": "11bd71901bbe5b1630ceea73d27597364c9af683",
+    "setupNode": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "uploadArtifact": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+  },
+  "arms": {
+    "baseline": {
+      "bunSourceClosure": "manifests/baseline-bun-closure.json",
+      "generated": "manifests/baseline-generated.json",
+      "portableAuthentication": "manifests/baseline-portable.json",
+      "sources": "manifests/baseline-sources.json"
+    },
+    "candidate": {
+      "bunSourceClosure": "manifests/candidate-bun-closure.json",
+      "generated": "manifests/candidate-generated.json",
+      "portableAuthentication": "manifests/candidate-portable.json",
+      "sources": "manifests/candidate-sources.json"
+    }
+  },
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidatePatch": "candidate.patch",
+  "commonOverlays": [
+    {
+      "source": "overlays/shared-ordered-map-packed.test.ts",
+      "target": "shared-ordered-map-packed.test.ts"
+    },
+    {
+      "source": "overlays/proofs/ordered-map-packed-worker.node.mjs",
+      "target": "proofs/ordered-map-packed-worker.node.mjs"
+    }
+  ],
+  "criticalValues": {
+    "independentlyValidated": true,
+    "latencyContrasts": 38,
+    "memoryContrasts": 22,
+    "review": "statistics/REVIEW.md",
+    "reviewSha256": "ac1658592bd93a2a96849c557aad8b43295cc52fccb9e397def935e29867780d",
+    "seal": "statistics/SHA256SUMS",
+    "sealSha256": "f7b3d7535e2f1887519e9867e07c585d920c04ffecb3cedd662ebb43885b6752",
+    "values": "statistics/VALUES.json",
+    "valuesSha256": "dfce433ed5ba8ce44ff2450a0319889dc49a96ebb9a5a568206095afdcb740cc"
+  },
+  "executables": {
+    "bun": {
+      "bytes": 79500640,
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "version": "1.4.2"
+    },
+    "node": {
+      "bytes": 121509208,
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "version": "22.16.0"
+    }
+  },
+  "focusedEvidence": {
+    "localFullSuiteSummary": {
+      "path": "provenance/LOCAL-FULL-SUITE-SUMMARY.json",
+      "sha256": "c440b4458957d03c3daa95ab73d89086385bd8ecd2a9b6323b08f49717d4ff21"
+    },
+    "sourceSeal": {
+      "path": "provenance/SOURCE-SEAL.sha256",
+      "sha256": "f62fe13c044cbf13b066c674d42e7fa02a533812233bf229c38a471c4cfae1f4"
+    }
+  },
+  "hostedCorrectness": {
+    "commandPlan": "manifests/hosted-correctness-plan.json",
+    "commandPlanSha256": "97b710846967f9e4b50a3a528572e10bd10d134dc8058cbd6a5ac8602821c4f3",
+    "correctnessCommandsSeconds": 720,
+    "executed": false,
+    "ordinarySuiteTimeoutMilliseconds": 5000,
+    "requiredPassCasesPerArm": 1088,
+    "requiredWorkerCasesPerArm": 2,
+    "runnerReviewed": true,
+    "scientificChildren": 0,
+    "sourceOnly": true,
+    "subjectTimingExecuted": false,
+    "wholeSetupAndCorrectnessSeconds": 1620
+  },
+  "method": {
+    "implementationNote": {
+      "path": "method/IMPLEMENTATION-NOTE.md",
+      "sha256": "287c9f8576d3cdaea4d6754d808c07c97bbbf827394cdddf80f6cc3f7c041eb7"
+    },
+    "path": "method/METHOD.md",
+    "sha256": "2ac7f4c1979eef5bf41cb798c4d9a1deb7f3312d987ada61d87b1ded13f65267"
+  },
+  "nativeBuildExtra": "manifests/native-build-extra.json",
+  "npmCliSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+  "pristineSources": "manifests/pristine-sources.json",
+  "releaseState": {
+    "enabledCandidateForFinalReview": true,
+    "executionReleased": true,
+    "identityGate": "Event SHA equals checked-out HEAD; sole pinned-main parent; exact additions-only payload and authenticated bytes. The commit/tree is verified before branch creation; later pushes have no independent external HEAD pin.",
+    "publicationReleased": true,
+    "scientificChildrenStarted": 0,
+    "sourcePreparationOnly": false
+  },
+  "requiredReviews": {
+    "analysis": {
+      "approved": true,
+      "path": "reviews/SUBJECT-ANALYSIS.md",
+      "sha256": "ea7206a4cdc0b5d97dced65702b867217e3f7fd2def1855364afaf83944b411f"
+    },
+    "controller": {
+      "approved": true,
+      "path": "reviews/CONTROLLER.md",
+      "sha256": "382e97b28bf7acb4eaed715b2d73d51464f4f08a4dffbef5c72495fd9a341728"
+    },
+    "correctness": {
+      "approved": true,
+      "path": "reviews/CORRECTNESS.md",
+      "sha256": "4640845ddd63a87c0461969f44c341a0f31871f5754a0ea285e4820fc41a30e2"
+    },
+    "hostedCorrectnessRunner": {
+      "approved": true,
+      "path": "reviews/CONTROLLER.md",
+      "sha256": "382e97b28bf7acb4eaed715b2d73d51464f4f08a4dffbef5c72495fd9a341728"
+    },
+    "subject": {
+      "approved": true,
+      "path": "reviews/SUBJECT-ANALYSIS.md",
+      "sha256": "ea7206a4cdc0b5d97dced65702b867217e3f7fd2def1855364afaf83944b411f"
+    }
+  },
+  "schema": 1,
+  "scientificBudget": {
+    "analysisAndSealingSeconds": 90,
+    "calibrationChildren": 2,
+    "calibrationSecondsEach": 120,
+    "comparisonChildren": 32,
+    "comparisonSecondsEach": 90,
+    "finalCleanupSeconds": 60,
+    "probeChildren": 2,
+    "probeSecondsEach": 20,
+    "stagingAndPinsSeconds": 120,
+    "wholeSeconds": 3430
+  },
+  "toolchain": {
+    "dependencyInventory": "manifests/dependencies-hosted-node22-npm10.json",
+    "dependencyInventorySha256": "7ee99a31bc1bb35e826b979c7066f1a84041159fcb79d551ea0ade5c029bcd55",
+    "hiddenLockPolicy": "Exact installed paths/types/regular-file bytes/symlink targets; only npm-generated root .package-lock.json receives a preserved per-run SHA-256 binding, matching reviewed hosted v4 provisioning.",
+    "lock": "toolchain/package-lock.json",
+    "package": "toolchain/package.json"
+  }
+}

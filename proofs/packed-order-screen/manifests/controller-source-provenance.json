@@ -1,0 +1,56 @@
+{
+  "correctnessIdentityExtraction": {
+    "distinctFileAndFullNamePairs": 1086,
+    "duplicateMultiplicityPreserved": true,
+    "exportedFields": [
+      "file",
+      "fullName"
+    ],
+    "files": 51,
+    "rawReportSha256": "ac9bb8a6de0ca0c843d75d58fcf751d45c783c337ba458824417819dafbea751",
+    "testRows": 1088,
+    "timingAndFailureFieldsExported": false
+  },
+  "execution": false,
+  "schema": 1,
+  "scientificDataRead": false,
+  "scope": "Source identity and correctness-report identity extraction",
+  "sources": [
+    {
+      "role": "accepted lifetime controller source",
+      "sha256": "a240be0112ef8bdc6d459d5df61b25aa8d37264a37078495fc31636b2ee98712"
+    },
+    {
+      "role": "accepted mocked supervisor checks source",
+      "sha256": "50e5f04f92f90b1ee80ea830791aeb6c8aac4f15f01ac11868398b1b8471f694"
+    },
+    {
+      "role": "accepted hosted v4 provisioning source",
+      "sha256": "ed22d9785bdae3e1b17c78ff31187ff308821fe71e34cce54025fdf8a0a4e78a"
+    },
+    {
+      "role": "accepted hosted v4 inventory validation source",
+      "sha256": "0a5309f319c7992df7673465cb518cd92e6f8a37e841fe8ce3a61d44865e3ee7"
+    },
+    {
+      "role": "accepted hosted v4 exact dependency inventory",
+      "sha256": "7ee99a31bc1bb35e826b979c7066f1a84041159fcb79d551ea0ade5c029bcd55"
+    },
+    {
+      "role": "pinned Vitest CLI source supporting multiple reporters and per-reporter output",
+      "sha256": "27cc9365d180bee3da005fe6c4d485868caf9d8f54280759eea28842836af549"
+    }
+  ],
+  "targetImport": false,
+  "vitestReporterSyntax": {
+    "jsonOutputOption": "--outputFile.json=PATH",
+    "reporters": [
+      "default",
+      "json"
+    ],
+    "sourceLines": [
+      702,
+      715
+    ]
+  }
+}

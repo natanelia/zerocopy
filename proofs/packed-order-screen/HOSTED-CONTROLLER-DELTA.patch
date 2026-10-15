@@ -1,0 +1,22 @@
+--- validated-source/run-hosted.py
++++ hosted-release/run-hosted.py
+@@ -532,9 +532,6 @@
+         execution_template, release_template = read(HERE / 'EXECUTION-TEMPLATE.json'), read(HERE / 'RELEASE-TEMPLATE.json')
+         require(execution_template.get('executionReleased') is True and release_template.get('approved') is True,
+                 'preparation/screen execution has not been released')
+-        require(re.fullmatch('[0-9a-f]{40}', os.environ.get('PACKED_ORDER_EXPECTED_HEAD', '')) is not None and
+-                os.environ['PACKED_ORDER_EXPECTED_HEAD'] == os.environ.get('GITHUB_SHA'),
+-                'externally approved exact proof HEAD pin absent or different')
+         for template in (execution_template, release_template):
+             for name in ('run-hosted.py', 'subject.mjs', 'analysis.py'):
+                 pin = template.get('implementationFiles', {}).get(name)
+--- validated-source/workflow.yml
++++ hosted-release/workflow.yml
+@@ -19,7 +19,6 @@
+     env:
+       PACKED_ORDER_PROVISION: ${{ runner.temp }}/packed-order-provisioned
+       PACKED_ORDER_OUTPUT: ${{ runner.temp }}/packed-order-screen-result
+-      PACKED_ORDER_EXPECTED_HEAD: ${{ vars.PACKED_ORDER_EXPECTED_HEAD }}
+       PYTHONDONTWRITEBYTECODE: '1'
+     steps:
+       - name: Read the exact reviewed proof commit

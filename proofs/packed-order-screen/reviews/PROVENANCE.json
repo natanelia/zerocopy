@@ -1,0 +1,20 @@
+{
+  "CONTROLLER.md": {
+    "originalSha256": "8893ffd07b6c995771bf6f9ba801e30994e8246375ad02e1095f92b97872bfaa",
+    "publicCopySha256": "382e97b28bf7acb4eaed715b2d73d51464f4f08a4dffbef5c72495fd9a341728",
+    "scope": "Technical source/focused-correctness findings and limitations. No hosted performance result.",
+    "transformation": "Reader-facing technical edition; scientific findings, test outcomes and original evidence identities retained."
+  },
+  "CORRECTNESS.md": {
+    "originalSha256": "2bed40993b5791b99415ea039c674130078c52983090e750b2023fdb825774ac",
+    "publicCopySha256": "4640845ddd63a87c0461969f44c341a0f31871f5754a0ea285e4820fc41a30e2",
+    "scope": "Technical source/focused-correctness findings and limitations. No hosted performance result.",
+    "transformation": "Reader-facing technical edition; scientific findings, test outcomes and original evidence identities retained."
+  },
+  "SUBJECT-ANALYSIS.md": {
+    "originalSha256": "5810539ba7f3bb68103184705997fed8f56b89cdbb5f4ce80803df73eb036beb",
+    "publicCopySha256": "ea7206a4cdc0b5d97dced65702b867217e3f7fd2def1855364afaf83944b411f",
+    "scope": "Technical source/focused-correctness findings and limitations. No hosted performance result.",
+    "transformation": "Reader-facing technical edition; scientific findings, test outcomes and original evidence identities retained."
+  }
+}

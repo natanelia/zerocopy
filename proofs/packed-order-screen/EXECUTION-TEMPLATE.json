@@ -1,0 +1,50 @@
+{
+  "approved": true,
+  "arms": {
+    "baseline": {
+      "generated": "manifests/baseline-generated.json",
+      "root": "${PROVISION_ROOT}/arms/baseline",
+      "sources": "manifests/baseline-sources.json"
+    },
+    "candidate": {
+      "generated": "manifests/candidate-generated.json",
+      "root": "${PROVISION_ROOT}/arms/candidate",
+      "sources": "manifests/candidate-sources.json"
+    }
+  },
+  "evidence": {
+    "correctnessReviewSha256": "4640845ddd63a87c0461969f44c341a0f31871f5754a0ea285e4820fc41a30e2",
+    "criticalReviewSha256": "ac1658592bd93a2a96849c557aad8b43295cc52fccb9e397def935e29867780d",
+    "focusedSourceSealSha256": "f62fe13c044cbf13b066c674d42e7fa02a533812233bf229c38a471c4cfae1f4",
+    "implementationNoteSha256": "287c9f8576d3cdaea4d6754d808c07c97bbbf827394cdddf80f6cc3f7c041eb7",
+    "localFullSuiteSummarySha256": "c440b4458957d03c3daa95ab73d89086385bd8ecd2a9b6323b08f49717d4ff21",
+    "methodSha256": "2ac7f4c1979eef5bf41cb798c4d9a1deb7f3312d987ada61d87b1ded13f65267"
+  },
+  "executables": {
+    "bun": {
+      "bytes": 79500640,
+      "path": "${BUN}",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "version": "1.4.2"
+    },
+    "node": {
+      "bytes": 121509208,
+      "path": "${NODE}",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "version": "22.16.0"
+    }
+  },
+  "executionReleased": true,
+  "expectedHostedHead": "${PROOF_HEAD}",
+  "implementationFiles": {
+    "analysis.py": "33cb8de1c646a1fe2b4568ae7256b0a5cb489f6e93c5315d79edbeb00ba28ce8",
+    "run-hosted.py": "bde63809b8613fb7c0d3a8c40e8b4e75c16f7544ae24bd6a65ccd78b76d491ff",
+    "subject.mjs": "0e9922afff43c2388ad43e81c1b1bc1676f4a6e094ee349d485ba67fcc74dc1c"
+  },
+  "note": "Exact technical packet pins for the prospective hosted run; source/synthetic results are distinct from hosted correctness and performance evidence.",
+  "preparationSeconds": 1620,
+  "publicationReleased": true,
+  "schema": 1,
+  "screenSeconds": 3430,
+  "subjectChildren": 36
+}

@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "sourceOnly": true,
+  "executed": false,
+  "setupAndCorrectnessWholeSeconds": 1620,
+  "correctnessCommandsCeilingSeconds": 720,
+  "individualSuiteTestTimeoutMilliseconds": 5000,
+  "scientificChildren": 0,
+  "subjectTimingExecuted": false,
+  "commands": [
+    {
+      "label": "baseline-bun-full-suite",
+      "arm": "baseline",
+      "kind": "bun-full-suite",
+      "argv": [
+        "${BUN}",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--cache=false",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=${ARTIFACT_ROOT}/reports/baseline-bun-full-suite.json"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/baseline",
+      "capSeconds": 240,
+      "sampledGroupRssLimitBytes": 2147483648
+    },
+    {
+      "label": "candidate-bun-full-suite",
+      "arm": "candidate",
+      "kind": "bun-full-suite",
+      "argv": [
+        "${BUN}",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--cache=false",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=${ARTIFACT_ROOT}/reports/candidate-bun-full-suite.json"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/candidate",
+      "capSeconds": 240,
+      "sampledGroupRssLimitBytes": 2147483648
+    },
+    {
+      "label": "baseline-typecheck",
+      "arm": "baseline",
+      "kind": "typecheck",
+      "argv": [
+        "${NODE}",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/baseline",
+      "capSeconds": 60,
+      "sampledGroupRssLimitBytes": 2147483648
+    },
+    {
+      "label": "candidate-typecheck",
+      "arm": "candidate",
+      "kind": "typecheck",
+      "argv": [
+        "${NODE}",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/candidate",
+      "capSeconds": 60,
+      "sampledGroupRssLimitBytes": 2147483648
+    },
+    {
+      "label": "baseline-node-worker",
+      "arm": "baseline",
+      "kind": "node-worker",
+      "argv": [
+        "${NODE}",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=20000",
+        "proofs/ordered-map-packed-worker.node.mjs"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/baseline",
+      "capSeconds": 60,
+      "sampledGroupRssLimitBytes": 2147483648
+    },
+    {
+      "label": "candidate-node-worker",
+      "arm": "candidate",
+      "kind": "node-worker",
+      "argv": [
+        "${NODE}",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=20000",
+        "proofs/ordered-map-packed-worker.node.mjs"
+      ],
+      "cwd": "${PROVISION_ROOT}/arms/candidate",
+      "capSeconds": 60,
+      "sampledGroupRssLimitBytes": 2147483648
+    }
+  ],
+  "expectedFullSuiteFiles": "manifests/expected-test-files.json",
+  "expectedFullSuiteCases": "manifests/expected-full-suite-cases.json",
+  "expectedFullSuiteCount": 1088,
+  "expectedWorkerCases": [
+    "packed ordered histories in a real worker (copy=false)",
+    "packed ordered histories in a real worker (copy=true)"
+  ]
+}

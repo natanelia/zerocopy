@@ -1,0 +1,29 @@
+{
+  "allOriginalLeadersReaped": true,
+  "allRawStreamsAndReceiptsAuthenticated": true,
+  "analysisSyntheticTests": 24,
+  "capFailure": false,
+  "commandCount": 7,
+  "noSourceFilesAddedOrChanged": true,
+  "originalTerminalAuditSha256": "be62f918b625d76598ed323db307624bd40907cef7c8c70413f0752f496f8d97",
+  "originalTerminalManifestSha256": "07db31bcba80d340cc0d359310741bb027480c286300c7c7f3c4788283b82be7",
+  "originalTerminalSealSha256": "ac04191c73c5275456771a67d999792968407c8d30fd3a8415fc5bf2502d937a",
+  "performanceInference": false,
+  "publicationReleased": false,
+  "remainingOriginalProcessGroups": false,
+  "schema": 1,
+  "scientificExecutionReleased": false,
+  "scope": "Only seven inert AST/JSON/hash/syntax/synthetic/mocked commands; no correctness/target/probe/measurement/build/install/external execution.",
+  "sealedBytecodeAbsent": true,
+  "sourceManifestFilesVerified": 50,
+  "sourcePacketSealSha256": "4ff8675fbd4712d5f5dbc776c2b8b6107770d54d02f108578b5c38475e261d8a",
+  "status": "seven-command-inert-pass",
+  "subjectSyntheticEngines": [
+    "node",
+    "bun"
+  ],
+  "summaryScope": "Public synthetic result summary; local paths, environment, process identifiers and resource timings omitted.",
+  "supervisorMockedTests": 7,
+  "targetLibraryImported": false,
+  "terminalExitCode": 0
+}
