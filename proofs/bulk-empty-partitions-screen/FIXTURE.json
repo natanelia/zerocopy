@@ -1,0 +1,226 @@
+{
+  "keyPattern": "item:00000 through item:04095",
+  "keyCount": 4096,
+  "uniqueFullHashes": 4096,
+  "hash": "FNV-1a over ASCII bytes, initial 2166136261, multiplier 16777619, unsigned 32-bit",
+  "denseIndexes": [
+    4,
+    21,
+    2,
+    5,
+    8,
+    3,
+    6,
+    9,
+    22,
+    7,
+    19,
+    23,
+    0,
+    18,
+    20,
+    1
+  ],
+  "objectMaximumJsonBytes": 46,
+  "seedBranchBound": 2359296,
+  "seedUsedUpper": 2605070,
+  "cases": [
+    {
+      "name": "P8",
+      "n": 8,
+      "branchBound": 4608,
+      "stagingOrLeafBound": 366,
+      "allocationPerCallUpper": 4974,
+      "seedUsedUpper": 2605070,
+      "memoryCountMax": 1024,
+      "combinedCountMax": 1024,
+      "fullLifetimeUpper": 33165326
+    },
+    {
+      "name": "P128",
+      "n": 128,
+      "branchBound": 73728,
+      "stagingOrLeafBound": 5646,
+      "allocationPerCallUpper": 79374,
+      "seedUsedUpper": 2605070,
+      "memoryCountMax": 64,
+      "combinedCountMax": 64,
+      "fullLifetimeUpper": 33084686
+    },
+    {
+      "name": "large",
+      "n": 4096,
+      "branchBound": 2359296,
+      "stagingOrLeafBound": 294512,
+      "allocationPerCallUpper": 2653808,
+      "seedUsedUpper": 65536,
+      "memoryCountMax": 2,
+      "combinedCountMax": 2,
+      "fullLifetimeUpper": 31911232
+    },
+    {
+      "name": "dense16",
+      "n": 16,
+      "branchBound": 9216,
+      "stagingOrLeafBound": 718,
+      "allocationPerCallUpper": 9934,
+      "seedUsedUpper": 2605070,
+      "memoryCountMax": 512,
+      "combinedCountMax": 512,
+      "fullLifetimeUpper": 33122318
+    },
+    {
+      "name": "one",
+      "n": 1,
+      "branchBound": 576,
+      "stagingOrLeafBound": 58,
+      "allocationPerCallUpper": 634,
+      "seedUsedUpper": 2605070,
+      "memoryCountMax": 8192,
+      "combinedCountMax": 8192,
+      "fullLifetimeUpper": 33767438
+    },
+    {
+      "name": "four",
+      "n": 4,
+      "branchBound": 2304,
+      "stagingOrLeafBound": 190,
+      "allocationPerCallUpper": 2494,
+      "seedUsedUpper": 2605070,
+      "memoryCountMax": 2048,
+      "combinedCountMax": 2048,
+      "fullLifetimeUpper": 33251342
+    }
+  ],
+  "schema": "prospective-bulk-screen-fixture-v1",
+  "status": "source-derived arithmetic only; no subject execution",
+  "numericSeedValues": "i",
+  "numericReplacementValues": [
+    "i+10000",
+    "i+20000"
+  ],
+  "objectValue": {
+    "propertyOrder": [
+      "id",
+      "label",
+      "active"
+    ],
+    "id": "i",
+    "label": "item- + decimal i",
+    "active": "i%2===0"
+  },
+  "readSequence": {
+    "hits": "item:00000 through item:00127",
+    "misses": "absent:00000 through absent:00127",
+    "repeatPeriod": 256
+  },
+  "partitionMetadata": [
+    {
+      "case": "P8",
+      "frames": 1,
+      "emptyDigitVisits": 8,
+      "occupiedDigitVisits": 8,
+      "perDepth": [
+        {
+          "shift": 0,
+          "frames": 1,
+          "empty": 8
+        }
+      ]
+    },
+    {
+      "case": "P128",
+      "frames": 17,
+      "emptyDigitVisits": 144,
+      "occupiedDigitVisits": 128,
+      "perDepth": [
+        {
+          "shift": 0,
+          "frames": 1,
+          "empty": 0
+        },
+        {
+          "shift": 4,
+          "frames": 16,
+          "empty": 144
+        }
+      ]
+    },
+    {
+      "case": "large",
+      "frames": 295,
+      "emptyDigitVisits": 1704,
+      "occupiedDigitVisits": 3016,
+      "perDepth": [
+        {
+          "shift": 0,
+          "frames": 1,
+          "empty": 0
+        },
+        {
+          "shift": 4,
+          "frames": 16,
+          "empty": 0
+        },
+        {
+          "shift": 8,
+          "frames": 256,
+          "empty": 1446
+        },
+        {
+          "shift": 12,
+          "frames": 22,
+          "empty": 258
+        }
+      ]
+    },
+    {
+      "case": "dense16",
+      "frames": 1,
+      "emptyDigitVisits": 0,
+      "occupiedDigitVisits": 16
+    }
+  ],
+  "allocationBoundDerivation": [
+    "All 4096 full hashes are distinct. Hash routing consumes four bits at each of eight levels, so no terminal collision bucket is needed for these fixed keys, including replacements.",
+    "Each branch allocates at most 8+4*16=72 bytes. An overlay allocates 12 bytes. Failed tryOverlay allocates nothing; successful tryOverlay returns directly. fullBranch resolves an arbitrary permitted overlay chain in scratch and allocates exactly one ordinary branch, not one allocation per prior overlay.",
+    "Charge at most one 72-byte branch allocation per input record per hash level: for count>4, each partitioned batch frame allocates one branch at its own level; its child frames or <=4 insertAt paths operate only at subsequent levels. For <=4, each insertAt/mergeHashed path allocates at most one branch or overlay per remaining level. Private fresh-node reuse only reduces this bound.",
+    "Thus branch allocation <=8*72*n=576n per call regardless of old overlay depth, pointer-distance fallback or repeated replacement history. The bound uses no seed-trie arity or pilot delta.",
+    "Numeric leaves have 10 ASCII key bytes and 8 value bytes: each bulk leaf is 40 bytes, pointer storage is 4n, and 14 extra bytes conservatively cover initial and final 8-byte alignment, giving 44n+14. Native branches/overlays are multiples of four bytes and do not call alloc; no further per-node 8-byte alignment is assumed.",
+    "Object JSON is ASCII, maximum length 46 bytes; sum of roundUp4(16+10+JSON_length) for all 4096 values is 294512 bytes. Its 4096 input pointers use existing scratch because count<=12288. Fixed plain objects have no callbacks or dependencies.",
+    "Numeric seed upper heapEnd=65536+(44*4096+14)+(576*4096)=2605070. Per-call bounds are 576n plus numeric staging or object leaf bytes. Empty/read allocate zero arena payload.",
+    "Only public setMany creates writer roots in these fixtures, so no scalar-write journal is introduced. Overlay fallback/materialization is covered as above. Unexpected journals, collisions, key changes or source changes invalidate this fixture-bound proof.",
+    "Gmemory=floorPowerOfTwo(floor((67108864-4194304-S)/(6*D))); seed plus two warm plus four measured chunks are all covered. Empty/read D=0 use their operation ceiling.",
+    "Each observed endpoint delta must be <= its number of calls times D, and endpoint used must be <= S plus cumulative call count times D. Any excess is a correctness/planning stop; never revise bounds or counts after observing it."
+  ],
+  "operationCeilings": {
+    "P8": 8192,
+    "P128": 512,
+    "large": 16,
+    "dense16": 4096,
+    "empty": 1048576,
+    "one": 16384,
+    "four": 8192,
+    "read": 1048576
+  },
+  "calibrationStartingCounts": {
+    "P8": 256,
+    "P128": 16,
+    "large": 1,
+    "dense16": 128,
+    "empty": 16384,
+    "one": 1024,
+    "four": 256,
+    "read": 4096
+  },
+  "fixedMaximumCounts": {
+    "P8": 1024,
+    "P128": 64,
+    "large": 2,
+    "dense16": 512,
+    "empty": 1048576,
+    "one": 8192,
+    "four": 2048,
+    "read": 1048576
+  }
+}

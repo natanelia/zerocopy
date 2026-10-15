@@ -1,0 +1,30 @@
+{
+  "baseline": {
+    "coreSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "coreBytes": 26180,
+    "embeddedFile": "chunk-t2acd52e.js",
+    "embeddedFileSha256": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+    "sharedEntryReachableFiles": [
+      "chunk-enwn105b.js",
+      "chunk-jyz2w9p4.js",
+      "chunk-n1amv1q3.js",
+      "chunk-t2acd52e.js",
+      "shared.js"
+    ],
+    "embeddedBytesEqualNative": true
+  },
+  "candidate": {
+    "coreSha256": "ee17702d638e275cfbcc494e455617fff46b55a6e7d7ed5bb8ef08e6c4c986a7",
+    "coreBytes": 26191,
+    "embeddedFile": "chunk-kr1k87rk.js",
+    "embeddedFileSha256": "48ed6dd7038935450c9fc6f6253098aec142fbc1e8d91d60a97d4e1de689b7c6",
+    "sharedEntryReachableFiles": [
+      "chunk-37013j6k.js",
+      "chunk-abhb669b.js",
+      "chunk-kr1k87rk.js",
+      "chunk-sf28h15s.js",
+      "shared.js"
+    ],
+    "embeddedBytesEqualNative": true
+  }
+}

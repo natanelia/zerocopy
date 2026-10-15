@@ -1,0 +1,16 @@
+--- a/persistent-core.as.ts
++++ b/persistent-core.as.ts
+@@ -442,8 +442,11 @@
+   start = 0;
+   for (let digit: u32 = 0; digit < 16; digit++) {
+     const n = load<u32>(frame + digit * 4);
+-    const child = batchAt(childAt(old, digit, shift), input + start * 4, n, shift + 4, mark);
+-    added += batchChange;
++    let child = childAt(old, digit, shift);
++    if (n) {
++      child = batchAt(child, input + start * 4, n, shift + 4, mark);
++      added += batchChange;
++    }
+     if (child) {
+       bitmap |= 1 << digit;
+       store<u32>(frame + 128 + children++ * 4, child);

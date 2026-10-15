@@ -1,0 +1,650 @@
+[
+  {
+    "id": "cal-0",
+    "kind": "calibration",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 0,
+    "rotation": 0,
+    "order": [
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read"
+    ]
+  },
+  {
+    "id": "cal-1",
+    "kind": "calibration",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 1,
+    "rotation": 2,
+    "order": [
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128"
+    ]
+  },
+  {
+    "id": "cal-2",
+    "kind": "calibration",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 2,
+    "rotation": 4,
+    "order": [
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16"
+    ]
+  },
+  {
+    "id": "cal-3",
+    "kind": "calibration",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 3,
+    "rotation": 6,
+    "order": [
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One"
+    ]
+  },
+  {
+    "id": "obs-0-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 0,
+    "rotation": 0,
+    "order": [
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read"
+    ]
+  },
+  {
+    "id": "obs-0-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 0,
+    "rotation": 0,
+    "order": [
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read"
+    ]
+  },
+  {
+    "id": "obs-0-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 0,
+    "rotation": 0,
+    "order": [
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read"
+    ]
+  },
+  {
+    "id": "obs-0-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 0,
+    "rotation": 0,
+    "order": [
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read"
+    ]
+  },
+  {
+    "id": "obs-1-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 1,
+    "rotation": 1,
+    "order": [
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8"
+    ]
+  },
+  {
+    "id": "obs-1-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 1,
+    "rotation": 1,
+    "order": [
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8"
+    ]
+  },
+  {
+    "id": "obs-1-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 1,
+    "rotation": 1,
+    "order": [
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8"
+    ]
+  },
+  {
+    "id": "obs-1-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 1,
+    "rotation": 1,
+    "order": [
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8"
+    ]
+  },
+  {
+    "id": "obs-2-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 2,
+    "rotation": 2,
+    "order": [
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128"
+    ]
+  },
+  {
+    "id": "obs-2-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 2,
+    "rotation": 2,
+    "order": [
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128"
+    ]
+  },
+  {
+    "id": "obs-2-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 2,
+    "rotation": 2,
+    "order": [
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128"
+    ]
+  },
+  {
+    "id": "obs-2-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 2,
+    "rotation": 2,
+    "order": [
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128"
+    ]
+  },
+  {
+    "id": "obs-3-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 3,
+    "rotation": 3,
+    "order": [
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large"
+    ]
+  },
+  {
+    "id": "obs-3-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 3,
+    "rotation": 3,
+    "order": [
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large"
+    ]
+  },
+  {
+    "id": "obs-3-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 3,
+    "rotation": 3,
+    "order": [
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large"
+    ]
+  },
+  {
+    "id": "obs-3-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 3,
+    "rotation": 3,
+    "order": [
+      "Dense16",
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large"
+    ]
+  },
+  {
+    "id": "obs-4-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 4,
+    "rotation": 4,
+    "order": [
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16"
+    ]
+  },
+  {
+    "id": "obs-4-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 4,
+    "rotation": 4,
+    "order": [
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16"
+    ]
+  },
+  {
+    "id": "obs-4-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 4,
+    "rotation": 4,
+    "order": [
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16"
+    ]
+  },
+  {
+    "id": "obs-4-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 4,
+    "rotation": 4,
+    "order": [
+      "Empty",
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16"
+    ]
+  },
+  {
+    "id": "obs-5-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 5,
+    "rotation": 5,
+    "order": [
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty"
+    ]
+  },
+  {
+    "id": "obs-5-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 5,
+    "rotation": 5,
+    "order": [
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty"
+    ]
+  },
+  {
+    "id": "obs-5-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 5,
+    "rotation": 5,
+    "order": [
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty"
+    ]
+  },
+  {
+    "id": "obs-5-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 5,
+    "rotation": 5,
+    "order": [
+      "One",
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty"
+    ]
+  },
+  {
+    "id": "obs-6-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 6,
+    "rotation": 6,
+    "order": [
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One"
+    ]
+  },
+  {
+    "id": "obs-6-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 6,
+    "rotation": 6,
+    "order": [
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One"
+    ]
+  },
+  {
+    "id": "obs-6-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 6,
+    "rotation": 6,
+    "order": [
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One"
+    ]
+  },
+  {
+    "id": "obs-6-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 6,
+    "rotation": 6,
+    "order": [
+      "Four",
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One"
+    ]
+  },
+  {
+    "id": "obs-7-Bun-baseline",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "baseline",
+    "repetition": 7,
+    "rotation": 7,
+    "order": [
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four"
+    ]
+  },
+  {
+    "id": "obs-7-Bun-candidate",
+    "kind": "observation",
+    "engine": "Bun",
+    "arm": "candidate",
+    "repetition": 7,
+    "rotation": 7,
+    "order": [
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four"
+    ]
+  },
+  {
+    "id": "obs-7-Node-candidate",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "candidate",
+    "repetition": 7,
+    "rotation": 7,
+    "order": [
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four"
+    ]
+  },
+  {
+    "id": "obs-7-Node-baseline",
+    "kind": "observation",
+    "engine": "Node",
+    "arm": "baseline",
+    "repetition": 7,
+    "rotation": 7,
+    "order": [
+      "Read",
+      "P8",
+      "P128",
+      "Large",
+      "Dense16",
+      "Empty",
+      "One",
+      "Four"
+    ]
+  }
+]

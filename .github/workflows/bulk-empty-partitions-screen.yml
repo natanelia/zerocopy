@@ -1,0 +1,77 @@
+name: Bounded native bulk public screen
+
+on:
+  push:
+    branches: [proof/bulk-empty-partitions-screen-20261014]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bulk-empty-partitions-screen-20261014
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.repository == 'natanelia/zerocopy' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    env:
+      BULK_SCREEN_ROOT: ${{ runner.temp }}/bulk-empty-partitions-screen-20261014
+      BULK_SCREEN_EPOCH: ${{ runner.temp }}/bulk-empty-partitions-screen-20261014-epoch.json
+    steps:
+      - name: Start one bounded bootstrap and fixed cohort
+        run: |
+          python3 - <<'PYBOOT'
+          import json, os, re, subprocess, sys, time
+          from pathlib import Path
+          start=time.monotonic()
+          epoch=Path(os.environ['BULK_SCREEN_EPOCH'])
+          bootstrap=Path(os.environ['RUNNER_TEMP'])/'bulk-empty-partitions-screen-20261014-bootstrap'
+          bootstrap.mkdir()
+          checkout=Path(os.environ['RUNNER_TEMP'])/'bulk-empty-partitions-screen-20261014-checkout'
+          checkout.mkdir()
+          with epoch.open('x') as f:
+              json.dump({'monotonic':start,'wallUtcSeconds':time.time(),'runId':os.environ['GITHUB_RUN_ID'],'attempt':os.environ['GITHUB_RUN_ATTEMPT']},f)
+          receipts=[]
+          env={k:os.environ[k] for k in ['PATH','HOME','TMPDIR','LANG','LC_ALL','TZ'] if k in os.environ}
+          env.update({'GIT_TERMINAL_PROMPT':'0','GIT_CONFIG_NOSYSTEM':'1'})
+          def command(label,args):
+              remaining=start+120-time.monotonic()
+              assert remaining>0,'preparation deadline exhausted'
+              with (bootstrap/(label+'.stdout')).open('xb') as out, (bootstrap/(label+'.stderr')).open('xb') as err:
+                  # GNU timeout owns this command group and kills it at the common deadline.
+                  result=subprocess.run(['timeout','--signal=KILL',str(remaining)+'s',*args],cwd=checkout,env=env,stdout=out,stderr=err)
+              receipts.append({'label':label,'argv':args,'exitCode':result.returncode,'elapsedSeconds':time.monotonic()-start,'remainingCapSeconds':remaining})
+              (bootstrap/'receipts.json').write_text(json.dumps(receipts,indent=2)+'\n')
+              assert result.returncode==0 and time.monotonic()<=start+120,'bounded bootstrap command failed'
+          try:
+              head=os.environ['GITHUB_SHA']
+              assert re.fullmatch('[0-9a-f]{40}',head) and os.environ['GITHUB_RUN_ATTEMPT']=='1'
+              command('init',['git','init','.'])
+              command('remote',['git','remote','add','origin','https://github.com/natanelia/zerocopy.git'])
+              command('fetch',['git','-c','credential.helper=','-c','core.askPass=','fetch','--no-tags','--depth=2','origin',head])
+              command('checkout',['git','checkout','--detach','FETCH_HEAD'])
+              command('head',['git','rev-parse','HEAD'])
+              command('parent',['git','rev-parse','HEAD^'])
+              assert (bootstrap/'head.stdout').read_text().strip()==head
+              assert (bootstrap/'parent.stdout').read_text().strip()=='afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+              assert time.monotonic()<start+120
+              (bootstrap/'result.json').write_text(json.dumps({'complete':True,'head':head,'elapsedSeconds':time.monotonic()-start})+'\n')
+              os.execv(sys.executable,[sys.executable,str(checkout/'proofs/bulk-empty-partitions-screen/run-hosted.py'),os.environ['BULK_SCREEN_ROOT'],str(epoch)])
+          except BaseException as error:
+              (bootstrap/'result.json').write_text(json.dumps({'complete':False,'error':repr(error),'elapsedSeconds':time.monotonic()-start})+'\n')
+              raise
+          PYBOOT
+      - name: Transport terminal and partial evidence without subject work
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bulk-empty-partitions-screen-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/bulk-empty-partitions-screen-20261014/artifact/
+            ${{ runner.temp }}/bulk-empty-partitions-screen-20261014-epoch.json
+            ${{ runner.temp }}/bulk-empty-partitions-screen-20261014-bootstrap/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
