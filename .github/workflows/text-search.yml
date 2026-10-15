@@ -23,6 +23,10 @@ jobs:
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bunx tsc --noEmit -p tsconfig.text-search.json
       - run: node --test proofs/text-search.mjs proofs/text-kernel.mjs proofs/text-batch.mjs
+      - name: Check short-query preparation on Node and Bun
+        run: |
+          node proofs/text-query-preparation.mjs
+          bun proofs/text-query-preparation.mjs
       - run: npm --prefix website install --ignore-scripts --no-package-lock
       - run: bunx playwright install --with-deps chromium webkit
       - name: Build the previous PR13 version

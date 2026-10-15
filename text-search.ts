@@ -46,13 +46,21 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
   // to shared bytes are disproportionately costly in some browser engines.
   // Packed query words are call arguments, never shared allocator scratch.
   if (length <= 16) {
-    const packed = new Uint32Array(4), masks = new Uint32Array(4);
+    let packed0 = 0, packed1 = 0, packed2 = 0, packed3 = 0;
+    let mask0 = 0, mask1 = 0, mask2 = 0, mask3 = 0;
     for (let i = 0; i < length; i++) {
       const code = needle[i], shift = (i & 3) * 8;
-      packed[i >>> 2] |= code << shift;
-      if (!sensitive && code >= 97 && code <= 122) masks[i >>> 2] |= 32 << shift;
+      const word = code << shift;
+      const mask = !sensitive && code >= 97 && code <= 122 ? 32 << shift : 0;
+      switch (i >>> 2) {
+        case 0: packed0 |= word; mask0 |= mask; break;
+        case 1: packed1 |= word; mask1 |= mask; break;
+        case 2: packed2 |= word; mask2 |= mask; break;
+        case 3: packed3 |= word; mask3 |= mask; break;
+      }
     }
-    const [q0,q1,q2,q3] = packed, [m0,m1,m2,m3] = masks;
+    const q0 = packed0 >>> 0, q1 = packed1 >>> 0, q2 = packed2 >>> 0, q3 = packed3 >>> 0;
+    const m0 = mask0 >>> 0, m1 = mask1 >>> 0, m2 = mask2 >>> 0, m3 = mask3 >>> 0;
     const scan = arena.wasm.textContains16;
     const test = (raw: number) => {
       const result = scan(raw, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
