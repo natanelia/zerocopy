@@ -1,0 +1,21 @@
+{
+  "BUILD-PINS-PROVENANCE.json": "6bbb86c7b570ed94bb9fe613a00128b055e5eea11ebe4a2b9bf1493e1828c736",
+  "FIXTURE.json": "8a5f8ca39522a48af9baaa030c2dbfa54759fcb81a54141178e66644e6f45c04",
+  "METHOD.md": "0f24e0a83b424ab428ba234034324ae6b8466174fed73110bcb799acffec7085",
+  "README.md": "5b16e23a1cb3436388fc1a1b28c7ed5807d755e008a5415e1297becfb5b799f6",
+  "SCHEDULE.json": "bc61c2227fca48e33d0cefa4eb73879deaabf0567dcd27832859ef3f928fe8fd",
+  "SOURCE-PINS.json": "abb3877ef705b527a486084f677fdad6d949513585ab07e51c9ff4231835f2cb",
+  "baseline-generated.json": "150f24ca0978fbb8ba5b4d21e64d103c3264c77267dc1a5d96cc9623d5bdc509",
+  "baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "candidate-generated.json": "dc10dde9b251512075fadfc063b97e5f2096914da10cafeeb18958a041711ec5",
+  "candidate.patch": "87aa2268a99d9bc76e669d459c138bb4f15227c3d16d4c0ad0675bb4f7e0d4bf",
+  "child.mjs": "396f0dd42e478bd94ba608d8f1cbd3761cc5f241becdecf05d79b95290f3e575",
+  "portable-authentication.json": "33fecae8ba6b09e7c3d2aa1a416a09b0605b171e61dee8a6a2109e17f1a65896",
+  "protocol.mjs": "6a3fa62ed3a8f81d67ff463f2017c516c2f8174dfad0e05f7ac3646e410e9b0b",
+  "protocol.test.mjs": "5bfce9035d58444999b764d51bd3b0f507e9370f8cfd4c24bb274c01687979e5",
+  "run-hosted.py": "5b41be99c1707503f051bd2eb9c244d5f59f737512502d82e3a5c45fb03d01e7",
+  "summarize.mjs": "11546281c0001ff37e6fa5e2bd6b72ad20e90fb21146c9b40d97c87ef1239621",
+  "toolchain/package-lock.json": "40cb25e6af64cc2f20e7a5dd9a828fb90e222fee762e8df78dde40ec956e89ce",
+  "toolchain/package.json": "58c08a8b207f0768b1a81b0ff473cf50c5b26f922c422bbb3ad6943534930e77",
+  "../../.github/workflows/bulk-empty-partitions-screen.yml": "808da5f17dbaf3d1846b2964d3160139ad340e343a9f2ee8551f91b35dba72d4"
+}

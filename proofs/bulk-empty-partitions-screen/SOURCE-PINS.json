@@ -1,0 +1,60 @@
+{
+  "schema": "prospective-bulk-screen-source-pins-v1",
+  "main": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "baselineRoot": "/workspace/scratch/e7ec22ef2609/zerocopy-set-insert-20261014/baseline",
+  "candidateRoot": "/workspace/scratch/e7ec22ef2609/zerocopy-bulk-empty-partitions-20261014",
+  "sourceSha256": {
+    "baseline/persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+    "candidate/persistent-core.as.ts": "eacf630af6466cf4a8bfaa8eadaf32f155fa027a41dd2a2d69965662b7d9caec",
+    "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+    "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+    "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+    "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+    "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+    "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+    "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+    "CONTRIBUTING.md": "44a8ae75826df5fb491350df509e8150edeec0244149e7e175f16199f8da33c0"
+  },
+  "nativeWasm": {
+    "baseline": {
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "bytes": 26180
+    },
+    "candidate": {
+      "sha256": "ee17702d638e275cfbcc494e455617fff46b55a6e7d7ed5bb8ef08e6c4c986a7",
+      "bytes": 26191
+    }
+  },
+  "engines": {
+    "Node": {
+      "version": "22.16.0",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "bytes": 121509208,
+      "publicExport": "./dist/shared.js"
+    },
+    "Bun": {
+      "version": "1.4.2",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "bytes": 79500640,
+      "publicExport": "./shared.ts"
+    }
+  },
+  "enginePinProvenance": "Read from retained correctness run 38638756598 artifact/executables.json; not newly executed here.",
+  "portableBuildStatus": "Correctness run 38641407273 at d59e3f157c19e051088c1f8996972dce9aa5bb34 completed with authenticated generated outputs and matching embedded cores. Independent correctness review is sealing. Verify selected generated files against the authenticated artifact manifest and portable-authentication record before any separately authorized timing.",
+  "reviews": [
+    "/workspace/shared/zerocopy-bulk-empty-partition-review-20261014/REVIEW.md",
+    "/workspace/shared/zerocopy-bulk-empty-partition-review-20261014/failed-run-38638756598/REVIEW.md"
+  ],
+  "correctnessPrerequisite": {
+    "runId": 38641407273,
+    "head": "d59e3f157c19e051088c1f8996972dce9aa5bb34",
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/38641407273",
+    "localRoot": "/workspace/scratch/e7ec22ef2609/zerocopy-bulk-empty-partitions-20261014/hosted-result-38641407273",
+    "authenticationFile": "AUTHENTICATION.json",
+    "authenticationSha256": "ef9b6442096c005ae79f0c2ca61b8df6850be74338c0c16704b7f646adfd4b9b",
+    "artifactManifest": "artifact/ARTIFACT-SHA256.json",
+    "artifactManifestSha256": "26aacc2a43f22bfc6f7d6c3bf91f556424ff17fc1fb40de7138ca39e571899eb",
+    "portableAuthentication": "artifact/portable-authentication.json",
+    "independentReview": "sealing; no performance authority inferred"
+  }
+}

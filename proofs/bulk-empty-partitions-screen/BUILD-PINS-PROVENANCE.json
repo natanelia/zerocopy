@@ -1,0 +1,40 @@
+{
+  "run": 38641407273,
+  "head": "d59e3f157c19e051088c1f8996972dce9aa5bb34",
+  "url": "https://github.com/natanelia/zerocopy/actions/runs/38641407273",
+  "officialZipSha256": "16a05d7e518c2b54f43d1b5269e3970f907e5dec0251b255f62c78afe0acb7c7",
+  "authenticationSha256": "ef9b6442096c005ae79f0c2ca61b8df6850be74338c0c16704b7f646adfd4b9b",
+  "artifactManifestSha256": "26aacc2a43f22bfc6f7d6c3bf91f556424ff17fc1fb40de7138ca39e571899eb",
+  "originalEvidenceFiles": {
+    "portable-authentication.json": "33fecae8ba6b09e7c3d2aa1a416a09b0605b171e61dee8a6a2109e17f1a65896",
+    "baseline-build-v1/generated.json": "33698c708f49335cc630c68015c52dfe27436b1883e61c094d867351af4b709d",
+    "candidate-build-v1/generated.json": "b1d700d87284fe422b24a7b44d53cacc196e90485cfe62cbbb300da5f4f900d8"
+  },
+  "projectedBuildPins": {
+    "baseline-generated.json": "150f24ca0978fbb8ba5b4d21e64d103c3264c77267dc1a5d96cc9623d5bdc509",
+    "candidate-generated.json": "dc10dde9b251512075fadfc063b97e5f2096914da10cafeeb18958a041711ec5"
+  },
+  "projection": "Omit only dist/types declarations, which are not built or imported by this runtime screen. All freshly generated native and portable outputs must match the authenticated full manifest. No new generated pins inferred.",
+  "independentReviewSha256": {
+    "method": "382042154a3e311789c4e1a69b43453836f3b72f03f54ac438b3464c97c0a354",
+    "correctness": "62d8fb370e5b746e01783cbe45675d526d21a51a7ed9135e495db8bd64b2cbf7"
+  },
+  "firstCorrectnessAttempt": {
+    "run": 38638756598,
+    "status": "failed structural checker; preserved unchanged"
+  },
+  "preparationHistoricalSeconds": {
+    "lockedInstall": 4.339,
+    "baselineNative": 5.811,
+    "candidateNative": 5.797,
+    "baselinePortable": 0.133,
+    "candidatePortable": 0.141
+  },
+  "historicalTimingScope": "Build/setup diagnostics only; not candidate performance measurements.",
+  "officialNodeArchive": {
+    "url": "https://nodejs.org/download/release/v22.16.0/node-v22.16.0-linux-x64.tar.xz",
+    "sha256": "f4cb75bb036f0d0eddf6b79d9596df1aaab9ddccd6a20bf489be5abe9467e84e",
+    "bytes": 30425588,
+    "historicalDownloadSeconds": 18.204938411712646
+  }
+}
