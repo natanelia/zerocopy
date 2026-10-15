@@ -1,0 +1,14 @@
+{
+  ".github/workflows/capture-enumeration.yml": "0063e3af1775b384163c208594a538a82ffb14904f9e775b8916c3bdd079c3d2",
+  "proofs/capture-enumeration/METHOD.md": "176db504814f6379bd25082a660d2e78968b792bf87f87696f62157b6ae2db86",
+  "proofs/capture-enumeration/README.md": "003bbf9570434b3c51f3aae8f14901652ec868029bac3946dfa9f387582adac8",
+  "proofs/capture-enumeration/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/capture-enumeration/dependencies/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "proofs/capture-enumeration/dependencies/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "proofs/capture-enumeration/harness.node.mjs": "ef330b8e85c616761152218f2e21fefcdf63a6572688ce5b291072b53834720b",
+  "proofs/capture-enumeration/harness_test.py": "8797f02931e6a742f94db105b3c11b5a247e0af400ef929f6580fef2e7f951e1",
+  "proofs/capture-enumeration/latency.mjs": "a502a41122622ab69611ee8f33cc4f534c06ff0ddad876d060ab6ee730003c4a",
+  "proofs/capture-enumeration/run.py": "976a49b2b8acaf537b26760678c6f49a710b2f7ecc633183af3e0fd0f275a911",
+  "worker-capture-enumeration.test.ts": "599ced3cffd97a04a5766fb54e48ece0de16eff3bbaf08d23bb2177b4af22b4b",
+  "worker-protocol.ts": "cbb3d21326633270ba8143b07e00fa6763ca51af280e5d94ab52b340f6362067"
+}

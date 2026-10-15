@@ -1,0 +1,72 @@
+name: Capture enumeration publication-latency screen
+
+on:
+  push:
+    branches: [proof/capture-enumeration-20261015]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.ref == 'refs/heads/proof/capture-enumeration-20261015'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify inert harness and workflow context
+        run: |
+          node --test proofs/capture-enumeration/harness.node.mjs
+          PYTHONDONTWRITEBYTECODE=1 python3 proofs/capture-enumeration/harness_test.py
+      - name: Provision the pinned shared dependencies once
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/capture-enumeration-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/capture-enumeration-evidence
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(node --version)" = v22.16.0
+          test "$(bun --version)" = 1.4.2
+          npm ci --prefix proofs/capture-enumeration/dependencies --no-audit --no-fund
+          git worktree add --detach "$BASELINE_DIRECTORY" afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+          ln -s "$GITHUB_WORKSPACE/proofs/capture-enumeration/dependencies/node_modules" node_modules
+          ln -s "$GITHUB_WORKSPACE/proofs/capture-enumeration/dependencies/node_modules" "$BASELINE_DIRECTORY/node_modules"
+      - name: Admit exact sources and run the fixed latency screen
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/capture-enumeration-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/capture-enumeration-evidence
+          CI: '1'
+          NO_COLOR: '1'
+        run: python3 proofs/capture-enumeration/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY"
+      - name: Preserve partial or complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capture-enumeration-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/capture-enumeration-evidence/
+            proofs/capture-enumeration/*.mjs
+            proofs/capture-enumeration/*.py
+            proofs/capture-enumeration/*.md
+            proofs/capture-enumeration/*.json
+            proofs/capture-enumeration/dependencies/package*.json
+            dist/
+            *.wasm
+            ${{ runner.temp }}/capture-enumeration-baseline/dist/
+            ${{ runner.temp }}/capture-enumeration-baseline/*.wasm
+            worker-protocol.ts
+            worker-capture-enumeration.test.ts
+            .github/workflows/capture-enumeration.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

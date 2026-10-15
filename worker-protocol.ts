@@ -115,7 +115,14 @@ export function identities(data: WorkerData): Readonly<Record<string, string>> {
 export function capture<T extends object>(value: T): Capture<T> {
   const { single, structures } = recordOf(value);
   const data = getWorkerData(structures, { copy: false });
-  return { value: (single ? value : Object.freeze(structures)) as T, single, data, identities: identities(data) };
+  const capturedValue = (single ? value : Object.freeze(structures)) as T;
+  const result = Object.create(null);
+  // getWorkerData owns this frozen, null-prototype record of data properties.
+  for (const name in data.structures) {
+    const item = data.structures[name];
+    result[name] = JSON.stringify([item.type, item.arena, item.data]);
+  }
+  return { value: capturedValue, single, data, identities: Object.freeze(result) };
 }
 export function same(a: Pick<Capture, 'single' | 'identities'>, b: Pick<Capture, 'single' | 'identities'>): boolean {
   const keys = Object.keys(a.identities);
