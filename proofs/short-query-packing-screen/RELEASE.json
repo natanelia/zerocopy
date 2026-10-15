@@ -1,0 +1,9 @@
+{
+  "approved": true,
+  "corpusSha256": "a5c2e6411548b6e16f970041aed9c2c8bab436a918cfd852253ac5c06080138a",
+  "repository": "natanelia/zerocopy",
+  "branch": "proof/short-query-packing-screen-20261015-v3",
+  "baseCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "methodSha256": "f32eadded0fd6618754184f42339054c7efb8bdbef0709e512524043cc28df4d",
+  "note": "Reviewed pure preflight bound the corpus. This enabled successor is prepared for final publication review; execution requires the separate coordinator release."
+}

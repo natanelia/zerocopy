@@ -1,0 +1,50 @@
+{
+  "doubly-linked-list.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "geometry-kernels.wasm": {
+    "sha256": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+    "bytes": 571
+  },
+  "linked-list.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "numeric-kernels-simd.wasm": {
+    "sha256": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "bytes": 782
+  },
+  "numeric-kernels.wasm": {
+    "sha256": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "bytes": 720
+  },
+  "ordered-map.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "persistent-core.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "priority-queue.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "shared-list.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "shared-map.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "singly-linked-list.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  },
+  "sorted-tree.wasm": {
+    "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "bytes": 26180
+  }
+}
