@@ -1,0 +1,58 @@
+name: Short-query packing public-path screen (provisioning v2)
+
+on:
+  push:
+    branches: [proof/short-query-packing-screen-20261015-v2]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: short-query-packing-screen-20261015-v2
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.repository == 'natanelia/zerocopy' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - name: Read the exact reviewed proof commit
+        timeout-minutes: 2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          fetch-tags: false
+          persist-credentials: false
+      - name: Install the pinned official Node release
+        timeout-minutes: 3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+          check-latest: false
+      - name: Prepare the fixed source and native arms
+        timeout-minutes: 16
+        env:
+          SHORT_QUERY_PROVISION: ${{ runner.temp }}/short-query-provisioned
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 proofs/short-query-packing-screen/hosted.py prepare "$SHORT_QUERY_PROVISION"
+      - name: Run the fixed 66-child screen
+        timeout-minutes: 16
+        env:
+          SHORT_QUERY_PROVISION: ${{ runner.temp }}/short-query-provisioned
+          SHORT_QUERY_OUTPUT: ${{ runner.temp }}/short-query-screen-result
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 proofs/short-query-packing-screen/hosted.py screen "$SHORT_QUERY_PROVISION" "$SHORT_QUERY_OUTPUT"
+      - name: Preserve all observations and partial failures
+        if: ${{ always() }}
+        timeout-minutes: 3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: short-query-packing-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/short-query-provisioned/evidence/
+            ${{ runner.temp }}/short-query-screen-result/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
