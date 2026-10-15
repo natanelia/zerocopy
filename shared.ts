@@ -71,16 +71,31 @@ export interface WorkerData<T extends StructureRecord<T> = Record<string, Shared
 export function getWorkerData<T extends StructureRecord<T>>(structures: T, options: { copy?: boolean } = {}): WorkerData<T> {
   if (Object.getOwnPropertySymbols(structures).length) throw new TypeError('Worker structure names must be strings');
   const copy = options.copy ?? (typeof Bun !== 'undefined');
-  const found = new Map<string, Arena>();
+  let first: Arena | undefined, firstId: string | undefined;
+  let found: Map<string, Arena> | undefined;
   const collect = (root: Arena): void => {
     let arena: Arena | undefined = root, pending: Arena[] | undefined;
     while (arena) {
-      if (!found.has(arena.id)) {
-        found.set(arena.id, arena);
+      const id = arena.id;
+      if (found ? !found.has(id) : !first || id !== firstId) {
+        if (!first) {
+          firstId = arena.id;
+          first = arena;
+        } else {
+          if (!found) {
+            found = new Map<string, Arena>();
+            found.set(firstId!, first);
+          }
+          found.set(arena.id, arena);
+        }
         const dependencies = arena.transportDependencies ?? arena.dependencies;
         // Empty owned maps, including one-arena payloads, need no iterator or
         // DFS stack. Nonempty ordinary maps still follow their values verbatim.
         if (dependencies.size) {
+          if (!found) {
+            found = new Map<string, Arena>();
+            found.set(firstId!, first!);
+          }
           const members = arena.readOnly ? arena.sharedDependencyMembers : undefined;
           if (members) {
             // A closed payload is a complete graph. Legacy DFS visits its root,
@@ -109,7 +124,10 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
     collect(arena);
     serialized[name] = Object.freeze({ type, arena: arena.id, data: structure.toWorkerData() });
   }
-  const arenas = [...found.values()].map(arena => Object.freeze(copy ? { id: arena.id, used: arena.used, copy: arena.copy() } : { id: arena.id, used: arena.used, memory: arena.memory }));
+  const describe = (arena: Arena) => Object.freeze(copy ? { id: arena.id, used: arena.used, copy: arena.copy() } : { id: arena.id, used: arena.used, memory: arena.memory });
+  const arenas = found ? [...found.values()].map(describe)
+    : first ? [describe(first)]
+    : [];
   return Object.freeze({ __shared: true, version: FORMAT_VERSION, arenas: Object.freeze(arenas), structures: Object.freeze(serialized) }) as WorkerData<T>;
 }
 
