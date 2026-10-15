@@ -1,0 +1,70 @@
+{
+  "candidatePatchSha256": "77f05fa906d9ccfc6d0afdaebc04cf181f3a7dea23d8b88b82c2a9d11a6077bb",
+  "candidateRuntimeSha256": "fad8b54107a1f672bacbf6d5c9e9cb22a7e0d715b528212fbc4f906e5692292c",
+  "candidateTestSha256": "51e3850277791fc7b6308c2467039e789445dabd55ce74179434bb3f3d65b1dd",
+  "focusedGate": {
+    "commands": 4,
+    "casesPerCommand": 8,
+    "totalCaseExecutions": 32,
+    "engines": [
+      "Node 22.16.0",
+      "Bun 1.4.2"
+    ],
+    "arms": [
+      "current-main",
+      "candidate"
+    ],
+    "allPassed": true,
+    "independentAuditPassed": true,
+    "sealSha256": "7ec194642262cfb517ee6c211f8bb8dc8e2241d07e9b889d94b04b95cca106e3"
+  },
+  "localOrdinaryGate": {
+    "passingCommands": [
+      "native-build",
+      "portable-build",
+      "declarations",
+      "typecheck",
+      "typecheck-redux",
+      "typecheck-values",
+      "typecheck-values-nonexact",
+      "typecheck-geometry"
+    ],
+    "stoppedCommand": "full-bun",
+    "reason": "sampled group RSS cap exceeded",
+    "sampledLimitBytes": 1073741824,
+    "observedGroupRssBytes": 1083371520,
+    "exitCode": -9,
+    "fullSuiteReportProduced": false,
+    "laterCommandsRun": false,
+    "sourcesUnchanged": true,
+    "sealSha256": "76d49277afc57771f54e6b5eaae67a5119f1457469d13b2b53459d1262169e8e",
+    "receiptSha256": "37eb1d33d33fb2ff50313e30915badeff0cd3390856ae2f07e8357413894424f",
+    "noRegressionConclusion": true,
+    "noPreexistingFailureConclusion": true
+  },
+  "nativeBaselineProvenance": {
+    "repository": "natanelia/zerocopy",
+    "runId": 38641407273,
+    "attempt": 1,
+    "artifactId": 11931130743,
+    "sourceCommit": "d59e3f157c19e051088c1f8996972dce9aa5bb34",
+    "soleParent": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+    "artifactManifestSha256": "26aacc2a43f22bfc6f7d6c3bf91f556424ff17fc1fb40de7138ca39e571899eb",
+    "generatedManifestSha256": "33698c708f49335cc630c68015c52dfe27436b1883e61c094d867351af4b709d",
+    "hostedBulkTestOverlayNotUsed": true
+  },
+  "priorHostedFullSuite": {
+    "runId": 38641407273,
+    "cases": 1058,
+    "passed": true,
+    "defaultScheduling": true,
+    "wallCapSeconds": 300,
+    "rssRecorded": false,
+    "notCurrentCandidateEvidence": true
+  },
+  "limitations": [
+    "This continuation is correctness only; resource receipts are not performance data.",
+    "Missing historical HAMT/Unicode scope and unrelated holds persist.",
+    "The scoped ordinary gate does not execute every additional repository CI proof or browser check."
+  ]
+}

@@ -1,0 +1,178 @@
+--- a/arena.ts
++++ b/arena.ts
+@@ -668,7 +668,9 @@
+         this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+         this.prefixValid[word] |= bit;
+       }
+-      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
++      const child = this.prefixChildren[prefix];
++      if (!child) return 0;
++      candidate = this.wasm.mapHashCandidateFrom(child, hash >>> 0, this.prefixBits) >>> 0;
+     } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+     if (!candidate) return 0;
+     const bucket = view.getUint32(candidate, true) === 2;
+--- /dev/null
++++ b/map-empty-prefix.test.ts
+@@ -0,0 +1,162 @@
++import { describe, expect, test } from 'vitest';
++import { Arena, arenaOf, hashBytes, HEAP_START } from './arena';
++import { SharedMap, SharedOrderedMap, getWorkerData, initWorker } from './shared';
++import collisions from './proofs/bulk-input-collisions.json';
++
++const encoder = new TextEncoder();
++const hash = (key: string) => hashBytes(encoder.encode(key));
++
++function prefixKeys(prefix: number, count: number, stem = 'probe') {
++  const keys: string[] = [];
++  for (let i = 0; keys.length < count; i++) {
++    const key = `${stem}/${i}`;
++    if ((hash(key) & 255) === prefix) keys.push(key);
++  }
++  return keys;
++}
++function sparse(arena = new Arena()) {
++  return new SharedMap('number', 0, 0, arena).setMany([
++    [prefixKeys(0, 1, 'seed')[0], 10], [prefixKeys(1, 1, 'seed')[0], 20],
++  ]);
++}
++function attached<T extends string>(map: SharedMap<T>, reader?: Arena) {
++  const a = arenaOf(map);
++  return SharedMap.fromWorkerData(map.root, map.valueType, map.size,
++    reader ?? new Arena({ memory: a.memory, used: a.used, readOnly: true }));
++}
++
++// The trusted-descriptor layout follows journal() in trie-view-fixtures.ts.
++// Keep this fixture local so no historical traversal implementation is loaded.
++function importedJournal(base: SharedMap<'number'>, edits: readonly (readonly [string, number])[]) {
++  const a = arenaOf(base), leaves = edits.map(([key, value]) => a.leaf('number', key, value));
++  const root = a.alloc(16 + 4 * leaves.length), view = a.dv;
++  const keys = new Set(base.keys());
++  edits.forEach(([key]) => keys.add(key));
++  view.setUint32(root, 0xffffffff, true); view.setUint32(root + 4, base.root, true);
++  view.setUint32(root + 8, keys.size, true); view.setUint32(root + 12, leaves.length, true);
++  leaves.forEach((leaf, i) => view.setUint32(root + 16 + i * 4, leaf, true));
++  return SharedMap.fromWorkerData(root, 'number', keys.size, a);
++}
++
++describe('lookups through empty hash prefixes', () => {
++  test('keeps misses root-specific across retained roots, forks and deletion', () => {
++    const base = sparse(), keys = prefixKeys(0x22, 8);
++    const left = base.setMany(keys.map((key, i) => [key, i + 100] as const));
++    const right = base.setMany(keys.map((key, i) => [key, i + 200] as const));
++    const removed = left.deleteMany(keys), owner = arenaOf(base);
++    const reader = new Arena({ memory: owner.memory, used: owner.used, readOnly: true });
++    const [old, branch, other, deleted] = [base, left, right, removed].map(map => attached(map, reader));
++    for (let i = 0; i < keys.length; i++) {
++      const key = keys[i], target = i % 2 ? branch : other;
++      expect(old.get(key)).toBeUndefined(); expect(old.has(key)).toBe(false);
++      expect(target.get(key)).toBe(i + (i % 2 ? 100 : 200));
++      expect(deleted.get(key)).toBeUndefined();
++      expect(old.get(key)).toBeUndefined();
++    }
++    expect(branch.getMany(keys)).toEqual(keys.map((_, i) => i + 100));
++    expect(other.getMany(keys)).toEqual(keys.map((_, i) => i + 200));
++    expect([...deleted.entries()].sort()).toEqual([...old.entries()].sort());
++  });
++
++  test('keeps old and new reads correct when directory width grows and shrinks', () => {
++    const entries: [string, number][] = [];
++    for (let i = 0; entries.length < 16384; i++) {
++      const key = `dense/${i}`;
++      const lane = hash(key) & 15;
++      if (lane !== 2 && lane !== 3) entries.push([key, i]);
++    }
++    const [added, ...misses] = prefixKeys(0x22, 5);
++    const emptyWide = prefixKeys(0x33, 1)[0];
++    const base = new SharedMap('number', 0, 0, new Arena()).setMany(entries);
++    const large = base.set(added, 99), shrunk = large.delete(entries[0][0]), owner = arenaOf(base);
++    expect([base.size, large.size, shrunk.size]).toEqual([16384, 16385, 16384]);
++    const reader = new Arena({ memory: owner.memory, used: owner.used, readOnly: true });
++    const [old, wide, narrow] = [base, large, shrunk].map(map => attached(map, reader));
++    expect(old.get(misses[0])).toBeUndefined(); expect(old.get(added)).toBeUndefined();
++    expect(wide.get(misses[1])).toBeUndefined();
++    // Lane 2 reaches an early leaf; lane 3 is empty even with a 12-bit directory.
++    expect(wide.get(emptyWide)).toBeUndefined(); expect(wide.get(emptyWide)).toBeUndefined();
++    expect(narrow.get(misses[2])).toBeUndefined();
++    expect(wide.get(added)).toBe(99);
++    expect(old.get(misses[3])).toBeUndefined(); expect(old.has(added)).toBe(false);
++    expect(narrow.get(added)).toBe(99); expect(narrow.has(entries[0][0])).toBe(false);
++    expect(old.get(entries[0][0])).toBe(entries[0][1]);
++  });
++
++  test.each([false, true])('scans imported pending entries before a cached empty base (copy=%s)', async copy => {
++    const base = sparse(), [first, second, absent] = prefixKeys(0x22, 3), seed = [...base.keys()][0];
++    const one = importedJournal(base, [[first, 31], [seed, 41]]);
++    const two = importedJournal(base, [[second, 32], [seed, 42]]);
++    const sources = { base, one, two }, read = await initWorker(getWorkerData(sources, { copy }));
++    const a = arenaOf(read.base), used = a.used, before = a.buf.slice(HEAP_START, used);
++    expect(arenaOf(read.one)).toBe(a); expect(arenaOf(read.two)).toBe(a);
++    expect(read.base.get(first)).toBeUndefined(); expect(read.base.get(first)).toBeUndefined();
++    expect(read.one.get(first)).toBe(31); expect(read.one.get(absent)).toBeUndefined();
++    expect(read.base.get(second)).toBeUndefined(); expect(read.two.get(second)).toBe(32);
++    expect(read.two.get(seed)).toBe(42); expect(read.one.get(seed)).toBe(41);
++    expect(read.base.get(seed)).toBe(base.get(seed));
++    expect(read.one.has(second)).toBe(false); expect(read.two.has(first)).toBe(false);
++    expect(() => read.one.set(absent, 1)).toThrow(/read-only/);
++    expect(a.used).toBe(used); expect(a.buf.slice(HEAP_START, used)).toEqual(before);
++  });
++
++  test('checks complete hashes and key bytes for early leaves and collision buckets', () => {
++    const [first, second, absent] = collisions.keys.slice(2, 5);
++    expect(new Set([first, second, absent].map(key => key.length)).size).toBe(1);
++    for (const key of [first, second, absent]) expect(hash(key)).toBe(collisions.target);
++    const singleton = new SharedMap('string', 0, 0, new Arena()).set(first, 'first');
++    const leafRead = attached(singleton);
++    expect(leafRead.get(absent)).toBeUndefined(); expect(leafRead.has('unrelated')).toBe(false);
++    expect(leafRead.get(first)).toBe('first');
++    const bucket = singleton.set(second, 'second'), bucketRead = attached(bucket);
++    expect(bucketRead.get(absent)).toBeUndefined(); expect(bucketRead.get(absent)).toBeUndefined();
++    expect(bucketRead.get(second)).toBe('second'); expect(bucketRead.get(first)).toBe('first');
++    const changed = bucket.delete(first);
++    expect(attached(changed).get(first)).toBeUndefined(); expect(attached(changed).get(second)).toBe('second');
++    expect(leafRead.get(first)).toBe('first');
++  });
++
++  test('keeps Unicode aliases, ordered values and object reads correct after misses', async () => {
++    const keys = ['', '\0', '\ufeff', '🙂路', '\ud800'];
++    const owner = new Arena();
++    const base = new SharedMap('boolean', 0, 0, owner).set('a', true).set('b', false);
++    const map = base.setMany(keys.map(key => [key, false] as const));
++    let ordered = new SharedOrderedMap('number', 0, 0, 0, 0, owner);
++    let objects = new SharedMap('object', 0, 0, owner);
++    for (const [i, key] of keys.entries()) {
++      ordered = ordered.set(key, i); objects = objects.set(key, { i });
++    }
++    const read = await initWorker(getWorkerData({ base, map }, { copy: false }));
++    const { ordered: orderedRead } = await initWorker(getWorkerData({ ordered }, { copy: false }));
++    const { objects: objectRead } = await initWorker(getWorkerData({ objects }, { copy: false }));
++    // Make map the active primitive root, then keep decoder reads in fresh caches.
++    expect(read.map.has(keys[0])).toBe(true);
++    const absent = prefixKeys(0x22, 1)[0];
++    expect(orderedRead.get(absent)).toBeUndefined(); expect(orderedRead.get(absent)).toBeUndefined();
++    expect(objectRead.get(absent)).toBeUndefined(); expect(objectRead.get(absent)).toBeUndefined();
++    for (const [i, key] of keys.entries()) {
++      expect(read.base.has(key)).toBe(false); expect(read.base.get(key)).toBeUndefined();
++      expect(read.map.has(key)).toBe(true); expect(read.map.get(key)).toBe(false);
++      expect(orderedRead.get(key)).toBe(i); expect(objectRead.get(key)).toEqual({ i });
++      expect(Object.isFrozen(objectRead.get(key))).toBe(true);
++    }
++    expect(read.map.get('\ufffd')).toBe(false);
++    expect(orderedRead.get('\ufffd')).toBe(4); expect(objectRead.get('\ufffd')).toEqual({ i: 4 });
++  });
++
++  test.each([false, true])('keeps warmed misses and retained values after owner memory growth (copy=%s)', async copy => {
++    const base = sparse(), [missing, later] = prefixKeys(0x22, 2), owner = arenaOf(base);
++    const { map } = await initWorker(getWorkerData({ map: base }, { copy }));
++    const reader = arenaOf(map), used = reader.used, before = reader.buf.slice(HEAP_START, used);
++    expect(map.get(missing)).toBeUndefined(); expect(map.has(missing)).toBe(false);
++    const oldLength = owner.memory.buffer.byteLength;
++    new SharedMap('string', 0, 0, owner).set('growth', 'x'.repeat(oldLength * 2));
++    const next = base.set(later, 73);
++    expect(owner.memory.buffer.byteLength).toBeGreaterThan(oldLength);
++    expect(map.get(missing)).toBeUndefined(); expect(map.get(later)).toBeUndefined();
++    for (const [key, value] of base.entries()) expect(map.get(key)).toBe(value);
++    expect(attached(next).get(later)).toBe(73); expect(base.has(later)).toBe(false);
++    expect(reader.used).toBe(used); expect(reader.buf.slice(HEAP_START, used)).toEqual(before);
++    expect(() => map.set(later, 0)).toThrow(/read-only/);
++  });
++});
