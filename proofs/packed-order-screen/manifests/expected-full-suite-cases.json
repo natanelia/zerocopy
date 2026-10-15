@@ -1,0 +1,4354 @@
+[
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot can make a smaller write after a partial failure without rewinding the arena"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot doubly linked list: append"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot doubly linked list: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot doubly linked list: remove"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot linked list: append"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot linked list: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot linked list: remove"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot list: append across a full leaf"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot list: bulk append across leaves"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot list: replace a tail value"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot list: replace a tree value"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot map: bulk insert, overwrite, duplicate and exact hash collision"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot map: delete"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot map: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot map: replace"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot ordered map: delete"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot ordered map: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot ordered map: replace"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot ordered set: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot priority queue: max dequeue"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot priority queue: max enqueue"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot priority queue: min dequeue"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot priority queue: min enqueue"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot queue: enqueue after a partial drain at a leaf boundary"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot set: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot sorted map: delete"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot sorted map: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot sorted map: replace"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot sorted set: insert"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot stack: JSON payload then node"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot stack: number"
+  },
+  {
+    "file": "allocation-failure.test.ts",
+    "fullName": "bounded-memory writes preserve every published snapshot stack: string payload then node"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: captures after first next, including roots created after the previous view"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: early return and callback throws do not affect later scans"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: forward callbacks can reenter, fork and grow the owner"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: nested decode can reenter block scans and grow the outer arena"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: preserves interleaved forward, reverse, forked and independent iterators across growth"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: refreshes once per nonempty traversal at block and tail boundaries"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList: reverse callbacks can reenter, fork and grow the owner"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList<boolean>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList<number>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList<object>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedDoublyLinkedList<string>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: captures after first next, including roots created after the previous view"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: early return and callback throws do not affect later scans"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: forward callbacks can reenter, fork and grow the owner"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: nested decode can reenter block scans and grow the outer arena"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: preserves interleaved forward, reverse, forked and independent iterators across growth"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList: refreshes once per nonempty traversal at block and tail boundaries"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList<boolean>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList<number>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList<object>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views SharedLinkedList<string>: source, shared, fixed-size copy, forks and compaction agree"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views keeps empty roots and never-started generators free of view access"
+  },
+  {
+    "file": "block-traversal-view.test.ts",
+    "fullName": "block traversal snapshot views supports fixed and growing shared memories and rejects unsupported unshared imports"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "Unicode, duplicate validation, long values and source callback order"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/0"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/1"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/12287"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/12288"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/12289"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/4"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/4096"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary object/5"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/0"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/1"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/12287"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/12288"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/12289"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/4"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/4096"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "bulk input boundary string/5"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "eight full FNV collisions reach terminal buckets and preserve forks"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "fixed recursive allocation failure/recovery object/160"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "fixed recursive allocation failure/recovery object/96"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "fixed recursive allocation failure/recovery string/160"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "fixed recursive allocation failure/recovery string/96"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive boolean/0"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive boolean/1"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive boolean/2"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive number/0"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive number/1"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy invalid primitive number/2"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "legacy numeric, boolean and set allocation controls"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "nested descriptors, unchanged leaf aliases and attached read-only guards"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "normalization reference remains replacement-character based"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "normalized boundary object/12288"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "normalized boundary object/12289"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "normalized boundary string/12288"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "normalized boundary string/12289"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "object callbacks can reenter scratch, grow memory, retain side results and fail"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "string validation and object serialization errors precede table staging"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "tagged journal, empty iterator and real overlay object"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "tagged journal, empty iterator and real overlay string"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "terminal collision failure/recovery object"
+  },
+  {
+    "file": "bulk-input-storage.test.ts",
+    "fullName": "terminal collision failure/recovery string"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedDoublyLinkedList' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedLinkedList' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedList' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedMap' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedMap' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedOrderedSet' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedPriorityQueue' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedQueue' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSet' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedMap' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedSortedSet' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' accepts generated nonempty and empty descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' accepts raw empty descriptors produced by public removal"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' also accepts public transport descriptors without prior compaction"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' rejects incorrectly typed fields and fields from unrelated descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' rejects missing live pointers and out-of-range or misaligned pointers"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' requires every mandatory producer field"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata 'SharedStack' validates the complete value type grammar"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw 'SharedDoublyLinkedList' edits with all remaining values in blocks"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw 'SharedLinkedList' edits with all remaining values in blocks"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw list descriptors popped across size 1025"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw list descriptors popped across size 1057"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw list descriptors popped across size 33"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw list descriptors popped across size 65"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw ordered descriptors with deleted and reinserted entries"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw queue descriptors after 1 dequeues"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw queue descriptors after 35 dequeues"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata accepts raw queue descriptors after 69 dequeues"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata does not invoke descriptor accessors or accept inherited required fields"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata keeps valid sequence boundaries and nested descriptors at size 1025"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata keeps valid sequence boundaries and nested descriptors at size 32"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata keeps valid sequence boundaries and nested descriptors at size 33"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata preserves the optional orderStable compatibility field for SharedOrderedMap"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata preserves the optional orderStable compatibility field for SharedOrderedSet"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects a SharedLinkedList descriptor relabeled as SharedList"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects a SharedList descriptor relabeled as SharedQueue"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects a SharedMap descriptor relabeled as SharedStack"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects a SharedOrderedMap descriptor relabeled as SharedMap"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects a SharedPriorityQueue descriptor relabeled as SharedStack"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects an omitted map root instead of successfully restoring an empty map"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata rejects impossible sequence sizes and truncated tail storage"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata requires complete direct root headers in size-33 sequence descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata requires complete direct root headers in size-65 sequence descriptors"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata requires the numeric backing value type for SharedOrderedSet"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata requires the numeric backing value type for SharedSet"
+  },
+  {
+    "file": "checkpoint-descriptor-validation.test.ts",
+    "fullName": "checkpoint descriptors preserve data or reject malformed metadata requires the numeric backing value type for SharedSortedSet"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedDoublyLinkedList agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedLinkedList agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedList agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedMap agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedOrderedMap agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedOrderedSet agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedPriorityQueue agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedQueue agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedSet agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedSortedMap agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedSortedSet agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation SharedStack agrees with its leaf grammar"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation bounds cached descriptors and does not retain oversized keys"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation handles primitives and unchecked non-string input without throwing"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedBogus<number> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedList<SharedSet<object>> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedList<SharedSortedSet<boolean>> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap< number> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<<number>> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<SharedList<number> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<__proto__> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<constructor> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<invalid> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number>\u0000 consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number>\n consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number>\r consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number>  consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number><string> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedMap<number>> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation rejects SharedSet<SharedMap<number>> consistently"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation reuses immutable metadata without allowing cache poisoning"
+  },
+  {
+    "file": "descriptor-validation.test.ts",
+    "fullName": "complete descriptor validation validates generated compositions and damaged delimiters"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing continues through a shallow-frozen parent"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing freezes mixed arrays, empty containers, and every nested coordinate"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing handles 20,000 nested arrays without recursive calls"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing handles a wide array without a function-argument limit"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing ignores inherited enumerable properties and accessors"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves own special names and null-prototype records"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar "
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar -0"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar 0"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar 12.5"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar false"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar null"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar text"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar true"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing preserves scalar undefined"
+  },
+  {
+    "file": "freeze-json.test.ts",
+    "fullName": "JSON freezing uses the same semantics for direct object-codec reads"
+  },
+  {
+    "file": "geometry.test.ts",
+    "fullName": "bboxXY keeps old arenas and separate kernel instances independent"
+  },
+  {
+    "file": "geometry.test.ts",
+    "fullName": "bboxXY preserves attached snapshots after append, fork, and memory growth"
+  },
+  {
+    "file": "geometry.test.ts",
+    "fullName": "bboxXY rejects incomplete points and incorrect collection types"
+  },
+  {
+    "file": "geometry.test.ts",
+    "fullName": "bboxXY returns independent bounds with exact signed-zero and NaN handling"
+  },
+  {
+    "file": "heap-entry-views.test.ts",
+    "fullName": "heap entries view capture keeps custom decoder receiver, order, reentrant growth and exceptions"
+  },
+  {
+    "file": "heap-entry-views.test.ts",
+    "fullName": "heap entries view capture keeps the generator method shape and touches no view before an actual entry"
+  },
+  {
+    "file": "heap-entry-views.test.ts",
+    "fullName": "heap entries view capture preserves binary64 values and priorities in detached entry tuples"
+  },
+  {
+    "file": "heap-entry-views.test.ts",
+    "fullName": "heap entries view capture preserves suspended, interleaved and early-terminated iterators through owner growth"
+  },
+  {
+    "file": "heap-entry-views.test.ts",
+    "fullName": "heap entries view capture requests one existing view per visited node on owners and read-only attachments"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedMap boolean: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedMap number: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedMap string: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedOrderedMap boolean: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedOrderedMap number: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedOrderedMap string: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedSortedMap boolean: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedSortedMap number: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots SharedSortedMap string: cached hits, misses, empty roots and forks"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots a stack stores encoded values, not mutable caller objects"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots does not confuse full-hash collisions"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots falls back correctly beyond the entry and string-value budgets"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots handles Unicode, empty strings and the scratch boundary"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots keeps NaN, negative zero, zero and missing values distinct"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots read caches do not write any shared bytes in worker attachments"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots uses the right codec and ordered prefix in one shared arena"
+  },
+  {
+    "file": "hot-path.test.ts",
+    "fullName": "bounded hot paths preserve immutable snapshots vector leaf hints remain correct across edits, forks and growth"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "FNV-1a exact collision: scalar, bulk, merge, overwrite and delete"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "batching has no 8-bit owner epoch or 1024-live-root limit"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "bulk vector construction has a deterministic linear allocation bound"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "caller inputs and returned JSON objects cannot change stored values"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "empty map keys do not alias cached values; UTF-8 BOM is content"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories HAMT: 500 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories SharedOrderedSet: 400 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories SharedSet: 400 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories SharedSortedSet: 400 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories doubly: 500 branching versions and AVL ranks"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories heap: branching histories, order, size and leftist ranks (max=false)"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories heap: branching histories, order, size and leftist ranks (max=true)"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories ordered: 500 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories queue and stack: 400 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories singly: 500 branching versions and AVL ranks"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories sorted: 500 branching versions"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "forked model histories vector: partial blocks, level growth, overwrite, pop and forks"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedDoublyLinkedList"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedLinkedList"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedList"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedMap"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedOrderedMap"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedOrderedSet"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedPriorityQueue"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedQueue"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedSet"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedSortedMap"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedSortedSet"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "immutable published bytes and handles, all 12 structures SharedStack"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "large keys, values, batches and UTF-16 replacement have no packed-pointer truncation"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "nested values remain valid after their originating arena is reset"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "reentrant and interleaved iterators survive nested reads and memory growth"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "worker snapshot attachment, nested dependencies, reset and read-only writes (copy=false)"
+  },
+  {
+    "file": "immutable-proof.test.ts",
+    "fullName": "worker snapshot attachment, nested dependencies, reset and read-only writes (copy=true)"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "immutable JSON read cache does not retain an oversized value or consume the budget for smaller values"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "immutable JSON read cache includes the exact 2 MiB byte boundary and leaves later values uncached"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "immutable JSON read cache keeps the 2048-entry limit while freezing values that do not enter the cache"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "immutable JSON read cache shares cached JSON scalars and objects between both decoder entry points"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "refreshes an older view before an uncached boolean read"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "refreshes an older view before an uncached number read"
+  },
+  {
+    "file": "json-read-cache.test.ts",
+    "fullName": "refreshes an older view before an uncached string read"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "compact immutable HAMT records batch ownership is local to the call and published payload bytes never change"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "compact immutable HAMT records coalesced changes preserve negative size deltas and empty branches"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "compact immutable HAMT records long-distance forks materialize pointers without truncating their addresses"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "compact immutable HAMT records scalar construction has bounded allocation without compaction or dropping snapshots"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "compact immutable HAMT records unaligned map records can interleave with aligned vector and stack records"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes Unicode aliases and cache-budget replacements do not keep stale values"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes historical roots reuse prefix indexes beyond the value-cache limit"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes ordered prefixes, numeric values, and object decoders remain separate"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes prefix indexes are root-specific through forks, removals, and shared memory growth"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes presence checks do not replace boolean values or confuse missing keys"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes same-prefix and exact-hash collisions retain complete key checks"
+  },
+  {
+    "file": "map-memory.test.ts",
+    "fullName": "small root-specific read indexes worker format rejects older map layouts and attachments do not write shared bytes"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "cold nested projections keep read-only child snapshots (copy=false)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "cold nested projections keep read-only child snapshots (copy=true)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "custom comparator ties keep stable natural order and comparator receiver"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "custom sorted map projection retains replacement, deletion, reinsertion, Unicode and old-fork order"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "custom sorted map projection sorted keys skip value decoding, including cold JSON larger than the cache"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "natural sorted keys stay lazy when a writer grows before first next"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "natural sorted keys stop decoding after return, throw, or an early break"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "natural sorted projection methods preserve their generator function and iterator prototypes"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "natural sorted values stay lazy when a writer grows before first next"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "natural sorted values stop decoding after return, throw, or an early break"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "ordered map projection retains replacement, deletion, reinsertion, Unicode and old-fork order"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "ordered read-only projections attached iterator remains valid across memory growth (copy=false)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "ordered read-only projections attached iterator remains valid across memory growth (copy=true)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "ordered read-only projections values preserve every f64 value"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sets retain ordered, natural and custom traversal"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted map projection retains replacement, deletion, reinsertion, Unicode and old-fork order"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted map projection sorted keys skip value decoding, including cold JSON larger than the cache"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted read-only projections attached iterator remains valid across memory growth (copy=false)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted read-only projections attached iterator remains valid across memory growth (copy=true)"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted read-only projections natural sorted values skip key decoding"
+  },
+  {
+    "file": "map-projection.test.ts",
+    "fullName": "sorted read-only projections values preserve every f64 value"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index checks complete keys when full hashes collide"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index finishes user callbacks before using the writer index"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index invalidates lanes on forks and interleaved maps in the same arena"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index keeps the byte hash unchanged across word boundaries"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index keeps worker snapshots read-only with independent WASM globals"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index preserves snapshots while every prefix is inserted and then overwritten"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index remains valid after bulk updates, deletes, and low-level inserts"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index resets partly updated scratch after allocation failure"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index retains insertion order for ordered maps"
+  },
+  {
+    "file": "map-set-index.test.ts",
+    "fullName": "bounded writer prefix index supports UTF-8 keys, long values and the generic codec path"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 0"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 1"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 10"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 11"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 12"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 13"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 14"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 15"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 16"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 17"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 2"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 3"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 4"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 5"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 6"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 7"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 8"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path checks exact short-key bytes at length 9"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path compares full keys for exact hash collisions"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path does not change any old payload byte"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path falls back for forks, scalar writes after bulk updates, and deletions"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path handles two maps, an ordered map, and a list in the same writer arena"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path invalidates partial writer hints after allocation failure"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path keeps old handles valid after reset and interleaved object serialization"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path keeps size correct after large-record fallbacks and memory growth"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path keeps the compact allocation bound without allocating another index"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path preserves Unicode replacement semantics and empty keys and values"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path preserves every retained root while adding and replacing distinct keys"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path preserves numeric special values and no-op cache behavior"
+  },
+  {
+    "file": "map-set-path.test.ts",
+    "fullName": "scalar map write path rejects writes through attached readers and rejects invalid primitive values"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded key boundaries at 16383 BMP characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded key boundaries at 16384 BMP characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded key boundaries at 16385 BMP characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded value boundaries at 12287 supplementary characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded value boundaries at 12288 supplementary characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes handles encoded value boundaries at 12289 supplementary characters"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes keeps cached strings consistent with replacement of unpaired surrogates"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes matches encoded values across key and value character classes"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes preserves alias keys, cached values, and retained roots after bulk changes"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes rejects writes through an independently attached read-only view"
+  },
+  {
+    "file": "map-set-utf8.test.ts",
+    "fullName": "direct UTF-8 scalar writes uses the complete scratch range without writing into old payloads"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures Immutability with nested structures modifying nested structure does not affect stored version"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures Iteration with nested structures entries with nested lists"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures Iteration with nested structures forEach with nested maps"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedDoublyLinkedList containing nested structures SharedDoublyLinkedList<SharedMap<number>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedLinkedList containing nested structures SharedLinkedList<SharedSet<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedList containing nested structures SharedList<SharedMap<number>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedList containing nested structures SharedList<SharedSet<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedMap containing nested structures SharedMap<SharedList<number>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedMap containing nested structures SharedMap<SharedMap<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedMap containing nested structures SharedMap<SharedSet<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedOrderedMap containing nested structures SharedOrderedMap<SharedList<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedPriorityQueue containing nested structures SharedPriorityQueue<SharedMap<string>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedQueue containing nested structures SharedQueue<SharedList<number>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedSortedMap containing nested structures SharedSortedMap<SharedSet<number>>"
+  },
+  {
+    "file": "nested.test.ts",
+    "fullName": "Nested Data Structures SharedStack containing nested structures SharedStack<SharedMap<string>>"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox includes boundaries and rejects NaN coordinates in either axis"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 0 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 1 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 15 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 16 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 16385 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 17 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 2 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 31 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 32 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 33 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 511 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 512 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 513 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 7 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox matches scalar for 8 interleaved points"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox numeric-kernels-simd.wasm reads only complete points at the memory boundary"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox numeric-kernels.wasm reads only complete points at the memory boundary"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox preserves attached and old snapshots after append, edit, and growth"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox rejects incomplete points, incorrect list types, and incorrect bounds"
+  },
+  {
+    "file": "numeric-spatial.test.ts",
+    "fullName": "countPointsInBox works when the SIMD probe selects the scalar fallback"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 0"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 1"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 1023"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 1024"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 1025"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 15"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 16"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 17"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 2"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 3"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 31"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 32"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 32768"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 32769"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 33"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 63"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 64"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange matches scalar semantics at size 65"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange numeric-kernels-simd.wasm does not overread the last visible pair"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange numeric-kernels.wasm does not overread the last visible pair"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange preserves old snapshots through edits, pop, forks, and memory growth"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange reads attached arenas without allocating or changing shared bytes"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange rejects non-numeric lists and non-number bounds"
+  },
+  {
+    "file": "numeric.test.ts",
+    "fullName": "numeric countInRange uses the scalar fallback when the SIMD probe fails"
+  },
+  {
+    "file": "ordered-empty-regression.test.ts",
+    "fullName": "ordered iteration stays empty after the last deletion and handles re-insertion"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences SharedDoublyLinkedList: mixed block edits retain all sampled branches"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences SharedLinkedList: mixed block edits retain all sampled branches"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences compaction drops a consumed queue prefix without changing its source"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences frontier append uses exactly eight fresh bytes, while a fork copies its visible prefix"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 0"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 1"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 1024"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 1025"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 31"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 32"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 33"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "frontier tails and blocked persistent sequences vector branches and compaction at 4097"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction SharedMap: inserts, overwrites and deletes preserve forks"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction SharedOrderedMap: inserts, overwrites and deletes preserve forks"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction SharedSortedMap: inserts, overwrites and deletes preserve forks"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction compaction removes dead history and does not parse primitive JSON payloads"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction compaction shares repeated live nested snapshots and releases obsolete dependencies"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction numeric lookup caching distinguishes roots, missing values, NaN and negative zero"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction set variants, stacks, heaps and custom sort order survive compaction"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction sorted journal boundaries, empty keys, NUL, BOM and long shared UTF-8 prefixes"
+  },
+  {
+    "file": "performance-revision.test.ts",
+    "fullName": "maps, journals and raw live-data compaction worker wire format rejects the former layout"
+  },
+  {
+    "file": "primitive-scan-portability.test.ts",
+    "fullName": "preserves scan byte order, view reuse and snapshot lifetimes"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths SharedDoublyLinkedList: retains numeric scans, boolean scans and source versions"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths SharedLinkedList: retains numeric scans, boolean scans and source versions"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths does not read a growing writer or a fork in the middle of a scan"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths preserves all f64 values and indexes at leaf boundaries on writer and reader"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths preserves boolean decoding, UTF-8 strings and immutable JSON objects"
+  },
+  {
+    "file": "primitive-sequence-scan.test.ts",
+    "fullName": "primitive sequence scan fast paths preserves reverse traversal and source indexes for a doubly linked list"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards permits physical differences only for bounded generic-map construction, including update seeds"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards records verified actual outputs and all retained write snapshots"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects actual field corruption in both fixture oracles"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects actual keys corruption in both fixture oracles"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects actual size corruption in both fixture oracles"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects actual type corruption in both fixture oracles"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects actual value corruption in both fixture oracles"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards rejects missing or mismatched verified logical evidence"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards retains exact cross-arm physical checks on every unchanged fixture path"
+  },
+  {
+    "file": "proof-storage-integrity.test.ts",
+    "fullName": "allocation-aware proof storage guards still rejects within-build payload, descriptor, length and backing changes"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation does not silently serialize custom comparator functions"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation enforces configured resource limits"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid arena length"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid bad pointer"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid base64"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid binary format"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid checksum"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid duplicate arena"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid duplicate object key"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid invalid number"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid missing arena"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid missing snapshot"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid unknown class"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects an invalid version"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "checkpoint validation rejects unsupported values, accessors, symbols and cycles without executing getters"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips checkpoints a read-only worker view and restores it as a writable collection"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips escapes tag-like user objects and prototype property names"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips exports live data only and does not allocate in the source arena"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips gives two imports distinct arena IDs before they are combined into a nested snapshot"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips preserves repeated snapshot aliases and deeply freezes the restored state"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips preserves undefined, sparse arrays, special numbers, and null-prototype records"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable doubly linked list with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable linked list with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable list with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable map with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable ordered map with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable ordered set with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable priority queue with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable queue with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable set with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable sorted map with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable sorted set with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores a writable stack with its original semantics"
+  },
+  {
+    "file": "redux-checkpoint.test.ts",
+    "fullName": "complete checkpoint round trips restores nested dependencies and can export them to a worker again"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary does not interpret empty user keys as a second wire envelope"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary preserves marker objects and strings, JSON-only=false"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary preserves marker objects and strings, JSON-only=true"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary preserves null prototypes and own __proto__ fields without changing prototypes"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary preserves ordinary undefined properties, holes, special numbers, and repeated values"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary rejects cycles rather than replacing them with a false value"
+  },
+  {
+    "file": "redux-jsan.test.ts",
+    "fullName": "portable DevTools transport boundary restores real collection classes without changing source snapshots"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions counts holes and plain record fields on both sides of the codec"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions iterates priority queues without allocating WASM nodes, including attached views"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions preserves exact tied-priority dequeue behavior, maxHeap=false"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions preserves exact tied-priority dequeue behavior, maxHeap=true"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions preserves literal JSAN marker keys through both supported codecs"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions rejects hand-written object payloads that JSON storage would change"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions rejects malformed heap graphs and wrong heap ordering"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions round-trips real DevTools JSAN, including our reserved marker"
+  },
+  {
+    "file": "redux-regression.test.ts",
+    "fullName": "Redux persistence boundary regressions supports small limits without counting schema tuples as collection items"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux DevTools escapes user objects that contain the DevTools tag"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux DevTools exports and imports real lifted history through the JSAN replacer/reviver"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux DevTools makes summary mode explicit without disabling time travel"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux DevTools uses real instrumentation to jump between retained immutable states"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedDoublyLinkedList updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedLinkedList updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedList updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedMap updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedOrderedMap updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedOrderedSet updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedPriorityQueue updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedQueue updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedSet updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedSortedMap updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedSortedSet updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration SharedStack updates a frozen field without drafting collection internals"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration does not accept forged snapshots, unknown subclasses, or mutable classes"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration does not scan or allocate collection data in development checks or summary views"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration keeps 1,200 retained states readable through updates, reset, compaction and deprecated GC calls"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration retains mutation detection for ordinary state"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "Redux Toolkit integration retains serializability warnings outside collections, including action payloads"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "stable entry selectors does not confuse equal offsets in different arenas, or different keys"
+  },
+  {
+    "file": "redux-rtk.test.ts",
+    "fullName": "stable entry selectors keeps object identity after the global decode cache is full and unrelated entries change"
+  },
+  {
+    "file": "redux-wide-json.test.ts",
+    "fullName": "restores a wide JSON object without spreading its fields into function arguments"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "DevTools display and portable serialization defaults to bounded display summaries and leaves real state unchanged"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "DevTools display and portable serialization keeps portable data independent of source arenas after compaction and reset"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "DevTools display and portable serialization round-trips collection state and escapes reserved markers"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration does not decode collections during dispatch checks or summary rendering"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration keeps Immer, serializability checks, old states, and action replay working"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration preserves state identity for guarded no-op writes"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration rejects forged collection prototypes and does not trust root descriptors"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration retains snapshots after legacy dispose, auto-GC settings, growth, and reset"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration still reports an unrelated non-serializable action value"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "Redux Toolkit integration supports real DevTools time travel, view selection, and committing an old state"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec does not pollute prototypes when restoring object or map keys"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec enforces text, depth, node, and collection limits"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec exports read-only worker snapshots without writes or source resets"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec preserves queue offsets, stack order, map order, and heap direction"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec preserves special numbers, undefined fields, sparse arrays, and null prototypes"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec rejects functions, dates, cycles, accessors, and custom comparators"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec restores nested snapshots, frozen JSON, and future writes"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedDoublyLinkedList with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedLinkedList with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedList with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedMap with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedOrderedMap with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedOrderedSet with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedPriorityQueue with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedQueue with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedSet with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedSortedMap with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedSortedSet with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips SharedStack with a fresh writable arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedDoublyLinkedList"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedLinkedList"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedList"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedMap"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedOrderedMap"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedOrderedSet"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedPriorityQueue"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedQueue"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedSet"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedSortedMap"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedSortedSet"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec round-trips empty SharedStack"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "portable state codec validates versions, collection types, and duplicate map keys"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "selectors does not reuse a pointer identity from a different arena"
+  },
+  {
+    "file": "redux.test.ts",
+    "fullName": "selectors retains uncached object identity across repeated reads and unrelated writes"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations append"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations empty list"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations get by index"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations mixed prepend/append"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations prepend"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations removeFirst"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations removeFirst to empty"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations removeLast"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList basic operations removeLast to empty"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList bidirectional iteration forEach"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList bidirectional iteration forEachReverse"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList bidirectional iteration toArray"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList bidirectional iteration toArrayReverse"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList immutability append does not modify original"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList immutability prepend branching works"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList immutability prepend does not modify original"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertAfter insert at end"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertAfter insert in middle"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertAfter insert out of bounds"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertBefore insert at head"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertBefore insert in middle"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList insertBefore insert out of bounds"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList optimized access from closer end get from back half"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList optimized access from closer end get from front half"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList remove by index remove first"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList remove by index remove last"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList remove by index remove middle"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList remove by index remove out of bounds"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList stress tests 1000 appends"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList stress tests 1000 prepends"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList stress tests alternating removeFirst/removeLast"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList stress tests many removals"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList stress tests random access"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: boolean true and false"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: number floats"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: number integers"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: number special values"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: object arrays"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: object nested objects"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: object simple objects"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: string basic strings"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: string empty string"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: string long strings"
+  },
+  {
+    "file": "shared-doubly-linked-list.test.ts",
+    "fullName": "SharedDoublyLinkedList type: string unicode"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations append"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations empty list"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations get by index"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations mixed prepend/append"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations prepend"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations removeFirst"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList basic operations removeFirst to empty"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList immutability append does not modify original"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList immutability prepend branching works"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList immutability prepend does not modify original"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList insertAfter insert at end"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList insertAfter insert in middle"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList insertAfter insert out of bounds"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList iteration empty forEach"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList iteration forEach"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList iteration toArray"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList removeAfter remove in middle"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList removeAfter remove last element"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList removeAfter remove out of bounds"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList stress tests 1000 appends"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList stress tests 1000 prepends"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList stress tests many string appends"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList stress tests random access"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: boolean true and false"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: number floats"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: number integers"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: number special values"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: object arrays"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: object nested objects"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: object simple objects"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: string basic strings"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: string empty string"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: string long strings"
+  },
+  {
+    "file": "shared-linked-list.test.ts",
+    "fullName": "SharedLinkedList type: string unicode"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList boolean type"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList crosses 1024-element boundary"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList crosses 32-element boundary"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList empty list has size 0"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList forEach with index"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList get out of bounds returns undefined"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList get returns correct index"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList immutability - original unchanged"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList many elements"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList many strings"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList object type"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList pop on empty returns same"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList pop removes last"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList push increases size"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList pushMany"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList set out of bounds returns same list"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList set updates value"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList string interning"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList string set"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList string type"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList toArray"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList values iteration"
+  },
+  {
+    "file": "shared-list.test.ts",
+    "fullName": "SharedList version isolation"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap branching at multiple levels"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap empty get returns undefined"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap empty string key and value"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap hash collision handling"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap immutability - original unchanged"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap long keys"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap many keys"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap missing key returns undefined"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap multiple keys"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap overwrite key"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap set and get single value"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap structural sharing - nodes reused"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap unicode keys and values"
+  },
+  {
+    "file": "shared-map.test.ts",
+    "fullName": "SharedMap version isolation"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories borrowed proxy receivers keep lazy arena/view/head order and native pointer reads without metadata access"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories decoder constructor and typed-getter replacements permit later recursive and interleaved iterators"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories defers a static malformed leaf to its old output position (stable=false)"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories defers a static malformed leaf to its old output position (stable=true)"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories filters overwrites, deletions and reinsertions while retaining both forks"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 0 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 1 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 4095 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 4096 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 4097 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 8191 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 8192 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps all projections in insertion order for 8193 entries"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps iterator state local during recursive and interleaved forEach callbacks"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories keeps the captured scan view when a borrowed head getter grows the arena"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories nested factories can reenter iteration and ordered keys still decode values after keys"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories ordered sets preserve insertion order and old snapshots across several blocks"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories preserves generator identity and remains lazy before next, return or throw"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories preserves the old nonnumeric-head coercion and error path"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories public projections still dispatch through subclass entries and ordered-set keys"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories rejects a malformed link after scan index 0 before output or decoding"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories rejects a malformed link after scan index 4095 before output or decoding"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories rejects a malformed link after scan index 4096 before output or decoding"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories rejects a malformed link after scan index 8192 before output or decoding"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories resume tolerates decoder-installed array setters and replacement array/DataView methods"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories retains shared/copied readers across growth, reset and new attachments (copy=false)"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories retains shared/copied readers across growth, reset and new attachments (copy=true)"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories stops decoding after an early break"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories stops decoding after an early return"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories stops decoding after an early throw"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories survives global constructor replacement in a arena getter"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories survives global constructor replacement in a head getter"
+  },
+  {
+    "file": "shared-ordered-map-packed.test.ts",
+    "fullName": "ordered iteration with packed pointer histories uses actual log length with misleading tail and size metadata without coercing tail"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "encoded strings, objects and nested values keep their payloads on promotion"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) allocates only reachable path nodes for empty, root, interior and tied insertion"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) can use the final available node and preserves snapshots after later failure"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) failed multi-node insertion changes only unpublished allocation bytes"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) keeps signed-zero, equal and infinite priorities and old snapshots"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) shared/copy readers and compaction retain the shape across growth"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=false) uses normal allocator alignment after a four-byte-aligned record"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) allocates only reachable path nodes for empty, root, interior and tied insertion"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) can use the final available node and preserves snapshots after later failure"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) failed multi-node insertion changes only unpublished allocation bytes"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) keeps signed-zero, equal and infinite priorities and old snapshots"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) shared/copy readers and compaction retain the shape across growth"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "heap insertion (max=true) uses normal allocator alignment after a four-byte-aligned record"
+  },
+  {
+    "file": "shared-priority-queue-insert.test.ts",
+    "fullName": "validation and serialization failures precede heap node allocation"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue basic operations dequeue returns new queue with next priority"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue basic operations dequeue to empty"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue basic operations empty queue"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue basic operations enqueue and peek (min-heap)"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue edge cases many items"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue edge cases negative priorities"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue edge cases same priority values"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue immutability branching creates independent versions"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue immutability dequeue does not modify original"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue immutability enqueue does not modify original"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue max-heap max-heap dequeue order"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue max-heap max-heap returns highest priority first"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue value types boolean values"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue value types number values"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue value types object values"
+  },
+  {
+    "file": "shared-priority-queue.test.ts",
+    "fullName": "SharedPriorityQueue value types string values"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue FIFO order FIFO with strings"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue FIFO order maintains FIFO order"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue basic operations dequeue returns new queue"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue basic operations dequeue to empty"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue basic operations empty queue"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue basic operations enqueue and peek"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue immutability branching versions"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue immutability dequeue does not modify original"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue immutability enqueue does not modify original"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue stress tests 1000 enqueue/dequeue cycles"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue stress tests 1000 enqueues"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue stress tests many string enqueues"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: boolean true and false"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: number floats"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: number integers"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: object arrays"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: object nested objects"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: object simple objects"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: string basic strings"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: string empty string"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: string long strings"
+  },
+  {
+    "file": "shared-queue.test.ts",
+    "fullName": "SharedQueue type: string unicode"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet add duplicate does not increase size"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet add increases size"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet addMany"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet addMany with existing returns same if no new"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet delete non-existent returns same set"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet delete removes element"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet empty set has size 0"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet forEach"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet has returns true for existing"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet immutability - original unchanged"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet many elements"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet numeric values"
+  },
+  {
+    "file": "shared-set.test.ts",
+    "fullName": "SharedSet values iteration"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedMap basic operations"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedMap branching creates independent versions"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedMap delete"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedMap set branching"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedSet add branching"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedSet basic operations"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedSet branching creates independent versions"
+  },
+  {
+    "file": "shared-sorted.test.ts",
+    "fullName": "SharedSortedSet delete"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack LIFO order maintains LIFO order"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack basic operations empty stack"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack basic operations pop returns new stack"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack basic operations pop to empty"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack basic operations push and peek"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack immutability branching versions"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack immutability pop does not modify original"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack immutability push does not modify original"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack stress tests 1000 push/pop cycles"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack stress tests 1000 pushes"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack stress tests many string pushes"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: boolean true and false"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: number floats"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: number integers"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: number special values"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: object arrays"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: object nested objects"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: object simple objects"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: string basic strings"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: string empty string"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: string long strings"
+  },
+  {
+    "file": "shared-stack.test.ts",
+    "fullName": "SharedStack type: string unicode"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "SharedCollection converts to array"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "SharedCollection deletes items"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "SharedCollection inserts and retrieves items"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "SharedCollection updates items immutably"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "SharedCollection zero-copy worker transfer via root pointer"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "sharedCollectionConfig provides TanStack DB SyncConfig interface"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "sharedCollectionConfig supports worker state sharing"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "sharedCollectionConfig sync loads initial data"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "withSharedCache handles updates and deletes"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "withSharedCache mirrors upstream sync writes to SharedArrayBuffer"
+  },
+  {
+    "file": "tanstack-db-collection.test.ts",
+    "fullName": "withSharedCache provides zero-copy state for workers"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls captures after caller growth before first next and survives two interleaved paused traversals"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls keeps both generator methods and native iterator prototypes unchanged"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls keeps copy attachments and ordinary/sorted sets unchanged"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls keeps shared attachments and ordinary/sorted sets unchanged"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls matches exact baseline pointer order and independent recursion across all trie shapes"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves creation, return-before-next, throw-before-next, and zero-root laziness"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves natural UTF-8 byte order independently of baseline traversal"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and SharedList<number> values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and SharedMap<number> values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and boolean values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and number values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and object values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls preserves public projection order, Unicode and string values"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls resumes journal yields across growth and captures each recursive iterator independently"
+  },
+  {
+    "file": "trie-view-capture.test.ts",
+    "fullName": "radix view capture with unchanged HAMT controls retains close, throw, callback reentry and fresh iteration after termination"
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration keeps existing validation for hand-written object imports: \"a\""
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration keeps existing validation for hand-written object imports: \"n\""
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration keeps existing validation for hand-written object imports: \"n\""
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration keeps existing validation for hand-written object imports: \"n\""
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration keeps existing validation for hand-written object imports: \"u\""
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration preserves typed snapshots in Toolkit reducers and selectors"
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration produces the same persistence envelope as an untyped object collection"
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration rejects the removed draft json descriptor in persistence data"
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration retains native JSON normalization after persistence"
+  },
+  {
+    "file": "typed-json-redux.test.ts",
+    "fullName": "typed JSON Redux integration round-trips nested collections into writable snapshots through the existing codec"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse calls native JSON.stringify once per scalar write without a validation walk"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse does not register a separate json runtime codec"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse keeps byte allocation identical for large typed and untyped batches"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse keeps native bigint errors without changing published snapshots"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse keeps native cycle errors without changing published snapshots"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse uses existing object descriptors for transport and mixed nested collections"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse uses native JSON semantics for unchecked inputs, including hooks and negative zero"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "existing object codec reuse uses the same codec instance, runtime names, and native UTF-8 bytes"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function doublyLinkedList(type) {\n\treturn nested(\"SharedDoublyLinkedList\", type);\n} retains the wire description for SharedDoublyLinkedList"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function linkedList(type) {\n\treturn nested(\"SharedLinkedList\", type);\n} retains the wire description for SharedLinkedList"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function list(type) {\n\treturn nested(\"SharedList\", type);\n} retains the wire description for SharedList"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function map(type) {\n\treturn nested(\"SharedMap\", type);\n} retains the wire description for SharedMap"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function orderedMap(type) {\n\treturn nested(\"SharedOrderedMap\", type);\n} retains the wire description for SharedOrderedMap"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function priorityQueue(type) {\n\treturn nested(\"SharedPriorityQueue\", type);\n} retains the wire description for SharedPriorityQueue"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function queue(type) {\n\treturn nested(\"SharedQueue\", type);\n} retains the wire description for SharedQueue"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function sortedMap(type) {\n\treturn nested(\"SharedSortedMap\", type);\n} retains the wire description for SharedSortedMap"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers function stack(type) {\n\treturn nested(\"SharedStack\", type);\n} retains the wire description for SharedStack"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "nested descriptor helpers retains string and number set types without adding object set support"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values covers bulk operations, callbacks, arrays, and detached iteration tuples"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values keeps old snapshots, forks, input ownership, and deeply frozen reads"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values keeps special keys as data and freezes array values"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values preserves nested descriptors through forks, compaction, growth, and resets"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports doubly linked list, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports linked list, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports list, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports map, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports ordered map, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports priority queue, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports queue, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports sorted map, worker reconstruction, and compaction"
+  },
+  {
+    "file": "typed-values.test.ts",
+    "fullName": "typed JSON values supports stack, worker reconstruction, and compaction"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'bulk list' recovers after failed serialization without changing a retained root"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'bulk map' recovers after failed serialization without changing a retained root"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'doubly linked list' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'doubly linked list' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'doubly linked list' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'doubly linked list' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'doubly linked list' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'linked list' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'linked list' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'linked list' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'linked list' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'linked list' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'list' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'list' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'list' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'list' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'list' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' handles exact shared-scratch capacity and oversized keys"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'map' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' handles exact shared-scratch capacity and oversized keys"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'ordered map' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'priority queue' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'priority queue' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'priority queue' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'priority queue' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'priority queue' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'queue' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'queue' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'queue' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'queue' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'queue' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'scalar list' recovers after failed serialization without changing a retained root"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'scalar map' recovers after failed serialization without changing a retained root"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' handles exact shared-scratch capacity and oversized keys"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'sorted map' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'stack' 'object' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'stack' 'string' preserves snapshots and attachments while the writer grows"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'stack' preserves nested descriptors and read-only child attachments"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'stack' serializes hooks once before reentrant writes and growth, large=false"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes 'stack' serializes hooks once before reentrant writes and growth, large=true"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes keeps bytes intact when getters and toJSON reenter different arenas"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes keeps native leaf payloads, prefixes, and alignment for object"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes keeps native leaf payloads, prefixes, and alignment for string"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes keeps prepared bytes independent from subsequent scratch use"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes matches native bytes and exact allocation for encoded object values"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes matches native bytes and exact allocation for encoded string values"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes returns complete native UTF-8 bytes across temporary-buffer boundaries"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes returns native allocated bytes when TextEncoder.encodeInto is absent"
+  },
+  {
+    "file": "utf8-write.test.ts",
+    "fullName": "UTF-8 value writes uses ordinary buffers when a runtime rejects shared TextEncoder output"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) exports empty, singleton, and two-arena payloads without dependency iterators"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) follows singleton dependency values even when their key is the owner ID"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) honors mutations of an observed dependency map without changing sibling maps"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) isolates overlapping arena IDs across attachments, including deferred nested reads"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) keeps a single dependency backing field and avoids dependency getters during reads"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) preserves DFS order and duplicate-ID precedence after extending a reader graph"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) preserves distinct self-excluding dependency maps when observed"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) preserves legacy first-ID order across overlapping closed and observed registries"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) preserves same-arena nesting, aliases, forks, and read-only behavior"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) re-exports reader groups reached from writer-owned dependency maps"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) resolves cross-arena nesting and cycles in the arena dependency graph"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) retains ordinary invalid transport and missing nested arena errors"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=false) shares one lookup without materializing all-to-all dependency maps"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) exports empty, singleton, and two-arena payloads without dependency iterators"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) follows singleton dependency values even when their key is the owner ID"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) honors mutations of an observed dependency map without changing sibling maps"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) isolates overlapping arena IDs across attachments, including deferred nested reads"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) keeps a single dependency backing field and avoids dependency getters during reads"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) preserves DFS order and duplicate-ID precedence after extending a reader graph"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) preserves distinct self-excluding dependency maps when observed"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) preserves legacy first-ID order across overlapping closed and observed registries"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) preserves same-arena nesting, aliases, forks, and read-only behavior"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) re-exports reader groups reached from writer-owned dependency maps"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) resolves cross-arena nesting and cycles in the arena dependency graph"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) retains ordinary invalid transport and missing nested arena errors"
+  },
+  {
+    "file": "worker-attachment.test.ts",
+    "fullName": "worker attachment registry (copy=true) shares one lookup without materializing all-to-all dependency maps"
+  },
+  {
+    "file": "worker-records.test.ts",
+    "fullName": "collects deep arena graphs iteratively and deduplicates cycles"
+  },
+  {
+    "file": "worker-records.test.ts",
+    "fullName": "rejects symbol names rather than silently losing a typed collection"
+  },
+  {
+    "file": "worker-records.test.ts",
+    "fullName": "worker metadata keeps plain string keys, copy=false"
+  },
+  {
+    "file": "worker-records.test.ts",
+    "fullName": "worker metadata keeps plain string keys, copy=true"
+  },
+  {
+    "file": "worker-tasks.test.ts",
+    "fullName": "typed task executors dispatches against the requested shared-state revision"
+  },
+  {
+    "file": "worker-tasks.test.ts",
+    "fullName": "typed task executors keeps one immutable snapshot for an async task"
+  },
+  {
+    "file": "worker-tasks.test.ts",
+    "fullName": "typed task executors schedules work across borrowed pool endpoints and keeps input order"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol attaches a compacted arena without invalidating retained snapshots"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol attaches nested dependencies and keeps old nested values readable"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol automatically publishes a single collection and preserves old snapshots"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol batches nested and empty updates with immediate publication"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol batches nested and empty updates with microtask publication"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol batches same-turn updates and supports the value setter"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol binds Redux selections and unsubscribes on disposal"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol bounds in-flight latest delivery while a reader does not acknowledge"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol cancels scheduled publication and closes readers on disposal"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol connects multiple readers and can disconnect one without closing its port"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol copies every publication only when copy mode is selected"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol covers a source update made while subscribe is installed"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol does not allocate in the source arena during publication"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol does not confuse identical root offsets from different arenas"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol does not publish an update that returns to the last committed snapshot"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol flushes newer pending state installed by a publication subscriber"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol flushes pending publication without a duplicate microtask publication"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol handles a reader that starts first"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol isolates named sessions on one endpoint and leaves ordinary messages alone"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol keeps the manual session API"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol keeps the session alive when a subscriber throws"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol publishes record roots atomically and preserves unchanged wrapper identity"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol rejects a bounded all-mode iterator on overflow"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol rejects a connection when aborted"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol rejects a failed send and releases the channel for reuse"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol rejects initialization timeout and removes listeners"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol rejects unsupported state without changing the current value"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol reports queue overflow instead of silently dropping all-mode snapshots"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol shares memory handles once per connection, then sends descriptors"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol supports aborting a pending stream"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol supports every-publication delivery with a bounded queue"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol supports latest-only async iteration and closes pending reads on disposal"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol supports the one-shot helpers"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol suppresses distinct record captures restored to the last committed handles"
+  },
+  {
+    "file": "worker.test.ts",
+    "fullName": "shared state and session protocol suppresses no-ops, including newly allocated record wrappers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Seamless Worker API all structures via getWorkerData/initWorker"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedList Multi-Worker Tests SharedList after pop operation"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedList Multi-Worker Tests SharedList after set operation"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedList Multi-Worker Tests SharedList<number> shared across workers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedList Multi-Worker Tests SharedList<object> shared across workers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedList Multi-Worker Tests SharedList<string> shared across workers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests 3 workers same key simultaneously"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests concurrent reads from multiple workers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests empty SharedMap"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests stress test - 2 workers, 100 keys"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests unicode keys and values"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests workers handle missing keys"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests workers see map after delete operations"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedMap Multi-Worker Tests workers see updated map after set operations"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedSet Multi-Worker Tests SharedSet after delete operation"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "SharedSet Multi-Worker Tests SharedSet shared across workers"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedList<boolean> zero-copy (Node.js)"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedList<number> zero-copy (Node.js)"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedList<object> zero-copy (Node.js)"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedList<string> zero-copy (Node.js)"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedMap<boolean> zero-copy"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedMap<number> zero-copy"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedMap<object> zero-copy"
+  },
+  {
+    "file": "workers.test.ts",
+    "fullName": "Zero-Copy Data Type Tests SharedMap<string> zero-copy"
+  }
+]

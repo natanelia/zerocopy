@@ -1,0 +1,137 @@
+{
+  "status": "stopped-baseline-suite-failure",
+  "oneShot": true,
+  "attemptedCommands": 1,
+  "passedCommands": 0,
+  "candidateNeverStarted": true,
+  "baselineReportedTestFiles": 51,
+  "baselineReportedTests": 1088,
+  "baselineStatusCounts": {
+    "passed": 1070,
+    "failed": 18
+  },
+  "baselineFailuresByFile": {
+    "allocation-failure.test.ts": 12,
+    "geometry.test.ts": 1,
+    "performance-revision.test.ts": 1,
+    "redux-checkpoint.test.ts": 3,
+    "typed-values.test.ts": 1
+  },
+  "baselineFailedCases": [
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot map: bulk insert, overwrite, duplicate and exact hash collision",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot map: delete",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot map: insert",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot ordered map: delete",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot ordered map: insert",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot ordered map: replace",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot priority queue: min dequeue",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot priority queue: min enqueue",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot set: insert",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot sorted map: delete",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot sorted map: insert",
+      "status": "failed"
+    },
+    {
+      "file": "allocation-failure.test.ts",
+      "fullName": "bounded-memory writes preserve every published snapshot sorted map: replace",
+      "status": "failed"
+    },
+    {
+      "file": "geometry.test.ts",
+      "fullName": "bboxXY preserves attached snapshots after append, fork, and memory growth",
+      "status": "failed"
+    },
+    {
+      "file": "performance-revision.test.ts",
+      "fullName": "maps, journals and raw live-data compaction SharedSortedMap: inserts, overwrites and deletes preserve forks",
+      "status": "failed"
+    },
+    {
+      "file": "redux-checkpoint.test.ts",
+      "fullName": "complete checkpoint round trips restores a writable priority queue with its original semantics",
+      "status": "failed"
+    },
+    {
+      "file": "redux-checkpoint.test.ts",
+      "fullName": "complete checkpoint round trips restores a writable sorted map with its original semantics",
+      "status": "failed"
+    },
+    {
+      "file": "redux-checkpoint.test.ts",
+      "fullName": "complete checkpoint round trips restores a writable sorted set with its original semantics",
+      "status": "failed"
+    },
+    {
+      "file": "typed-values.test.ts",
+      "fullName": "typed JSON values supports list, worker reconstruction, and compaction",
+      "status": "failed"
+    }
+  ],
+  "baselinePackedRegressionsPassed": 33,
+  "failureClassification": "Test command returned exit 1; no supervisor containment breach. Report failure strings contain generic Error stacks; no unsupported root-cause classification is made.",
+  "sourceNativeBuildChecks": {
+    "baseline": {
+      "sourceFilesUnchanged": 504,
+      "nativeArtifactsUnchanged": 12,
+      "portableOutputsUnchanged": 12
+    },
+    "candidate": {
+      "sourceFilesUnchanged": 504,
+      "nativeArtifactsUnchanged": 12,
+      "portableOutputsUnchanged": 12
+    }
+  },
+  "sourceSealSHA256": "f62fe13c044cbf13b066c674d42e7fa02a533812233bf229c38a471c4cfae1f4",
+  "rawReportSHA256": "ac9bb8a6de0ca0c843d75d58fcf751d45c783c337ba458824417819dafbea751",
+  "leaderReaped": true,
+  "remainingOriginalGroupMembers": [],
+  "fullSuiteClearance": false,
+  "candidateFullSuiteEvidence": "not run",
+  "performanceInference": false,
+  "publicSummaryOnly": true,
+  "localTerminalAuditSha256": "02837adc3ab34ffe0823f7f44fe1989b8bb8fdd15d1a2598b8da971981172829",
+  "localTerminalManifestSha256": "6918aac4203bfab245e39af6d72213b045e831f0e574896988f343b1e4345048",
+  "interpretation": "Failed baseline validation, not a candidate regression or cleared correctness gate. The reporter contains generic Error stacks and omits a textual timeout reason. All 18 failed durations exceeded the unchanged 5000 ms per-test timeout; no local retry or timeout change was made. Fresh hosted full ordinary suites must pass for both arms before science."
+}

@@ -1,0 +1,42 @@
+--- a/shared-ordered-map.ts
++++ b/shared-ordered-map.ts
+@@ -1,6 +1,8 @@
+ import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
+ import { structureRegistry } from './codec';
+ import type { ValueOf } from './types';
++// Capture under ordinary initial intrinsics, before receiver or decoder hooks run.
++const OrderPointerBlock = Uint32Array;
+ // Registering a collection must not allocate an unused writer in every reader.
+ let current: Arena | undefined;
+ /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
+@@ -50,10 +52,26 @@
+       : new SharedOrderedMap(this.valueType, 0, 0, 0, 0, a);
+   }
+   *entries(): Generator<[string, ValueOf<T>]> {
+-    const a = this.arena, order: number[] = [], view = a.dv; let p = this.head;
+-    while (p) { order.push(view.getUint32(p + 4, true)); p = view.getUint32(p, true); }
+-    for (let i = order.length - 1; i >= 0; i--) {
+-      const old = order[i];
++    const a = this.arena; let order: number[] | undefined = []; const view = a.dv; let p = this.head;
++    let blocks: Uint32Array[] | undefined, count = 0, blockIndex = 0, slot = 0;
++    while (p) {
++      const old = view.getUint32(p + 4, true);
++      if (!blocks && count < 4096) order!.push(old);
++      else {
++        if (!blocks) {
++          blocks = [new OrderPointerBlock(4096), new OrderPointerBlock(4096)];
++          for (let i = 0; i < 4096; i++) blocks[0][i] = order![i];
++          order = undefined; blockIndex = 1;
++        } else if (slot === 4096) {
++          blocks[++blockIndex] = new OrderPointerBlock(4096); slot = 0;
++        }
++        blocks[blockIndex][slot++] = old;
++      }
++      count++; p = view.getUint32(p, true);
++    }
++    for (let i = count - 1; i >= 0; i--) {
++      const old = blocks ? blocks[blockIndex][--slot] : order![i];
++      if (blocks && slot === 0) { blockIndex--; slot = 4096; }
+       if (this.orderStable) { yield [a.leafKey(old), a.leafValue(this.valueType, old, 4)]; continue; }
+       const dv = a.dv, length = dv.getUint32(old + 8, true);
+       const leaf = a.wasm.mapFind(this.root, old + 16, length, dv.getUint32(old + 4, true)) >>> 0;

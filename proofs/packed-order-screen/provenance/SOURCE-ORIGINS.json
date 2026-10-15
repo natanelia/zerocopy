@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "sourceReuseOnly": true,
+  "oldScientificDataCopied": false,
+  "acceptedLifetimeSource": {
+    "subject.mjs": "3e7f25cc7349815aa67461a29af26bd1028fd76d9429b83c90a1ab7d0030b1b7",
+    "subject-check.mjs": "3417923945c7097808fbb39d280eb29fb41fa8221fe6dbced02af28d7a103aea",
+    "run-hosted.py": "a240be0112ef8bdc6d459d5df61b25aa8d37264a37078495fc31636b2ee98712",
+    "supervisor_checks.py": "50e5f04f92f90b1ee80ea830791aeb6c8aac4f15f01ac11868398b1b8471f694",
+    "analysis.py": "7d8b12a0a43622d7009e1e28a43fbdb0da6080d30e51f1a5c48128cccb833aa4",
+    "analysis_checks.py": "46b16ed89b63abcff9dcd62c334a40bbd14e71bc0220971b10ac3fa10a7ef9cd",
+    "method/METHOD.md": "25d6af75fb5f602805f05bde6ab7d30f6887fe36c4a84ff892cc6b8370f68f43",
+    "method/LIFETIME-ADDENDUM.md": "642674e84697122ad67dd35d84f0c71677a8d3d308ed7ac248de809ebad799c8",
+    "statistics/REVIEW.md": "683981d2560217f6888a5bf7a36f4ea523c4d5de9d16139bfa06a6d74a938bdc"
+  },
+  "acceptedHostedProvisioningSource": {
+    "hosted.py": "ed22d9785bdae3e1b17c78ff31187ff308821fe71e34cce54025fdf8a0a4e78a",
+    "workflow.yml": "f21d7401c3b43a76a757d9750cfa5c5c4b0a41aa356b8577cca6d1dd0b3370af",
+    "manifests/dependencies-hosted-node22-npm10.json": "7ee99a31bc1bb35e826b979c7066f1a84041159fcb79d551ea0ade5c029bcd55",
+    "manifests/native-build-extra.json": "e6e9eea3e323822f5cf90374afced6fc5781be116e62612d2e96a24a1fca25a4",
+    "toolchain/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+    "toolchain/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1"
+  },
+  "packedCandidateSource": {
+    "candidate.patch": "67ebba91cff4a2cff7a9be1962f193fe24743c758e2007acc43a460fb279edcd",
+    "overlays/shared-ordered-map-packed.test.ts": "747cac3ae7007183c0f965da32a3509c2d9c24fdf52e74eb4d6e43e20dfd0837",
+    "overlays/proofs/ordered-map-packed-worker.node.mjs": "7c7f844dfdb36ca9122a7c51ceed8a9c7f4543284941c695778fff950e943e1e",
+    "provenance/SOURCE-SEAL.sha256": "f62fe13c044cbf13b066c674d42e7fa02a533812233bf229c38a471c4cfae1f4"
+  },
+  "prospectiveMethodReviewOriginalSha256": "2f7c5ecf4b3f173a40cbf9fbfe673dfabf1faa8d6c0c71b9bd383c2567faf2c9"
+}

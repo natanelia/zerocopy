@@ -1,0 +1,50 @@
+{
+  "status": "verified-deterministic-mathematics-only",
+  "degreesOfFreedom": 7,
+  "confidence": 0.95,
+  "twoSided": true,
+  "tailProbabilityFormula": "0.05 / (2*m) = 1 / (40*m)",
+  "values": {
+    "1": {
+      "tailProbabilityExact": "1/40",
+      "decimalRoot": "2.36462425159278534168090147378049028313029088348956491870525368397045434494",
+      "binary64Literal": "2.3646242515927853",
+      "decimalTailResidual": "2.89988E-71",
+      "independentDoubleRoot": "2.364624251592785",
+      "rootAbsoluteDifference": 4.440892098500626e-16,
+      "independentTailResidualAtDecimalRoot": 0.0
+    },
+    "22": {
+      "tailProbabilityExact": "1/880",
+      "decimalRoot": "4.67552140238239986550859487629782623239300533897654750564766594613116039082",
+      "binary64Literal": "4.6755214023824",
+      "decimalTailResidual": "9.4714E-73",
+      "independentDoubleRoot": "4.675521402382399",
+      "rootAbsoluteDifference": 8.881784197001252e-16,
+      "independentTailResidualAtDecimalRoot": -2.168404344971009e-19
+    },
+    "38": {
+      "tailProbabilityExact": "1/1520",
+      "decimalRoot": "5.1556333574517177629874270051371723910293450703121459068318364314595493237",
+      "binary64Literal": "5.155633357451718",
+      "decimalTailResidual": "3.44960E-73",
+      "independentDoubleRoot": "5.155633357451718",
+      "rootAbsoluteDifference": 0.0,
+      "independentTailResidualAtDecimalRoot": 2.168404344971009e-19
+    }
+  },
+  "decimalPrecisionDigits": 75,
+  "decimalBisections": 230,
+  "decimalBracket": [
+    2,
+    10
+  ],
+  "positiveSeriesMaxTerms": 353,
+  "positiveSeriesTermLimit": 600,
+  "quadratureTolerance": 1e-17,
+  "quadratureDepthLimit": 24,
+  "quadratureBisections": 60,
+  "scientificSamplesUsed": 0,
+  "subjectExecution": false,
+  "familiesAreSeparate": true
+}

@@ -1,0 +1,58 @@
+name: Packed ordered pointers prospective hosted screen
+
+on:
+  push:
+    branches: [proof/packed-order-screen-context-fix-20261015]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packed-order-screen-20261015
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    if: github.repository == 'natanelia/zerocopy' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Read the exact reviewed proof commit
+        timeout-minutes: 2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          fetch-tags: false
+          persist-credentials: false
+      - name: Install the pinned official Node release
+        timeout-minutes: 3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+          check-latest: false
+      - name: Prepare exact arms and require full ordinary correctness
+        timeout-minutes: 28
+        env:
+          PACKED_ORDER_PROVISION: ${{ runner.temp }}/packed-order-provisioned
+        run: python3 proofs/packed-order-screen/run-hosted.py prepare "$PACKED_ORDER_PROVISION"
+      - name: Run the fixed 36-child scientific screen
+        timeout-minutes: 58
+        env:
+          PACKED_ORDER_PROVISION: ${{ runner.temp }}/packed-order-provisioned
+          PACKED_ORDER_OUTPUT: ${{ runner.temp }}/packed-order-screen-result
+        run: python3 proofs/packed-order-screen/run-hosted.py screen "$PACKED_ORDER_OUTPUT" "$PACKED_ORDER_PROVISION"
+      - name: Preserve every observation and partial failure
+        if: ${{ always() }}
+        timeout-minutes: 3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: packed-order-screen-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/packed-order-provisioned/artifact/
+            ${{ runner.temp }}/packed-order-screen-result/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
