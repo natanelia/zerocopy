@@ -1,0 +1,16 @@
+{
+  ".github/workflows/sorted-journal-delete.yml": "f910de6ecb73442724e6f976cc43a8a8a34819ee923856b06e883214427b1f76",
+  "persistent-core.as.ts": "6a0e16e08270221c581e2604adac842aeaed221256dd03d9792c45359299018d",
+  "proofs/sorted-journal-delete-worker.mjs": "c77b32c4508ed9bf180d91b07083ce511110885fa08a8203fb494c946e13be37",
+  "proofs/sorted-journal-delete/CORRECTNESS.md": "febb03ab474250f84520558c04cf689f8d2f61ea4fe9013fc59b623f7d0d426a",
+  "proofs/sorted-journal-delete/METHOD.md": "2296246d8b7bfdb0193c1d129d7109fa4a1617f941af7e01ff4b14d02d7a6542",
+  "proofs/sorted-journal-delete/README.md": "2ce9dfc43053147679d00e4dafd64a6b6ab74a71884aec6167a03dcb7be372f2",
+  "proofs/sorted-journal-delete/SUBJECT-CONTRACT.md": "421cbca3ebc716211d965a17614c0adcd875bc8dd46ed79e84905f82e814e092",
+  "proofs/sorted-journal-delete/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/sorted-journal-delete/dependencies/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "proofs/sorted-journal-delete/dependencies/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "proofs/sorted-journal-delete/harness_test.py": "c5026ed3c434e39f6c46afd03fe655eb358dfdd4f7616e601b0a84f94fc9c7b0",
+  "proofs/sorted-journal-delete/run.py": "2de6e6da0a7731c175a9a1b5e6bbec16e663b47dc73518f087c71d528c131fc6",
+  "proofs/sorted-journal-delete/subject.mjs": "7c471af9d15dc9415d3af5d31480c1dfb35fa852012fe4e37e394fdd95d1f20b",
+  "sorted-journal-delete.test.ts": "b2bb9c9a3e54457fc09024a087ca52bc1e1da400950536fbebd234ba276866bb"
+}
