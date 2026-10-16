@@ -1,0 +1,39 @@
+name: Restore audited native reader inputs
+on:
+  push:
+    branches: [proof/native-reader-reuse-preparation-20261016]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    permissions:
+      contents: read
+      actions: read
+    if: github.ref == 'refs/heads/proof/native-reader-reuse-preparation-20261016' && github.event.before == 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Restore exact audited inputs under separate bounds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          python3 -B proofs/native-reader-preparation/prepare.py native-reader-bindings/preparation.json 7937a74825a222dcb89fa49f15bb543a7bddc1a01d4b2b68fc3dd59aac890e44 "$RUNNER_TEMP/native-reader-preparation-output" "$RUNNER_TEMP/native-reader-preparation-work"
+      - name: Locate preparation evidence
+        if: always()
+        run: echo "NATIVE_READER_PREPARATION=$RUNNER_TEMP/native-reader-preparation-output" >> "$GITHUB_ENV"
+      - name: Preserve complete or partial preparation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-reader-preparation-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.NATIVE_READER_PREPARATION }}/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

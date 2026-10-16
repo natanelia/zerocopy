@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "kind": "native-reader-performance-transport-method",
+  "wholeCapSeconds": 180,
+  "downloadAllowanceSeconds": 90,
+  "restorationAllowanceSeconds": 60,
+  "finalizationReserveSeconds": 30,
+  "sampledGroupRssLimitBytes": 4294967296,
+  "minimumEffectiveAvailableBytes": 6442450944,
+  "noRebuild": true,
+  "noTargetImports": true,
+  "firstFailureTerminal": true,
+  "originalPreparationReceiptImmutable": true,
+  "files": {
+    "transport.py": "32b9bd0811184255c50d16e4e24d22afb23c72bc5eba4f0259c9334409f1cf1f",
+    "restore.py": "f5a63d0467f9c5d6a84aea453b665ccb006258cc0ead2521662afd47cc096e57",
+    "download.py": "4d20d634270a133704a5fdbd0901761506a2d476c386ab3ea09d955238e2176e",
+    "files.py": "638e9a381548f4be994f9ce01e184db57b95739d41f7faa2a544c4f68ca5dee6",
+    "gates.py": "c89955ec6dd814a91a1a1b5f54cd36b1e93f7066c3f4c505e32a66714e0c607e",
+    "bounded_process.py": "d8ed2c8a7467f8628435f92e1744d3fed1f50cabb2b30d6cd1c0983add55015e",
+    "headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78",
+    "authentication.py": "bfc9393c1fc1ef51f6df47131ab2026f106bb15724415076ac941cde896be63d",
+    "specification.py": "795c5407056a207951bff8259c7a83b153845ca7b716f6d0298ab23e63e9e36a",
+    "cases.json": "4b9e38f5e184d10715e83047ac037e6bb567582d9ba90ae1d48828ed606552e0",
+    "scratch.py": "7db92bd58db058fb12b66891c2c7ec6ee50e731c8e0903ac034a55c3250f0657"
+  },
+  "maximumRegularBytesPerInventoryOrArchive": 1073741824,
+  "maximumFilesPerInventory": 10000
+}
