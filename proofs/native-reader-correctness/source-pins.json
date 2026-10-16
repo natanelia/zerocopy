@@ -1,0 +1,19 @@
+{
+  ".github/workflows/native-reader-correctness.yml": "1970ff63b671fd95b4b7ee4d8163220bc9bf8ddbdf09655bce1c7eeb1e345344",
+  "arena.ts": "8603c3b219e1435ea882799ca0abe9d8492209e001e535e17f18f56a6920ec7b",
+  "native-reader.test.ts": "8add94718bde419e01d17b70a3cc880f282c29f971b6bf1239c672b716e8036f",
+  "proofs/native-reader-correctness/METHOD.md": "d8a86d3a083595277a115a73b326bf85b1d8ab8401874ad37c06d8e7a9adb6be",
+  "proofs/native-reader-correctness/artifact_checks.py": "c4acc7ff58659f8c2db6e2e86ccfdcbadf919679c0fcf0d5e0045fd4f1cd64df",
+  "proofs/native-reader-correctness/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/native-reader-correctness/bounded_process.py": "d8ed2c8a7467f8628435f92e1744d3fed1f50cabb2b30d6cd1c0983add55015e",
+  "proofs/native-reader-correctness/dependencies/package-lock.json": "9a21d54dffb4782257ccee864de6b7f11f9c6d12a30ea8eaa411dff11cf9cfa4",
+  "proofs/native-reader-correctness/dependencies/package.json": "c61836da6c6d1c2699a909a1b84cc8e9f3d51ec9f27d4e0a2c5c322f7d10f02e",
+  "proofs/native-reader-correctness/headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78",
+  "proofs/native-reader-correctness/report_selector_test.py": "24d376f180d5e755bf6d271c2322fa1c0aa7ff25cbaa8cb879a4b6a52e24144b",
+  "proofs/native-reader-correctness/run.py": "b43a16333731bd2a55bddcdb11300fa49a0c26bce9af5d90e66dc54562a3ab5a",
+  "proofs/native-reader-correctness/temp_scope_test.py": "0c93c32ad02679a45441cde927e5a71d05751cccef3bfeb0393dbde8375cd0eb",
+  "proofs/native-reader-correctness/temp_scopes.py": "afcecee9817832ae117ccffee9b311bde24dd6da83ff7fcfcdd9aaea95e2e98a",
+  "proofs/native-reader-correctness/workflow_guard.py": "63fbeef1db321c118fdc4c073aa826ad0ab1bea52cd6b3b45162d73749410662",
+  "worker.test.ts": "af1f02348f9ae0e33597d5eef12517428d3ed13c05d1ee5edb4b78cbc3a70629",
+  "worker.ts": "2d719b3496c75cb69c2e86252785b324d1e0a8228c0b83b6918727b527ea4f38"
+}
