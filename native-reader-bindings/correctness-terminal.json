@@ -1,0 +1,41 @@
+{
+  "artifact": {
+    "archiveBytes": 978322,
+    "archiveSHA256": "8774f9b100fc5df4ac36496cdcc046cab9459b626ca43a1b6ddc52c9d702b4cd",
+    "id": 12032199116
+  },
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidateCommit": "2176942d528db615443fc9d3622e88508b8969c2",
+  "cleanupSHA256": "a624d4a564770e8e248306c5b612d6212fef83e812ac5102e716c960e0aa687f",
+  "commandsSHA256": "a9490e8f6b6585c5458eae898db5fe97bd7000eb979babef02ba6670380293e9",
+  "conclusion": "success",
+  "controllerStep": {
+    "completed_at": "2026-10-16T07:47:24Z",
+    "conclusion": "success",
+    "name": "Run bounded matched correctness checks",
+    "number": 6,
+    "started_at": "2026-10-16T07:44:43Z",
+    "status": "completed"
+  },
+  "event": "push",
+  "evidenceSealSHA256": "a28b49b5f7df4973fd08900569b7a650bc915b1e225892d96e05e278db25dd72",
+  "exitCode": 0,
+  "finished": true,
+  "jobId": 116868810376,
+  "kind": "native-reader-correctness-controller-exit",
+  "officialResponseSHA256": {
+    "jobs": "ec04b0ed82ce1f9938676d99dd19133e521d14928cfc56687733e6049814555a",
+    "run": "298dc7a3f0f7d8ec0ad2a9aeb21af926749540a7ba652772a3cfce0894bc3b0c"
+  },
+  "repository": "natanelia/zerocopy",
+  "runAttempt": 1,
+  "runId": 38869133422,
+  "runSourceURL": "https://github.com/natanelia/zerocopy/actions/runs/38869133422",
+  "schemaVersion": 1,
+  "sourceURL": "https://github.com/natanelia/zerocopy/actions/runs/38869133422/job/116868810376",
+  "statusSHA256": "d0da0825066dba32944963873d868a2ffcd686d5fe0adeaf137772d494f8da8c",
+  "temporaryCleanupReceiptSHA256": "ea4418ea7d86eca894d91afc795e86dd5ecab4310993bac8d4abfefc5261e897",
+  "verificationBasis": "The independently retained GitHub run and job are terminal success. The exact controller step succeeded under the pinned workflow with set -euo pipefail and no continue-on-error. The controller process is the final shell command; this establishes its zero exit independently of status.json.",
+  "workflow": ".github/workflows/native-reader-correctness.yml",
+  "workflowSHA256": "1970ff63b671fd95b4b7ee4d8163220bc9bf8ddbdf09655bce1c7eeb1e345344"
+}

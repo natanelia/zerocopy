@@ -1,0 +1,77 @@
+name: Screen exact native reader reuse
+on:
+  push:
+    branches: [proof/native-reader-reuse-performance-20261016]
+permissions:
+  contents: read
+jobs:
+  screen:
+    permissions:
+      contents: read
+      actions: read
+    if: github.ref == 'refs/heads/proof/native-reader-reuse-performance-20261016' && github.event.before == 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Resolve exact reviewed transport binding
+        id: transport_binding
+        timeout-minutes: 1
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          python3 -B proofs/native-reader-screen-release/compose.py transport native-reader-bindings/SCREEN-RELEASE.json cf5db8977c892f849d650e78e4d818acbcab7d80e09ec428ffd30d888f1021d6
+      - name: Restore exact prepared inputs under 180-second bound
+        timeout-minutes: 4
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONDONTWRITEBYTECODE: '1'
+          TRANSPORT_BINDING_SHA256: ${{ steps.transport_binding.outputs.transport_binding_sha256 }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          python3 -B proofs/native-reader-preparation/transport.py "$RUNNER_TEMP/native-reader-screen-release-output/transport-binding.json" "$TRANSPORT_BINDING_SHA256" "$RUNNER_TEMP/native-reader-transport-output" "$RUNNER_TEMP/native-reader-transport-work" 2>&1 | tee "$RUNNER_TEMP/native-reader-screen-release-output/transport-terminal.log"
+      - name: Resolve fresh receipt and exact screen binding
+        id: screen_binding
+        timeout-minutes: 1
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python3 -B proofs/native-reader-screen-release/compose.py performance native-reader-bindings/SCREEN-RELEASE.json cf5db8977c892f849d650e78e4d818acbcab7d80e09ec428ffd30d888f1021d6
+      - name: Run unchanged 900-second screen once
+        timeout-minutes: 16
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          PERFORMANCE_BINDING_SHA256: ${{ steps.screen_binding.outputs.performance_binding_sha256 }}
+          EXECUTION_APPROVAL_SHA256: ${{ steps.screen_binding.outputs.execution_approval_sha256 }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          python3 -B proofs/native-reader-performance/controller.py --binding "$RUNNER_TEMP/native-reader-screen-release-output/performance-binding.json" --binding-sha256 "$PERFORMANCE_BINDING_SHA256" --approval "$RUNNER_TEMP/native-reader-screen-release-output/execution-approval.json" --approval-sha256 "$EXECUTION_APPROVAL_SHA256" --output "$RUNNER_TEMP/native-reader-performance-output" 2>&1 | tee "$RUNNER_TEMP/native-reader-screen-release-output/performance-terminal.log"
+      - name: Locate complete or partial evidence
+        if: always()
+        id: evidence
+        run: |
+          echo "release=$RUNNER_TEMP/native-reader-screen-release-output" >> "$GITHUB_OUTPUT"
+          echo "transport=$RUNNER_TEMP/native-reader-transport-output" >> "$GITHUB_OUTPUT"
+          echo "performance=$RUNNER_TEMP/native-reader-performance-output" >> "$GITHUB_OUTPUT"
+      - name: Retain complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-reader-performance-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ steps.evidence.outputs.release }}/
+            ${{ steps.evidence.outputs.transport }}/raw/
+            ${{ steps.evidence.outputs.transport }}/preparation-receipt.json
+            ${{ steps.evidence.outputs.transport }}/transport-receipt.json
+            ${{ steps.evidence.outputs.performance }}/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

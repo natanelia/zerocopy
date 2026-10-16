@@ -1,0 +1,14 @@
+# Integration fragment for the final exclusive hosted allocation, before the
+# unchanged 900-second study controller. Its job uses only contents: read and
+# actions: read for the existing ephemeral same-repository artifact token. It is not an executable workflow.
+# Replace the unresolved binding only after independent prepared-byte review.
+- name: Restore reviewed ready inputs under separate 180-second bounds
+  env:
+    GH_TOKEN: ${{ github.token }}
+    PYTHONDONTWRITEBYTECODE: '1'
+  run: |
+    set -euo pipefail
+    test "$GITHUB_RUN_ATTEMPT" = 1
+    python3 -B proofs/native-reader-preparation/transport.py native-reader-bindings/transport.json UNRESOLVED_TRANSPORT_BINDING_SHA256 "$RUNNER_TEMP/native-reader-transport-output" "$RUNNER_TEMP/native-reader-transport-work"
+# The existing external release process authenticates this fresh transport
+# receipt and exact final binding before it releases the unchanged study.

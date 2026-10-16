@@ -1,0 +1,47 @@
+{
+  "status": "prospective-source-only",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "methodSHA256": "24fc7ac4ea6b84d5d08c340d4468bb36693e31c14b3b9e08a24359af3140a880",
+  "baselineInventoryEntriesVerified": 502,
+  "baselineMismatches": [],
+  "sourceSHA256": {
+    "candidate.diff": "75680715f2313604e4cb8ba5f41c0c2655f272a511899cb05d352b05032cfcb6",
+    "candidate/arena.ts": "8603c3b219e1435ea882799ca0abe9d8492209e001e535e17f18f56a6920ec7b",
+    "candidate/worker.ts": "2d719b3496c75cb69c2e86252785b324d1e0a8228c0b83b6918727b527ea4f38",
+    "design": "7f61edca005e29d67cebace5beec40b99c6388b6157e85d65214963d172a50c3",
+    "exact-source-review": "a0d04986cacc91b99fe8cfbe3bf42dfc64c81790e43882d4a6ee7c31e87b2ed9",
+    "baseline-source-inventory": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+    "bounded_process.py": "d8ed2c8a7467f8628435f92e1744d3fed1f50cabb2b30d6cd1c0983add55015e",
+    "headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78"
+  },
+  "checks": {
+    "targetImportsExecuted": false,
+    "driverImplemented": false,
+    "timingsExecuted": false,
+    "externalWrites": false
+  },
+  "prospectiveExecution": {
+    "measurementBlocksPerEngine": 12,
+    "measurementProcessGroups": 72,
+    "mechanismProcessGroups": 4,
+    "calibrationProcessGroups": 2,
+    "rehearsalProcessGroups": 2,
+    "totalExperimentalProcessGroups": 80,
+    "wholeStudyCapSeconds": 900
+  },
+  "version": 2,
+  "methodFile": "METHOD-v2.md",
+  "priorMethodSHA256": "c91866333f17dc50332fcdb9327c9d88db01075f9a18461d2483ac9adf986a55",
+  "priorSealSHA256": "4d7e8a1ed2c292869eb38a7a7e794fb48ec59ad94949f8af4c9e1129b5b72ade",
+  "revisionSHA256": "a9845bf8712c9435239f407c9dd6ed9aace1dc52fc32d341105eb227cf72e160",
+  "diffSHA256": "348bbca2314b1359f4e9b4e40889808131dccc4bde5573dcdf912d7a60b25495",
+  "fixtureOracle": {
+    "queryIndexSum": 1016,
+    "P1V0": 1016,
+    "P1V1": 101016,
+    "P8V0": 19312,
+    "P8V1": 19313,
+    "F8Group0": 19312,
+    "F8Group1": 147312
+  }
+}

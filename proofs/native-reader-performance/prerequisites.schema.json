@@ -1,0 +1,642 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:zerocopy:native-reader-performance:prerequisites:v1",
+  "title": "Prospective authentication document schemas; not an approval or success receipt",
+  "description": "Cross-document hashes, exact file inventories, independent provenance and terminal success are additionally enforced by authentication.py. Schema conformance alone never authorizes execution.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/binding"
+    },
+    {
+      "$ref": "#/$defs/approval"
+    },
+    {
+      "$ref": "#/$defs/correctnessAudit"
+    },
+    {
+      "$ref": "#/$defs/terminalReceipt"
+    },
+    {
+      "$ref": "#/$defs/implementationAudit"
+    },
+    {
+      "$ref": "#/$defs/preparationReceipt"
+    },
+    {
+      "$ref": "#/$defs/transportReceipt"
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^/",
+      "minLength": 2
+    },
+    "hashMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "armPaths": {
+      "type": "object",
+      "required": [
+        "baseline",
+        "candidate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/path"
+        },
+        "candidate": {
+          "$ref": "#/$defs/path"
+        }
+      }
+    },
+    "armBuilds": {
+      "type": "object",
+      "required": [
+        "baseline",
+        "candidate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/hashMap"
+        },
+        "candidate": {
+          "$ref": "#/$defs/hashMap"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "methodSHA256",
+        "methodPath",
+        "methodSealPath",
+        "candidateDiffSHA256",
+        "candidateDiffPath",
+        "baselineInventoryPath",
+        "caseSHA256",
+        "sequenceSHA256",
+        "correctnessEvidenceRoot",
+        "correctnessAuditPath",
+        "correctnessAuditSHA256",
+        "correctnessTerminalReceiptPath",
+        "performanceReviewPath",
+        "performanceReviewSHA256",
+        "preparationReceiptPath",
+        "preparationReceiptSHA256",
+        "proofFiles",
+        "artifactRoots",
+        "sourceRoots",
+        "dependencyRoot",
+        "lockPath",
+        "runtimePaths",
+        "readyInputArchivePath",
+        "readyInputInventoryPath",
+        "transportMethodPath",
+        "transportReceiptPath",
+        "transportEvidenceRoot",
+        "transportReceiptSHA256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-performance-prerequisites"
+        },
+        "methodSHA256": {
+          "const": "24fc7ac4ea6b84d5d08c340d4468bb36693e31c14b3b9e08a24359af3140a880"
+        },
+        "methodPath": {
+          "$ref": "#/$defs/path"
+        },
+        "methodSealPath": {
+          "$ref": "#/$defs/path"
+        },
+        "candidateDiffSHA256": {
+          "const": "75680715f2313604e4cb8ba5f41c0c2655f272a511899cb05d352b05032cfcb6"
+        },
+        "candidateDiffPath": {
+          "$ref": "#/$defs/path"
+        },
+        "baselineInventoryPath": {
+          "$ref": "#/$defs/path"
+        },
+        "caseSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sequenceSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "correctnessEvidenceRoot": {
+          "$ref": "#/$defs/path"
+        },
+        "correctnessAuditPath": {
+          "$ref": "#/$defs/path"
+        },
+        "correctnessAuditSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "correctnessTerminalReceiptPath": {
+          "$ref": "#/$defs/path"
+        },
+        "performanceReviewPath": {
+          "$ref": "#/$defs/path"
+        },
+        "performanceReviewSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "preparationReceiptPath": {
+          "$ref": "#/$defs/path"
+        },
+        "preparationReceiptSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proofFiles": {
+          "$ref": "#/$defs/hashMap"
+        },
+        "artifactRoots": {
+          "$ref": "#/$defs/armPaths"
+        },
+        "sourceRoots": {
+          "$ref": "#/$defs/armPaths"
+        },
+        "dependencyRoot": {
+          "$ref": "#/$defs/path"
+        },
+        "lockPath": {
+          "$ref": "#/$defs/path"
+        },
+        "runtimePaths": {
+          "type": "object",
+          "required": [
+            "node",
+            "bun"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "node": {
+              "$ref": "#/$defs/path"
+            },
+            "bun": {
+              "$ref": "#/$defs/path"
+            }
+          }
+        },
+        "readyInputArchivePath": {
+          "$ref": "#/$defs/path"
+        },
+        "readyInputInventoryPath": {
+          "$ref": "#/$defs/path"
+        },
+        "transportMethodPath": {
+          "$ref": "#/$defs/path"
+        },
+        "transportReceiptPath": {
+          "$ref": "#/$defs/path"
+        },
+        "transportEvidenceRoot": {
+          "$ref": "#/$defs/path"
+        },
+        "transportReceiptSHA256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "authorized",
+        "bindingSHA256",
+        "methodSHA256",
+        "correctnessAuditSHA256",
+        "performanceReviewSHA256",
+        "maximumGroups",
+        "wholeStudySeconds",
+        "singleAttempt",
+        "exclusiveStudyHost",
+        "authorizationReference"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-performance-execution-approval"
+        },
+        "authorized": {
+          "const": true
+        },
+        "bindingSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "methodSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "correctnessAuditSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "performanceReviewSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "maximumGroups": {
+          "const": 80
+        },
+        "wholeStudySeconds": {
+          "const": 900
+        },
+        "singleAttempt": {
+          "const": true
+        },
+        "exclusiveStudyHost": {
+          "const": true
+        },
+        "authorizationReference": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "correctnessAudit": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "disposition",
+        "independent",
+        "baselineCommit",
+        "candidateCommit",
+        "candidateDiffSHA256",
+        "candidateSources",
+        "evidenceSealSHA256",
+        "controllerExitIndependentlyVerified",
+        "terminalControllerReceipt",
+        "checks",
+        "buildProvenance"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-terminal-correctness-audit"
+        },
+        "disposition": {
+          "const": "successful-terminal-correctness"
+        },
+        "independent": {
+          "const": true
+        },
+        "baselineCommit": {
+          "const": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e"
+        },
+        "candidateCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "candidateDiffSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "candidateSources": {
+          "$ref": "#/$defs/hashMap"
+        },
+        "evidenceSealSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "controllerExitIndependentlyVerified": {
+          "const": true
+        },
+        "terminalControllerReceipt": {
+          "type": "object",
+          "required": [
+            "exitCode",
+            "conclusion",
+            "finished",
+            "receiptSHA256",
+            "sourceURL"
+          ],
+          "properties": {
+            "exitCode": {
+              "const": 0
+            },
+            "conclusion": {
+              "const": "success"
+            },
+            "finished": {
+              "const": true
+            },
+            "receiptSHA256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "sourceURL": {
+              "type": "string",
+              "pattern": "^https://"
+            }
+          }
+        },
+        "checks": {
+          "type": "object",
+          "required": [
+            "exactSource",
+            "fullCorrectnessCoverage",
+            "perViewCacheRegistryIsolation",
+            "rawPromotionFailureRetry",
+            "completeBuildProvenance",
+            "allEmittedFiles",
+            "nativeBytesAcrossArms",
+            "runtimeIdentity",
+            "emptyOwnedGroups",
+            "portableImportClosureReviewed"
+          ],
+          "additionalProperties": {
+            "const": true
+          }
+        },
+        "buildProvenance": {
+          "type": "object",
+          "required": [
+            "commandReceiptsSHA256",
+            "dependencyInventorySHA256",
+            "lockSHA256",
+            "compilerIdentity",
+            "compilerOptions",
+            "buildScripts",
+            "ordinaryRepositoryBuild",
+            "identicalSettingsAcrossArms"
+          ]
+        }
+      }
+    },
+    "terminalReceipt": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "exitCode",
+        "conclusion",
+        "finished",
+        "candidateCommit",
+        "evidenceSealSHA256",
+        "sourceURL"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-correctness-controller-exit"
+        },
+        "exitCode": {
+          "const": 0
+        },
+        "conclusion": {
+          "const": "success"
+        },
+        "finished": {
+          "const": true
+        },
+        "candidateCommit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "evidenceSealSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sourceURL": {
+          "type": "string",
+          "pattern": "^https://"
+        }
+      }
+    },
+    "implementationAudit": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "disposition",
+        "independent",
+        "methodSHA256",
+        "caseSHA256",
+        "sequenceSHA256",
+        "correctnessAuditSHA256",
+        "preparationReceiptSHA256",
+        "proofFiles",
+        "builds",
+        "runtimes",
+        "checks",
+        "readyInputArchiveSHA256",
+        "readyInputInventorySHA256",
+        "reviewedTransportMethodSHA256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-performance-implementation-audit"
+        },
+        "disposition": {
+          "const": "source-clear-for-exact-bound-execution"
+        },
+        "independent": {
+          "const": true
+        },
+        "methodSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "caseSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sequenceSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "correctnessAuditSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "preparationReceiptSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proofFiles": {
+          "$ref": "#/$defs/hashMap"
+        },
+        "builds": {
+          "$ref": "#/$defs/armBuilds"
+        },
+        "runtimes": {
+          "type": "object",
+          "required": [
+            "node",
+            "bun"
+          ]
+        },
+        "checks": {
+          "type": "object",
+          "required": [
+            "completeDriverAnalyzerReview",
+            "unmodifiedSupervision",
+            "exactMeasurementProtocol",
+            "prerequisiteAuthentication",
+            "boundedPreparationReviewed",
+            "boundedTransportReviewed"
+          ],
+          "additionalProperties": {
+            "const": true
+          }
+        },
+        "readyInputArchiveSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "readyInputInventorySHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewedTransportMethodSHA256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "preparationReceipt": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "status",
+        "bounded",
+        "correctnessAuditSHA256",
+        "builds",
+        "noRebuild",
+        "elapsedSeconds",
+        "wholeCapSeconds",
+        "ownedGroupsEmpty",
+        "reviewedPreparationMethodSHA256",
+        "rawEvidenceSealSHA256",
+        "readyInputArchiveSHA256",
+        "readyInputInventorySHA256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "status": {
+          "const": "complete"
+        },
+        "bounded": {
+          "const": true
+        },
+        "correctnessAuditSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "builds": {
+          "$ref": "#/$defs/armBuilds"
+        },
+        "noRebuild": {
+          "const": true
+        },
+        "elapsedSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "wholeCapSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "ownedGroupsEmpty": {
+          "const": true
+        },
+        "reviewedPreparationMethodSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rawEvidenceSealSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "readyInputArchiveSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "readyInputInventorySHA256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "transportReceipt": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "status",
+        "bounded",
+        "noRebuild",
+        "noTargetImports",
+        "extractionVerified",
+        "ownedGroupsEmpty",
+        "preparationReceiptSHA256",
+        "readyInputArchiveSHA256",
+        "readyInputInventorySHA256",
+        "reviewedTransportMethodSHA256",
+        "rawEvidenceSealSHA256",
+        "elapsedSeconds",
+        "wholeCapSeconds"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "native-reader-performance-transport"
+        },
+        "status": {
+          "const": "complete"
+        },
+        "bounded": {
+          "const": true
+        },
+        "noRebuild": {
+          "const": true
+        },
+        "noTargetImports": {
+          "const": true
+        },
+        "extractionVerified": {
+          "const": true
+        },
+        "ownedGroupsEmpty": {
+          "const": true
+        },
+        "preparationReceiptSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "readyInputArchiveSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "readyInputInventorySHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "reviewedTransportMethodSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rawEvidenceSealSHA256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "elapsedSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 180
+        },
+        "wholeCapSeconds": {
+          "const": 180
+        }
+      }
+    }
+  }
+}
