@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { SharedMap, SharedList, SharedSet, resetMap, compact } from './shared';
-import { arenaOf } from './arena';
+import { SharedMap, SharedList, SharedSet, resetMap, compact, getWorkerData, initWorker } from './shared';
+import { Arena, arenaOf } from './arena';
 import { createSharedState, createSharedSession, connectSharedSession, shareWithWorker, receiveShared, type SharedValue, type StateOptions } from './worker';
 import { bindRedux } from './worker-redux';
 
@@ -340,5 +340,187 @@ describe('shared state and session protocol', () => {
   it('does not allocate in the source arena during publication', async () => {
     const map = new SharedMap('number').set('x', 1), arena = arenaOf(map), used = arena.used;
     const { state } = await setup(map); state.publish(map); await drain(); expect(arena.used).toBe(used);
+  });
+});
+
+describe('later session native readers', () => {
+  const isBorrowed = (value: object) => typeof Object.getOwnPropertyDescriptor(arenaOf(value).wasm, 'alloc')!.get === 'function';
+
+  it('reuses native reads with fresh decoded caches and independent used bounds through growth', async () => {
+    const owner = new Arena(), original = new SharedMap('object', 0, 0, owner).set('same', { value: 1 });
+    const { state, reader } = await setup(original);
+    const first = reader.current, a = arenaOf(first), firstUsed = a.used, firstJSON = first.get('same');
+    expect(isBorrowed(first)).toBe(false);
+    owner.alloc(owner.memory.buffer.byteLength);
+    state.publish(original.set('other', { value: 2 })); await drain();
+    const second = reader.current, b = arenaOf(second), secondUsed = b.used, secondJSON = second.get('same');
+    expect(isBorrowed(second)).toBe(true);
+    expect(b).not.toBe(a); expect(b.wasm).not.toBe(a.wasm);
+    expect(b.wasm.mapSize).toBe(a.wasm.mapSize);
+    expect(secondJSON).toEqual(firstJSON); expect(secondJSON).not.toBe(firstJSON);
+    expect(second.get('same')).toBe(secondJSON); expect(first.get('same')).toBe(firstJSON);
+    expect(secondUsed).toBeGreaterThan(firstUsed);
+    owner.alloc(owner.memory.buffer.byteLength);
+    expect(a.wasm.getHeapEnd() >>> 0).toBe(firstUsed);
+    expect(b.wasm.getHeapEnd() >>> 0).toBe(secondUsed);
+    for (const [snapshot, used] of [[first, firstUsed], [second, secondUsed]] as const) {
+      const arena = arenaOf(snapshot);
+      expect(arena.used).toBe(used); expect(arena.state().heapEnd).toBe(used);
+      const shared = getWorkerData({ snapshot }, { copy: false }).arenas[0];
+      const copied = getWorkerData({ snapshot }, { copy: true }).arenas[0];
+      expect(shared.used).toBe(used); expect(copied.used).toBe(used); expect(copied.copy!.length).toBe(used);
+    }
+    state.publish(state.current.set('third', { value: 3 })); await drain();
+    expect(arenaOf(reader.current).wasm.mapSize).toBe(a.wasm.mapSize);
+    expect(reader.current.get('same')).not.toBe(secondJSON);
+    const raw = await initWorker(getWorkerData({ map: state.current }, { copy: false }));
+    expect(isBorrowed(raw.map)).toBe(false);
+    reader.dispose(); expect(first.get('same')).toBe(firstJSON); expect(second.get('same')).toBe(secondJSON);
+  });
+
+  it('keeps deferred nested ownership and complete fresh registries during factory reentrancy', async () => {
+    const childA = new SharedMap('number', 0, 0, new Arena()).set('value', 1);
+    const childB = new SharedMap('number', 0, 0, new Arena()).set('value', 2);
+    const owner = new Arena(), parent = new SharedMap('SharedMap<number>', 0, 0, owner).set('child', childA);
+    const { state, reader } = await setup(parent);
+    const first = reader.current, oldRegistry = arenaOf(first).transportDependencies;
+    const next = parent.set('child', childB);
+    owner.dependencies.delete(arenaOf(childA).id);
+    const factory = SharedMap.fromWorkerData;
+    let calls = 0;
+    SharedMap.fromWorkerData = ((root: number, type: any, size: number, source: Arena) => {
+      const value = factory(root, type, size, source);
+      if (source.id === owner.id) {
+        calls++;
+        expect(source.transportDependencies).not.toBe(oldRegistry);
+        expect(source.transportDependencies.has(arenaOf(childB).id)).toBe(true);
+        expect(source.transportDependencies.has(arenaOf(childA).id)).toBe(false);
+        expect(first.get('child')!.get('value')).toBe(1);
+        owner.alloc(owner.memory.buffer.byteLength);
+        expect((value as SharedMap<'SharedMap<number>'>).get('child')!.get('value')).toBe(2);
+      }
+      return value;
+    }) as typeof SharedMap.fromWorkerData;
+    try { state.publish(next); await drain(); } finally { SharedMap.fromWorkerData = factory; }
+    expect(calls).toBe(1); expect(isBorrowed(reader.current)).toBe(true);
+    expect(reader.current.get('child')!.get('value')).toBe(2);
+    expect(first.get('child')!.get('value')).toBe(1);
+    expect(oldRegistry.has(arenaOf(childA).id)).toBe(true);
+    expect(oldRegistry.has(arenaOf(childB).id)).toBe(false);
+    expect(arenaOf(first).transportDependencies).toBe(oldRegistry);
+  });
+
+  it('preserves eager copy/fresh/missing-donor fallbacks and retires removed IDs', async () => {
+    const make = (value: number) => new SharedMap('number', 0, 0, new Arena()).set('value', value);
+    const copy = await setup(make(1), { copy: true });
+    copy.state.publish(copy.state.current.set('value', 2)); await drain();
+    expect(isBorrowed(copy.reader.current)).toBe(false);
+    const a = make(1), b = make(2);
+    const session = await setup({ a, b });
+    const retained = session.reader.current;
+    session.state.publish({ a: a.set('value', 3) } as any); await drain();
+    const changedA = session.reader.current.a;
+    expect(isBorrowed(changedA)).toBe(true);
+    session.state.publish({ a: session.state.current.a.set('value', 4), b } as any); await drain();
+    expect(isBorrowed(session.reader.current.a)).toBe(true);
+    expect(isBorrowed(session.reader.current.b)).toBe(false);
+    const fresh = compact(session.state.current.a);
+    session.state.publish({ a: fresh } as any); await drain();
+    expect(isBorrowed(session.reader.current.a)).toBe(false);
+    session.reader.dispose();
+    expect(retained.a.get('value')).toBe(1); expect(retained.b.get('value')).toBe(2);
+    expect(changedA.get('value')).toBe(3);
+
+    // A retained unchanged root may lack a newly added dependency. Recovering
+    // that absent donor must fall back, rather than borrowing stale metadata.
+    const root = make(8), late = make(9), spare = make(0), missing = await setup({ root, spare });
+    const retainedRoot = missing.reader.current.root;
+    arenaOf(root).dependencies.set(arenaOf(late).id, arenaOf(late));
+    // Removing spare forces publication without changing root's descriptor.
+    // The new wire has late, but the retained root keeps its older registry.
+    missing.state.publish({ root } as any); await drain();
+    expect(missing.reader.current.root).toBe(retainedRoot);
+    expect(missing.pair.owner.frames.at(-1).data.arenas.some((source: any) => source.id === arenaOf(late).id)).toBe(true);
+    expect(arenaOf(retainedRoot).transportDependencies.has(arenaOf(late).id)).toBe(false);
+    const factory = SharedMap.fromWorkerData;
+    const seen: Arena[] = [];
+    SharedMap.fromWorkerData = ((r: number, t: any, n: number, source: Arena) => {
+      seen.push(source); return factory(r, t, n, source);
+    }) as typeof SharedMap.fromWorkerData;
+    try {
+      missing.state.publish({ root: root.set('value', 10) } as any); await drain();
+    } finally { SharedMap.fromWorkerData = factory; }
+    expect(seen).toHaveLength(1);
+    const dependency = seen[0].transportDependencies.get(arenaOf(late).id)!;
+    expect(Object.getOwnPropertyDescriptor(dependency.wasm, 'alloc')!.get).toBeUndefined();
+    expect(missing.reader.current.root.get('value')).toBe(10);
+  });
+
+  it('calls current factories for unchanged handles and retains failed-factory views', async () => {
+    const pair = ports(), errors: Error[] = [];
+    const a = new SharedMap('number', 0, 0, new Arena()).set('value', 1);
+    const b = new SharedMap('number', 0, 0, new Arena()).set('value', 2);
+    const state = createSharedState({ a, b }, { copy: false, onError: error => errors.push(error) });
+    cleanup.push(() => state.dispose());
+    const connected = state.connect(pair.owner);
+    const reader = await connectSharedSession<typeof state.current>({ endpoint: pair.reader, onError: error => errors.push(error) });
+    cleanup.push(() => reader.dispose()); await connected;
+    const retained = reader.current, factory = SharedMap.fromWorkerData;
+    const calls: string[] = []; let leaked: SharedMap<'number'> | undefined, fail = false;
+    SharedMap.fromWorkerData = ((root: number, type: any, size: number, source: Arena) => {
+      calls.push(source.id);
+      const value = factory(root, type, size, source);
+      if (source.id === arenaOf(a).id) leaked = value as SharedMap<'number'>;
+      if (fail && source.id === arenaOf(b).id) throw new Error('later factory failed');
+      return value;
+    }) as typeof SharedMap.fromWorkerData;
+    try {
+      state.publish({ a, b: b.set('value', 3) }); await drain();
+      expect(calls).toEqual([arenaOf(a).id, arenaOf(b).id]);
+      expect(reader.current.a).toBe(retained.a);
+      expect(isBorrowed(leaked!)).toBe(true);
+      const acceptedVersion = reader.version, acknowledgements = pair.reader.sent.filter(item => item.kind === 'ack').length;
+      calls.length = 0; fail = true;
+      state.publish({ a: a.set('value', 4), b: state.current.b.set('value', 5) }); await drain();
+      expect(reader.closed).toBe(true); expect(reader.version).toBe(acceptedVersion);
+      expect(pair.reader.sent.filter(item => item.kind === 'ack')).toHaveLength(acknowledgements);
+      expect(errors.some(error => error.message === 'later factory failed')).toBe(true);
+      expect(leaked!.get('value')).toBe(4);
+      expect(retained.a.get('value')).toBe(1); expect(retained.b.get('value')).toBe(2);
+    } finally { SharedMap.fromWorkerData = factory; }
+  });
+
+  it('keeps raw attachment validation errors ahead of later session factories', async () => {
+    const changes: ((data: any) => any)[] = [
+      data => ({ ...data, version: 3 }),
+      data => ({ ...data, arenas: data.arenas.map((source: any) => ({ ...source, used: 65535 })) }),
+      data => ({ ...data, structures: { value: { ...data.structures.value, type: 'compact' } } }),
+      data => ({ ...data, structures: { value: { ...data.structures.value, type: '__proto__' } } }),
+    ];
+    for (const change of changes) {
+      const pair = ports(), errors: Error[] = [];
+      const memory = new WebAssembly.Memory({ initial: 2, maximum: 8, shared: true });
+      const map = new SharedMap('number', 0, 0, new Arena({ memory })).set('value', 1);
+      const state = createSharedState(map, { copy: false, onError: () => {} }); cleanup.push(() => state.dispose());
+      const connected = state.connect(pair.owner);
+      const reader = await connectSharedSession<SharedMap<'number'>>({ endpoint: pair.reader, onError: error => errors.push(error) });
+      cleanup.push(() => reader.dispose()); await connected;
+      const retained = reader.current, frame = pair.owner.frames[0];
+      const raw = change(frame.data);
+      let expected: Error | undefined;
+      try { await initWorker(raw); } catch (error) { expected = error as Error; }
+      expect(expected).toBeInstanceOf(Error);
+      const factory = SharedMap.fromWorkerData; let calls = 0;
+      SharedMap.fromWorkerData = ((...args: any[]) => { calls++; return (factory as any)(...args); }) as typeof SharedMap.fromWorkerData;
+      try {
+        // Later frames omit known memory handles, as the real publisher does.
+        const data = { ...raw, arenas: raw.arenas.map(({ memory: _memory, ...source }: any) => source) };
+        pair.reader.emit('message', { data: { ...frame, sequence: 1, data } }); await drain();
+      } finally { SharedMap.fromWorkerData = factory; }
+      expect(calls).toBe(0); expect(reader.closed).toBe(true);
+      expect(errors).toHaveLength(1); expect(errors[0].message).toBe(expected!.message);
+      expect(reader.version).toBe(0); expect(retained.get('value')).toBe(1);
+      expect(pair.reader.sent.filter(item => item.kind === 'ack')).toHaveLength(1);
+    }
   });
 });
