@@ -1,0 +1,73 @@
+name: Sorted pending-delete latency and allocation screen
+
+on:
+  push:
+    branches: [proof/sorted-journal-delete-screen-20261016]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.ref == 'refs/heads/proof/sorted-journal-delete-screen-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify inert analysis and workflow context
+        run: PYTHONDONTWRITEBYTECODE=1 python3 proofs/sorted-journal-delete/harness_test.py
+      - name: Provision the pinned shared dependencies once
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-evidence
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(node --version)" = v22.16.0
+          test "$(bun --version)" = 1.4.2
+          npm ci --prefix proofs/sorted-journal-delete/dependencies --no-audit --no-fund
+          git worktree add --detach "$BASELINE_DIRECTORY" afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-journal-delete/dependencies/node_modules" node_modules
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-journal-delete/dependencies/node_modules" "$BASELINE_DIRECTORY/node_modules"
+      - name: Admit exact sources and run the fixed screen
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-evidence
+          CI: '1'
+          NO_COLOR: '1'
+        run: python3 proofs/sorted-journal-delete/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY"
+      - name: Preserve partial or complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorted-journal-delete-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/sorted-journal-delete-evidence/
+            proofs/sorted-journal-delete/*.mjs
+            proofs/sorted-journal-delete/*.py
+            proofs/sorted-journal-delete/*.md
+            proofs/sorted-journal-delete/*.json
+            proofs/sorted-journal-delete/dependencies/package*.json
+            proofs/sorted-journal-delete-worker.mjs
+            dist/
+            *.wasm
+            *.wat
+            ${{ runner.temp }}/sorted-journal-delete-baseline/dist/
+            ${{ runner.temp }}/sorted-journal-delete-baseline/*.wasm
+            ${{ runner.temp }}/sorted-journal-delete-baseline/*.wat
+            persistent-core.as.ts
+            sorted-journal-delete.test.ts
+            .github/workflows/sorted-journal-delete.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
