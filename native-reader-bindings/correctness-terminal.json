@@ -1,0 +1,42 @@
+{
+  "artifact": {
+    "archiveBytes": 1022312,
+    "archiveSHA256": "0dca5386893eeba699fe4148f20fd01ed212813a8976d9dbe2280501c643fd07",
+    "id": 12038097560
+  },
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "candidateCommit": "b72f055e549b176ab0456704f61f298ebe5902b6",
+  "cleanupSHA256": "a624d4a564770e8e248306c5b612d6212fef83e812ac5102e716c960e0aa687f",
+  "commandsSHA256": "5eb5f6d3151c79f1c0a51f21a82bb2551a284b1ca3be439c958df09ab1aca9ab",
+  "conclusion": "success",
+  "controllerStep": {
+    "completed_at": "2026-10-16T09:45:04Z",
+    "conclusion": "success",
+    "name": "Run bounded matched correctness checks",
+    "number": 6,
+    "started_at": "2026-10-16T09:42:25Z",
+    "status": "completed"
+  },
+  "event": "push",
+  "evidenceSealSHA256": "21eed6887ec29be8fe696f8dd9ede90dcbe1d7bb507661448dbe096ac94a651c",
+  "exitCode": 0,
+  "finished": true,
+  "jobId": 116911535964,
+  "kind": "native-reader-correctness-controller-exit",
+  "officialResponseSHA256": {
+    "decodedJobLog": "7bf14d17b230f272345e68edbc1c6cf7337b184463b599e4ecfcccdc40517eb7",
+    "jobs": "229b9bf3aed87cd7f2377f5a893fc18d2f6fe5b357dd1f9acba2733e7d876b75",
+    "run": "4ca6052d02a6a6bee38147feeda87a22cb71d1539a399c4e91557eec7083de8f"
+  },
+  "repository": "natanelia/zerocopy",
+  "runAttempt": 1,
+  "runId": 38882256866,
+  "runSourceURL": "https://github.com/natanelia/zerocopy/actions/runs/38882256866",
+  "schemaVersion": 1,
+  "sourceURL": "https://github.com/natanelia/zerocopy/actions/runs/38882256866/job/116911535964",
+  "statusSHA256": "3065d6f2e310f5ecfefa85f20c5d8062a26d1b753e44a11c106439c5d46bb8b0",
+  "temporaryCleanupReceiptSHA256": "07625d1f626e6277822184bc4fe0972e37a026805c049c09924c9ac5a22a6dc4",
+  "verificationBasis": "The independently retained GitHub run and job are terminal success. The exact controller step succeeded under the pinned workflow with set -euo pipefail and no continue-on-error. The controller process is the final shell command; this establishes its zero exit independently of status.json.",
+  "workflow": ".github/workflows/direct-native-reader-correctness.yml",
+  "workflowSHA256": "d647ee708a27253c44f60208f0a6daf5e398a16b6c461e456b1e62a49bd1053e"
+}
