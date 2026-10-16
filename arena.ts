@@ -72,6 +72,66 @@ export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
   return registry;
 }
 
+// Internal session attachment component. Keep only native functions whose
+// results depend on their arguments and memory, never allocator/scratch state.
+const nativeReadNames = [
+  'mapSize', 'mapFind', 'radixSize', 'radixFind',
+  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix',
+  'journalFind', 'compareLeaves', 'vecLeaf', 'vecGet', 'blockGet',
+  'textContains16', 'textContainsBlock16',
+] as const;
+export interface NativeReader {
+  readonly memory: WebAssembly.Memory;
+  readonly reads: Readonly<Record<(typeof nativeReadNames)[number], (...args: any[]) => any>>;
+}
+/** @internal Extract data properties only, without retaining the donor view. */
+export function nativeReaderOf(arena: Arena): NativeReader {
+  const reads = Object.create(null);
+  for (const name of nativeReadNames) reads[name] = arena.wasm[name];
+  return Object.freeze({ memory: arena.memory, reads: Object.freeze(reads) });
+}
+interface NativeReaderState { memory: WebAssembly.Memory; used: number; own?: any }
+let nativeExportNames: string[] | undefined;
+let nativeRawDescriptors: PropertyDescriptorMap | undefined;
+let nativeReaderStates: WeakMap<object, NativeReaderState> | undefined;
+function ownReader(state: NativeReaderState): any {
+  if (!state.own) {
+    const wasm = new WebAssembly.Instance(module, { env: { memory: state.memory } }).exports as any;
+    wasm.setHeapEnd(state.used);
+    state.own = wasm;
+  }
+  return state.own;
+}
+function prepareReaderExports(): void {
+  // These shared getters are created outside any view's activation, so the
+  // module-level descriptor table cannot retain a first view's memory/state.
+  nativeExportNames = WebAssembly.Module.exports(module).map(item => item.name);
+  nativeRawDescriptors = Object.create(null);
+  nativeReaderStates = new WeakMap();
+  for (const name of nativeExportNames) {
+    if (name === 'getHeapEnd' || name === 'memory' || (nativeReadNames as readonly string[]).includes(name)) continue;
+    nativeRawDescriptors![name] = {
+      enumerable: true,
+      get(this: object) { return ownReader(nativeReaderStates!.get(this)!)[name]; },
+    };
+  }
+}
+function readerFacade(reader: NativeReader, used: number): any {
+  if (!nativeExportNames) prepareReaderExports();
+  const state: NativeReaderState = { memory: reader.memory, used };
+  const getHeapEnd = () => state.own ? state.own.getHeapEnd() : state.used;
+  const descriptors: PropertyDescriptorMap = Object.create(null);
+  for (const name of nativeExportNames!) {
+    if (name === 'getHeapEnd') descriptors[name] = { enumerable: true, value: getHeapEnd };
+    else if (name === 'memory') descriptors[name] = { enumerable: true, value: reader.memory };
+    else if (Object.hasOwn(reader.reads, name)) descriptors[name] = { enumerable: true, value: reader.reads[name] };
+    else descriptors[name] = nativeRawDescriptors![name];
+  }
+  const facade = Object.create(null, descriptors);
+  nativeReaderStates!.set(facade, state);
+  return Object.preventExtensions(facade);
+}
+
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
  * Attached arenas are read-only: their allocator and scratch cannot race a writer.
@@ -160,11 +220,14 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}, nativeReader?: NativeReader) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
-    this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
-    if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+    if (nativeReader) this.wasm = readerFacade(nativeReader, options.used!);
+    else {
+      this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+      if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+    }
     this.readOnly = options.readOnly ?? false;
     if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
