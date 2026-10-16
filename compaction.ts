@@ -88,7 +88,7 @@ class Compactor {
       const total = size + (queue ? d.tail : 0), tailLen = total ? ((total - 1) & 31) + 1 : 0, prefix = total - tailLen;
       const root = queue ? d.head : d.root, tail = queue ? d.block : d.tail;
       for (let i = queue ? d.tail : 0; i < total; i++) {
-        const raw = i >= prefix ? a.dv.getFloat64(tail + (i - prefix) * 8, true) : a.wasm.vecGet(root, d.depth, i);
+        const raw = i >= prefix ? a.dv.getFloat64(tail + (i - prefix) * 8, true) : a.nativeReads.vecGet(root, d.depth, i);
         values.push(this.raw(a, type, raw));
       }
     }
@@ -136,7 +136,7 @@ class Compactor {
       const order: number[] = [], leaves: number[] = []; let p = d.head, head = 0;
       while (p) { order.push(a.dv.getUint32(p + 4, true)); p = a.dv.getUint32(p, true); }
       for (let i = order.length - 1; i >= 0; i--) {
-        const old = order[i], n = a.dv.getUint32(old + 8, true), leaf = a.wasm.mapFind(d.root, old + 16, n, a.dv.getUint32(old + 4, true)) >>> 0;
+        const old = order[i], n = a.dv.getUint32(old + 8, true), leaf = a.nativeReads.mapFind(d.root, old + 16, n, a.dv.getUint32(old + 4, true)) >>> 0;
         if (!leaf || a.dv.getUint32(leaf + 16 + n, true) !== a.dv.getUint32(old + 16 + n, true)) continue;
         const copied = this.leaf(a, type, leaf, 4, leaves.length); leaves.push(copied); head = this.target.wasm.orderCons(head, copied) >>> 0;
       }

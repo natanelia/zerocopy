@@ -30,7 +30,7 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
   readonly valueType: T;
   private readonly comparator?: Comparator<string>;
   constructor(type: T, comparator?: Comparator<string>, root = 0, _size: number | undefined = undefined, source: Arena = defaultArena()) {
-    super(source); this.valueType = type; this.comparator = comparator; this.root = root; this.size = _size ?? source.wasm.radixSize(root); Object.freeze(this);
+    super(source); this.valueType = type; this.comparator = comparator; this.root = root; this.size = _size ?? source.nativeReads.radixSize(root); Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedSortedMap<T> {
     const a = this.arena; a.assertWritable();

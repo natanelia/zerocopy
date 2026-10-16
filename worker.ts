@@ -1,5 +1,7 @@
 /** Typed, single-writer snapshot sessions. No polling, shared locks, or store dependency. */
 import { initWorker, type WorkerData } from './shared';
+import { Arena, Snapshot, arenaOf, createArenaRegistry, FORMAT_VERSION, nativeReaderOf, type NativeReader } from './arena';
+import { structureRegistry } from './codec';
 import {
   capture, same, identities, message, isMessage, listen, reserve, settings, strategy,
   uniqueId, defaultEndpoint, report, errorOf, notify, WIRE_VERSION,
@@ -359,6 +361,60 @@ class Reader<T extends SharedShape<T>> implements SharedReader<T> {
   }
 }
 
+// Keep this private whitelist equal to shared.ts's built-in constructors. A
+// registry entry alone does not make an additional transport type supported.
+const readerStructureTypes = {
+  SharedMap: true, SharedList: true, SharedSet: true, SharedStack: true, SharedQueue: true,
+  SharedLinkedList: true, SharedDoublyLinkedList: true, SharedOrderedMap: true,
+  SharedOrderedSet: true, SharedSortedMap: true, SharedSortedSet: true, SharedPriorityQueue: true,
+};
+function sessionNativeReaders(current: SharedValue, single: boolean, active: ReadonlyMap<string, ArenaWire>): Map<string, NativeReader> {
+  const readers = new Map<string, NativeReader>();
+  const roots = single ? [current] : Object.values(current);
+  const pending = roots.filter(value => value instanceof Snapshot).map(arenaOf);
+  const seen = new Set<Arena>(), lookups = new Set<ReadonlyMap<string, Arena>>();
+  while (pending.length) {
+    const arena = pending.pop()!;
+    if (!(arena instanceof Arena) || seen.has(arena)) continue;
+    seen.add(arena);
+    if (arena.readOnly && active.get(arena.id)?.memory === arena.memory && !readers.has(arena.id)) {
+      readers.set(arena.id, nativeReaderOf(arena));
+    }
+    // Do not observe .dependencies: its getter changes the old registry.
+    const dependencies = arena.transportDependencies;
+    if (!lookups.has(dependencies)) {
+      lookups.add(dependencies);
+      for (const dependency of dependencies.values()) pending.push(dependency);
+    }
+  }
+  return readers;
+}
+// The first/raw/copy paths retain initWorker. Keep validation and dynamic
+// factory ordering here equivalent to that ordinary attachment function.
+async function attachLaterSession(data: WorkerData, current: SharedValue, single: boolean, active: ReadonlyMap<string, ArenaWire>): Promise<Readonly<Record<string, SharedCollection>>> {
+  if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
+  const donors = sessionNativeReaders(current, single, active);
+  const arenas = new Map<string, Arena>();
+  const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
+  for (const source of data.arenas) {
+    if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
+    if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
+    const donor = donors.get(source.id);
+    // Preserve native setHeapEnd's eager ceiling trap through the ordinary path.
+    const nativeReader = !source.copy && donor?.memory === source.memory && source.used <= 0x7fff0000 ? donor : undefined;
+    const arena = new Arena({ ...source, readOnly: true, registry }, nativeReader);
+    arenas.set(source.id, arena);
+    registry?.members.push(arena);
+  }
+  const result: Record<string, SharedCollection> = Object.create(null);
+  for (const [name, item] of Object.entries(data.structures)) {
+    const arena = arenas.get(item.arena), factory = structureRegistry[item.type];
+    if (!arena || !Object.hasOwn(readerStructureTypes, item.type) || !factory) throw new Error(`Invalid structure: ${name}`);
+    result[name] = factory.fromWorkerData(item.data, arena);
+  }
+  return Object.freeze(result);
+}
+
 export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOptions = {}): Promise<SharedReader<T>> {
   const config = settings(options);
   const endpoint = options.endpoint ?? defaultEndpoint();
@@ -402,7 +458,11 @@ export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOp
       if (known?.memory && source.memory) throw new Error('An existing arena cannot replace its memory');
       next.set(source.id, source.memory || source.copy ? source : { ...source, memory: known!.memory });
     }
-    const values = await initWorker<Record<string, SharedCollection>>({ ...payload, arenas: [...next.values()] });
+    const complete = { ...payload, arenas: [...next.values()] };
+    const canReuse = initialized && complete.arenas.some(source => source.memory && arenas.get(source.id)?.memory === source.memory);
+    const values = await (canReuse
+      ? attachLaterSession(complete, reader.current as SharedValue, data.single!, arenas)
+      : initWorker<Record<string, SharedCollection>>(complete));
     if (closed) return;
     const ids = identities(payload);
     const result: Record<string, SharedCollection> = Object.create(null);

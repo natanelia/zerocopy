@@ -53,12 +53,12 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
       if (!sensitive && code >= 97 && code <= 122) masks[i >>> 2] |= 32 << shift;
     }
     const [q0,q1,q2,q3] = packed, [m0,m1,m2,m3] = masks;
-    const scan = arena.wasm.textContains16;
+    const scan = arena.nativeReads.textContains16;
     const test = (raw: number) => {
       const result = scan(raw, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive);
       return result < 0 ? fallback(raw) : result !== 0;
     };
-    const scanBlock = arena.wasm.textContainsBlock16;
+    const scanBlock = arena.nativeReads.textContainsBlock16;
     return Object.assign(test, {
       block16: (address: number, count: number) => scanBlock(address, count, length, q0,q1,q2,q3, m0,m1,m2,m3, !sensitive),
       fallback,

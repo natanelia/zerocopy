@@ -36,7 +36,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
   readonly valueType: T;
   readonly size: number;
   constructor(type: T, root = 0, _size: number | undefined = undefined, source: Arena = defaultArena()) {
-    super(source); this.valueType = type; this.root = root; this.size = _size ?? source.wasm.mapSize(root); Object.freeze(this);
+    super(source); this.valueType = type; this.root = root; this.size = _size ?? source.nativeReads.mapSize(root); Object.freeze(this);
   }
   /** @deprecated Arena lifetime is managed by JavaScript reachability. */
   dispose(): void {}

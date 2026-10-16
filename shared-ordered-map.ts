@@ -32,7 +32,7 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
   readonly valueType: T;
   readonly orderStable: boolean;
   constructor(type: T, root = 0, head = 0, tail = 0, _size: number | undefined = undefined, source: Arena = defaultArena(), orderStable = root === 0 && head === 0) {
-    super(source); this.valueType = type; this.root = root; this.head = head; this.tail = tail; this.size = _size ?? source.wasm.mapSize(root); this.orderStable = orderStable; Object.freeze(this);
+    super(source); this.valueType = type; this.root = root; this.head = head; this.tail = tail; this.size = _size ?? source.nativeReads.mapSize(root); this.orderStable = orderStable; Object.freeze(this);
   }
   set(key: string, value: ValueOf<T>): SharedOrderedMap<T> {
     const a = this.arena; a.assertWritable();
@@ -56,7 +56,7 @@ export class SharedOrderedMap<T extends string = SharedOrderedMapType> extends S
       const old = order[i];
       if (this.orderStable) { yield [a.leafKey(old), a.leafValue(this.valueType, old, 4)]; continue; }
       const dv = a.dv, length = dv.getUint32(old + 8, true);
-      const leaf = a.wasm.mapFind(this.root, old + 16, length, dv.getUint32(old + 4, true)) >>> 0;
+      const leaf = a.nativeReads.mapFind(this.root, old + 16, length, dv.getUint32(old + 4, true)) >>> 0;
       if (leaf && a.dv.getUint32(leaf + 16 + length, true) === a.dv.getUint32(old + 16 + length, true)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf, 4)];
     }
   }

@@ -61,7 +61,7 @@ export class SharedLinkedList<T extends string = SharedLinkedListType> extends S
   get(index: number): ValueOf<T> | undefined {
     if (!validIndex(index, this.size)) return undefined;
     const a = this.arena, before = this.size - this.tailSize;
-    const raw = index >= before ? a.dv.getFloat64(this.tail + (index - before) * 8, true) : a.wasm.blockGet(this.head, index);
+    const raw = index >= before ? a.dv.getFloat64(this.tail + (index - before) * 8, true) : a.nativeReads.blockGet(this.head, index);
     return a.decode(this.valueType, raw);
   }
   insertAfter(index: number, value: ValueOf<T>): SharedLinkedList<T> { return validIndex(index, this.size) ? this.insert(index + 1, value) : this; }

@@ -454,7 +454,7 @@ Use `try/finally`, as above. Dispose an executor before terminating a borrowed w
 
 ## Cost and limits
 
-Shared transport avoids copying collection backing bytes between compatible threads. It does not eliminate task messages, Promises, root descriptors, or JS allocation. Session updates currently reconstruct read-only arenas and WASM instances. JSON/string encoding and decoding can allocate, and ordinary task results are cloned.
+Shared transport avoids copying collection backing bytes between compatible threads. It does not eliminate task messages, Promises, root descriptors, or JS allocation. Session updates reconstruct read-only arena views with fresh decoding caches; eligible later shared-memory views can reuse pure native reader functions, while first/copy/fresh attachment and explicit raw WASM access still instantiate as needed. This does not establish a performance improvement. JSON/string encoding and decoding can allocate, and ordinary task results are cloned.
 
 `memory: 'share'` requests shared transport. `memory: 'copy'` requests used-prefix copies. When omitted, task clients follow session defaults: shared in Node and supported browsers, copies in Bun. No measured near-zero task or pool overhead is claimed. The [collection benchmarks](benchmarks.md) measure collection workloads, not this task API.
 

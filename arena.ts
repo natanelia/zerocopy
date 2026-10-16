@@ -72,9 +72,51 @@ export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
   return registry;
 }
 
+// Internal session attachment component. Keep only native functions whose
+// results depend on their arguments and memory, never allocator/scratch state.
+const nativeReadNames = [
+  'mapSize', 'mapFind', 'radixSize', 'radixFind',
+  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix',
+  'journalFind', 'compareLeaves', 'vecLeaf', 'vecGet', 'blockGet',
+  'textContains16', 'textContainsBlock16',
+] as const;
+type NativeReads = Readonly<Record<(typeof nativeReadNames)[number], (...args: any[]) => any>>;
+export interface NativeReader {
+  readonly memory: WebAssembly.Memory;
+  readonly reads: NativeReads;
+}
+let nativeReaders: WeakMap<object, NativeReader> | undefined;
+/** @internal Reuse pure data functions only, without retaining the donor view. */
+export function nativeReaderOf(arena: Arena): NativeReader {
+  const source = arena.nativeReads;
+  const cached = nativeReaders?.get(source);
+  if (cached) return cached;
+  const reads = Object.create(null);
+  for (const name of nativeReadNames) reads[name] = source[name];
+  const reader = Object.freeze({ memory: arena.memory, reads: Object.freeze(reads) });
+  (nativeReaders ??= new WeakMap()).set(source, reader);
+  nativeReaders.set(reads, reader);
+  return reader;
+}
+interface NativeReaderState { memory: WebAssembly.Memory; used: number; own?: any }
+function ownReader(state: NativeReaderState): any {
+  if (!state.own) {
+    const wasm = new WebAssembly.Instance(module, { env: { memory: state.memory } }).exports as any;
+    wasm.setHeapEnd(state.used);
+    state.own = wasm;
+  }
+  return state.own;
+}
+function rawReaderGetter(state: NativeReaderState): () => any {
+  // A separate activation captures only this view's raw state, not constructor
+  // options, the Arena, its caches/registry, or a donor view.
+  return () => ownReader(state);
+}
+
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
  * Reset is implemented by replacing the Arena, not by reusing its addresses.
- * Attached arenas are read-only: their allocator and scratch cannot race a writer.
+ * Supported attached reads do not allocate or write scratch. Raw native exports
+ * and Memory remain writable escape hatches, including shared scratch bytes.
  */
 export class Arena {
   readonly memory: WebAssembly.Memory;
@@ -160,11 +202,21 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}, nativeReader?: NativeReader) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
-    this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
-    if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+    if (nativeReader) {
+      this.nativeReads = nativeReader.reads;
+      const state = this.nativeState = { memory: this.memory, used: options.used! };
+      Object.defineProperty(this, 'wasm', {
+        enumerable: true, configurable: true, get: rawReaderGetter(state),
+      });
+    }
+    else {
+      this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+      if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+      this.nativeReads = this.wasm;
+    }
     this.readOnly = options.readOnly ?? false;
     if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
@@ -181,7 +233,10 @@ export class Arena {
       this.view = new DataView(this.buffer);
     }
   }
-  get used(): number { return this.wasm.getHeapEnd() >>> 0; }
+  get used(): number {
+    const state = this.nativeState;
+    return (state ? state.own ? state.own.getHeapEnd() : state.used : this.wasm.getHeapEnd()) >>> 0;
+  }
   assertWritable(): void { if (this.readOnly) throw new Error('Attached snapshots are read-only; update them in the owning writer'); }
   alloc(bytes: number): number {
     this.assertWritable();
@@ -468,7 +523,7 @@ export class Arena {
       const next = (kind === 2 ? this.wasm.radixInsert(root, leaf) : this.wasm.mapInsert(root, leaf)) >>> 0;
       this.writeHead = kind === 1 && !previous ? this.wasm.orderCons(head, leaf) >>> 0 : head;
       this.writeCount = kind === 1 && !previous ? count + 1 : count;
-      this.writeSize = kind === 2 ? this.wasm.radixSize(next) : this.wasm.mapSize(next);
+      this.writeSize = kind === 2 ? this.nativeReads.radixSize(next) : this.nativeReads.mapSize(next);
       return next;
     }
     this.refresh(); let hash = token?.hash ?? 2166136261;
@@ -551,11 +606,11 @@ export class Arena {
     if (root && (dv = this.dv).getUint32(root, true) === 0xffffffff) {
       const pending: number[] = [], n = dv.getUint32(root + 12, true);
       for (let i = 0; i < n; i++) pending.push(dv.getUint32(root + 16 + i * 4, true));
-      pending.sort((a, b) => this.wasm.compareLeaves(a, b));
+      pending.sort((a, b) => this.nativeReads.compareLeaves(a, b));
       let i = 0;
       for (const leaf of this.radixLeaves(dv.getUint32(root + 4, true))) {
-        while (i < n && this.wasm.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
-        if (i < n && this.wasm.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
+        while (i < n && this.nativeReads.compareLeaves(pending[i], leaf) < 0) yield pending[i++];
+        if (i < n && this.nativeReads.compareLeaves(pending[i], leaf) === 0) yield pending[i++]; else yield leaf;
       }
       while (i < n) yield pending[i++]; return;
     }
@@ -574,7 +629,7 @@ export class Arena {
     if (slot !== undefined) {
       if (this.reads.root(slot) === root) return this.reads.leaf(slot);
       const keyLeaf = this.reads.keyLeaf(slot), view = this.dv;
-      const leaf = this.wasm.radixFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true)) >>> 0;
+      const leaf = this.nativeReads.radixFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true)) >>> 0;
       this.reads.update(slot, root, leaf); return leaf;
     }
     const leaf = this.radixFindUncached(root, key);
@@ -582,7 +637,7 @@ export class Arena {
   }
   private radixFindUncached(root: number, key: string): number {
     const token = this.key(key);
-    if (token.ptr !== undefined) return this.wasm.radixFind(root, token.ptr, token.length) >>> 0;
+    if (token.ptr !== undefined) return this.nativeReads.radixFind(root, token.ptr, token.length) >>> 0;
     const bytes = token.bytes, length = token.length, dv = this.dv;
     if (root && dv.getUint32(root, true) === 0xffffffff) {
       for (let j = 0; j < dv.getUint32(root + 12, true); j++) {
@@ -627,7 +682,7 @@ export class Arena {
     if (slot !== undefined) {
       if (this.reads.root(slot) === root) return this.reads.leaf(slot);
       const keyLeaf = this.reads.keyLeaf(slot), view = this.dv;
-      const leaf = this.wasm.mapFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true), view.getUint32(keyLeaf + 4, true)) >>> 0;
+      const leaf = this.nativeReads.mapFind(root, keyLeaf + 16, view.getUint32(keyLeaf + 8, true), view.getUint32(keyLeaf + 4, true)) >>> 0;
       this.reads.update(slot, root, leaf); return leaf;
     }
     const leaf = this.findUncached(root, key);
@@ -657,7 +712,7 @@ export class Arena {
     // The exact-root check below invalidates the directory before any reuse.
     if (root) {
       if (this.prefixRoot !== root) {
-        const bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
+        const bits = this.nativeReads.mapSize(root) > 16384 ? 12 : 8;
         if (!this.prefixChildren || bits !== this.prefixBits) {
           this.prefixChildren = new Uint32Array(1 << bits); this.prefixValid = new Uint32Array((1 << bits) >>> 5);
         } else this.prefixValid!.fill(0);
@@ -665,11 +720,11 @@ export class Arena {
       }
       const prefix = hash & ((1 << this.prefixBits) - 1), word = prefix >>> 5, bit = 1 << (prefix & 31);
       if (!(this.prefixValid[word] & bit)) {
-        this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        this.prefixChildren[prefix] = this.nativeReads.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
         this.prefixValid[word] |= bit;
       }
-      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
-    } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+      candidate = this.nativeReads.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
+    } else candidate = this.nativeReads.mapHashCandidate(root, hash >>> 0) >>> 0;
     if (!candidate) return 0;
     const bucket = view.getUint32(candidate, true) === 2;
     const count = bucket ? view.getUint32(candidate + 8, true) : 1;
@@ -710,7 +765,7 @@ export class Arena {
       for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
       for (const leaf of this.leaves(base)) {
         const dv = this.dv;
-        if (!this.wasm.journalFind(root, leaf + 16, dv.getUint32(leaf + 8, true), dv.getUint32(leaf + 4, true))) yield leaf;
+        if (!this.nativeReads.journalFind(root, leaf + 16, dv.getUint32(leaf + 8, true), dv.getUint32(leaf + 4, true))) yield leaf;
       }
       return;
     }
@@ -802,10 +857,13 @@ export class Arena {
   private vectorBlock = -1;
   private vectorAddress = 0;
   private vectorView: DataView | undefined;
+  /** @internal Pure native reads; this is not a public customization surface. */
+  readonly nativeReads: NativeReads;
+  private readonly nativeState: NativeReaderState | undefined;
   vectorValue(root: number, depth: number, index: number): number {
     const block = index >>> 5;
     if (root !== this.vectorRoot || depth !== this.vectorLevel || block !== this.vectorBlock) {
-      this.vectorAddress = this.wasm.vecLeaf(root, depth, index) >>> 0;
+      this.vectorAddress = this.nativeReads.vecLeaf(root, depth, index) >>> 0;
       this.vectorRoot = root; this.vectorLevel = depth; this.vectorBlock = block; this.vectorView = this.dv;
     }
     // One pointer-path lookup serves up to 32 nearby reads. The cached leaf is
@@ -844,7 +902,7 @@ export class Arena {
   *vector(root: number, depth: number, start: number, count: number): Generator<number> {
     let i = start, end = start + count;
     while (i < end) {
-      const leaf = this.wasm.vecLeaf(root, depth, i) >>> 0;
+      const leaf = this.nativeReads.vecLeaf(root, depth, i) >>> 0;
       const stop = Math.min(end, (Math.floor(i / 32) + 1) * 32);
       while (i < stop) { const raw = this.dv.getFloat64(leaf + (i & 31) * 8, true); i++; yield raw; }
     }

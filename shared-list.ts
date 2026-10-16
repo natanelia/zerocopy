@@ -67,7 +67,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     if (block !== this.#readBlock) {
       const a = this.arena;
       this.#readAddress = block === ((this.size - 1) >>> 5)
-        ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+        ? this.tail : a.nativeReads.vecLeaf(this.root, this.depth, index) >>> 0;
       // Published addresses never move. Shared memory growth does not detach
       // this view; every byte reachable from this snapshot already exists.
       this.#readView ??= a.dv;
@@ -96,7 +96,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
         if (nextBlock !== block) {
           const first = nextBlock * 16;
           const leaf = (first >>> 5) === ((size - 1) >>> 5)
-            ? tail : a.wasm.vecLeaf(root, depth, first) >>> 0;
+            ? tail : a.nativeReads.vecLeaf(root, depth, first) >>> 0;
           address = leaf + (first & 31) * 8;
           flags = scanBlock(address, Math.min(16, size - first));
           block = nextBlock;
@@ -111,7 +111,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
       if (!validIndex(index, size)) return false;
       const nextBlock = index >>> 5;
       if (nextBlock !== block) {
-        address = nextBlock === ((size - 1) >>> 5) ? tail : a.wasm.vecLeaf(root, depth, index) >>> 0;
+        address = nextBlock === ((size - 1) >>> 5) ? tail : a.nativeReads.vecLeaf(root, depth, index) >>> 0;
         block = nextBlock;
       }
       return match(view.getFloat64(address + (index & 31) * 8, true));
@@ -128,7 +128,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     const a = this.arena, size = this.size - 1;
     if (!size) return new SharedList(this.type, 0, 0, 0, a);
     if ((this.size - 1) & 31) return new SharedList(this.type, this.root, this.depth, size, a, this.tail);
-    const tail = a.wasm.vecLeaf(this.root, this.depth, size - 32) >>> 0;
+    const tail = a.nativeReads.vecLeaf(this.root, this.depth, size - 32) >>> 0;
     const depth = vectorDepth(size - 32); let root = this.root, oldDepth = this.depth;
     if (size === 32) root = 0;
     else while (oldDepth-- > depth) root = a.dv.getUint32(root, true);
@@ -142,7 +142,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     // detach it, and all bytes in this immutable snapshot already exist.
     // Explicit little-endian reads also work on big-endian hosts.
     for (let first = 0; first < this.size; first += 32) {
-      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const leaf = first === start ? this.tail : a.nativeReads.vecLeaf(this.root, this.depth, first) >>> 0;
       const length = Math.min(32, this.size - first);
       if (isNumber) {
         for (let j = 0; j < length; j++) yield view.getFloat64(leaf + j * 8, true) as ValueOf<T>;
@@ -156,7 +156,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
-      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const leaf = first === start ? this.tail : a.nativeReads.vecLeaf(this.root, this.depth, first) >>> 0;
       const stop = Math.min(this.size, first + 32), view = a.dv;
       // Shared views remain valid if the callback grows memory or creates forks.
       for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
@@ -166,7 +166,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     const a = this.arena, result = new Array<ValueOf<T>>(this.size);
     const start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
-      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const leaf = first === start ? this.tail : a.nativeReads.vecLeaf(this.root, this.depth, first) >>> 0;
       const stop = Math.min(this.size, first + 32), dv = a.dv;
       for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
     }

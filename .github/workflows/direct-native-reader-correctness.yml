@@ -1,0 +1,75 @@
+name: Direct native reader correctness
+
+on:
+  push:
+    branches: [proof/direct-native-reader-correctness-20261016]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    if: github.ref == 'refs/heads/proof/direct-native-reader-correctness-20261016' && github.event.before == 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify workflow context placement
+        run: python3 -B proofs/direct-native-reader-correctness/workflow_guard.py .github/workflows/direct-native-reader-correctness.yml
+      - name: Run bounded matched correctness checks
+        env:
+          CI: '1'
+          NO_COLOR: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          export BASELINE_DIRECTORY="$RUNNER_TEMP/direct-native-reader-correctness-baseline"
+          export EVIDENCE_DIRECTORY="$RUNNER_TEMP/direct-native-reader-correctness-evidence"
+          export WORK_DIRECTORY="$RUNNER_TEMP/direct-native-reader-correctness-work"
+          python3 -B proofs/direct-native-reader-correctness/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY" "$WORK_DIRECTORY"
+      - name: Locate evidence
+        if: always()
+        run: |
+          echo "NATIVE_READER_EVIDENCE=$RUNNER_TEMP/direct-native-reader-correctness-evidence" >> "$GITHUB_ENV"
+      - name: Preserve complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: direct-native-reader-correctness-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.NATIVE_READER_EVIDENCE }}/
+            proofs/direct-native-reader-correctness/*.py
+            proofs/direct-native-reader-correctness/*.json
+            proofs/direct-native-reader-correctness/*.md
+            proofs/direct-native-reader-correctness/dependencies/package*.json
+            arena.ts
+            compaction.ts
+            direct-native-reader.test.ts
+            docs/worker-sessions.md
+            docs/workers.md
+            native-reader.test.ts
+            shared-doubly-linked-list.ts
+            shared-linked-list.ts
+            shared-list.ts
+            shared-map.ts
+            shared-ordered-map.ts
+            shared-queue.ts
+            shared-sorted-map.ts
+            text-search.ts
+            worker.test.ts
+            worker.ts
+            .github/workflows/direct-native-reader-correctness.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
