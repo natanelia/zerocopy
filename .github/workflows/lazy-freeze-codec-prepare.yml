@@ -1,0 +1,51 @@
+name: Lazy freezeJSON compiled-codec preparation only
+
+on:
+  push:
+    branches: [proof/lazy-freeze-codec-prepare-20261016]
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/proof/lazy-freeze-codec-prepare-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build and check the two sealed source arms once
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          CI: '1'
+          NO_COLOR: '1'
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test ! -e proofs/lazy-freeze-worklist/artifacts
+          python3 -B proofs/lazy-freeze-worklist/prepare.py \
+            proofs/lazy-freeze-worklist \
+            proofs/lazy-freeze-worklist/artifacts \
+            --node "$(command -v node)" \
+            --bun "$(command -v bun)"
+      - name: Retain source, emitted bundles and complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lazy-freeze-codec-preparation-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            proofs/lazy-freeze-worklist/
+            proofs/lazy-freeze-preparation.md
+            .github/workflows/lazy-freeze-codec-prepare.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

@@ -1,0 +1,22 @@
+{
+  "METHOD.md": "e8a454f20249783935629a09b49a85b458394df4b4a72c368c7a96ad6154af4c",
+  "README.md": "43803cd1b7c85fd413ac258f561eb8b97f276d2c881bd7721a264b7b4c68825e",
+  "analyze.py": "d49906d71e2e9fb927b499dbe5fb4bd3e63b0105fec3ce50ffae591f1af91241",
+  "dependencies/tsconfig.json": "e74cdfb5eb9e8019be3f2aac1b63394f21b022aca970404527279bf6c6f7855e",
+  "entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+  "headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78",
+  "prepare.py": "fd8766c8099cf063a445a20f6947896468d2fcbb81feae1cecdf4e2fb1401364",
+  "regressions.mjs": "3e8d643e155d156b7259618efdb6666ca12a15fde5da402d4503cacf08c6fa24",
+  "run.py": "8215e8bed3c0e3a5aa69060428ba5a1164761ef1d1772ae06370804c56e399a3",
+  "sources/baseline/codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+  "sources/baseline/entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+  "sources/baseline/freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+  "sources/baseline/types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+  "sources/baseline/utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+  "sources/candidate/codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+  "sources/candidate/entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+  "sources/candidate/freeze-json.ts": "f12919fb7cf31f2a276b8a83f9b66410dbe24d57314f7c418c67aa7e0a2e568e",
+  "sources/candidate/types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+  "sources/candidate/utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+  "subject.mjs": "689504f97e2e9d8d1185664885a6f1eaba2a5b8b30a9523f3b61369be3add985"
+}
