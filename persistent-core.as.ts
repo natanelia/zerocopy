@@ -724,7 +724,44 @@ function radixRemove(root: u32, key: u32, len: u32): u32 {
   copyWords(p + 16 + (offset + (child ? 1 : 0)) * 4, root + 20 + offset * 4, (count - offset - 1) * 4);
   store<u32>(p + 12, representative(load<u32>(p + 16))); return p;
 }
-export function radixDelete(root: u32, key: u32, len: u32): u32 { root = materializeJournal(root, 2); return root ? radixRemove(root, key, len) : 0; }
+// A public pending-key deletion already supplies that immutable leaf's key.
+// Omit every version of that key before folding the other pending updates.
+// The sentinel keeps all other native callers on the original deletion path.
+function radixDeletePending(root: u32, key: u32, len: u32): u32 {
+  const end = heapEnd;
+  if (root < HEAP_START || root > end - 16) return 0xffffffff;
+  const count = load<u32>(root + 12);
+  if (!count || count > JOURNAL_LIMIT || count > ((end - root - 16) >> 2)) return 0xffffffff;
+  const base = load<u32>(root + 4);
+  if (base && (base < HEAP_START || base > end - 16 || tag(base) == JOURNAL)) return 0xffffffff;
+  if (key < HEAP_START || key > end || len > end - key) return 0xffffffff;
+  let matched = false;
+  for (let i: u32 = 0; i < count; i++) {
+    const leaf = load<u32>(root + 16 + i * 4);
+    if (leaf < HEAP_START || leaf > end - 16 || tag(leaf) != 0) return 0xffffffff;
+    const length = load<u32>(leaf + 8);
+    if (length > end - leaf - 16) return 0xffffffff;
+    if (leaf + 16 == key && length == len) matched = true;
+  }
+  if (!matched) return 0xffffffff;
+  let remaining: u32 = 0;
+  for (let i: u32 = 0; i < count; i++) {
+    const leaf = load<u32>(root + 16 + i * 4);
+    if (load<u32>(leaf + 8) == len && memory.compare(leaf + 16, key, len) == 0) continue;
+    store<u32>(1024 + remaining++ * 4, leaf);
+  }
+  const next = base ? radixRemove(base, key, len) : 0;
+  // Preserve descriptor equality for net-zero updates of an existing tree.
+  if (!remaining && base && next == base && tag(base) != 0) return 0xffffffff;
+  return foldJournal(next, 1024, remaining, 2);
+}
+export function radixDelete(root: u32, key: u32, len: u32): u32 {
+  if (root && tag(root) == JOURNAL) {
+    const next = radixDeletePending(root, key, len);
+    if (next != 0xffffffff) return next;
+  }
+  root = materializeJournal(root, 2); return root ? radixRemove(root, key, len) : 0;
+}
 
 // Single synchronous writer call: allocate the leaf, update the selected index,
 // and report new metadata. STAGE and result words are not snapshot payloads.
