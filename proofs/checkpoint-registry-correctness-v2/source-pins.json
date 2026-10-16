@@ -1,0 +1,21 @@
+{
+  ".github/workflows/checkpoint-registry-correctness-v2.yml": "6b8be9f37b437df799a840cbd5874d3ccbe851713f747bde91c79c0f2b174272",
+  "checkpoint-descriptor-validation.test.ts": "a99ee57b523cb3d337f58f7810dccb9a830aa857da6dd63e690212121d5bb52d",
+  "proofs/checkpoint-registry-correctness-v2/METHOD.md": "0c1ba800cb3137f78b3c43059f5d1f6fbf20f462f0a40204c260798b51de50ef",
+  "proofs/checkpoint-registry-correctness-v2/artifact_checks.py": "c4acc7ff58659f8c2db6e2e86ccfdcbadf919679c0fcf0d5e0045fd4f1cd64df",
+  "proofs/checkpoint-registry-correctness-v2/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/checkpoint-registry-correctness-v2/bounded_process.py": "d8ed2c8a7467f8628435f92e1744d3fed1f50cabb2b30d6cd1c0983add55015e",
+  "proofs/checkpoint-registry-correctness-v2/command_plan.py": "073ebc031e9773497039c68b18e7b06bb53ff7442e6aca25bff6a86a1991aad3",
+  "proofs/checkpoint-registry-correctness-v2/dependencies/package-lock.json": "9a21d54dffb4782257ccee864de6b7f11f9c6d12a30ea8eaa411dff11cf9cfa4",
+  "proofs/checkpoint-registry-correctness-v2/dependencies/package.json": "c61836da6c6d1c2699a909a1b84cc8e9f3d51ec9f27d4e0a2c5c322f7d10f02e",
+  "proofs/checkpoint-registry-correctness-v2/headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78",
+  "proofs/checkpoint-registry-correctness-v2/report_selector_test.py": "b8f311aa5e282c30ddaccea7d7533e1f444b3a4f2c02c763ab952cb29eb0024b",
+  "proofs/checkpoint-registry-correctness-v2/run.py": "cea7e74c88c9f3a473596be32d2fc0cb80a307a06f845c548525e399763c2454",
+  "proofs/checkpoint-registry-correctness-v2/temp_scope_test.py": "0c93c32ad02679a45441cde927e5a71d05751cccef3bfeb0393dbde8375cd0eb",
+  "proofs/checkpoint-registry-correctness-v2/temp_scopes.py": "afcecee9817832ae117ccffee9b311bde24dd6da83ff7fcfcdd9aaea95e2e98a",
+  "proofs/checkpoint-registry-correctness-v2/test-inventory.json": "e60a795310f896dbfc93db8c95a00ed53756bdce4ec35c9d3b5da10a36ec8017",
+  "proofs/checkpoint-registry-correctness-v2/test_transplant.py": "d9501740873e8276ff2b6ba2a3f48ba600a3b2585d1b7befc234af55e63522d2",
+  "proofs/checkpoint-registry-correctness-v2/test_transplant_test.py": "ccb17f139a4d2fdd49297c1d59346de6e9185e17cab5ba1fc50e0c98480533ca",
+  "proofs/checkpoint-registry-correctness-v2/workflow_guard.py": "f0370d5d28b4b537c924660b1258d8d59bccebf4ac00eb771054767b31733ad4",
+  "redux-checkpoint.ts": "122b7f00542fc62b9ccb2d11675fde4fe1684221c2f2bbc45664e4dce45a6dfa"
+}

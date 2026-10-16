@@ -4,7 +4,8 @@ import {
   SharedMap, SharedSet, SharedList, SharedStack, SharedQueue,
   SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap,
   SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue,
-  getWorkerData, initWorker,
+  getWorkerData, initWorker, resetMap, resetSharedList, resetStack, resetQueue,
+  resetLinkedList, resetDoublyLinkedList, resetOrderedMap, resetSortedMap, resetPriorityQueue,
 } from './shared';
 import { arenaOf, FORMAT_VERSION, HEAP_START, MAX_SIZE, hashBytes } from './arena';
 import { decodeZerocopyState, serializeZerocopyState } from './redux';
@@ -46,6 +47,11 @@ function removeOnly(value: any): any {
   return value.delete('x');
 }
 function packetOf(value: unknown): any { return JSON.parse(serializeZerocopyState(value)); }
+function resetFixtureArenas(): void {
+  // Sets share their backing Map family's default arena.
+  resetMap(); resetSharedList(); resetStack(); resetQueue();
+  resetLinkedList(); resetDoublyLinkedList(); resetOrderedMap(); resetSortedMap(); resetPriorityQueue();
+}
 // Avoid encodeZerocopyState's compaction here: public descriptors can retain
 // queue offsets, historical order entries, and noncanonical sequence storage.
 function rawPacketOf(snapshot: any): any {
@@ -96,10 +102,21 @@ describe('checkpoint descriptors preserve data or reject malformed metadata', ()
     });
 
     it('also accepts public transport descriptors without prior compaction', () => {
-      const restored: any = decodeZerocopyState(rawPacketOf(fixture.make()));
+      resetFixtureArenas();
+      const unused = rawPacketOf(new SharedMap('number')).arenas[0];
+      resetMap();
+      const packet = rawPacketOf(fixture.make());
+      packet.arenas.push(unused);
+      expect(packet.arenas).toHaveLength(2);
+      expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(2);
+      const restored: any = decodeZerocopyState(packet);
       expect(restored.constructor.name).toBe(fixture.kind);
       expect(contents(restored)).toEqual(fixture.expected);
-      const empty: any = decodeZerocopyState(rawPacketOf(fixture.empty()));
+      const emptyPacket = rawPacketOf(fixture.empty());
+      emptyPacket.arenas.push(unused);
+      expect(emptyPacket.arenas).toHaveLength(2);
+      expect(new Set(emptyPacket.arenas.map((arena: any) => arena.id)).size).toBe(2);
+      const empty: any = decodeZerocopyState(emptyPacket);
       expect(empty.constructor.name).toBe(fixture.kind);
       expect(contents(empty)).toEqual([]);
     });
@@ -282,4 +299,117 @@ describe('checkpoint descriptors preserve data or reject malformed metadata', ()
       expect(contents(decodeZerocopyState(rawPacketOf(source)))).toEqual([]);
     },
   );
+});
+
+describe('raw checkpoint arena restoration', () => {
+  it.each(['original', 'reversed'])('restores cross-arena chains and aliases with %s arena order', order => {
+    resetMap(); resetSharedList();
+    const child = new SharedList('number').push(1).push(2);
+    const middle = new SharedMap('SharedList<number>').set('child', child);
+    resetMap();
+    const root = new SharedMap('SharedMap<SharedList<number>>').set('middle', middle);
+    resetMap();
+    const unused = new SharedSet().add('unused');
+    const packet = rawPacketOf(root);
+    expect(packet.arenas).toHaveLength(3);
+    expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(3);
+    packet.arenas.push(...rawPacketOf(unused).arenas);
+    expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(4);
+    if (order === 'reversed') packet.arenas.reverse();
+    packet.tree = ['object', [['root', ['snapshot', 's0']], ['alias', ['snapshot', 's0']]]];
+    const before = [root, middle, child, unused].map(value => {
+      const arena = arenaOf(value);
+      return { arena, used: arena.used, bytes: arena.copy() };
+    });
+
+    const restored = decodeZerocopyState<{ root: typeof root; alias: typeof root }>(packet);
+    expect(restored.root).toBe(restored.alias);
+    expect(Object.isFrozen(restored)).toBe(true);
+    const leaf = restored.root.get('middle')!.get('child')!;
+    expect(leaf.toArray()).toEqual([1, 2]);
+    expect(arenaOf(leaf)).toBe(arenaOf(restored.root));
+    expect(packet.arenas.map((arena: any) => arena.id)).not.toContain(arenaOf(restored.root).id);
+    for (const { arena, used, bytes } of before) {
+      expect(arena.used).toBe(used);
+      expect(arena.copy()).toEqual(bytes);
+    }
+  });
+
+  it('keeps two raw multi-arena imports independent when updated and exported together', async () => {
+    resetMap(); resetSharedList();
+    const child = new SharedList('number').push(1).push(2);
+    const source = new SharedMap('SharedList<number>').set('child', child);
+    const packet = rawPacketOf(source);
+    expect(packet.arenas).toHaveLength(2);
+    expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(2);
+    const a = decodeZerocopyState<typeof source>(packet);
+    const second = decodeZerocopyState<typeof source>(packet);
+    const b = second.set('child', second.get('child')!.push(3));
+    expect(arenaOf(a).id).not.toBe(arenaOf(b).id);
+    for (const restored of [a, b]) {
+      expect(packet.arenas.map((arena: any) => arena.id)).not.toContain(arenaOf(restored).id);
+    }
+    expect(a.get('child')!.toArray()).toEqual([1, 2]);
+    expect(second.get('child')!.toArray()).toEqual([1, 2]);
+    expect(source.get('child')!.toArray()).toEqual([1, 2]);
+    expect(b.get('child')!.toArray()).toEqual([1, 2, 3]);
+    resetMap();
+    const parent = new SharedMap('SharedMap<SharedList<number>>').set('a', a).set('b', b);
+    const transport = getWorkerData({ parent }, { copy: true });
+    expect(transport.arenas).toHaveLength(3);
+    expect(new Set(transport.arenas.map(arena => arena.id)).size).toBe(3);
+    const worker = await initWorker(transport);
+    expect(worker.parent.get('a')!.get('child')!.toArray()).toEqual([1, 2]);
+    expect(worker.parent.get('b')!.get('child')!.toArray()).toEqual([1, 2, 3]);
+  });
+
+  it('accepts and still validates multiple arena records with no snapshot descriptors', () => {
+    resetMap(); resetSharedList();
+    const packet = rawPacketOf(new SharedMap('number').set('x', 1));
+    packet.arenas.push(...rawPacketOf(new SharedList('number').push(2)).arenas);
+    packet.structures = {};
+    packet.tree = ['null'];
+    expect(packet.arenas).toHaveLength(2);
+    expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(2);
+    expect(decodeZerocopyState(packet)).toBeNull();
+    packet.arenas[1].checksum = (packet.arenas[1].checksum + 1) >>> 0;
+    expect(() => decodeZerocopyState(packet)).toThrow(/arena checksum mismatch/);
+  });
+
+  it('preserves ordinary zero-arena and singleton checkpoint round trips', () => {
+    resetMap(); resetSharedList();
+    const plain = packetOf({ ui: { open: true }, missing: undefined });
+    expect(plain.arenas).toHaveLength(0);
+    const state = decodeZerocopyState<any>(plain);
+    expect(state).toEqual({ ui: { open: true }, missing: undefined });
+    expect(Object.isFrozen(state.ui)).toBe(true);
+    const source = new SharedMap('number').set('x', 1);
+    const single = packetOf(source);
+    expect(single.arenas).toHaveLength(1);
+    const restored = decodeZerocopyState<typeof source>(single);
+    expect(restored.get('x')).toBe(1);
+    expect(restored.set('x', 2).get('x')).toBe(2);
+    expect(restored.get('x')).toBe(1);
+    expect(source.get('x')).toBe(1);
+    expect(arenaOf(restored).id).not.toBe(single.arenas[0].id);
+  });
+
+  it('preserves captured IDs from direct-input getters without rereading them', () => {
+    for (const retainedId of [undefined, null, '', 7]) {
+      resetMap(); resetSharedList();
+      const packet = rawPacketOf(new SharedMap('number').set('x', 1));
+      const unusedPacket = rawPacketOf(new SharedList('number').push(2));
+      expect(packet.arenas).toHaveLength(1);
+      expect(unusedPacket.arenas).toHaveLength(1);
+      const unused = unusedPacket.arenas[0];
+      packet.arenas.push(unused);
+      expect(packet.arenas).toHaveLength(2);
+      expect(new Set(packet.arenas.map((arena: any) => arena.id)).size).toBe(2);
+      const validId = unused.id;
+      let reads = 0;
+      Object.defineProperty(unused, 'id', { enumerable: true, get: () => ++reads < 5 ? validId : retainedId });
+      expect(decodeZerocopyState<SharedMap<'number'>>(packet).get('x')).toBe(1);
+      expect(reads).toBe(5);
+    }
+  });
 });
