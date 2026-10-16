@@ -1,4 +1,4 @@
-import { Arena, FORMAT_VERSION, HEAP_START, MAX_SIZE, freezeJSON, hashBytes, vectorDepth } from './arena';
+import { Arena, createArenaRegistry, FORMAT_VERSION, HEAP_START, MAX_SIZE, freezeJSON, hashBytes, vectorDepth } from './arena';
 import { compactMany, getWorkerData } from './shared';
 import { structureRegistry } from './codec';
 import { collectionConstructors, isPlainRecord, isZerocopyCollection } from './redux-internal';
@@ -263,8 +263,20 @@ export function decodeZerocopyState<T = unknown>(input: unknown, options: Zeroco
   };
   walk(input.tree, 0);
   const arenas = new Map<string, Arena>();
-  for (const [id, data] of copies) arenas.set(id, new Arena({ ...data, id, readOnly: true }));
-  for (const arena of arenas.values()) for (const dependency of arenas.values()) if (arena !== dependency) arena.dependencies.set(dependency.id, dependency);
+  // Direct-input getters can change IDs after validation; preserve that legacy path.
+  let useRegistry = copies.size >= 2;
+  if (useRegistry) for (const id of copies.keys()) if (typeof id !== 'string') { useRegistry = false; break; }
+  if (useRegistry) {
+    const registry = createArenaRegistry(arenas);
+    for (const [id, data] of copies) {
+      const arena = new Arena({ ...data, id, readOnly: true, registry });
+      arenas.set(id, arena);
+      registry.members.push(arena);
+    }
+  } else {
+    for (const [id, data] of copies) arenas.set(id, new Arena({ ...data, id, readOnly: true }));
+    for (const arena of arenas.values()) for (const dependency of arenas.values()) if (arena !== dependency) arena.dependencies.set(dependency.id, dependency);
+  }
   const attached: Record<string, SharedCollection> = Object.create(null);
   for (const [name, item] of descriptors) attached[name] = structureRegistry[item.type].fromWorkerData(item.data, arenas.get(item.arena));
   const restored = descriptors.size ? compactMany(attached) : attached;

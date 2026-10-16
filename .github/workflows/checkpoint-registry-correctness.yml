@@ -1,0 +1,61 @@
+name: Checkpoint registry correctness
+
+on:
+  push:
+    branches: [proof/checkpoint-registry-correctness-20261016]
+
+permissions:
+  contents: read
+
+jobs:
+  correctness:
+    if: github.ref == 'refs/heads/proof/checkpoint-registry-correctness-20261016' && github.event.before == 'afdffdcfcbd61013f120de82411c0c4a6b2d1e0e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify workflow context placement
+        run: python3 -B proofs/checkpoint-registry-correctness/workflow_guard.py .github/workflows/checkpoint-registry-correctness.yml
+      - name: Run bounded matched correctness checks
+        env:
+          CI: '1'
+          NO_COLOR: '1'
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          export BASELINE_DIRECTORY="$RUNNER_TEMP/checkpoint-registry-correctness-baseline"
+          export EVIDENCE_DIRECTORY="$RUNNER_TEMP/checkpoint-registry-correctness-evidence"
+          export WORK_DIRECTORY="$RUNNER_TEMP/checkpoint-registry-correctness-work"
+          python3 -B proofs/checkpoint-registry-correctness/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY" "$WORK_DIRECTORY"
+      - name: Locate evidence
+        if: always()
+        run: |
+          echo "CHECKPOINT_EVIDENCE=$RUNNER_TEMP/checkpoint-registry-correctness-evidence" >> "$GITHUB_ENV"
+      - name: Preserve complete or partial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-registry-correctness-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.CHECKPOINT_EVIDENCE }}/
+            proofs/checkpoint-registry-correctness/*.py
+            proofs/checkpoint-registry-correctness/*.json
+            proofs/checkpoint-registry-correctness/*.md
+            proofs/checkpoint-registry-correctness/dependencies/package*.json
+            redux-checkpoint.ts
+            checkpoint-descriptor-validation.test.ts
+            .github/workflows/checkpoint-registry-correctness.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

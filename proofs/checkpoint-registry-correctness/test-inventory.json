@@ -1,0 +1,31 @@
+{
+  "observedInThisPacket": false,
+  "method": "Static source registration accounting; no target imports or tests executed during preparation.",
+  "files": {
+    "redux-checkpoint.test.ts": {
+      "baselineSha256": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+      "changed": false,
+      "expectedTests": 34,
+      "accounting": "12 collection examples + 7 ordinary cases + 12 invalid-packet cases + 3 validation cases"
+    },
+    "checkpoint-descriptor-validation.test.ts": {
+      "baselineSha256": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+      "candidateSha256": "22518c4f0163548b3424d2770c1bee8ab249c1e65add92b2460b3e3d9f6bc508",
+      "baselineExpectedTests": 112,
+      "candidateExpectedTests": 118,
+      "baselineAccounting": "1 + 12*7 + 3 + 2 + 5 + 1 + 2 + 1 + 3 + 3 + 4 + 1 + 2",
+      "candidateAddedCases": "2 arena-order cases + 4 ordinary regression cases",
+      "allKindFixtureAdaptation": "Existing 12 public-transport descriptor cases gain one unused arena; registration count unchanged."
+    }
+  },
+  "focusedNodeAndBun": {
+    "baselineWithCandidateRegressionText": { "expectedTests": 152, "expectedFiles": 2 },
+    "candidate": { "expectedTests": 152, "expectedFiles": 2 },
+    "baselineOriginalSourceReferenceOnly": { "expectedTests": 146, "expectedFiles": 2 }
+  },
+  "fullBun": {
+    "baseline": { "expectedTests": 1055, "expectedFiles": 50 },
+    "candidate": { "expectedTests": 1061, "expectedFiles": 50 },
+    "baselineCountProvenance": "Inherited correctness-packet baseline inventory; unchanged pinned main. Candidate adds six registrations and no test file."
+  }
+}
