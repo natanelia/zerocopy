@@ -1,0 +1,76 @@
+name: Sorted-delete correctness admission diagnostic
+
+on:
+  push:
+    branches: [proof/sorted-journal-delete-admission-diagnostic-20261016]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.ref == 'refs/heads/proof/sorted-journal-delete-admission-diagnostic-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Verify synthetic diagnostic instrumentation
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 python3 proofs/sorted-journal-delete-admission/controller_test.py
+          node --experimental-vm-modules proofs/sorted-journal-delete-admission/reporter-test.mjs
+      - name: Provision the pinned shared dependencies once
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-admission-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-admission-evidence
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(node --version)" = v22.16.0
+          test "$(bun --version)" = 1.4.2
+          npm ci --prefix proofs/sorted-journal-delete-admission/dependencies --no-audit --no-fund
+          git worktree add --detach "$BASELINE_DIRECTORY" afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-journal-delete-admission/dependencies/node_modules" node_modules
+          ln -s "$GITHUB_WORKSPACE/proofs/sorted-journal-delete-admission/dependencies/node_modules" "$BASELINE_DIRECTORY/node_modules"
+      - name: Run correctness admission with bounded observations
+        env:
+          BASELINE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-admission-baseline
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/sorted-journal-delete-admission-evidence
+          CI: '1'
+          NO_COLOR: '1'
+        run: python3 proofs/sorted-journal-delete-admission/run.py "$GITHUB_WORKSPACE" "$BASELINE_DIRECTORY" "$EVIDENCE_DIRECTORY"
+      - name: Preserve partial or complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorted-journal-delete-admission-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/sorted-journal-delete-admission-evidence/
+            proofs/sorted-journal-delete-admission/*.mjs
+            proofs/sorted-journal-delete-admission/*.py
+            proofs/sorted-journal-delete-admission/*.md
+            proofs/sorted-journal-delete-admission/*.json
+            proofs/sorted-journal-delete-admission/dependencies/package*.json
+            proofs/sorted-journal-delete-worker.mjs
+            dist/
+            *.wasm
+            *.wat
+            ${{ runner.temp }}/sorted-journal-delete-admission-baseline/dist/
+            ${{ runner.temp }}/sorted-journal-delete-admission-baseline/*.wasm
+            ${{ runner.temp }}/sorted-journal-delete-admission-baseline/*.wat
+            persistent-core.as.ts
+            sorted-journal-delete.test.ts
+            vitest.config.ts
+            .github/workflows/sorted-journal-delete-admission.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

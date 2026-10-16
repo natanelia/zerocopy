@@ -1,0 +1,27 @@
+# Correctness admission diagnostic
+
+This is one correctness-only investigation of the failed admission in [run 38842133053](https://github.com/natanelia/zerocopy/actions/runs/38842133053). The candidate aggregate command crossed its fixed 4-GiB process-group RSS ceiling at 4,299,575,296 bytes after 334.474 seconds. It reported 1,040 passing cases in 50 completed files; the 35-case worker.test.ts completion was absent. The retained logs did not contain per-line timestamps, per-process memory series, thread counts or runtime heap snapshots, so they do not establish the cause. No study child ran. The failure remains preserved.
+
+## Fixed sources and execution
+
+Baseline is main afdffdcfcbd61013f120de82411c0c4a6b2d1e0e. Candidate is the previously reviewed sorted pending-delete change with its canonical-dispatch repair, unchanged from that failed run. The original incomplete study and the completed rejected candidate remain separate; this diagnostic supplies no performance evidence or promotion decision.
+
+Both arms receive identical reporter and configuration additions. All production code, test bodies, scripts and selection stay pinned. Vitest retains threads, isolate:false, fileParallelism:true, minWorkers:1, maxWorkers:4, testTimeout:5000 and teardownTimeout:1000. The default reporter remains enabled; only a custom reporter and built-in logHeapUsage are added.
+
+Run baseline prepublishOnly (600 seconds), baseline Node worker proof (90), baseline typed-JSON worker proof (90), then the same three commands for candidate. Use Node 22.16.0 and Bun 1.4.2, shared locked dependencies, fresh native/portable builds and exact source/output authentication. Every command retains the 4-GiB sampled process-group ceiling and 50-ms safety polling, including the original two-second cleanup reserve. Stop at the first failure and preserve partial evidence. No retry, calibration, benchmark, statistical analysis or automatic follow-on study is part of this workflow.
+
+The controller retains a 1,620-second admission limit. Workflow provisioning and pure instrumentation checks precede that controller; the full job is bounded by 35 minutes. The remaining eight minutes cover provisioning, upload and other outer workflow work, not an additional test allowance.
+
+## Observations and bounds
+
+The supported Vitest reporter synchronously appends delivered module queued/collected/start/end and case ready/result events, scalar state and supported diagnostic fields. One-second reporter heartbeats describe only that process's event loop. Run-start gives its PID for comparison with process observations. Synthetic module/case digests and encounter ordinals identify events; bounded identity records map them to allowlisted public repository-relative test paths and exact public full titles. Existing public titles containing LF, CR or NUL are preserved through JSON escaping within a single record; the 2,048-byte title bound remains. No task or module object is retained. Reporter output is capped at 16,000 records and 8 MiB per arm, including the terminal limit marker and public identity records. Invalid mapping, overflow or I/O failure raises a fixed diagnostic error after clearing its timer and retained scalar map. The supervisor checks the fixed failure marker in bounded log tails once per second and stops the owned group; successful admission also requires a clean reporter run-end.
+
+At most once per second, plus a terminal snapshot, the supervisor appends each owned process's PID, PPID, start ticks, state, RSS bytes, CPU user/system ticks and thread count. Each snapshot also records observation time and stdout/stderr byte counts. The existing 50-ms RSS guard is unchanged. Each command's telemetry is capped at 64 owned processes per snapshot, 2,000 snapshots and 8 MiB. Exceeding a bound or failing to persist observations fails admission and invokes ordinary owned cleanup. No arbitrary command line, environment, stack, heap dump, arena registry or allocation-site instrumentation is collected.
+
+## Interpretation
+
+Worker task events are buffered and throttled at 100 ms. Delivered callbacks can lag execution, arrive together after state changes, or never arrive before termination. A delivered ready event without a result does not prove that case is currently running or responsible for growth. Missing delivery does not prove that execution never began. Reporter liveness cannot establish worker liveness. Process CPU/thread/RSS observations can narrow a stall while remaining aggregate per process.
+
+Built-in diagnostic heap values are runtime heapUsed snapshots at task completion, without forced GC. They do not measure retained bytes, per-case allocation, total resident memory, or complete native/WebAssembly memory. No public global arena census is available. Instrumentation can perturb scheduling and memory. A complete passing diagnostic means non-reproduction; the original failure remains unresolved. A reproduced failure requires interpretation of the actual observations and cannot automatically be attributed to the production change.
+
+All outputs are original public hosted diagnostics. Verified ephemeral paths to this public checkout and public dependencies/toolchain may appear in raw build/test logs. Private local paths, credentials, broad environment dumps and internal notes are excluded. The workflow retains partial or complete output for 30 days.

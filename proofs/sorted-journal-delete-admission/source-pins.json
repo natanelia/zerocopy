@@ -1,0 +1,16 @@
+{
+  ".github/workflows/sorted-journal-delete-admission.yml": "14d2f5bad4e1facc6d0d2f943f2a889fec7e3128ce1ed084f68cccd99e2612be",
+  "persistent-core.as.ts": "6a0e16e08270221c581e2604adac842aeaed221256dd03d9792c45359299018d",
+  "proofs/sorted-journal-delete-admission/METHOD.md": "f071ed199c68dfd5112c69532930344fdc88821a416573a63683c9f8aecc3907",
+  "proofs/sorted-journal-delete-admission/README.md": "fa89963848c4440823efa2fbbedbebe105763b7d24556e2a3e1512a3276f9eef",
+  "proofs/sorted-journal-delete-admission/baseline-sources.json": "9a68795d3c96706ddcad035e7e0cf37c8635753eeb18afe128dbf32ac27f5b59",
+  "proofs/sorted-journal-delete-admission/controller_test.py": "a523f4357b2ea09f28d00462bd358671510b56cd6ccff21dfca4b3495add9cec",
+  "proofs/sorted-journal-delete-admission/dependencies/package-lock.json": "da87863a448e51920afc9134622276970b3db5642483af3193baccc9926699a1",
+  "proofs/sorted-journal-delete-admission/dependencies/package.json": "0ae61ae1d8c085ec802ae971fdd7541bcd1713fe57df6a26f5e24d827deffe6a",
+  "proofs/sorted-journal-delete-admission/reporter-test.mjs": "04c9a30aca61c54c8ae025a997495a7ef50c2ec64fff10cc4a6fe53203cca144",
+  "proofs/sorted-journal-delete-admission/reporter.mjs": "109138604724b7ef065d7b249f15d19ceefed30a8a12edf828764847b63fce74",
+  "proofs/sorted-journal-delete-admission/run.py": "907478f710a33506b0a620dd41ef9c3ffebcb2c224f1f5e1da5e339ca57fe98c",
+  "proofs/sorted-journal-delete-worker.mjs": "c77b32c4508ed9bf180d91b07083ce511110885fa08a8203fb494c946e13be37",
+  "sorted-journal-delete.test.ts": "b2bb9c9a3e54457fc09024a087ca52bc1e1da400950536fbebd234ba276866bb",
+  "vitest.config.ts": "34b3207482e9033fe3f0fe21bf4728ff532475fea7660c6d3ccea6e9fed4f1bd"
+}
