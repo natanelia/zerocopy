@@ -1,0 +1,18 @@
+{
+  "admission.json": "e5fe3bea6eec1419bf9d53d00635ee1b4d94eccfb176f059d6e0cf56f5b8d95f",
+  "baseline.mjs": "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+  "build-baseline.stderr": "260ce4f31b54f473190c41f8a3378d5911e0a0bae0a731f4ea75f016ce479639",
+  "build-baseline.stdout": "79ccfd2574cb41aae34712b6d91763289750bbe76280c46882fbb1f5a581e527",
+  "build-candidate.stderr": "260ce4f31b54f473190c41f8a3378d5911e0a0bae0a731f4ea75f016ce479639",
+  "build-candidate.stdout": "30c96af2f818ccb50f841dfe9bf720d713f6b2eb7660bd6a87563a06096dd71a",
+  "candidate.mjs": "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+  "commands.json": "9bc0f6f3ab0755bfc71a4b464e01fc6532f81cdb04ff3cd70c355c4114e4f592",
+  "regressions-bun-baseline.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "regressions-bun-baseline.stdout": "848707f2185871400d01f666e016218ecd9cfcdb573266051d4c1e52773539cb",
+  "regressions-bun-candidate.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "regressions-bun-candidate.stdout": "d57b54855e88f29b0f8ef98ece63eea75afa62262aa88613cc63a171ab8694d2",
+  "regressions-node-baseline.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "regressions-node-baseline.stdout": "848707f2185871400d01f666e016218ecd9cfcdb573266051d4c1e52773539cb",
+  "regressions-node-candidate.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "regressions-node-candidate.stdout": "d57b54855e88f29b0f8ef98ece63eea75afa62262aa88613cc63a171ab8694d2"
+}

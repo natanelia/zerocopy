@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "performanceInference": false,
+  "startedUnix": 1792126346.2580543,
+  "commandsStarted": 6,
+  "limits": {
+    "wholeSeconds": 240,
+    "commandSeconds": 30,
+    "cleanupReserveSeconds": 2,
+    "maxCommands": 6,
+    "sampledGroupRssBytes": 1073741824,
+    "minEffectiveAvailableBytes": 2147483648,
+    "sampleIntervalSeconds": 0.05,
+    "hardCgroupCap": false
+  },
+  "sourceManifestSha256": "22b8da9843c3d65dc35efddd68a60271b03d7435a4d70315aa70ad163535246f",
+  "sources": {
+    "METHOD.md": "e8a454f20249783935629a09b49a85b458394df4b4a72c368c7a96ad6154af4c",
+    "README.md": "43803cd1b7c85fd413ac258f561eb8b97f276d2c881bd7721a264b7b4c68825e",
+    "analyze.py": "d49906d71e2e9fb927b499dbe5fb4bd3e63b0105fec3ce50ffae591f1af91241",
+    "dependencies/tsconfig.json": "e74cdfb5eb9e8019be3f2aac1b63394f21b022aca970404527279bf6c6f7855e",
+    "entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+    "headroom.py": "c0bf89d30b15589ed40ef0a7c5f450bc97db1233833b03a499a3412ed60e1a78",
+    "prepare.py": "fd8766c8099cf063a445a20f6947896468d2fcbb81feae1cecdf4e2fb1401364",
+    "regressions.mjs": "3e8d643e155d156b7259618efdb6666ca12a15fde5da402d4503cacf08c6fa24",
+    "run.py": "8215e8bed3c0e3a5aa69060428ba5a1164761ef1d1772ae06370804c56e399a3",
+    "sources/baseline/codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+    "sources/baseline/entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+    "sources/baseline/freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+    "sources/baseline/types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+    "sources/baseline/utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "sources/candidate/codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+    "sources/candidate/entry.ts": "293f133280c9d733a085fb830d66bce3ff789a0494d9b5c4d607d97a45cca304",
+    "sources/candidate/freeze-json.ts": "f12919fb7cf31f2a276b8a83f9b66410dbe24d57314f7c418c67aa7e0a2e568e",
+    "sources/candidate/types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+    "sources/candidate/utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "subject.mjs": "689504f97e2e9d8d1185664885a6f1eaba2a5b8b30a9523f3b61369be3add985"
+  },
+  "methodSha256": "e8a454f20249783935629a09b49a85b458394df4b4a72c368c7a96ad6154af4c",
+  "driverSha256": "689504f97e2e9d8d1185664885a6f1eaba2a5b8b30a9523f3b61369be3add985",
+  "regressionDriverSha256": "3e8d643e155d156b7259618efdb6666ca12a15fde5da402d4503cacf08c6fa24",
+  "tools": {
+    "node": {
+      "path": "$NODE",
+      "sha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+      "version": "v22.16.0",
+      "versionVerification": "exact executable SHA-256 pin"
+    },
+    "bun": {
+      "path": "$BUN",
+      "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+      "version": "1.4.2",
+      "versionVerification": "exact executable SHA-256 pin"
+    }
+  },
+  "headroom": {
+    "effectiveAvailableBytes": 15275978752,
+    "effectiveLimitBytes": 16766414848,
+    "hostTotalBytes": 16766414848,
+    "hostAvailableBytes": 15275978752,
+    "hostLogicalCpuCount": 4,
+    "affinityCpuCount": 4,
+    "effectiveCpuBudget": 4
+  },
+  "compiler": {
+    "runtime": "bun",
+    "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+    "version": "1.4.2",
+    "minified": false,
+    "target": "node",
+    "format": "esm",
+    "tsconfigSha256": "e74cdfb5eb9e8019be3f2aac1b63394f21b022aca970404527279bf6c6f7855e",
+    "argvTemplate": [
+      "$BUN",
+      "build",
+      "entry.ts",
+      "--target=node",
+      "--format=esm",
+      "--tsconfig-override",
+      "$PROOF/dependencies/tsconfig.json",
+      "--outfile",
+      "$ADMISSION/{arm}.mjs"
+    ],
+    "cwdTemplate": "$PROOF/sources/{arm}"
+  },
+  "bundles": {
+    "baseline": {
+      "path": "baseline.mjs",
+      "file": "baseline.mjs",
+      "sha256": "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+      "bytes": 5211
+    },
+    "candidate": {
+      "path": "candidate.mjs",
+      "file": "candidate.mjs",
+      "sha256": "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+      "bytes": 5260
+    }
+  },
+  "regressions": {
+    "node": {
+      "baseline": {
+        "command": "regressions-node-baseline",
+        "result": {
+          "status": "passed",
+          "sourceSha256": "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+          "cases": [
+            "flat-root-identity-values-and-descriptors",
+            "object-values-snapshot-before-push",
+            "first-push-throws-before-parent-freeze",
+            "swallowed-write-uses-inherited-getter",
+            "reentrant-traversal-keeps-separate-stacks",
+            "parent-first-lifo-freeze-order",
+            "values-getter-throws-before-any-push",
+            "parent-freeze-throws-before-child-visit"
+          ],
+          "expectedDifference": {
+            "name": "initial-pop-replacement",
+            "arm": "baseline",
+            "threwSentinel": true,
+            "rootFrozen": false
+          },
+          "performanceInference": false
+        }
+      },
+      "candidate": {
+        "command": "regressions-node-candidate",
+        "result": {
+          "status": "passed",
+          "sourceSha256": "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+          "cases": [
+            "flat-root-identity-values-and-descriptors",
+            "object-values-snapshot-before-push",
+            "first-push-throws-before-parent-freeze",
+            "swallowed-write-uses-inherited-getter",
+            "reentrant-traversal-keeps-separate-stacks",
+            "parent-first-lifo-freeze-order",
+            "values-getter-throws-before-any-push",
+            "parent-freeze-throws-before-child-visit"
+          ],
+          "expectedDifference": {
+            "name": "initial-pop-replacement",
+            "arm": "candidate",
+            "threwSentinel": false,
+            "rootFrozen": true
+          },
+          "performanceInference": false
+        }
+      }
+    },
+    "bun": {
+      "baseline": {
+        "command": "regressions-bun-baseline",
+        "result": {
+          "status": "passed",
+          "sourceSha256": "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+          "cases": [
+            "flat-root-identity-values-and-descriptors",
+            "object-values-snapshot-before-push",
+            "first-push-throws-before-parent-freeze",
+            "swallowed-write-uses-inherited-getter",
+            "reentrant-traversal-keeps-separate-stacks",
+            "parent-first-lifo-freeze-order",
+            "values-getter-throws-before-any-push",
+            "parent-freeze-throws-before-child-visit"
+          ],
+          "expectedDifference": {
+            "name": "initial-pop-replacement",
+            "arm": "baseline",
+            "threwSentinel": true,
+            "rootFrozen": false
+          },
+          "performanceInference": false
+        }
+      },
+      "candidate": {
+        "command": "regressions-bun-candidate",
+        "result": {
+          "status": "passed",
+          "sourceSha256": "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+          "cases": [
+            "flat-root-identity-values-and-descriptors",
+            "object-values-snapshot-before-push",
+            "first-push-throws-before-parent-freeze",
+            "swallowed-write-uses-inherited-getter",
+            "reentrant-traversal-keeps-separate-stacks",
+            "parent-first-lifo-freeze-order",
+            "values-getter-throws-before-any-push",
+            "parent-freeze-throws-before-child-visit"
+          ],
+          "expectedDifference": {
+            "name": "initial-pop-replacement",
+            "arm": "candidate",
+            "threwSentinel": false,
+            "rootFrozen": true
+          },
+          "performanceInference": false
+        }
+      }
+    }
+  },
+  "commands": [
+    {
+      "label": "build-baseline",
+      "argv": [
+        "$BUN",
+        "build",
+        "entry.ts",
+        "--target=node",
+        "--format=esm",
+        "--tsconfig-override",
+        "$PROOF/dependencies/tsconfig.json",
+        "--outfile",
+        "$ADMISSION/baseline.mjs"
+      ],
+      "cwd": "$PROOF/sources/baseline",
+      "startedUnix": 1792126346.4264393,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 0,
+      "peakObservedProcessHwmBytes": 0,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2454,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 21868544,
+      "stdout": {
+        "file": "build-baseline.stdout",
+        "sha256": "79ccfd2574cb41aae34712b6d91763289750bbe76280c46882fbb1f5a581e527",
+        "bytes": 66
+      },
+      "stderr": {
+        "file": "build-baseline.stderr",
+        "sha256": "260ce4f31b54f473190c41f8a3378d5911e0a0bae0a731f4ea75f016ce479639",
+        "bytes": 149
+      },
+      "endedUnix": 1792126346.4653883,
+      "elapsedSecondsForSafety": 0.03810537199998976,
+      "failure": null
+    },
+    {
+      "label": "build-candidate",
+      "argv": [
+        "$BUN",
+        "build",
+        "entry.ts",
+        "--target=node",
+        "--format=esm",
+        "--tsconfig-override",
+        "$PROOF/dependencies/tsconfig.json",
+        "--outfile",
+        "$ADMISSION/candidate.mjs"
+      ],
+      "cwd": "$PROOF/sources/candidate",
+      "startedUnix": 1792126346.770606,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 0,
+      "peakObservedProcessHwmBytes": 0,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2460,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 21884928,
+      "stdout": {
+        "file": "build-candidate.stdout",
+        "sha256": "30c96af2f818ccb50f841dfe9bf720d713f6b2eb7660bd6a87563a06096dd71a",
+        "bytes": 67
+      },
+      "stderr": {
+        "file": "build-candidate.stderr",
+        "sha256": "260ce4f31b54f473190c41f8a3378d5911e0a0bae0a731f4ea75f016ce479639",
+        "bytes": 149
+      },
+      "endedUnix": 1792126346.7991252,
+      "elapsedSecondsForSafety": 0.027515116999992983,
+      "failure": null
+    },
+    {
+      "label": "regressions-node-baseline",
+      "argv": [
+        "$NODE",
+        "$PROOF/regressions.mjs",
+        "$ADMISSION/baseline.mjs",
+        "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+        "baseline"
+      ],
+      "cwd": "$PROOF",
+      "startedUnix": 1792126347.0996048,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 30670848,
+      "peakObservedProcessHwmBytes": 30670848,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2466,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 49340416,
+      "stdout": {
+        "file": "regressions-node-baseline.stdout",
+        "sha256": "848707f2185871400d01f666e016218ecd9cfcdb573266051d4c1e52773539cb",
+        "bytes": 574
+      },
+      "stderr": {
+        "file": "regressions-node-baseline.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "endedUnix": 1792126347.1820312,
+      "elapsedSecondsForSafety": 0.08141521200001023,
+      "failure": null
+    },
+    {
+      "label": "regressions-node-candidate",
+      "argv": [
+        "$NODE",
+        "$PROOF/regressions.mjs",
+        "$ADMISSION/candidate.mjs",
+        "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+        "candidate"
+      ],
+      "cwd": "$PROOF",
+      "startedUnix": 1792126347.4807916,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 32620544,
+      "peakObservedProcessHwmBytes": 32620544,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2477,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 49344512,
+      "stdout": {
+        "file": "regressions-node-candidate.stdout",
+        "sha256": "d57b54855e88f29b0f8ef98ece63eea75afa62262aa88613cc63a171ab8694d2",
+        "bytes": 575
+      },
+      "stderr": {
+        "file": "regressions-node-candidate.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "endedUnix": 1792126347.5704446,
+      "elapsedSecondsForSafety": 0.08836007600000073,
+      "failure": null
+    },
+    {
+      "label": "regressions-bun-baseline",
+      "argv": [
+        "$BUN",
+        "$PROOF/regressions.mjs",
+        "$ADMISSION/baseline.mjs",
+        "c8de925fa2b9f00ad495fef6170ab58ec6489067bf674f575f1bc19cda018c56",
+        "baseline"
+      ],
+      "cwd": "$PROOF",
+      "startedUnix": 1792126347.8678904,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 19943424,
+      "peakObservedProcessHwmBytes": 19943424,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2488,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 31002624,
+      "stdout": {
+        "file": "regressions-bun-baseline.stdout",
+        "sha256": "848707f2185871400d01f666e016218ecd9cfcdb573266051d4c1e52773539cb",
+        "bytes": 574
+      },
+      "stderr": {
+        "file": "regressions-bun-baseline.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "endedUnix": 1792126347.9528441,
+      "elapsedSecondsForSafety": 0.08401504699999407,
+      "failure": null
+    },
+    {
+      "label": "regressions-bun-candidate",
+      "argv": [
+        "$BUN",
+        "$PROOF/regressions.mjs",
+        "$ADMISSION/candidate.mjs",
+        "e7f026562d0a3235ca9a9f2494c3b1f58fa890e83cb4dc2b66033654204da9d5",
+        "candidate"
+      ],
+      "cwd": "$PROOF",
+      "startedUnix": 1792126348.2520366,
+      "wallSeconds": 30,
+      "cleanupReserveSeconds": 2,
+      "sampledGroupRssLimitBytes": 1073741824,
+      "sampleIntervalSeconds": 0.05,
+      "hardCgroupCap": false,
+      "peakObservedGroupRssBytes": 19816448,
+      "peakObservedProcessHwmBytes": 19816448,
+      "cleanupSignals": [],
+      "leaderReaped": true,
+      "descendantsAfterCleanup": [],
+      "pathLabelsAppliedToLogs": true,
+      "ownedProcessGroup": 2494,
+      "descendantsBeforeCleanup": [],
+      "exitCode": 0,
+      "wait4MaxRssBytes": 31068160,
+      "stdout": {
+        "file": "regressions-bun-candidate.stdout",
+        "sha256": "d57b54855e88f29b0f8ef98ece63eea75afa62262aa88613cc63a171ab8694d2",
+        "bytes": 575
+      },
+      "stderr": {
+        "file": "regressions-bun-candidate.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "endedUnix": 1792126348.337372,
+      "elapsedSecondsForSafety": 0.08388154299998973,
+      "failure": null
+    }
+  ],
+  "endedUnix": 1792126348.4862297,
+  "elapsedSecondsForSafety": 2.228215782999996,
+  "ownedGroupUnreaped": false
+}

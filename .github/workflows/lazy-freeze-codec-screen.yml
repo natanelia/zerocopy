@@ -1,0 +1,57 @@
+name: Lazy freezeJSON compiled-codec latency screen
+
+on:
+  push:
+    branches: [proof/lazy-freeze-codec-screen-20261016]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    if: github.ref == 'refs/heads/proof/lazy-freeze-codec-screen-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Consume reviewed sealed artifacts and run the fixed screen once
+        env:
+          EVIDENCE_DIRECTORY: ${{ runner.temp }}/lazy-freeze-codec-screen-evidence
+          PYTHONDONTWRITEBYTECODE: '1'
+          CI: '1'
+          NO_COLOR: '1'
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test -f proofs/lazy-freeze-worklist/artifacts/admission.json
+          test -f proofs/lazy-freeze-worklist/artifacts/ARTIFACT-SEAL.json
+          test -f proofs/lazy-freeze-worklist/artifacts/baseline.mjs
+          test -f proofs/lazy-freeze-worklist/artifacts/candidate.mjs
+          python3 proofs/lazy-freeze-worklist/run.py \
+            proofs/lazy-freeze-worklist \
+            proofs/lazy-freeze-worklist/artifacts \
+            "$EVIDENCE_DIRECTORY" \
+            --node "$(command -v node)" \
+            --bun "$(command -v bun)"
+      - name: Preserve partial or complete evidence and exact source packet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lazy-freeze-codec-screen-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/lazy-freeze-codec-screen-evidence/
+            proofs/lazy-freeze-worklist/
+            .github/workflows/lazy-freeze-codec-screen.yml
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
