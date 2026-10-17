@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run "--maxWorkers=1" numeric.test.ts numeric-spatial.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/736c0a2657a3/zerocopy-numeric
+
+
+ Test Files  2 passed (2)
+      Tests  52 passed (52)
+   Start at  09:23:05
+   Duration  2.74s (transform 182ms, setup 0ms, import 228ms, tests 2.41s, environment 0ms)
+

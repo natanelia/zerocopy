@@ -1,0 +1,488 @@
+{
+  "runId": 38998487385,
+  "prHeadCommit": "85eee3354b85f8d7d6121a72579ddc8e06a57112",
+  "testedMergeCommit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "method": "Original v1 same-process method. Recompute each speedup from raw batch medians. Keep all cases and failed cohorts.",
+  "aaInterval": [
+    0.95,
+    1.0526315789473684
+  ],
+  "abLimits": {
+    "allRowsAtLeast": 0.95,
+    "largeSimdAndPublicRangeStrictlyAbove": 1.05,
+    "largeMinimumValues": 1024
+  },
+  "performanceAccepted": false,
+  "architectures": [
+    {
+      "arch": "x64",
+      "archive": "numeric-tree-x64-second.zip",
+      "archiveSha256": "953e91c8a2b6c371dedaff6454794a616ddc098086327e874e48841fbf5fb255",
+      "aa": [
+        {
+          "run": "1-node-a-b",
+          "rows": 21,
+          "runtime": "node",
+          "version": "v22.23.3",
+          "failures": [
+            {
+              "name": "range-simd",
+              "size": 1,
+              "speedup": 0.9217456651782567,
+              "ms": {
+                "baseline": 13.685828000000129,
+                "candidate": 14.847726999999963
+              }
+            }
+          ]
+        },
+        {
+          "run": "2-bun-a-b",
+          "rows": 21,
+          "runtime": "bun",
+          "version": "1.4.2",
+          "failures": [
+            {
+              "name": "range-public",
+              "size": 1,
+              "speedup": 2.0845596323240696,
+              "ms": {
+                "baseline": 13.265854000000218,
+                "candidate": 6.363863999999921
+              }
+            }
+          ]
+        },
+        {
+          "run": "3-node-b-a",
+          "rows": 21,
+          "runtime": "node",
+          "version": "v22.23.3",
+          "failures": []
+        },
+        {
+          "run": "4-bun-b-a",
+          "rows": 21,
+          "runtime": "bun",
+          "version": "1.4.2",
+          "failures": [
+            {
+              "name": "range-public",
+              "size": 1,
+              "speedup": 2.040952784721364,
+              "ms": {
+                "baseline": 12.978679999999713,
+                "candidate": 6.359128000000055
+              }
+            },
+            {
+              "name": "point-simd-control",
+              "size": 2,
+              "speedup": 0.9406043253838451,
+              "ms": {
+                "baseline": 9.072536000001492,
+                "candidate": 9.645433000001503
+              }
+            },
+            {
+              "name": "range-simd",
+              "size": 32,
+              "speedup": 0.9456409847764564,
+              "ms": {
+                "baseline": 3.7737429999997403,
+                "candidate": 3.990671999999904
+              }
+            },
+            {
+              "name": "range-scalar",
+              "size": 32,
+              "speedup": 1.2547841668900621,
+              "ms": {
+                "baseline": 9.055559000000358,
+                "candidate": 7.216825999999855
+              }
+            }
+          ]
+        }
+      ],
+      "ab": [
+        {
+          "runtime": "node",
+          "version": "v22.23.3",
+          "rows": 48,
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "failures": [],
+          "source": {
+            "baseline": {
+              "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+              "files": {
+                "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "candidate": {
+              "commit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+              "files": {
+                "numeric-kernels.as.ts": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "driver": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+          }
+        },
+        {
+          "runtime": "bun",
+          "version": "1.4.2",
+          "rows": 48,
+          "cpu": "AMD EPYC 9V45 96-Core Processor",
+          "failures": [
+            {
+              "name": "range-public",
+              "size": 33,
+              "speedup": 0.8862456936026983,
+              "ms": {
+                "baseline": 4.9180450000003475,
+                "candidate": 5.549301999999443
+              }
+            },
+            {
+              "name": "range-public",
+              "size": 32768,
+              "speedup": 1.0393749767667657,
+              "ms": {
+                "baseline": 2.096965000000637,
+                "candidate": 2.0175249999992957
+              }
+            },
+            {
+              "name": "range-public",
+              "size": 32801,
+              "speedup": 0.9424272898724707,
+              "ms": {
+                "baseline": 2.1432050000003073,
+                "candidate": 2.274133000000802
+              }
+            }
+          ],
+          "source": {
+            "baseline": {
+              "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+              "files": {
+                "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "candidate": {
+              "commit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+              "files": {
+                "numeric-kernels.as.ts": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "driver": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+          }
+        }
+      ],
+      "workers": {
+        "node": "Numeric tree worker proof passed: partial depth-three tree, IEEE values, retained snapshots, fork, and memory growth.",
+        "bun": "Numeric tree worker proof passed: partial depth-three tree, IEEE values, retained snapshots, fork, and memory growth."
+      },
+      "testSummary": [
+        "Test Files  50 passed (50)",
+        "Tests  1062 passed (1062)",
+        "Duration  35.29s (transform 928ms, setup 0ms, import 1.95s, tests 124.03s, environment 7ms)"
+      ],
+      "browser": {
+        "rows": 24,
+        "allOk": true,
+        "allGrowth": true,
+        "engineVersions": [
+          [
+            "chromium",
+            "153.0.8010.12"
+          ],
+          [
+            "firefox",
+            "155.0"
+          ],
+          [
+            "webkit",
+            "26.6"
+          ]
+        ],
+        "kernelRows": 12,
+        "kernelChecks": 7236,
+        "workerRows": 12,
+        "workerScans": 36864,
+        "baselineLimitRows": []
+      }
+    },
+    {
+      "arch": "arm64",
+      "archive": "numeric-tree-arm64-second.zip",
+      "archiveSha256": "10096611d910f04d6eb05a79d66525f20dfd447ec998c9fe539f97caf6a4609e",
+      "aa": [
+        {
+          "run": "1-node-a-b",
+          "rows": 21,
+          "runtime": "node",
+          "version": "v22.23.3",
+          "failures": []
+        },
+        {
+          "run": "2-bun-a-b",
+          "rows": 21,
+          "runtime": "bun",
+          "version": "1.4.2",
+          "failures": []
+        },
+        {
+          "run": "3-node-b-a",
+          "rows": 21,
+          "runtime": "node",
+          "version": "v22.23.3",
+          "failures": [
+            {
+              "name": "range-public",
+              "size": 1,
+              "speedup": 0.8547634430266406,
+              "ms": {
+                "baseline": 19.286949000001187,
+                "candidate": 22.564077999999427
+              }
+            }
+          ]
+        },
+        {
+          "run": "4-bun-b-a",
+          "rows": 21,
+          "runtime": "bun",
+          "version": "1.4.2",
+          "failures": [
+            {
+              "name": "range-simd",
+              "size": 2,
+              "speedup": 1.0583924500774597,
+              "ms": {
+                "baseline": 22.004358999999567,
+                "candidate": 20.790358999999626
+              }
+            }
+          ]
+        }
+      ],
+      "ab": [
+        {
+          "runtime": "node",
+          "version": "v22.23.3",
+          "rows": 48,
+          "cpu": "unknown",
+          "failures": [],
+          "source": {
+            "baseline": {
+              "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+              "files": {
+                "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "candidate": {
+              "commit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+              "files": {
+                "numeric-kernels.as.ts": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "driver": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+          }
+        },
+        {
+          "runtime": "bun",
+          "version": "1.4.2",
+          "rows": 48,
+          "cpu": "unknown",
+          "failures": [
+            {
+              "name": "range-scalar",
+              "size": 33,
+              "speedup": 0.9204535152602755,
+              "ms": {
+                "baseline": 11.056760999999824,
+                "candidate": 12.012296999999307
+              }
+            }
+          ],
+          "source": {
+            "baseline": {
+              "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+              "files": {
+                "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "candidate": {
+              "commit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+              "files": {
+                "numeric-kernels.as.ts": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3",
+                "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+                "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+                "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+                "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+              },
+              "dist": {
+                "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+                "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+                "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+                "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+                "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+                "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+                "numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+                "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+                "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+                "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+                "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+                "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+              }
+            },
+            "driver": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+          }
+        }
+      ],
+      "workers": {
+        "node": "Numeric tree worker proof passed: partial depth-three tree, IEEE values, retained snapshots, fork, and memory growth.",
+        "bun": "Numeric tree worker proof passed: partial depth-three tree, IEEE values, retained snapshots, fork, and memory growth."
+      },
+      "testSummary": [
+        "Test Files  50 passed (50)",
+        "Tests  1062 passed (1062)",
+        "Duration  33.85s (transform 1.11s, setup 0ms, import 2.13s, tests 113.62s, environment 9ms)"
+      ]
+    }
+  ],
+  "totals": {
+    "aaRows": 168,
+    "aaFailures": 8,
+    "abRows": 192,
+    "abFailures": 4
+  }
+}

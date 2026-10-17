@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { describe, expect, it } from 'vitest';
 import { bboxXY } from './geometry';
 import { SharedList, resetSharedList } from './shared-list';
@@ -27,7 +28,9 @@ describe('bboxXY', () => {
     expect(bboxXY(attached)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(p)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(newer)).toEqual([-99, 0, 4, 4]);
-    expect(new Uint8Array(memory.buffer)).toEqual(before);
+    const after = Buffer.from(memory.buffer);
+    expect(after.byteLength).toBe(before.byteLength);
+    expect(after.equals(before)).toBe(true);
   });
   it('keeps old arenas and separate kernel instances independent', () => {
     const old = new SharedList('number').pushMany([0, 1, 2, 3]);

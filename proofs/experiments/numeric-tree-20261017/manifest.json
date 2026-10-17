@@ -1,0 +1,729 @@
+{
+  "version": 2,
+  "kind": "current-file-inventory",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "sourceParent": "906eaf1d9ca4751244631695900335d1f78f2017",
+  "notes": [
+    "This inventories the staged source, not a performance acceptance decision.",
+    "The inventory excludes itself to avoid a recursive digest.",
+    "manifest-before-stage4.json preserves the superseded inventory verbatim. Its entries do not describe the current tree.",
+    "Historical test outcomes and generated-binary digests stay with their original stage reports and hosted artifacts."
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/numeric-tree-performance.yml",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 6722,
+      "sha256": "a08175fbca4fed62cee642f054749c6771d53dc647f355e73e6e7821e9dd046f"
+    },
+    {
+      "path": "geometry.test.ts",
+      "status": "modified",
+      "mode": "100644",
+      "bytes": 2118,
+      "sha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+    },
+    {
+      "path": "numeric-kernels.as.ts",
+      "status": "modified",
+      "mode": "100644",
+      "bytes": 2618,
+      "sha256": "a28385fe2041023ae45d4e6acd82911545825e76c18040ac19085651f79fccc4"
+    },
+    {
+      "path": "numeric.test.ts",
+      "status": "modified",
+      "mode": "100644",
+      "bytes": 9142,
+      "sha256": "7460fa383c69ad1c0e4b11c1527244634eadd1609d7486777ba17e4c055e02be"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/METHOD-REPAIR.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1154,
+      "sha256": "19bea28c947b4d97ba75d1bf135c39da2e26bf713d563b55690c734d6bdfc8d2"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/PROCESS-METHOD.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4038,
+      "sha256": "43a894648d89a4b48b00059aae81c3c21edbb72c2bd2b499db19075fa3c48740"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/PROCESS-RECOVERY-RESULTS.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 5286,
+      "sha256": "544829e19d2cba8d1045337d7b7f508f193e4ff7157cdd0ff69b18e303e7ea24"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/README.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 5997,
+      "sha256": "c3c49bac1e59d66d9d972db80a4931936c191c6a9b4f4b436e09ad6dda604c08"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/REPORT.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 18116,
+      "sha256": "df3bce77d3fd8679906f499e6cfc9a043f4035b2ed36abcc70bd783995ad3ef9"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/SIZE-PROCESS-METHOD.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2539,
+      "sha256": "1166f56128e7903dc4d5747d8e95605347a5b976cf27cf611cae402a71e027ca"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/STAGE4.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 5992,
+      "sha256": "d32adced76eeb847784b1ebdd0b8b7c7fa95908d50ecadbc482a3bf56748ab43"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/baseline.as.ts",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1695,
+      "sha256": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-arm64-first.zip",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 143775,
+      "sha256": "b88b7637e96bb76e5301a2c3dc8c29052e86afecee702759e8453b7223dc249c"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-x64-first.zip",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 148193,
+      "sha256": "d12001e8add59df3b446711984952409631525114a70948f99b7bee005b6b728"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/origin.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1209,
+      "sha256": "250e4f101eadf4a16eefb80d87305ffd27b90919879eb565e6ed08e9442439fe"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-process-run6/summary.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 13047,
+      "sha256": "9203d4beb6ec5f436787fdea53d4fdf0683d838952b137efbb4259aa7dca3b62"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/ASSERTION-REPAIR.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3688,
+      "sha256": "f898731ee68682d5a5e86474d1276d111972f1298d5165ed9f017b403366eb71"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/build-alias-restoration.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1724,
+      "sha256": "8d0703f751141374a82f1a5cd8105636362f391b9ef10306cf6d0a9f02839977"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/failed-files-after-aliases-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 712,
+      "sha256": "cb6adfa9c3ca86f39fc2b5c6af7767458826d3cc2ce3c87b46f97249f95e33d0"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/failed-files-after-aliases.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 325,
+      "sha256": "6dc1dac10d88050809ec200b47c5d1ad56a05077f00bcd555059ce3f7763ba85"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/focused-tests-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 623,
+      "sha256": "fdd19e863e659ac93dada61ab59a207c4644e15b8aaacead93c2ddc0494d8000"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/focused-tests.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 339,
+      "sha256": "5292e16539d92b68af15d330601fdb8bf0f2d5037cc22a23a694d4eada602981"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-after-aliases-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 654,
+      "sha256": "fa65851769f37bc7bf6201d53b1e209808907afb1214b641bd1e2de0f728dafd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-after-aliases.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 292,
+      "sha256": "2b10576f0143b409b9a992c5ce69947e14f7a1859c1e5bf79aadda94332b8ddd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 542,
+      "sha256": "7390db970c39087ee00c3036f277cd239eb0d1c448ae79118969a786c383226f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 6277,
+      "sha256": "8c373542f537ba24dead0e15423a675eddcff545d18e605eda7baf0e0c419c18"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/geometry-before-buffer-equality.test.ts.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1994,
+      "sha256": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/geometry-buffer-equality.test.ts.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2118,
+      "sha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296190799.log",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 38996,
+      "sha256": "b6275f4782ff1ced2889ecf68477b2aa0352b88b8c66e6a48221910f297c512d"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296191012.log",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 38523,
+      "sha256": "51a5c0d2f8281303a6407ea90181d0f99c31edd590be9e2e1b89e43423fabe47"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296191057.log",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 39911,
+      "sha256": "f77f917117febc6e67336fae0a6b5454edc1c7bbab6f4cb52291fde660de2722"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/origin.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2992,
+      "sha256": "c1084fc4434a5104babd35cf41b79e594fb8b5e8c5e9570c8fefe29843db1267"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-final-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 737,
+      "sha256": "277c684c7773ce74b19f964fc510037a826683be63aa152cb75522e4f34bf66a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-final.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 148,
+      "sha256": "66ab6507b447c340bcc88ba2b10410858b5c48ac9b07aa99318486485eb2bddb"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 632,
+      "sha256": "370b8a3cc5133187ce1e0e84a047a1f927791ef3086ef94188451883ac140229"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 148,
+      "sha256": "588fe4a626b1e08ab875c7167d77a08dd09db6ba399ddb4be83e97e842f7fc1a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/validation-runtime.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 422,
+      "sha256": "04427ea7e96ffd7ae7127fc1a6baaed838d2438a1031cfb81c427b63c79c471e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/SUMMARY.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3885,
+      "sha256": "bbdfc328fd59773498f0b60373f3ada067d26e37c62ad77fd0a08f645002f434"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/job-status.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7681,
+      "sha256": "4883a22d946e822f549a10993a173b6da9f4f5ad40e197174b7057f4db963d50"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/numeric-tree-arm64-second.zip",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 144712,
+      "sha256": "10096611d910f04d6eb05a79d66525f20dfd447ec998c9fe539f97caf6a4609e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/numeric-tree-x64-second.zip",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 149086,
+      "sha256": "953e91c8a2b6c371dedaff6454794a616ddc098086327e874e48841fbf5fb255"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/origin.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 996,
+      "sha256": "1b4840b97ad568643ba6160d9892823c147638dd889fe01e10a3d008c53b7c8e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/summary.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 23975,
+      "sha256": "73b6706c7a13341b23914953a22e2d5d8dfb6959634773960fdd06c06534afe7"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-third/REVIEW.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1954,
+      "sha256": "6d55b5fdf8dedc67c7b93071bacb12a9cf4098a950f2d50a40881c80675fea08"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/manifest-before-stage4.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 36717,
+      "sha256": "0f01fe45460f510711965e5c167de9f1f1a00bac40fef444b53f7545c86ce908"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/method-v1-benchmark.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 9356,
+      "sha256": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/method-v2-workflow.yml.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4680,
+      "sha256": "54042c8aecd8504d5b4b401563c8c81d54df6ca9ca6a36feb1ad0002dd13d9ec"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-before-private-arena.test.ts.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7440,
+      "sha256": "05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-private-arena.test.ts.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7495,
+      "sha256": "f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-spatial.as.ts",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1473,
+      "sha256": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/pipeline-failure-check.sh",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 156,
+      "sha256": "e7754ebaadccd254f4d104ec7e7d682b76b478219e4159445d9253a916c55486"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/process-method-v1.mjs.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 14981,
+      "sha256": "cc0261dc03e50b2c91ff4044493084929d5716dbdd7a1467d981a1ba2cc75de2"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/pipeline-status-check.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 1399,
+      "sha256": "0288d7e02b3f6dcf986368c4370664e94ecd1be9c847c02639576dd33e18872f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/private-arena-focused-tests.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 339,
+      "sha256": "57d374fbcade1663641383ae0147972fc4490e28bc4468e0dccbfed7ee744962"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-bun-screen.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 33886,
+      "sha256": "1844f44360f09dac64d6bde1eba30097a93c2b49e517910d58e18f32761a5903"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-node-screen.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 33839,
+      "sha256": "edb0780dca30234a27cda8784e881a994de75267f8085e65968a4dd27991244c"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-wasm-bodies.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3046,
+      "sha256": "392995bde62fe018eb39ff0f146327216e7e302bc7cdf01185cee8c1a549e0e3"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-bun-screen.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 52360,
+      "sha256": "24fe3df5304b35aec4a2a3c1d79c6184433cfccfb0899e3df4d88cbc00672ebd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-node-screen.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 52312,
+      "sha256": "dde590d9a3acfb05bcb8812849d2355c86a76d4d4fbd83d3f426a79e96bc8b6a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-tests.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 339,
+      "sha256": "7a9b57c63066a0e681b3a30da315ba0d771326e3b86bc73b98fecf80b7415250"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa-controller.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2946,
+      "sha256": "7d7a6c709327f92f246fe2367479aa35d6f7b5374e0c4a34a89b202d011e38d4"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 68666,
+      "sha256": "3bf0af9b806f73696f521a2bd82c7fae8f29bcb94a4e3165b56c0785a64affb1"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4184,
+      "sha256": "9a9b18ce105410fc61d14ffd16396efdf6cad7df0bd757b155bbfebc8c891aa6"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 68921,
+      "sha256": "dc8856bf438d03417d4cea66346b437b25a6c8bec1edbe9a62460699fec2d827"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4188,
+      "sha256": "92db81bbe6627d66063f6a2206e7284cb6a46e164a1a8595df3c293c8390e28a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 68733,
+      "sha256": "561349629fa8e74d63226583989bbd47a860baeda818d975ce0b452fe5d5c319"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4185,
+      "sha256": "57658fae86a20744f72e4f8ff798def494257750445713b1664fe9a22f130724"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 68925,
+      "sha256": "addfc507ec774753331bc08fa09d0d28e0ab3bd8345ad59d10ffc442b0ebbeaf"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4186,
+      "sha256": "6af565d6f68b32c99e4837d71b7c5dea5e8b9200beacae1c85e880b8aeba3aa7"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/cohort.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 5090,
+      "sha256": "1084d05ed4adb1851dc5703df4f2b87ce3309d53be22b3d6a73c5a826998f63f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 110450,
+      "sha256": "37a5b2d162ec794da8542b8d81cd09de1057ad6b4597b787ae42cc9fc15eb1ec"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 10538,
+      "sha256": "f0c6d30c21c8896b2b72d1a64f88bcf1143c0ea3628bb07b7a07115e1461e151"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-worker.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 110194,
+      "sha256": "3b167544b683b3eed83d7a8e83a87dda587ef47c368ac8a0d73c52883824c876"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 9918,
+      "sha256": "415b34a9fff8b366bdca1bc084f6c4f59dca50106058633bd4c049cd8d115892"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-worker.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-review-tests.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 339,
+      "sha256": "9129648492de82c3527e0ab20dd62536a717e1a3bc2194f380e1ccd68d432044"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-tests.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 339,
+      "sha256": "e388e30ba11b66cafd263fcd911d665fe1252df21eb926d688751c96db1f6c59"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-wasm-bodies.json",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7314,
+      "sha256": "29f829c26b8dc879b13103a6f39f1acf1a029bd3ae87ac8fc6c046b4cc0d6e56"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/size-process-v1.mjs.source",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4257,
+      "sha256": "af4a3422d477fadc6021810b487efc0bbb6b888185f55c8636ac10853adfb957"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1-benchmark.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 8653,
+      "sha256": "f26c5a44ab69591a96e6d00f28d206a2f3d4d31a82c31e557d2425f8aadb717a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1.as.ts",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2930,
+      "sha256": "fa7d635b30f8b3757c50e697f45d9641015f19e824a5b7f8a4c0770837d7c8dd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1.wat",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 6963,
+      "sha256": "7cdc99c0b6c252e9e2023e36d392b955abb297cb652917931f50308c314c23ff"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2-benchmark.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 8899,
+      "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2.as.ts",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3264,
+      "sha256": "37429133d4b835f6d907f50aa7a50ca340f1b46b4d9e848fc2ecf0b85cfca1ef"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2.wat",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7923,
+      "sha256": "a36f44d8c448e201d529052d775c11285a8211578f9fd188536e4b3458a77622"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3-benchmark.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 8899,
+      "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3.as.ts",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2392,
+      "sha256": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3.wat",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7988,
+      "sha256": "c2469955851bdb3632dc4cefbaecd214632d65bc59b65bc1c04629c6925a804a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage4-local/baseline-fixture-check.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 114,
+      "sha256": "c961789965f8f6cd84de5ca1ae060cf7dc71250f7a0edbbafba15ac28eb5a30b"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage4-local/proof-tests-final.txt",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7543,
+      "sha256": "3d6df0378ece627ff25e789a90baff245199c335c5139e6a0f1f056536dd805c"
+    },
+    {
+      "path": "proofs/numeric-tree-aa.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4471,
+      "sha256": "72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480"
+    },
+    {
+      "path": "proofs/numeric-tree-benchmark.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 9600,
+      "sha256": "cda8d17eb2ee7a91d54c0c8c8147e09a5dc5819893c649ff4e67f978136366d8"
+    },
+    {
+      "path": "proofs/numeric-tree-browsers.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 14869,
+      "sha256": "ae96b01092f4cfc30e211a3457413fd350c044b19dc2a698bb56327d06e6a8bf"
+    },
+    {
+      "path": "proofs/numeric-tree-gate.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2208,
+      "sha256": "a71bb5843c3b44c569b93f33659a56c8af05e7d2985020a75057e8c0c7f47b30"
+    },
+    {
+      "path": "proofs/numeric-tree-manifest.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 4342,
+      "sha256": "d0159ecd20fb5c1e364c0abd7980244312b0efb2a86bb5ff12f4c49b65eb2e8c"
+    },
+    {
+      "path": "proofs/numeric-tree-manifest.node.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 6067,
+      "sha256": "fa7e685a3a9d69b9dc8a3bcae0b7dedaadce7567de08e26e4c66aff8e0867207"
+    },
+    {
+      "path": "proofs/numeric-tree-process.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 15190,
+      "sha256": "d10d8f237d9e873d816d547d4edb22cc38b48678e7a8103edf7dde61a5676a39"
+    },
+    {
+      "path": "proofs/numeric-tree-process.node.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 6160,
+      "sha256": "0d76f1b91d400184d7c49819b2c0a0e443384f0867669e3e3e640e16c1d3cda8"
+    },
+    {
+      "path": "proofs/numeric-tree-size-process.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 5405,
+      "sha256": "d8eb6c399e475b61a72abeb62b9c87d963319f4a319ab8e5cfc92bbe875e75a5"
+    },
+    {
+      "path": "proofs/numeric-tree-toolkit.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3209,
+      "sha256": "e4fd28b17e7776c6cda92c2f269ef1857d92497acc0211ac4d41b9a3e9b99122"
+    },
+    {
+      "path": "proofs/numeric-tree-worker.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 3088,
+      "sha256": "6697d70d62c8fab2ffbcaf8d85c787cbcbe9e49b975867a2e9bbcd2e2fffb0a0"
+    }
+  ]
+}

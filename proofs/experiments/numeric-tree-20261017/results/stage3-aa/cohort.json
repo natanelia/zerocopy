@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-17T02:18:22.559Z",
+  "source": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "bundles": "/tmp/zerocopy-numeric-aa-ETSYqk",
+  "manifest": {
+    "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+    "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c",
+    "dist/chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+    "dist/chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+    "dist/chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+    "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+    "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+    "dist/geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+    "dist/numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+    "dist/redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+    "dist/shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+    "dist/state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+    "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+    "dist/worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+  },
+  "driver": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff",
+  "controller": "72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480",
+  "schedule": [
+    {
+      "runtime": "node",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+      "left": "a",
+      "right": "b"
+    },
+    {
+      "runtime": "bun",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+      "left": "a",
+      "right": "b"
+    },
+    {
+      "runtime": "node",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+      "left": "b",
+      "right": "a"
+    },
+    {
+      "runtime": "bun",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+      "left": "b",
+      "right": "a"
+    }
+  ],
+  "warmup": 25,
+  "samples": 31,
+  "work": 8000000,
+  "sizes": [
+    1,
+    2,
+    32,
+    1024
+  ],
+  "method": "Same stage-3 bundle in two clean neutral directories; swap the directory roles on the second run of each runtime. Any ratio outside [0.95, 1/0.95] detects a greater-than-5% A/A shift. This does not change the production acceptance gate.",
+  "rows": [
+    {
+      "name": "1-node-a-b",
+      "runtime": "node",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+      "left": "a",
+      "right": "b",
+      "status": 0,
+      "failures": [
+        {
+          "name": "range-scalar",
+          "size": 2,
+          "speedup": 0.9385580761329805,
+          "pairedMedian": 0.940990261326684
+        },
+        {
+          "name": "range-public",
+          "size": 2,
+          "speedup": 1.0785435988585201,
+          "pairedMedian": 1.0715644559181228
+        },
+        {
+          "name": "range-simd",
+          "size": 1024,
+          "speedup": 1.1737191563762783,
+          "pairedMedian": 1.1366282133199155
+        }
+      ]
+    },
+    {
+      "name": "2-bun-a-b",
+      "runtime": "bun",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+      "left": "a",
+      "right": "b",
+      "status": 0,
+      "failures": [
+        {
+          "name": "range-simd",
+          "size": 2,
+          "speedup": 1.0573302333566805,
+          "pairedMedian": 1.0652572260743935
+        }
+      ]
+    },
+    {
+      "name": "3-node-b-a",
+      "runtime": "node",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+      "left": "b",
+      "right": "a",
+      "status": 0,
+      "failures": [
+        {
+          "name": "range-scalar",
+          "size": 2,
+          "speedup": 0.9377829637999826,
+          "pairedMedian": 0.9341928568912352
+        },
+        {
+          "name": "range-public",
+          "size": 2,
+          "speedup": 1.0663140161989788,
+          "pairedMedian": 1.0584458521955349
+        }
+      ]
+    },
+    {
+      "name": "4-bun-b-a",
+      "runtime": "bun",
+      "executable": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+      "left": "b",
+      "right": "a",
+      "status": 0,
+      "failures": [
+        {
+          "name": "point-simd-control",
+          "size": 2,
+          "speedup": 0.9445144437956898,
+          "pairedMedian": 0.954278546418591
+        },
+        {
+          "name": "range-simd",
+          "size": 1024,
+          "speedup": 1.0594817028365004,
+          "pairedMedian": 1.0379789162204527
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+NUMERIC-TREE {"name":"range-simd","size":1,"iterations":1000000,"ms":{"baseline":16.522756000000072,"candidate":14.674477000000024},"speedup":1.1259519504511162,"pairedMedian":1.1210169116094473}
+NUMERIC-TREE {"name":"range-scalar","size":1,"iterations":1000000,"ms":{"baseline":13.307821000000104,"candidate":13.017567999999983},"speedup":1.022297021993672,"pairedMedian":1.0198083990415097}
+NUMERIC-TREE {"name":"range-public","size":1,"iterations":1000000,"ms":{"baseline":11.015687999999955,"candidate":22.026393999999982},"speedup":0.5001130915936564,"pairedMedian":0.5001454635036844}
+NUMERIC-TREE {"name":"range-simd","size":2,"iterations":1000000,"ms":{"baseline":20.566106000000218,"candidate":18.977104000000054},"speedup":1.0837325863841059,"pairedMedian":1.085953775494423}
+NUMERIC-TREE {"name":"range-scalar","size":2,"iterations":1000000,"ms":{"baseline":20.1301669999998,"candidate":20.312957000000097},"speedup":0.9910013101489707,"pairedMedian":0.990082980040756}
+NUMERIC-TREE {"name":"range-public","size":2,"iterations":1000000,"ms":{"baseline":17.048337999999603,"candidate":16.9561190000004},"speedup":1.0054386855859647,"pairedMedian":0.9925027620391857}
+NUMERIC-TREE {"name":"point-scalar-control","size":2,"iterations":1000000,"ms":{"baseline":15.214928000000327,"candidate":15.235950999999659},"speedup":0.9986201714616086,"pairedMedian":0.9869867943110108}
+NUMERIC-TREE {"name":"point-simd-control","size":2,"iterations":1000000,"ms":{"baseline":16.163886000000275,"candidate":16.444587999999385},"speedup":0.9829304327965456,"pairedMedian":0.9854291100667231}
+NUMERIC-TREE {"name":"point-public-control","size":2,"iterations":1000000,"ms":{"baseline":21.52173700000094,"candidate":21.460441999999603},"speedup":1.002856185347969,"pairedMedian":1.0383352822503167}
+NUMERIC-TREE {"name":"range-simd","size":31,"iterations":258065,"ms":{"baseline":9.461545000000115,"candidate":8.820628999999826},"speedup":1.0726610313165084,"pairedMedian":1.047262221746135}
+NUMERIC-TREE {"name":"range-scalar","size":31,"iterations":258065,"ms":{"baseline":14.753128000000288,"candidate":14.15165799999886},"speedup":1.0425017337192204,"pairedMedian":1.0131158534281435}
+NUMERIC-TREE {"name":"range-public","size":31,"iterations":258065,"ms":{"baseline":7.899746999999479,"candidate":7.699601000000257},"speedup":1.0259943339920101,"pairedMedian":1.0179927030176126}
+NUMERIC-TREE {"name":"range-simd","size":32,"iterations":250000,"ms":{"baseline":8.105279000001246,"candidate":7.576645999999528},"speedup":1.0697713737716863,"pairedMedian":1.0561024528750627}
+NUMERIC-TREE {"name":"range-scalar","size":32,"iterations":250000,"ms":{"baseline":14.653420000000551,"candidate":14.063347000001158},"speedup":1.0419582194764407,"pairedMedian":1.0260622710572236}
+NUMERIC-TREE {"name":"range-public","size":32,"iterations":250000,"ms":{"baseline":7.1792179999993095,"candidate":7.3666899999989255},"speedup":0.9745513928236911,"pairedMedian":1.0165440162121024}
+NUMERIC-TREE {"name":"point-scalar-control","size":32,"iterations":250000,"ms":{"baseline":12.651361000000179,"candidate":12.661325000000943},"speedup":0.9992130365502218,"pairedMedian":1.0067526234379345}
+NUMERIC-TREE {"name":"point-simd-control","size":32,"iterations":250000,"ms":{"baseline":12.603157999999894,"candidate":12.931067000001349},"speedup":0.9746417677673914,"pairedMedian":0.9703897197285153}
+NUMERIC-TREE {"name":"point-public-control","size":32,"iterations":250000,"ms":{"baseline":14.760571999999229,"candidate":14.671103000000585},"speedup":1.0060983144892814,"pairedMedian":0.995882314756078}
+NUMERIC-TREE {"name":"range-simd","size":33,"iterations":242425,"ms":{"baseline":10.4771039999996,"candidate":9.206900999999561},"speedup":1.137962056939691,"pairedMedian":1.1511752091706793}
+NUMERIC-TREE {"name":"range-scalar","size":33,"iterations":242425,"ms":{"baseline":14.818787999998676,"candidate":14.340978999998697},"speedup":1.0333177393258872,"pairedMedian":1.053000997386069}
+NUMERIC-TREE {"name":"range-public","size":33,"iterations":242425,"ms":{"baseline":9.243931999997585,"candidate":8.097872999998799},"speedup":1.1415259290926094,"pairedMedian":1.1733293201677555}
+NUMERIC-TREE {"name":"range-simd","size":1024,"iterations":7813,"ms":{"baseline":4.473684999997204,"candidate":3.6711299999988114},"speedup":1.2186125252983828,"pairedMedian":1.229980147825702}
+NUMERIC-TREE {"name":"range-scalar","size":1024,"iterations":7813,"ms":{"baseline":11.43382500000007,"candidate":10.926488000000973},"speedup":1.046431845255223,"pairedMedian":1.0326618183746978}
+NUMERIC-TREE {"name":"range-public","size":1024,"iterations":7813,"ms":{"baseline":4.561674000000494,"candidate":3.5961089999982505},"speedup":1.2685027066762196,"pairedMedian":1.2510122012747353}
+NUMERIC-TREE {"name":"point-scalar-control","size":1024,"iterations":7813,"ms":{"baseline":10.421383000000787,"candidate":10.450723000001744},"speedup":0.997192538736224,"pairedMedian":0.9965145357137216}
+NUMERIC-TREE {"name":"point-simd-control","size":1024,"iterations":7813,"ms":{"baseline":10.603220000000874,"candidate":10.302332999999635},"speedup":1.0292057148610174,"pairedMedian":1.0204261500770315}
+NUMERIC-TREE {"name":"point-public-control","size":1024,"iterations":7813,"ms":{"baseline":10.489743999998609,"candidate":10.359964999999647},"speedup":1.012526972822685,"pairedMedian":0.9828858914845535}
+NUMERIC-TREE {"name":"range-simd","size":1057,"iterations":7569,"ms":{"baseline":4.982284000001528,"candidate":3.701324999998178},"speedup":1.3460812006521934,"pairedMedian":1.3214342074944299}
+NUMERIC-TREE {"name":"range-scalar","size":1057,"iterations":7569,"ms":{"baseline":11.344180999996752,"candidate":11.343563000002177},"speedup":1.000054480236463,"pairedMedian":0.9762005312879789}
+NUMERIC-TREE {"name":"range-public","size":1057,"iterations":7569,"ms":{"baseline":4.949884000001475,"candidate":3.671672000000399},"speedup":1.3481280462963297,"pairedMedian":1.3591900008553286}
+NUMERIC-TREE {"name":"range-simd","size":32768,"iterations":245,"ms":{"baseline":4.662499000001844,"candidate":3.574509999998554},"speedup":1.304374305849957,"pairedMedian":1.3049336035748893}
+NUMERIC-TREE {"name":"range-scalar","size":32768,"iterations":245,"ms":{"baseline":11.274906999999075,"candidate":11.166016999999556},"speedup":1.0097519106409674,"pairedMedian":0.9859504537418715}
+NUMERIC-TREE {"name":"range-public","size":32768,"iterations":245,"ms":{"baseline":4.664365000000544,"candidate":3.5760000000009313},"speedup":1.304352628635159,"pairedMedian":1.3008907304264312}
+NUMERIC-TREE {"name":"point-scalar-control","size":32768,"iterations":245,"ms":{"baseline":10.52644500000315,"candidate":10.320766999997431},"speedup":1.0199285576358588,"pairedMedian":1.005665010356906}
+NUMERIC-TREE {"name":"point-simd-control","size":32768,"iterations":245,"ms":{"baseline":10.296986000001198,"candidate":10.59684699999707},"speedup":0.9717028093360266,"pairedMedian":0.9906063101890847}
+NUMERIC-TREE {"name":"point-public-control","size":32768,"iterations":245,"ms":{"baseline":10.395163000001048,"candidate":10.467225000000326},"speedup":0.9931154627898726,"pairedMedian":0.9707687567620603}
+NUMERIC-TREE {"name":"range-simd","size":32801,"iterations":244,"ms":{"baseline":4.724028000000544,"candidate":3.5624659999994037},"speedup":1.3260556030573583,"pairedMedian":1.3225387877185608}
+NUMERIC-TREE {"name":"range-scalar","size":32801,"iterations":244,"ms":{"baseline":11.07357299999785,"candidate":11.099240999999893},"speedup":0.9976874094361909,"pairedMedian":1.001363327395313}
+NUMERIC-TREE {"name":"range-public","size":32801,"iterations":244,"ms":{"baseline":4.611196999998356,"candidate":3.6096940000024915},"speedup":1.2774481715057213,"pairedMedian":1.2860410944467584}
+NUMERIC-TREE {"name":"range-simd","size":262144,"iterations":31,"ms":{"baseline":5.03171199999997,"candidate":3.958707999998296},"speedup":1.2710490392325315,"pairedMedian":1.2826702693886802}
+NUMERIC-TREE {"name":"range-scalar","size":262144,"iterations":31,"ms":{"baseline":12.230469999998604,"candidate":12.038399000000936},"speedup":1.0159548624362469,"pairedMedian":1.0062942669699306}
+NUMERIC-TREE {"name":"range-public","size":262144,"iterations":31,"ms":{"baseline":4.929811999998492,"candidate":3.867113000000245},"speedup":1.2748042273391493,"pairedMedian":1.3259598226360065}
+NUMERIC-TREE {"name":"point-scalar-control","size":262144,"iterations":31,"ms":{"baseline":11.278849999998783,"candidate":11.560365000001184},"speedup":0.9756482602407128,"pairedMedian":0.9649176250946071}
+NUMERIC-TREE {"name":"point-simd-control","size":262144,"iterations":31,"ms":{"baseline":11.574555000002874,"candidate":11.769756000001507},"speedup":0.9834150342625108,"pairedMedian":1.0164207295253915}
+NUMERIC-TREE {"name":"point-public-control","size":262144,"iterations":31,"ms":{"baseline":11.151036999999633,"candidate":11.179727999999159},"speedup":0.9974336584933436,"pairedMedian":0.9895789924070404}
+NUMERIC-TREE {"name":"range-simd","size":1048609,"iterations":8,"ms":{"baseline":5.47016000000076,"candidate":4.269089000001259},"speedup":1.2813412885042095,"pairedMedian":1.2722692600116368}
+NUMERIC-TREE {"name":"range-scalar","size":1048609,"iterations":8,"ms":{"baseline":12.471308000000136,"candidate":12.661130000000412},"speedup":0.9850074993306072,"pairedMedian":0.9928442814945525}
+NUMERIC-TREE {"name":"range-public","size":1048609,"iterations":8,"ms":{"baseline":5.400723000002472,"candidate":4.3223870000001625},"speedup":1.2494769672410797,"pairedMedian":1.2457046411109023}
+125 | const report = { date: new Date().toISOString(), runtime: process.version, bun: process.versions.bun, v8: process.versions.v8, arch: process.arch, cpu: cpus()[0].model, mode, warmup, rounds, work, timed: 'Warm repeated scans only; allocation, compilation, setup, and correctness assertions are outside the timed region.', source: sourceBefore, sink, results };
+126 | mkdirSync(dirname(outFile), { recursive: true });
+127 | writeFileSync(outFile, JSON.stringify(report, null, 2) + '\n');
+128 | if (process.env.PERF_GATE === '1') {
+129 |   for (const row of results) {
+130 |     assert.ok(row.speedup >= 0.95, `${row.name}/${row.size} regressed by more than 5%`);
+                 ^
+AssertionError: range-public/1 regressed by more than 5%
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "==",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /workspace/scratch/736c0a2657a3/zerocopy-numeric/proofs/numeric-tree-benchmark.mjs:130:12
+
+Bun v1.4.2 (Linux x64)
