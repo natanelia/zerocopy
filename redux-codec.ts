@@ -13,7 +13,9 @@ const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
   SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue });
 export type SharedCollection = InstanceType<(typeof classes)[keyof typeof classes]>;
 type Kind = keyof typeof classes;
-const kinds = Object.freeze(Object.keys(classes) as Kind[]);
+const kindsByPrototype = new Map<object, Kind>(
+  Object.entries(classes).map(([name, C]) => [C.prototype, name as Kind]),
+);
 export type EncodedReduxValue = null | boolean | string | number | EncodedReduxValue[];
 export interface ZerocopyCodecOptions {
   /** Limits apply to both encoding and decoding. Text length is in UTF-16 units. */
@@ -31,7 +33,7 @@ export interface ZerocopyReduxEnvelope {
 export function sharedCollectionKind(value: unknown): Kind | undefined {
   if (!value || typeof value !== 'object' || !Object.isFrozen(value)) return undefined;
   const prototype = Object.getPrototypeOf(value);
-  const kind = kinds.find(key => prototype === classes[key].prototype);
+  const kind = kindsByPrototype.get(prototype);
   if (!kind) return undefined;
   try { arenaOf(value); return kind; } catch { return undefined; }
 }
