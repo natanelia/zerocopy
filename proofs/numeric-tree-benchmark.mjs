@@ -58,6 +58,30 @@ for (const [label, dir] of [['baseline', baseModules], ['candidate', candidateMo
 }
 let sink = 0;
 const results = [];
+// One loop source for each pair avoids role-specific JavaScript call sites.
+// Resolve the exported function once, before any timed scans.
+const runRangeKernel = (fn, list, size) => n => {
+  const { root, depth, tail } = list;
+  let total = 0;
+  for (let i = 0; i < n; i++) total += fn(root, depth, tail, size, -1000, 1000);
+  return total;
+};
+const runPointKernel = (fn, list, size) => n => {
+  const { root, depth, tail } = list;
+  let total = 0;
+  for (let i = 0; i < n; i++) total += fn(root, depth, tail, size, -1000, -1000, 1000, 1000);
+  return total;
+};
+const runRangePublic = (fn, list) => n => {
+  let total = 0;
+  for (let i = 0; i < n; i++) total += fn(list, -1000, 1000);
+  return total;
+};
+const runPointPublic = (fn, list, bounds) => n => {
+  let total = 0;
+  for (let i = 0; i < n; i++) total += fn(list, bounds);
+  return total;
+};
 function measure(name, size, baseline, candidate, expected, iterations) {
   assert.equal(baseline(1), expected);
   assert.equal(candidate(1), expected);
@@ -91,42 +115,35 @@ for (const size of sizes) {
   const iterations = Math.min(1_000_000, Math.max(8, Math.ceil(work / size)));
   const instances = Object.fromEntries(Object.entries(compiled).map(([label, modules]) => [label, Object.fromEntries(Object.entries(modules).map(([name, module]) => [name, new WebAssembly.Instance(module, { env: { memory } }).exports]))]));
   if (mode !== 'public') for (const kernel of ['simd', 'scalar']) {
-    const fns = Object.fromEntries(['baseline', 'candidate'].map(label => [label, n => {
-      const { root, depth, tail } = list;
-      let total = 0;
-      for (let i = 0; i < n; i++) total += instances[label][kernel].countInRange(root, depth, tail, size, -1000, 1000);
-      return total;
-    }]));
+    const fns = Object.fromEntries(['baseline', 'candidate'].map(label =>
+      [label, runRangeKernel(instances[label][kernel].countInRange, list, size)]));
     measure(`range-${kernel}`, size, fns.baseline, fns.candidate, expected, iterations);
   }
   if (mode !== 'kernels') {
-    const baseline = n => { let total = 0; for (let i = 0; i < n; i++) total += publicBase.countInRange(list, -1000, 1000); return total; };
-    const candidate = n => { let total = 0; for (let i = 0; i < n; i++) total += publicCandidate.countInRange(listCandidate, -1000, 1000); return total; };
-    measure('range-public', size, baseline, candidate, expected, iterations);
+    measure('range-public', size,
+      runRangePublic(publicBase.countInRange, list),
+      runRangePublic(publicCandidate.countInRange, listCandidate), expected, iterations);
   }
   if (!(size & 1)) {
     const bounds = { minX: -1000, minY: -1000, maxX: 1000, maxY: 1000 };
     let expectedBox = 0;
     for (let i = 0; i < size; i += 2) expectedBox += Number(values[i] >= -1000 && values[i] <= 1000 && values[i + 1] >= -1000 && values[i + 1] <= 1000);
     if (mode !== 'public') for (const kernel of ['scalar', 'simd']) {
-      const fns = Object.fromEntries(['baseline', 'candidate'].map(label => [label, n => {
-        const { root, depth, tail } = list;
-        let total = 0;
-        for (let i = 0; i < n; i++) total += instances[label][kernel].countPointsInBox(root, depth, tail, size, -1000, -1000, 1000, 1000);
-        return total;
-      }]));
+      const fns = Object.fromEntries(['baseline', 'candidate'].map(label =>
+        [label, runPointKernel(instances[label][kernel].countPointsInBox, list, size)]));
       measure(`point-${kernel}-control`, size, fns.baseline, fns.candidate, expectedBox, iterations);
     }
     if (mode !== 'kernels') {
-      const baseline = n => { let total = 0; for (let i = 0; i < n; i++) total += publicBase.countPointsInBox(list, bounds); return total; };
-      const candidate = n => { let total = 0; for (let i = 0; i < n; i++) total += publicCandidate.countPointsInBox(listCandidate, bounds); return total; };
-      measure('point-public-control', size, baseline, candidate, expectedBox, iterations);
+      measure('point-public-control', size,
+        runPointPublic(publicBase.countPointsInBox, list, bounds),
+        runPointPublic(publicCandidate.countPointsInBox, listCandidate, bounds),
+        expectedBox, iterations);
     }
   }
 }
 const sourceAfter = { baseline: metadata(baseDir, baseModules), candidate: metadata(candidateDir, candidateModules), driver: hashFile(new URL(import.meta.url)) };
 assert.deepEqual(sourceAfter, sourceBefore, 'Sources changed during measurement');
-const report = { date: new Date().toISOString(), runtime: process.version, bun: process.versions.bun, v8: process.versions.v8, arch: process.arch, cpu: cpus()[0].model, mode, warmup, rounds, work, timed: 'Warm repeated scans only; allocation, compilation, setup, and correctness assertions are outside the timed region.', source: sourceBefore, sink, results };
+const report = { date: new Date().toISOString(), runtime: process.version, bun: process.versions.bun, v8: process.versions.v8, arch: process.arch, cpu: cpus()[0].model, mode, warmup, rounds, work, timed: 'Warm repeated scans through one shared JavaScript loop source for each pair; method selection, setup, compilation, allocation, and correctness checks are outside the timed region.', source: sourceBefore, sink, results };
 mkdirSync(dirname(outFile), { recursive: true });
 writeFileSync(outFile, JSON.stringify(report, null, 2) + '\n');
 if (process.env.PERF_GATE === '1') {
