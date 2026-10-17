@@ -1,0 +1,1 @@
+Numeric tree worker proof passed: partial depth-three tree, IEEE values, retained snapshots, fork, and memory growth.

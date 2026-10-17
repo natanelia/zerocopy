@@ -1,0 +1,453 @@
+{
+  "version": 1,
+  "created": "2026-10-17T02:25:33.692349+00:00",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "branch": "perf/numeric-kernels-20261017",
+  "status": "Draft. First full A/B gates and every fixed A/A run failed. No performance clearance.",
+  "notes": [
+    "The files array lists the exact intended PR files except this manifest, which cannot hash itself.",
+    "The generated array records build outputs. These generated binaries and JavaScript files are not part of the PR file set.",
+    "Stage source and driver hashes were checked against both recorded runtime reports.",
+    "Stage 3 source and all current diagnostic input bundles were checked against the fixed A/A cohort.",
+    "Current report and README hashes include the diagnostic findings; the diagnostic controller hash records the fixed executable schedule used in that cohort."
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/numeric-tree-performance.yml",
+      "bytes": 4598,
+      "sha256": "816fb0871d0cece58cdd71e6ebc3225d4bb2f5baa27cdad851b549d71b66c5d3"
+    },
+    {
+      "path": "numeric-kernels.as.ts",
+      "bytes": 2392,
+      "sha256": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3"
+    },
+    {
+      "path": "numeric.test.ts",
+      "bytes": 7440,
+      "sha256": "05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/README.md",
+      "bytes": 5146,
+      "sha256": "0ecf1d48677822962682c5bc2d7e46f3541e05fa3d519f5fb23576eaf906ce05"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/REPORT.md",
+      "bytes": 12693,
+      "sha256": "78814f8fca2f153b94f25014e85e58b5d3a0577d040fd25f6a2dd1423378b335"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/baseline.as.ts",
+      "bytes": 1695,
+      "sha256": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-spatial.as.ts",
+      "bytes": 1473,
+      "sha256": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1-benchmark.mjs",
+      "bytes": 8653,
+      "sha256": "f26c5a44ab69591a96e6d00f28d206a2f3d4d31a82c31e557d2425f8aadb717a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1.as.ts",
+      "bytes": 2930,
+      "sha256": "fa7d635b30f8b3757c50e697f45d9641015f19e824a5b7f8a4c0770837d7c8dd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage1.wat",
+      "bytes": 6963,
+      "sha256": "7cdc99c0b6c252e9e2023e36d392b955abb297cb652917931f50308c314c23ff"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2-benchmark.mjs",
+      "bytes": 8899,
+      "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2.as.ts",
+      "bytes": 3264,
+      "sha256": "37429133d4b835f6d907f50aa7a50ca340f1b46b4d9e848fc2ecf0b85cfca1ef"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage2.wat",
+      "bytes": 7923,
+      "sha256": "a36f44d8c448e201d529052d775c11285a8211578f9fd188536e4b3458a77622"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3-benchmark.mjs",
+      "bytes": 8899,
+      "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3.as.ts",
+      "bytes": 2392,
+      "sha256": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3.wat",
+      "bytes": 7988,
+      "sha256": "c2469955851bdb3632dc4cefbaecd214632d65bc59b65bc1c04629c6925a804a"
+    },
+    {
+      "path": "proofs/numeric-tree-aa.mjs",
+      "bytes": 4471,
+      "sha256": "72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480"
+    },
+    {
+      "path": "proofs/numeric-tree-benchmark.mjs",
+      "bytes": 9356,
+      "sha256": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+    },
+    {
+      "path": "proofs/numeric-tree-browsers.mjs",
+      "bytes": 14869,
+      "sha256": "ae96b01092f4cfc30e211a3457413fd350c044b19dc2a698bb56327d06e6a8bf"
+    },
+    {
+      "path": "proofs/numeric-tree-worker.mjs",
+      "bytes": 3088,
+      "sha256": "6697d70d62c8fab2ffbcaf8d85c787cbcbe9e49b975867a2e9bbcd2e2fffb0a0"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage1-bun-screen.json",
+      "bytes": 33886,
+      "sha256": "1844f44360f09dac64d6bde1eba30097a93c2b49e517910d58e18f32761a5903"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage1-node-screen.json",
+      "bytes": 33839,
+      "sha256": "edb0780dca30234a27cda8784e881a994de75267f8085e65968a4dd27991244c"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage1-wasm-bodies.json",
+      "bytes": 3046,
+      "sha256": "392995bde62fe018eb39ff0f146327216e7e302bc7cdf01185cee8c1a549e0e3"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage2-bun-screen.json",
+      "bytes": 52360,
+      "sha256": "24fe3df5304b35aec4a2a3c1d79c6184433cfccfb0899e3df4d88cbc00672ebd"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage2-node-screen.json",
+      "bytes": 52312,
+      "sha256": "dde590d9a3acfb05bcb8812849d2355c86a76d4d4fbd83d3f426a79e96bc8b6a"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage2-tests.txt",
+      "bytes": 339,
+      "sha256": "7a9b57c63066a0e681b3a30da315ba0d771326e3b86bc73b98fecf80b7415250"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.json",
+      "bytes": 68666,
+      "sha256": "3bf0af9b806f73696f521a2bd82c7fae8f29bcb94a4e3165b56c0785a64affb1"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.txt",
+      "bytes": 4184,
+      "sha256": "9a9b18ce105410fc61d14ffd16396efdf6cad7df0bd757b155bbfebc8c891aa6"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.json",
+      "bytes": 68921,
+      "sha256": "dc8856bf438d03417d4cea66346b437b25a6c8bec1edbe9a62460699fec2d827"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.txt",
+      "bytes": 4188,
+      "sha256": "92db81bbe6627d66063f6a2206e7284cb6a46e164a1a8595df3c293c8390e28a"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.json",
+      "bytes": 68733,
+      "sha256": "561349629fa8e74d63226583989bbd47a860baeda818d975ce0b452fe5d5c319"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.txt",
+      "bytes": 4185,
+      "sha256": "57658fae86a20744f72e4f8ff798def494257750445713b1664fe9a22f130724"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.json",
+      "bytes": 68925,
+      "sha256": "addfc507ec774753331bc08fa09d0d28e0ab3bd8345ad59d10ffc442b0ebbeaf"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.txt",
+      "bytes": 4186,
+      "sha256": "6af565d6f68b32c99e4837d71b7c5dea5e8b9200beacae1c85e880b8aeba3aa7"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa/cohort.json",
+      "bytes": 5090,
+      "sha256": "1084d05ed4adb1851dc5703df4f2b87ce3309d53be22b3d6a73c5a826998f63f"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-aa-controller.txt",
+      "bytes": 2946,
+      "sha256": "7d7a6c709327f92f246fe2367479aa35d6f7b5374e0c4a34a89b202d011e38d4"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-bun-full.json",
+      "bytes": 110450,
+      "sha256": "37a5b2d162ec794da8542b8d81cd09de1057ad6b4597b787ae42cc9fc15eb1ec"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-bun-full.txt",
+      "bytes": 10538,
+      "sha256": "f0c6d30c21c8896b2b72d1a64f88bcf1143c0ea3628bb07b7a07115e1461e151"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-bun-worker.txt",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-node-full.json",
+      "bytes": 110194,
+      "sha256": "3b167544b683b3eed83d7a8e83a87dda587ef47c368ac8a0d73c52883824c876"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-node-full.txt",
+      "bytes": 9918,
+      "sha256": "415b34a9fff8b366bdca1bc084f6c4f59dca50106058633bd4c049cd8d115892"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-node-worker.txt",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-review-tests.txt",
+      "bytes": 339,
+      "sha256": "9129648492de82c3527e0ab20dd62536a717e1a3bc2194f380e1ccd68d432044"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-tests.txt",
+      "bytes": 339,
+      "sha256": "e388e30ba11b66cafd263fcd911d665fe1252df21eb926d688751c96db1f6c59"
+    },
+    {
+      "path": "proofs/results/numeric-tree-20261017/stage3-wasm-bodies.json",
+      "bytes": 7314,
+      "sha256": "29f829c26b8dc879b13103a6f39f1acf1a029bd3ae87ac8fc6c046b4cc0d6e56"
+    }
+  ],
+  "buildInputs": [
+    {
+      "path": "numeric-kernels.as.ts",
+      "bytes": 2392,
+      "sha256": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3"
+    },
+    {
+      "path": "numeric-spatial.as.ts",
+      "bytes": 1473,
+      "sha256": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57"
+    },
+    {
+      "path": "numeric.ts",
+      "bytes": 3539,
+      "sha256": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b"
+    },
+    {
+      "path": "numeric-wasm.ts",
+      "bytes": 372,
+      "sha256": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4029,
+      "sha256": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9"
+    },
+    {
+      "path": "scripts/build-wasm.mjs",
+      "bytes": 1383,
+      "sha256": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9"
+    },
+    {
+      "path": "scripts/build-browser.ts",
+      "bytes": 2187,
+      "sha256": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713"
+    }
+  ],
+  "generated": [
+    {
+      "path": "numeric-kernels.wasm",
+      "bytes": 720,
+      "sha256": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95"
+    },
+    {
+      "path": "numeric-kernels-simd.wasm",
+      "bytes": 916,
+      "sha256": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+    },
+    {
+      "path": "persistent-core.wasm",
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "geometry-kernels.wasm",
+      "bytes": 571,
+      "sha256": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0"
+    },
+    {
+      "path": "dist/chunk-4w7mq2zb.js",
+      "bytes": 43116,
+      "sha256": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222"
+    },
+    {
+      "path": "dist/chunk-enwn105b.js",
+      "bytes": 39495,
+      "sha256": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a"
+    },
+    {
+      "path": "dist/chunk-jyz2w9p4.js",
+      "bytes": 11887,
+      "sha256": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc"
+    },
+    {
+      "path": "dist/chunk-n1amv1q3.js",
+      "bytes": 3129,
+      "sha256": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef"
+    },
+    {
+      "path": "dist/chunk-t2acd52e.js",
+      "bytes": 83457,
+      "sha256": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa"
+    },
+    {
+      "path": "dist/geometry.js",
+      "bytes": 2072,
+      "sha256": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8"
+    },
+    {
+      "path": "dist/numeric.js",
+      "bytes": 4483,
+      "sha256": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3"
+    },
+    {
+      "path": "dist/redux.js",
+      "bytes": 38023,
+      "sha256": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31"
+    },
+    {
+      "path": "dist/shared.js",
+      "bytes": 2141,
+      "sha256": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476"
+    },
+    {
+      "path": "dist/state.js",
+      "bytes": 224,
+      "sha256": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e"
+    },
+    {
+      "path": "dist/tanstack-db-collection.js",
+      "bytes": 3707,
+      "sha256": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4"
+    },
+    {
+      "path": "dist/worker.js",
+      "bytes": 682,
+      "sha256": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+    }
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "source": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage1.as.ts",
+        "bytes": 2930,
+        "sha256": "fa7d635b30f8b3757c50e697f45d9641015f19e824a5b7f8a4c0770837d7c8dd"
+      },
+      "driver": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage1-benchmark.mjs",
+        "bytes": 8653,
+        "sha256": "f26c5a44ab69591a96e6d00f28d206a2f3d4d31a82c31e557d2425f8aadb717a"
+      },
+      "reports": [
+        "proofs/results/numeric-tree-20261017/stage1-node-screen.json",
+        "proofs/results/numeric-tree-20261017/stage1-bun-screen.json"
+      ],
+      "wasm": "d6436b6dfc7a2366dc7747f8c583dcd7dfc4316190ef074f2252125ba78d593c"
+    },
+    {
+      "stage": 2,
+      "source": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage2.as.ts",
+        "bytes": 3264,
+        "sha256": "37429133d4b835f6d907f50aa7a50ca340f1b46b4d9e848fc2ecf0b85cfca1ef"
+      },
+      "driver": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage2-benchmark.mjs",
+        "bytes": 8899,
+        "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+      },
+      "reports": [
+        "proofs/results/numeric-tree-20261017/stage2-node-screen.json",
+        "proofs/results/numeric-tree-20261017/stage2-bun-screen.json"
+      ],
+      "wasm": "5c93efe7c070743f9285e2ba1b87a7dbe80d8d689c6b5ff170ca15e7ec0ead93"
+    },
+    {
+      "stage": 3,
+      "source": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage3.as.ts",
+        "bytes": 2392,
+        "sha256": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3"
+      },
+      "driver": {
+        "path": "proofs/experiments/numeric-tree-20261017/stage3-benchmark.mjs",
+        "bytes": 8899,
+        "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+      },
+      "reports": [
+        "proofs/results/numeric-tree-20261017/stage3-node-full.json",
+        "proofs/results/numeric-tree-20261017/stage3-bun-full.json"
+      ],
+      "wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+    }
+  ],
+  "protocols": {
+    "currentPlan": {
+      "path": "proofs/experiments/numeric-tree-20261017/README.md",
+      "bytes": 5146,
+      "sha256": "0ecf1d48677822962682c5bc2d7e46f3541e05fa3d519f5fb23576eaf906ce05"
+    },
+    "firstFullStage3Driver": {
+      "path": "proofs/experiments/numeric-tree-20261017/stage3-benchmark.mjs",
+      "bytes": 8899,
+      "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+    },
+    "neutralDiagnosticDriver": {
+      "path": "proofs/numeric-tree-benchmark.mjs",
+      "bytes": 9356,
+      "sha256": "40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff"
+    },
+    "fixedDiagnosticController": {
+      "path": "proofs/numeric-tree-aa.mjs",
+      "bytes": 4471,
+      "sha256": "72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480"
+    }
+  },
+  "checks": {
+    "focusedNumericSpatial": {
+      "tests": 52,
+      "status": "passed",
+      "log": "proofs/results/numeric-tree-20261017/stage3-review-tests.txt"
+    },
+    "nodeWorker": "passed",
+    "bunWorker": "passed",
+    "scalarBytesEqualBaseline": true,
+    "localFullSuite": "pending",
+    "localTypes": "pending",
+    "localBrowser": "pending",
+    "localARM64": "pending",
+    "performanceAcceptance": "failed"
+  }
+}

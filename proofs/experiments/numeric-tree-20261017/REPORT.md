@@ -1,0 +1,235 @@
+# Grouped numeric tree scans
+
+## Status
+
+Stage 3 is a draft candidate. Its first full Node and Bun runs did not pass
+the fixed performance gate. The large range scans improved, but two small
+cases failed. The fixed identical-source diagnostic also failed in all
+four runs. The raw failures remain part of this report. The candidate
+has no performance clearance.
+
+The comparison base is `afdffdcfcbd61013f120de82411c0c4a6b2d1e0e`. All local
+measurements in this report used an Intel Xeon Platinum 8573C, x64, on
+17 October 2026. The runtimes were Node.js 22.23.2 and Bun 1.4.2. These are
+shared-host results. They do not establish ARM64 or browser performance.
+
+## Change
+
+The existing SIMD range kernel compares two binary64 values at a time.
+Before this change, the tree scan calls the span kernel for each full
+32-value leaf. Each call creates vector bounds, accumulates two counts,
+and reduces those counts to one integer.
+
+Stage 3 scans a group of sibling leaves in their parent call. It creates
+the vector bounds once for the group and reduces the count once after the
+group. The group contains at most 32 leaves, or 1,024 values. Counts and
+bounds stay in local values. The scan writes no shared memory.
+
+This path runs only in the SIMD build at tree depth one. Its input count
+is a multiple of 32: the exported function sends only the full-leaf tree
+prefix into tree traversal. Higher levels preserve that boundary. The
+tail still uses the existing span kernel, including its scalar final
+value when the tail has odd length.
+
+The comparison operators remain `>=` and `<=`. A NaN value does not count.
+NaN bounds and reversed bounds still return zero at the existing export.
+Positive and negative zero compare equally. Infinity and subnormal values
+keep their existing comparison results. The function signatures, binary
+layout, public API, allocation paths, and snapshot ownership do not change.
+
+The stage-3 scalar Wasm file equals the baseline byte for byte. In the
+SIMD module, only the `treeCount` function body changes, from 96 to 229
+bytes. The span, exported range, tree-box, and exported point-count bodies
+are identical to their baseline bodies. Types, imports, function
+signatures, and exports also have identical section bytes. This byte
+comparison does not establish equal native code placement in a runtime.
+See [the Wasm body audit](../../results/numeric-tree-20261017/stage3-wasm-bodies.json).
+
+## Stages and observed results
+
+Stages 1 and 2 used five warm-up rounds, 11 measured rounds, and four
+million requested values of work per batch. Stage 1 measured the direct
+kernels. Stage 2 also measured the public wrappers. These were screens,
+not acceptance runs.
+
+| Stage | Change | Large-case result | Decision |
+| --- | --- | --- | --- |
+| 1 | Pass vector bounds and a vector count through recursive tree calls; reduce at the export | Direct SIMD range ratios: 1.081–1.248 on Node; 0.859–0.959 on Bun | Keep the evidence. Investigate the recursive vector-call cost. |
+| 2 | Scan sibling leaves together, with vector recursion above that group | Public range ratios: 1.156–1.351 on Node; 1.052–1.181 on Bun | Keep the grouping. Restore the original integer recursion and small-span path. |
+| 3 | Keep vector state inside each sibling group; retain the original export, span kernel, and integer recursion | Public range ratios: 1.302–1.546 on Node; 1.249–1.348 on Bun | Keep the candidate as a draft. Diagnose the failed small controls before acceptance. |
+
+Here, a large case has at least 1,024 values. A ratio is baseline elapsed
+time divided by candidate elapsed time. A ratio above one means the
+candidate completed the measured work sooner. These ranges describe the
+recorded runs; they are not confidence intervals or a performance promise.
+The apparent recursive-call cost is a working explanation. No runtime
+profile in this report proves that explanation.
+
+## First full stage-3 comparison
+
+The full comparison used seven warm-up rounds and 21 measured rounds.
+Each batch requested eight million values of work. The call count was
+`min(1_000_000, max(8, ceil(8_000_000 / size)))`. Each process ran both
+variants, in alternating order. Allocation, imports, initial compilation,
+input preparation, and result checks were outside the timed region.
+Every timed batch result was checked after its timer stopped.
+
+The fixed gate requires a ratio of at least 0.95 in every case. Direct
+SIMD range and public range cases with at least 1,024 values must exceed
+1.05. Scalar range calls and point-count calls serve as regression
+controls. The complete files include every measured case and sample.
+
+| Values | Node public range ratio | Bun public range ratio |
+| ---: | ---: | ---: |
+| 1 | 1.003 | 0.500 |
+| 2 | 1.020 | 1.005 |
+| 31 | 1.023 | 1.026 |
+| 32 | 1.044 | 0.975 |
+| 33 | 0.979 | 1.142 |
+| 1,024 | 1.409 | 1.269 |
+| 1,057 | 1.546 | 1.348 |
+| 32,768 | 1.428 | 1.304 |
+| 32,801 | 1.398 | 1.277 |
+| 262,144 | 1.386 | 1.275 |
+| 1,048,609 | 1.302 | 1.249 |
+
+Two rows failed the gate:
+
+- Node direct scalar range, two values: **0.937**. The baseline and
+  candidate scalar Wasm files are identical.
+- Bun public range, one value: **0.500**. The candidate took about twice
+  as long in most samples. The span and export Wasm bodies are identical,
+  but the two public calls use separate module instances and separate
+  JavaScript call sites in this driver.
+
+The Bun difference is stable within this run. It must not be dismissed as
+one timer outlier. A runtime optimization or module-placement effect is
+possible. An identical-source diagnostic is required before this driver
+can support acceptance. The diagnostic plan was fixed before its run; see
+[the method](README.md#fixed-aa-diagnostic-after-stage-3).
+
+## Fixed identical-source diagnostic
+
+The diagnostic copied the exact same stage-3 Wasm and portable JavaScript
+files into two fresh neutral directories, `a` and `b`. It checked all
+copied hashes. Four processes ran the same mixed-case workload: Node
+`a/b`, Bun `a/b`, Node `b/a`, then Bun `b/a`. Both module sets in each
+process had identical source and bundle bytes.
+
+Each process measured sizes 1, 2, 32, and 1,024. It used all 21 range and
+point-control rows, 25 warm-up rounds, 31 measured rounds, and eight
+million requested values of work per batch. The one-million-call cap
+remained. The diagnostic interval was fixed at `[0.95, 1/0.95]`. A result
+outside that interval detects a difference above the permitted size when
+the measured code is identical. It does not change the production gate.
+
+| Run | Rows outside the diagnostic interval | Ratios |
+| --- | --- | --- |
+| Node, `a/b` | Scalar range at 2; public range at 2; SIMD range at 1,024 | 0.939; 1.079; 1.174 |
+| Bun, `a/b` | SIMD range at 2 | 1.057 |
+| Node, `b/a` | Scalar range at 2; public range at 2 | 0.938; 1.066 |
+| Bun, `b/a` | SIMD point control at 2; SIMD range at 1,024 | 0.945; 1.059 |
+
+All four processes completed their workloads and result checks. The
+controller retained every report and then returned a failed diagnostic.
+Eight of the 84 rows fell outside the fixed interval. No run was repeated
+to obtain a passing result.
+
+The Node scalar difference stayed near 0.938 when the directory roles
+were reversed. It followed the benchmark role in both runs. This shows
+that the present method can produce a difference of this size with
+identical code. The dynamic per-call property lookup and the separate
+public JavaScript call sites need further investigation before a new
+acceptance run.
+
+The two Bun one-value public ratios were 1.006 and 0.994. The original
+0.500 A/B difference did not recur in this diagnostic. This does not
+establish the cause of that original loss or clear it. A larger changed
+callee can alter runtime compilation even when its caller's Wasm bytes
+are unchanged.
+
+The driver gained two module-path options for the neutral copies. Its
+timed loop bodies and production thresholds stayed the same. Exact
+driver hashes distinguish the first full stage-3 run from this diagnostic.
+The diagnostic driver SHA-256 is
+`40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff`.
+The controller SHA-256 is
+`72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480`.
+See [the full cohort](../../results/numeric-tree-20261017/stage3-aa/cohort.json)
+and [the controller log](../../results/numeric-tree-20261017/stage3-aa-controller.txt).
+
+## Correctness evidence
+
+The focused numeric and spatial suite passed 52 tests. The added cases
+cover partial sibling groups, depth changes, IEEE edge values, old and
+attached snapshots, forks, append and pop operations, memory-end loads,
+and invalid pointers in unused tree children. Both scalar and SIMD
+modules run the raw-memory boundary test. A read through an attached
+snapshot leaves the shared bytes unchanged.
+
+After review, the new raw-memory boundary test was changed to declare a
+maximum of two Wasm pages. It never grows memory. This avoids a large
+virtual memory reservation without changing the bytes that the test can
+read. The focused suite passed all 52 tests again after that test-only
+change. See [the review test log](../../results/numeric-tree-20261017/stage3-review-tests.txt).
+The existing unrelated memory-end test is unchanged.
+
+The focused worker proof passed on Node and Bun. A real worker repeatedly
+reads an attached snapshot while the owner grows its memory and creates
+new versions. It also checks the read-only write guard and the retained
+old, new, and forked values. These results are in
+[the test log](../../results/numeric-tree-20261017/stage3-tests.txt),
+[the Node worker log](../../results/numeric-tree-20261017/stage3-node-worker.txt),
+and [the Bun worker log](../../results/numeric-tree-20261017/stage3-bun-worker.txt).
+
+The separate hosted workflow builds the pull request base and candidate
+on x64 and ARM64. It retains the identical-source diagnostic and both
+runtime comparisons even when a gate fails. A final step requires every
+performance gate to pass. It also runs full tests, type checks, and real
+workers. The x64 job compares current-base and candidate correctness in
+Chromium, Firefox, and WebKit, in automatic and forced-scalar modes.
+These hosted checks are pending for this draft.
+
+The full suite and type checks have not run locally in the candidate
+worktree. Browser checks and ARM64 checks have also not run locally.
+The two recorded 52-test results cover the focused numeric and spatial
+suite before and after the test-only maximum-memory adjustment described
+above.
+
+The browser proof distinguishes a pre-existing WebKit worker-import
+memory limit from a candidate failure. That limit is allowed only if
+the current base fails in a fresh browser process at the existing shared
+module import with `RangeError: Out of memory`. If the candidate also
+fails, its phase and error must match. This condition is reported as a
+baseline limit; it is not a passing worker test. Browser checks make no
+browser performance claim.
+
+## Reproduction and retained evidence
+
+Use the commands and fixed plan in [README.md](README.md). The experiment
+directory contains the exact source and benchmark driver for each stage,
+plus its emitted WAT. The unchanged spatial source is included so each
+stored numeric source can be rebuilt. Raw JSON files contain source,
+Wasm, and driver SHA-256 digests. The stage-2 and stage-3 public runs also
+record every imported portable JavaScript file digest.
+The local experiment reports name the base Git revision because the
+candidate source was still uncommitted during those measurements. Their
+source hashes and stored stage files identify the exact measured code.
+
+- [Stage 1 Node samples](../../results/numeric-tree-20261017/stage1-node-screen.json)
+- [Stage 1 Bun samples](../../results/numeric-tree-20261017/stage1-bun-screen.json)
+- [Stage 2 Node samples](../../results/numeric-tree-20261017/stage2-node-screen.json)
+- [Stage 2 Bun samples](../../results/numeric-tree-20261017/stage2-bun-screen.json)
+- [Stage 3 Node samples and failed gate](../../results/numeric-tree-20261017/stage3-node-full.json)
+- [Stage 3 Bun samples and failed gate](../../results/numeric-tree-20261017/stage3-bun-full.json)
+
+The stage-3 source SHA-256 is
+`09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3`.
+Its SIMD Wasm SHA-256 is
+`6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c`.
+The unchanged scalar Wasm SHA-256 is
+`5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95`.
+
+Do not mark this candidate ready from the large-case ratios alone. The
+local small-case failures, method diagnosis, ARM64 comparison, and hosted
+correctness results must all be resolved before performance acceptance.
