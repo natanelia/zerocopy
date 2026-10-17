@@ -27,7 +27,7 @@ describe('bboxXY', () => {
     expect(bboxXY(attached)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(p)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(newer)).toEqual([-99, 0, 4, 4]);
-    expect(new Uint8Array(memory.buffer)).toEqual(before);
+    expect(Buffer.from(memory.buffer).equals(before)).toBe(true);
   });
   it('keeps old arenas and separate kernel instances independent', () => {
     const old = new SharedList('number').pushMany([0, 1, 2, 3]);
