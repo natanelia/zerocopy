@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { countInRange } from './numeric';
 import { SharedList, resetSharedList } from './shared-list';
 import { getWorkerData, initWorker } from './shared';
+import { Arena } from './arena';
 
 beforeEach(() => resetSharedList());
 const reference = (values: readonly number[], lo: number, hi: number): number => values.reduce((n, v) => n + Number(v >= lo && v <= hi), 0);
@@ -102,7 +103,7 @@ describe('numeric countInRange', () => {
     const size = 1048609;
     const special = [NaN, Infinity, -Infinity, -0, 0, Number.MIN_VALUE, -Number.MIN_VALUE, 1000, -1000];
     const values = Array.from({ length: size }, (_, i) => i % 31 === 0 ? special[Math.floor(i / 31) % special.length] : i % 2001 - 1000);
-    const original = new SharedList('number').pushMany(values);
+    const original = new SharedList('number', 0, 0, 0, new Arena()).pushMany(values);
     const data = getWorkerData({ original }, { copy: false });
     const attached = (await initWorker(data)).original;
     const changed = original.set(1048576, Infinity).pushMany([NaN, -Infinity, 1000]);

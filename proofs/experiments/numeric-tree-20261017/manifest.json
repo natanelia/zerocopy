@@ -9,13 +9,16 @@
     "The generated array records build outputs. These generated binaries and JavaScript files are not part of the PR file set.",
     "Stage source and driver hashes were checked against both recorded runtime reports.",
     "Stage 3 source and all current diagnostic input bundles were checked against the fixed A/A cohort.",
-    "Current report and README hashes include the diagnostic findings; the diagnostic controller hash records the fixed executable schedule used in that cohort."
+    "Current report and README hashes include the diagnostic findings; the diagnostic controller hash records the fixed executable schedule used in that cohort.",
+    "The PR added these 25 raw records. They moved into this experiment's results directory to satisfy strict preservation of the baseline proofs/results tree. Every raw file and historical driver retains its original bytes. Paths inside raw records remain historical provenance.",
+    "The first hosted workflow status is invalid: tee hid producer failures under bash -e. The job shell now enables pipefail. A deliberate producer exit of 23 returns 23 under the exact fixed shell; the old default returns 0.",
+    "The new million-value numeric test now uses a private Arena. This limits shared default-fixture state. It does not prove the cause of the separate hosted geometry timeout. The geometry test and test timeout were not changed. The old and repaired numeric test sources are retained."
   ],
   "files": [
     {
       "path": ".github/workflows/numeric-tree-performance.yml",
-      "bytes": 4598,
-      "sha256": "816fb0871d0cece58cdd71e6ebc3225d4bb2f5baa27cdad851b549d71b66c5d3"
+      "bytes": 4680,
+      "sha256": "54042c8aecd8504d5b4b401563c8c81d54df6ca9ca6a36feb1ad0002dd13d9ec"
     },
     {
       "path": "numeric-kernels.as.ts",
@@ -24,18 +27,18 @@
     },
     {
       "path": "numeric.test.ts",
-      "bytes": 7440,
-      "sha256": "05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f"
+      "bytes": 7495,
+      "sha256": "f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/README.md",
-      "bytes": 5146,
-      "sha256": "0ecf1d48677822962682c5bc2d7e46f3541e05fa3d519f5fb23576eaf906ce05"
+      "bytes": 5480,
+      "sha256": "38c6ad9d20ec50d6c5a7cfd35e0ff581b6ce8898e29b560f32f77f21e7e17fca"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/REPORT.md",
-      "bytes": 12693,
-      "sha256": "78814f8fca2f153b94f25014e85e58b5d3a0577d040fd25f6a2dd1423378b335"
+      "bytes": 14828,
+      "sha256": "5081f176d5a95f5e4fef9b38a6ca44236df31bc0a9f6e2f765a18dbbf5bad0f4"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/baseline.as.ts",
@@ -43,9 +46,174 @@
       "sha256": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7"
     },
     {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-arm64-first.zip",
+      "bytes": 143775,
+      "sha256": "b88b7637e96bb76e5301a2c3dc8c29052e86afecee702759e8453b7223dc249c"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-x64-first.zip",
+      "bytes": 148193,
+      "sha256": "d12001e8add59df3b446711984952409631525114a70948f99b7bee005b6b728"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/origin.json",
+      "bytes": 1209,
+      "sha256": "250e4f101eadf4a16eefb80d87305ffd27b90919879eb565e6ed08e9442439fe"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-before-private-arena.test.ts.source",
+      "bytes": 7440,
+      "sha256": "05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/numeric-private-arena.test.ts.source",
+      "bytes": 7495,
+      "sha256": "f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5"
+    },
+    {
       "path": "proofs/experiments/numeric-tree-20261017/numeric-spatial.as.ts",
       "bytes": 1473,
       "sha256": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/pipeline-failure-check.sh",
+      "bytes": 156,
+      "sha256": "e7754ebaadccd254f4d104ec7e7d682b76b478219e4159445d9253a916c55486"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/pipeline-status-check.json",
+      "bytes": 1399,
+      "sha256": "0288d7e02b3f6dcf986368c4370664e94ecd1be9c847c02639576dd33e18872f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/private-arena-focused-tests.txt",
+      "bytes": 339,
+      "sha256": "57d374fbcade1663641383ae0147972fc4490e28bc4468e0dccbfed7ee744962"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-bun-screen.json",
+      "bytes": 33886,
+      "sha256": "1844f44360f09dac64d6bde1eba30097a93c2b49e517910d58e18f32761a5903"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-node-screen.json",
+      "bytes": 33839,
+      "sha256": "edb0780dca30234a27cda8784e881a994de75267f8085e65968a4dd27991244c"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage1-wasm-bodies.json",
+      "bytes": 3046,
+      "sha256": "392995bde62fe018eb39ff0f146327216e7e302bc7cdf01185cee8c1a549e0e3"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-bun-screen.json",
+      "bytes": 52360,
+      "sha256": "24fe3df5304b35aec4a2a3c1d79c6184433cfccfb0899e3df4d88cbc00672ebd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-node-screen.json",
+      "bytes": 52312,
+      "sha256": "dde590d9a3acfb05bcb8812849d2355c86a76d4d4fbd83d3f426a79e96bc8b6a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage2-tests.txt",
+      "bytes": 339,
+      "sha256": "7a9b57c63066a0e681b3a30da315ba0d771326e3b86bc73b98fecf80b7415250"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa-controller.txt",
+      "bytes": 2946,
+      "sha256": "7d7a6c709327f92f246fe2367479aa35d6f7b5374e0c4a34a89b202d011e38d4"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.json",
+      "bytes": 68666,
+      "sha256": "3bf0af9b806f73696f521a2bd82c7fae8f29bcb94a4e3165b56c0785a64affb1"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.txt",
+      "bytes": 4184,
+      "sha256": "9a9b18ce105410fc61d14ffd16396efdf6cad7df0bd757b155bbfebc8c891aa6"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.json",
+      "bytes": 68921,
+      "sha256": "dc8856bf438d03417d4cea66346b437b25a6c8bec1edbe9a62460699fec2d827"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.txt",
+      "bytes": 4188,
+      "sha256": "92db81bbe6627d66063f6a2206e7284cb6a46e164a1a8595df3c293c8390e28a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.json",
+      "bytes": 68733,
+      "sha256": "561349629fa8e74d63226583989bbd47a860baeda818d975ce0b452fe5d5c319"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.txt",
+      "bytes": 4185,
+      "sha256": "57658fae86a20744f72e4f8ff798def494257750445713b1664fe9a22f130724"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.json",
+      "bytes": 68925,
+      "sha256": "addfc507ec774753331bc08fa09d0d28e0ab3bd8345ad59d10ffc442b0ebbeaf"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.txt",
+      "bytes": 4186,
+      "sha256": "6af565d6f68b32c99e4837d71b7c5dea5e8b9200beacae1c85e880b8aeba3aa7"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/cohort.json",
+      "bytes": 5090,
+      "sha256": "1084d05ed4adb1851dc5703df4f2b87ce3309d53be22b3d6a73c5a826998f63f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.json",
+      "bytes": 110450,
+      "sha256": "37a5b2d162ec794da8542b8d81cd09de1057ad6b4597b787ae42cc9fc15eb1ec"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.txt",
+      "bytes": 10538,
+      "sha256": "f0c6d30c21c8896b2b72d1a64f88bcf1143c0ea3628bb07b7a07115e1461e151"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-worker.txt",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.json",
+      "bytes": 110194,
+      "sha256": "3b167544b683b3eed83d7a8e83a87dda587ef47c368ac8a0d73c52883824c876"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.txt",
+      "bytes": 9918,
+      "sha256": "415b34a9fff8b366bdca1bc084f6c4f59dca50106058633bd4c049cd8d115892"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-node-worker.txt",
+      "bytes": 118,
+      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-review-tests.txt",
+      "bytes": 339,
+      "sha256": "9129648492de82c3527e0ab20dd62536a717e1a3bc2194f380e1ccd68d432044"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-tests.txt",
+      "bytes": 339,
+      "sha256": "e388e30ba11b66cafd263fcd911d665fe1252df21eb926d688751c96db1f6c59"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/results/stage3-wasm-bodies.json",
+      "bytes": 7314,
+      "sha256": "29f829c26b8dc879b13103a6f39f1acf1a029bd3ae87ac8fc6c046b4cc0d6e56"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/stage1-benchmark.mjs",
@@ -111,131 +279,6 @@
       "path": "proofs/numeric-tree-worker.mjs",
       "bytes": 3088,
       "sha256": "6697d70d62c8fab2ffbcaf8d85c787cbcbe9e49b975867a2e9bbcd2e2fffb0a0"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage1-bun-screen.json",
-      "bytes": 33886,
-      "sha256": "1844f44360f09dac64d6bde1eba30097a93c2b49e517910d58e18f32761a5903"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage1-node-screen.json",
-      "bytes": 33839,
-      "sha256": "edb0780dca30234a27cda8784e881a994de75267f8085e65968a4dd27991244c"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage1-wasm-bodies.json",
-      "bytes": 3046,
-      "sha256": "392995bde62fe018eb39ff0f146327216e7e302bc7cdf01185cee8c1a549e0e3"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage2-bun-screen.json",
-      "bytes": 52360,
-      "sha256": "24fe3df5304b35aec4a2a3c1d79c6184433cfccfb0899e3df4d88cbc00672ebd"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage2-node-screen.json",
-      "bytes": 52312,
-      "sha256": "dde590d9a3acfb05bcb8812849d2355c86a76d4d4fbd83d3f426a79e96bc8b6a"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage2-tests.txt",
-      "bytes": 339,
-      "sha256": "7a9b57c63066a0e681b3a30da315ba0d771326e3b86bc73b98fecf80b7415250"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.json",
-      "bytes": 68666,
-      "sha256": "3bf0af9b806f73696f521a2bd82c7fae8f29bcb94a4e3165b56c0785a64affb1"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.txt",
-      "bytes": 4184,
-      "sha256": "9a9b18ce105410fc61d14ffd16396efdf6cad7df0bd757b155bbfebc8c891aa6"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.json",
-      "bytes": 68921,
-      "sha256": "dc8856bf438d03417d4cea66346b437b25a6c8bec1edbe9a62460699fec2d827"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.txt",
-      "bytes": 4188,
-      "sha256": "92db81bbe6627d66063f6a2206e7284cb6a46e164a1a8595df3c293c8390e28a"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.json",
-      "bytes": 68733,
-      "sha256": "561349629fa8e74d63226583989bbd47a860baeda818d975ce0b452fe5d5c319"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.txt",
-      "bytes": 4185,
-      "sha256": "57658fae86a20744f72e4f8ff798def494257750445713b1664fe9a22f130724"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.json",
-      "bytes": 68925,
-      "sha256": "addfc507ec774753331bc08fa09d0d28e0ab3bd8345ad59d10ffc442b0ebbeaf"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.txt",
-      "bytes": 4186,
-      "sha256": "6af565d6f68b32c99e4837d71b7c5dea5e8b9200beacae1c85e880b8aeba3aa7"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa/cohort.json",
-      "bytes": 5090,
-      "sha256": "1084d05ed4adb1851dc5703df4f2b87ce3309d53be22b3d6a73c5a826998f63f"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-aa-controller.txt",
-      "bytes": 2946,
-      "sha256": "7d7a6c709327f92f246fe2367479aa35d6f7b5374e0c4a34a89b202d011e38d4"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-bun-full.json",
-      "bytes": 110450,
-      "sha256": "37a5b2d162ec794da8542b8d81cd09de1057ad6b4597b787ae42cc9fc15eb1ec"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-bun-full.txt",
-      "bytes": 10538,
-      "sha256": "f0c6d30c21c8896b2b72d1a64f88bcf1143c0ea3628bb07b7a07115e1461e151"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-bun-worker.txt",
-      "bytes": 118,
-      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-node-full.json",
-      "bytes": 110194,
-      "sha256": "3b167544b683b3eed83d7a8e83a87dda587ef47c368ac8a0d73c52883824c876"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-node-full.txt",
-      "bytes": 9918,
-      "sha256": "415b34a9fff8b366bdca1bc084f6c4f59dca50106058633bd4c049cd8d115892"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-node-worker.txt",
-      "bytes": 118,
-      "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-review-tests.txt",
-      "bytes": 339,
-      "sha256": "9129648492de82c3527e0ab20dd62536a717e1a3bc2194f380e1ccd68d432044"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-tests.txt",
-      "bytes": 339,
-      "sha256": "e388e30ba11b66cafd263fcd911d665fe1252df21eb926d688751c96db1f6c59"
-    },
-    {
-      "path": "proofs/results/numeric-tree-20261017/stage3-wasm-bodies.json",
-      "bytes": 7314,
-      "sha256": "29f829c26b8dc879b13103a6f39f1acf1a029bd3ae87ac8fc6c046b4cc0d6e56"
     }
   ],
   "buildInputs": [
@@ -371,8 +414,8 @@
         "sha256": "f26c5a44ab69591a96e6d00f28d206a2f3d4d31a82c31e557d2425f8aadb717a"
       },
       "reports": [
-        "proofs/results/numeric-tree-20261017/stage1-node-screen.json",
-        "proofs/results/numeric-tree-20261017/stage1-bun-screen.json"
+        "proofs/experiments/numeric-tree-20261017/results/stage1-node-screen.json",
+        "proofs/experiments/numeric-tree-20261017/results/stage1-bun-screen.json"
       ],
       "wasm": "d6436b6dfc7a2366dc7747f8c583dcd7dfc4316190ef074f2252125ba78d593c"
     },
@@ -389,8 +432,8 @@
         "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
       },
       "reports": [
-        "proofs/results/numeric-tree-20261017/stage2-node-screen.json",
-        "proofs/results/numeric-tree-20261017/stage2-bun-screen.json"
+        "proofs/experiments/numeric-tree-20261017/results/stage2-node-screen.json",
+        "proofs/experiments/numeric-tree-20261017/results/stage2-bun-screen.json"
       ],
       "wasm": "5c93efe7c070743f9285e2ba1b87a7dbe80d8d689c6b5ff170ca15e7ec0ead93"
     },
@@ -407,8 +450,8 @@
         "sha256": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
       },
       "reports": [
-        "proofs/results/numeric-tree-20261017/stage3-node-full.json",
-        "proofs/results/numeric-tree-20261017/stage3-bun-full.json"
+        "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.json",
+        "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.json"
       ],
       "wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
     }
@@ -416,8 +459,8 @@
   "protocols": {
     "currentPlan": {
       "path": "proofs/experiments/numeric-tree-20261017/README.md",
-      "bytes": 5146,
-      "sha256": "0ecf1d48677822962682c5bc2d7e46f3541e05fa3d519f5fb23576eaf906ce05"
+      "bytes": 5480,
+      "sha256": "38c6ad9d20ec50d6c5a7cfd35e0ff581b6ce8898e29b560f32f77f21e7e17fca"
     },
     "firstFullStage3Driver": {
       "path": "proofs/experiments/numeric-tree-20261017/stage3-benchmark.mjs",
@@ -439,7 +482,7 @@
     "focusedNumericSpatial": {
       "tests": 52,
       "status": "passed",
-      "log": "proofs/results/numeric-tree-20261017/stage3-review-tests.txt"
+      "log": "proofs/experiments/numeric-tree-20261017/results/stage3-review-tests.txt"
     },
     "nodeWorker": "passed",
     "bunWorker": "passed",
@@ -448,6 +491,189 @@
     "localTypes": "pending",
     "localBrowser": "pending",
     "localARM64": "pending",
-    "performanceAcceptance": "failed"
+    "performanceAcceptance": "failed",
+    "workflowPipelineStatus": {
+      "fixedShellPropagatesFailure": true,
+      "producerExit": 23,
+      "actualShellExit": 23,
+      "log": "proofs/experiments/numeric-tree-20261017/results/pipeline-status-check.json"
+    },
+    "privateArenaFocused": {
+      "tests": 56,
+      "files": 3,
+      "status": "passed",
+      "log": "proofs/experiments/numeric-tree-20261017/results/private-arena-focused-tests.txt"
+    }
+  },
+  "relocation": {
+    "reason": "Place new experiment records outside the protected baseline evidence tree.",
+    "rawBytesUnchanged": true,
+    "files": [
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage1-bun-screen.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage1-bun-screen.json",
+        "bytes": 33886,
+        "sha256": "1844f44360f09dac64d6bde1eba30097a93c2b49e517910d58e18f32761a5903"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage1-node-screen.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage1-node-screen.json",
+        "bytes": 33839,
+        "sha256": "edb0780dca30234a27cda8784e881a994de75267f8085e65968a4dd27991244c"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage1-wasm-bodies.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage1-wasm-bodies.json",
+        "bytes": 3046,
+        "sha256": "392995bde62fe018eb39ff0f146327216e7e302bc7cdf01185cee8c1a549e0e3"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage2-bun-screen.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage2-bun-screen.json",
+        "bytes": 52360,
+        "sha256": "24fe3df5304b35aec4a2a3c1d79c6184433cfccfb0899e3df4d88cbc00672ebd"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage2-node-screen.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage2-node-screen.json",
+        "bytes": 52312,
+        "sha256": "dde590d9a3acfb05bcb8812849d2355c86a76d4d4fbd83d3f426a79e96bc8b6a"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage2-tests.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage2-tests.txt",
+        "bytes": 339,
+        "sha256": "7a9b57c63066a0e681b3a30da315ba0d771326e3b86bc73b98fecf80b7415250"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.json",
+        "bytes": 68666,
+        "sha256": "3bf0af9b806f73696f521a2bd82c7fae8f29bcb94a4e3165b56c0785a64affb1"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/1-node-a-b.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/1-node-a-b.txt",
+        "bytes": 4184,
+        "sha256": "9a9b18ce105410fc61d14ffd16396efdf6cad7df0bd757b155bbfebc8c891aa6"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.json",
+        "bytes": 68921,
+        "sha256": "dc8856bf438d03417d4cea66346b437b25a6c8bec1edbe9a62460699fec2d827"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/2-bun-a-b.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/2-bun-a-b.txt",
+        "bytes": 4188,
+        "sha256": "92db81bbe6627d66063f6a2206e7284cb6a46e164a1a8595df3c293c8390e28a"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.json",
+        "bytes": 68733,
+        "sha256": "561349629fa8e74d63226583989bbd47a860baeda818d975ce0b452fe5d5c319"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/3-node-b-a.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/3-node-b-a.txt",
+        "bytes": 4185,
+        "sha256": "57658fae86a20744f72e4f8ff798def494257750445713b1664fe9a22f130724"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.json",
+        "bytes": 68925,
+        "sha256": "addfc507ec774753331bc08fa09d0d28e0ab3bd8345ad59d10ffc442b0ebbeaf"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/4-bun-b-a.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/4-bun-b-a.txt",
+        "bytes": 4186,
+        "sha256": "6af565d6f68b32c99e4837d71b7c5dea5e8b9200beacae1c85e880b8aeba3aa7"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa/cohort.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa/cohort.json",
+        "bytes": 5090,
+        "sha256": "1084d05ed4adb1851dc5703df4f2b87ce3309d53be22b3d6a73c5a826998f63f"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-aa-controller.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-aa-controller.txt",
+        "bytes": 2946,
+        "sha256": "7d7a6c709327f92f246fe2367479aa35d6f7b5374e0c4a34a89b202d011e38d4"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-bun-full.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.json",
+        "bytes": 110450,
+        "sha256": "37a5b2d162ec794da8542b8d81cd09de1057ad6b4597b787ae42cc9fc15eb1ec"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-bun-full.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-full.txt",
+        "bytes": 10538,
+        "sha256": "f0c6d30c21c8896b2b72d1a64f88bcf1143c0ea3628bb07b7a07115e1461e151"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-bun-worker.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-bun-worker.txt",
+        "bytes": 118,
+        "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-node-full.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.json",
+        "bytes": 110194,
+        "sha256": "3b167544b683b3eed83d7a8e83a87dda587ef47c368ac8a0d73c52883824c876"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-node-full.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-node-full.txt",
+        "bytes": 9918,
+        "sha256": "415b34a9fff8b366bdca1bc084f6c4f59dca50106058633bd4c049cd8d115892"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-node-worker.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-node-worker.txt",
+        "bytes": 118,
+        "sha256": "b24c59e65af7bd2389f925a68c0660694c67f231e6139ba63034c0eea753c7aa"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-review-tests.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-review-tests.txt",
+        "bytes": 339,
+        "sha256": "9129648492de82c3527e0ab20dd62536a717e1a3bc2194f380e1ccd68d432044"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-tests.txt",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-tests.txt",
+        "bytes": 339,
+        "sha256": "e388e30ba11b66cafd263fcd911d665fe1252df21eb926d688751c96db1f6c59"
+      },
+      {
+        "oldPath": "proofs/results/numeric-tree-20261017/stage3-wasm-bodies.json",
+        "newPath": "proofs/experiments/numeric-tree-20261017/results/stage3-wasm-bodies.json",
+        "bytes": 7314,
+        "sha256": "29f829c26b8dc879b13103a6f39f1acf1a029bd3ae87ac8fc6c046b4cc0d6e56"
+      }
+    ]
+  },
+  "fixtureRepair": {
+    "beforeTestSource": "proofs/experiments/numeric-tree-20261017/numeric-before-private-arena.test.ts.source",
+    "beforeSha256": "05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f",
+    "afterTestSource": "proofs/experiments/numeric-tree-20261017/numeric-private-arena.test.ts.source",
+    "afterSha256": "f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5",
+    "change": "Only the new million-value fixture uses an explicit private Arena; its data and assertions are unchanged.",
+    "geometryTestUnchanged": true,
+    "timeoutUnchanged": true,
+    "timeoutCauseEstablished": false
+  },
+  "hostedFirst": {
+    "runId": 38997133985,
+    "statusInvalid": true,
+    "origin": "proofs/experiments/numeric-tree-20261017/hosted-first/origin.json"
   }
 }

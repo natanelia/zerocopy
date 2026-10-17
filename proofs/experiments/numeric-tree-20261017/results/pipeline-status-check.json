@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-17T03:11:52.084986+00:00",
+  "scope": "A deliberate failure checks pipeline exit propagation. This is not a numeric performance measurement.",
+  "workflow": ".github/workflows/numeric-tree-performance.yml",
+  "scriptSha256": "e7754ebaadccd254f4d104ec7e7d682b76b478219e4159445d9253a916c55486",
+  "runs": [
+    {
+      "name": "old-default-shell",
+      "shellArguments": [
+        "/usr/bin/bash",
+        "-e"
+      ],
+      "script": "proofs/experiments/numeric-tree-20261017/pipeline-failure-check.sh",
+      "producerExit": 23,
+      "expectedShellExit": 0,
+      "actualShellExit": 0,
+      "stdout": "Intentional failure for numeric workflow pipeline verification.\n",
+      "stderr": "",
+      "teeOutput": "Intentional failure for numeric workflow pipeline verification.\n"
+    },
+    {
+      "name": "fixed-job-shell",
+      "shellArguments": [
+        "/usr/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-euo",
+        "pipefail"
+      ],
+      "script": "proofs/experiments/numeric-tree-20261017/pipeline-failure-check.sh",
+      "producerExit": 23,
+      "expectedShellExit": 23,
+      "actualShellExit": 23,
+      "stdout": "Intentional failure for numeric workflow pipeline verification.\n",
+      "stderr": "",
+      "teeOutput": "Intentional failure for numeric workflow pipeline verification.\n"
+    }
+  ],
+  "fixedShellPropagatesFailure": true
+}

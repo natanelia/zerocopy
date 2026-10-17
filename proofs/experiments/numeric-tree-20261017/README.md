@@ -33,6 +33,12 @@ initial Wasm compilation, imports, worker transport, and checks are excluded.
 
 ## Run
 
+Committed raw evidence is in this experiment's `results/` directory. Each
+file has the same bytes as its first recorded output. Paths inside the raw
+records and saved historical drivers retain their original names. The
+commands below write new runtime output under `proofs/results/`; do not
+replace a retained report with a new run.
+
 Build both checkouts with their normal Wasm and browser build scripts. Run
 from the candidate checkout:
 

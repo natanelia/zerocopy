@@ -43,7 +43,7 @@ bytes. The span, exported range, tree-box, and exported point-count bodies
 are identical to their baseline bodies. Types, imports, function
 signatures, and exports also have identical section bytes. This byte
 comparison does not establish equal native code placement in a runtime.
-See [the Wasm body audit](../../results/numeric-tree-20261017/stage3-wasm-bodies.json).
+See [the Wasm body audit](results/stage3-wasm-bodies.json).
 
 ## Stages and observed results
 
@@ -155,8 +155,31 @@ The diagnostic driver SHA-256 is
 `40a470193594c6db0b6e5bb9a16f9850e8692f2f5c70eb266a3f70456574d7ff`.
 The controller SHA-256 is
 `72fff1ae8d9b600808b7230ff0a50d41ce4f0906531ec5dc5962191df5e2c480`.
-See [the full cohort](../../results/numeric-tree-20261017/stage3-aa/cohort.json)
-and [the controller log](../../results/numeric-tree-20261017/stage3-aa-controller.txt).
+See [the full cohort](results/stage3-aa/cohort.json)
+and [the controller log](results/stage3-aa-controller.txt).
+
+## First hosted workflow status is invalid
+
+The first [hosted comparison run](https://github.com/natanelia/zerocopy/actions/runs/38997133985)
+reported success even though its x64 identical-source diagnostic and Bun
+performance gate failed. Its default shell used `bash -e`. The commands
+sent their output through `tee`. Without `pipefail`, the success of `tee`
+hid the failed benchmark command. The final step received successful step
+outcomes and could not detect those failures.
+
+That green workflow status is invalid as an acceptance result. Keep its
+raw failures. They do not clear the local failures or the new method.
+The complete [x64 archive](hosted-first/numeric-tree-x64-first.zip) and
+[ARM64 archive](hosted-first/numeric-tree-arm64-first.zip) are retained.
+[Their origin record](hosted-first/origin.json) gives the workflow run,
+artifact IDs, file sizes, and verified official SHA-256 digests.
+
+The workflow now sets the job's run shell to
+`bash --noprofile --norc -euo pipefail {0}`. Each pipeline then propagates
+the producer's nonzero status. A small deliberate-failure probe records
+the exact shell command, producer status, and returned status in
+[the pipeline check](results/pipeline-status-check.json). The probe checks
+exit propagation only. It is not a passing numeric performance result.
 
 ## Correctness evidence
 
@@ -171,16 +194,36 @@ After review, the new raw-memory boundary test was changed to declare a
 maximum of two Wasm pages. It never grows memory. This avoids a large
 virtual memory reservation without changing the bytes that the test can
 read. The focused suite passed all 52 tests again after that test-only
-change. See [the review test log](../../results/numeric-tree-20261017/stage3-review-tests.txt).
+change. See [the review test log](results/stage3-review-tests.txt).
 The existing unrelated memory-end test is unchanged.
+
+A separate hosted worker-sessions job timed out in the existing geometry
+test for an attached snapshot after memory growth. That test compares the
+whole default arena buffer. The new million-value numeric fixture had
+used that default arena and could leave it large for a later test. This
+is a possible cause, not a proved explanation for the timeout.
+
+The new numeric fixture now creates an explicit private `Arena`. Its
+values, bounds, snapshots, and checks remain the same. The geometry test
+and its time limit remain unchanged. The combined numeric, spatial, and
+geometry check passed all 56 tests after the fixture change; see
+[the focused log](results/private-arena-focused-tests.txt). This is a
+fixture isolation check. A full suite on the repaired head is still
+required.
+
+The [old test source](numeric-before-private-arena.test.ts.source) and
+[private-arena test source](numeric-private-arena.test.ts.source) are both
+retained. Their SHA-256 digests are
+`05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f`
+and `f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5`.
 
 The focused worker proof passed on Node and Bun. A real worker repeatedly
 reads an attached snapshot while the owner grows its memory and creates
 new versions. It also checks the read-only write guard and the retained
 old, new, and forked values. These results are in
-[the test log](../../results/numeric-tree-20261017/stage3-tests.txt),
-[the Node worker log](../../results/numeric-tree-20261017/stage3-node-worker.txt),
-and [the Bun worker log](../../results/numeric-tree-20261017/stage3-bun-worker.txt).
+[the test log](results/stage3-tests.txt),
+[the Node worker log](results/stage3-node-worker.txt),
+and [the Bun worker log](results/stage3-bun-worker.txt).
 
 The separate hosted workflow builds the pull request base and candidate
 on x64 and ARM64. It retains the identical-source diagnostic and both
@@ -188,7 +231,8 @@ runtime comparisons even when a gate fails. A final step requires every
 performance gate to pass. It also runs full tests, type checks, and real
 workers. The x64 job compares current-base and candidate correctness in
 Chromium, Firefox, and WebKit, in automatic and forced-scalar modes.
-These hosted checks are pending for this draft.
+Hosted acceptance remains open for this draft. The first workflow status
+cannot establish acceptance for the reason described above.
 
 The full suite and type checks have not run locally in the candidate
 worktree. Browser checks and ARM64 checks have also not run locally.
@@ -216,12 +260,12 @@ The local experiment reports name the base Git revision because the
 candidate source was still uncommitted during those measurements. Their
 source hashes and stored stage files identify the exact measured code.
 
-- [Stage 1 Node samples](../../results/numeric-tree-20261017/stage1-node-screen.json)
-- [Stage 1 Bun samples](../../results/numeric-tree-20261017/stage1-bun-screen.json)
-- [Stage 2 Node samples](../../results/numeric-tree-20261017/stage2-node-screen.json)
-- [Stage 2 Bun samples](../../results/numeric-tree-20261017/stage2-bun-screen.json)
-- [Stage 3 Node samples and failed gate](../../results/numeric-tree-20261017/stage3-node-full.json)
-- [Stage 3 Bun samples and failed gate](../../results/numeric-tree-20261017/stage3-bun-full.json)
+- [Stage 1 Node samples](results/stage1-node-screen.json)
+- [Stage 1 Bun samples](results/stage1-bun-screen.json)
+- [Stage 2 Node samples](results/stage2-node-screen.json)
+- [Stage 2 Bun samples](results/stage2-bun-screen.json)
+- [Stage 3 Node samples and failed gate](results/stage3-node-full.json)
+- [Stage 3 Bun samples and failed gate](results/stage3-bun-full.json)
 
 The stage-3 source SHA-256 is
 `09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3`.
