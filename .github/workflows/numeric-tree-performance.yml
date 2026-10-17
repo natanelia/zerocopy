@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: numeric-tree-comparison-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   compare:
     strategy:
@@ -46,12 +50,19 @@ jobs:
           bun-version: '1.4.2'
       - name: Install pinned dependencies
         run: bun install
-      - name: Build candidate
+      - name: Build candidate and retain its exact input
         run: |
           mkdir -p "$EVIDENCE_DIR"
+          git archive HEAD > "$EVIDENCE_DIR/candidate-source.tar"
+          git rev-parse HEAD > "$EVIDENCE_DIR/candidate-commit.txt"
           bun run build:wasm
           bun run build:browser
           bun run build:types
+          mkdir "$EVIDENCE_DIR/candidate-build"
+          cp -R dist "$EVIDENCE_DIR/candidate-build/"
+          cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/candidate-build/"
+      - name: Test the fail-closed measurement harness
+        run: node --test proofs/numeric-tree-process.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
       - name: Check types and test suite
         run: |
           bun run typecheck
@@ -74,32 +85,46 @@ jobs:
         run: |
           ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
           cd "$BASE_DIR"
+          git archive HEAD > "$EVIDENCE_DIR/baseline-source.tar"
+          git rev-parse HEAD > "$EVIDENCE_DIR/baseline-commit.txt"
           bun run build:wasm
           bun run build:browser
           cmp numeric-kernels.wasm "$CANDIDATE_DIR/numeric-kernels.wasm"
-      - name: Check fixed identical-source cohort
-        id: aa
+          mkdir "$EVIDENCE_DIR/baseline-build"
+          cp -R dist "$EVIDENCE_DIR/baseline-build/"
+          cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/baseline-build/"
+      - name: Check Node identical-build size-isolated cohort
+        id: node_aa
         continue-on-error: true
         env:
-          SOURCE_DIR: ${{ github.workspace }}
-          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/aa
-          NODE_BIN: node
-          BUN_BIN: bun
-        run: node proofs/numeric-tree-aa.mjs 2>&1 | tee "$EVIDENCE_DIR/aa-controller.txt"
-      - name: Compare base and candidate on Node
-        id: node
+          RUNTIME_BIN: node
+          KIND: aa
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/node-aa
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/node-aa.txt"
+      - name: Compare Node base and candidate in fresh processes
+        id: node_ab
         continue-on-error: true
         env:
-          PERF_GATE: '1'
-          OUT_FILE: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/node-full.json
-        run: node proofs/numeric-tree-benchmark.mjs 2>&1 | tee "$EVIDENCE_DIR/node-full.txt"
-      - name: Compare base and candidate on Bun
-        id: bun
+          RUNTIME_BIN: node
+          KIND: ab
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/node-ab
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/node-ab.txt"
+      - name: Check Bun identical-build size-isolated cohort
+        id: bun_aa
         continue-on-error: true
         env:
-          PERF_GATE: '1'
-          OUT_FILE: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/bun-full.json
-        run: bun proofs/numeric-tree-benchmark.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-full.txt"
+          RUNTIME_BIN: bun
+          KIND: aa
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/bun-aa
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-aa.txt"
+      - name: Compare Bun base and candidate in fresh processes
+        id: bun_ab
+        continue-on-error: true
+        env:
+          RUNTIME_BIN: bun
+          KIND: ab
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/bun-ab
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-ab.txt"
       - name: Install browser engines
         if: runner.arch == 'X64'
         run: bunx playwright install --with-deps chromium firefox webkit
@@ -111,13 +136,15 @@ jobs:
       - name: Enforce every performance gate
         if: always()
         env:
-          AA_RESULT: ${{ steps.aa.outcome }}
-          NODE_RESULT: ${{ steps.node.outcome }}
-          BUN_RESULT: ${{ steps.bun.outcome }}
+          NODE_AA_RESULT: ${{ steps.node_aa.outcome }}
+          NODE_AB_RESULT: ${{ steps.node_ab.outcome }}
+          BUN_AA_RESULT: ${{ steps.bun_aa.outcome }}
+          BUN_AB_RESULT: ${{ steps.bun_ab.outcome }}
         run: |
-          test "$AA_RESULT" = success
-          test "$NODE_RESULT" = success
-          test "$BUN_RESULT" = success
+          test "$NODE_AA_RESULT" = success
+          test "$NODE_AB_RESULT" = success
+          test "$BUN_AA_RESULT" = success
+          test "$BUN_AB_RESULT" = success
       - name: Save all evidence, including failed gates
         uses: actions/upload-artifact@v4
         if: always()
