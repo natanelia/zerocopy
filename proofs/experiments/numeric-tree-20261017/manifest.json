@@ -3,7 +3,7 @@
   "kind": "current-file-inventory",
   "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
   "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
-  "sourceParent": "906eaf1d9ca4751244631695900335d1f78f2017",
+  "sourceParent": "5d43c0e2f93e1f6128462b251309be37816a61ec",
   "notes": [
     "This inventories the staged source, not a performance acceptance decision.",
     "The inventory excludes itself to avoid a recursive digest.",
@@ -15,8 +15,8 @@
       "path": ".github/workflows/numeric-tree-performance.yml",
       "status": "added",
       "mode": "100644",
-      "bytes": 6722,
-      "sha256": "a08175fbca4fed62cee642f054749c6771d53dc647f355e73e6e7821e9dd046f"
+      "bytes": 6648,
+      "sha256": "5eb65016f8d9a57db1044ea0c758fd3494d63a763dfc1e6a6253426006f657c2"
     },
     {
       "path": "geometry.test.ts",
@@ -45,6 +45,13 @@
       "mode": "100644",
       "bytes": 1154,
       "sha256": "19bea28c947b4d97ba75d1bf135c39da2e26bf713d563b55690c734d6bdfc8d2"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/MIXED-POINT-METHOD.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2786,
+      "sha256": "0a1dea8876e65d159edb71323d0aee6951bf0d075e2ac0d0452c8972df7c1862"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/PROCESS-METHOD.md",
@@ -694,22 +701,22 @@
       "path": "proofs/numeric-tree-process.mjs",
       "status": "added",
       "mode": "100644",
-      "bytes": 15190,
-      "sha256": "d10d8f237d9e873d816d547d4edb22cc38b48678e7a8103edf7dde61a5676a39"
+      "bytes": 16501,
+      "sha256": "77842c9459547c616ea4f90ade8bb32118d2f4175408aecf2269e2d8d7d5d033"
     },
     {
       "path": "proofs/numeric-tree-process.node.mjs",
       "status": "added",
       "mode": "100644",
-      "bytes": 6160,
-      "sha256": "0d76f1b91d400184d7c49819b2c0a0e443384f0867669e3e3e640e16c1d3cda8"
+      "bytes": 7055,
+      "sha256": "0a8070df1b33c3228c9710653d6eab2b97907cd2a8d2fbac7b0d56236f6cf8ac"
     },
     {
       "path": "proofs/numeric-tree-size-process.mjs",
       "status": "added",
       "mode": "100644",
       "bytes": 5405,
-      "sha256": "d8eb6c399e475b61a72abeb62b9c87d963319f4a319ab8e5cfc92bbe875e75a5"
+      "sha256": "032bc752abfd2f753827fbcb65cd51b3a10f406b6ca2e293614f00e8488a2c48"
     },
     {
       "path": "proofs/numeric-tree-toolkit.mjs",

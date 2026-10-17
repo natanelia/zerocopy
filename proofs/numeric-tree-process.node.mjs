@@ -15,9 +15,27 @@ test('balanced ABBA/BAAB schedule has eight pairs with equal role positions', ()
   for (const position of [0, 1, 2, 3]) assert.equal(jobs.filter(j => j.position === position && j.role === 'A').length, 2);
   assert.equal(jobs.filter(j => j.role === 'A').length, 8);
 });
-test('full fixed cohort retains all 48 endpoints and all old thresholds', () => {
-  assert.equal(endpoints().length, 48); assert.equal(PLAN.regressionFloor, .95);
+test('fixed cohort preserves 48 original endpoints and adds 15 mixed-hit controls', () => {
+  const entries = endpoints();
+  assert.equal(entries.length, 63);
+  assert.equal(entries.filter(({ name }) => !name.endsWith('-mixed')).length, 48);
+  assert.equal(entries.filter(({ name }) => name.endsWith('-mixed')).length, 15);
+  assert.equal(PLAN.version, 2);
+  assert.equal(PLAN.regressionFloor, .95);
   assert.equal(PLAN.improvementFloor, 1.05); assert.equal(PLAN.aaCeiling, 1 / .95);
+});
+test('fixed mixed box includes hits at every original even size and misses above size 2', () => {
+  const bounds = { minX: -5000, minY: 2000, maxX: -2500, maxY: 5000 };
+  const knownHits = new Map([[2, 1], [32, 4], [1024, 108], [32768, 3408], [262144, 27269]]);
+  for (const [size, count] of knownHits) {
+    let actual = 0;
+    for (let i = 0; i < size; i += 2) {
+      const x = (i * 7919) % 10007 - 5000, y = ((i + 1) * 7919) % 10007 - 5000;
+      actual += Number(x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY);
+    }
+    assert.equal(actual, count);
+    assert.ok(actual > 0 && (size === 2 || actual < size / 2));
+  }
 });
 test('median rejects invalid observations without dropping them', () => {
   assert.equal(median([4, 1, 2, 3]), 2.5);

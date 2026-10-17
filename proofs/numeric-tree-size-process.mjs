@@ -20,7 +20,7 @@ const runtimeSha256 = digest(runtimeFile);
 const kind = process.env.KIND ?? 'aa';
 assert.ok(['aa', 'ab'].includes(kind));
 assert.equal(process.platform, 'linux', 'This fixed affinity diagnostic requires Linux');
-assert.ok(!process.env.DIAGNOSTIC_SIZES, 'Full 48-endpoint coverage is required');
+assert.ok(!process.env.DIAGNOSTIC_SIZES, 'Full 63-endpoint coverage is required');
 assert.ok(!existsSync(outDir), 'Refuse to overwrite a prior cohort');
 mkdirSync(outDir, { recursive: true });
 const affinity = () => readFileSync('/proc/self/status', 'utf8').match(/^Cpus_allowed_list:\s*(.+)$/m)[1].trim();

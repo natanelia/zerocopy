@@ -9,7 +9,7 @@ import { performance } from 'node:perf_hooks';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const PLAN = Object.freeze({
-  version: 1, blocks: 4, warmup: 7, samples: 21, work: 8_000_000,
+  version: 2, blocks: 4, warmup: 7, samples: 21, work: 8_000_000,
   sizes: Object.freeze([1, 2, 31, 32, 33, 1024, 1057, 32768, 32801, 262144, 1048609]),
   regressionFloor: 0.95, improvementFloor: 1.05, aaCeiling: 1 / 0.95,
   childTimeoutMs: 240_000,
@@ -25,7 +25,8 @@ export function median(values) {
 export function endpoints(sizes = PLAN.sizes) {
   return sizes.flatMap(size => [
     ...['range-simd', 'range-scalar', 'range-public'].map(name => ({ name, size })),
-    ...(!(size & 1) ? ['point-scalar-control', 'point-simd-control', 'point-public-control'].map(name => ({ name, size })) : []),
+    ...(!(size & 1) ? ['point-scalar-control', 'point-simd-control', 'point-public-control',
+      'point-scalar-mixed', 'point-simd-mixed', 'point-public-mixed'].map(name => ({ name, size })) : []),
   ]);
 }
 export function schedule() {
@@ -146,6 +147,23 @@ async function subject(configPath) {
         measure(`point-${k}-control`, size, n => { let total = 0; for (let i = 0; i < n; i++) total += fn(root, depth, tail, size, -1000, -1000, 1000, 1000); return total; }, box, iterations);
       }
       measure('point-public-control', size, n => { let total = 0; for (let i = 0; i < n; i++) total += numeric.countPointsInBox(list, bounds); return total; }, box, iterations);
+      // Supplemental coverage: old all-miss controls stay byte-for-byte above.
+      // This independent box includes the first point at every even size and
+      // includes misses as well at every size above 2. Do not tune per size.
+      const mixedBounds = { minX: -5000, minY: 2000, maxX: -2500, maxY: 5000 };
+      let mixed = 0;
+      for (let i = 0; i < size; i += 2)
+        mixed += Number(values[i] >= mixedBounds.minX && values[i] <= mixedBounds.maxX &&
+          values[i + 1] >= mixedBounds.minY && values[i + 1] <= mixedBounds.maxY);
+      assert.ok(mixed > 0 && (size === 2 || mixed < size / 2), 'Mixed control lacks hit/miss coverage');
+      for (const k of ['scalar', 'simd']) {
+        const fn = kernels[k].countPointsInBox; const { root, depth, tail } = list;
+        measure(`point-${k}-mixed`, size, n => { let total = 0; for (let i = 0; i < n; i++)
+          total += fn(root, depth, tail, size, mixedBounds.minX, mixedBounds.minY, mixedBounds.maxX, mixedBounds.maxY);
+          return total; }, mixed, iterations);
+      }
+      measure('point-public-mixed', size, n => { let total = 0; for (let i = 0; i < n; i++)
+        total += numeric.countPointsInBox(list, mixedBounds); return total; }, mixed, iterations);
     }
     assert.equal(memory.buffer.byteLength, savedBytes.length, 'Read changed arena length');
     assert.ok(Buffer.from(memory.buffer).equals(savedBytes), 'Read changed snapshot bytes');

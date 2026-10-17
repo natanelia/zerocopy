@@ -2,11 +2,6 @@ name: Numeric tree comparison
 
 on:
   workflow_dispatch:
-    inputs:
-      baseline:
-        description: Exact baseline revision to build
-        required: true
-        default: afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
   pull_request:
     paths:
       - 'numeric-kernels.as.ts'
@@ -48,6 +43,7 @@ jobs:
       - name: Check out candidate
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -89,7 +85,7 @@ jobs:
       - name: Check out exact comparison base after candidate tests
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.sha || inputs.baseline }}
+          ref: afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
           path: .numeric-tree-base
           persist-credentials: false
       - name: Verify the complete source inventory
@@ -158,7 +154,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: numeric-tree-${{ runner.arch }}-${{ github.sha }}
+          name: numeric-tree-${{ runner.arch }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: proofs/results/numeric-tree-hosted/
           if-no-files-found: error
           retention-days: 30
