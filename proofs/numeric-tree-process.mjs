@@ -91,7 +91,7 @@ function bundleManifest(dir) {
     ...readdirSync(resolve(dir, 'dist')).filter(n => n.endsWith('.js')).sort().map(n => `dist/${n}`)];
   return Object.fromEntries(files.map(name => [name, digest(resolve(dir, name))]));
 }
-function sourceManifest(dir) {
+export function sourceManifest(dir) {
   const tracked = spawnSync('git', ['ls-files', '-z'], { cwd: dir, encoding: 'utf8' });
   assert.equal(tracked.status, 0, 'A Git source index is required');
   const files = tracked.stdout.split('\0').filter(Boolean).filter(name => !name.startsWith('proofs/'));
@@ -153,11 +153,12 @@ async function subject(configPath) {
   assert.deepEqual(bundleManifest(moduleDir), before); assert.equal(digest(self), driver);
   writeFileSync(output, JSON.stringify({ plan, driver, runtime: { node: process.version, bun: process.versions.bun ?? null, v8: process.versions.v8, arch: process.arch, cpu: cpus()[0].model }, bundle: before, maximumArenaBytes, sink, results }, null, 2) + '\n', { flag: 'wx' });
 }
-export function runCohort({ baseDir, candidateDir, outDir, runtime, kind, sizes = PLAN.sizes }) {
+export function runCohort({ baseDir, candidateDir, outDir, runtime, kind, sizes = PLAN.sizes, expectedSources = null }) {
   assert.ok(['aa', 'ab'].includes(kind));
   assert.ok(sizes.length && new Set(sizes).size === sizes.length && sizes.every(s => PLAN.sizes.includes(s)));
   assert.ok(!existsSync(outDir), 'Refuse to overwrite a prior cohort'); mkdirSync(outDir, { recursive: true });
   const base = sourceManifest(baseDir); const candidate = sourceManifest(candidateDir);
+  if (expectedSources) assert.deepEqual({ baseline: base, candidate }, expectedSources, 'Inputs changed since the full-run plan');
   const sources = { A: kind === 'aa' ? candidate : base, B: candidate };
   const directories = { A: kind === 'aa' ? candidateDir : baseDir, B: candidateDir };
   const temporary = mkdtempSync(join(tmpdir(), 'zerocopy-numeric-process-'));
@@ -195,7 +196,7 @@ export function runCohort({ baseDir, candidateDir, outDir, runtime, kind, sizes 
     assert.deepEqual(sourceManifest(baseDir), base); assert.deepEqual(sourceManifest(candidateDir), candidate); assert.equal(digest(self), driver);
     let rows = []; let error = null;
     try { rows = summarize(children, kind, sizes); } catch (failure) { error = String(failure); }
-    const report = { kind, plan, driver, fullCoverage: JSON.stringify(sizes) === JSON.stringify(PLAN.sizes), complete: children.length === fixedSchedule.length, error, pass: !error && rows.length === endpoints(sizes).length && rows.every(r => r.pass), rows };
+    const report = { kind, plan, driver, runtime: children[0]?.report?.runtime ?? null, fullCoverage: JSON.stringify(sizes) === JSON.stringify(PLAN.sizes), complete: children.length === fixedSchedule.length, error, pass: !error && rows.length === endpoints(sizes).length && rows.every(r => r.pass), rows };
     writeFileSync(resolve(outDir, 'summary.json'), JSON.stringify(report, null, 2) + '\n', { flag: 'wx' });
     console.log('NUMERIC-PROCESS-SUMMARY', JSON.stringify(report)); return report;
   } finally { rmSync(temporary, { recursive: true, force: true }); }

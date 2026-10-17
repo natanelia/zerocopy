@@ -11,6 +11,13 @@ on:
     paths:
       - 'numeric-kernels.as.ts'
       - 'numeric.test.ts'
+      - 'numeric.ts'
+      - 'numeric-spatial.as.ts'
+      - 'numeric-wasm.ts'
+      - 'geometry.test.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'scripts/build-browser.ts'
+      - 'package.json'
       - 'proofs/numeric-tree-*'
       - 'proofs/experiments/numeric-tree-20261017/**'
       - '.github/workflows/numeric-tree-performance.yml'
@@ -61,8 +68,12 @@ jobs:
           mkdir "$EVIDENCE_DIR/candidate-build"
           cp -R dist "$EVIDENCE_DIR/candidate-build/"
           cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/candidate-build/"
+      - name: Retain the installed pinned compiler and licenses
+        env:
+          TOOLKIT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/compiler-toolkit
+        run: node proofs/numeric-tree-toolkit.mjs 2>&1 | tee "$EVIDENCE_DIR/compiler-toolkit.txt"
       - name: Test the fail-closed measurement harness
-        run: node --test proofs/numeric-tree-process.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
+        run: node --test proofs/numeric-tree-process.node.mjs proofs/numeric-tree-manifest.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
       - name: Check types and test suite
         run: |
           bun run typecheck
@@ -81,6 +92,8 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha || inputs.baseline }}
           path: .numeric-tree-base
           persist-credentials: false
+      - name: Verify the complete source inventory
+        run: node proofs/numeric-tree-manifest.mjs 2>&1 | tee "$EVIDENCE_DIR/source-inventory.txt"
       - name: Build comparison base and check scalar bytes
         run: |
           ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
@@ -140,11 +153,7 @@ jobs:
           NODE_AB_RESULT: ${{ steps.node_ab.outcome }}
           BUN_AA_RESULT: ${{ steps.bun_aa.outcome }}
           BUN_AB_RESULT: ${{ steps.bun_ab.outcome }}
-        run: |
-          test "$NODE_AA_RESULT" = success
-          test "$NODE_AB_RESULT" = success
-          test "$BUN_AA_RESULT" = success
-          test "$BUN_AB_RESULT" = success
+        run: node proofs/numeric-tree-gate.mjs
       - name: Save all evidence, including failed gates
         uses: actions/upload-artifact@v4
         if: always()

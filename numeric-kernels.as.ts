@@ -49,6 +49,10 @@ function treeCount(root: u32, depth: u32, count: u32, lo: f64, hi: f64): u32 {
 export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f64, hi: f64): u32 {
   if (!size || lo > hi || isNaN(lo) || isNaN(hi)) return 0;
   const treeSize = (size - 1) & ~31;
-  return (treeSize ? treeCount(root, depth, treeSize, lo, hi) : 0) + spanCount(tail, size - treeSize, lo, hi);
+  // A depth-zero root is one leaf. Avoid the larger recursive SIMD helper
+  // on 33–64 value lists; the scalar build keeps its original call path.
+  return (treeSize ? (ASC_FEATURE_SIMD && !depth
+    ? spanCount(root, treeSize, lo, hi)
+    : treeCount(root, depth, treeSize, lo, hi)) : 0) + spanCount(tail, size - treeSize, lo, hi);
 }
 export { countPointsInBox } from './numeric-spatial.as';

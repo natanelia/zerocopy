@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { Buffer } from 'node:buffer';
 import { countInRange } from './numeric';
 import { SharedList, resetSharedList } from './shared-list';
 import { getWorkerData, initWorker } from './shared';
@@ -98,6 +99,27 @@ describe('numeric countInRange', () => {
         expect(kernel.countInRange(root, 2, tail, visible.length, lo, hi)).toBe(reference(visible, lo, hi));
       }
     }
+  });
+  it.each(['numeric-kernels.wasm', 'numeric-kernels-simd.wasm'])('%s scans a depth-zero root leaf at the memory boundary', filename => {
+    const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+    const kernel = new WebAssembly.Instance(new WebAssembly.Module(readFileSync(filename)), { env: { memory } }).exports as any;
+    const view = new DataView(memory.buffer);
+    const root = memory.buffer.byteLength - 256, tail = 64;
+    const special = [NaN, Infinity, -Infinity, -0, 0, Number.MIN_VALUE, -Number.MIN_VALUE, 1, -1];
+    const leaf = Array.from({ length: 32 }, (_, i) => special[i % special.length]!);
+    const tailValues = Array.from({ length: 32 }, (_, i) => special[(i + 3) % special.length]!);
+    leaf.forEach((value, i) => view.setFloat64(root + i * 8, value, true));
+    tailValues.forEach((value, i) => view.setFloat64(tail + i * 8, value, true));
+    const before = Buffer.from(new Uint8Array(memory.buffer));
+    for (let tailSize = 1; tailSize <= 32; tailSize++) {
+      const visible = [...leaf, ...tailValues.slice(0, tailSize)];
+      for (const [lo, hi] of [[-Infinity, Infinity], [-0, 0], [-Number.MIN_VALUE, Number.MIN_VALUE], [Infinity, Infinity], [-Infinity, -Infinity], [NaN, 1], [0, NaN], [1, -1]]) {
+        expect(kernel.countInRange(root, 0, tail, visible.length, lo, hi)).toBe(reference(visible, lo!, hi!));
+      }
+    }
+    expect(memory.buffer.byteLength).toBe(before.length);
+    expect(Buffer.from(memory.buffer).equals(before)).toBe(true);
+    expect(kernel.countInRange(0xffffff00, 0, 0xffffff00, 0, -Infinity, Infinity)).toBe(0);
   });
   it('preserves snapshots across the next tree depth with binary64 edge values', async () => {
     const size = 1048609;

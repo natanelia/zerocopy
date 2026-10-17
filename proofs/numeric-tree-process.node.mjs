@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { PLAN, endpoints, interval, median, schedule, summarize, runCohort } from './numeric-tree-process.mjs';
+import { PLAN, endpoints, interval, median, schedule, summarize, runCohort, sourceManifest } from './numeric-tree-process.mjs';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -76,5 +76,19 @@ test('an unavailable runtime retains every planned failed child and exits withou
     assert.equal(result.pass, false); assert.equal(result.complete, true);
     assert.equal(readdirSync(output).filter(n => n.endsWith('.status.json')).length, 16);
     assert.equal(JSON.parse(readFileSync(join(output, 'plan.json'))).schedule.length, 16);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('a changed input between size cohorts is rejected before timing', async () => {
+  const { mkdirSync } = await import('node:fs');
+  const { execFileSync } = await import('node:child_process');
+  const dir = mkdtempSync(join(tmpdir(), 'numeric-process-input-lock-'));
+  try {
+    const source = join(dir, 'source'); mkdirSync(join(source, 'dist'), { recursive: true });
+    for (const file of ['package.json', 'numeric-kernels.wasm', 'numeric-kernels-simd.wasm', 'dist/shared.js', 'dist/numeric.js']) writeFileSync(join(source, file), '{}');
+    execFileSync('git', ['init', '-q'], { cwd: source }); execFileSync('git', ['add', '.'], { cwd: source });
+    const expectedSources = { baseline: sourceManifest(source), candidate: sourceManifest(source) };
+    writeFileSync(join(source, 'dist/numeric.js'), 'changed between cohorts');
+    assert.throws(() => runCohort({ baseDir: source, candidateDir: source, outDir: join(dir, 'out'), runtime: process.execPath, kind: 'aa', sizes: [1], expectedSources }), /Inputs changed/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
