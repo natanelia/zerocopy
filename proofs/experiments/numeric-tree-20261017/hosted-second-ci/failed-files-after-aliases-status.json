@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "run",
+    "test",
+    "redux-checkpoint.test.ts",
+    "workers.test.ts"
+  ],
+  "cwd": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "startedAt": "2026-10-17T03:33:54.859179+00:00",
+  "completedAt": "2026-10-17T03:34:08.653615+00:00",
+  "elapsedSeconds": 13.794446804999097,
+  "exitCode": 0,
+  "log": "failed-files-after-aliases.txt",
+  "logSha256": "6dc1dac10d88050809ec200b47c5d1ad56a05077f00bcd555059ce3f7763ba85",
+  "testSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62",
+  "priorFailure": "full-suite-status.json",
+  "buildInputRepair": "build-alias-restoration.json"
+}

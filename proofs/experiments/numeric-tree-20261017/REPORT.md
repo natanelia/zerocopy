@@ -161,7 +161,7 @@ and [the controller log](results/stage3-aa-controller.txt).
 ## First hosted workflow status is invalid
 
 The first [hosted comparison run](https://github.com/natanelia/zerocopy/actions/runs/38997133985)
-reported success even though its x64 identical-source diagnostic and Bun
+reported success even though its identical-source diagnostics and x64 Bun
 performance gate failed. Its default shell used `bash -e`. The commands
 sent their output through `tee`. Without `pipefail`, the success of `tee`
 hid the failed benchmark command. The final step received successful step
@@ -180,6 +180,28 @@ the producer's nonzero status. A small deliberate-failure probe records
 the exact shell command, producer status, and returned status in
 [the pipeline check](results/pipeline-status-check.json). The probe checks
 exit propagation only. It is not a passing numeric performance result.
+
+## Corrected hosted workflow retains failed gates
+
+[Run 38998487385](https://github.com/natanelia/zerocopy/actions/runs/38998487385)
+used the corrected shell and failed on both x64 and ARM64. Its final gate
+now detects the failed step outcomes. The run retained all eight A/A
+processes, all four full A/B cohorts, and the correctness checks.
+
+Eight of 168 A/A rows failed. Four of 192 full A/B rows failed: x64 Bun
+public range at 33 values (0.8862456936026983), 32,768 values
+(1.0393749767667657), and 32,801 values (0.9424272898724707); ARM64 Bun
+scalar range at 33 values (0.9204535152602755). The 32,768-value result
+misses the original strict `>1.05` target. Both Node A/B cohorts passed
+their point-estimate gates, but failed method controls and Bun results
+still prevent acceptance.
+
+Both architectures passed 1,062 tests, type checks, and real-worker
+proofs. All 24 x64 browser rows passed, with growth checks and no WebKit
+exception. These checks are separate from the geometry timeouts in two
+other workflows. The [complete second-run record](hosted-second/SUMMARY.md)
+lists every failed row and links both verified archives. This run confirms
+correct failure propagation. It does not clear the numeric candidate.
 
 ## Correctness evidence
 
@@ -204,18 +226,41 @@ used that default arena and could leave it large for a later test. This
 is a possible cause, not a proved explanation for the timeout.
 
 The new numeric fixture now creates an explicit private `Arena`. Its
-values, bounds, snapshots, and checks remain the same. The geometry test
-and its time limit remain unchanged. The combined numeric, spatial, and
+values, bounds, snapshots, and checks remain the same. At that step, the
+geometry test and its time limit remained unchanged. The combined numeric, spatial, and
 geometry check passed all 56 tests after the fixture change; see
 [the focused log](results/private-arena-focused-tests.txt). This is a
-fixture isolation check. A full suite on the repaired head is still
-required.
+fixture isolation check. It did not establish a full-suite pass.
 
 The [old test source](numeric-before-private-arena.test.ts.source) and
 [private-arena test source](numeric-private-arena.test.ts.source) are both
 retained. Their SHA-256 digests are
 `05752b3a7c259d72676309c8e584210f49237c1af5e240987099f2d56a0cc87f`
 and `f9c816f87d71f7f21d9a05c57ab0b84e8e27ce2e1ba42973f711111a073c8ab5`.
+
+The private-arena repair did not resolve the repeated x64 timeout. At PR
+head `85eee3354b85f8d7d6121a72579ddc8e06a57112`, Worker sessions run
+38998487324 and Numeric performance proof run 38998487320 each failed the
+geometry attached-growth test. It took 5,727 ms and 5,735 ms, respectively,
+against the unchanged 5,000 ms limit. Each job passed the other 1,061 tests.
+The ARM64 numeric proof passed all 1,062 tests; its geometry test took
+1,399 ms. These runs are separate from Numeric tree comparison run
+38998487385. The failed x64 numeric proof skipped its worker and timing
+steps. Its missing-artifact error followed the test failure.
+
+The geometry assertion now uses native `Buffer.equals` for the complete
+current memory buffer. It keeps the independent saved byte copy and
+checks the full byte length explicitly. All bounds, owner, attached, and
+old-snapshot checks remain, as does the 5,000 ms limit. This removes the
+element-wise deep-comparison cost. It does not prove the cause of the
+earlier timeout. This repair changes no production code.
+
+See the [assertion repair record](hosted-second-ci/ASSERTION-REPAIR.md),
+which retains the three raw hosted logs, both exact geometry test sources,
+local checks, and exit codes. The before-test SHA-256 is
+`d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4`.
+The repaired-test SHA-256 is
+`c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62`.
 
 The focused worker proof passed on Node and Bun. A real worker repeatedly
 reads an attached snapshot while the owner grows its memory and creates
@@ -234,8 +279,18 @@ Chromium, Firefox, and WebKit, in automatic and forced-scalar modes.
 Hosted acceptance remains open for this draft. The first workflow status
 cannot establish acceptance for the reason described above.
 
-The full suite and type checks have not run locally in the candidate
-worktree. Browser checks and ARM64 checks have also not run locally.
+After the byte-assertion repair, the local focused check passed 56 tests.
+The first local full-suite attempt failed 15 tests: 14 worker tests lacked
+the generated `shared-map.wasm` alias, and one priority-queue checkpoint
+test timed out. Geometry passed. Restoring the exact core aliases specified
+by `scripts/build-wasm.mjs` required no compilation or source change.
+The two failed files then passed 58 tests, and the complete suite passed
+all 1,062 tests in 50 files. Every attempt and exit code is retained. The
+alias repair explains the missing-file errors; it does not establish the
+cause of the checkpoint timeout. The test time limit was not changed.
+
+Type checks have not run locally in the candidate worktree. Browser and
+ARM64 checks have also not run locally.
 The two recorded 52-test results cover the focused numeric and spatial
 suite before and after the test-only maximum-memory adjustment described
 above.

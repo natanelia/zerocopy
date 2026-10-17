@@ -105,3 +105,13 @@ NODE_BIN=node BUN_BIN=bun bun proofs/numeric-tree-aa.mjs
 
 The experiment changes no storage format or exported function signature.
 Vector sums stay in local values; the kernels do not write shared memory.
+
+## CI assertion repair
+
+Two x64 jobs still timed out in the geometry full-buffer assertion after
+the numeric test gained a private arena. The assertion now keeps its
+independent saved copy and uses native byte equality, with an explicit
+full-length check. It keeps every snapshot check and the 5,000 ms limit.
+Production is unchanged by this repair. The old and new test sources,
+all three hosted job logs, and the local validation records are in the
+[assertion repair record](hosted-second-ci/ASSERTION-REPAIR.md).

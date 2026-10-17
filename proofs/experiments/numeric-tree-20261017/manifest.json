@@ -3,7 +3,7 @@
   "created": "2026-10-17T02:25:33.692349+00:00",
   "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
   "branch": "perf/numeric-kernels-20261017",
-  "status": "Draft. First full A/B gates and every fixed A/A run failed. No performance clearance.",
+  "status": "Draft. Original local and both hosted comparisons retained failed gates. No performance clearance.",
   "notes": [
     "The files array lists the exact intended PR files except this manifest, which cannot hash itself.",
     "The generated array records build outputs. These generated binaries and JavaScript files are not part of the PR file set.",
@@ -12,13 +12,19 @@
     "Current report and README hashes include the diagnostic findings; the diagnostic controller hash records the fixed executable schedule used in that cohort.",
     "The PR added these 25 raw records. They moved into this experiment's results directory to satisfy strict preservation of the baseline proofs/results tree. Every raw file and historical driver retains its original bytes. Paths inside raw records remain historical provenance.",
     "The first hosted workflow status is invalid: tee hid producer failures under bash -e. The job shell now enables pipefail. A deliberate producer exit of 23 returns 23 under the exact fixed shell; the old default returns 0.",
-    "The new million-value numeric test now uses a private Arena. This limits shared default-fixture state. It does not prove the cause of the separate hosted geometry timeout. The geometry test and test timeout were not changed. The old and repaired numeric test sources are retained."
+    "The new million-value numeric test uses a private Arena. That first fixture repair kept geometry.test.ts and the timeout unchanged. Two later x64 jobs still timed out. The separate geometry assertion repair now keeps the independent full-byte copy and uses Buffer.equals with an explicit length check; the timeout remains unchanged.",
+    "The corrected hosted run 38998487385 failed on both architectures. All 168 A/A rows and 192 full A/B rows remain in two archives verified against official digests. Eight A/A rows and four Bun A/B rows failed. Both full test suites and all 24 browser rows passed in this separate comparison run."
   ],
   "files": [
     {
       "path": ".github/workflows/numeric-tree-performance.yml",
       "bytes": 4680,
       "sha256": "54042c8aecd8504d5b4b401563c8c81d54df6ca9ca6a36feb1ad0002dd13d9ec"
+    },
+    {
+      "path": "geometry.test.ts",
+      "bytes": 2118,
+      "sha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
     },
     {
       "path": "numeric-kernels.as.ts",
@@ -32,13 +38,13 @@
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/README.md",
-      "bytes": 5480,
-      "sha256": "38c6ad9d20ec50d6c5a7cfd35e0ff581b6ce8898e29b560f32f77f21e7e17fca"
+      "bytes": 5997,
+      "sha256": "c3c49bac1e59d66d9d972db80a4931936c191c6a9b4f4b436e09ad6dda604c08"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/REPORT.md",
-      "bytes": 14828,
-      "sha256": "5081f176d5a95f5e4fef9b38a6ca44236df31bc0a9f6e2f765a18dbbf5bad0f4"
+      "bytes": 18116,
+      "sha256": "df3bce77d3fd8679906f499e6cfc9a043f4035b2ed36abcc70bd783995ad3ef9"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/baseline.as.ts",
@@ -59,6 +65,141 @@
       "path": "proofs/experiments/numeric-tree-20261017/hosted-first/origin.json",
       "bytes": 1209,
       "sha256": "250e4f101eadf4a16eefb80d87305ffd27b90919879eb565e6ed08e9442439fe"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/ASSERTION-REPAIR.md",
+      "bytes": 3688,
+      "sha256": "f898731ee68682d5a5e86474d1276d111972f1298d5165ed9f017b403366eb71"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/build-alias-restoration.json",
+      "bytes": 1724,
+      "sha256": "8d0703f751141374a82f1a5cd8105636362f391b9ef10306cf6d0a9f02839977"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/failed-files-after-aliases-status.json",
+      "bytes": 712,
+      "sha256": "cb6adfa9c3ca86f39fc2b5c6af7767458826d3cc2ce3c87b46f97249f95e33d0"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/failed-files-after-aliases.txt",
+      "bytes": 325,
+      "sha256": "6dc1dac10d88050809ec200b47c5d1ad56a05077f00bcd555059ce3f7763ba85"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/focused-tests-status.json",
+      "bytes": 623,
+      "sha256": "fdd19e863e659ac93dada61ab59a207c4644e15b8aaacead93c2ddc0494d8000"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/focused-tests.txt",
+      "bytes": 339,
+      "sha256": "5292e16539d92b68af15d330601fdb8bf0f2d5037cc22a23a694d4eada602981"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-after-aliases-status.json",
+      "bytes": 654,
+      "sha256": "fa65851769f37bc7bf6201d53b1e209808907afb1214b641bd1e2de0f728dafd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-after-aliases.txt",
+      "bytes": 292,
+      "sha256": "2b10576f0143b409b9a992c5ce69947e14f7a1859c1e5bf79aadda94332b8ddd"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite-status.json",
+      "bytes": 542,
+      "sha256": "7390db970c39087ee00c3036f277cd239eb0d1c448ae79118969a786c383226f"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/full-suite.txt",
+      "bytes": 6277,
+      "sha256": "8c373542f537ba24dead0e15423a675eddcff545d18e605eda7baf0e0c419c18"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/geometry-before-buffer-equality.test.ts.source",
+      "bytes": 1994,
+      "sha256": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/geometry-buffer-equality.test.ts.source",
+      "bytes": 2118,
+      "sha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296190799.log",
+      "bytes": 38996,
+      "sha256": "b6275f4782ff1ced2889ecf68477b2aa0352b88b8c66e6a48221910f297c512d"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296191012.log",
+      "bytes": 38523,
+      "sha256": "51a5c0d2f8281303a6407ea90181d0f99c31edd590be9e2e1b89e43423fabe47"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/job-117296191057.log",
+      "bytes": 39911,
+      "sha256": "f77f917117febc6e67336fae0a6b5454edc1c7bbab6f4cb52291fde660de2722"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/origin.json",
+      "bytes": 2992,
+      "sha256": "c1084fc4434a5104babd35cf41b79e594fb8b5e8c5e9570c8fefe29843db1267"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-final-status.json",
+      "bytes": 737,
+      "sha256": "277c684c7773ce74b19f964fc510037a826683be63aa152cb75522e4f34bf66a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-final.txt",
+      "bytes": 148,
+      "sha256": "66ab6507b447c340bcc88ba2b10410858b5c48ac9b07aa99318486485eb2bddb"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-status.json",
+      "bytes": 632,
+      "sha256": "370b8a3cc5133187ce1e0e84a047a1f927791ef3086ef94188451883ac140229"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs.txt",
+      "bytes": 148,
+      "sha256": "588fe4a626b1e08ab875c7167d77a08dd09db6ba399ddb4be83e97e842f7fc1a"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/validation-runtime.json",
+      "bytes": 422,
+      "sha256": "04427ea7e96ffd7ae7127fc1a6baaed838d2438a1031cfb81c427b63c79c471e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/SUMMARY.md",
+      "bytes": 3885,
+      "sha256": "bbdfc328fd59773498f0b60373f3ada067d26e37c62ad77fd0a08f645002f434"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/job-status.json",
+      "bytes": 7681,
+      "sha256": "4883a22d946e822f549a10993a173b6da9f4f5ad40e197174b7057f4db963d50"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/numeric-tree-arm64-second.zip",
+      "bytes": 144712,
+      "sha256": "10096611d910f04d6eb05a79d66525f20dfd447ec998c9fe539f97caf6a4609e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/numeric-tree-x64-second.zip",
+      "bytes": 149086,
+      "sha256": "953e91c8a2b6c371dedaff6454794a616ddc098086327e874e48841fbf5fb255"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/origin.json",
+      "bytes": 996,
+      "sha256": "1b4840b97ad568643ba6160d9892823c147638dd889fe01e10a3d008c53b7c8e"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-second/summary.json",
+      "bytes": 23975,
+      "sha256": "73b6706c7a13341b23914953a22e2d5d8dfb6959634773960fdd06c06534afe7"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/numeric-before-private-arena.test.ts.source",
@@ -669,11 +810,70 @@
     "change": "Only the new million-value fixture uses an explicit private Arena; its data and assertions are unchanged.",
     "geometryTestUnchanged": true,
     "timeoutUnchanged": true,
-    "timeoutCauseEstablished": false
+    "timeoutCauseEstablished": false,
+    "scope": "The earlier private-Arena fixture step, before the later geometry byte-assertion repair."
   },
   "hostedFirst": {
     "runId": 38997133985,
     "statusInvalid": true,
     "origin": "proofs/experiments/numeric-tree-20261017/hosted-first/origin.json"
+  },
+  "updated": "2026-10-17T03:36:37.067773+00:00",
+  "geometryAssertionRepair": {
+    "scope": "Test-only full-byte comparison. No production change.",
+    "origin": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/origin.json",
+    "report": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/ASSERTION-REPAIR.md",
+    "beforeSha256": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+    "afterSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62",
+    "timeoutMs": 5000,
+    "timeoutCauseEstablished": false,
+    "focusedTests": {
+      "passed": 56,
+      "exitCode": 0
+    },
+    "initialFullSuite": {
+      "passed": 1047,
+      "failed": 15,
+      "exitCode": 1,
+      "retained": true
+    },
+    "generatedAliasRepair": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/build-alias-restoration.json",
+    "failedFilesAfterAliases": {
+      "passed": 58,
+      "exitCode": 0
+    },
+    "fullSuiteAfterAliases": {
+      "passed": 1062,
+      "files": 50,
+      "exitCode": 0
+    },
+    "checkpointTimeoutCauseEstablished": false,
+    "performanceAccepted": false,
+    "strictDocsBeforeSecondArchiveSummary": {
+      "exitCode": 0,
+      "recordedRowsUnchanged": 72,
+      "recordedEvidenceFilesChanged": 0,
+      "markdownFiles": 54,
+      "statusFile": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-status.json"
+    },
+    "strictDocsFinal": {
+      "exitCode": 0,
+      "recordedRowsUnchanged": 72,
+      "recordedEvidenceFilesChanged": 0,
+      "markdownFiles": 55,
+      "statusFile": "proofs/experiments/numeric-tree-20261017/hosted-second-ci/strict-docs-final-status.json"
+    }
+  },
+  "hostedSecond": {
+    "runId": 38998487385,
+    "testedMergeCommit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+    "bothFinalGatesFailed": true,
+    "aaRows": 168,
+    "aaFailures": 8,
+    "abRows": 192,
+    "abFailures": 4,
+    "origin": "proofs/experiments/numeric-tree-20261017/hosted-second/origin.json",
+    "summary": "proofs/experiments/numeric-tree-20261017/hosted-second/summary.json",
+    "performanceAccepted": false
   }
 }
