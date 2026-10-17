@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { List } from '../_site/compare/vendor/immutable.mjs';
-import { immutableVersion } from '../_site/compare/vendor/version.mjs';
-import { fromColumns, appendImmutable, immutableView, transportColumns } from '../_site/compare/assets/immutable-storage.mjs';
-import { fromColumns as fromImmerColumns, appendImmer, immerView } from '../_site/compare/assets/immer-storage.mjs';
-import { emptyShared, appendShared } from '../_site/compare/assets/explorer-storage.mjs';
+import { List } from '../_site/historical/log-compare/vendor/immutable.mjs';
+import { immutableVersion } from '../_site/historical/log-compare/vendor/version.mjs';
+import { fromColumns, appendImmutable, immutableView, transportColumns } from '../_site/historical/log-compare/assets/immutable-storage.mjs';
+import { fromColumns as fromImmerColumns, appendImmer, immerView } from '../_site/historical/log-compare/assets/immer-storage.mjs';
+import { emptyShared, appendShared } from '../_site/historical/log-compare/assets/explorer-storage.mjs';
 import { FIELDS, MAX_EVENTS, SERVICES, generateColumns, nativeView, sharedView, rowAt, search, summarizeEvents } from '../assets/explorer-core.mjs';
 import { reference, verifyAnswer } from '../assets/explorer-reference.mjs';
 import { readFileSync } from 'node:fs';

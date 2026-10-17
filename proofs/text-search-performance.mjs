@@ -60,7 +60,8 @@ try {
         for(const v of order) {
           const context=await browser.newContext();const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
           try {
-            await page.goto(v.origin+'/investigation-benchmark/');
+            // Keep the same log workload at its historical route in the current site.
+            await page.goto(v.origin + (v.variant === 'before' ? '/investigation-benchmark/' : '/historical/log-benchmark/'));
             const result=await page.evaluate(async()=>{
               if(!crossOriginIsolated)throw Error('Not isolated');
               const {Peer}=await import('./assets/explorer-peer.mjs');

@@ -7,7 +7,7 @@ import { createPreview } from '../serve.mjs';
 import { generateColumns } from '../assets/explorer-core.mjs';
 import { reference } from '../assets/explorer-reference.mjs';
 const metadata = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
-const base = metadata.base, artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
+const base = metadata.base, artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
 mkdirSync(artifacts, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox'] });
 const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -26,7 +26,7 @@ try {
   await page.goto(origin + base);
   assert.equal(await page.locator('.use-case-card').count(), 6);
   assert.match(await page.locator('h1').innerText(), /Share your data/);
-  await page.goto(origin + base + 'explorer/');
+  await page.goto(origin + base + 'historical/log-explorer/');
   assert.equal(await page.locator('#log-size').inputValue(), '100000');
   await page.locator('#load-logs').click(); await count('view-count', 100000); await matches(100000);
   assert.equal(await page.locator('#log-rows tr').count(), 50);
@@ -64,7 +64,7 @@ try {
   await page.locator('#load-logs').click(); await count('view-count', 1000); await page.locator('#reset-logs').click();
   console.log('Passed: 100,000-event explorer, reference checks, pagination, frozen/live divergence, filters, restarts, and stop during startup.');
 
-  await page.goto(origin + base + 'investigation-benchmark/');
+  await page.goto(origin + base + 'historical/log-benchmark/');
   for (const size of ['1000', '10000', '100000']) {
   await page.locator('#investigation-size').selectOption(size); await page.locator('#run-investigation-bench').click();
   await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120_000 });
@@ -85,11 +85,11 @@ try {
   console.log('Passed: four-architecture benchmark at all three sizes, full reference verification, all samples exported, and early cancellation.');
 
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const route of ['explorer/', 'investigation-benchmark/', 'use-cases/', 'docs/use-cases/']) {
+  for (const route of ['historical/log-explorer/', 'historical/log-benchmark/', 'use-cases/', 'docs/use-cases/']) {
     await page.goto(origin + base + route);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, route);
   }
-  await page.goto(origin + base + 'explorer/'); await page.locator('#log-size').selectOption('1000'); await page.locator('#load-logs').click(); await count('view-count', 1000);
+  await page.goto(origin + base + 'historical/log-explorer/'); await page.locator('#log-size').selectOption('1000'); await page.locator('#load-logs').click(); await count('view-count', 1000);
   await page.screenshot({ path: artifacts + '/log-explorer-mobile.png', fullPage: true }); await page.locator('#reset-logs').click();
   await context.close();
 
@@ -97,11 +97,11 @@ try {
   try {
     const staticOrigin = `http://127.0.0.1:${staticServer.address().port}`, ctx = await browser.newContext();
     page = await ctx.newPage(); page.setDefaultTimeout(60_000); page.on('pageerror', error => errors.push(error.message));
-    for (const [route, runId, sizeId, statusId] of [['explorer/', 'load-logs', 'log-size', 'view-count'], ['investigation-benchmark/', 'run-investigation-bench', 'investigation-size', 'investigation-bench-status']]) {
+    for (const [route, runId, sizeId, statusId] of [['historical/log-explorer/', 'load-logs', 'log-size', 'view-count'], ['historical/log-benchmark/', 'run-investigation-bench', 'investigation-size', 'investigation-bench-status']]) {
       await page.goto(staticOrigin + base + route);
       await page.waitForFunction(id => crossOriginIsolated && !document.getElementById(id).disabled, runId);
       await page.locator('#' + sizeId).selectOption('1000'); await page.locator('#' + runId).click();
-      if (route === 'explorer/') { await count(statusId, 1000); await page.locator('#reset-logs').click(); }
+      if (route === 'historical/log-explorer/') { await count(statusId, 1000); await page.locator('#reset-logs').click(); }
       else await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120_000 });
     }
     await page.goto(staticOrigin + base + 'docs/use-cases/');

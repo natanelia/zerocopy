@@ -9,7 +9,7 @@ function render() {
   const list = document.querySelector('#reader-nodes'); list.replaceChildren();
   for (let i = 0; i < count; i++) {
     const node = document.createElement('div'); node.className = 'reader-node';
-    node.append(`Worker ${i + 1}`);
+    node.append(`Reader ${i + 1}`);
     const label = document.createElement('small'); label.textContent = mode === 'shared' ? 'READ-ONLY VIEW' : 'LOCAL COPY'; node.append(label);
     if (mode === 'cloned') { const memory = document.createElement('div'); memory.className = 'mini-memory'; memory.setAttribute('aria-hidden', 'true'); for (let j = 0; j < 4; j++) memory.append(document.createElement('i')); node.append(memory); }
     list.append(node);

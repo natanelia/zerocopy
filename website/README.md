@@ -26,15 +26,17 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
 
+> The current primary demos use the product-catalog workload described under [Product catalog comparison](#product-catalog-comparison). The log-column sections below describe the preserved historical routes.
+
 ## Log explorer
 
-At `/explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
+At `/historical/log-explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
 
-The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs, simulations, and scientific/spatial tools.
+The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs and simulations.
 
 ## Investigation benchmark
 
-At `/investigation-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
+At `/historical/log-benchmark/`, compare shared snapshots, two Immutable.js List replicas, two native-array replicas, and one native-data-owning worker. Both replica designs use incremental updates. Measure initial sharing, a query on attached data, and append + publish + query separately. Native and Immutable.js replicas receive only deltas after initial load. Each path uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
 
 Two warm-ups precede seven samples per path. Order rotates, all samples are exported, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
@@ -140,7 +142,7 @@ Google controls crawl timing, indexing, and ranking. Metadata and a sitemap do n
 
 ## Side-by-side comparison
 
-The `/compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
+The `/historical/log-compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
 
 All three replica baselines use incremental deltas by default. Full snapshot replication is an optional, separately labelled mode. All four can retain this append-only stream: zerocopy, Immutable.js, and Immer keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
 
@@ -155,6 +157,9 @@ The comparison is tested in real Chromium and Playwright WebKit, including 1,000
 The library now creates default arenas only when used. New writable arenas start at 128 KiB with a configurable 256 MiB maximum; read-only workers reuse supplied memories. Native, Immutable.js, and Immer comparison readers do not import the WASM engine. Shared readers preload it before publication timing, so module loading is not moved into that measurement.
 
 Nested demo workers use a small local ES module wrapper. This lets them inherit the parent worker's isolation on WebKit while importing the original worker module. The wrapper URL is released with the worker. Hosts with a custom Content Security Policy must permit `blob:` in `worker-src` for these nested demos.
+
+The product catalog uses the same small Blob module bootstrap for document-owned writers and nested readers, so each worker inherits its creator’s isolation before importing the same-origin module. Each bootstrap URL is revoked when its worker closes or fails to start. Custom Content Security Policies must permit `blob:` in `worker-src` for this demo; the demo does not relax the policy or change the service-worker scope.
+
 
 `node --test proofs/memory-startup.mjs` checks allocation counts in fresh workers, bounded defaults, configuration, read-only copies, growth, reset, and retained snapshots. `node website/tests/memory-browser.mjs` runs the browser regression.
 
@@ -186,3 +191,17 @@ The shared owner now calls public `SharedList.pushMany()` once per column and ba
 just as the Immutable.js owner batches with `withMutations`. Query work, generated
 values, independent reference checks, worker counts, and retained versions remain
 the same. See `proofs/query-performance.mjs` and the Query performance workflow.
+
+## Product catalog comparison
+
+The current `/compare/` is the direct live comparison. A writer worker owns a product catalog keyed by string IDs; lookup and validation workers read its snapshots. All four implementations receive the same products, sparse replacements and retained initial revision. Product records include a name, category, SKU, price, stock and availability. The UI displays bounded record/issue replies. `/explorer/` forwards directly to this comparison for old links.
+
+SharedMap, native Map, Immutable.js Map and Immer Map use equivalent operations. Replicas receive an initial snapshot once and only changed ID/object pairs later. Native Map copies its index only when retaining its initial version. Records remain immutable in every path.
+
+## Catalog benchmark
+
+The current `/investigation-benchmark/` uses the product catalog and creates fresh owner/reader workers for each sample. Two warm-ups and seven measured samples per implementation rotate path order. Startup and imports finish before timing. Generation, construction, publication, first/repeated queries and sparse edits have separate timers. The export uses `zerocopy-product-catalog-browser/v1`; it includes every sample and checked current/initial answers. It measures no browser memory.
+
+The displayed historical memory charts use the earlier synthetic-record fixture and runtime, not this product catalog. Original data, source hashes, proof drivers and fixture modules remain unchanged. The separate catalog model prevents changing the old proof workload when the live example evolves. See [the catalog guide](content/catalog.md) and [recorded memory method](../docs/feature-map-memory.md).
+
+The original log implementations remain at `/historical/log-explorer/`, `/historical/log-compare/` and `/historical/log-benchmark/`. The earlier sections describe those historical routes. Run `node website/tests/feature-browser.mjs` after building to check real product workers, replacements, retained reads, Stop/restart/navigation, export and mobile layout.

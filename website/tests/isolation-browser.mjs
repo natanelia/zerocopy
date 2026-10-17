@@ -1,15 +1,18 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 import { ATTEMPT_PARAMETER } from '../assets/isolation.mjs';
 import { cacheEarlyRegistration } from './isolation-registration-cache.mjs';
 
+const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
+mkdirSync(artifacts, { recursive: true });
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const demos = [
-  ['compare/', 'compare-start'], ['explorer/', 'load-logs'],
-  ['investigation-benchmark/', 'run-investigation-bench'],
+  ['compare/', 'feature-load'],
+  ['investigation-benchmark/', 'feature-run'],
   ['lab/', 'run-benchmark'], ['playground/', 'start-playground'],
 ];
 async function ready(page, id) {
@@ -59,8 +62,9 @@ async function navigations(page) {
   Object.defineProperty(urls, 'trace', { value: trace });
   return urls;
 }
-for (const [name, engine] of Object.entries({ chromium, webkit })) {
-  const browser = await engine.launch({ headless: true });
+for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'webkit']) {
+  assert.ok(['chromium', 'webkit'].includes(name));
+  const browser = await ({ chromium, webkit })[name].launch({ headless: true });
   const errors = [];
   try {
     for (const isolated of [true, false]) {
@@ -96,9 +100,9 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         assert.equal(requests.filter(url => url.includes('/library/')).length, 0, 'Setup must not allocate a dataset or load WASM');
         await page.goto(origin + base + 'docs/getting-started/');
         assert.equal(await page.evaluate(() => navigator.serviceWorker.controller), null, 'Demo workers must not control the guides');
-        assert.equal(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), isolated ? 0 : 5);
+        assert.deepEqual(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).map(value => value.scope).sort()), isolated ? [] : demos.map(([route]) => origin + base + route).sort());
         await context.close();
-        console.log(`Passed: ${name}, all five demos, automatic first visit, return visit, preserved URL, no data work (${isolated ? 'headers' : 'no headers'}).`);
+        console.log(`Passed: ${name}, all ${demos.length} demos, automatic first visit, return visit, preserved URL, no data work (${isolated ? 'headers' : 'no headers'}).`);
 
         if (isolated) continue;
         // A real first visit while all web-storage access throws. No storage-based loop guard.
@@ -108,7 +112,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         });
         const p = await storage.newPage(); p.setDefaultTimeout(25000); p.on('pageerror', error => errors.push(error.message));
         const storageVisits = await navigations(p);
-        await p.goto(origin + base + 'compare/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'compare-start');
+        await p.goto(origin + base + 'compare/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'feature-load');
         assert.equal(storageVisits.length, 2); await storage.close();
 
         // Keep register()/getRegistration() views empty after a real install.
@@ -132,7 +136,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         for (const tab of stalePair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         await Promise.all(stalePair.map(async tab => {
           await tab.goto(origin + base + 'compare/?stale-registration=1#main', { waitUntil: 'commit' });
-          await ready(tab, 'compare-start');
+          await ready(tab, 'feature-load');
           assert.equal(new URL(tab.url()).searchParams.get('stale-registration'), '1');
           assert.equal(new URL(tab.url()).hash, '#main');
         }));
@@ -147,7 +151,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         const pair = [await tabs.newPage(), await tabs.newPage()];
         const histories = await Promise.all(pair.map(navigations));
         for (const tab of pair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
-        const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'compare-start'); }));
+        const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'feature-load'); }));
         for (let index = 0; index < starts.length; index++) {
           if (starts[index].status === 'rejected') {
             console.error(`Concurrent tab ${index}:`, JSON.stringify(histories[index].trace));
@@ -177,7 +181,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         for (const tab of cachedPair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         await Promise.all(cachedPair.map(async tab => {
           const url = origin + base + 'compare/?cached-registration=1#main';
-          await tab.goto(url, { waitUntil: 'commit' }); await ready(tab, 'compare-start');
+          await tab.goto(url, { waitUntil: 'commit' }); await ready(tab, 'feature-load');
           assert.equal(tab.url(), url);
           assert.equal(await tab.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + 'compare/isolation-sw.js');
         }));
@@ -198,9 +202,9 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         f.on('pageerror', error => errors.push(error.message));
         await f.goto(origin + base + 'compare/'); await f.locator('#capability[data-state="blocked"]').waitFor();
         await f.evaluate(() => globalThis.__zcDocumentReported);
-        assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#compare-start').isDisabled(), true);
+        assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#feature-load').isDisabled(), true);
         assert.match(await f.locator('#capability-text').innerText(), /Registration blocked by test/);
-        await f.getByRole('button', { name: 'Retry setup', exact: true }).click(); await ready(f, 'compare-start');
+        await f.getByRole('button', { name: 'Retry setup', exact: true }).click(); await ready(f, 'feature-load');
         assert.equal(failedVisits.length, 2); await failure.close();
 
         // Some embedded browsers throw on access, rather than hide the API.
@@ -216,7 +220,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         await r.locator('#capability[data-state="blocked"]').waitFor();
         await r.evaluate(() => globalThis.__zcDocumentReported);
         assert.match(await r.locator('#capability-text').innerText(), /blocked by policy/);
-        assert.equal(await r.locator('#compare-start').isDisabled(), true);
+        assert.equal(await r.locator('#feature-load').isDisabled(), true);
         assert.equal(await r.locator('#enable-isolation').isHidden(), true);
         assert.equal(await r.locator('#capability-help').isVisible(), true);
         assert.equal(restrictedVisits.length, 1); await restricted.close();
@@ -231,7 +235,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
         await d.locator('#capability[data-state="blocked"]').waitFor();
         await d.evaluate(() => globalThis.__zcDocumentReported);
         assert.match(await d.locator('#capability-text').innerText(), /Automatic reloads have stopped/);
-        assert.equal(await d.locator('#compare-start').isDisabled(), true);
+        assert.equal(await d.locator('#feature-load').isDisabled(), true);
         await d.waitForTimeout(300); assert.equal(deniedVisits.length, 2, 'A failed setup must not loop');
         await d.reload(); await d.locator('#capability[data-state="blocked"]').waitFor();
         await d.evaluate(() => globalThis.__zcDocumentReported);
@@ -241,6 +245,7 @@ for (const [name, engine] of Object.entries({ chromium, webkit })) {
       } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
     }
     assert.deepEqual(errors, []);
+    writeFileSync(`${artifacts}/isolation-${name}.json`, JSON.stringify({ status: 'verified', engine: name, browserVersion: browser.version(), base, routes: demos.map(([route]) => route), hosting: ['headers', 'service-worker'] }, null, 2) + '\n');
   } finally { await browser.close(); }
 }
 console.log(`Automatic isolation verified at ${base}. No enable click was used on successful first visits.`);

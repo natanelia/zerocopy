@@ -78,7 +78,7 @@ export function renderMarkdown(source, file, routes, base) {
       '#memory-shared-vs-immutablejs-vs-native': 'docs/benchmarks/#memory-shared-vs-immutablejs-vs-native',
       '#reproduce-the-timing-and-memory-comparisons': 'docs/benchmarks/#reproduce-the-timing-and-memory-comparisons',
     }[fragment] : undefined;
-    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'lab/', '#log-explorer': 'explorer/', '#investigation-benchmark': 'investigation-benchmark/', '#side-by-side-comparison': 'compare/' }[fragment] : undefined;
+    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'lab/', '#product-catalog-comparison': 'compare/', '#feature-attribute-example': 'compare/', '#catalog-benchmark': 'investigation-benchmark/', '#feature-map-benchmark': 'investigation-benchmark/', '#log-explorer': 'historical/log-explorer/', '#investigation-benchmark': 'historical/log-benchmark/', '#side-by-side-comparison': 'historical/log-compare/' }[fragment] : undefined;
     const route = routes.get(resolved);
     const target = demo ? base + demo : legacy ? base + legacy : route !== undefined ? base + route + fragment : repository + '/blob/main/' + resolved + fragment;
     return `href="${escape(target)}"`;

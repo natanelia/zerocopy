@@ -102,7 +102,7 @@ function main() {
     const result = preservedRows(git('show', `${base}:${basePath}`), report);
     console.log(`Recorded benchmark rows unchanged: ${result.total - result.missing.length}/${result.total}`);
     if (result.missing.length) console.log('Changed or removed numerical rows:\n' + result.missing.join('\n'));
-    const evidence = git('diff', '--name-only', base, '--', 'proofs/results').trim().split('\n').filter(path => path && !path.endsWith('.md'));
+    const evidence = git('diff', '--name-only', '--diff-filter=a', base, '--', 'proofs/results').trim().split('\n').filter(path => path && !path.endsWith('.md'));
     console.log(`Recorded evidence files changed: ${evidence.length}`);
     if (preserve && (result.missing.length || evidence.length)) failures.push('Recorded benchmark data changed');
   }

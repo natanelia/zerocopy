@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
-const library = new URL('../_site/compare/library/', import.meta.url);
+const library = new URL('../_site/historical/log-compare/library/', import.meta.url);
 const originals = new Map(readdirSync(library).filter(name => name.endsWith('.js')).map(name => [new URL(name, library), readFileSync(new URL(name, library), 'utf8')]));
 const server = createPreview({ base: meta.base });
 server.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -20,7 +20,7 @@ try {
     const browser = await webkit.launch();
     try {
       const page = await browser.newPage();
-      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}compare/`);
+      await page.goto(`http://127.0.0.1:${server.address().port}${meta.base}historical/log-compare/`);
       await page.locator('#compare-size').selectOption('1000');
       await page.locator('#compare-start').click();
       await page.waitForFunction(() => document.querySelector('#compare-parity').dataset.verified === 'true' || (!document.querySelector('#compare-start').disabled && /(?:error|stopped|failed|memory)/i.test(document.querySelector('#compare-status').textContent)), null, { timeout: 90000 });
