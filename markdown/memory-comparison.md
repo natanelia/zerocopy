@@ -1,129 +1,71 @@
-# Memory usage comparison
+# SharedMap recorded memory
 
-Memory is part of the performance result. A copy counter is not a memory measurement. Passing a startup test is not a memory comparison.
+This report preserves an earlier synthetic-record workload with keyed reads, sparse replacements and retained revisions. It does not measure the current [product catalog](../website/content/catalog.md). Original fixture fields and source hashes remain in the [recorded method](../proofs/feature-map-memory-method.md). The [historical SharedList report](memory-comparison.md) measures log columns and remains unchanged.
 
-These are **recorded Node.js worker measurements**, not live measurements of your browser. The speed comparison uses Chromium and WebKit. Do not combine these memory figures with those timings as one browser result. Browser and physical iPhone RAM remain unmeasured here.
+## Results with reader workers
 
-## Retained data memory
+<!-- feature-memory:highlights:start -->
 
-100,000 initial events. One data owner and two reader workers for Shared, Immutable.js and Native replicas. The one-owner control uses one native data owner with no reader replicas. All paths also have a small controller thread. Values are **MiB**, where 1 MiB = 1,048,576 bytes. Lower is better.
+**84.7% less retained data with two reader workers.** SharedMap: 22.27 MiB; native Map: 145.39 MiB. This measure adds signed post-GC heap and tracked-buffer changes to unique shared backing capacity.
 
-<!-- memory-chart:retained -->
-![Retained data memory for 100,000 unique messages: zerocopy 9.10 MiB, Immutable.js 44.46, native replicas 33.36, one native owner 14.04. Node.js, not browser memory.](assets/memory-retained.svg)
-<!-- /memory-chart -->
+**46.7% lower process RSS in the same two-reader case.** SharedMap: 186.40 MiB; native Map: 349.68 MiB. This is absolute whole-process resident memory at the post-GC endpoint, without subtracting a startup baseline.
 
-The table shows memory after two identical `request` search/summary operations. `vs Imm` means Immutable.js / Shared, and `vs Native` means native replicas / Shared. These are memory ratios, not speed ratios.
+Both compare medians from three fresh trials with 100,000 synthetic records, 100 replacements and initial/current revisions retained. Retained data and RSS use different accounting; they cannot be added or subtracted to explain the rest of the process. These are endpoint measurements, not peak memory.
 
-| Input | Shared | Immutable.js | vs Imm | Native replicas | vs Native | One native owner |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Repeated messages | 4.70 | 33.77 | 7.18x | 23.35 | 4.96x | 6.06 |
-| Unique messages | 9.10 | 44.46 | 4.89x | 33.36 | 3.67x | 14.04 |
-| Unique messages, 20% Unicode prefix | 9.79 | 46.65 | 4.77x | 35.86 | 3.66x | 14.88 |
+<!-- feature-memory:highlights:end -->
 
-This metric includes JavaScript objects, strings, read caches, tracked buffers, and the full current shared WASM buffer. It counts that WASM buffer **once**, not once per reader. It includes spare buffer space and arena history that is not reclaimed. It excludes the empty, imported worker baseline.
+## Whole-process RAM with two or four readers
 
-## Count all memory parts
+<!-- feature-memory:rss -->
 
-For each architecture, the proof uses a fresh OS process. That process contains the controller, one owner, and every reader. It takes a baseline after imports and worker connections, before data loading. At each later sample, work and publication have stopped. Every thread runs four garbage-collection passes.
+![Whole-process endpoint RSS at matched two-reader and four-reader counts](assets/feature-memory-rss.svg)
 
-```text
-Retained data memory =
-  sum of post-GC JavaScript heap changes in all threads
-  + sum of tracked ArrayBuffer changes in all threads
-  + current capacity of each unique shared WASM memory, counted once
-```
+All four maps run the same workload at each reader count. The chart uses the `edited-retained` stage: 100,000 objects, 1,000 requested IDs including 90 misses, one 100-object replacement batch, and revision 0 plus current revision 1 retained in every owner and reader. RSS counts the whole Node process, including the owner, readers and runtime. The raw report also records process high-water RSS separately; the chart does not show that peak.
 
-The proof records `external`, `arrayBuffers`, `heapUsed`, and RSS separately. It does not add `external` to `arrayBuffers`: that would count some memory twice. RSS is process-wide, so it is read once, not summed across workers. A separate calibration checks that this Node build tracks ordinary ArrayBuffers but does not already include shared WASM capacity in `arrayBuffers`. A changed accounting result fails the proof rather than silently changing the total.
+At four readers, SharedMap's median endpoint RSS is 215.45 MiB versus native Map's 551.53 MiB, 60.9% lower. This percentage compares the medians at the same reader count. Three fresh processes produce each median. Every sample and observed minimum–maximum range is in the downloadable data. These ranges are not confidence intervals.
 
-Shared memory breakdown, after queries, in MiB:
+The original-cohort savings chart includes two and four readers only. Two readers divide lookup and validation; four run two copies of those jobs. Zero-reader cases stay in the raw data as a method control. The owner performs both jobs in those cases. SharedMap's owner-only endpoint RSS is 158.19 MiB versus native Map's 143.25 MiB; the recording does not isolate the cause of that difference. No owner-only saving is claimed.
 
-| Input | JS heap increase, all threads | Unique WASM capacity | Arena allocation pointer, including header |
-| --- | ---: | ---: | ---: |
-| Repeated messages | 0.53 | 4.12 | 4.06 |
-| Unique messages | 0.74 | 8.31 | 8.25 |
-| Unique messages, 20% Unicode prefix | 1.31 | 8.44 | 8.40 |
+## Eight readers: a separate cohort
 
-Tracked auxiliary buffer changes are also in the totals. They are less than 0.05 MiB for these shared cases. The allocation pointer includes the 64 KiB arena header; it is not a measure of live payload only. The buffer capacity is the value added to the retained-memory total.
+The eight-reader run uses the same workload and identical built library, adapter and comparison-library bytes. It ran separately on an AMD EPYC 7763 host; the original two/four-reader cases ran on an AMD EPYC 9V74 host. These are separate cohorts, not a controlled same-host scaling curve. Each chart compares libraries within its own cohort and labels its own zero-based scale.
 
-The configured maximum growth limit is **not** used memory. The proof counts `memory.buffer.byteLength`, not the configured maximum. It also does not claim to measure reserved virtual address space.
+<!-- feature-memory:rss-eight -->
 
-## More readers
+![Eight-reader whole-process endpoint RSS from the separate AMD EPYC 7763 cohort](assets/feature-memory-rss-eight.svg)
 
-Unique-message fixture, 100,000 events, after queries. All values are MiB. Zero readers means that the owner performs both calculations itself.
+With eight readers, SharedMap's median endpoint RSS is 281.18 MiB versus native Map's 961.34 MiB, 70.8% lower within this cohort. Three new trials per implementation produce 12 cases. Eight readers run four copies each of lookup and validation. No earlier case was rerun or pooled into these medians. Both original and new cohort data keep their own source commit, timestamps, runtime, host, raw cases and terminal receipt.
 
-| Readers | Shared | Immutable.js | Native |
-| --- | ---: | ---: | ---: |
-| 0 | 8.90 | 17.48 | 14.04 |
-| 2 | 9.10 | 44.46 | 33.36 |
-| 4 | 9.41 | 71.12 | 54.28 |
+## Secondary component accounting
 
-<!-- memory-chart:readers -->
-![Retained data memory at 0, 2 and 4 readers: zerocopy 8.90, 9.10, 9.41 MiB; Immutable.js 17.48, 44.46, 71.12; native 14.04, 33.36, 54.28. Three trials per case.](assets/memory-readers.svg)
-<!-- /memory-chart -->
+Retained data is the signed sum of post-GC JavaScript heap changes and tracked ArrayBuffer changes across all isolates, plus the current capacity of unique shared WASM backing stores counted once. The baseline consists of empty imported workers with connected MessageChannels. Each stage waits for work to finish and forces GC in every isolate.
 
-The shared buffer remains the same size when more readers attach. Per-reader wrappers, compiled code and read caches still have a cost. The measured JavaScript cost grows; it is not zero. The native and Immutable.js designs retain separate data structures in each reader.
+Arena-used bytes are separate from full backing capacity and are not added twice. Different attachments can report earlier used prefixes for the same backing store; accounting uses the maximum prefix for each arena ID. Current capacity must agree. Caches, retained small answers, spare capacity and unreclaimed arena history are included. External memory remains a diagnostic. Negative component changes are preserved.
 
-## Updates and old snapshots
+A separate calibration checks that this Node build counts ordinary ArrayBuffers but excludes shared WASM backing from `arrayBuffers`, including a worker attachment and memory growth. The run stops if that assumption fails.
 
-Unique-message fixture. Two readers for replicated/shared designs. All values are MiB.
+## Equivalent work and history
 
-| State | Events | Shared | Immutable.js | Native replicas | One native owner |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Loaded, before queries | 100,000 | 8.82 | 44.23 | 33.19 | 15.75 |
-| After two queries | 100,000 | 9.10 | 44.46 | 33.36 | 14.04 |
-| Appended; old snapshot retained | 102,000 | 9.33 | 45.61 | 38.04 | 14.65 |
-| Old snapshot released; query live | 102,000 | 9.39 | 45.64 | 38.09 | 14.71 |
-| 20 more batches; latest view only | 142,000 | 12.58 | 62.52 | 47.57 | 21.11 |
+Every path stores the same deeply frozen JSON-compatible records. SharedMap uses object `setMany`, Immutable.js uses Map batches, and Immer uses Map `produce` batches. Native Map copies its index only when current and retained initial are the same root, then mutates its exclusively owned current index. All paths replace objects without mutating retained values.
 
-Shared and Immutable.js retain actual old roots. The native append-only design retains a prefix length over its existing arrays. It is not charged for a needless full snapshot copy. Every old and live query is checked against an independent reference.
+Each replica receives the initial dataset once. Later native, Immutable.js and Immer messages carry only 100 changed ID/object pairs. SharedMap messages carry descriptors for shared backing. No baseline is charged a full-dataset clone for sparse updates.
 
-Dropping a shared root does not shrink its arena. The allocation and capacity figures remain unchanged between the retain and release stages. Small changes in JavaScript heap include cache state and measurement noise; they are not a leak diagnosis. No compaction runs in this workload. This benchmark does not test arbitrary edits, unbounded history, or long production sessions.
-
-## Total process RAM is a different metric
-
-Post-query **RSS**, in MiB. This is the whole Node process, including runtime code, all worker threads, heap pages, native allocations and shared backing. The startup baseline is not subtracted here. RSS can include free pages that the allocator has not returned to the operating system.
-
-| Input | Shared | Immutable.js | Native replicas | One native owner |
-| --- | ---: | ---: | ---: | ---: |
-| Repeated messages | 107.57 | 181.20 | 142.29 | 88.15 |
-| Unique messages | 122.06 | 212.99 | 164.17 | 116.21 |
-| Unique messages, 20% Unicode prefix | 122.98 | 222.67 | 170.70 | 118.48 |
-
-<!-- memory-chart:rss -->
-![Whole-process RSS for unique messages: zerocopy 122.06 MiB, Immutable.js 212.99, native replicas 164.17, one native owner 116.21. Node.js, not browser RAM.](assets/memory-rss.svg)
-<!-- /memory-chart -->
-
-The one-native-owner design has the lowest total process RAM in these samples, even though its retained data memory is higher than Shared. This is an important control: avoiding extra workers can save memory. Shared data is not automatically the smallest complete application.
-
-Process high-water RSS through the final 142,000-event stream stage, in MiB:
-
-| Input | Shared | Immutable.js | Native replicas | One native owner |
-| --- | ---: | ---: | ---: | ---: |
-| Repeated messages | 114.47 | 234.45 | 178.96 | 110.64 |
-| Unique messages | 129.37 | 251.07 | 206.93 | 124.61 |
-| Unique messages, 20% Unicode prefix | 138.24 | 250.85 | 211.52 | 127.64 |
-
-These are OS high-water readings from the **forced-GC experiment**. They include startup, data construction, transfer, queries and updates through that stage. They are not a prediction of a production application's peak. Full before/after counters and the final worker-stop sample remain in each raw run file.
-
-## Method and limits
-
-[Hosted profiling run](https://github.com/natanelia/zerocopy/actions/runs/38009932586) measured on 2026-10-10 in an isolated Linux x64 environment, v22.23.3, V8 12.4.254.21-node.57, INTEL(R) XEON(R) PLATINUM 8573C. Immutable.js is pinned to 5.1.9. Each table cell is the median of three fresh-process trials. The complete matrix has **90 runs and 450 state samples**: three text fixtures, zero/two/four readers for each collection design, and the one-native-owner control. Architecture order rotates between trials. No samples were removed.
-
-The runtime is the exact CI-built library. Module and driver hashes are recorded in the raw summary. The proof reuses the website's storage adapters, query functions, batching and 4,096-index task yields. Owner-to-reader transport uses real Node MessagePorts. Search readers return indices; the owner materializes the visible page, as in the browser benchmark. The separate proof controller is not a DOM renderer.
-
-All paths use the same five columns and input values. Unique messages add an event ID. The Unicode case adds `追跡 ` to every fifth unique message. Immutable.js uses upstream Lists and `withMutations`; native and Immutable.js readers receive incremental updates. Query preparation and result objects are allowed to allocate normally. The reference dataset is held in the supervising process, outside the measured process. It is not an extra data copy charged to any architecture.
-
-The data-memory comparison is **not** a total JavaScript-engine or browser-memory metric. It does not include every C++ allocation. The separate RSS measurements include more costs, but are platform- and allocator-dependent. These are not universal percentages. They also do not establish a memory improvement over the earlier text-search implementation; they compare the current architectures.
+The proof records loaded data, first/repeat queries, one edit with retained history, released initial roots, and ten additional sparse edits. Current and retained answers must match the independent reference. Releasing a root does not reclaim individual shared-arena allocations; later stages expose that lifetime cost.
 
 ## Reproduce and inspect
 
+The exact runtime source, Node/V8 versions, CPU, OS, architecture, timestamps, dependency versions and module hashes are in the downloadable data. These recordings used source/runtime commits `8ad5788648db93c18994fdde9b8fdb12e3a4957b` (0/2/4 readers) and `f140ebe650d536c9b88bd412c291a3cd91614454` (eight readers), whose measured runtime bytes matched. They predate the later main-branch optimizations, including PR30. The live example uses the current site build; these recorded figures do not measure that newer build or establish its gains.
+
 ```sh
-bun install
-bun run build:wasm && bun run build:browser
-node --test proofs/investigation-memory-checks.mjs
-node proofs/investigation-memory.mjs
+node --test website/tests/feature-core.test.mjs proofs/feature-map-memory-checks.mjs
+FEATURE_MEMORY_OUT=proofs/results/feature-map-memory/new-run \
+node proofs/feature-map-memory.mjs
 ```
 
-Results are saved under `proofs/results/investigation-memory/`. Each run retains the baseline, each thread's counters, unique arena IDs and capacities, checked query outputs, all lifecycle samples, process RSS, and the stop sample. `summary.json` contains all grouped medians, environment details and source hashes. The **Investigation memory comparison** CI workflow retains these files for 90 days and imposes no “Shared must win” threshold.
+To record a new eight-reader-only cohort, set `FEATURE_MEMORY_READERS=8` and use another new output directory. The normal command measures the current checkout and records its provenance. The exact original-runtime check was specific to the preserved eight-reader validation run. Keep new cohorts separate; a different host or runtime is not a controlled extension of the earlier reader counts.
 
-The tables on the website are recorded results, not a live browser RAM meter. They do not change when you change the live demo's event count. Read [the historical collection benchmarks](benchmarks.md) for the earlier single-thread measurements and compaction cases; those records are unchanged.
+The documentation importer’s `--eight-readers` option is narrower: it requires the preserved `referenceRecording` and byte-identical original runtime to update this fixed supplemental chart. Ordinary fresh eight-reader outputs are standalone records and intentionally cannot replace this historical documentation cohort. Publishing a different cohort needs a new, explicitly reviewed comparison and its own provenance.
+
+Use the [contributor setup](../CONTRIBUTING.md) and build the declared runtime before recording. The destination must be new or empty. Raw process output, calibration, source hashes, all stages, component samples and failures are retained. The [complete proof method](../proofs/feature-map-memory-method.md) describes the fixed 36-case matrix, accounting and limits.
+
+The browser benchmark measures timings separately. These Node values do not measure the browser, the current device, or production application memory. Run the intended workload on the target device before choosing a design.

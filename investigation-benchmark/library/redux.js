@@ -119,12 +119,12 @@ var classes = Object.freeze({
   SharedSortedSet: SharedSortedSet2,
   SharedPriorityQueue: SharedPriorityQueue2
 });
-var kinds = Object.freeze(Object.keys(classes));
+var kindsByPrototype = new Map(Object.entries(classes).map(([name, C]) => [C.prototype, name]));
 function sharedCollectionKind(value) {
   if (!value || typeof value !== "object" || !Object.isFrozen(value))
     return;
   const prototype = Object.getPrototypeOf(value);
-  const kind = kinds.find((key) => prototype === classes[key].prototype);
+  const kind = kindsByPrototype.get(prototype);
   if (!kind)
     return;
   try {

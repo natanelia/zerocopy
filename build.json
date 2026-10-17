@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "sourceCommit": "501b73819ed7e9bbf7adbb74b03df01045701973",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9",
@@ -9,8 +9,10 @@
   "pages": [
     "",
     "compare/",
-    "explorer/",
     "investigation-benchmark/",
+    "historical/log-compare/",
+    "historical/log-explorer/",
+    "historical/log-benchmark/",
     "lab/",
     "playground/",
     "use-cases/",
@@ -26,6 +28,7 @@
     "docs/tanstack/",
     "docs/memory/",
     "docs/memory-comparison/",
+    "docs/historical-sharedlist-memory/",
     "docs/benchmarks/",
     "docs/migration/",
     "docs/use-cases/",
@@ -34,7 +37,7 @@
     "docs/graphs/",
     "docs/simulations/",
     "docs/analytics/",
-    "docs/maps/",
+    "docs/catalog/",
     "docs/editors/"
   ],
   "librarySHA256": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476"
