@@ -76,7 +76,36 @@ class Compactor {
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return (sorted ? this.target.wasm.radixBuild(input, leaves.length) : this.target.wasm.mapBatch(0, input, leaves.length)) >>> 0;
   }
+  private primitiveVector(a: Arena, d: any, queue: boolean): { input: number; size: number } {
+    const size = d.size, input = size ? this.target.alloc(size * 8) : 0;
+    if (!size) return { input, size };
+    const start = queue ? d.tail : 0, total = start + size, prefix = (total - 1) & ~31;
+    const root = queue ? d.head : d.root, tail = queue ? d.block : d.tail;
+    const source = a.buf, target = this.target.buf;
+    let output = input, runStart = 0, runEnd = 0;
+    for (let first = start; first < total;) {
+      const block = first & ~31;
+      const leaf = first >= prefix ? tail : a.wasm.vecLeaf(root, d.depth, first) >>> 0;
+      const stop = Math.min(total, block + 32), offset = leaf + (first - block) * 8, length = (stop - first) * 8;
+      // Both primitive types already have their final eight-byte encoding.
+      // Preserve those bytes without staging decoded values in a JS array.
+      if (!Number.isInteger(offset) || offset < 0 || offset + length > source.byteLength) throw new RangeError('Vector block exceeds the source buffer');
+      // Bulk writes often place adjacent leaves in one contiguous span.
+      // Keep that span together instead of making one view for every leaf.
+      if (offset !== runEnd) {
+        if (runEnd > runStart) {
+          target.set(source.subarray(runStart, runEnd), output);
+          output += runEnd - runStart;
+        }
+        runStart = offset;
+      }
+      runEnd = offset + length; first = stop;
+    }
+    target.set(source.subarray(runStart, runEnd), output);
+    return { input, size };
+  }
   private vector(a: Arena, d: any, type: string, sequence: boolean, queue: boolean): { input: number; size: number } {
+    if (!sequence && (type === 'number' || type === 'boolean')) return this.primitiveVector(a, d, queue);
     const size = d.size;
     // Place blobs before the final contiguous values. Nested compaction may grow
     // memory, so reacquire the view after it returns.

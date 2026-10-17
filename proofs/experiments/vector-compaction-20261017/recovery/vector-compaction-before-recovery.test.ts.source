@@ -1,0 +1,108 @@
+import { describe, expect, test } from 'vitest';
+import * as S from './shared';
+import { Arena, arenaOf, HEAP_START } from './arena';
+
+const edgeNumbers = [NaN, -0, 0, Infinity, -Infinity, Number.MIN_VALUE, -17.25];
+const numericValues = (size: number) => Array.from({ length: size }, (_, i) => i % 31 ? i + 0.25 : edgeNumbers[(i / 31) % edgeNumbers.length | 0]);
+function queueValues<T extends string>(queue: S.SharedQueue<T>) {
+  const values = [];
+  for (let current = queue; current.size; current = current.dequeue()) values.push(current.peek());
+  return values;
+}
+const payload = (snapshot: object) => {
+  const a = arenaOf(snapshot);
+  return a.buf.slice(HEAP_START, a.used);
+};
+
+describe('compaction across vector blocks', () => {
+  test('rejects a negative or truncated primitive tail instead of copying partial bytes', () => {
+    for (const type of ['number', 'boolean'] as const) {
+      const arena = new Arena();
+      for (const tail of [-8, arena.buf.byteLength - 4]) {
+        const list = new S.SharedList(type, 0, 0, 1, arena, tail);
+        const queue = new S.SharedQueue(type, 0, 0, 1, undefined, arena, tail, 0);
+        expect(() => S.compact(list)).toThrow(RangeError);
+        expect(() => S.compact(queue)).toThrow(RangeError);
+      }
+    }
+  });
+
+  test.each([0, 1, 31, 32, 33, 63, 64, 65, 1024, 1025, 32768, 32769])('retains numeric list values and forks at size %i', size => {
+    const expected = numericValues(size);
+    const source = new S.SharedList('number', 0, 0, 0, new Arena()).pushMany(expected);
+    const fork = source.push(-42), before = payload(source);
+    const copy = S.compact(source);
+    expect(copy.toArray()).toEqual(expected);
+    for (let i = 0; i < size; i++) expect(Object.is(copy.get(i), expected[i])).toBe(true);
+    expect(copy.push(7).toArray()).toEqual([...expected, 7]);
+    expect(fork.toArray()).toEqual([...expected, -42]);
+    expect(payload(source)).toEqual(before);
+    expect(arenaOf(copy)).not.toBe(arenaOf(source));
+  });
+
+  test.each([0, 1, 17, 31, 32, 33, 1023, 1024, 1025, 2052, 2066])('drops a queue prefix of %i without shifting values', consumed => {
+    const expected = numericValues(2067);
+    let source = new S.SharedQueue('number', 0, 0, 0, undefined, new Arena());
+    for (const value of expected) source = source.enqueue(value);
+    const old = source;
+    for (let i = 0; i < consumed; i++) source = source.dequeue();
+    const before = payload(source), copy = S.compact(source);
+    expect(queueValues(copy)).toEqual(expected.slice(consumed));
+    expect(copy.toWorkerData().tail).toBe(0);
+    expect(queueValues(copy.enqueue(7))).toEqual([...expected.slice(consumed), 7]);
+    expect(queueValues(old)).toEqual(expected);
+    expect(payload(source)).toEqual(before);
+  });
+
+  test('keeps logical order when forked leaves have backward or disjoint addresses', () => {
+    const expected = numericValues(1057);
+    const original = new S.SharedList('number', 0, 0, 0, new Arena()).pushMany(expected);
+    const changed = original.set(32, -111).set(0, -0).set(1024, Infinity).set(31, NaN);
+    const nextValues = [...expected];
+    nextValues[32] = -111; nextValues[0] = -0; nextValues[1024] = Infinity; nextValues[31] = NaN;
+    const before = payload(original), copies = S.compactMany({ original, changed });
+    expect(copies.original.toArray()).toEqual(expected);
+    expect(copies.changed.toArray()).toEqual(nextValues);
+    expect(Object.is(copies.changed.get(0), -0)).toBe(true);
+    expect(copies.changed.push(7).toArray()).toEqual([...nextValues, 7]);
+    expect(original.toArray()).toEqual(expected);
+    expect(changed.toArray()).toEqual(nextValues);
+    expect(payload(original)).toEqual(before);
+  });
+
+  test('retains booleans and raw JSON through target memory growth', () => {
+    const booleans = new S.SharedList('boolean').pushMany(Array.from({ length: 4097 }, (_, i) => i % 3 === 0));
+    const text = '界🙂'.repeat(96);
+    const records = Array.from({ length: 1057 }, (_, i) => ({ i, values: [i, i + 1], text }));
+    const objects = new S.SharedList('object').pushMany(records);
+    const before = payload(objects), copies = S.compactMany({ booleans, objects });
+    expect(copies.booleans.toArray()).toEqual(booleans.toArray());
+    expect(copies.objects.toArray()).toEqual(records);
+    expect(Object.isFrozen(copies.objects.get(1024))).toBe(true);
+    expect(Object.isFrozen((copies.objects.get(1024) as { values: number[] }).values)).toBe(true);
+    expect(arenaOf(copies.objects).used).toBeGreaterThan(2 * 65536);
+    expect(payload(objects)).toEqual(before);
+  });
+
+  test.each([false, true])('compacts read-only attachments and nested snapshots (copy=%s)', async copy => {
+    const values = numericValues(1057);
+    const inner = new S.SharedList('number').pushMany(values);
+    const outer = new S.SharedList('SharedList<number>').pushMany(Array.from({ length: 65 }, () => inner));
+    let queue = new S.SharedQueue('SharedList<number>');
+    for (let i = 0; i < 65; i++) queue = queue.enqueue(inner);
+    for (let i = 0; i < 17; i++) queue = queue.dequeue();
+    const attached = await S.initWorker<any>(S.getWorkerData({ inner, outer, queue }, { copy }));
+    const compacted = S.compactMany(attached);
+    expect(compacted.inner.toArray()).toEqual(values);
+    expect(compacted.outer.size).toBe(65);
+    expect(compacted.queue.size).toBe(48);
+    for (const nested of compacted.outer.toArray()) {
+      expect(nested.toArray()).toEqual(values);
+      expect(nested.toWorkerData()).toEqual(compacted.inner.toWorkerData());
+    }
+    expect(compacted.queue.peek()!.toArray()).toEqual(values);
+    expect(compacted.inner.push(1).size).toBe(1058);
+    expect(() => attached.inner.push(1)).toThrow(/read-only/);
+    expect(attached.inner.toArray()).toEqual(values);
+  });
+});

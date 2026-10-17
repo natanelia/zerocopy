@@ -1,0 +1,8 @@
+{
+  "writtenBeforeMeasurement": true,
+  "purpose": "Check the revised steady-state measurement method before accepting a source change.",
+  "protocol": "vector-compaction-protocol.json version2",
+  "cohort": "All 14 cases, Node and Bun, exactly 3 process pairs in each. Both arms use the main source.",
+  "noiseRule": "Flag a case if its geometric mean candidate/baseline time is outside [0.95, 1.05], or all three paired ratios are below 0.97 or above 1.03. Keep every observation.",
+  "followup": "A failure remains a measurement limit; do not weaken acceptance gates or repeat until a favorable result appears."
+}

@@ -1,0 +1,8 @@
+{
+  "recoveredAt": "2026-10-17T04:03:25.204729+00:00",
+  "method": "Reapply the exact transcript edits, then compare with the SHA-256 recorded before the workspace rollback.",
+  "beforeSHA256": "7b2982d2bf8f3d14e12eace100dea5fdbb671f8849c48f8849aff7a1344b15f3",
+  "afterSHA256": "6544257230239eee778d198709b305027d1e16449568e7839d19777f5d548b97",
+  "exactHashMatch": true,
+  "performanceMeasurement": false
+}

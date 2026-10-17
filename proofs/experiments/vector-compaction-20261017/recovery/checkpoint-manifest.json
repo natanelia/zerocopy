@@ -1,0 +1,122 @@
+{
+  "status": "Recovery checkpoint; gate recovery and fresh validation are still pending. No performance clearance.",
+  "base": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "createdAt": "2026-10-17T04:05:01.580652+00:00",
+  "files": [
+    {
+      "path": "compaction.ts",
+      "bytes": 12972,
+      "sha256": "e7d6d9c57cbc5be0d134959fa291b96f5bdd87e48ed1c7924373508ab39bb6f8"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/archives/local-surviving-after-reset.manifest.json",
+      "bytes": 511495,
+      "sha256": "268498004f4903fc7986388f961f7971fb9436f28cf37d3ddd0ab9d81bf27d55"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/archives/local-surviving-after-reset.tar.gz",
+      "bytes": 442512,
+      "sha256": "6a84fd9778dad823bbda6582295d6c85f5d90ba3ff8216de94e506f6c5ccbfe9"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/baseline-compaction.ts.source",
+      "bytes": 11302,
+      "sha256": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/benchmark-v1.mjs.source",
+      "bytes": 8772,
+      "sha256": "687279ba76c6f0e64a8d9932a3a363799875d440b8493627619a29fe6970ab41"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/benchmark-v2.mjs.source",
+      "bytes": 10429,
+      "sha256": "6b68c5fa3a2bfb95738e1cdecdd99ea7a9aed6a3abbd9b6f1a5e812108026376"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/cases-v2.mjs.source",
+      "bytes": 3032,
+      "sha256": "89a1ecf6fc15447e6ebdf940738f822247524d8e2ea8d64f801650ed3756e3d4"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/protocol-v1.json",
+      "bytes": 1725,
+      "sha256": "2cc4139e9e00490fe5455c7158108806d0e5f30872b79c2f784416dd192df965"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/recovery/README.md",
+      "bytes": 2608,
+      "sha256": "2048bbce37459c516c959052be22dbefc16de78e88627aff0e71382f8d1225be"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/recovery/test-source-recovery.json",
+      "bytes": 409,
+      "sha256": "7b5183fcfa0ce9b37a56f59da57c968f1c9cefb0940f0ec71e759d928c724633"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/recovery/vector-compaction-before-recovery.test.ts.source",
+      "bytes": 5795,
+      "sha256": "7b2982d2bf8f3d14e12eace100dea5fdbb671f8849c48f8849aff7a1344b15f3"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/stage-2-compaction.ts.source",
+      "bytes": 12585,
+      "sha256": "9efc061320667689c4abbc04a667b66bfd1ad20ffb7bdc376cfc01f2a8b745d1"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/stage-3-compaction.ts.source",
+      "bytes": 12972,
+      "sha256": "e7d6d9c57cbc5be0d134959fa291b96f5bdd87e48ed1c7924373508ab39bb6f8"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/stage-3-plan.json",
+      "bytes": 882,
+      "sha256": "e943e726f899ef22aa5792edd9c4c2633393be604f817b585d4bbb32a853c714"
+    },
+    {
+      "path": "proofs/experiments/vector-compaction-20261017/stage-3-review.md",
+      "bytes": 919,
+      "sha256": "ae2445122b53c04b97c9741725768e12e2ce27353aad0d1ad9545dd63a1aff8c"
+    },
+    {
+      "path": "proofs/summarize-vector-compaction.mjs",
+      "bytes": 2840,
+      "sha256": "603f8fa40fb8318f129a9d92bc770a0a11812c94b1769ec45c88c681e8b65b98"
+    },
+    {
+      "path": "proofs/vector-compaction-aa-plan-v2.json",
+      "bytes": 617,
+      "sha256": "7a8a0c0d92b59e831e4c91b8054245eedc8ea187c46510adb2d647da5305d790"
+    },
+    {
+      "path": "proofs/vector-compaction-aa-plan.json",
+      "bytes": 946,
+      "sha256": "fdeb57e224afa2e6844f785c28df725350a054e81a9990c07405954b28c6f406"
+    },
+    {
+      "path": "proofs/vector-compaction-benchmark.mjs",
+      "bytes": 10429,
+      "sha256": "6b68c5fa3a2bfb95738e1cdecdd99ea7a9aed6a3abbd9b6f1a5e812108026376"
+    },
+    {
+      "path": "proofs/vector-compaction-cases.mjs",
+      "bytes": 3032,
+      "sha256": "89a1ecf6fc15447e6ebdf940738f822247524d8e2ea8d64f801650ed3756e3d4"
+    },
+    {
+      "path": "proofs/vector-compaction-protocol.json",
+      "bytes": 2697,
+      "sha256": "553ce83d34e4f2b704a0e00484b74aab1ff43378d2234fea0c5110b6181bebb8"
+    },
+    {
+      "path": "proofs/vector-compaction-screen.mjs",
+      "bytes": 3092,
+      "sha256": "233451ccdcb517b19928e1f40c223f4f4fb9566bd4b7581404ea83ae7febee1d"
+    },
+    {
+      "path": "vector-compaction.test.ts",
+      "bytes": 6040,
+      "sha256": "6544257230239eee778d198709b305027d1e16449568e7839d19777f5d548b97"
+    }
+  ]
+}

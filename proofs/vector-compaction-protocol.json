@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "purpose": "Compare complete compact() calls against the current main source, including fresh arena creation and output construction.",
+  "primaryCases": [
+    "list-number-32769",
+    "list-number-262145",
+    "list-boolean-32769",
+    "queue-number-offset17-32769"
+  ],
+  "improvementRule": "The upper 95% bootstrap confidence bound for the geometric mean candidate/baseline time across the four primary cases must be below 0.90 in both Node and Bun.",
+  "regressionRule": "Report every case. A case is clear only if the upper 95% paired bootstrap bound for candidate/baseline time is at most 1.05. A lower bound above 1.05 is a regression; all other failures are unresolved. Report consistent smaller losses as well.",
+  "pairs": 8,
+  "order": "Alternate baseline/candidate then candidate/baseline for each case and process pair.",
+  "warmupBatches": 5,
+  "measuredBatches": 21,
+  "batchCalibration": "After warm-up, use both three-sample, one-operation pilots. Select one shared iteration count to reach at least 25 ms for the faster pilot, capped at 256 operations and 64 MiB of output backing memory per batch. Record when the cap prevents the time target.",
+  "processIsolation": "One fresh child per case, arm and pair. A Node controller selects the Node or Bun subject. Both arms use the same neutral entry path and a fixed union of their known hashed chunks. The selected entry modules and the full manifest are checked before and after each child. Force garbage collection before each batch, outside its timer. Keep all observations.",
+  "checks": "Check every output element before and after timing. Check output used bytes and backing memory against the other arm. Retain source hashes, bundle hashes, runtime versions, CPU, raw batches, launch errors, and all trial results.",
+  "scope": "Warm repeated compaction on one x64 host. No startup, whole-process peak-memory, browser, ARM64, or application-wide claim follows from this local study. Run portability checks separately.",
+  "reasonForRevision": "The fixed v1 A/A cohort crossed the 5% noise rule in both runtimes. Preserve v1. Use a fixed warm-up execution floor, a compiler settling pause, longer measured batches, and an immutable completed record. Acceptance limits and the case cohort are unchanged.",
+  "warmupMinimumMs": 250,
+  "settleMs": 25,
+  "batchTargetMs": 25,
+  "warmupMethod": "Choose a per-subject warm-up batch from one excluded preflight call, aiming for 25 ms within the same 256-operation/64-MiB cap. Run at least five batches and at least 250 ms of actual compact execution. Record every warm-up batch, force collection before batches, then yield for 25 ms before measured samples."
+}

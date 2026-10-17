@@ -1,0 +1,11 @@
+{
+  "writtenBeforeMeasurement": true,
+  "purpose": "Check whether the unchanged main build crosses the planned control limits in this environment.",
+  "method": "Use the vector-compaction-protocol.json v1 timing method with the Node controller. Point both BASE_DIR and CANDIDATE_DIR to main. Run all 14 cases once, with exactly three process pairs in each runtime. Keep every observation.",
+  "runtimes": [
+    "Node 22.23.2",
+    "Bun 1.4.2"
+  ],
+  "noiseRule": "Flag a case if its geometric mean candidate/baseline time is outside [0.95, 1.05], or all three paired ratios are on one side of [0.97, 1.03]. A flag means this short method cannot settle a change of that size for this case.",
+  "followup": "Inspect warm-up and batch durations if noise is flagged. Do not change production code or weaken acceptance limits in response to the A/A labels. Preserve v1 and write a new method before new timing if its measurement scope must change."
+}
