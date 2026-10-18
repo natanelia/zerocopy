@@ -94,6 +94,19 @@ test('changed status, builds, journals, plans, oracles and summaries fail closed
   const path = resolve(dir, 'size-1/01.json.samples.ndjson'), bytes = readFileSync(path);
   writeFileSync(path, bytes.toString().replace('"expected":0', '"expected":1'));
   assert.throws(() => verifyEvidence(dir, 'aa'), /journal/); writeFileSync(path, bytes);
+  // The oracle must also catch a false count when the child and journal
+  // agree. Journal equality alone cannot reject this forged result.
+  const childPath = resolve(dir, 'size-2/01.json');
+  const rawPath = `${childPath}.samples.ndjson`;
+  const oldChild = readFileSync(childPath), oldRaw = readFileSync(rawPath);
+  const altered = JSON.parse(oldChild);
+  const mixed = altered.results.find(row => row.name === 'point-public-mixed');
+  assert.equal(mixed.expected, 1);
+  mixed.expected = 2;
+  writeFileSync(childPath, JSON.stringify(altered));
+  writeFileSync(rawPath, altered.results.map(row => JSON.stringify(row)).join('\n') + '\n');
+  assert.throws(() => verifyEvidence(dir, 'aa'), /Wrong fixture oracle result/);
+  writeFileSync(childPath, oldChild); writeFileSync(rawPath, oldRaw);
   unlinkSync(path); assert.throws(() => verifyEvidence(dir, 'aa'), /ENOENT/); writeFileSync(path, bytes);
 }));
 test('editing both a child and its journal still requires matching raw estimates', () => fixture(({ dir }) => {
