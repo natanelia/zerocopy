@@ -48,3 +48,15 @@ Do not describe fixed priming as a proven fix for the observed timing variation.
 
 PR #39 and the unroll candidates remain without performance clearance. Hosted
 correctness, integration and performance outcomes must be reported separately.
+
+## Concurrent base update
+
+Commit fedce68d7dd83098a5f5927bbd0b45b05387463a landed on the base while
+this repair was being published. It independently added the raw recomputation
+checks and a compact version-3 source inventory. Both changes are retained.
+The remaining gate change in this PR adds the independent fixture-count oracle
+and broader regression coverage. The timing plan remains version 2. Inventory
+version 3 is a source representation, not a new timing method.
+
+All 28 harness tests pass after reconciliation. The merge commit preserves both
+parents; no base-branch commit is replaced or force-pushed.
