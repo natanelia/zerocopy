@@ -3,7 +3,7 @@
   "kind": "current-file-inventory",
   "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
   "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
-  "sourceParent": "5d43c0e2f93e1f6128462b251309be37816a61ec",
+  "sourceParent": "01814f2f79f625a453a142f2831c687b3331812a",
   "notes": [
     "This inventories the staged source, not a performance acceptance decision.",
     "The inventory excludes itself to avoid a recursive digest.",
@@ -15,8 +15,8 @@
       "path": ".github/workflows/numeric-tree-performance.yml",
       "status": "added",
       "mode": "100644",
-      "bytes": 6648,
-      "sha256": "5eb65016f8d9a57db1044ea0c758fd3494d63a763dfc1e6a6253426006f657c2"
+      "bytes": 6682,
+      "sha256": "69a6bf898600a8627c40a5b37d86dbcebc252f1b6dc299bebdbae964aca555ff"
     },
     {
       "path": "geometry.test.ts",
@@ -38,6 +38,13 @@
       "mode": "100644",
       "bytes": 9142,
       "sha256": "7460fa383c69ad1c0e4b11c1527244634eadd1609d7486777ba17e4c055e02be"
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/GATE-INTEGRITY.md",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 2785,
+      "sha256": "556cc7ec03dc508a710a40164638d8fc1c6e38dd449aa4b6adf4d9ae8b889abf"
     },
     {
       "path": "proofs/experiments/numeric-tree-20261017/METHOD-REPAIR.md",
@@ -680,8 +687,15 @@
       "path": "proofs/numeric-tree-gate.mjs",
       "status": "added",
       "mode": "100644",
-      "bytes": 2208,
-      "sha256": "a71bb5843c3b44c569b93f33659a56c8af05e7d2985020a75057e8c0c7f47b30"
+      "bytes": 8461,
+      "sha256": "6359dfd1f0c1160404cebad826636c6bac4a96c66b4d2774c11f40b21adfc5fa"
+    },
+    {
+      "path": "proofs/numeric-tree-gate.node.mjs",
+      "status": "added",
+      "mode": "100644",
+      "bytes": 7184,
+      "sha256": "d92f44edbded4194586cf83e50cce33f696f3e0620d6ea389fce879aa3dd3302"
     },
     {
       "path": "proofs/numeric-tree-manifest.mjs",
@@ -694,8 +708,8 @@
       "path": "proofs/numeric-tree-manifest.node.mjs",
       "status": "added",
       "mode": "100644",
-      "bytes": 6067,
-      "sha256": "fa7e685a3a9d69b9dc8a3bcae0b7dedaadce7567de08e26e4c66aff8e0867207"
+      "bytes": 6164,
+      "sha256": "34a3a16be8868af9214b316169dbf77023410b1a6139167656c9a0bf28110eca"
     },
     {
       "path": "proofs/numeric-tree-process.mjs",
