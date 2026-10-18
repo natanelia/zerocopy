@@ -163,12 +163,34 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
   }
   toArray(): ValueOf<T>[] {
+    if (this.type === 'number') return this.#numberArray();
+    if (this.type === 'boolean') return this.#booleanArray();
     const a = this.arena, result = new Array<ValueOf<T>>(this.size);
     const start = this.size ? (this.size - 1) & ~31 : 0;
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
       const stop = Math.min(this.size, first + 32), dv = a.dv;
       for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
+    }
+    return result;
+  }
+  #numberArray(): ValueOf<T>[] {
+    const a = this.arena, result = new Array<ValueOf<T>>(this.size), dv = a.dv;
+    const start = this.size ? (this.size - 1) & ~31 : 0;
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const stop = Math.min(this.size, first + 32);
+      for (let i = first; i < stop; i++) result[i] = dv.getFloat64(leaf + (i - first) * 8, true) as ValueOf<T>;
+    }
+    return result;
+  }
+  #booleanArray(): ValueOf<T>[] {
+    const a = this.arena, result = new Array<ValueOf<T>>(this.size), dv = a.dv;
+    const start = this.size ? (this.size - 1) & ~31 : 0;
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const stop = Math.min(this.size, first + 32);
+      for (let i = first; i < stop; i++) result[i] = (dv.getFloat64(leaf + (i - first) * 8, true) !== 0) as ValueOf<T>;
     }
     return result;
   }
