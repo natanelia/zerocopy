@@ -53,6 +53,17 @@ function treeCount(root: u32, depth: u32, count: u32, lo: f64, hi: f64): u32 {
 }
 export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f64, hi: f64): u32 {
   if (!size || lo > hi || isNaN(lo) || isNaN(hi)) return 0;
+  // One or two published values are faster as direct scalar loads even in a SIMD module.
+  // Keep the original grouped-tree and tail dispatch for all larger snapshots.
+  if (ASC_FEATURE_SIMD && size <= 2) {
+    const a = load<f64>(tail);
+    let hits: u32 = <u32>(a >= lo) & <u32>(a <= hi);
+    if (size == 2) {
+      const b = load<f64>(tail + 8);
+      hits += <u32>(b >= lo) & <u32>(b <= hi);
+    }
+    return hits;
+  }
   const treeSize = (size - 1) & ~31;
   // A depth-zero root is one leaf. Avoid the larger recursive SIMD helper
   // on 33–64 value lists; the scalar build keeps its original call path.
