@@ -9,6 +9,21 @@ function near(actual, expected, name) {
   assert.ok(Number.isFinite(actual) && actual > 0, `Invalid ${name}`);
   assert.ok(Math.abs(actual - expected) <= Math.max(1, Math.abs(expected)) * 1e-12, `Inconsistent ${name}`);
 }
+export function expectedCount(name, size) {
+  assert.ok(endpoints([size]).some(key => key.name === name));
+  const range = name.startsWith('range-'), mixed = name.endsWith('-mixed');
+  let total = 0;
+  for (let i = 0; i < size; i += range ? 1 : 2) {
+    const x = (i * 7919) % 10007 - 5000;
+    if (range) total += Number(x >= -1000 && x <= 1000);
+    else {
+      const y = ((i + 1) * 7919) % 10007 - 5000;
+      total += Number(mixed ? x >= -5000 && x <= -2500 && y >= 2000 && y <= 5000 :
+        x >= -1000 && x <= 1000 && y >= -1000 && y <= 1000);
+    }
+  }
+  return total;
+}
 export function validatePhase(report, kind) {
   assert.ok(['aa', 'ab'].includes(kind));
   assert.equal(report.kind, kind); assert.equal(report.fullCoverage, true);
@@ -37,6 +52,24 @@ export function validatePhase(report, kind) {
   assert.ok(report.cohorts.every(c => c.error === null && c.pass === true));
 }
 
+// Math.log/exp can differ at the last bit across runtimes and architectures.
+// Reuse near() only for cached derived estimates. Raw samples, paired ratios,
+// endpoint identity and all pass flags remain exact. The timing floors do not move.
+function compareSummaryRows(cached, calculated, context) {
+  assert.equal(cached.length, calculated.length, `${context} differs from raw samples`);
+  for (let i = 0; i < calculated.length; i++) {
+    const { speedup, lower, upper, blockRatios, ...cachedExact } = cached[i];
+    const { speedup: actualSpeedup, lower: actualLower, upper: actualUpper,
+      blockRatios: actualBlocks, ...actualExact } = calculated[i];
+    assert.deepEqual(cachedExact, actualExact, `${context} differs from raw samples`);
+    near(speedup, actualSpeedup, `${context} differs from raw samples: speedup`);
+    near(lower, actualLower, `${context} differs from raw samples: lower`);
+    near(upper, actualUpper, `${context} differs from raw samples: upper`);
+    assert.equal(blockRatios.length, actualBlocks.length, `${context} differs from raw samples`);
+    blockRatios.forEach((value, j) => near(value, actualBlocks[j], `${context} differs from raw samples: block ratio`));
+  }
+}
+
 // Recompute from every retained child, not the cached pass flags or estimates.
 // No path or sample selection comes from the report. Failed evidence stays put.
 export function verifyEvidence(directory, kind) {
@@ -58,6 +91,7 @@ export function verifyEvidence(directory, kind) {
     assert.deepEqual(cohortPlan.source, report.inputSources);
     assert.equal(cohortPlan.driver, report.sources.driver);
     assert.equal(cohortPlan.runtime, report.runtimeFile);
+    const expected = endpoints([size]).map(({ name }) => expectedCount(name, size));
     const children = schedule().map((assignment, index) => {
       const prefix = resolve(dir, String(index + 1).padStart(2, '0'));
       const status = read(`${prefix}.status.json`);
@@ -65,6 +99,7 @@ export function verifyEvidence(directory, kind) {
       const child = read(`${prefix}.json`);
       const journal = readFileSync(`${prefix}.json.samples.ndjson`, 'utf8').trim().split('\n').map(JSON.parse);
       assert.deepEqual(journal, child.results, 'Raw sample journal differs from child');
+      assert.deepEqual(child.results.map(row => row.expected), expected, 'Wrong fixture oracle result');
       assert.equal(child.driver, report.sources.driver);
       assert.deepEqual(child.runtime, report.runtime);
       const source = kind === 'aa' || assignment.role === 'B' ? 'candidate' : 'baseline';
@@ -74,16 +109,39 @@ export function verifyEvidence(directory, kind) {
     const actual = summarize(children, kind, [size]);
     const summary = read(resolve(dir, 'summary.json'));
     assert.equal(summary.kind, kind); assert.equal(summary.complete, true); assert.equal(summary.error, null);
-    assert.deepEqual(summary.rows, actual, 'Size summary differs from raw samples');
+    compareSummaryRows(summary.rows, actual, 'Size summary');
     const pass = actual.every(r => r.pass);
     assert.equal(summary.pass, pass);
     rows.push(...actual); cohorts.push({ size, error: null, pass });
   }
   assert.equal(report.fullCoverage, true); assert.equal(report.error, null);
-  assert.deepEqual(report.rows, rows, 'Phase summary differs from raw samples');
+  compareSummaryRows(report.rows, rows, 'Phase summary');
   assert.deepEqual(report.cohorts, cohorts);
   assert.equal(report.pass, rows.every(r => r.pass));
-  return report;
+  return { ...report, rows };
+}
+
+/** Check both runtime families and the job architecture, not only A/A-to-A/B equality. */
+export function validateRuntimeCoverage(verified, expectedArch = process.arch) {
+  assert.ok(['x64', 'arm64'].includes(expectedArch), 'Unsupported comparison architecture');
+  assert.equal(verified.size, 4, 'All four evidence sets are required');
+  const first = verified.get('node-aa');
+  for (const runtime of ['node', 'bun']) for (const kind of ['aa', 'ab']) {
+    const name = `${runtime}-${kind}`, report = verified.get(name);
+    assert.ok(report, `Missing runtime phase: ${name}`);
+    assert.equal(report.kind, kind, `Wrong phase kind: ${name}`);
+    assert.equal(report.runtime.arch, expectedArch, `Wrong runtime architecture: ${name}`);
+    assert.match(report.runtime.node, /^v\d+\.\d+\.\d+(?:[-+].+)?$/, `Missing Node-compatible version: ${name}`);
+    if (runtime === 'node') assert.equal(report.runtime.bun, null, `Node phase contains Bun evidence: ${name}`);
+    else assert.match(report.runtime.bun ?? '', /^\d+\.\d+\.\d+(?:[-+].+)?$/, `Bun phase lacks Bun evidence: ${name}`);
+    assert.deepEqual(report.inputSources, first.inputSources, 'Build inputs changed between phases');
+    assert.deepEqual(report.sources, first.sources, 'Measurement source changed between phases');
+  }
+  for (const runtime of ['node', 'bun']) {
+    const a = verified.get(`${runtime}-aa`), b = verified.get(`${runtime}-ab`);
+    assert.equal(a.runtimeSha256, b.runtimeSha256, 'Runtime binary changed between A/A and A/B');
+    assert.deepEqual(a.runtime, b.runtime, 'Runtime metadata changed between A/A and A/B');
+  }
 }
 
 const self = fileURLToPath(import.meta.url);
@@ -103,17 +161,7 @@ if (process.argv[1] && resolve(process.argv[1]) === self) {
   }
   let identityError = null;
   try {
-    assert.equal(verified.size, 4, 'All four evidence sets are required');
-    const first = verified.get('node-aa');
-    for (const report of verified.values()) {
-      assert.deepEqual(report.inputSources, first.inputSources, 'Build inputs changed between phases');
-      assert.deepEqual(report.sources, first.sources, 'Measurement source changed between phases');
-    }
-    for (const runtime of ['node', 'bun']) {
-      const a = verified.get(`${runtime}-aa`), b = verified.get(`${runtime}-ab`);
-      assert.equal(a.runtimeSha256, b.runtimeSha256, 'Runtime binary changed between A/A and A/B');
-      assert.deepEqual(a.runtime, b.runtime, 'Runtime metadata changed between A/A and A/B');
-    }
+    validateRuntimeCoverage(verified);
   } catch (failure) { identityError = String(failure); }
   const result = { pass: !identityError && phases.every(p => !p.error), identityError, phases };
   writeFileSync(resolve(directory, 'gate.json'), JSON.stringify(result, null, 2) + '\n', { flag: 'wx' });
