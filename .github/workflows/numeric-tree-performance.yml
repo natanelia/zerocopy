@@ -6,6 +6,7 @@ on:
     paths:
       - 'numeric-kernels.as.ts'
       - '.github/workflows/numeric-tree-performance.yml'
+      - 'proofs/experiments/numeric-tree-20261017/manifest.json'
   workflow_dispatch:
   pull_request:
     paths:
