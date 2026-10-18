@@ -1,0 +1,20 @@
+--- a/numeric-spatial.as.ts
++++ b/numeric-spatial.as.ts
+@@
+ function treeBox(root: u32, depth: u32, values: u32, minX: f64, minY: f64, maxX: f64, maxY: f64): u32 {
+   if (!depth) return spanBox(root, values, minX, minY, maxX, maxY);
++  if (depth == 1) {
++    // Complete leaf group. Keep point predicates in one loop and avoid one
++    // recursive call per 32 interleaved values. Read only published leaves.
++    let total: u32 = 0;
++    const children = values >> 5;
++    for (let child: u32 = 0; child < children; child++) {
++      const p = load<u32>(root + child * 4);
++      for (let i: u32 = 0; i < 32; i += 2) {
++        const x = load<f64>(p + i * 8), y = load<f64>(p + i * 8 + 8);
++        total += <u32>(x >= minX) & <u32>(x <= maxX) & <u32>(y >= minY) & <u32>(y <= maxY);
++      }
++    }
++    return total;
++  }
+   const capacity: u32 = 1 << (depth * 5);
