@@ -69,7 +69,7 @@ jobs:
           TOOLKIT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/compiler-toolkit
         run: node proofs/numeric-tree-toolkit.mjs 2>&1 | tee "$EVIDENCE_DIR/compiler-toolkit.txt"
       - name: Test the fail-closed measurement harness
-        run: node --test proofs/numeric-tree-process.node.mjs proofs/numeric-tree-manifest.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
+        run: node --test proofs/numeric-tree-process.node.mjs proofs/numeric-tree-manifest.node.mjs proofs/numeric-tree-gate.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
       - name: Check types and test suite
         run: |
           bun run typecheck

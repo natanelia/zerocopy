@@ -62,10 +62,10 @@ test('compiler snapshot includes exact transitive packages and their license fil
 
 test('final gate checks raw status and refuses missing or failed endpoints', async () => {
   const { validatePhase } = await import('./numeric-tree-gate.mjs');
-  const { endpoints } = await import('./numeric-tree-process.mjs');
+  const { endpoints, PLAN } = await import('./numeric-tree-process.mjs');
   const report = { kind: 'aa', fullCoverage: true, error: null, pass: true,
-    rows: endpoints().map(r => ({ ...r, pointPass: true, confidencePass: true, pass: true })),
-    cohorts: Array.from({ length: 11 }, () => ({ error: null, pass: true })) };
+    rows: endpoints().map(r => ({ ...r, speedup: 1, lower: 1, upper: 1, pairedRatios: Array(8).fill(1), blockRatios: Array(4).fill(1), pointPass: true, confidencePass: true, pass: true })),
+    cohorts: PLAN.sizes.map(size => ({ size, error: null, pass: true })) };
   assert.doesNotThrow(() => validatePhase(report, 'aa'));
   for (const change of [r => r.pass = false, r => r.fullCoverage = false,
     r => r.error = 'failure', r => r.rows.pop(), r => r.rows[0].confidencePass = false,

@@ -34,13 +34,19 @@ export function inventory(baseDir, candidateDir) {
   return files;
 }
 export function verify(manifest, baseDir, candidateDir) {
-  assert.equal(manifest.version, 2); assert.equal(manifest.kind, 'current-file-inventory');
+  assert.ok(manifest.version === 2 || manifest.version === 3); assert.equal(manifest.kind, 'current-file-inventory');
   assert.match(manifest.baselineCommit, /^[0-9a-f]{40}$/); assert.match(manifest.sourceParent, /^[0-9a-f]{40}$/);
   const head = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: baseDir, encoding: 'utf8' });
   if (head.status === 0) assert.equal(head.stdout.trim(), manifest.baselineCommit, 'Different baseline commit');
   assert.equal(manifest.baselineTree, execFileSync('git', ['write-tree'], { cwd: baseDir, encoding: 'utf8' }).trim(), 'Different baseline tree');
-  assert.deepEqual(manifest.files, inventory(baseDir, candidateDir), 'Stale, missing or extra inventory entry');
-  return { filesVerified: manifest.files.length, baselineTreeVerified: true, baselineCommitVerified: head.status === 0 };
+  const files = inventory(baseDir, candidateDir);
+  if (manifest.version === 2) assert.deepEqual(manifest.files, files, 'Stale, missing or extra inventory entry');
+  else {
+    assert.equal(manifest.fileCount, files.length, 'Wrong inventory count');
+    assert.equal(manifest.inventorySha256, hash('sha256', Buffer.from(JSON.stringify(files))), 'Stale inventory digest');
+    assert.ok(!Object.hasOwn(manifest, 'files'), 'Do not mix inventory representations');
+  }
+  return { filesVerified: files.length, baselineTreeVerified: true, baselineCommitVerified: head.status === 0 };
 }
 const self = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === self) {
@@ -50,13 +56,14 @@ if (process.argv[1] && resolve(process.argv[1]) === self) {
   if (process.argv.includes('--write')) {
     assert.match(process.env.BASELINE_COMMIT ?? '', /^[0-9a-f]{40}$/);
     assert.match(process.env.SOURCE_PARENT ?? '', /^[0-9a-f]{40}$/);
-    const manifest = { version: 2, kind: 'current-file-inventory', baselineCommit: process.env.BASELINE_COMMIT,
+    const files = inventory(baseDir, candidateDir);
+    const manifest = { version: 3, kind: 'current-file-inventory', baselineCommit: process.env.BASELINE_COMMIT,
       baselineTree: execFileSync('git', ['write-tree'], { cwd: baseDir, encoding: 'utf8' }).trim(), sourceParent: process.env.SOURCE_PARENT,
-      notes: ['This inventories the staged source, not a performance acceptance decision.',
-        'The inventory excludes itself to avoid a recursive digest.',
-        'manifest-before-stage4.json preserves the superseded inventory verbatim. Its entries do not describe the current tree.',
-        'Historical test outcomes and generated-binary digests stay with their original stage reports and hosted artifacts.'],
-      files: inventory(baseDir, candidateDir) };
+      fileCount: files.length, inventorySha256: hash('sha256', Buffer.from(JSON.stringify(files))),
+      notes: ['All changed paths, Git modes, byte counts and SHA-256 hashes are committed by this canonical inventory digest.',
+        'The inventory excludes this file to avoid a recursive digest. Re-run inventory() to inspect each entry.',
+        'The complete version-2 manifest remains immutable in the parent commit and earlier experiment reports.',
+        'Historical outcomes and binary digests remain in original artifacts. This is not performance clearance.'] };
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
   }
   console.log(JSON.stringify(verify(JSON.parse(readFileSync(path, 'utf8')), baseDir, candidateDir)));
