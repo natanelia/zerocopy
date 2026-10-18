@@ -1,0 +1,100 @@
+name: Numeric pairing diagnostic evidence
+on:
+  push:
+    branches: [proof/numeric-pairing-diagnostic-20261018]
+    paths:
+      - '.github/workflows/numeric-pairing-diagnostic.yml'
+      - 'proofs/experiments/numeric-pairing-20261018/diagnostic-source.tar.xz'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: numeric-pairing-diagnostic-evidence
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    env:
+      PROOF: proofs/experiments/numeric-pairing-20261018
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Check the source seal and prepare a private output
+        run: |
+          cd "$PROOF"
+          sha256sum -c diagnostic-source.sha256
+          mkdir "$RUNNER_TEMP/pairing-source"
+          tar -xJf diagnostic-source.tar.xz -C "$RUNNER_TEMP/pairing-source"
+      - name: Fetch and verify the frozen build input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if test -f "$PROOF/inputs/numeric-tree-X64-d16d82c9.zip"; then
+            cp "$PROOF/inputs/numeric-tree-X64-d16d82c9.zip" "$RUNNER_TEMP/"
+          else
+            curl --fail --location --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H 'Accept: application/vnd.github+json' \
+              'https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/12123443213/zip' \
+              -o "$RUNNER_TEMP/numeric-tree-X64-d16d82c9.zip"
+          fi
+          echo 'c47098bfa2c34c916b058fd38b3178dc85289b68b69141c88afeeea90ef837fb  numeric-tree-X64-d16d82c9.zip' | (cd "$RUNNER_TEMP" && sha256sum -c -)
+      - name: Run both predeclared methods once and replay every sample
+        id: diagnostic
+        continue-on-error: true
+        run: |
+          python3 "$RUNNER_TEMP/pairing-source/reproduce.py" \
+            "$RUNNER_TEMP/numeric-tree-X64-d16d82c9.zip" "$RUNNER_TEMP/pairing-evidence" \
+            > "$RUNNER_TEMP/pairing-controller.log" 2>&1
+      - name: Retain complete evidence even when a diagnostic fails
+        if: always()
+        run: |
+          DEST="$PROOF/runs/$GITHUB_RUN_ID"
+          mkdir -p "$DEST"
+          cp "$RUNNER_TEMP/pairing-controller.log" "$DEST/" 2>/dev/null || true
+          printf '%s\n' "$GITHUB_SHA" > "$DEST/source-commit.txt"
+          printf '%s\n' '${{ steps.diagnostic.outcome }}' > "$DEST/command-outcome.txt"
+          METHODS=()
+          for METHOD in pairing pairing-longbatch; do
+            test ! -d "$RUNNER_TEMP/pairing-evidence/work/$METHOD" || METHODS+=("$METHOD")
+          done
+          if test "${#METHODS[@]}" -gt 0; then
+            tar --exclude='*/scratch' -cJf "$DEST/raw.tar.xz" -C "$RUNNER_TEMP/pairing-evidence/work" "${METHODS[@]}"
+          fi
+          if test -f "$RUNNER_TEMP/numeric-tree-X64-d16d82c9.zip"; then
+            mkdir -p "$PROOF/inputs"
+            echo 'c47098bfa2c34c916b058fd38b3178dc85289b68b69141c88afeeea90ef837fb  numeric-tree-X64-d16d82c9.zip' | (cd "$RUNNER_TEMP" && sha256sum -c -)
+            cp "$RUNNER_TEMP/numeric-tree-X64-d16d82c9.zip" "$PROOF/inputs/"
+          fi
+          if test -f "$RUNNER_TEMP/pairing-source/reproduce.py"; then
+            mkdir -p "$PROOF/source"
+            cp "$RUNNER_TEMP/pairing-source/"* "$PROOF/source/"
+          fi
+          find "$DEST" -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > "$DEST/SHA256SUMS"
+          echo 'Diagnostic evidence only. This workflow does not clear any performance PR or replace the original version-2 gates.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: numeric-pairing-diagnostic-${{ github.run_id }}
+          path: proofs/experiments/numeric-pairing-20261018/runs/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve raw evidence and fixed inputs in Git without a force push
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f -- "$PROOF/runs/$GITHUB_RUN_ID"
+          test ! -d "$PROOF/inputs" || git add -f -- "$PROOF/inputs"
+          test ! -d "$PROOF/source" || git add -f -- "$PROOF/source"
+          git diff --cached --quiet && exit 0
+          git commit -m "proof(numeric): retain diagnostic $GITHUB_RUN_ID, including failures"
+          git push origin 'HEAD:refs/heads/proof/numeric-pairing-diagnostic-20261018'
