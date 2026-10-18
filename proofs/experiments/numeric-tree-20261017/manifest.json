@@ -3,9 +3,9 @@
   "kind": "current-file-inventory",
   "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
   "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
-  "sourceParent": "caebe14fd519cd8e558e77ea164edaef9aac35eb",
-  "fileCount": 106,
-  "inventorySha256": "b8f7eeb5d02aa0a6b83e6ed7e1e1b4d37b8d361de880072bc57229170335c3ca",
+  "sourceParent": "cc21d3674c6be4aad46b83a791125b1a354310c5",
+  "fileCount": 108,
+  "inventorySha256": "a0323e3fcdd33d16cd145a8da39a42bcf14cdd7da2fc13c5da027db9bb5162cd",
   "notes": [
     "All changed paths, Git modes, byte counts and SHA-256 hashes are committed by this canonical inventory digest.",
     "The inventory excludes this file to avoid a recursive digest. Re-run inventory() to inspect each entry.",

@@ -27,14 +27,19 @@ function treeCount(root: u32, depth: u32, count: u32, lo: f64, hi: f64): u32 {
     // sibling leaves, with no recursive call or lane reduction per leaf.
     const lower = f64x2.splat(lo), upper = f64x2.splat(hi);
     const children = count >> 5;
-    let sums = i64x2.splat(0);
+    // Independent sums shorten the dependency chain across complete leaves.
+    let sums0 = i64x2.splat(0);
+    let sums1 = i64x2.splat(0);
     for (let child: u32 = 0; child < children; child++) {
       const p = load<u32>(root + child * 4);
-      for (let i: u32 = 0; i < 32; i += 2) {
-        const values = v128.load(p + i * 8);
-        sums = i64x2.sub(sums, v128.and(f64x2.ge(values, lower), f64x2.le(values, upper)));
+      for (let i: u32 = 0; i < 32; i += 4) {
+        const values0 = v128.load(p + i * 8);
+        const values1 = v128.load(p + i * 8 + 16);
+        sums0 = i64x2.sub(sums0, v128.and(f64x2.ge(values0, lower), f64x2.le(values0, upper)));
+        sums1 = i64x2.sub(sums1, v128.and(f64x2.ge(values1, lower), f64x2.le(values1, upper)));
       }
     }
+    const sums = i64x2.add(sums0, sums1);
     return <u32>i64x2.extract_lane(sums, 0) + <u32>i64x2.extract_lane(sums, 1);
   }
   const capacity: u32 = 1 << (depth * 5);

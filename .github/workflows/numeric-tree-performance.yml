@@ -64,6 +64,8 @@ jobs:
           mkdir "$EVIDENCE_DIR/candidate-build"
           cp -R dist "$EVIDENCE_DIR/candidate-build/"
           cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/candidate-build/"
+      - name: Check SIMD bounds and snapshot safety
+        run: node --test proofs/numeric-tree-safety.node.mjs 2>&1 | tee "$EVIDENCE_DIR/numeric-safety.txt"
       - name: Retain the installed pinned compiler and licenses
         env:
           TOOLKIT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/compiler-toolkit
