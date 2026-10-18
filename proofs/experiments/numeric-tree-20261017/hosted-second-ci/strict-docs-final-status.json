@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "scripts/check-docs.mjs",
+    "--base",
+    "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+    "--preserve"
+  ],
+  "cwd": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "startedAt": "2026-10-17T03:42:54.166762+00:00",
+  "completedAt": "2026-10-17T03:42:54.224840+00:00",
+  "elapsedSeconds": 0.05807988699962152,
+  "exitCode": 0,
+  "log": "strict-docs-final.txt",
+  "logSha256": "66ab6507b447c340bcc88ba2b10410858b5c48ac9b07aa99318486485eb2bddb",
+  "testSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62",
+  "scope": "The complete repair, including both corrected-workflow archives and the new summary."
+}

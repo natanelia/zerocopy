@@ -22,6 +22,21 @@ function spanCount(p: u32, count: u32, lo: f64, hi: f64): u32 {
 }
 function treeCount(root: u32, depth: u32, count: u32, lo: f64, hi: f64): u32 {
   if (!depth) return spanCount(root, count, lo, hi);
+  if (ASC_FEATURE_SIMD && depth == 1) {
+    // Tree leaves are complete. Keep the vector count across each group of
+    // sibling leaves, with no recursive call or lane reduction per leaf.
+    const lower = f64x2.splat(lo), upper = f64x2.splat(hi);
+    const children = count >> 5;
+    let sums = i64x2.splat(0);
+    for (let child: u32 = 0; child < children; child++) {
+      const p = load<u32>(root + child * 4);
+      for (let i: u32 = 0; i < 32; i += 2) {
+        const values = v128.load(p + i * 8);
+        sums = i64x2.sub(sums, v128.and(f64x2.ge(values, lower), f64x2.le(values, upper)));
+      }
+    }
+    return <u32>i64x2.extract_lane(sums, 0) + <u32>i64x2.extract_lane(sums, 1);
+  }
   const capacity: u32 = 1 << (depth * 5);
   let total: u32 = 0, child: u32 = 0;
   while (count) {
@@ -34,6 +49,10 @@ function treeCount(root: u32, depth: u32, count: u32, lo: f64, hi: f64): u32 {
 export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f64, hi: f64): u32 {
   if (!size || lo > hi || isNaN(lo) || isNaN(hi)) return 0;
   const treeSize = (size - 1) & ~31;
-  return (treeSize ? treeCount(root, depth, treeSize, lo, hi) : 0) + spanCount(tail, size - treeSize, lo, hi);
+  // A depth-zero root is one leaf. Avoid the larger recursive SIMD helper
+  // on 33–64 value lists; the scalar build keeps its original call path.
+  return (treeSize ? (ASC_FEATURE_SIMD && !depth
+    ? spanCount(root, treeSize, lo, hi)
+    : treeCount(root, depth, treeSize, lo, hi)) : 0) + spanCount(tail, size - treeSize, lo, hi);
 }
 export { countPointsInBox } from './numeric-spatial.as';

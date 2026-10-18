@@ -1,0 +1,22 @@
+NUMERIC-TREE-AA {"name":"1-node-a-b","runtime":"node","executable":"/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node","left":"a","right":"b","status":0,"failures":[{"name":"range-scalar","size":2,"speedup":0.9385580761329805,"pairedMedian":0.940990261326684},{"name":"range-public","size":2,"speedup":1.0785435988585201,"pairedMedian":1.0715644559181228},{"name":"range-simd","size":1024,"speedup":1.1737191563762783,"pairedMedian":1.1366282133199155}]}
+NUMERIC-TREE-AA {"name":"2-bun-a-b","runtime":"bun","executable":"/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun","left":"a","right":"b","status":0,"failures":[{"name":"range-simd","size":2,"speedup":1.0573302333566805,"pairedMedian":1.0652572260743935}]}
+NUMERIC-TREE-AA {"name":"3-node-b-a","runtime":"node","executable":"/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node","left":"b","right":"a","status":0,"failures":[{"name":"range-scalar","size":2,"speedup":0.9377829637999826,"pairedMedian":0.9341928568912352},{"name":"range-public","size":2,"speedup":1.0663140161989788,"pairedMedian":1.0584458521955349}]}
+NUMERIC-TREE-AA {"name":"4-bun-b-a","runtime":"bun","executable":"/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun","left":"b","right":"a","status":0,"failures":[{"name":"point-simd-control","size":2,"speedup":0.9445144437956898,"pairedMedian":0.954278546418591},{"name":"range-simd","size":1024,"speedup":1.0594817028365004,"pairedMedian":1.0379789162204527}]}
+58 |   console.log('NUMERIC-TREE-AA', JSON.stringify(row));
+59 |   writeFileSync(resolve(output, 'cohort.json'), JSON.stringify({ date: new Date().toISOString(), source, bundles: temporary, manifest: expected, driver, controller, schedule, warmup: 25, samples: 31, work: 8000000, sizes: [1, 2, 32, 1024], method: 'Same stage-3 bundle in two clean neutral directories; swap the directory roles on the second run of each runtime. Any ratio outside [0.95, 1/0.95] detects a greater-than-5% A/A shift. This does not change the production acceptance gate.', rows }, null, 2) + '\n');
+60 | }
+61 | assert.deepEqual(manifest(source), expected, 'Source bundles changed during the fixed cohort');
+62 | assert.equal(digest(resolve(source, 'proofs/numeric-tree-benchmark.mjs')), driver, 'Driver changed during the fixed cohort');
+63 | assert.ok(rows.every(row => row.status === 0 && !row.error && row.failures.length === 0), 'The fixed A/A cohort detected a harness or runtime placement effect; do not use this method to accept an A/B change.');
+            ^
+AssertionError: The fixed A/A cohort detected a harness or runtime placement effect; do not use this method to accept an A/B change.
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "==",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /workspace/scratch/736c0a2657a3/zerocopy-numeric/proofs/numeric-tree-aa.mjs:63:8
+
+Bun v1.4.2 (Linux x64)

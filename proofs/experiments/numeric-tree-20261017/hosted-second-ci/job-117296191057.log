@@ -1,0 +1,419 @@
+﻿2026-10-17T03:21:53.9929556Z Current runner version: '2.337.0'
+2026-10-17T03:21:53.9954718Z ##[group]Runner Image Provisioner
+2026-10-17T03:21:53.9955580Z Hosted Compute Agent
+2026-10-17T03:21:53.9956157Z Version: 20261012.601
+2026-10-17T03:21:53.9957008Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-17T03:21:53.9957768Z Build Date: 2026-10-12T17:48:21Z
+2026-10-17T03:21:53.9958563Z Worker ID: {c6db7188-b83d-4bac-92d7-ae921f095f9f}
+2026-10-17T03:21:53.9959313Z Region: westus2
+2026-10-17T03:21:53.9959845Z Cloud: Azure
+2026-10-17T03:21:53.9960672Z ##[endgroup]
+2026-10-17T03:21:53.9962171Z ##[group]Operating System
+2026-10-17T03:21:53.9962893Z Ubuntu
+2026-10-17T03:21:53.9963442Z 24.04.5
+2026-10-17T03:21:53.9963949Z LTS
+2026-10-17T03:21:53.9964678Z ##[endgroup]
+2026-10-17T03:21:53.9965266Z ##[group]Runner Image
+2026-10-17T03:21:53.9965882Z Image: ubuntu-24.04
+2026-10-17T03:21:53.9966462Z Version: 20261012.334.1
+2026-10-17T03:21:53.9967761Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-17T03:21:53.9969387Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-17T03:21:53.9970706Z ##[endgroup]
+2026-10-17T03:21:53.9971894Z ##[group]GITHUB_TOKEN Permissions
+2026-10-17T03:21:53.9973996Z Contents: read
+2026-10-17T03:21:53.9974668Z Metadata: read
+2026-10-17T03:21:53.9975236Z ##[endgroup]
+2026-10-17T03:21:53.9977734Z Secret source: Actions
+2026-10-17T03:21:53.9978718Z Cache mode: write
+2026-10-17T03:21:53.9979529Z Prepare workflow directory
+2026-10-17T03:21:54.0375601Z Prepare all required actions
+2026-10-17T03:21:54.0424393Z Getting action download info
+2026-10-17T03:21:54.3723943Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-17T03:21:54.5095206Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-17T03:21:54.6065917Z Download action repository 'oven-sh/setup-bun@v2' (SHA:0c5077e51419868618aeaa5fe8019c62421857d6)
+2026-10-17T03:21:54.8345029Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-17T03:21:55.0643626Z Complete job name: verify (ubuntu-latest)
+2026-10-17T03:21:55.1613235Z ##[group]Run actions/checkout@v4
+2026-10-17T03:21:55.1614249Z with:
+2026-10-17T03:21:55.1614682Z   repository: natanelia/zerocopy
+2026-10-17T03:21:55.1618343Z   token: ***
+2026-10-17T03:21:55.1618754Z   ssh-strict: true
+2026-10-17T03:21:55.1619169Z   ssh-user: git
+2026-10-17T03:21:55.1619598Z   persist-credentials: true
+2026-10-17T03:21:55.1620066Z   clean: true
+2026-10-17T03:21:55.1620811Z   sparse-checkout-cone-mode: true
+2026-10-17T03:21:55.1621319Z   fetch-depth: 1
+2026-10-17T03:21:55.1621735Z   fetch-tags: false
+2026-10-17T03:21:55.1622160Z   show-progress: true
+2026-10-17T03:21:55.1622592Z   lfs: false
+2026-10-17T03:21:55.1622985Z   submodules: false
+2026-10-17T03:21:55.1623422Z   set-safe-directory: true
+2026-10-17T03:21:55.1623906Z   allow-unsafe-pr-checkout: false
+2026-10-17T03:21:55.1624752Z ##[endgroup]
+2026-10-17T03:21:55.2633124Z Syncing repository: natanelia/zerocopy
+2026-10-17T03:21:55.2636080Z ##[group]Getting Git version info
+2026-10-17T03:21:55.2637437Z Working directory is '/home/runner/work/zerocopy/zerocopy'
+2026-10-17T03:21:55.2639720Z [command]/usr/bin/git version
+2026-10-17T03:21:55.2747163Z git version 2.55.0
+2026-10-17T03:21:55.2770108Z ##[endgroup]
+2026-10-17T03:21:55.2786305Z Temporarily overriding HOME='/home/runner/work/_temp/770c7d62-0a8b-45f0-af3b-ffaedb352ffe' before making global git config changes
+2026-10-17T03:21:55.2788588Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T03:21:55.2792896Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/zerocopy/zerocopy
+2026-10-17T03:21:55.2849712Z Deleting the contents of '/home/runner/work/zerocopy/zerocopy'
+2026-10-17T03:21:55.2854948Z ##[group]Initializing the repository
+2026-10-17T03:21:55.2858677Z [command]/usr/bin/git init /home/runner/work/zerocopy/zerocopy
+2026-10-17T03:21:55.2990550Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-17T03:21:55.2992022Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-17T03:21:55.2993108Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-17T03:21:55.2994479Z hint: call:
+2026-10-17T03:21:55.2995472Z hint:
+2026-10-17T03:21:55.2996434Z hint: 	git config --global init.defaultBranch <name>
+2026-10-17T03:21:55.2997581Z hint:
+2026-10-17T03:21:55.2998686Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-17T03:21:55.3000638Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-17T03:21:55.3002051Z hint:
+2026-10-17T03:21:55.3002799Z hint: 	git branch -m <name>
+2026-10-17T03:21:55.3003644Z hint:
+2026-10-17T03:21:55.3004735Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-17T03:21:55.3006612Z Initialized empty Git repository in /home/runner/work/zerocopy/zerocopy/.git/
+2026-10-17T03:21:55.3009209Z [command]/usr/bin/git remote add origin https://github.com/natanelia/zerocopy
+2026-10-17T03:21:55.3078206Z ##[endgroup]
+2026-10-17T03:21:55.3079660Z ##[group]Disabling automatic garbage collection
+2026-10-17T03:21:55.3082615Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-17T03:21:55.3120746Z ##[endgroup]
+2026-10-17T03:21:55.3122136Z ##[group]Setting up auth
+2026-10-17T03:21:55.3132775Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T03:21:55.3170231Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T03:21:55.3593623Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T03:21:55.3629887Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T03:21:55.3853672Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T03:21:55.3892698Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T03:21:55.4119316Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-17T03:21:55.4160570Z ##[endgroup]
+2026-10-17T03:21:55.4161857Z ##[group]Fetching the repository
+2026-10-17T03:21:55.4170145Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2ac1950417e6a9151eaa6b5fb48afc3cc4998399:refs/remotes/pull/39/merge
+2026-10-17T03:21:55.8701469Z From https://github.com/natanelia/zerocopy
+2026-10-17T03:21:55.8702900Z  * [new ref]         2ac1950417e6a9151eaa6b5fb48afc3cc4998399 -> pull/39/merge
+2026-10-17T03:21:55.8710559Z ##[endgroup]
+2026-10-17T03:21:55.8713510Z ##[group]Determining the checkout info
+2026-10-17T03:21:55.8716568Z ##[endgroup]
+2026-10-17T03:21:55.8725636Z [command]/usr/bin/git sparse-checkout disable
+2026-10-17T03:21:55.8781899Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-17T03:21:55.8815148Z ##[group]Checking out the ref
+2026-10-17T03:21:55.8818464Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/39/merge
+2026-10-17T03:21:55.9273009Z Note: switching to 'refs/remotes/pull/39/merge'.
+2026-10-17T03:21:55.9274422Z 
+2026-10-17T03:21:55.9275370Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-17T03:21:55.9277796Z changes and commit them, and you can discard any commits you make in this
+2026-10-17T03:21:55.9280086Z state without impacting any branches by switching back to a branch.
+2026-10-17T03:21:55.9282510Z 
+2026-10-17T03:21:55.9283699Z If you want to create a new branch to retain commits you create, you may
+2026-10-17T03:21:55.9287183Z do so (now or later) by using -c with the switch command. Example:
+2026-10-17T03:21:55.9288938Z 
+2026-10-17T03:21:55.9289614Z   git switch -c <new-branch-name>
+2026-10-17T03:21:55.9291048Z 
+2026-10-17T03:21:55.9291702Z Or undo this operation with:
+2026-10-17T03:21:55.9292808Z 
+2026-10-17T03:21:55.9293421Z   git switch -
+2026-10-17T03:21:55.9294276Z 
+2026-10-17T03:21:55.9295530Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-17T03:21:55.9297427Z 
+2026-10-17T03:21:55.9299652Z HEAD is now at 2ac1950 Merge 85eee3354b85f8d7d6121a72579ddc8e06a57112 into afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+2026-10-17T03:21:55.9305536Z ##[endgroup]
+2026-10-17T03:21:55.9336940Z [command]/usr/bin/git log -1 --format=%H
+2026-10-17T03:21:55.9364840Z 2ac1950417e6a9151eaa6b5fb48afc3cc4998399
+2026-10-17T03:21:55.9757426Z ##[group]Run actions/setup-node@v4
+2026-10-17T03:21:55.9758536Z with:
+2026-10-17T03:21:55.9759304Z   node-version: 22
+2026-10-17T03:21:55.9760200Z   always-auth: false
+2026-10-17T03:21:55.9761575Z   check-latest: false
+2026-10-17T03:21:55.9771704Z   token: ***
+2026-10-17T03:21:55.9772534Z ##[endgroup]
+2026-10-17T03:21:56.1294220Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-17T03:21:56.1299858Z (node:2336) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T03:21:56.1303262Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T03:21:56.1305696Z ##[group]Environment details
+2026-10-17T03:21:56.5721162Z node: v22.23.3
+2026-10-17T03:21:56.5722393Z npm: 10.9.9
+2026-10-17T03:21:56.5723416Z yarn: 1.22.22
+2026-10-17T03:21:56.5725570Z ##[endgroup]
+2026-10-17T03:21:56.5936865Z ##[group]Run oven-sh/setup-bun@v2
+2026-10-17T03:21:56.5937645Z with:
+2026-10-17T03:21:56.5938296Z   bun-version: 1.4.2
+2026-10-17T03:21:56.5938968Z   no-cache: false
+2026-10-17T03:21:56.5942649Z   token: ***
+2026-10-17T03:21:56.5943340Z ##[endgroup]
+2026-10-17T03:21:57.0061757Z Cache hit for: bun-gmoqYqdUbaYsI0KujeXt7Zg/p0I=
+2026-10-17T03:21:58.3142559Z Received 0 of 35684134 (0.0%), 0.0 MBs/sec
+2026-10-17T03:21:58.5631555Z Received 35684134 of 35684134 (100.0%), 27.2 MBs/sec
+2026-10-17T03:21:58.5633016Z Cache Size: ~34 MB (35684134 B)
+2026-10-17T03:21:58.5671978Z [command]/usr/bin/tar -xf /home/runner/work/_temp/e81f73cc-04dc-402d-b2a9-0bc386cccc9f/cache.tzst -P -C /home/runner/work/zerocopy/zerocopy --use-compress-program unzstd
+2026-10-17T03:21:58.7057140Z Cache restored successfully
+2026-10-17T03:21:58.7085513Z [command]/home/runner/.bun/bin/bun --revision
+2026-10-17T03:21:58.7135543Z 1.4.2+744846f84
+2026-10-17T03:21:58.7142089Z Using a cached version of Bun: 1.4.2+744846f84
+2026-10-17T03:21:58.7293371Z ##[group]Run bun install
+2026-10-17T03:21:58.7293733Z [36;1mbun install[0m
+2026-10-17T03:21:58.7613505Z shell: /usr/bin/bash -e {0}
+2026-10-17T03:21:58.7613901Z ##[endgroup]
+2026-10-17T03:21:58.7756080Z bun install v1.4.2 (744846f84)
+2026-10-17T03:21:58.7767121Z Resolving dependencies
+2026-10-17T03:21:59.5827799Z Resolved, downloaded and extracted [375]
+2026-10-17T03:21:59.6186754Z Saved lockfile
+2026-10-17T03:21:59.6187049Z 
+2026-10-17T03:21:59.6187292Z + @redux-devtools/instrument@3.0.0
+2026-10-17T03:21:59.6187856Z + @reduxjs/toolkit@2.12.0 (v2.13.0 available)
+2026-10-17T03:21:59.6188265Z + @turf/bbox@7.4.0
+2026-10-17T03:21:59.6188641Z + @vitest/browser@4.1.11 (v5.0.5 available)
+2026-10-17T03:21:59.6189166Z + @vitest/browser-playwright@4.1.11 (v5.0.5 available)
+2026-10-17T03:21:59.6189623Z + assemblyscript@0.28.20
+2026-10-17T03:21:59.6190009Z + bun-types@1.4.2 (v1.4.3 available)
+2026-10-17T03:21:59.6190758Z + immer@11.1.21
+2026-10-17T03:21:59.6191116Z + immutable@5.1.9
+2026-10-17T03:21:59.6191454Z + jsan@3.1.14
+2026-10-17T03:21:59.6191873Z + playwright@1.63.0 (v1.64.1 available)
+2026-10-17T03:21:59.6192332Z + react@19.2.0 (v19.3.1 available)
+2026-10-17T03:21:59.6192761Z + react-dom@19.2.0 (v19.3.1 available)
+2026-10-17T03:21:59.6193543Z + react-redux@9.2.0 (v9.3.0 available)
+2026-10-17T03:21:59.6193996Z + typescript@5.9.3 (v7.0.2 available)
+2026-10-17T03:21:59.6194414Z + vitest@4.1.11 (v5.0.5 available)
+2026-10-17T03:21:59.6194645Z 
+2026-10-17T03:21:59.6194841Z 84 packages installed [844.00ms]
+2026-10-17T03:21:59.6346001Z ##[group]Run bun run build:wasm && bun run build:browser && bun run build:types
+2026-10-17T03:21:59.6346601Z [36;1mbun run build:wasm && bun run build:browser && bun run build:types[0m
+2026-10-17T03:21:59.6412108Z shell: /usr/bin/bash -e {0}
+2026-10-17T03:21:59.6412387Z ##[endgroup]
+2026-10-17T03:21:59.6517902Z $ node scripts/build-wasm.mjs
+2026-10-17T03:22:04.9441929Z $ bun scripts/build-browser.ts
+2026-10-17T03:22:04.9641967Z Built 12 portable modules: 232416 bytes
+2026-10-17T03:22:04.9687517Z $ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+2026-10-17T03:22:07.3128058Z ##[group]Run bun run typecheck && bun run typecheck:redux && bun run typecheck:values
+2026-10-17T03:22:07.3128671Z [36;1mbun run typecheck && bun run typecheck:redux && bun run typecheck:values[0m
+2026-10-17T03:22:07.3198017Z shell: /usr/bin/bash -e {0}
+2026-10-17T03:22:07.3198294Z ##[endgroup]
+2026-10-17T03:22:07.3302632Z $ tsc --noEmit
+2026-10-17T03:22:09.8521743Z $ tsc --noEmit -p tsconfig.redux.json
+2026-10-17T03:22:11.1562534Z $ tsc --noEmit -p tsconfig.typed-values.json && tsc --noEmit -p tsconfig.typed-values.json --exactOptionalPropertyTypes false
+2026-10-17T03:22:17.7416160Z ##[group]Run bunx tsc --noEmit -p tsconfig.numeric.json
+2026-10-17T03:22:17.7416611Z [36;1mbunx tsc --noEmit -p tsconfig.numeric.json[0m
+2026-10-17T03:22:17.7481620Z shell: /usr/bin/bash -e {0}
+2026-10-17T03:22:17.7481906Z ##[endgroup]
+2026-10-17T03:22:20.6645119Z ##[group]Run bun run test
+2026-10-17T03:22:20.6645423Z [36;1mbun run test[0m
+2026-10-17T03:22:20.6708792Z shell: /usr/bin/bash -e {0}
+2026-10-17T03:22:20.6709066Z ##[endgroup]
+2026-10-17T03:22:20.6808530Z $ bun --bun node_modules/vitest/vitest.mjs run
+2026-10-17T03:22:20.9757614Z 
+2026-10-17T03:22:20.9761634Z [1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/home/runner/work/zerocopy/zerocopy[39m
+2026-10-17T03:22:20.9763013Z 
+2026-10-17T03:22:21.8175544Z [90mstderr[2m | worker.test.ts[2m > [22m[2mshared state and session protocol[2m > [22m[2mreports queue overflow instead of silently dropping all-mode snapshots
+2026-10-17T03:22:21.8177369Z [22m[39m[zerocopy/worker] Error: Shared session pending queue overflow
+2026-10-17T03:22:21.8196798Z     at [90m/home/runner/work/zerocopy/zerocopy/[39mworker.ts:429:32
+2026-10-17T03:22:21.8198307Z     at emit [90m(/home/runner/work/zerocopy/zerocopy/[39mworker.test.ts:24:91[90m)[39m
+2026-10-17T03:22:21.8199523Z     at processTicksAndRejections (native)
+2026-10-17T03:22:21.8200107Z 
+2026-10-17T03:22:21.9075851Z  [32m✓[39m worker.test.ts [2m([22m[2m35 tests[22m[2m)[22m[33m 440[2mms[22m[39m
+2026-10-17T03:22:22.8511626Z  [32m✓[39m workers.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 1526[2mms[22m[39m
+2026-10-17T03:22:25.5092376Z  [32m✓[39m bulk-input-storage.test.ts [2m([22m[2m41 tests[22m[2m)[22m[33m 3564[2mms[22m[39m
+2026-10-17T03:22:25.5095003Z    [33m[2m✓[22m[39m bulk input boundary string/12287 [33m 368[2mms[22m[39m
+2026-10-17T03:22:25.5101643Z    [33m[2m✓[22m[39m bulk input boundary string/12288 [33m 354[2mms[22m[39m
+2026-10-17T03:22:25.5103014Z    [33m[2m✓[22m[39m bulk input boundary object/12287 [33m 399[2mms[22m[39m
+2026-10-17T03:22:25.5104264Z    [33m[2m✓[22m[39m bulk input boundary object/12288 [33m 403[2mms[22m[39m
+2026-10-17T03:22:25.5105430Z    [33m[2m✓[22m[39m bulk input boundary object/12289 [33m 398[2mms[22m[39m
+2026-10-17T03:22:26.7705313Z  [32m✓[39m redux.test.ts [2m([22m[2m44 tests[22m[2m)[22m[33m 1191[2mms[22m[39m
+2026-10-17T03:22:28.3277998Z  [32m✓[39m checkpoint-descriptor-validation.test.ts [2m([22m[2m112 tests[22m[2m)[22m[33m 5351[2mms[22m[39m
+2026-10-17T03:22:29.1232601Z  [32m✓[39m immutable-proof.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 7709[2mms[22m[39m
+2026-10-17T03:22:29.1233946Z      [33m[2m✓[22m[39m HAMT: 500 branching versions [33m 516[2mms[22m[39m
+2026-10-17T03:22:29.1234692Z      [33m[2m✓[22m[39m sorted: 500 branching versions [33m 326[2mms[22m[39m
+2026-10-17T03:22:29.1235418Z      [33m[2m✓[22m[39m vector: partial blocks, level growth, overwrite, pop and forks [33m 485[2mms[22m[39m
+2026-10-17T03:22:29.1236383Z    [33m[2m✓[22m[39m worker snapshot attachment, nested dependencies, reset and read-only writes (copy=true) [33m 495[2mms[22m[39m
+2026-10-17T03:22:30.8336495Z  [32m✓[39m worker-attachment.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 4039[2mms[22m[39m
+2026-10-17T03:22:30.8353020Z      [33m[2m✓[22m[39m shares one lookup without materializing all-to-all dependency maps [33m 487[2mms[22m[39m
+2026-10-17T03:22:30.8382237Z      [33m[2m✓[22m[39m shares one lookup without materializing all-to-all dependency maps [33m 944[2mms[22m[39m
+2026-10-17T03:22:30.8384452Z      [33m[2m✓[22m[39m preserves legacy first-ID order across overlapping closed and observed registries [33m 312[2mms[22m[39m
+2026-10-17T03:22:31.5905492Z  [32m✓[39m utf8-write.test.ts [2m([22m[2m61 tests[22m[2m)[22m[33m 10176[2mms[22m[39m
+2026-10-17T03:22:31.5907625Z      [33m[2m✓[22m[39m matches native bytes and exact allocation for encoded object values [33m 400[2mms[22m[39m
+2026-10-17T03:22:31.5909540Z      [33m[2m✓[22m[39m 'ordered map' 'object' preserves snapshots and attachments while the writer grows [33m 302[2mms[22m[39m
+2026-10-17T03:22:32.2083748Z  [32m✓[39m redux-rtk.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 542[2mms[22m[39m
+2026-10-17T03:22:32.5899538Z  [32m✓[39m block-traversal-view.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 1731[2mms[22m[39m
+2026-10-17T03:22:32.5912434Z      [33m[2m✓[22m[39m SharedLinkedList: refreshes once per nonempty traversal at block and tail boundaries [33m 492[2mms[22m[39m
+2026-10-17T03:22:32.5949140Z      [33m[2m✓[22m[39m SharedDoublyLinkedList: refreshes once per nonempty traversal at block and tail boundaries [33m 344[2mms[22m[39m
+2026-10-17T03:22:34.3202276Z  [32m✓[39m nested.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 2083[2mms[22m[39m
+2026-10-17T03:22:34.9734091Z  [32m✓[39m shared-doubly-linked-list.test.ts [2m([22m[2m44 tests[22m[2m)[22m[33m 616[2mms[22m[39m
+2026-10-17T03:22:44.6502422Z  [32m✓[39m typed-values.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 16291[2mms[22m[39m
+2026-10-17T03:22:44.6511946Z      [33m[2m✓[22m[39m supports list, worker reconstruction, and compaction [33m 2010[2mms[22m[39m
+2026-10-17T03:22:44.6552138Z      [33m[2m✓[22m[39m supports stack, worker reconstruction, and compaction [33m 1929[2mms[22m[39m
+2026-10-17T03:22:44.6577228Z      [33m[2m✓[22m[39m supports queue, worker reconstruction, and compaction [33m 1996[2mms[22m[39m
+2026-10-17T03:22:44.6609940Z      [33m[2m✓[22m[39m supports linked list, worker reconstruction, and compaction [33m 2104[2mms[22m[39m
+2026-10-17T03:22:44.6611910Z      [33m[2m✓[22m[39m supports doubly linked list, worker reconstruction, and compaction [33m 1962[2mms[22m[39m
+2026-10-17T03:22:44.6671101Z      [33m[2m✓[22m[39m supports priority queue, worker reconstruction, and compaction [33m 1979[2mms[22m[39m
+2026-10-17T03:22:44.6696154Z      [33m[2m✓[22m[39m keeps byte allocation identical for large typed and untyped batches [33m 1350[2mms[22m[39m
+2026-10-17T03:22:46.4610136Z  [32m✓[39m map-set-path.test.ts [2m([22m[2m30 tests[22m[2m)[22m[33m 1780[2mms[22m[39m
+2026-10-17T03:22:46.4612283Z      [33m[2m✓[22m[39m does not change any old payload byte [33m 1135[2mms[22m[39m
+2026-10-17T03:22:47.8231526Z  [32m✓[39m performance-revision.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 12802[2mms[22m[39m
+2026-10-17T03:22:47.8292392Z      [33m[2m✓[22m[39m vector branches and compaction at 4097 [33m 396[2mms[22m[39m
+2026-10-17T03:22:47.8331882Z      [33m[2m✓[22m[39m SharedLinkedList: mixed block edits retain all sampled branches [33m 1044[2mms[22m[39m
+2026-10-17T03:22:47.8340583Z      [33m[2m✓[22m[39m SharedDoublyLinkedList: mixed block edits retain all sampled branches [33m 981[2mms[22m[39m
+2026-10-17T03:22:47.8351551Z      [33m[2m✓[22m[39m compaction drops a consumed queue prefix without changing its source [33m 837[2mms[22m[39m
+2026-10-17T03:22:47.8353591Z      [33m[2m✓[22m[39m SharedMap: inserts, overwrites and deletes preserve forks [33m 2010[2mms[22m[39m
+2026-10-17T03:22:47.8355419Z      [33m[2m✓[22m[39m SharedOrderedMap: inserts, overwrites and deletes preserve forks [33m 2333[2mms[22m[39m
+2026-10-17T03:22:47.8357249Z      [33m[2m✓[22m[39m SharedSortedMap: inserts, overwrites and deletes preserve forks [33m 2620[2mms[22m[39m
+2026-10-17T03:22:47.8359177Z      [33m[2m✓[22m[39m compaction removes dead history and does not parse primitive JSON payloads [33m 1919[2mms[22m[39m
+2026-10-17T03:22:48.9042555Z  [32m✓[39m map-projection.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 1036[2mms[22m[39m
+2026-10-17T03:22:49.5272864Z  [32m✓[39m trie-view-capture.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 2106[2mms[22m[39m
+2026-10-17T03:22:49.5275164Z      [33m[2m✓[22m[39m matches exact baseline pointer order and independent recursion across all trie shapes [33m 429[2mms[22m[39m
+2026-10-17T03:22:49.5277549Z      [33m[2m✓[22m[39m resumes journal yields across growth and captures each recursive iterator independently [33m 358[2mms[22m[39m
+2026-10-17T03:22:49.9575193Z  [32m✓[39m map-memory.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1020[2mms[22m[39m
+2026-10-17T03:22:49.9611089Z      [33m[2m✓[22m[39m prefix indexes are root-specific through forks, removals, and shared memory growth [33m 338[2mms[22m[39m
+2026-10-17T03:22:50.4194499Z  [32m✓[39m shared-linked-list.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 432[2mms[22m[39m
+2026-10-17T03:22:50.4657012Z  [32m✓[39m proof-storage-integrity.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+2026-10-17T03:22:52.2843907Z  [32m✓[39m map-set-index.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 2725[2mms[22m[39m
+2026-10-17T03:22:52.2854038Z      [33m[2m✓[22m[39m preserves snapshots while every prefix is inserted and then overwritten [33m 2137[2mms[22m[39m
+2026-10-17T03:22:52.6602652Z  [32m✓[39m numeric.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 2168[2mms[22m[39m
+2026-10-17T03:22:52.6642362Z      [33m[2m✓[22m[39m reads attached arenas without allocating or changing shared bytes [33m 894[2mms[22m[39m
+2026-10-17T03:22:52.6648070Z      [33m[2m✓[22m[39m preserves snapshots across the next tree depth with binary64 edge values [33m 506[2mms[22m[39m
+2026-10-17T03:22:53.6909608Z  [32m✓[39m hot-path.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 973[2mms[22m[39m
+2026-10-17T03:22:53.6915433Z      [33m[2m✓[22m[39m falls back correctly beyond the entry and string-value budgets [33m 653[2mms[22m[39m
+2026-10-17T03:22:54.2122375Z  [32m✓[39m heap-entry-views.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 498[2mms[22m[39m
+2026-10-17T03:22:54.2151945Z      [33m[2m✓[22m[39m requests one existing view per visited node on owners and read-only attachments [33m 425[2mms[22m[39m
+2026-10-17T03:22:54.2464173Z  [32m✓[39m tanstack-db-collection.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+2026-10-17T03:22:54.6029124Z  [32m✓[39m shared-queue.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 342[2mms[22m[39m
+2026-10-17T03:22:55.4125335Z  [32m✓[39m shared-priority-queue-insert.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 3109[2mms[22m[39m
+2026-10-17T03:22:55.4138274Z      [33m[2m✓[22m[39m can use the final available node and preserves snapshots after later failure [33m 867[2mms[22m[39m
+2026-10-17T03:22:55.4140920Z      [33m[2m✓[22m[39m failed multi-node insertion changes only unpublished allocation bytes [33m 456[2mms[22m[39m
+2026-10-17T03:22:55.4143494Z      [33m[2m✓[22m[39m can use the final available node and preserves snapshots after later failure [33m 900[2mms[22m[39m
+2026-10-17T03:22:55.4148483Z      [33m[2m✓[22m[39m failed multi-node insertion changes only unpublished allocation bytes [33m 447[2mms[22m[39m
+2026-10-17T03:22:56.0359712Z  [32m✓[39m primitive-sequence-scan.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1412[2mms[22m[39m
+2026-10-17T03:22:56.0365465Z      [33m[2m✓[22m[39m does not read a growing writer or a fork in the middle of a scan [33m 1322[2mms[22m[39m
+2026-10-17T03:22:56.2307024Z  [32m✓[39m shared-stack.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 798[2mms[22m[39m
+2026-10-17T03:22:56.3959496Z  [32m✓[39m shared-priority-queue.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 339[2mms[22m[39m
+2026-10-17T03:22:56.7525942Z  [32m✓[39m redux-regression.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 325[2mms[22m[39m
+2026-10-17T03:22:56.8732924Z  [32m✓[39m shared-list.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 614[2mms[22m[39m
+2026-10-17T03:22:56.9582686Z  [32m✓[39m descriptor-validation.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 69[2mms[22m[39m
+2026-10-17T03:22:57.2726644Z  [32m✓[39m freeze-json.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 504[2mms[22m[39m
+2026-10-17T03:22:57.2751136Z      [33m[2m✓[22m[39m handles 20,000 nested arrays without recursive calls [33m 314[2mms[22m[39m
+2026-10-17T03:22:57.2775854Z  [32m✓[39m map-set-utf8.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 304[2mms[22m[39m
+2026-10-17T03:22:57.4659076Z  [32m✓[39m typed-json-redux.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+2026-10-17T03:22:57.6593038Z  [32m✓[39m json-read-cache.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 182[2mms[22m[39m
+2026-10-17T03:22:57.6873369Z  [32m✓[39m shared-map.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+2026-10-17T03:22:57.7622174Z  [32m✓[39m redux-jsan.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 63[2mms[22m[39m
+2026-10-17T03:22:58.0500651Z  [32m✓[39m worker-tasks.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 278[2mms[22m[39m
+2026-10-17T03:22:58.1286791Z  [32m✓[39m redux-checkpoint.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 25500[2mms[22m[39m
+2026-10-17T03:22:58.1302184Z      [33m[2m✓[22m[39m restores a writable map with its original semantics [33m 1979[2mms[22m[39m
+2026-10-17T03:22:58.1311978Z      [33m[2m✓[22m[39m restores a writable set with its original semantics [33m 2035[2mms[22m[39m
+2026-10-17T03:22:58.1313523Z      [33m[2m✓[22m[39m restores a writable list with its original semantics [33m 2044[2mms[22m[39m
+2026-10-17T03:22:58.1314909Z      [33m[2m✓[22m[39m restores a writable stack with its original semantics [33m 2091[2mms[22m[39m
+2026-10-17T03:22:58.1316344Z      [33m[2m✓[22m[39m restores a writable queue with its original semantics [33m 2016[2mms[22m[39m
+2026-10-17T03:22:58.1317806Z      [33m[2m✓[22m[39m restores a writable linked list with its original semantics [33m 1995[2mms[22m[39m
+2026-10-17T03:22:58.1319302Z      [33m[2m✓[22m[39m restores a writable doubly linked list with its original semantics [33m 2114[2mms[22m[39m
+2026-10-17T03:22:58.1321005Z      [33m[2m✓[22m[39m restores a writable ordered map with its original semantics [33m 2034[2mms[22m[39m
+2026-10-17T03:22:58.1322471Z      [33m[2m✓[22m[39m restores a writable ordered set with its original semantics [33m 2213[2mms[22m[39m
+2026-10-17T03:22:58.1323936Z      [33m[2m✓[22m[39m restores a writable sorted map with its original semantics [33m 2157[2mms[22m[39m
+2026-10-17T03:22:58.1325400Z      [33m[2m✓[22m[39m restores a writable sorted set with its original semantics [33m 2056[2mms[22m[39m
+2026-10-17T03:22:58.1326858Z      [33m[2m✓[22m[39m restores a writable priority queue with its original semantics [33m 2006[2mms[22m[39m
+2026-10-17T03:22:58.1644888Z  [32m✓[39m shared-set.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+2026-10-17T03:22:58.2482498Z  [32m✓[39m shared-sorted.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 184[2mms[22m[39m
+2026-10-17T03:22:58.4259792Z  [32m✓[39m worker-records.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 248[2mms[22m[39m
+2026-10-17T03:22:58.4548715Z  [32m✓[39m ordered-empty-regression.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 20[2mms[22m[39m
+2026-10-17T03:22:59.2728235Z  [32m✓[39m redux-wide-json.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 798[2mms[22m[39m
+2026-10-17T03:22:59.2751637Z    [33m[2m✓[22m[39m restores a wide JSON object without spreading its fields into function arguments [33m 798[2mms[22m[39m
+2026-10-17T03:22:59.8948328Z  [32m✓[39m primitive-scan-portability.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 597[2mms[22m[39m
+2026-10-17T03:22:59.8964172Z    [33m[2m✓[22m[39m preserves scan byte order, view reuse and snapshot lifetimes [33m 597[2mms[22m[39m
+2026-10-17T03:23:00.5505512Z  [32m✓[39m numeric-spatial.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 3255[2mms[22m[39m
+2026-10-17T03:23:00.5509562Z      [33m[2m✓[22m[39m preserves attached and old snapshots after append, edit, and growth [33m 2690[2mms[22m[39m
+2026-10-17T03:23:04.0236523Z  [31m❯[39m geometry.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 5752[2mms[22m[39m
+2026-10-17T03:23:04.0238120Z      [32m✓[39m returns independent bounds with exact signed-zero and NaN handling[32m 2[2mms[22m[39m
+2026-10-17T03:23:04.0240068Z      [32m✓[39m rejects incomplete points and incorrect collection types[32m 0[2mms[22m[39m
+2026-10-17T03:23:04.0241989Z [31m     [31m×[31m preserves attached snapshots after append, fork, and memory growth[39m[33m 5735[2mms[22m[39m
+2026-10-17T03:23:04.0243005Z      [32m✓[39m keeps old arenas and separate kernel instances independent[32m 14[2mms[22m[39m
+2026-10-17T03:23:07.6338563Z  [32m✓[39m allocation-failure.test.ts [2m([22m[2m32 tests[22m[2m)[22m[33m 38477[2mms[22m[39m
+2026-10-17T03:23:07.6340161Z      [33m[2m✓[22m[39m map: insert [33m 1996[2mms[22m[39m
+2026-10-17T03:23:07.6341474Z      [33m[2m✓[22m[39m map: replace [33m 1963[2mms[22m[39m
+2026-10-17T03:23:07.6342586Z      [33m[2m✓[22m[39m map: delete [33m 1779[2mms[22m[39m
+2026-10-17T03:23:07.6343954Z      [33m[2m✓[22m[39m ordered map: insert [33m 2009[2mms[22m[39m
+2026-10-17T03:23:07.6344923Z      [33m[2m✓[22m[39m ordered map: replace [33m 1740[2mms[22m[39m
+2026-10-17T03:23:07.6345889Z      [33m[2m✓[22m[39m ordered map: delete [33m 1750[2mms[22m[39m
+2026-10-17T03:23:07.6346769Z      [33m[2m✓[22m[39m sorted map: insert [33m 2313[2mms[22m[39m
+2026-10-17T03:23:07.6347687Z      [33m[2m✓[22m[39m sorted map: replace [33m 2559[2mms[22m[39m
+2026-10-17T03:23:07.6348651Z      [33m[2m✓[22m[39m sorted map: delete [33m 2618[2mms[22m[39m
+2026-10-17T03:23:07.6349996Z      [33m[2m✓[22m[39m map: bulk insert, overwrite, duplicate and exact hash collision [33m 1810[2mms[22m[39m
+2026-10-17T03:23:07.6351515Z      [33m[2m✓[22m[39m set: insert [33m 1850[2mms[22m[39m
+2026-10-17T03:23:07.6352398Z      [33m[2m✓[22m[39m ordered set: insert [33m 1961[2mms[22m[39m
+2026-10-17T03:23:07.6353295Z      [33m[2m✓[22m[39m sorted set: insert [33m 2503[2mms[22m[39m
+2026-10-17T03:23:07.6354287Z      [33m[2m✓[22m[39m list: append across a full leaf [33m 1041[2mms[22m[39m
+2026-10-17T03:23:07.6355346Z      [33m[2m✓[22m[39m list: replace a tree value [33m 962[2mms[22m[39m
+2026-10-17T03:23:07.6356422Z      [33m[2m✓[22m[39m list: replace a tail value [33m 858[2mms[22m[39m
+2026-10-17T03:23:07.6357479Z      [33m[2m✓[22m[39m list: bulk append across leaves [33m 823[2mms[22m[39m
+2026-10-17T03:23:07.6358473Z      [33m[2m✓[22m[39m linked list: append [33m 555[2mms[22m[39m
+2026-10-17T03:23:07.6359832Z      [33m[2m✓[22m[39m linked list: insert [33m 463[2mms[22m[39m
+2026-10-17T03:23:07.6361039Z      [33m[2m✓[22m[39m linked list: remove [33m 545[2mms[22m[39m
+2026-10-17T03:23:07.6362058Z      [33m[2m✓[22m[39m doubly linked list: append [33m 427[2mms[22m[39m
+2026-10-17T03:23:07.6363132Z      [33m[2m✓[22m[39m doubly linked list: insert [33m 378[2mms[22m[39m
+2026-10-17T03:23:07.6364222Z      [33m[2m✓[22m[39m doubly linked list: remove [33m 368[2mms[22m[39m
+2026-10-17T03:23:07.6365678Z      [33m[2m✓[22m[39m queue: enqueue after a partial drain at a leaf boundary [33m 411[2mms[22m[39m
+2026-10-17T03:23:07.6366852Z      [33m[2m✓[22m[39m stack: number [33m 315[2mms[22m[39m
+2026-10-17T03:23:07.6367853Z      [33m[2m✓[22m[39m stack: JSON payload then node [33m 317[2mms[22m[39m
+2026-10-17T03:23:07.6368899Z      [33m[2m✓[22m[39m priority queue: min enqueue [33m 1215[2mms[22m[39m
+2026-10-17T03:23:07.6369941Z      [33m[2m✓[22m[39m priority queue: min dequeue [33m 1136[2mms[22m[39m
+2026-10-17T03:23:07.6372830Z      [33m[2m✓[22m[39m priority queue: max enqueue [33m 754[2mms[22m[39m
+2026-10-17T03:23:07.6373921Z      [33m[2m✓[22m[39m priority queue: max dequeue [33m 749[2mms[22m[39m
+2026-10-17T03:23:07.6418960Z 
+2026-10-17T03:23:07.6420100Z [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+2026-10-17T03:23:07.6421349Z 
+2026-10-17T03:23:07.6422825Z [41m[1m FAIL [22m[49m geometry.test.ts[2m > [22mbboxXY[2m > [22mpreserves attached snapshots after append, fork, and memory growth
+2026-10-17T03:23:07.6424018Z [31m[1mError[22m: Test timed out in 5000ms.
+2026-10-17T03:23:07.6425822Z If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+2026-10-17T03:23:07.6427508Z [36m [2m❯[22m <anonymous> geometry.test.ts:[2m45:30[22m[39m
+2026-10-17T03:23:07.6472439Z     [90m 38|[39m     [34mexpect[39m([34mbboxXY[39m(newer))[33m.[39m[34mtoEqual[39m([[33m-[39m[34m5[39m[33m,[39m [33m-[39m[34m4[39m[33m,[39m [33m-[39m[34m2[39m[33m,[39m [33m-[39m[34m1[39m])[33m;[39m
+2026-10-17T03:23:07.6475307Z     [90m 39|[39m   })[33m;[39m
+2026-10-17T03:23:07.6475897Z     [90m 40|[39m })[33m;[39m
+2026-10-17T03:23:07.6476533Z     [90m   |[39m              [31m^[39m
+2026-10-17T03:23:07.6477056Z     [90m 41|[39m
+2026-10-17T03:23:07.6477868Z [90m [2m❯[22m processTicksAndRejections unknown:[2m7:39[22m[39m
+2026-10-17T03:23:07.6478321Z 
+2026-10-17T03:23:07.6478848Z [31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+2026-10-17T03:23:07.6479247Z 
+2026-10-17T03:23:07.6479282Z 
+2026-10-17T03:23:07.6492127Z [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m49 passed[39m[22m[90m (50)[39m
+2026-10-17T03:23:07.6517018Z [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1061 passed[39m[22m[90m (1062)[39m
+2026-10-17T03:23:07.6532392Z [2m   Start at [22m 03:22:20
+2026-10-17T03:23:07.6533861Z [2m   Duration [22m 46.65s[2m (transform 1.41s, setup 0ms, import 2.90s, tests 164.18s, environment 11ms)[22m
+2026-10-17T03:23:07.6534528Z 
+2026-10-17T03:23:07.6549186Z 
+2026-10-17T03:23:07.6583129Z ##[error]Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> geometry.test.ts:45:30
+ ❯ processTicksAndRejections unknown:7:39
+
+
+2026-10-17T03:23:07.6854422Z error: script "test" exited with code 1
+2026-10-17T03:23:07.6866465Z ##[error]Process completed with exit code 1.
+2026-10-17T03:23:07.7028925Z ##[group]Run actions/upload-artifact@v4
+2026-10-17T03:23:07.7029230Z with:
+2026-10-17T03:23:07.7029438Z   name: numeric-proof-X64
+2026-10-17T03:23:07.7029701Z   path: proofs/results/numeric-*.json
+2026-10-17T03:23:07.7029986Z   if-no-files-found: error
+2026-10-17T03:23:07.7030232Z   retention-days: 30
+2026-10-17T03:23:07.7030871Z   compression-level: 6
+2026-10-17T03:23:07.7031338Z   overwrite: false
+2026-10-17T03:23:07.7031558Z   include-hidden-files: false
+2026-10-17T03:23:07.7031811Z ##[endgroup]
+2026-10-17T03:23:07.8744378Z (node:2633) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-17T03:23:07.8745235Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-17T03:23:07.8806020Z ##[error]No files were found with the provided path: proofs/results/numeric-*.json. No artifacts will be uploaded.
+2026-10-17T03:23:07.9105789Z Post job cleanup.
+2026-10-17T03:23:08.0040544Z [command]/usr/bin/git version
+2026-10-17T03:23:08.0083656Z git version 2.55.0
+2026-10-17T03:23:08.0124720Z Temporarily overriding HOME='/home/runner/work/_temp/7192a83a-1187-4b37-ab29-5a03fed20617' before making global git config changes
+2026-10-17T03:23:08.0126310Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-17T03:23:08.0131060Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/zerocopy/zerocopy
+2026-10-17T03:23:08.0173338Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-17T03:23:08.0209187Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-17T03:23:08.0476026Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-17T03:23:08.0506077Z http.https://github.com/.extraheader
+2026-10-17T03:23:08.0517970Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-17T03:23:08.0553727Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-17T03:23:08.0819936Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-17T03:23:08.0859924Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-17T03:23:08.1262226Z Cleaning up orphan processes
+2026-10-17T03:23:08.1592722Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

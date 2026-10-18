@@ -1,0 +1,1 @@
+{"checks":1024,"builds":["main","stage3"],"kernels":["scalar","simd"],"passed":true,"stage4NotBuiltLocally":true}
