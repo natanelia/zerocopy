@@ -55,7 +55,7 @@ export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f6
   if (!size || lo > hi || isNaN(lo) || isNaN(hi)) return 0;
   // The root is empty until the first complete 32-value leaf is published.
   // For tiny snapshots, dispatch directly to the original span kernel.
-  if (size <= 32) return spanCount(tail, size, lo, hi);
+  if (ASC_FEATURE_SIMD && size <= 32) return spanCount(tail, size, lo, hi);
   const treeSize = (size - 1) & ~31;
   // A depth-zero root is one leaf. Avoid the larger recursive SIMD helper
   // on 33–64 value lists; the scalar build keeps its original call path.
