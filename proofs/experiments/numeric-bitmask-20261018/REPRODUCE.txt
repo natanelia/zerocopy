@@ -1,0 +1,38 @@
+Rebuild recipe for the rejected bitmask variants.
+Start from exact Stage 4 file numeric-kernels.as.ts at caebe14fd519cd8e558e77ea164edaef9aac35eb.
+Only replace the body of the depth-one SIMD group scan in treeCount.
+
+Variant A (bitmask per 4 elements):
+  let total: u32 = 0;
+  for (let child: u32 = 0; child < children; child++) {
+    const p = load<u32>(root + child * 4);
+    for (let i: u32 = 0; i < 32; i += 4) {
+      const values0 = v128.load(p + i * 8);
+      const values1 = v128.load(p + i * 8 + 16);
+      const mask0 = i64x2.bitmask(v128.and(f64x2.ge(values0, lower), f64x2.le(values0, upper)));
+      const mask1 = i64x2.bitmask(v128.and(f64x2.ge(values1, lower), f64x2.le(values1, upper)));
+      total += popcnt(mask0 | (mask1 << 2));
+    }
+  }
+  return total;
+
+Variant B (one popcount per 32-element leaf):
+  let total: u32 = 0;
+  for (let child: u32 = 0; child < children; child++) {
+    const p = load<u32>(root + child * 4);
+    let packed: u32 = 0;
+    for (let i: u32 = 0; i < 32; i += 4) {
+      const values0 = v128.load(p + i * 8);
+      const values1 = v128.load(p + i * 8 + 16);
+      packed |= i64x2.bitmask(v128.and(f64x2.ge(values0, lower), f64x2.le(values0, upper))) << i;
+      packed |= i64x2.bitmask(v128.and(f64x2.ge(values1, lower), f64x2.le(values1, upper))) << (i + 2);
+    }
+    total += popcnt(packed);
+  }
+  return total;
+
+Build with AssemblyScript 0.28.20 and:
+--importMemory --sharedMemory --initialMemory 2 --maximumMemory 65536
+--enable threads --runtime stub --optimizeLevel 3 --shrinkLevel 0 --enable simd
+Do not change the rest of the source, public contracts or dependencies.
+The expected exact source and WASM digests are in SOURCE-HASHES.txt.
