@@ -1,0 +1,8 @@
+{
+  "processes": 76,
+  "rowsIndependentlyRecomputed": 82,
+  "measuredBatches": 18312,
+  "warmupBatches": 6104,
+  "separateProcessesWithoutPerChildBinaryAttestation": 48,
+  "evidenceVerified": true
+}

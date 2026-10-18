@@ -1,0 +1,1 @@
+{"evidenceVerified":true,"processes":76,"missingPerChildBinaryAttestations":48,"checks":[["separate-aa",2,9,5],["paired-aa",2,9,7],["paired-ab",2,9,8],["separate-aa",1024,9,9],["paired-aa",1024,9,9],["paired-ab",1024,9,8],["separate-aa",32768,9,6],["paired-aa",32768,9,9],["paired-ab",32768,9,9],["slow-control",1024,0,0]]}

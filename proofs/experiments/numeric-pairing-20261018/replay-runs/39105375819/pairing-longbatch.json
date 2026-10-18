@@ -1,0 +1,347 @@
+{
+  "verifier": "retained-replay-2",
+  "verifierSha256": "f2294624b6af0b6cbd5dcfd49f271c1be19ff382873ea425772359ff94f7145b",
+  "planSha256": "c4a6f79c0ad6985b944bf7199f839827940e14758046f0f68e110fdae1645f29",
+  "processes": 12,
+  "measuredBatches": 3192,
+  "warmupBatches": 1064,
+  "evidenceVerified": true,
+  "separateProcessesWithoutPerChildBinaryAttestation": 0,
+  "binaryBindingLimit": null,
+  "results": [
+    {
+      "mode": "paired-aa",
+      "size": 2,
+      "children": 4,
+      "rows": [
+        {
+          "name": "range-simd",
+          "size": 2,
+          "speedup": 0.9977590059980226,
+          "lower": 0.9972096122694656,
+          "upper": 0.9983087024046378,
+          "blockRatios": [
+            0.9975033849226225,
+            0.998225558477243,
+            0.9974913566489043,
+            0.9978159032666053
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "range-scalar",
+          "size": 2,
+          "speedup": 0.9987490487484487,
+          "lower": 0.9925123822097102,
+          "upper": 1.005024904732289,
+          "blockRatios": [
+            0.9930775719466997,
+            0.9994486250084077,
+            1.0019883698939034,
+            1.0005048205638045
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "range-public",
+          "size": 2,
+          "speedup": 1.0000889217347593,
+          "lower": 0.969529869808098,
+          "upper": 1.0316111782864017,
+          "blockRatios": [
+            0.9851487538609852,
+            1.0152748505037814,
+            0.9817099080848062,
+            1.018792762580349
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-scalar-control",
+          "size": 2,
+          "speedup": 1.0031782690302196,
+          "lower": 0.9961811210603542,
+          "upper": 1.0102245647691777,
+          "blockRatios": [
+            0.997950456529239,
+            1.002026918332291,
+            1.008531484805603,
+            1.0042333337755058
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-simd-control",
+          "size": 2,
+          "speedup": 1.0009115749885404,
+          "lower": 0.9971881405608802,
+          "upper": 1.0046489124735811,
+          "blockRatios": [
+            0.9985535751157761,
+            1.0034054124038143,
+            1.002381033409234,
+            0.9993145156855935
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-public-control",
+          "size": 2,
+          "speedup": 1.009152171892862,
+          "lower": 0.9779292661673656,
+          "upper": 1.041371949146464,
+          "blockRatios": [
+            0.9818678761624192,
+            1.015135518872737,
+            1.0290202148107748,
+            1.0111734439135631
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-scalar-mixed",
+          "size": 2,
+          "speedup": 0.9992359477748288,
+          "lower": 0.9972579142062831,
+          "upper": 1.0012179047184038,
+          "blockRatios": [
+            0.998802185307726,
+            1.001007863196726,
+            0.9990311633126174,
+            0.9981049042335899
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-simd-mixed",
+          "size": 2,
+          "speedup": 0.9981276040331036,
+          "lower": 0.9966895162647337,
+          "upper": 0.999567766767043,
+          "blockRatios": [
+            0.997577040615243,
+            0.9993584468711714,
+            0.9973372733473533,
+            0.9982388847488445
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-public-mixed",
+          "size": 2,
+          "speedup": 1.0130528742289313,
+          "lower": 0.9850266405987433,
+          "upper": 1.0418765175322389,
+          "blockRatios": [
+            0.9873489430426745,
+            1.0157869161981445,
+            1.0244583183641338,
+            1.0250873611155489
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        }
+      ],
+      "pointPass": 9,
+      "confidencePass": 9,
+      "pass": true
+    },
+    {
+      "mode": "paired-ab",
+      "size": 2,
+      "children": 4,
+      "rows": [
+        {
+          "name": "range-simd",
+          "size": 2,
+          "speedup": 0.9616418461959013,
+          "lower": 0.9373507295129293,
+          "upper": 0.9865624586813809,
+          "blockRatios": [
+            0.9566424711773818,
+            0.9832138853077818,
+            0.9464004467567293,
+            0.9606845724342703
+          ],
+          "pointPass": true,
+          "confidencePass": false,
+          "pass": false
+        },
+        {
+          "name": "range-scalar",
+          "size": 2,
+          "speedup": 1.0034203772544406,
+          "lower": 0.9956033296116796,
+          "upper": 1.0112988009814632,
+          "blockRatios": [
+            1.0064363669558236,
+            0.9987830893753985,
+            1.0087782193855233,
+            0.9997201982697382
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "range-public",
+          "size": 2,
+          "speedup": 1.0160473331529893,
+          "lower": 0.9581052926316936,
+          "upper": 1.0774934562480802,
+          "blockRatios": [
+            0.9924261874738863,
+            1.071027383659067,
+            0.9885725523869399,
+            1.014257954628382
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-scalar-control",
+          "size": 2,
+          "speedup": 1.0006505719303247,
+          "lower": 0.9931702042856735,
+          "upper": 1.008187280270516,
+          "blockRatios": [
+            1.0027021954612398,
+            1.0047299104135976,
+            0.9939189096765042,
+            1.0012846108327254
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-simd-control",
+          "size": 2,
+          "speedup": 1.0047568537207918,
+          "lower": 0.9870041631953115,
+          "upper": 1.0228288519378153,
+          "blockRatios": [
+            1.0000672338008272,
+            0.999117999991117,
+            0.9982843527291709,
+            1.0217476882417205
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-public-control",
+          "size": 2,
+          "speedup": 0.9943030259306079,
+          "lower": 0.9720748108069477,
+          "upper": 1.0170395286285276,
+          "blockRatios": [
+            0.977592298147167,
+            1.0071524946546901,
+            0.9878983368203977,
+            1.0048697806559637
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-scalar-mixed",
+          "size": 2,
+          "speedup": 0.9988519420818808,
+          "lower": 0.9961651773318352,
+          "upper": 1.0015459533257671,
+          "blockRatios": [
+            0.9974432799567727,
+            0.9974081204205008,
+            1.0007431289552455,
+            0.9998175322600461
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-simd-mixed",
+          "size": 2,
+          "speedup": 1.0014065743705796,
+          "lower": 0.9990233199794791,
+          "upper": 1.0037955142160424,
+          "blockRatios": [
+            1.0023827177030287,
+            0.9995010222442693,
+            1.002801242890179,
+            1.0009446822505905
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        },
+        {
+          "name": "point-public-mixed",
+          "size": 2,
+          "speedup": 0.9990079385512883,
+          "lower": 0.9685420591786359,
+          "upper": 1.0304321343926506,
+          "blockRatios": [
+            0.9856109703229217,
+            1.0169582108453377,
+            0.9793527579466258,
+            1.0146773611460458
+          ],
+          "pointPass": true,
+          "confidencePass": true,
+          "pass": true
+        }
+      ],
+      "pointPass": 9,
+      "confidencePass": 8,
+      "pass": false
+    },
+    {
+      "mode": "slow-control",
+      "size": 1024,
+      "children": 4,
+      "rows": [
+        {
+          "name": "range-public",
+          "size": 1024,
+          "speedup": 0.50478980732413,
+          "lower": 0.49950816532793885,
+          "upper": 0.5101272957390832,
+          "blockRatios": [
+            0.5092893921416504,
+            0.5043393357090308,
+            0.5012046921764581,
+            0.504358921858595
+          ],
+          "pointPass": false,
+          "confidencePass": false,
+          "pass": false
+        }
+      ],
+      "pointPass": 0,
+      "confidencePass": 0,
+      "pass": false
+    }
+  ]
+}

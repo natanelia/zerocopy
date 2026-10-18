@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: sealed schedules contain every original diagnostic process once
+ok 1 - sealed schedules contain every original diagnostic process once
+  ---
+  duration_ms: 6.119957
+  type: 'test'
+  ...
+# Subtest: unmodified retained results preserve both successes and failures
+ok 2 - unmodified retained results preserve both successes and failures
+  ---
+  duration_ms: 0.497887
+  type: 'test'
+  ...
+# Subtest: replay cannot invent missing per-child binary attestations
+ok 3 - replay cannot invent missing per-child binary attestations
+  ---
+  duration_ms: 0.138458
+  type: 'test'
+  ...
+# Subtest: reject coordinated cross-size paired-aa report and journal substitution
+ok 4 - reject coordinated cross-size paired-aa report and journal substitution
+  ---
+  duration_ms: 362.237455
+  type: 'test'
+  ...
+# Subtest: reject coordinated cross-size paired-ab report and journal substitution
+ok 5 - reject coordinated cross-size paired-ab report and journal substitution
+  ---
+  duration_ms: 280.881378
+  type: 'test'
+  ...
+# Subtest: reject scheduled kind substitution
+ok 6 - reject scheduled kind substitution
+  ---
+  duration_ms: 263.688872
+  type: 'test'
+  ...
+# Subtest: reject scheduled block substitution
+ok 7 - reject scheduled block substitution
+  ---
+  duration_ms: 271.92463
+  type: 'test'
+  ...
+# Subtest: reject whole separate-process cohort with substituted node
+ok 8 - reject whole separate-process cohort with substituted node
+  ---
+  duration_ms: 269.479365
+  type: 'test'
+  ...
+# Subtest: reject whole separate-process cohort with substituted bun
+ok 9 - reject whole separate-process cohort with substituted bun
+  ---
+  duration_ms: 293.35856
+  type: 'test'
+  ...
+# Subtest: reject whole separate-process cohort with substituted arch
+ok 10 - reject whole separate-process cohort with substituted arch
+  ---
+  duration_ms: 259.427524
+  type: 'test'
+  ...
+# Subtest: reject whole separate-process cohort with substituted v8
+ok 11 - reject whole separate-process cohort with substituted v8
+  ---
+  duration_ms: 279.720348
+  type: 'test'
+  ...
+# Subtest: reject paired architecture substitution across a whole cohort
+ok 12 - reject paired architecture substitution across a whole cohort
+  ---
+  duration_ms: 271.774942
+  type: 'test'
+  ...
+# Subtest: reject a paired binary hash that differs from the controller plan
+ok 13 - reject a paired binary hash that differs from the controller plan
+  ---
+  duration_ms: 233.301418
+  type: 'test'
+  ...
+# Subtest: reject an altered declared schedule
+ok 14 - reject an altered declared schedule
+  ---
+  duration_ms: 221.322086
+  type: 'test'
+  ...
+# Subtest: reject removal of a warm-up from both report and journal
+ok 15 - reject removal of a warm-up from both report and journal
+  ---
+  duration_ms: 524.634231
+  type: 'test'
+  ...
+# Subtest: reject a missing child instead of excluding it
+ok 16 - reject a missing child instead of excluding it
+  ---
+  duration_ms: 563.199297
+  type: 'test'
+  ...
+# Subtest: reject a failed child even when its complete report exists
+ok 17 - reject a failed child even when its complete report exists
+  ---
+  duration_ms: 705.741177
+  type: 'test'
+  ...
+# Subtest: reject matching false build identities in plan and child reports
+ok 18 - reject matching false build identities in plan and child reports
+  ---
+  duration_ms: 2563.454461
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7591.593463
