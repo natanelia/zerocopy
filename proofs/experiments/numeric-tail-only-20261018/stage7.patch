@@ -1,0 +1,12 @@
+--- a/numeric-kernels.as.ts
++++ b/numeric-kernels.as.ts
+@@ -53,6 +53,9 @@
+ }
+ export function countInRange(root: u32, depth: u32, tail: u32, size: u32, lo: f64, hi: f64): u32 {
+   if (!size || lo > hi || isNaN(lo) || isNaN(hi)) return 0;
++  // A tail-only snapshot needs no tree mask, depth check or root traversal.
++  // The scalar build retains its original bytes and entry path.
++  if (ASC_FEATURE_SIMD && size <= 32) return spanCount(tail, size, lo, hi);
+   const treeSize = (size - 1) & ~31;
+   // A depth-zero root is one leaf. Avoid the larger recursive SIMD helper
+   // on 33–64 value lists; the scalar build keeps its original call path.

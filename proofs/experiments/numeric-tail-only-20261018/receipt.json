@@ -1,0 +1,72 @@
+{
+  "experiment": "Stage 7 tail-only entry",
+  "date": "2026-10-18",
+  "accepted": false,
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "parentCommit": "b94a923990e09fa9e97f6e4f20519f63f5a640d2",
+  "sourceTree": "0023d7bf7b486747308f369727fd3da18f587988",
+  "sourceCommit": null,
+  "kernelSha256": "eccfc79c51bc5075160ffbdeae131ecf9ae9275c6f0c04ea7900acfd358373f2",
+  "scalarSha256": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+  "simdSha256": "68318f611fd2fcedd3ba84a1b5bbd704bbc66ada4b9fd038b18056b27cdc4813",
+  "localRuntime": "Node 22.16.0 / Linux / x64",
+  "phases": [
+    {
+      "kind": "aa",
+      "pointPass": 61,
+      "confidencePass": 28,
+      "endpoints": 63,
+      "pass": false
+    },
+    {
+      "kind": "ab",
+      "pointPass": 63,
+      "confidencePass": 51,
+      "endpoints": 63,
+      "pass": false
+    }
+  ],
+  "children": 352,
+  "measuredBatches": 42336,
+  "warmupBatches": 14112,
+  "correctness": {
+    "tests": 6,
+    "oracleChecks": 37855,
+    "worker": true,
+    "inheritedHarnessTests": 28
+  },
+  "rawLocalArchive": {
+    "fileName": "zerocopy-runtime-fixes-stage7-20261018.zip",
+    "bytes": 8832846,
+    "sha256": "d950515557c3bd23c3cef48d0966a6c9349ad7e3f6d79b105c28c43dcdb38de1",
+    "storage": "Attached to the originating ChatGPT conversation; not copied into Git history."
+  },
+  "upstreamArtifact": {
+    "run": 39088420210,
+    "id": 12121084431,
+    "sha256": "de53ce15b38b7406ea4a79e4250cc1aa6deb66dcf14fef2fd23ee8c49d7d69c4",
+    "expires": "2026-11-17T02:10:48Z"
+  },
+  "reproductionCheck": {
+    "artifactSha256": "de53ce15b38b7406ea4a79e4250cc1aa6deb66dcf14fef2fd23ee8c49d7d69c4",
+    "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+    "parentTree": "2d232ae08272b354dffc499d0c6dcbea016caab5",
+    "candidateTree": "0023d7bf7b486747308f369727fd3da18f587988",
+    "localCommit": null,
+    "kernelSha256": "eccfc79c51bc5075160ffbdeae131ecf9ae9275c6f0c04ea7900acfd358373f2",
+    "scalarSha256": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "simdSha256": "68318f611fd2fcedd3ba84a1b5bbd704bbc66ada4b9fd038b18056b27cdc4813",
+    "node": "v22.16.0",
+    "nodeSha256": "8142d37c6f2f372ef040419e7a111a6baf17df89f8078d02447d6c639ae20c1d",
+    "portableBundleEdit": "one checked SIMD literal in dist/numeric.js; not a native Bun rebuild",
+    "historicalInventory": "The inherited parent manifest does not describe Stage 7; use the exact tree above.",
+    "performanceAcceptance": false
+  },
+  "limits": [
+    "Failed full A/A and A/B gates; not an accepted optimization.",
+    "No Stage 7 Bun, ARM64, browser or local full-suite result.",
+    "Public API used archived JS with one checked SIMD literal replacement.",
+    "Inherited parent inventory is historical; independent exact source tree identifies Stage 7.",
+    "Compiler-mode diagnostic is separate, partial and not an acceptance benchmark."
+  ]
+}

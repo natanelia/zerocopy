@@ -1,0 +1,12 @@
+{
+  "stage": "stage7-tail-only-entry",
+  "created": "2026-10-18T02:53:40.525648+00:00",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "parentKernelCommit": "b94a923990e09fa9e97f6e4f20519f63f5a640d2",
+  "hypothesis": "An early tail-only SIMD return avoids the tree mask and depth dispatch on 1-32 values. Preserve invalid-bound handling and byte-identical scalar Wasm.",
+  "method": "Original PLAN version 2, all 63 endpoints, 4 ABBA/BAAB blocks, 7 warmup and 21 samples, unchanged thresholds. Run one A/A followed by one A/B. No retry or sample exclusion.",
+  "limits": "Node 22.16.0 Linux x64 local screen. Archived public JS bundle with verified single SIMD literal replacement. No upstream commit objects; exact source trees and SHA256 retained. Not acceptance on Bun, browsers, ARM64 or current main.",
+  "kernelBeforeSha256": "76d0bbcbf5acea9106e6e3f9d89a2b41c3a60a612f4e8fd07dd1425ad649c5c5",
+  "kernelAfterSha256": "eccfc79c51bc5075160ffbdeae131ecf9ae9275c6f0c04ea7900acfd358373f2"
+}
