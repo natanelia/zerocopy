@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { PLAN, endpoints, interval, schedule, summarize } from './numeric-tree-process.mjs';
-import { expectedCount, validatePhase, verifyEvidence } from './numeric-tree-gate.mjs';
+import { expectedCount, validatePhase, verifyEvidence, validateRuntimeCoverage } from './numeric-tree-gate.mjs';
 
 function phase(kind = 'aa', ratio = 1) {
   const stats = interval(Array(PLAN.blocks).fill(Math.log(ratio)));
@@ -127,3 +127,74 @@ test('fixture oracles retain known all-miss, mixed-hit and range counts', () => 
   assert.equal(expectedCount('range-scalar', 2), 0);
   assert.throws(() => expectedCount('nonexistent', 32));
 });
+
+// These are synthetic reports for the cross-phase validator, not speed evidence.
+function runtimeCoverage(arch = 'x64') {
+  return new Map(['node', 'bun'].flatMap(runtime => ['aa', 'ab'].map(kind => [`${runtime}-${kind}`, {
+    kind, inputSources: { baseline: 'base', candidate: 'candidate' }, sources: { driver: 'fixed' },
+    runtimeSha256: `${runtime}-binary`,
+    runtime: { node: runtime === 'node' ? 'v22.23.3' : 'v26.3.0',
+      bun: runtime === 'bun' ? '1.4.2' : null, arch, v8: 'fixture', cpu: 'fixture' },
+  }])));
+}
+test('runtime coverage requires both Node and Bun on the expected architecture', () => {
+  for (const arch of ['x64', 'arm64']) validateRuntimeCoverage(runtimeCoverage(arch), arch);
+  assert.throws(() => validateRuntimeCoverage(runtimeCoverage(), 'ia32'), /Unsupported comparison architecture/);
+});
+test('copied Node pairs cannot satisfy Bun coverage and copied Bun pairs cannot satisfy Node coverage', () => {
+  for (const [from, to, error] of [['node', 'bun', /Bun phase lacks Bun evidence/],
+    ['bun', 'node', /Node phase contains Bun evidence/]]) {
+    const reports = runtimeCoverage();
+    for (const kind of ['aa', 'ab']) reports.set(`${to}-${kind}`, structuredClone(reports.get(`${from}-${kind}`)));
+    assert.throws(() => validateRuntimeCoverage(reports, 'x64'), error);
+  }
+});
+test('cross-phase coverage rejects missing, mislabeled, wrong-architecture and incomplete runtime metadata', () => {
+  const changes = [
+    [r => r.delete('bun-ab'), /All four evidence sets/],
+    [r => { r.set('extra', r.get('bun-ab')); r.delete('bun-ab'); }, /Missing runtime phase/],
+    [r => r.get('node-ab').kind = 'aa', /Wrong phase kind/],
+    [r => { for (const report of r.values()) report.runtime.arch = 'arm64'; }, /Wrong runtime architecture/],
+    [r => { for (const kind of ['aa', 'ab']) delete r.get(`bun-${kind}`).runtime.bun; }, /Bun phase lacks Bun evidence/],
+    [r => { for (const kind of ['aa', 'ab']) r.get(`bun-${kind}`).runtime.bun = 'not-a-version'; }, /Bun phase lacks Bun evidence/],
+    [r => r.get('node-aa').runtime.node = '', /Missing Node-compatible version/],
+  ];
+  for (const [change, message] of changes) {
+    const reports = runtimeCoverage(); change(reports);
+    assert.throws(() => validateRuntimeCoverage(reports, 'x64'), message);
+  }
+});
+test('runtime-family checks preserve cross-phase source and binary identity checks', () => {
+  for (const [change, message] of [
+    [r => r.get('bun-ab').inputSources.candidate = 'other', /Build inputs changed/],
+    [r => r.get('bun-ab').sources.driver = 'other', /Measurement source changed/],
+    [r => r.get('node-ab').runtimeSha256 = 'other', /Runtime binary changed/],
+    [r => r.get('node-ab').runtime.cpu = 'other', /Runtime metadata changed/],
+  ]) {
+    const reports = runtimeCoverage(); change(reports);
+    assert.throws(() => validateRuntimeCoverage(reports, 'x64'), message);
+  }
+});
+
+test('last-bit cached estimate differences are portable; returned rows come from raw samples', () => fixture(({ dir, report }) => {
+  for (const file of ['size-1/summary.json', 'summary.json']) {
+    const path = resolve(dir, file), value = JSON.parse(readFileSync(path));
+    for (const key of ['speedup', 'lower', 'upper']) value.rows[0][key] += Number.EPSILON;
+    value.rows[0].blockRatios[0] += Number.EPSILON;
+    writeFileSync(path, JSON.stringify(value));
+  }
+  const actual = verifyEvidence(dir, 'aa');
+  assert.deepEqual(actual.rows, report.rows);
+  validatePhase(actual, 'aa');
+}));
+test('estimate tolerance cannot change paired ratios or convert a below-floor result to PASS', () => fixture(({ dir }) => {
+  const path = resolve(dir, 'size-1/summary.json'), before = readFileSync(path);
+  const ratioChange = JSON.parse(before); ratioChange.rows[0].pairedRatios[0] += Number.EPSILON;
+  writeFileSync(path, JSON.stringify(ratioChange));
+  assert.throws(() => verifyEvidence(dir, 'ab'), /summary differs from raw samples/);
+  const forged = JSON.parse(before);
+  forged.rows[0].speedup = PLAN.regressionFloor;
+  forged.rows[0].pointPass = true; forged.rows[0].confidencePass = true; forged.rows[0].pass = true;
+  writeFileSync(path, JSON.stringify(forged));
+  assert.throws(() => verifyEvidence(dir, 'ab'), /summary differs from raw samples/);
+}, 'ab', 0.9499999999999));
