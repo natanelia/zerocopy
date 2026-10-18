@@ -1,6 +1,11 @@
 name: Numeric tree comparison
 
 on:
+  push:
+    branches: [proof/numeric-scalar2-screen-20261018]
+    paths:
+      - 'numeric-kernels.as.ts'
+      - '.github/workflows/numeric-tree-performance.yml'
   workflow_dispatch:
   pull_request:
     paths:
