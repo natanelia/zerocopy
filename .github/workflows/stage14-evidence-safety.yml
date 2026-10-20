@@ -25,9 +25,9 @@ jobs:
         shell: bash --noprofile --norc -euo pipefail {0}
     env:
       PROOF: proofs/experiments/numeric-depth2-20261018
-      RETAINED_DIR: ${{ runner.temp }}/stage14-retained
-      BUILD_DIR: ${{ runner.temp }}/stage14-build
-      MODULE_DIR: ${{ runner.temp }}/stage14-build/candidate-build
+      RETAINED_DIR: ${{ github.workspace }}/.stage14-retained
+      BUILD_DIR: ${{ github.workspace }}/.stage14-build
+      MODULE_DIR: ${{ github.workspace }}/.stage14-build/candidate-build
     steps:
       - uses: actions/checkout@v4
         with:
