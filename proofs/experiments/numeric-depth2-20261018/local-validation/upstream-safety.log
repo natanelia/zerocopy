@@ -1,0 +1,47 @@
+TAP version 13
+# UNROLL-SAFETY {"oracleChecks":37855,"maxArenaBytes":8650752,"wasm":[{"mode":"scalar","sha256":"5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95"},{"mode":"simd","sha256":"f6b02c82ea39c9f9092dc72955faf8aefb370e5747220e237c6baed64c8b7109"}]}
+# Subtest: scalar: all full-leaf group sizes and tail lengths, with memory-end loads
+ok 1 - scalar: all full-leaf group sizes and tail lengths, with memory-end loads
+  ---
+  duration_ms: 19.840666
+  type: 'test'
+  ...
+# Subtest: scalar: raw binary64 values and one-root-leaf boundaries
+ok 2 - scalar: raw binary64 values and one-root-leaf boundaries
+  ---
+  duration_ms: 9.031872
+  type: 'test'
+  ...
+# Subtest: simd: all full-leaf group sizes and tail lengths, with memory-end loads
+ok 3 - simd: all full-leaf group sizes and tail lengths, with memory-end loads
+  ---
+  duration_ms: 12.876824
+  type: 'test'
+  ...
+# Subtest: simd: raw binary64 values and one-root-leaf boundaries
+ok 4 - simd: raw binary64 values and one-root-leaf boundaries
+  ---
+  duration_ms: 8.110811
+  type: 'test'
+  ...
+# Subtest: public scans: depth boundaries, read-only attachments, forks, and all bytes
+ok 5 - public scans: depth boundaries, read-only attachments, forks, and all bytes
+  ---
+  duration_ms: 304.817928
+  type: 'test'
+  ...
+# Subtest: public error contracts
+ok 6 - public error contracts
+  ---
+  duration_ms: 0.436218
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 448.198191

@@ -1,0 +1,20 @@
+test_complete_replay (__main__.RestoreTests.test_complete_replay) ... Stage 13 24 children, A/A 3 /3, A/B 0 /3
+Independent audit sha256 ac0729827f0069a43a60d33034b1d1028d1ec8938711fd0a6f58ce36e110575c
+Stage 14 24 children, A/A 2 /3, A/B 2 /3
+Independent audit sha256 cf7c3c6863690e1e7dee158df36ce0e666ad55b04e0da031dfe21932b2d9126c
+ok
+test_corrupted_part (__main__.RestoreTests.test_corrupted_part) ... ok
+test_derived_last_bit_is_not_a_gate_margin (__main__.RestoreTests.test_derived_last_bit_is_not_a_gate_margin) ... ok
+test_existing_output (__main__.RestoreTests.test_existing_output) ... ok
+test_extra_part (__main__.RestoreTests.test_extra_part) ... ok
+test_false_pass_is_rejected (__main__.RestoreTests.test_false_pass_is_rejected) ... ok
+test_large_derived_edit_is_rejected (__main__.RestoreTests.test_large_derived_edit_is_rejected) ... ok
+test_missing_part (__main__.RestoreTests.test_missing_part) ... ok
+test_truncated_part (__main__.RestoreTests.test_truncated_part) ... ok
+test_unsafe_member (__main__.RestoreTests.test_unsafe_member) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.589s
+
+OK
+PASS: 26 sealed files, 48 child reports and journals; failed gates remain failed

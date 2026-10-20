@@ -1,0 +1,41 @@
+TAP version 13
+# Subtest: depth-two dispatch: below, at and above 2048 published tree values
+ok 1 - depth-two dispatch: below, at and above 2048 published tree values
+  ---
+  duration_ms: 111.077038
+  type: 'test'
+  ...
+# Subtest: new depth-two branch: every partial final group and every tail length
+ok 2 - new depth-two branch: every partial final group and every tail length
+  ---
+  duration_ms: 374.350919
+  type: 'test'
+  ...
+# Subtest: deeper recursion: partial depth-two children and depth transitions
+ok 3 - deeper recursion: partial depth-two children and depth transitions
+  ---
+  duration_ms: 682.7862
+  type: 'test'
+  ...
+# Subtest: invalid bounds and empty snapshots return before dereferencing poison
+ok 4 - invalid bounds and empty snapshots return before dereferencing poison
+  ---
+  duration_ms: 0.45696
+  type: 'test'
+  ...
+# STAGE14-BOUNDARIES {"oracleChecks":46112,"fixtures":1272,"maxArenaBytes":8650752,"binaries":{"stage10-simd.wasm":"94c1c2849be996188673cecded3d3107c71b903b4780d7d73c46798d58b7b219","stage14-simd.wasm":"f6b02c82ea39c9f9092dc72955faf8aefb370e5747220e237c6baed64c8b7109","stage14-scalar.wasm":"5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95"},"publicOverlay":true}
+# Subtest: public snapshots: dispatch boundaries, read-only attachments and retained forks
+ok 5 - public snapshots: dispatch boundaries, read-only attachments and retained forks
+  ---
+  duration_ms: 120.461482
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1353.456066

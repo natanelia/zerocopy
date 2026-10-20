@@ -1,0 +1,74 @@
+name: Stage 14 evidence and safety
+on:
+  push:
+    branches: [proof/numeric-stage14-flatten-20261018]
+    paths:
+      - 'proofs/experiments/numeric-depth2-20261018/**'
+      - '.github/workflows/stage14-evidence-safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stage14-evidence-safety-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        runtime: [node, bun]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+    env:
+      PROOF: proofs/experiments/numeric-depth2-20261018
+      RETAINED_DIR: ${{ runner.temp }}/stage14-retained
+      BUILD_DIR: ${{ runner.temp }}/stage14-build
+      MODULE_DIR: ${{ runner.temp }}/stage14-build/candidate-build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - uses: oven-sh/setup-bun@v2
+        if: matrix.runtime == 'bun'
+        with:
+          bun-version: '1.4.2'
+      - name: Restore every raw record and test corruption rejection
+        run: |
+          mkdir validation-logs
+          git rev-parse HEAD > validation-logs/commit.txt
+          python3 "$PROOF/restore.test.py" -v 2>&1 | tee validation-logs/restore-tests.log
+          python3 "$PROOF/restore.py" "$RETAINED_DIR" 2>&1 | tee validation-logs/replay.log
+          cp -R "$RETAINED_DIR/verification" validation-logs/
+      - name: Rebuild all exact kernels with the archived compiler
+        run: |
+          curl --fail --location 'https://raw.githubusercontent.com/natanelia/zerocopy/b7f5a0604b78b5fb6db562ed6d674d2380da20e5/proofs/experiments/numeric-pairing-20261018/inputs/numeric-tree-X64-d16d82c9.zip' -o "$RUNNER_TEMP/input.zip"
+          python3 "$PROOF/prepare.py" "$RUNNER_TEMP/input.zip" "$RETAINED_DIR" "$BUILD_DIR" 2>&1 | tee validation-logs/build.log
+          cp "$BUILD_DIR/build-report.json" validation-logs/
+      - name: Check depth-two boundaries and public snapshots without timing
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          "$RUNTIME" -e 'const fs=require("node:fs"),c=require("node:crypto"); console.log(JSON.stringify({version:process.version,versions:process.versions,arch:process.arch,execPath:process.execPath,binarySha256:c.createHash("sha256").update(fs.readFileSync(process.execPath)).digest("hex")}))' > validation-logs/runtime.json
+          "$RUNTIME" "$PROOF/stage14-boundaries.node.mjs" 2>&1 | tee validation-logs/boundaries.log
+          python3 - <<'PY'
+          import json,pathlib
+          text=pathlib.Path('validation-logs/boundaries.log').read_text()
+          rows=[json.loads(line.split('STAGE14-BOUNDARIES ',1)[1]) for line in text.splitlines() if 'STAGE14-BOUNDARIES ' in line]
+          assert len(rows)==1 and rows[0]['oracleChecks']==46112 and rows[0]['fixtures']==1272 and rows[0]['publicOverlay'] is True
+          assert 0 < rows[0]['maxArenaBytes'] <= 64*1024*1024
+          PY
+      - name: Retain validation results, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage14-safety-${{ runner.arch }}-${{ matrix.runtime }}-${{ github.sha }}
+          path: validation-logs/
+          if-no-files-found: error
+          retention-days: 30
