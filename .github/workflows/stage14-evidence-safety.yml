@@ -56,7 +56,11 @@ jobs:
           RUNTIME: ${{ matrix.runtime }}
         run: |
           "$RUNTIME" -e 'const fs=require("node:fs"),c=require("node:crypto"); console.log(JSON.stringify({version:process.version,versions:process.versions,arch:process.arch,execPath:process.execPath,binarySha256:c.createHash("sha256").update(fs.readFileSync(process.execPath)).digest("hex")}))' > validation-logs/runtime.json
-          "$RUNTIME" "$PROOF/stage14-boundaries.node.mjs" 2>&1 | tee validation-logs/boundaries.log
+          if [ "$RUNTIME" = bun ]; then
+            bun test "./$PROOF/stage14-boundaries.node.mjs" --timeout 60000
+          else
+            node --test "$PROOF/stage14-boundaries.node.mjs"
+          fi 2>&1 | tee validation-logs/boundaries.log
           python3 - <<'PY'
           import json,pathlib
           text=pathlib.Path('validation-logs/boundaries.log').read_text()
