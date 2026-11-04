@@ -1,0 +1,48 @@
+diff --git a/shared-list.ts b/shared-list.ts
+index 21a7608..4f5c147 100644
+--- a/shared-list.ts
++++ b/shared-list.ts
+@@ -154,21 +154,36 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+     }
+   }
+   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
+-    const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
++    const a = this.arena, view = a.dv, start = this.size ? (this.size - 1) & ~31 : 0;
++    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
++    // Every address reachable from this snapshot fits the captured view.
++    // Callback writes may grow shared memory, but cannot detach this view.
+     for (let first = 0; first < this.size; first += 32) {
+       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+-      const stop = Math.min(this.size, first + 32), view = a.dv;
+-      // Shared views remain valid if the callback grows memory or creates forks.
+-      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
++      const stop = Math.min(this.size, first + 32);
++      if (isNumber) {
++        for (let i = first; i < stop; i++) fn(view.getFloat64(leaf + (i - first) * 8, true) as ValueOf<T>, i);
++      } else if (isBoolean) {
++        for (let i = first; i < stop; i++) fn((view.getFloat64(leaf + (i - first) * 8, true) !== 0) as ValueOf<T>, i);
++      } else {
++        for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
++      }
+     }
+   }
+   toArray(): ValueOf<T>[] {
+-    const a = this.arena, result = new Array<ValueOf<T>>(this.size);
++    const a = this.arena, view = a.dv, result = new Array<ValueOf<T>>(this.size);
+     const start = this.size ? (this.size - 1) & ~31 : 0;
++    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
+     for (let first = 0; first < this.size; first += 32) {
+       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+-      const stop = Math.min(this.size, first + 32), dv = a.dv;
+-      for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
++      const stop = Math.min(this.size, first + 32);
++      if (isNumber) {
++        for (let i = first; i < stop; i++) result[i] = view.getFloat64(leaf + (i - first) * 8, true) as ValueOf<T>;
++      } else if (isBoolean) {
++        for (let i = first; i < stop; i++) result[i] = (view.getFloat64(leaf + (i - first) * 8, true) !== 0) as ValueOf<T>;
++      } else {
++        for (let i = first; i < stop; i++) result[i] = a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true));
++      }
+     }
+     return result;
+   }

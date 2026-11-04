@@ -164,11 +164,22 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   }
   toArray(): ValueOf<T>[] {
     const a = this.arena, result = new Array<ValueOf<T>>(this.size);
+    if (!this.size) return result;
+    const view = a.dv;
     const start = this.size ? (this.size - 1) & ~31 : 0;
+    const isNumber = this.type === 'number', isBoolean = this.type === 'boolean';
+    // Published leaves fit this view even if nested decoding grows the arena.
+    // Keep primitive materialization out of the general value decoder.
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
-      const stop = Math.min(this.size, first + 32), dv = a.dv;
-      for (let i = first; i < stop; i++) result[i] = a.decode(this.type, dv.getFloat64(leaf + (i - first) * 8, true));
+      const stop = Math.min(this.size, first + 32);
+      if (isNumber) {
+        for (let i = first; i < stop; i++) result[i] = view.getFloat64(leaf + (i - first) * 8, true) as ValueOf<T>;
+      } else if (isBoolean) {
+        for (let i = first; i < stop; i++) result[i] = (view.getFloat64(leaf + (i - first) * 8, true) !== 0) as ValueOf<T>;
+      } else {
+        for (let i = first; i < stop; i++) result[i] = a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true));
+      }
     }
     return result;
   }
