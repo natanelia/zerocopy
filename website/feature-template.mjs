@@ -31,7 +31,7 @@ export function featureBenchmark(base) {
     <p class="lab-small"><strong>Incremental copy:</strong> copy the full catalog once, then only the 100 changed ID/object pairs to each reader per edit. <strong>Full copy:</strong> copy the entire updated catalog to each reader on every edit. These labels describe worker data transfer; queries read data already attached in both modes.</p>
     <section class="feature-benchmark-preview" aria-labelledby="feature-preview-heading">
       <h2 id="feature-preview-heading">Seven cases this benchmark measures</h2>
-      <p class="lab-small">Four implementations, seven worker-publication strategies. The rows below measure <strong>replace 100 products + publish to two readers</strong>. Results appear here after a completed run.</p>
+      <p class="lab-small">Four implementations, seven worker-publication strategies, ordered by shared snapshots, full copies, then incremental copies. The rows below measure <strong>replace 100 products + publish to two readers</strong>. Results appear here after a completed run.</p>
       <div class="feature-benchmark-preview-rows">
         ${BENCHMARK_CASES.map(({ id, label }) => `<div class="feature-timing-row" data-preview-case="${id}"><span>${label}</span><div class="feature-timing-track" aria-hidden="true"><div class="feature-timing-fill"></div></div><strong class="feature-timing-value" data-preview-ms>—</strong></div>`).join('')}
       </div>
