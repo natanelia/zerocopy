@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-list
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  13:26:51
+   Duration  548ms (transform 151ms, setup 0ms, import 188ms, tests 295ms, environment 0ms)
+

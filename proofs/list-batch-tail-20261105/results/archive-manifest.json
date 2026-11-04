@@ -1,0 +1,44 @@
+{
+  "schema": "zerocopy-list-batch-evidence-archive/v1",
+  "status": "complete",
+  "recordedAt": "2026-11-04T19:50:49.070940+00:00",
+  "compression": "gzip, level9, mtime0; original UTF-8 JSON bytes preserved exactly",
+  "files": [
+    {
+      "originalPath": "results/pilot-02.json",
+      "originalBytes": 5124151,
+      "originalSha256": "09c8c81711d4c7cb6a1f8e56c2bc62ff2191d78e2a7765be5c920d17c0e82191",
+      "archivePath": "results/pilot-02.json.gz",
+      "archiveBytes": 298587,
+      "archiveSha256": "0f5fcf0a59bd766c4fc7e453adb0cd4a8797d6b82b681ded86569a753638b5ba",
+      "roundTripVerified": true
+    },
+    {
+      "originalPath": "results/pilot-wasm-v2-01.json",
+      "originalBytes": 5423026,
+      "originalSha256": "67923a44a3889f708b712e3a336c095d9575f16db363a9bc2a93516895f20ab8",
+      "archivePath": "results/pilot-wasm-v2-01.json.gz",
+      "archiveBytes": 315145,
+      "archiveSha256": "9b6170845db38c515c19380a2cf7cc7e7acbd344476dc5de3d91d89db7c3fb6b",
+      "roundTripVerified": true
+    },
+    {
+      "originalPath": "results/node-01.json",
+      "originalBytes": 5842591,
+      "originalSha256": "4982a77277a436e2f4ea78ba335787d9401096256d124313abc12fcc2f5b7a06",
+      "archivePath": "results/node-01.json.gz",
+      "archiveBytes": 345571,
+      "archiveSha256": "793c627e88401f7bcfca4b6579cd447e337cf622f98161a5b62a9f844b8d2d90",
+      "roundTripVerified": true
+    },
+    {
+      "originalPath": "results/bun-01.json",
+      "originalBytes": 10512563,
+      "originalSha256": "d7b611ee4adf6ec3ce643c59da2dfa451d5b5d09c56cd89223cf19b01874ed9b",
+      "archivePath": "results/bun-01.json.gz",
+      "archiveBytes": 556673,
+      "archiveSha256": "ce1722a2135e8a5d792da4573027f9542b449df64a75da83375ee4c599222269",
+      "roundTripVerified": true
+    }
+  ]
+}
