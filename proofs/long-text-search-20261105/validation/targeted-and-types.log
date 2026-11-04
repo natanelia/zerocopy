@@ -1,0 +1,29 @@
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-search
+
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  11:59:43
+   Duration  1.88s (transform 189ms, setup 0ms, import 229ms, tests 1.49s, environment 0ms)
+
+✔ half-leaf masks preserve matches, Unicode fallbacks, and every short tail (45.038225ms)
+✔ half-leaf predicates remain exact for sparse, reverse, and interleaved queries (64.094062ms)
+✔ seeded full-range Unicode needles match JavaScript on retained shared and copied views (425.62219ms)
+✔ packed text search is read-only and bounded at every final memory byte (31.205918ms)
+✔ literal search preserves case, punctuation, null bytes and every short-needle boundary (84.921406ms)
+✔ seeded ASCII data exercises short and long needles at every byte position (78.955303ms)
+✔ Unicode case expansion, contextual casing, surrogate halves and UTF-8 replacements match JavaScript (65.573581ms)
+✔ seeded arbitrary UTF-16 texts and needles preserve includes semantics (200.934651ms)
+✔ query compilation never materializes an ASCII dataset or writes into a reader arena (16.458663ms)
+✔ invalid indices, invalid options and non-string collections are rejected predictably (0.915111ms)
+✔ compiled predicates retain their snapshot after forks, growth, pops and resets (722.881113ms)
+✔ real readers keep their compiled snapshot while the owner grows memory (152.792551ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1442.459388

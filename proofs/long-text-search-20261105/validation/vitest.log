@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-search
+
+
+ Test Files  51 passed (51)
+      Tests  1060 passed (1060)
+   Start at  12:05:57
+   Duration  38.96s (transform 1.75s, setup 0ms, import 2.86s, tests 146.38s, environment 22ms)
+
