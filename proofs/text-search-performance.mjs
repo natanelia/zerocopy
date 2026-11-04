@@ -1,6 +1,7 @@
 /** End-to-end text-search proof against PR13 before compiled byte matching.
- * All four architectures keep identical data, predicates, task yields, workers,
- * output verification and sample counts. Fixture variants are diagnostic only.
+ * Both revisions keep identical data, predicates, task yields and reference checks.
+ * Current adds full-copy replica cases; verify each revision's case count separately.
+ * Fixture variants are diagnostic only.
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -68,7 +69,11 @@ try {
               const peer=new Peer(new URL('./assets/explorer-bench-runner.mjs',location.href));
               try{return await peer.request('run',{entries:100000},180000);}finally{peer.close();}
             });
-            assert.equal(result.raw.length,28);assert.deepEqual(Object.keys(result.samples).sort(),['centralized','immutable','replicated','shared']);
+            const paths = v.variant === 'before'
+               ? ['centralized', 'immutable', 'replicated', 'shared']
+               : ['centralized', 'immutable', 'immutable-full', 'replicated', 'replicated-full', 'shared'];
+             assert.equal(result.raw.length, paths.length * 7);
+             assert.deepEqual(Object.keys(result.samples).sort(), paths);
             for(const phases of Object.values(result.samples))for(const values of Object.values(phases))assert.ok(values.length===7&&values.every(x=>Number.isFinite(x)&&x>=0));
             assert.deepEqual(errors,[]);
             const source=JSON.parse(readFileSync(resolve(v.dir,'build.json'),'utf8')).sourceCommit;
@@ -88,5 +93,5 @@ try {
   }
   for(const group of groups.values())group.medians=Object.fromEntries(['initialMs','queryMs','updateMs'].map(k=>[k,median(group.samples.map(s=>s[k]))]));
   writeFileSync(resolve(out,'by-query.json'),JSON.stringify([...groups.values()],null,2));
-  writeFileSync(resolve(out,'manifest.json'),JSON.stringify({schema:'zerocopy-text-search-proof/v1',repetitions,runCount:runs.length,records:runs.reduce((n,r)=>n+r.raw.length,0),note:'Baseline is PR13 before compiled text search. Both use the same 4096-index task yields, bulk appends, field/row layout and unchanged Immutable.js. Query preparation is timed. Actual four-architecture worker benchmark; full independent reference checks. Original, unique IDs, absent ASCII text and 20% Unicode-prefix diagnostics run for every architecture. No precomputed index, decoded dataset cache or artificial delay. No universal performance threshold; retain losing cases.'},null,2));
+  writeFileSync(resolve(out,'manifest.json'),JSON.stringify({schema:'zerocopy-text-search-proof/v1',repetitions,runCount:runs.length,records:runs.reduce((n,r)=>n+r.raw.length,0),note:'Baseline is PR13 before compiled text search. Both use the same 4096-index task yields, bulk appends, field/row layout and unchanged Immutable.js. Query preparation is timed. Baseline has four cases (28 samples), while the current benchmark also measures full-copy Immutable.js and native replicas (six cases, 42 samples); like-for-like cases retain their names. Full independent reference checks. Original, unique IDs, absent ASCII text and 20% Unicode-prefix diagnostics run for every architecture. No precomputed index, decoded dataset cache or artificial delay. No universal performance threshold; retain losing cases.'},null,2));
 }finally{for(const v of variants){v.server.closeAllConnections();await new Promise(r=>v.server.close(r));}}

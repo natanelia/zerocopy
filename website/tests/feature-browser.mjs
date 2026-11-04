@@ -169,6 +169,9 @@ try {
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
       record({ type: 'phase', name: 'complete benchmark and export' });
       await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
+      const caseIds = ['shared', 'native-incremental', 'native-full', 'immutable-incremental', 'immutable-full', 'immer-incremental', 'immer-full'];
+      assert.deepEqual(await page.locator('[data-preview-case]').evaluateAll(rows => rows.map(row => row.dataset.previewCase)), caseIds);
+      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'No fake pre-run timing results');
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 90000 });
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
@@ -176,9 +179,11 @@ try {
       assert.equal(raw.workload, 'product-catalog');
       assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v2'); assert.equal(raw.raw.length, 63); assert.equal(raw.raw.filter(record => !record.warmup).length, 49);
       assert.equal(raw.sourceCommit, meta.sourceCommit); assert.deepEqual(raw.dependencies, meta.dependencies);
-      const caseIds = ['shared', 'native-incremental', 'native-full', 'immutable-incremental', 'immutable-full', 'immer-incremental', 'immer-full'];
       assert.deepEqual(raw.cases.map(item => item.id), caseIds);
       assert.deepEqual(Object.keys(raw.summary), caseIds);
+      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(),
+        caseIds.map(id => `${raw.summary[id].updatePublicationMs.median.toFixed(2)} ms`));
+      assert.match(await page.locator('#feature-preview-status').innerText(), /median replace \+ publication time/);
       assert.equal(raw.config.samplesPerCase, 7); assert.equal(raw.config.warmups, 2);
       for (const item of raw.cases) {
         const samples = raw.raw.filter(sample => sample.caseId === item.id);
@@ -208,6 +213,7 @@ try {
       await page.setViewportSize({ width: 1440, height: 1000 });
       record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
+      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'Stop clears previous medians');
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), true);
       await page.locator('#feature-run').click(); await page.goto(origin + meta.base + 'docs/catalog/'); await page.goBack();
       await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);

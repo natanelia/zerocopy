@@ -1,5 +1,6 @@
 import { isolationNotice } from './templates.mjs';
 import { LABELS } from './assets/feature-core.mjs';
+import { BENCHMARK_CASES } from './assets/catalog-benchmark-core.mjs';
 import { featureMemory } from './feature-memory-charts.mjs';
 
 const selector = `<label for="feature-count">Products<select id="feature-count"><option value="1000">1,000 · quick check</option><option value="10000" selected>10,000</option><option value="100000">100,000</option></select></label>`;
@@ -28,6 +29,14 @@ export function featureBenchmark(base) {
     <div class="page-intro"><span class="eyebrow">MEASURE YOUR BROWSER · SEVEN CASES</span><h1>One product catalog.<br>Both copy strategies.</h1><p>Compare SharedMap, native Map, Immutable.js Map and Immer Map. Separate construction, publication, first queries, repeat queries and sparse edits. Every worker answer is checked against an independent reference.</p></div>
     <p class="lab-small"><strong>Both copy strategies run automatically.</strong> Native Map, Immutable.js Map and Immer Map each appear twice: <strong>incremental copy</strong> and <strong>full copy</strong>. SharedMap uses shared snapshots, for seven cases in total.</p>
     <p class="lab-small"><strong>Incremental copy:</strong> copy the full catalog once, then only the 100 changed ID/object pairs to each reader per edit. <strong>Full copy:</strong> copy the entire updated catalog to each reader on every edit. These labels describe worker data transfer; queries read data already attached in both modes.</p>
+    <section class="feature-benchmark-preview" aria-labelledby="feature-preview-heading">
+      <h2 id="feature-preview-heading">Seven cases this benchmark measures</h2>
+      <p class="lab-small">Four implementations, seven worker-publication strategies. The rows below measure <strong>replace 100 products + publish to two readers</strong>. Results appear here after a completed run.</p>
+      <div class="feature-benchmark-preview-rows">
+        ${BENCHMARK_CASES.map(({ id, label }) => `<div class="feature-timing-row" data-preview-case="${id}"><span>${label}</span><div class="feature-timing-track" aria-hidden="true"><div class="feature-timing-fill"></div></div><strong class="feature-timing-value" data-preview-ms>—</strong></div>`).join('')}
+      </div>
+      <p class="lab-small" id="feature-preview-status" role="status">Not measured on this device yet.</p>
+    </section>
     ${isolationNotice()}<form id="feature-benchmark-form" class="feature-controls">${selector}<button id="feature-run" class="button primary" disabled>Run catalog benchmark</button><button id="feature-cancel" type="button" class="button secondary" hidden>Stop run</button><button id="feature-export" type="button" class="button secondary" disabled>Export raw JSON</button></form>
     <p id="feature-benchmark-status" role="status">Two warm-ups and seven measured samples per case · seven cases · 49 measured samples. No assumed winner.</p><div id="feature-benchmark-results" aria-live="polite"></div>
     <section class="prose feature-method"><h2>What the timers include</h2><p>Each sample starts with fresh owner and reader workers. Startup and module loading finish before timing. Input generation and collection construction have separate values. Initial publication copies the full catalog for all replica cases and includes encoding, two worker deliveries and attachment. SharedMap publishes descriptors for shared backing. The first query requests 1,000 IDs once; the repeat query requests the same IDs. SharedMap can cache decoded JSON locally. Both collection and cache costs remain part of the design.</p>
