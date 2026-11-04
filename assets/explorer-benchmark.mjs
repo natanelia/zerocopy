@@ -1,5 +1,6 @@
 import { checkCapability } from './capability.mjs';
 import { Peer } from './explorer-peer.mjs';
+import { INVESTIGATION_CASES } from './explorer-benchmark-cases.mjs';
 const $ = id => document.getElementById(id);
 let peer, result, generation = 0;
 checkCapability(() => { $('run-investigation-bench').disabled = false; });
@@ -10,7 +11,7 @@ function show(value) {
     const section = document.createElement('section'); section.className = 'architecture-result';
     const title = document.createElement('h2'); title.textContent = heading; section.append(title);
     const max = Math.max(.001, ...Object.values(value.summary).map(path => path[phase].median));
-    for (const [path, label] of [['shared', 'zerocopy · shared snapshots'], ['immutable', 'Immutable.js Lists · incremental replicas'], ['replicated', 'Native arrays · incremental replicas'], ['centralized', 'Native arrays · one owner']]) {
+    for (const { id: path, label } of INVESTIGATION_CASES) {
       const row = document.createElement('div'); row.className = 'result-row'; const summary = value.summary[path][phase];
       const header = document.createElement('div'), name = document.createElement('span'), time = document.createElement('strong');
       name.textContent = label; time.textContent = `${summary.median.toFixed(2)} ms`; header.append(name, time);

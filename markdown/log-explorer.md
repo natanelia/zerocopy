@@ -84,11 +84,13 @@ The shared arena can grow while a snapshot is pinned. Retaining an earlier root 
 The investigation benchmark compares:
 
 - Shared columns with two independent readers and local visible-row reads.
-- Immutable.js List replicas, with batched persistent appends and only new values sent on updates.
-- Native array replicas, with only appended events sent on updates.
+- Immutable.js List replicas with incremental copy: batched persistent appends and only new values sent on updates.
+- Immutable.js List replicas with full copy: all updated columns sent and rebuilt in each reader on every append.
+- Native array replicas with incremental copy: only appended events sent on updates.
+- Native array replicas with full copy: all updated columns sent to each reader on every append.
 - One native-data-owning worker that returns the results and visible rows.
 
-It measures initial sharing, a query on an attached dataset, and append + publish + query. Construction, worker startup, and DOM rendering are reported separately or excluded explicitly. Every answer is checked against an independent native-array reference. The raw export includes all samples and the build source.
+Both copy strategies run automatically, for six cases and 42 measured samples. They describe worker data transfer, separate from local collection updates. It measures initial sharing, a query on an attached dataset, and append + publish + query. Queries do not resend the dataset. Construction, worker startup, and DOM rendering are reported separately or excluded explicitly. Every answer is checked against an independent native-array reference. The raw export includes all samples and the build source.
 
 For append-only arrays, an earlier view can also be retained by a length boundary. This workload does not establish that zerocopy is uniquely necessary for freezing logs. It demonstrates the uniform shared-collection model and lets you compare costs.
 
@@ -96,6 +98,8 @@ For append-only arrays, an earlier view can also be retained by a length boundar
 
 Replace events with document nodes, table rows, product records, or graph edges. The ownership model remains: one producer publishes immutable versions; multiple components read locally. See [all use cases and alternatives](../../docs/use-cases.md), not just this example.
 
-## Watch all three implementations
+## Watch all four implementations
 
-Open the [three-way comparison](../README.md#side-by-side-comparison) to apply the same controls to shared snapshots, Immutable.js Lists, and native arrays. Both replica baselines send incremental deltas by default. All three answers are independently checked. Immutable.js queries read real Lists directly; publication includes column encoding and List reconstruction. Frozen views retain real List roots, not converted arrays. Transport counters count logical event copies, not memory bytes. Use the [investigation benchmark](../README.md#investigation-benchmark) for rotated timing samples.
+Open the [four-way comparison](../README.md#side-by-side-comparison) to apply the same controls to shared snapshots, Immutable.js Lists, Immer arrays and native arrays. All three replica baselines use **incremental copy** by default: the full initial dataset, then only appended events. Select **full copy** to resend the complete updated dataset to each reader on every append. Queries read already attached data.
+
+All four answers are independently checked. Immutable.js queries read real Lists directly; publication includes column encoding and List reconstruction. Immer uses `produce` and freezes received arrays. Frozen views retain real immutable roots. Local structural sharing is separate from copying data between workers. Transport counters count logical event copies, not memory bytes. Use the [investigation benchmark](../README.md#investigation-benchmark) for rotated samples of both copy strategies for native arrays and Immutable.js Lists.

@@ -5,6 +5,8 @@ let storage, current, retained;
 listen(async data => {
   if (data.type === 'prepare') { storage = await createStorage(data.kind); return true; }
   if (data.type === 'load') { current = await storage.attach(data.payload); retained = current; return current.size; }
+  // Full publication replaces only the live root; revision 0 stays retained.
+  if (data.type === 'replace') { current = await storage.attach(data.payload); return current.size; }
   if (data.type === 'edit') { current = storage.kind === 'shared' ? await storage.attach(data.payload) : storage.update(current, data.changes, retained); return current.size; }
   if (data.type === 'release') { retained = undefined; return true; }
   if (data.type === 'query') {

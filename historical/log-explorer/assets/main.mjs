@@ -1,5 +1,18 @@
 import { findResults, resultSnippet, validateSearchIndex } from './search.mjs';
 
+// WebKit can evaluate this module before <body> exists during navigation.
+// Observe its insertion rather than awaiting DOMContentLoaded: module
+// evaluation itself may delay that event in some engines.
+if (!document.body) {
+  await new Promise(resolve => {
+    const observer = new MutationObserver(() => {
+      if (!document.body) return;
+      observer.disconnect();
+      resolve();
+    });
+    observer.observe(document.documentElement, { childList: true });
+  });
+}
 const base = document.body.dataset.base;
 const dialog = document.querySelector('.search-dialog');
 const input = document.querySelector('#search-input');

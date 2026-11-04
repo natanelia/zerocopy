@@ -14,7 +14,7 @@ export function verifyChecksums(results, count, entries) {
   if (results.length !== count || results.some(result => result.checksum !== expectedChecksum(entries))) throw new Error('Output mismatch: benchmark results are invalid');
 }
 export const BENCHMARK_PATHS = ['shared', 'immutable', 'immer'];
-export const BENCHMARK_LABELS = { shared: 'zerocopy shared snapshot', immutable: 'Immutable.js Map', immer: 'Immer Map' };
+export const BENCHMARK_LABELS = { shared: 'zerocopy · shared snapshot', immutable: 'Immutable.js Map · full copy', immer: 'Immer Map · full copy' };
 export function orderFor(round) {
   const offset = round % BENCHMARK_PATHS.length;
   return [...BENCHMARK_PATHS.slice(offset), ...BENCHMARK_PATHS.slice(0, offset)];
