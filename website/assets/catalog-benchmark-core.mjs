@@ -1,9 +1,11 @@
 import { LABELS } from './catalog-core.mjs';
 
 export const UPDATE_MODES = ['incremental', 'full'];
+// Show the costly full-copy baselines directly below SharedMap, then incremental copies.
+const BENCHMARK_DISPLAY_MODES = ['full', 'incremental'];
 export const BENCHMARK_CASES = [
   { id: 'shared', kind: 'shared', updateMode: 'shared', label: 'SharedMap · shared snapshot' },
-  ...['native', 'immutable', 'immer'].flatMap(kind => UPDATE_MODES.map(updateMode => ({
+  ...BENCHMARK_DISPLAY_MODES.flatMap(updateMode => ['native', 'immutable', 'immer'].map(kind => ({
     id: `${kind}-${updateMode}`, kind, updateMode,
     label: `${LABELS[kind]} · ${updateMode === 'full' ? 'full' : 'incremental'} copy`,
   }))),
