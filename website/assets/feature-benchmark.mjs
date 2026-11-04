@@ -1,5 +1,5 @@
 import { checkCapability } from './capability.mjs';
-import { BENCHMARK_CASES } from './catalog-benchmark-core.mjs';
+import { BENCHMARK_CASES, EDIT_PUBLICATION_PHASES, casesForPhase } from './catalog-benchmark-core.mjs';
 import { Peer } from './catalog-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
 const $ = id => document.getElementById(id);
@@ -9,6 +9,9 @@ let current, generation = 0, result, ready = false, running = false;
 checkCapability(() => { ready = true; controls(); });
 function controls() { $('feature-run').disabled = !ready || running; $('feature-count').disabled = running; $('feature-cancel').hidden = !running; $('feature-export').disabled = !result || running; }
 function summarize(values) {
+  if (values.length !== SAMPLES || values.some(value => !Number.isFinite(value) || value < 0)) {
+    throw new Error('Incomplete benchmark samples for a measured phase');
+  }
   const sorted = [...values].sort((a, b) => a - b);
   return { median: sorted[3], min: sorted[0], max: sorted[6], p25: (sorted[1] + sorted[2]) / 2, p75: (sorted[4] + sorted[5]) / 2 };
 }
@@ -32,8 +35,9 @@ function render(value) {
   for (const [phase, label] of Object.entries(PHASES)) {
     const section = document.createElement('section'); section.className = 'feature-timing-group'; section.dataset.phase = phase;
     const heading = document.createElement('h2'); heading.textContent = label; section.append(heading);
-    const maximum = Math.max(.001, ...BENCHMARK_CASES.map(({ id }) => value.summary[id][phase].max));
-    for (const { id, label } of BENCHMARK_CASES) {
+    const phaseCases = casesForPhase(phase);
+    const maximum = Math.max(.001, ...phaseCases.map(({ id }) => value.summary[id][phase].max));
+    for (const { id, label } of phaseCases) {
       const stats = value.summary[id][phase], row = document.createElement('div'); row.className = 'feature-timing-row'; row.dataset.case = id;
       const name = document.createElement('span'); name.textContent = label;
       const track = document.createElement('div'); track.className = 'feature-timing-track';
@@ -52,14 +56,24 @@ async function sample({ id, kind, updateMode }, count, token) {
     await peer.request('prepare', { kind, readers: 2, updateMode: updateMode === 'shared' ? 'incremental' : updateMode });
     const setup = await peer.request('load', { count });
     if (token !== generation) throw new Error('Cancelled');
-    const first = await peer.request('query'), repeat = await peer.request('query');
+    // Full-copy cases only measure the two phases affected by whole-dataset
+    // delivery. Building the inputs and verifying both snapshots remain required,
+    // but query/constructor timings are not duplicated in the exported results.
+    const fullCopy = updateMode === 'full';
+    const first = fullCopy ? undefined : await peer.request('query');
+    const repeat = fullCopy ? undefined : await peer.request('query');
     const edit = await peer.request('edit');
     const updated = await peer.request('query'), initial = await peer.request('query', { frozen: true });
     await peer.request('stop');
-    return { caseId: id, kind, updateMode, generationMs: setup.generationMs, constructionMs: setup.constructionMs, publicationMs: setup.publicationMs,
-      firstQueryMs: first.ms, repeatQueryMs: repeat.ms, editGenerationMs: edit.generationMs, updateMs: edit.updateMs,
-      editPublicationMs: edit.publicationMs, updatePublicationMs: edit.updatePublicationMs, updatedQueryMs: updated.ms,
-      publication: { initial: setup.publication, edit: edit.publication }, verification: { first, repeat, updated, initial } };
+    return { caseId: id, kind, updateMode,
+      ...(fullCopy ? {} : {
+        generationMs: setup.generationMs, constructionMs: setup.constructionMs, publicationMs: setup.publicationMs,
+        firstQueryMs: first.ms, repeatQueryMs: repeat.ms, editGenerationMs: edit.generationMs,
+        updateMs: edit.updateMs, updatedQueryMs: updated.ms,
+      }),
+      editPublicationMs: edit.publicationMs, updatePublicationMs: edit.updatePublicationMs,
+      publication: { initial: setup.publication, edit: edit.publication },
+      verification: fullCopy ? { updated, initial } : { first, repeat, updated, initial } };
   } finally { peer.close(); if (current === peer) current = undefined; }
 }
 $('feature-benchmark-form').addEventListener('submit', async event => {
@@ -77,12 +91,17 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
       }
     }
     const measured = raw.filter(record => !record.warmup);
-    result = { schema: 'zerocopy-product-catalog-browser/v2', workload: 'product-catalog', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
+    const cases = BENCHMARK_CASES.map(benchmarkCase => ({
+      ...benchmarkCase,
+      measuredPhases: benchmarkCase.updateMode === 'full' ? EDIT_PUBLICATION_PHASES : Object.keys(PHASES),
+    }));
+    result = { schema: 'zerocopy-product-catalog-browser/v3', workload: 'product-catalog', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
       dependencies: { immutable: immutableVersion, immer: immerVersion }, environment: { userAgent: navigator.userAgent, crossOriginIsolated, hardwareConcurrency: navigator.hardwareConcurrency },
-      config: { entries: count, readers: 2, requestedIds: 1000, foundIds: 910, missingIds: 90, edits: 100, unicodeNameFraction: 0.2, warmups: WARMUPS, samplesPerCase: SAMPLES, retainedRevisions: [0, 1] },
-      cases: BENCHMARK_CASES,
-      method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. Generation and construction separated. Initial publication includes encoding, delivery and attachment of the full map for every replica case. First query accesses fresh reader attachments; repeated query uses the same IDs and may use local JSON caches. Each edit replaces 100 product objects in the owner. Native Map, Immutable.js and Immer each have separate incremental-copy and full-copy cases: incremental publication clones only the 100 changed pairs; full publication clones the entire current dataset into each reader after every edit, including encoding, reconstruction and freezing. SharedMap publishes shared descriptors. Owner updates are identical between copy modes; Native copies its index once to retain the initial revision. Reader replacement preserves the initial root. Publication counts are logical product deliveries, not bytes or local copy counts. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Cases rotate; all warmups and samples retained. No DOM paint or memory measurement.',
-      summary: Object.fromEntries(BENCHMARK_CASES.map(({ id }) => [id, Object.fromEntries(Object.keys(PHASES).map(phase => [phase, summarize(measured.filter(record => record.caseId === id).map(record => record[phase]))]))])), raw };
+      config: { entries: count, readers: 2, requestedIds: 1000, foundIds: 910, missingIds: 90, edits: 100, unicodeNameFraction: 0.2, warmups: WARMUPS, samplesPerCase: SAMPLES, retainedRevisions: [0, 1],
+        phaseCaseIds: Object.fromEntries(Object.keys(PHASES).map(phase => [phase, casesForPhase(phase).map(item => item.id)])) },
+      cases,
+      method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. The four baseline cases (shared snapshots and three incremental-copy implementations) measure all nine phases; three additional full-copy cases measure ONLY editPublicationMs and updatePublicationMs. All full-copy cases must still build and load the same catalog, update the same 100 objects and verify current and retained answers, but do not record redundant construction or query phases. Initial replica publication always clones the full catalog. Incremental edits clone only the 100 changed pairs, whereas full edits clone the entire updated dataset to each reader including encoding, reconstruction/freezing and both acknowledgements. SharedMap publishes shared descriptors. Owner updates are identical between copy modes; Native copies its index once to retain the initial revision. Publication counts are logical product deliveries, not bytes or local copy counts. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Cases rotate; all warmups and samples retained. No DOM paint or memory measurement.',
+      summary: Object.fromEntries(cases.map(({ id, measuredPhases }) => [id, Object.fromEntries(measuredPhases.map(phase => [phase, summarize(measured.filter(record => record.caseId === id).map(record => record[phase]))]))])), raw };
     render(result); $('feature-benchmark-status').textContent = `Complete. All ${SAMPLES * BENCHMARK_CASES.length} measured samples and ${WARMUPS * BENCHMARK_CASES.length} warm-ups passed current and retained-revision checks.`;
   } catch (error) { if (token === generation) { clearPreview('No completed benchmark results.'); $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; } }
   finally { if (token === generation) { running = false; controls(); } }

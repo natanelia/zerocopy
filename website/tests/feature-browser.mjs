@@ -170,6 +170,9 @@ try {
       record({ type: 'phase', name: 'complete benchmark and export' });
       await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
       const caseIds = ['shared', 'native-full', 'immutable-full', 'immer-full', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
+      const baselineIds = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
+      const editedPhases = ['editPublicationMs', 'updatePublicationMs'];
+      const allPhases = ['generationMs', 'constructionMs', 'publicationMs', 'firstQueryMs', 'repeatQueryMs', 'updateMs', ...editedPhases, 'updatedQueryMs'];
       assert.deepEqual(await page.locator('[data-preview-case]').evaluateAll(rows => rows.map(row => row.dataset.previewCase)), caseIds);
       assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'No fake pre-run timing results');
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
@@ -177,10 +180,14 @@ try {
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
       const raw = JSON.parse(readFileSync(await download.path(), 'utf8'));
       assert.equal(raw.workload, 'product-catalog');
-      assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v2'); assert.equal(raw.raw.length, 63); assert.equal(raw.raw.filter(record => !record.warmup).length, 49);
+      assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v3'); assert.equal(raw.raw.length, 63); assert.equal(raw.raw.filter(record => !record.warmup).length, 49);
       assert.equal(raw.sourceCommit, meta.sourceCommit); assert.deepEqual(raw.dependencies, meta.dependencies);
       assert.deepEqual(raw.cases.map(item => item.id), caseIds);
       assert.deepEqual(Object.keys(raw.summary), caseIds);
+      assert.deepEqual(Object.keys(raw.config.phaseCaseIds), allPhases);
+      for (const phase of allPhases) {
+        assert.deepEqual(raw.config.phaseCaseIds[phase], editedPhases.includes(phase) ? caseIds : baselineIds, phase);
+      }
       assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(),
         caseIds.map(id => `${raw.summary[id].updatePublicationMs.median.toFixed(2)} ms`));
       assert.match(await page.locator('#feature-preview-status').innerText(), /median replace \+ publication time/);
@@ -190,20 +197,36 @@ try {
         assert.equal(samples.length, 9); assert.equal(samples.filter(sample => sample.warmup).length, 2);
         assert.ok(samples.every(sample => sample.kind === item.kind && sample.updateMode === item.updateMode));
         assert.match(item.label, item.updateMode === 'shared' ? /shared snapshot/ : item.updateMode === 'full' ? /full copy/ : /incremental copy/);
+        assert.deepEqual(item.measuredPhases, item.updateMode === 'full' ? editedPhases : allPhases);
+        assert.deepEqual(Object.keys(raw.summary[item.id]), item.measuredPhases);
       }
       for (const record of raw.raw) {
-        assert.equal(record.verification.first.answer.lookup.found, 910);
         assert.equal(record.verification.updated.answer.validation.unavailable, 100);
         assert.equal(record.verification.initial.answer.validation.unavailable, 0);
-        assert.equal(record.verification.first.answer.lookup.fingerprint, record.verification.repeat.answer.lookup.fingerprint);
-        assert.ok(record.updatePublicationMs >= record.updateMs && record.updatePublicationMs >= record.editPublicationMs);
+        assert.equal(record.verification.updated.answer.lookup.found, 910);
+        assert.ok(record.updatePublicationMs >= record.editPublicationMs);
+        const full = record.updateMode === 'full';
+        for (const phase of allPhases) {
+          assert.equal(Object.hasOwn(record, phase), !full || editedPhases.includes(phase), `${record.caseId}: ${phase} exported only when measured`);
+        }
+        if (full) {
+          assert.deepEqual(Object.keys(record.verification), ['updated', 'initial']);
+          assert.equal(record.editGenerationMs, undefined);
+        } else {
+          assert.equal(record.verification.first.answer.lookup.found, 910);
+          assert.equal(record.verification.first.answer.lookup.fingerprint, record.verification.repeat.answer.lookup.fingerprint);
+          assert.ok(record.updatePublicationMs >= record.updateMs);
+          assert.ok(Number.isFinite(record.editGenerationMs));
+        }
         const initialRecords = record.kind === 'shared' ? 0 : 1000;
-        const editRecords = record.kind === 'shared' ? 0 : record.updateMode === 'full' ? 1000 : 100;
+        const editRecords = record.kind === 'shared' ? 0 : full ? 1000 : 100;
         assert.deepEqual(record.publication.initial, { recordsPerReader: initialRecords, totalRecords: initialRecords * 2 });
         assert.deepEqual(record.publication.edit, { recordsPerReader: editRecords, totalRecords: editRecords * 2 });
       }
       for (const section of await page.locator('.feature-timing-group').all()) {
-        assert.deepEqual(await section.locator('[data-case]').evaluateAll(rows => rows.map(row => row.dataset.case)), caseIds);
+        const phase = await section.getAttribute('data-phase');
+        assert.deepEqual(await section.locator('[data-case]').evaluateAll(rows => rows.map(row => row.dataset.case)),
+          editedPhases.includes(phase) ? caseIds : baselineIds, `${phase}: correct visible cases and order`);
       }
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(raw, null, 2));
       for (const width of [390, 320]) {

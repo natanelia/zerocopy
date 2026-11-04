@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BENCHMARK_CASES, publicationFor, validateUpdateMode } from '../assets/catalog-benchmark-core.mjs';
+import { BASELINE_CASES, BENCHMARK_CASES, EDIT_PUBLICATION_PHASES, casesForPhase, publicationFor, validateUpdateMode } from '../assets/catalog-benchmark-core.mjs';
 import { entriesFor, editsFor, queryIds } from '../assets/catalog-core.mjs';
 import { reference, verifyAnswer } from '../assets/catalog-reference.mjs';
 import { RPC } from '../assets/feature-core.mjs';
@@ -10,6 +10,20 @@ test('replica publication defaults to incremental and rejects unknown modes', ()
   assert.equal(validateUpdateMode(), 'incremental');
   for (const mode of ['incremental', 'full']) assert.equal(validateUpdateMode(mode), mode);
   for (const mode of ['snapshot', 'shared', '', null, false]) assert.throws(() => validateUpdateMode(mode), /incremental or full/);
+});
+
+test('full-copy comparisons are ordered directly under SharedMap on edited-publication phases only', () => {
+  const baseline = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
+  const edited = ['shared', 'native-full', 'immutable-full', 'immer-full', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
+  assert.deepEqual(BASELINE_CASES.map(item => item.id), baseline);
+  assert.deepEqual(BENCHMARK_CASES.map(item => item.id), edited);
+  assert.deepEqual(EDIT_PUBLICATION_PHASES, ['editPublicationMs', 'updatePublicationMs']);
+  for (const phase of ['generationMs', 'constructionMs', 'publicationMs', 'firstQueryMs', 'repeatQueryMs', 'updateMs', 'updatedQueryMs']) {
+    assert.deepEqual(casesForPhase(phase).map(item => item.id), baseline, phase);
+  }
+  for (const phase of EDIT_PUBLICATION_PHASES) {
+    assert.deepEqual(casesForPhase(phase).map(item => item.id), edited, phase);
+  }
 });
 
 test('actual readers receive full or incremental copies on every edit and retain revision zero', async () => {
