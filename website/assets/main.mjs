@@ -1,5 +1,11 @@
 import { findResults, resultSnippet, validateSearchIndex } from './search.mjs';
 
+// WebKit can start evaluating a module before the body exists during fast
+// navigation or service-worker isolation reloads. Delay all DOM setup until
+// parsing has finished instead of throwing and aborting every site handler.
+if (!document.body) {
+  await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+}
 const base = document.body.dataset.base;
 const dialog = document.querySelector('.search-dialog');
 const input = document.querySelector('#search-input');
