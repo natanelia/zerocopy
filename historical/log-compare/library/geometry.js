@@ -1,9 +1,9 @@
 import {
   arenaOf
-} from "./chunk-t2acd52e.js";
+} from "./chunk-naz6wrqq.js";
 import {
   SharedList2
-} from "./chunk-72y7f44w.js";
+} from "./chunk-5qfqrsqm.js";
 
 // geometry-wasm.ts
 function loadGeometryWasm() {

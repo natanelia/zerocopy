@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "3584f9a0640a10a0c1f42df1a4921c430718f514",
+  "sourceCommit": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9",
@@ -40,5 +40,5 @@
     "docs/catalog/",
     "docs/editors/"
   ],
-  "librarySHA256": "3308bcec6102f2cf9e260df84d45f077964840cde1e4ffda5b47b6c219f13b91"
+  "librarySHA256": "d8c565b60aa23736c3ea4e8076d72d5510b61b83f4f9d8c59328a1a08787fe55"
 }
