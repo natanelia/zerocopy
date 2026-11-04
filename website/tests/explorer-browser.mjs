@@ -6,6 +6,7 @@ import { chromium } from 'playwright';
 import { createPreview } from '../serve.mjs';
 import { generateColumns } from '../assets/explorer-core.mjs';
 import { reference } from '../assets/explorer-reference.mjs';
+import { INVESTIGATION_CASES } from '../assets/explorer-benchmark-cases.mjs';
 const metadata = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const base = metadata.base, artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
 mkdirSync(artifacts, { recursive: true });
@@ -68,11 +69,23 @@ try {
   for (const size of ['1000', '10000', '100000']) {
   await page.locator('#investigation-size').selectOption(size); await page.locator('#run-investigation-bench').click();
   await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120_000 });
-  assert.equal(await page.locator('.architecture-result').count(), 3); assert.equal(await page.locator('.architecture-result .result-row').count(), 12);
+  assert.equal(await page.locator('.architecture-result').count(), 3); assert.equal(await page.locator('.architecture-result .result-row').count(), 18);
   const download = page.waitForEvent('download'); await page.locator('#export-investigation-bench').click();
   const raw = JSON.parse(readFileSync(await (await download).path(), 'utf8'));
-  assert.equal(raw.schema, 'zerocopy-investigation-benchmark/v2'); assert.equal(raw.raw.length, 28);
-  assert.deepEqual(Object.keys(raw.samples).sort(), ['centralized', 'immutable', 'replicated', 'shared']);
+  assert.equal(raw.schema, 'zerocopy-investigation-benchmark/v3'); assert.equal(raw.raw.length, 42);
+  assert.deepEqual(Object.keys(raw.samples).sort(), ['centralized', 'immutable', 'immutable-full', 'replicated', 'replicated-full', 'shared']);
+  assert.deepEqual(raw.config.cases, INVESTIGATION_CASES);
+  for (const item of INVESTIGATION_CASES) {
+    assert.ok((await page.locator('#investigation-bench-results').innerText()).includes(item.label));
+    const records = raw.raw.filter(record => record.path === item.id);
+    assert.equal(records.length, 7);
+    for (const record of records) {
+      assert.equal(record.kind, item.kind); assert.equal(record.updateMode, item.updateMode);
+      const initial = item.kind === 'shared' ? 0 : Number(size) * item.readers;
+      const updated = item.kind === 'shared' ? 0 : (item.updateMode === 'full' ? Number(size) + 2000 : 2000) * item.readers;
+      assert.deepEqual(record.publication, { initialEventsCopied: initial, updateEventsCopied: updated, readers: item.readers });
+    }
+  }
   for (const path of Object.values(raw.samples)) for (const values of Object.values(path)) { assert.equal(values.length, 7); assert.ok(values.every(n => Number.isFinite(n) && n >= 0)); }
   assert.equal(raw.dependencies.immutable, metadata.dependencies.immutable);
   writeFileSync(artifacts + `/investigation-benchmark-${size}.json`, JSON.stringify(raw, null, 2));
@@ -82,7 +95,7 @@ try {
   await page.locator('#investigation-size').selectOption('100000'); await page.locator('#run-investigation-bench').click(); await page.locator('#stop-investigation-bench').click();
   await page.waitForFunction(() => !document.querySelector('#run-investigation-bench').disabled);
   assert.match(await page.locator('#investigation-bench-status').innerText(), /Stopped/); assert.equal(await page.locator('#export-investigation-bench').isDisabled(), true);
-  console.log('Passed: four-architecture benchmark at all three sizes, full reference verification, all samples exported, and early cancellation.');
+  console.log('Passed: six benchmark cases at all three sizes, full/incremental delivery counts, full reference verification, all samples exported, and early cancellation.');
 
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of ['historical/log-explorer/', 'historical/log-benchmark/', 'use-cases/', 'docs/use-cases/']) {

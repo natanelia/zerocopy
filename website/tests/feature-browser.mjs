@@ -174,16 +174,38 @@ try {
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
       const raw = JSON.parse(readFileSync(await download.path(), 'utf8'));
       assert.equal(raw.workload, 'product-catalog');
-      assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v1'); assert.equal(raw.raw.length, 36); assert.equal(raw.raw.filter(record => !record.warmup).length, 28);
+      assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v2'); assert.equal(raw.raw.length, 63); assert.equal(raw.raw.filter(record => !record.warmup).length, 49);
       assert.equal(raw.sourceCommit, meta.sourceCommit); assert.deepEqual(raw.dependencies, meta.dependencies);
+      const caseIds = ['shared', 'native-incremental', 'native-full', 'immutable-incremental', 'immutable-full', 'immer-incremental', 'immer-full'];
+      assert.deepEqual(raw.cases.map(item => item.id), caseIds);
+      assert.deepEqual(Object.keys(raw.summary), caseIds);
+      assert.equal(raw.config.samplesPerCase, 7); assert.equal(raw.config.warmups, 2);
+      for (const item of raw.cases) {
+        const samples = raw.raw.filter(sample => sample.caseId === item.id);
+        assert.equal(samples.length, 9); assert.equal(samples.filter(sample => sample.warmup).length, 2);
+        assert.ok(samples.every(sample => sample.kind === item.kind && sample.updateMode === item.updateMode));
+        assert.match(item.label, item.updateMode === 'shared' ? /shared snapshot/ : item.updateMode === 'full' ? /full copy/ : /incremental copy/);
+      }
       for (const record of raw.raw) {
         assert.equal(record.verification.first.answer.lookup.found, 910);
         assert.equal(record.verification.updated.answer.validation.unavailable, 100);
         assert.equal(record.verification.initial.answer.validation.unavailable, 0);
         assert.equal(record.verification.first.answer.lookup.fingerprint, record.verification.repeat.answer.lookup.fingerprint);
         assert.ok(record.updatePublicationMs >= record.updateMs && record.updatePublicationMs >= record.editPublicationMs);
+        const initialRecords = record.kind === 'shared' ? 0 : 1000;
+        const editRecords = record.kind === 'shared' ? 0 : record.updateMode === 'full' ? 1000 : 100;
+        assert.deepEqual(record.publication.initial, { recordsPerReader: initialRecords, totalRecords: initialRecords * 2 });
+        assert.deepEqual(record.publication.edit, { recordsPerReader: editRecords, totalRecords: editRecords * 2 });
+      }
+      for (const section of await page.locator('.feature-timing-group').all()) {
+        assert.deepEqual(await section.locator('[data-case]').evaluateAll(rows => rows.map(row => row.dataset.case)), caseIds);
       }
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(raw, null, 2));
+      for (const width of [390, 320]) {
+        await page.setViewportSize({ width, height: 844 });
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px completed benchmark`);
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
       record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), true);
@@ -240,7 +262,7 @@ try {
         await staticPage.locator('#feature-stop').click(); await staticPage.locator('#feature-load:not([disabled])').waitFor();
         assert.deepEqual(errors, []); await staticContext.close();
       } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
-      console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 36 benchmark records, headerless workers, no-JS charts and mobile layout at ${meta.base}`);
+      console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 63 benchmark records with both copy modes, headerless workers, no-JS charts and mobile layout at ${meta.base}`);
     } catch (error) {
       if (activePage && !activePage.isClosed()) {
         console.error(`Failure in ${name} at ${activePage.url()}`);

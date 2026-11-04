@@ -1,10 +1,10 @@
 import { checkCapability } from './capability.mjs';
-import { KINDS, LABELS } from './catalog-core.mjs';
+import { BENCHMARK_CASES } from './catalog-benchmark-core.mjs';
 import { Peer } from './catalog-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
 const $ = id => document.getElementById(id);
 const WARMUPS = 2, SAMPLES = 7;
-const PHASES = { generationMs: 'Generate the catalog', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 product objects', editPublicationMs: 'Publish the sparse edit', updatePublicationMs: 'Replace and publish 100 products', updatedQueryMs: 'Query the edited revision' };
+const PHASES = { generationMs: 'Generate the catalog', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 product objects', editPublicationMs: 'Publish the edited revision', updatePublicationMs: 'Replace and publish 100 products', updatedQueryMs: 'Query the edited revision' };
 let current, generation = 0, result, ready = false, running = false;
 checkCapability(() => { ready = true; controls(); });
 function controls() { $('feature-run').disabled = !ready || running; $('feature-count').disabled = running; $('feature-cancel').hidden = !running; $('feature-export').disabled = !result || running; }
@@ -15,36 +15,36 @@ function summarize(values) {
 function render(value) {
   const fragment = document.createDocumentFragment();
   for (const [phase, label] of Object.entries(PHASES)) {
-    const section = document.createElement('section'); section.className = 'feature-timing-group';
+    const section = document.createElement('section'); section.className = 'feature-timing-group'; section.dataset.phase = phase;
     const heading = document.createElement('h2'); heading.textContent = label; section.append(heading);
-    const maximum = Math.max(.001, ...KINDS.map(kind => value.summary[kind][phase].max));
-    for (const kind of KINDS) {
-      const stats = value.summary[kind][phase], row = document.createElement('div'); row.className = 'feature-timing-row';
-      const name = document.createElement('span'); name.textContent = LABELS[kind];
+    const maximum = Math.max(.001, ...BENCHMARK_CASES.map(({ id }) => value.summary[id][phase].max));
+    for (const { id, label } of BENCHMARK_CASES) {
+      const stats = value.summary[id][phase], row = document.createElement('div'); row.className = 'feature-timing-row'; row.dataset.case = id;
+      const name = document.createElement('span'); name.textContent = label;
       const track = document.createElement('div'); track.className = 'feature-timing-track';
       const fill = document.createElement('div'); fill.className = 'feature-timing-fill'; fill.style.width = `${stats.median / maximum * 100}%`; track.append(fill);
       const time = document.createElement('strong'); time.className = 'feature-timing-value'; time.textContent = `${stats.median.toFixed(2)} ms`;
       row.append(name, track, time); section.append(row);
-      const detail = document.createElement('p'); detail.className = 'lab-small'; detail.textContent = `${LABELS[kind]} range: ${stats.min.toFixed(2)}–${stats.max.toFixed(2)} ms. Median of all seven measured samples.`; section.append(detail);
+      const detail = document.createElement('p'); detail.className = 'lab-small'; detail.textContent = `${label} range: ${stats.min.toFixed(2)}–${stats.max.toFixed(2)} ms. Median of all seven measured samples.`; section.append(detail);
     }
     fragment.append(section);
   }
   $('feature-benchmark-results').replaceChildren(fragment);
 }
-async function sample(kind, count, token) {
+async function sample({ id, kind, updateMode }, count, token) {
   const peer = current = new Peer(new URL('./feature-owner.mjs', import.meta.url));
   try {
-    await peer.request('prepare', { kind, readers: 2 });
+    await peer.request('prepare', { kind, readers: 2, updateMode: updateMode === 'shared' ? 'incremental' : updateMode });
     const setup = await peer.request('load', { count });
     if (token !== generation) throw new Error('Cancelled');
     const first = await peer.request('query'), repeat = await peer.request('query');
     const edit = await peer.request('edit');
     const updated = await peer.request('query'), initial = await peer.request('query', { frozen: true });
     await peer.request('stop');
-    return { kind, generationMs: setup.generationMs, constructionMs: setup.constructionMs, publicationMs: setup.publicationMs,
+    return { caseId: id, kind, updateMode, generationMs: setup.generationMs, constructionMs: setup.constructionMs, publicationMs: setup.publicationMs,
       firstQueryMs: first.ms, repeatQueryMs: repeat.ms, editGenerationMs: edit.generationMs, updateMs: edit.updateMs,
       editPublicationMs: edit.publicationMs, updatePublicationMs: edit.updatePublicationMs, updatedQueryMs: updated.ms,
-      verification: { first, repeat, updated, initial } };
+      publication: { initial: setup.publication, edit: edit.publication }, verification: { first, repeat, updated, initial } };
   } finally { peer.close(); if (current === peer) current = undefined; }
 }
 $('feature-benchmark-form').addEventListener('submit', async event => {
@@ -53,21 +53,22 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
   result = undefined; running = true; controls(); $('feature-benchmark-results').replaceChildren();
   try {
     for (let round = 0; round < WARMUPS + SAMPLES; round++) {
-      for (let offset = 0; offset < KINDS.length; offset++) {
-        const kind = KINDS[(offset + round) % KINDS.length];
-        $('feature-benchmark-status').textContent = `${round < WARMUPS ? 'Warm-up' : 'Measured sample'} ${round < WARMUPS ? round + 1 : round - WARMUPS + 1}/${round < WARMUPS ? WARMUPS : SAMPLES} · ${LABELS[kind]} · fresh workers`;
-        const record = await sample(kind, count, token);
+      for (let offset = 0; offset < BENCHMARK_CASES.length; offset++) {
+        const benchmarkCase = BENCHMARK_CASES[(offset + round) % BENCHMARK_CASES.length];
+        $('feature-benchmark-status').textContent = `${round < WARMUPS ? 'Warm-up' : 'Measured sample'} ${round < WARMUPS ? round + 1 : round - WARMUPS + 1}/${round < WARMUPS ? WARMUPS : SAMPLES} · ${benchmarkCase.label} · fresh workers`;
+        const record = await sample(benchmarkCase, count, token);
         if (token !== generation) return;
         raw.push({ round: round + 1, warmup: round < WARMUPS, ...record });
       }
     }
     const measured = raw.filter(record => !record.warmup);
-    result = { schema: 'zerocopy-product-catalog-browser/v1', workload: 'product-catalog', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
+    result = { schema: 'zerocopy-product-catalog-browser/v2', workload: 'product-catalog', measuredAt: new Date().toISOString(), sourceCommit: document.body.dataset.source,
       dependencies: { immutable: immutableVersion, immer: immerVersion }, environment: { userAgent: navigator.userAgent, crossOriginIsolated, hardwareConcurrency: navigator.hardwareConcurrency },
-      config: { entries: count, readers: 2, requestedIds: 1000, foundIds: 910, missingIds: 90, edits: 100, unicodeNameFraction: 0.2, warmups: WARMUPS, samplesPerKind: SAMPLES, retainedRevisions: [0, 1] },
-      method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. Generation and construction separated. Initial publication includes encoding, delivery and attachment. First query accesses fresh reader attachments; repeated query uses the same IDs and may use local JSON caches. Edits replace 100 product objects; replica workers receive only changed pairs. Native copies its index once to retain initial revision. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Paths rotate; all warmups and samples retained. No DOM paint or memory measurement.',
-      summary: Object.fromEntries(KINDS.map(kind => [kind, Object.fromEntries(Object.keys(PHASES).map(phase => [phase, summarize(measured.filter(record => record.kind === kind).map(record => record[phase]))]))])), raw };
-    render(result); $('feature-benchmark-status').textContent = 'Complete. All 28 measured samples and 8 warm-ups passed current and retained-revision checks.';
+      config: { entries: count, readers: 2, requestedIds: 1000, foundIds: 910, missingIds: 90, edits: 100, unicodeNameFraction: 0.2, warmups: WARMUPS, samplesPerCase: SAMPLES, retainedRevisions: [0, 1] },
+      cases: BENCHMARK_CASES,
+      method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. Generation and construction separated. Initial publication includes encoding, delivery and attachment of the full map for every replica case. First query accesses fresh reader attachments; repeated query uses the same IDs and may use local JSON caches. Each edit replaces 100 product objects in the owner. Native Map, Immutable.js and Immer each have separate incremental-copy and full-copy cases: incremental publication clones only the 100 changed pairs; full publication clones the entire current dataset into each reader after every edit, including encoding, reconstruction and freezing. SharedMap publishes shared descriptors. Owner updates are identical between copy modes; Native copies its index once to retain the initial revision. Reader replacement preserves the initial root. Publication counts are logical product deliveries, not bytes or local copy counts. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Cases rotate; all warmups and samples retained. No DOM paint or memory measurement.',
+      summary: Object.fromEntries(BENCHMARK_CASES.map(({ id }) => [id, Object.fromEntries(Object.keys(PHASES).map(phase => [phase, summarize(measured.filter(record => record.caseId === id).map(record => record[phase]))]))])), raw };
+    render(result); $('feature-benchmark-status').textContent = `Complete. All ${SAMPLES * BENCHMARK_CASES.length} measured samples and ${WARMUPS * BENCHMARK_CASES.length} warm-ups passed current and retained-revision checks.`;
   } catch (error) { if (token === generation) $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; }
   finally { if (token === generation) { running = false; controls(); } }
 });

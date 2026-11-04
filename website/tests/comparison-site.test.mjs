@@ -9,7 +9,8 @@ test('comparison exposes all four real implementations and isolates their script
   assert.match(html, /id="lane-immer"/); assert.match(html, /Immer arrays/); assert.match(html, /produce/);
   assert.match(html, /Load all four paths/); assert.match(html, /Immer was not measured/);
   assert.match(html, /WITHOUT ZEROCOPY/); assert.match(html, /WITH ZEROCOPY/);
-  assert.match(html, /Incremental deltas/); assert.match(html, /not bytes or measured heap/);
+  assert.match(html, /Incremental copy is the default/);
+  assert.match(html, /Full copy · all events every update/); assert.match(html, /not bytes or measured heap/);
   assert.ok(existsSync(new URL('historical/log-compare/assets/comparison-reader.mjs', out)));
   assert.ok(existsSync(new URL('historical/log-compare/isolation-sw.js', out)));
   for (const route of ['historical/log-compare/', 'historical/log-benchmark/']) {

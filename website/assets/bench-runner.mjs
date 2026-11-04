@@ -55,7 +55,7 @@ self.onmessage = async ({ data }) => {
       schema: 'zerocopy-browser-benchmark/v2', timestamp: new Date().toISOString(), sourceCommit: data.source,
       dependencies: { immutable: immutableVersion, immer: immerVersion },
       environment: { userAgent: navigator.userAgent, hardwareConcurrency: navigator.hardwareConcurrency, crossOriginIsolated: self.crossOriginIsolated, coordinatorWorkers: 1 },
-      config, construction,
+      config, publicationModes: { shared: 'shared', immutable: 'full', immer: 'full' }, construction,
       summary: Object.fromEntries(BENCHMARK_PATHS.map(path => [path, summarize(samples[path])])), samples, raw,
       method: 'Wall time from snapshot encoding through parallel reader replies. Workers, module loading and dataset construction excluded. Each publication reattaches shared views, or structured-clones full replicas. Immutable.js Map entry encoding and Map reconstruction are included. Immer uses produce with Map support and default auto-freezing; each reader freezes the cloned Map. All three paths perform a get for every deterministic string key. Order rotates; all checksums checked. No memory or immutable-update measurement.'
     } });
