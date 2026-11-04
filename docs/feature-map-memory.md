@@ -2,6 +2,8 @@
 
 This report preserves an earlier synthetic-record workload with keyed reads, sparse replacements and retained revisions. It does not measure the current [product catalog](../website/content/catalog.md). Original fixture fields and source hashes remain in the [recorded method](../proofs/feature-map-memory-method.md). The [historical SharedList report](memory-comparison.md) measures log columns and remains unchanged.
 
+**Recorded copy strategy: incremental copy.** Native Map, Immutable.js Map and Immer Map receive a full dataset at load and only the 100 changed ID/object pairs on each edit. The figures below do not measure full-copy updates. The current [browser benchmark](../website/README.md#catalog-benchmark) separately measures both copy strategies.
+
 ## Results with reader workers
 
 <!-- feature-memory:highlights:start -->

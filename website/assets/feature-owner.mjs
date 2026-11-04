@@ -2,11 +2,13 @@ import { integer, validateCount, entriesFor, editsFor, queryIds, calculate, MAX_
 import { reference, verifyAnswer } from './catalog-reference.mjs';
 import { createStorage } from './feature-storage.mjs';
 import { Peer, listen } from './catalog-peer.mjs';
-let storage, current, retained, count = 0, revision = 0;
+import { publicationFor, validateUpdateMode } from './catalog-benchmark-core.mjs';
+let storage, current, retained, count = 0, revision = 0, updateMode = 'incremental';
 const readers = [];
 async function publish(initial, changes) {
-  const body = storage.kind === 'shared' || initial ? { payload: storage.payload(current) } : { changes };
-  await Promise.all(readers.map(reader => reader.request(initial ? 'load' : 'edit', body)));
+  const { type, body, recordsPerReader } = publicationFor(storage, current, { initial, changes, updateMode });
+  await Promise.all(readers.map(reader => reader.request(type, body)));
+  return { recordsPerReader, totalRecords: recordsPerReader * readers.length };
 }
 async function query(selected, frozen) {
   const ids = queryIds(count, selected), map = frozen ? retained : current;
@@ -23,6 +25,7 @@ async function query(selected, frozen) {
 listen(async data => {
   if (data.type === 'prepare') {
     integer(data.readers, 0, 4, 'Reader count');
+    updateMode = validateUpdateMode(data.updateMode);
     storage = await createStorage(data.kind);
     try {
       for (let i = 0; i < data.readers; i++) readers.push(new Peer(new URL('./feature-reader.mjs', import.meta.url)));
@@ -37,8 +40,8 @@ listen(async data => {
     const generationMs = performance.now() - start;
     start = performance.now(); current = storage.build(entries); retained = current; entries = undefined;
     const constructionMs = performance.now() - start;
-    start = performance.now(); await publish(true); const publicationMs = performance.now() - start;
-    return { generationMs, constructionMs, publicationMs, count, revision };
+    start = performance.now(); const publication = await publish(true); const publicationMs = performance.now() - start;
+    return { generationMs, constructionMs, publicationMs, publication, count, revision };
   }
   if (data.type === 'query') return query(data.selected, !!data.frozen);
   if (data.type === 'edit') {
@@ -47,10 +50,10 @@ listen(async data => {
     const generationMs = performance.now() - start;
     start = performance.now(); const operationStart = start; current = storage.update(current, changes, retained);
     const updateMs = performance.now() - start;
-    start = performance.now(); await publish(false, changes); changes = undefined;
+    start = performance.now(); const publication = await publish(false, changes); changes = undefined;
     const publicationMs = performance.now() - start, updatePublicationMs = performance.now() - operationStart;
     revision++;
-    return { generationMs, updateMs, publicationMs, updatePublicationMs, revision };
+    return { generationMs, updateMs, publicationMs, publication, updatePublicationMs, revision };
   }
   if (data.type === 'release') { retained = undefined; await Promise.all(readers.map(reader => reader.request('release'))); return true; }
   if (data.type === 'stop') { for (const reader of readers) reader.close(); readers.length = 0; current = retained = undefined; return true; }

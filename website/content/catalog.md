@@ -65,19 +65,26 @@ Each `.get(id)` is a local read. JSON values decode into deeply frozen JavaScrip
 
 ## Give every design equivalent work
 
-The comparison generates the same ID/object pairs for all four implementations. Its initial publication clones a native Map to each native or Immer reader, and entry pairs to each Immutable.js reader. Later publications clone only the 100 changed pairs. SharedMap sends new root descriptors backed by existing shared memory.
+The live comparison generates the same ID/object pairs for all four implementations and uses **incremental copy** for native Map, Immutable.js Map and Immer Map. Initial publication clones a native Map to each native or Immer reader, and entry pairs to each Immutable.js reader. Later publications clone only the 100 changed pairs. SharedMap sends new root descriptors backed by existing shared memory.
 
-Every owner and reader keeps initial and current revisions. Native makes one shallow `new Map(initial)` when the first edit must preserve the initial collection. It then mutates its exclusively owned current Map on later edits. Changed objects are replaced, never mutated. Immutable.js uses `withMutations`; Immer uses one `produce` batch. Replica paths do not clone the full dataset on sparse publication.
+Every owner and reader keeps initial and current revisions. Native makes one shallow `new Map(initial)` when the first edit must preserve the initial collection. It then mutates its exclusively owned current Map on later edits. Changed objects are replaced, never mutated. Immutable.js uses `withMutations`; Immer uses one `produce` batch. These local update mechanisms are separate from data copying between workers. Sharing unchanged objects or collection structure within one worker does not share that worker’s JavaScript heap with another worker.
+
+The separate benchmark runs both worker copy strategies for each replica library:
+
+- **Incremental copy:** clone the full catalog at load, then only the 100 changed ID/object pairs per edit.
+- **Full copy:** clone the full catalog at load and the entire updated catalog to each reader on every edit, including unchanged objects. Readers rebuild or freeze the received collection and preserve their retained initial revision.
+
+Queries read the data already attached in both modes. SharedMap publishes shared descriptors and appears once, alongside the six replica cases. The owner performs the same collection update for both copy strategies.
 
 SharedMap uses generic object `setMany` for initial construction and replacement. This exercises object serialization and bulk object staging. The example uses the current production runtime; no unmerged optimization is included.
 
 ## Read the measurements
 
-The browser benchmark starts fresh owner and reader workers for every sample. Startup and module loading are outside the phase timers. Input generation, construction, initial publication, first query, repeat query, owner edits and edit publication have separate values. The page and raw export also show a directly measured edit-plus-publication duration. Two warm-ups and seven measured samples per implementation run in rotating order.
+The browser benchmark starts fresh owner and reader workers for every sample. Startup and module loading are outside the phase timers. Input generation, construction, initial publication, first query, repeat query, owner edits and edit publication have separate values. The page and raw export also show a directly measured edit-plus-publication duration. Two warm-ups and seven measured samples per case run in rotating order: 49 measured samples across seven cases. The version 2 raw export includes all 63 records, including warm-ups, with the library and copy strategy.
 
 The same 1,000 IDs, 100 edits and two reader jobs apply to every path. First queries use fresh attachments; repeated queries can use local caches. Fingerprints cover every requested ID and all relevant record fields. Visible rows and validation results receive exact checks. Verification runs after the query timer. Browser timings exclude DOM painting and do not measure memory.
 
-The separate [recorded memory report](../../docs/feature-map-memory.md) preserves the earlier synthetic-record fixture, not this product catalog. It uses fresh Node processes, 100,000 records, zero/two/four readers plus a separate eight-reader cohort and three trials per case. It reports JavaScript retention, tracked buffers, unique backing capacity, arena-used bytes and RSS separately. The original [SharedList memory report](../../docs/memory-comparison.md) remains historical evidence for its log-column workload.
+The separate [recorded memory report](../../docs/feature-map-memory.md) preserves the earlier synthetic-record fixture with **incremental copy only** for native, Immutable.js and Immer replicas. It does not measure this product catalog or full-copy updates. It uses fresh Node processes, 100,000 records, zero/two/four readers plus a separate eight-reader cohort and three trials per case. It reports JavaScript retention, tracked buffers, unique backing capacity, arena-used bytes and RSS separately. The original [SharedList memory report](../../docs/memory-comparison.md) remains historical evidence for its log-column workload.
 
 ## Keep the limits visible
 
@@ -87,6 +94,6 @@ One allocating owner writes each arena. Compare a single native owner first if t
 
 ## Read the live timings
 
-The comparison highlights milliseconds for one selected phase: the latest read and validation, collection construction, initial handoff, or replacing 100 products and handing the revision to readers. Each relative result compares that phase with native Map in the same operation. “Less time” and “more time” describe this observation only; all four implementations run concurrently. Initial-load values remain labeled revision 0 after later edits.
+The live comparison uses incremental copy and highlights milliseconds for one selected phase: the latest read and validation, collection construction, initial handoff, or replacing 100 products and handing the revision to readers. Each relative result compares that phase with native Map in the same operation. “Less time” and “more time” describe this observation only; all four implementations run concurrently. Initial-load values remain labeled revision 0 after later edits.
 
 Worker startup and module loading are excluded. Build and handoff have separate timers. The combined replace-and-handoff value comes from its own direct timer; it does not add parallel worker times. Reads include the lookup and validation replies, but exclude the owner’s reference check and UI rendering. Matching counts and fingerprints appear under the verification details. Use the separate benchmark for repeated samples.

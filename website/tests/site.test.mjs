@@ -135,9 +135,19 @@ test('the catalog is the sole live comparison and old workloads stay historical'
   }
 });
 
-test('feature benchmark discloses sparse replicas, retained history and separate query phases', () => {
-  const html = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
-  for (const text of ['only changed pairs', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(html.includes(text), text);
+test('benchmark pages disclose their worker copy strategies and retain method context', () => {
+  const catalog = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
+  for (const text of ['incremental copy', 'full copy', 'only changed pairs', 'entire current catalog', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference', '49 measured samples']) assert.ok(catalog.includes(text), text);
+  const historical = readFileSync(join(out, 'historical/log-benchmark/index.html'), 'utf8');
+  for (const text of ['incremental copy', 'full copy', '42 measured samples', 'Queries use data already attached']) assert.ok(historical.includes(text), text);
+  const live = readFileSync(join(out, 'compare/index.html'), 'utf8');
+  assert.equal((live.match(/INCREMENTAL COPY/g) ?? []).length, 3);
+  assert.match(live, /Incremental copy baseline/);
+  const logLive = readFileSync(join(out, 'historical/log-compare/index.html'), 'utf8');
+  assert.match(logLive, /Incremental copy is the default/);
+  assert.match(logLive, /Full copy · all events every update/);
+  const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
+  assert.match(lab, /Full copy on every publication/);
 });
 
 test('old demo and guide routes redirect directly without allocating demo workers', () => {

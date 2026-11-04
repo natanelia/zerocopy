@@ -1,6 +1,8 @@
 # Benchmarks
 
-For the current product catalog use case, see the [product-catalog worker benchmark](../website/README.md#catalog-benchmark) and [SharedMap memory report](feature-map-memory.md). The collection timing tables below retain their original historical values and methods.
+The [product-catalog worker benchmark](../website/README.md#catalog-benchmark) measures both **incremental copy** (only changed records after initial load) and **full copy** (the entire updated dataset to every reader on each edit) for native Map, Immutable.js Map and Immer Map. SharedMap publishes shared snapshots. The [SharedMap memory report](feature-map-memory.md) preserves an earlier workload using incremental copies only.
+
+The collection timing tables below retain their original historical values and methods. They measure local collection operations; worker copy strategies do not apply to these tables.
 
 [README](../README.md) · [Documentation](README.md)
 
