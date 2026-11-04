@@ -1,0 +1,74 @@
+{
+  "baselineCommit": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+  "measuredCandidate": {
+    "worktreeBaseCommit": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+    "uncommittedRuntimeChange": "text-search.ts",
+    "sourceSha256": "4af3b6c4a11d3f350dedaac52b2af4244356aa22bca79b90c6a52e1be020c04a",
+    "bundleHashes": {
+      "chunk-2708a83g.js": "0ae06ce84381b9c3b0c69411bf01d52760b044fd9b77a0257d33dacb8c6c906a",
+      "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+      "chunk-j5ej7r96.js": "263cad3644b46e70c36c9c8c376deea2b768118be4d1b1aae809896effe1ae74",
+      "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+      "chunk-tge0m2rv.js": "ca2d1319dbd8b1853de09202f63e763e9588a0fa77a4485e3db36cbdf62d644a",
+      "geometry.js": "34291c130a5d354055326f5a05478a1ea6100a8581e0ba47bfdda119e893781b",
+      "numeric.js": "7880ea7f8a09d27b48f3cbde85d7630089cdf9573e504fc38c004085bd7dd3f3",
+      "redux.js": "f778d243a5c89196894700647454a380264029a050e33d16a13c876ccac8042d",
+      "shared.js": "ec99b58fcaf190a9709dd176e2ef69e30893832a510310d83b264b9ee2804f7f",
+      "state.js": "aa5eed2fc9490d50ba30beccda04e1f347a92ea1fb562ffe96a4dcfbfdb839fb",
+      "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+      "worker.js": "220a3c18624c8d9cda01f59a14c58dd36b561aed1b80f60e76dec0e9da8ab313"
+    }
+  },
+  "sourceEqualsMeasuredCandidate": true,
+  "validation": {
+    "specialized-checks.log": {
+      "exitCode": 0,
+      "commands": [
+        "bun run build:wasm",
+        "bun run build:browser",
+        "bun run build:types",
+        "bun run typecheck",
+        "bun run test text-search-long.test.ts text-search-modes.test.ts",
+        "node proofs/text-search.mjs",
+        "node proofs/long-text-search-worker.node.mjs"
+      ],
+      "vitestFiles": 2,
+      "vitestTests": 8,
+      "nodeTextTests": 8,
+      "nodeWorkerTests": 1
+    },
+    "full-suite.log": {
+      "exitCode": 0,
+      "commands": [
+        "bun run test"
+      ],
+      "vitestFiles": 54,
+      "vitestTests": 1079,
+      "durationSeconds": 46.69,
+      "defaultTimeouts": true
+    },
+    "docs-check.log": {
+      "exitCode": 0,
+      "commands": [
+        "node scripts/check-docs.mjs --base 09b1a385a7c2ac9b027a4055335ae2f9449abe6e --preserve"
+      ],
+      "historicalRowsUnchanged": 72,
+      "changedHistoricalEvidenceFiles": 0,
+      "markdownFiles": 58
+    }
+  },
+  "files": {
+    "specialized-checks.log": "0a6a6311c5f66583daad173c18d5b8b9bcd46c9662ecf0ec97ccf7f851162d5c",
+    "full-suite.log": "709b36f9843fa415c509c53ae8f274932098cfa27eb6311f3edc8d2daeaff768",
+    "baseline-manifest.json": "eaf9ece9bb065778b7b12c5c24744be7b3fb5c01a106ee52c4454889e20c41f7",
+    "baseline-validation.log": "d42509beb955fd9e8ef0b442a92fdcb665f26ecacd94c2c4a4d7e4df0a333413",
+    "docs-check.log": "956fafcad0d7cd0974f9b3d1f5476f27f40dbcd1ce96ec721423bb823c11a55d"
+  },
+  "proofHashes": {
+    "benchmark.mjs": "db18f79354230218574df9535276934595c75ec1bdba8d549540fb72018b625c",
+    "fixtures.mjs": "62ea7ce2e598b508a7deaf8e6245d94cd809fd6854f522948da5b94a5ebdad4c",
+    "results.json": "103caf08a0326baba1d7634b32c1b38c1cca593744abffe058b6c5fc3553c4bc",
+    "primary-progress.txt": "daf09f6b1017e5e60da58d34bbd9012259de768cc29980eb024ad9cc01322a43"
+  },
+  "testSha256": "d8f3bd3b420fd2336658bbb2980066d9290cb16a31a61b7a7e8f84477dffd9fb"
+}

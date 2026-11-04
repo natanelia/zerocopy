@@ -1,0 +1,36 @@
+pilot: node pair 1/2 before: 14 verified cases
+pilot: node pair 1/2 after: 14 verified cases
+pilot: node pair 2/2 after: 14 verified cases
+pilot: node pair 2/2 before: 14 verified cases
+pilot: bun pair 1/2 before: 14 verified cases
+pilot: bun pair 1/2 after: 14 verified cases
+pilot: bun pair 2/2 after: 14 verified cases
+pilot: bun pair 2/2 before: 14 verified cases
+node missing-first-byte: 0.8051 -> 0.8062 ms, 1.00x
+node late-start-hit: 0.9395 -> 0.8966 ms, 1.05x
+node first-byte-near-end: 1.0101 -> 0.9781 ms, 1.04x
+node multibyte-needle: 0.8981 -> 0.8169 ms, 1.10x
+node needle-longer-than-row: 0.0280 -> 0.0252 ms, 1.13x
+node common-first-byte: 5.7121 -> 4.0208 ms, 1.42x
+node immediate-hit: 0.4835 -> 0.2718 ms, 1.78x
+node overlapping-prefix: 13.2294 -> 8.9080 ms, 1.49x
+node insensitive-ascii: 5.9349 -> 5.2409 ms, 1.13x
+node insensitive-unicode: 8.6024 -> 7.6663 ms, 1.12x
+node short-query: 0.0608 -> 0.0608 ms, 0.99x
+node immediate-hit-33-bytes: 0.3507 -> 0.2024 ms, 1.77x
+node common-suffix-middle-mismatch: 12.9159 -> 8.8154 ms, 1.48x
+node early-false-suffix-candidates: 13.5093 -> 9.0815 ms, 1.49x
+bun missing-first-byte: 0.2388 -> 0.2717 ms, 0.87x
+bun late-start-hit: 0.2826 -> 0.2970 ms, 0.95x
+bun first-byte-near-end: 0.2592 -> 0.2834 ms, 0.91x
+bun multibyte-needle: 0.2935 -> 0.3030 ms, 0.96x
+bun needle-longer-than-row: 0.0556 -> 0.0667 ms, 0.83x
+bun common-first-byte: 5.8433 -> 4.9546 ms, 1.19x
+bun immediate-hit: 0.4247 -> 0.3398 ms, 1.26x
+bun overlapping-prefix: 6.5645 -> 6.4221 ms, 1.03x
+bun insensitive-ascii: 5.0934 -> 5.9409 ms, 0.87x
+bun insensitive-unicode: 11.5884 -> 12.0370 ms, 0.97x
+bun short-query: 0.0907 -> 0.0916 ms, 0.99x
+bun immediate-hit-33-bytes: 0.2555 -> 0.2312 ms, 1.12x
+bun common-suffix-middle-mismatch: 6.3631 -> 6.3957 ms, 1.00x
+bun early-false-suffix-candidates: 8.2662 -> 8.5196 ms, 0.97x
