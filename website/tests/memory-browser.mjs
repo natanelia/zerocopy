@@ -4,6 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
+import { INVESTIGATION_CASES } from '../assets/explorer-benchmark-cases.mjs';
 
 // A mobile viewport in Chromium is not a WebKit memory test.
 const engine = process.env.BROWSER ?? 'webkit';
@@ -92,7 +93,19 @@ try {
       }
       await page.locator('#investigation-size').selectOption('1000'); await page.locator('#run-investigation-bench').click();
       await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120000 });
-      assert.equal(await page.locator('.architecture-result .result-row').count(), 12);
+      // Three result phases, each with one row for all six benchmark methods.
+       assert.deepEqual(INVESTIGATION_CASES.map(item => item.id), [
+         'shared', 'immutable', 'immutable-full', 'replicated', 'replicated-full', 'centralized',
+       ]);
+       const phases = page.locator('.architecture-result');
+       assert.equal(await phases.count(), 3);
+       for (const phase of await phases.all()) {
+         assert.deepEqual(
+           await phase.locator('.result-row span:first-child').allTextContents(),
+           INVESTIGATION_CASES.map(item => item.label),
+         );
+       }
+       assert.equal(await page.locator('.architecture-result .result-row').count(), 3 * INVESTIGATION_CASES.length);
     } finally {
       await context.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
     }
