@@ -1,0 +1,2011 @@
+{
+  "method": "One build per fresh Chromium process; balanced AB/BA process pairs; shared loopback URL; 6 warm-up batches and 9 measured batches; full arrays checked after timing. Setup and validation excluded. Supplementary diagnostic measurements, not a universal performance guarantee.",
+  "kind": "list",
+  "date": "2026-11-04T17:54:16.002Z",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "rounds": 4,
+  "source": {
+    "baseline": {
+      "commit": "501b73819ed7e9bbf7adbb74b03df01045701973",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "dist/chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "dist/chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "dist/numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+        "dist/redux.js": "215b3d3b44943418b59edd4f7784468871be33e8c6bce79bcc9aa8895348b01f",
+        "dist/shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "dist/state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    },
+    "candidate": {
+      "commit": "8f91db6813af688510c45cf9efe59db39ee4a282",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4a4vyg4c.js": "0e57ea1f30490dbc7b2ed3e14e966285ca539c32475409bdecc5c30db60ec1b1",
+        "dist/chunk-5ph2cz4r.js": "97cf406785f0c15eb5d473785206dc60e3084eb2dac148819800f7ccd7121c0a",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-pf6r2ezs.js": "3437c3f387398e23ef8dde8c46f1c2cf4818c32fa8826f8f99ea6c31ff499dcf",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "64d07df6030a90cdfc7c9b2ffa09a4d8986cd364e438f82fc3e8af5a27a5e1a2",
+        "dist/numeric.js": "17477eed88271d0c167df98c60f26fd8ea653755584e305d5c87f87c748b42a2",
+        "dist/redux.js": "2554fe4f7db53a9607f8cd0eeb42c8c456cdd5c600ed29ad277959fd9c547f81",
+        "dist/shared.js": "d7f229d5bc727973ef8ae600cafea4f4e4bbedcc2bc64fa7f086cb51d2bb8be7",
+        "dist/state.js": "2154754ca94062b3617e1888253b3c7a21faa8bfdfe7b2c127887c5513d670c3",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "357e7071041916b62fe192cdd7b5da175182d6dc5ee462e3196a5263e62190ad",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list-to-array.test.ts": "0c04a33381bf07669418bd4496d8b631e7eab3c306a2953e40772fe8d2242e44",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    }
+  },
+  "driverSha256": "7b54a6027daeca1d1b9a98dbe9d01de8268d1865d78624ef9a827e9a35178a5c",
+  "correctness": {
+    "checks": {
+      "count": 24,
+      "passed": [
+        "numeric list boundaries: 0",
+        "numeric list boundaries: 1",
+        "numeric list boundaries: 31",
+        "numeric list boundaries: 32",
+        "numeric list boundaries: 33",
+        "numeric list boundaries: 1024",
+        "numeric list boundaries: 1025",
+        "numeric list boundaries: 32769",
+        "number: explicit byte order and zero new scan views",
+        "boolean: explicit byte order and zero new scan views",
+        "iterator suspension, interleaving, callbacks and actual shared growth",
+        "number: shared attachment",
+        "number: copy attachment",
+        "boolean: shared attachment",
+        "boolean: copy attachment",
+        "SharedLinkedList<number>: forward/reverse scans and growth",
+        "SharedLinkedList<boolean>: forward/reverse scans and growth",
+        "SharedLinkedList<string>: forward/reverse scans and growth",
+        "SharedLinkedList<object>: forward/reverse scans and growth",
+        "SharedDoublyLinkedList<number>: forward/reverse scans and growth",
+        "SharedDoublyLinkedList<boolean>: forward/reverse scans and growth",
+        "SharedDoublyLinkedList<string>: forward/reverse scans and growth",
+        "SharedDoublyLinkedList<object>: forward/reverse scans and growth",
+        "nested descriptors still decode across list leaves"
+      ]
+    },
+    "worker": "passed: real worker resumed the original snapshot after writer growth"
+  },
+  "processes": [
+    {
+      "round": 0,
+      "variant": "baseline",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            13.264999999664724,
+            4.7049999996088445,
+            5.080000000074506,
+            4.114999999757856,
+            9.445000000298023,
+            5.7299999999813735
+          ],
+          "samplesMs": [
+            3.5,
+            4.544999999925494,
+            3.4100000001490116,
+            3.4350000000558794,
+            4.5200000000186265,
+            3.4249999998137355,
+            3.3999999999068677,
+            5.044999999925494,
+            5.5200000000186265
+          ],
+          "medianMsPerOperation": 0.013671875
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            17.859999999869615,
+            21.149999999906868,
+            28.125,
+            26.309999999590218,
+            41.25,
+            9.399999999906868
+          ],
+          "samplesMs": [
+            26.15499999979511,
+            30.09500000020489,
+            35.419999999925494,
+            23.009999999776483,
+            23.390000000130385,
+            48.66000000014901,
+            11.774999999906868,
+            27.65500000026077,
+            22.58500000042841
+          ],
+          "medianMsPerOperation": 1.6346874999871943
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            2.555000000167638,
+            2.5749999997206032,
+            11.794999999925494,
+            2.434999999590218,
+            2.9399999999441206,
+            3.109999999869615
+          ],
+          "samplesMs": [
+            3.805000000167638,
+            2.885000000242144,
+            2.470000000204891,
+            2.8000000002793968,
+            2.9900000002235174,
+            2.6700000003911555,
+            3.1150000002235174,
+            3.010000000242144,
+            3.434999999590218
+          ],
+          "medianMsPerOperation": 0.011679687500873115
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            11.954999999608845,
+            17.725000000093132,
+            19.790000000037253,
+            8.779999999795109,
+            9.924999999813735,
+            13.299999999813735
+          ],
+          "samplesMs": [
+            8.870000000111759,
+            16.515000000130385,
+            8.174999999813735,
+            8.200000000186265,
+            17.020000000018626,
+            8.125,
+            9.899999999906868,
+            11.915000000037253,
+            7.84000000031665
+          ],
+          "medianMsPerOperation": 0.5543750000069849
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            4.084999999962747,
+            3.625,
+            3.6850000000558794,
+            3.6750000002793968,
+            3.9099999996833503,
+            4.385000000242144
+          ],
+          "samplesMs": [
+            4.245000000111759,
+            3.7150000003166497,
+            3.75,
+            3.694999999832362,
+            5.400000000372529,
+            3.360000000335276,
+            3.959999999962747,
+            3.944999999832362,
+            4.184999999590218
+          ],
+          "medianMsPerOperation": 0.015410156249345164
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.8249999997206032,
+            3.8100000000558794,
+            3.8650000002235174,
+            3.9799999999813735,
+            3.834999999962747,
+            5.96999999973923
+          ],
+          "samplesMs": [
+            5.904999999795109,
+            4.899999999906868,
+            4.4799999999813735,
+            4.209999999962747,
+            4.510000000242144,
+            5.0750000001862645,
+            8.18500000005588,
+            7.745000000111759,
+            3.7749999999068677
+          ],
+          "medianMsPerOperation": 0.019140624999636202
+        }
+      ]
+    },
+    {
+      "round": 0,
+      "variant": "candidate",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.319999999832362,
+            2.084999999962747,
+            0.6299999998882413,
+            1.1749999998137355,
+            0.8150000004097819,
+            0.8199999998323619
+          ],
+          "samplesMs": [
+            0.8100000000558794,
+            1.25,
+            0.6749999998137355,
+            0.9799999999813735,
+            0.6200000001117587,
+            0.8300000000745058,
+            0.5700000002980232,
+            0.5949999997392297,
+            0.6299999998882413
+          ],
+          "medianMsPerOperation": 0.0026367187492724042
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            4.25,
+            4.070000000298023,
+            3.9050000002607703,
+            4.3549999999813735,
+            1.8849999997764826,
+            3.900000000372529
+          ],
+          "samplesMs": [
+            3.760000000242144,
+            4,
+            1.9399999999441206,
+            5.1049999999813735,
+            4.415000000037253,
+            4.169999999925494,
+            2.3049999997019768,
+            11.764999999664724,
+            4.035000000149012
+          ],
+          "medianMsPerOperation": 0.2521875000093132
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            1.2549999998882413,
+            1.7049999996088445,
+            1.3500000000931323,
+            1.3700000001117587,
+            1.3149999999441206,
+            1.3800000003539026
+          ],
+          "samplesMs": [
+            1.8249999997206032,
+            1.845000000204891,
+            1.375,
+            1.2599999997764826,
+            1.4699999997392297,
+            1.8250000001862645,
+            1.334999999962747,
+            1.2050000000745058,
+            1.224999999627471
+          ],
+          "medianMsPerOperation": 0.00537109375
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            7.069999999832362,
+            7.4799999999813735,
+            7.140000000130385,
+            4.379999999888241,
+            4.779999999795109,
+            6.010000000242144
+          ],
+          "samplesMs": [
+            4.390000000130385,
+            5.984999999869615,
+            5.2000000001862645,
+            5.040000000037253,
+            6.9249999998137355,
+            4.9799999999813735,
+            4.834999999962747,
+            5.364999999757856,
+            5.185000000055879
+          ],
+          "medianMsPerOperation": 0.32406250000349246
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            4.640000000130385,
+            3.9249999998137355,
+            3.5200000000186265,
+            4.1749999998137355,
+            4.084999999962747,
+            5.115000000223517
+          ],
+          "samplesMs": [
+            4.180000000167638,
+            3.915000000037253,
+            4.435000000055879,
+            5.1749999998137355,
+            5.095000000204891,
+            6.669999999925494,
+            3.6600000001490116,
+            3.720000000204891,
+            6.009999999776483
+          ],
+          "medianMsPerOperation": 0.01732421875021828
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.430000000167638,
+            3.544999999925494,
+            3.3950000000186265,
+            3.400000000372529,
+            3.3950000000186265,
+            4.214999999850988
+          ],
+          "samplesMs": [
+            3.734999999869615,
+            3.5499999998137355,
+            3.6499999999068677,
+            3.555000000167638,
+            4.074999999720603,
+            3.720000000204891,
+            3.7149999998509884,
+            3.75,
+            3.705000000074506
+          ],
+          "medianMsPerOperation": 0.014511718749417923
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "variant": "candidate",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            4.3250000001862645,
+            3.0200000000186265,
+            0.6299999998882413,
+            0.9750000000931323,
+            0.5700000002980232,
+            0.75
+          ],
+          "samplesMs": [
+            0.7899999995715916,
+            5.279999999795109,
+            1.470000000204891,
+            0.9500000001862645,
+            0.5699999998323619,
+            0.9649999998509884,
+            0.6550000002607703,
+            0.5849999999627471,
+            0.6950000002980232
+          ],
+          "medianMsPerOperation": 0.0030859374983265297
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            4.220000000204891,
+            4.225000000093132,
+            3.9100000001490116,
+            4.165000000037253,
+            2.8849999997764826,
+            4.084999999962747
+          ],
+          "samplesMs": [
+            3.819999999832362,
+            3.9299999997019768,
+            1.8950000000186265,
+            3.9799999999813735,
+            6.290000000037253,
+            10.765000000130385,
+            2.0949999997392297,
+            10.849999999627471,
+            4.245000000111759
+          ],
+          "medianMsPerOperation": 0.24874999999883585
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            1.3549999999813735,
+            1.6450000000186265,
+            1.290000000037253,
+            4.189999999944121,
+            1.2650000001303852,
+            1.2850000001490116
+          ],
+          "samplesMs": [
+            1.2650000001303852,
+            1.2299999999813735,
+            1.275000000372529,
+            1.305000000167638,
+            1.400000000372529,
+            1.6049999999813735,
+            1.4550000000745058,
+            1.2949999999254942,
+            1.444999999832362
+          ],
+          "medianMsPerOperation": 0.005097656250654836
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            5.939999999944121,
+            7.379999999888241,
+            6.960000000428408,
+            4.115000000223517,
+            4.790000000037253,
+            6.294999999925494
+          ],
+          "samplesMs": [
+            4.189999999944121,
+            5.589999999850988,
+            4.1450000000186265,
+            4.09000000031665,
+            6.004999999888241,
+            4.154999999795109,
+            4.850000000093132,
+            5.100000000093132,
+            4.279999999795109
+          ],
+          "medianMsPerOperation": 0.2674999999871943
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.614999999757856,
+            3.614999999757856,
+            3.760000000242144,
+            3.6749999998137355,
+            7.870000000111759,
+            3.584999999962747
+          ],
+          "samplesMs": [
+            3.654999999795109,
+            3.5499999998137355,
+            4.225000000093132,
+            4.035000000149012,
+            4.1450000000186265,
+            3.4649999998509884,
+            3.8100000000558794,
+            3.544999999925494,
+            3.5349999996833503
+          ],
+          "medianMsPerOperation": 0.014277343749199645
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.5249999999068677,
+            3.4249999998137355,
+            3.9350000000558794,
+            3.765000000130385,
+            3.584999999962747,
+            4.089999999850988
+          ],
+          "samplesMs": [
+            3.515000000130385,
+            3.6600000001490116,
+            3.5200000000186265,
+            3.75,
+            3.7749999999068677,
+            3.690000000409782,
+            3.845000000204891,
+            3.8999999999068677,
+            3.6000000000931323
+          ],
+          "medianMsPerOperation": 0.01441406250160071
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "variant": "baseline",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            8.860000000335276,
+            3.3249999997206032,
+            3.6450000000186265,
+            2.544999999925494,
+            6.984999999869615,
+            3.8200000002980232
+          ],
+          "samplesMs": [
+            2.5900000003166497,
+            3.3800000003539026,
+            2.165000000037253,
+            2.2599999997764826,
+            2.7850000001490116,
+            2.1550000002607703,
+            2.1550000002607703,
+            3.294999999925494,
+            3.6450000000186265
+          ],
+          "medianMsPerOperation": 0.010117187501236913
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            11.134999999776483,
+            14.410000000149012,
+            21.18999999994412,
+            21.950000000186265,
+            40.55499999970198,
+            9.53499999968335
+          ],
+          "samplesMs": [
+            23.575000000186265,
+            28.395000000018626,
+            28.489999999757856,
+            34.739999999757856,
+            25.03500000014901,
+            55.06499999994412,
+            11.765000000130385,
+            24.479999999981374,
+            25.864999999757856
+          ],
+          "medianMsPerOperation": 1.616562499984866
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.3149999999441206,
+            2.3549999999813735,
+            6.385000000242144,
+            2.080000000074506,
+            2.234999999869615,
+            2.1450000000186265
+          ],
+          "samplesMs": [
+            2.3200000002980232,
+            2.1749999998137355,
+            2.2700000000186265,
+            2.2299999999813735,
+            2.390000000130385,
+            2.3249999997206032,
+            2.8500000000931323,
+            2.334999999962747,
+            3.5649999999441206
+          ],
+          "medianMsPerOperation": 0.009082031248908606
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            21.25499999988824,
+            17.674999999813735,
+            25.165000000037253,
+            12.234999999869615,
+            13.955000000074506,
+            19.15999999968335
+          ],
+          "samplesMs": [
+            12.220000000204891,
+            16.40999999968335,
+            12.319999999832362,
+            12.204999999608845,
+            27.509999999776483,
+            12.794999999925494,
+            14.600000000093132,
+            15.28499999968335,
+            12.095000000204891
+          ],
+          "medianMsPerOperation": 0.7996874999953434
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            5.5799999996088445,
+            5.564999999944121,
+            5.734999999869615,
+            5.5799999996088445,
+            5.625,
+            5.654999999795109
+          ],
+          "samplesMs": [
+            5.614999999757856,
+            5.595000000204891,
+            5.635000000242144,
+            5.760000000242144,
+            6.2000000001862645,
+            5.6450000000186265,
+            5.589999999850988,
+            5.600000000093132,
+            5.65999999968335
+          ],
+          "medianMsPerOperation": 0.022011718750945874
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            5.709999999962747,
+            5.765000000130385,
+            5.660000000149012,
+            5.725000000093132,
+            5.6749999998137355,
+            6.6450000000186265
+          ],
+          "samplesMs": [
+            5.785000000149012,
+            5.760000000242144,
+            5.7299999999813735,
+            5.814999999944121,
+            5.705000000074506,
+            5.669999999925494,
+            5.725000000093132,
+            5.71999999973923,
+            5.725000000093132
+          ],
+          "medianMsPerOperation": 0.022363281250363798
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "variant": "baseline",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            10.724999999627471,
+            4.839999999850988,
+            3.5649999999441206,
+            6.490000000223517,
+            7.964999999850988,
+            5.884999999776483
+          ],
+          "samplesMs": [
+            3.0649999999441206,
+            7.955000000074506,
+            2.5,
+            2.459999999962747,
+            3.305000000167638,
+            2.5349999996833503,
+            3.1450000000186265,
+            4.169999999925494,
+            5.254999999888241
+          ],
+          "medianMsPerOperation": 0.01228515625007276
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            29.06499999994412,
+            18.25499999988824,
+            29.604999999981374,
+            27.984999999869615,
+            48.40499999979511,
+            11.085000000428408
+          ],
+          "samplesMs": [
+            31.070000000298023,
+            28.425000000279397,
+            30.380000000353903,
+            34.22000000020489,
+            28.274999999906868,
+            47.47499999962747,
+            11.424999999813735,
+            26.49500000011176,
+            26.87000000011176
+          ],
+          "medianMsPerOperation": 1.7765625000174623
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            2.1899999999441206,
+            2.2550000003539026,
+            5.09499999973923,
+            2.140000000130385,
+            2.015000000130385,
+            4.130000000353903
+          ],
+          "samplesMs": [
+            2.5099999997764826,
+            2.5749999997206032,
+            2.169999999925494,
+            2.169999999925494,
+            2.135000000242144,
+            2.1850000000558794,
+            3.0200000000186265,
+            2.364999999757856,
+            2.480000000447035
+          ],
+          "medianMsPerOperation": 0.009238281249054126
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            8.379999999888241,
+            10.174999999813735,
+            10.390000000130385,
+            7.7299999999813735,
+            7.935000000055879,
+            8.879999999888241
+          ],
+          "samplesMs": [
+            7.7999999998137355,
+            9.725000000093132,
+            8.134999999776483,
+            7.5,
+            9.369999999646097,
+            8,
+            8.669999999925494,
+            9.099999999627471,
+            9.75
+          ],
+          "medianMsPerOperation": 0.5418749999953434
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.650000000372529,
+            4.334999999962747,
+            5.194999999832362,
+            4.054999999701977,
+            4.2700000000186265,
+            3.7700000000186265
+          ],
+          "samplesMs": [
+            3.6200000001117587,
+            3.8799999998882413,
+            3.3950000000186265,
+            3.834999999962747,
+            4.725000000093132,
+            3.944999999832362,
+            3.8999999999068677,
+            4.400000000372529,
+            4.314999999944121
+          ],
+          "medianMsPerOperation": 0.015234374999636202
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            4.595000000204891,
+            5.044999999925494,
+            4.464999999850988,
+            4.274999999906868,
+            5.285000000149012,
+            7.120000000111759
+          ],
+          "samplesMs": [
+            4.209999999962747,
+            4.654999999795109,
+            5.025000000372529,
+            6.09499999973923,
+            6.185000000055879,
+            5.919999999925494,
+            5.995000000111759,
+            5.7299999999813735,
+            5.785000000149012
+          ],
+          "medianMsPerOperation": 0.022597656250582077
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "variant": "candidate",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.3950000000186265,
+            1.2749999999068677,
+            1.3300000000745058,
+            1.1850000000558794,
+            1.125,
+            0.6300000003539026
+          ],
+          "samplesMs": [
+            0.8250000001862645,
+            1.7050000000745058,
+            0.5700000002980232,
+            0.9500000001862645,
+            0.5800000000745058,
+            0.8349999999627471,
+            0.5849999999627471,
+            0.5649999999441206,
+            0.5600000000558794
+          ],
+          "medianMsPerOperation": 0.002285156249854481
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            4.410000000149012,
+            4.595000000204891,
+            4.934999999590218,
+            4.524999999906868,
+            2.4500000001862645,
+            4.024999999906868
+          ],
+          "samplesMs": [
+            4.004999999888241,
+            5.140000000130385,
+            2.4699999997392297,
+            4.40999999968335,
+            5.680000000167638,
+            5.040000000037253,
+            1.9100000001490116,
+            4.8549999999813735,
+            4.550000000279397
+          ],
+          "medianMsPerOperation": 0.2843750000174623
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            1.5,
+            2.639999999664724,
+            1.444999999832362,
+            1.7050000000745058,
+            1.8600000003352761,
+            1.3599999998696148
+          ],
+          "samplesMs": [
+            1.9350000000558794,
+            1.529999999795109,
+            2.109999999869615,
+            1.5049999998882413,
+            1.7949999999254942,
+            1.9250000002793968,
+            1.5949999997392297,
+            1.3500000000931323,
+            1.3950000000186265
+          ],
+          "medianMsPerOperation": 0.006230468748981366
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            7.845000000204891,
+            9.450000000186265,
+            8.285000000149012,
+            4.845000000204891,
+            5.8950000000186265,
+            6.814999999944121
+          ],
+          "samplesMs": [
+            5.850000000093132,
+            7.3299999996088445,
+            6.2000000001862645,
+            4.560000000055879,
+            7.989999999757856,
+            5.334999999962747,
+            5.870000000111759,
+            5.890000000130385,
+            5.185000000055879
+          ],
+          "medianMsPerOperation": 0.3668750000069849
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.730000000447035,
+            3.8250000001862645,
+            4.180000000167638,
+            4.544999999925494,
+            4.439999999944121,
+            5.334999999962747
+          ],
+          "samplesMs": [
+            4.34000000031665,
+            4.274999999906868,
+            3.8100000000558794,
+            3.890000000130385,
+            4.970000000204891,
+            3.8149999999441206,
+            4.070000000298023,
+            4.300000000279397,
+            4.649999999906868
+          ],
+          "medianMsPerOperation": 0.016699218749636202
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.845000000204891,
+            3.9399999999441206,
+            4.015000000130385,
+            5.689999999944121,
+            4.1450000000186265,
+            4.964999999850988
+          ],
+          "samplesMs": [
+            3.8650000002235174,
+            3.654999999795109,
+            4.024999999906868,
+            4.239999999757856,
+            4.2299999999813735,
+            4.839999999850988,
+            5.330000000074506,
+            5.084999999962747,
+            3.9750000000931323
+          ],
+          "medianMsPerOperation": 0.01652343749992724
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "variant": "candidate",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            5.055000000167638,
+            2,
+            0.9199999999254942,
+            1.6450000000186265,
+            1.209999999962747,
+            0.8799999998882413
+          ],
+          "samplesMs": [
+            0.9199999999254942,
+            1.4500000001862645,
+            0.5800000000745058,
+            1.0350000001490116,
+            0.904999999795109,
+            0.8100000000558794,
+            0.6150000002235174,
+            5.830000000074506,
+            1.2399999997578561
+          ],
+          "medianMsPerOperation": 0.0035937499997089617
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            6.069999999832362,
+            5.649999999906868,
+            5.574999999720603,
+            5.25,
+            2.029999999795109,
+            4.379999999888241
+          ],
+          "samplesMs": [
+            4.930000000167638,
+            5.0450000003911555,
+            2.4450000002980232,
+            12.069999999832362,
+            18.415000000037253,
+            17.81499999994412,
+            2.7450000001117587,
+            18.709999999962747,
+            5.240000000223517
+          ],
+          "medianMsPerOperation": 0.32750000001396984
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            1.9050000002607703,
+            2.360000000335276,
+            1.904999999795109,
+            1.8700000001117587,
+            1.8600000003352761,
+            1.8950000000186265
+          ],
+          "samplesMs": [
+            1.8549999999813735,
+            1.9050000002607703,
+            1.9750000000931323,
+            1.8950000000186265,
+            1.9199999999254942,
+            2.359999999869615,
+            1.904999999795109,
+            1.8950000000186265,
+            1.8950000000186265
+          ],
+          "medianMsPerOperation": 0.007441406249199645
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            8.104999999981374,
+            10.43999999994412,
+            9.25,
+            6.3950000000186265,
+            6.59000000031665,
+            7.875
+          ],
+          "samplesMs": [
+            6.349999999627471,
+            8.104999999981374,
+            6.339999999850988,
+            6.470000000204891,
+            8.68999999994412,
+            6.220000000204891,
+            7.029999999795109,
+            7.339999999850988,
+            6.339999999850988
+          ],
+          "medianMsPerOperation": 0.4043750000128057
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            5.4799999999813735,
+            5.629999999888241,
+            5.524999999906868,
+            5.504999999888241,
+            5.625,
+            5.444999999832362
+          ],
+          "samplesMs": [
+            5.449999999720603,
+            5.464999999850988,
+            5.504999999888241,
+            5.544999999925494,
+            6.1450000000186265,
+            5.564999999944121,
+            5.625,
+            5.510000000242144,
+            5.805000000167638
+          ],
+          "medianMsPerOperation": 0.02166015624970896
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            5.540000000037253,
+            7.5750000001862645,
+            5.4799999999813735,
+            5.515000000130385,
+            5.53499999968335,
+            6.234999999869615
+          ],
+          "samplesMs": [
+            5.4500000001862645,
+            5.5200000000186265,
+            5.515000000130385,
+            5.5200000000186265,
+            5.564999999944121,
+            5.514999999664724,
+            5.444999999832362,
+            5.540000000037253,
+            5.554999999701977
+          ],
+          "medianMsPerOperation": 0.02156250000007276
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "variant": "baseline",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            13.03000000026077,
+            8.745000000111759,
+            5.134999999776483,
+            4.109999999869615,
+            9.369999999646097,
+            5.725000000093132
+          ],
+          "samplesMs": [
+            3.470000000204891,
+            4.820000000298023,
+            3.415000000037253,
+            3.419999999925494,
+            4.435000000055879,
+            3.3950000000186265,
+            3.455000000074506,
+            5.2000000001862645,
+            5.419999999925494
+          ],
+          "medianMsPerOperation": 0.013554687500800355
+        },
+        {
+          "name": "SharedList<number>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            16.53000000026077,
+            21.47000000020489,
+            28.520000000018626,
+            27.74500000011176,
+            49.5,
+            11.629999999888241
+          ],
+          "samplesMs": [
+            25.56000000005588,
+            25.895000000018626,
+            30.09000000031665,
+            26.680000000167638,
+            28.455000000074506,
+            44.61500000022352,
+            10.879999999888241,
+            25.02999999979511,
+            23.790000000037253
+          ],
+          "medianMsPerOperation": 1.6184375000011642
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            2.4799999999813735,
+            3.265000000130385,
+            5.319999999832362,
+            2.8549999999813735,
+            2.330000000074506,
+            2.9100000001490116
+          ],
+          "samplesMs": [
+            2.885000000242144,
+            2.3500000000931323,
+            2.6899999999441206,
+            2.459999999962747,
+            2.5200000000186265,
+            2.180000000167638,
+            3.1850000000558794,
+            2.6749999998137355,
+            2.8950000000186265
+          ],
+          "medianMsPerOperation": 0.010449218749272404
+        },
+        {
+          "name": "SharedList<boolean>.toArray",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            11.180000000167638,
+            11.180000000167638,
+            22.62000000011176,
+            8.404999999795109,
+            9.75,
+            14.629999999888241
+          ],
+          "samplesMs": [
+            9.515000000130385,
+            11.760000000242144,
+            8.004999999888241,
+            9.075000000186265,
+            19.024999999906868,
+            7.379999999888241,
+            11.554999999701977,
+            14.725000000093132,
+            8.359999999869615
+          ],
+          "medianMsPerOperation": 0.5946875000081491
+        },
+        {
+          "name": "SharedList<string>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            4.7950000003911555,
+            3.7149999998509884,
+            3.790000000037253,
+            3.7450000001117587,
+            3.8100000000558794,
+            3.5049999998882413
+          ],
+          "samplesMs": [
+            3.5,
+            3.455000000074506,
+            3.4350000000558794,
+            3.5,
+            4.5,
+            3.5649999999441206,
+            3.5300000002607703,
+            3.3700000001117587,
+            3.614999999757856
+          ],
+          "medianMsPerOperation": 0.013671875
+        },
+        {
+          "name": "SharedList<object>.toArray",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            3.640000000130385,
+            3.845000000204891,
+            3.455000000074506,
+            3.6750000002793968,
+            3.625,
+            4.850000000093132
+          ],
+          "samplesMs": [
+            3.7000000001862645,
+            3.680000000167638,
+            3.529999999795109,
+            3.830000000074506,
+            4.775000000372529,
+            3.734999999869615,
+            5.879999999888241,
+            3.6450000000186265,
+            4.084999999962747
+          ],
+          "medianMsPerOperation": 0.014589843749490683
+        }
+      ]
+    }
+  ],
+  "browserVersion": "153.0.8010.0",
+  "summary": [
+    {
+      "name": "SharedList<number>.toArray",
+      "size": 1024,
+      "beforeMs": 0.012919921875436557,
+      "afterMs": 0.002861328123799467,
+      "medianPairedSpeedup": 4.478462158789483,
+      "pairs": [
+        {
+          "beforeMs": 0.013671875,
+          "afterMs": 0.0026367187492724042,
+          "speedup": 5.185185186616024
+        },
+        {
+          "beforeMs": 0.010117187501236913,
+          "afterMs": 0.0030859374983265297,
+          "speedup": 3.2784810148369345
+        },
+        {
+          "beforeMs": 0.01228515625007276,
+          "afterMs": 0.002285156249854481,
+          "speedup": 5.376068376442565
+        },
+        {
+          "beforeMs": 0.013554687500800355,
+          "afterMs": 0.0035937499997089617,
+          "speedup": 3.771739130962943
+        }
+      ]
+    },
+    {
+      "name": "SharedList<number>.toArray",
+      "size": 65536,
+      "beforeMs": 1.6265624999941792,
+      "afterMs": 0.26828125001338776,
+      "medianPairedSpeedup": 6.364642482366037,
+      "pairs": [
+        {
+          "beforeMs": 1.6346874999871943,
+          "afterMs": 0.2521875000093132,
+          "speedup": 6.48203221780154
+        },
+        {
+          "beforeMs": 1.616562499984866,
+          "afterMs": 0.24874999999883585,
+          "speedup": 6.4987437185625385
+        },
+        {
+          "beforeMs": 1.7765625000174623,
+          "afterMs": 0.2843750000174623,
+          "speedup": 6.247252746930535
+        },
+        {
+          "beforeMs": 1.6184375000011642,
+          "afterMs": 0.32750000001396984,
+          "speedup": 4.9417938929225285
+        }
+      ]
+    },
+    {
+      "name": "SharedList<boolean>.toArray",
+      "size": 1024,
+      "beforeMs": 0.009843749999163265,
+      "afterMs": 0.005800781249490683,
+      "medianPairedSpeedup": 1.6321839078698,
+      "pairs": [
+        {
+          "beforeMs": 0.011679687500873115,
+          "afterMs": 0.00537109375,
+          "speedup": 2.1745454547080127
+        },
+        {
+          "beforeMs": 0.009082031248908606,
+          "afterMs": 0.005097656250654836,
+          "speedup": 1.7816091949593393
+        },
+        {
+          "beforeMs": 0.009238281249054126,
+          "afterMs": 0.006230468748981366,
+          "speedup": 1.4827586207802606
+        },
+        {
+          "beforeMs": 0.010449218749272404,
+          "afterMs": 0.007441406249199645,
+          "speedup": 1.4041994751188678
+        }
+      ]
+    },
+    {
+      "name": "SharedList<boolean>.toArray",
+      "size": 65536,
+      "beforeMs": 0.574531250007567,
+      "afterMs": 0.3454687500052387,
+      "medianPairedSpeedup": 1.593852828626225,
+      "pairs": [
+        {
+          "beforeMs": 0.5543750000069849,
+          "afterMs": 0.32406250000349246,
+          "speedup": 1.7107039537157505
+        },
+        {
+          "beforeMs": 0.7996874999953434,
+          "afterMs": 0.2674999999871943,
+          "speedup": 2.989485981434115
+        },
+        {
+          "beforeMs": 0.5418749999953434,
+          "afterMs": 0.3668750000069849,
+          "speedup": 1.4770017035366996
+        },
+        {
+          "beforeMs": 0.5946875000081491,
+          "afterMs": 0.4043750000128057,
+          "speedup": 1.4706336939457598
+        }
+      ]
+    },
+    {
+      "name": "SharedList<string>.toArray",
+      "size": 1024,
+      "beforeMs": 0.015322265624490683,
+      "afterMs": 0.01701171874992724,
+      "medianPairedSpeedup": 0.9008979607728166,
+      "pairs": [
+        {
+          "beforeMs": 0.015410156249345164,
+          "afterMs": 0.01732421875021828,
+          "speedup": 0.8895152197931582
+        },
+        {
+          "beforeMs": 0.022011718750945874,
+          "afterMs": 0.014277343749199645,
+          "speedup": 1.5417236663633458
+        },
+        {
+          "beforeMs": 0.015234374999636202,
+          "afterMs": 0.016699218749636202,
+          "speedup": 0.912280701752475
+        },
+        {
+          "beforeMs": 0.013671875,
+          "afterMs": 0.02166015624970896,
+          "speedup": 0.6311992786378771
+        }
+      ]
+    },
+    {
+      "name": "SharedList<object>.toArray",
+      "size": 1024,
+      "beforeMs": 0.020751953125,
+      "afterMs": 0.015517578124672582,
+      "medianPairedSpeedup": 1.343294706498975,
+      "pairs": [
+        {
+          "beforeMs": 0.019140624999636202,
+          "afterMs": 0.014511718749417923,
+          "speedup": 1.3189771198124929
+        },
+        {
+          "beforeMs": 0.022363281250363798,
+          "afterMs": 0.01441406250160071,
+          "speedup": 1.551490514758092
+        },
+        {
+          "beforeMs": 0.022597656250582077,
+          "afterMs": 0.01652343749992724,
+          "speedup": 1.3676122931854575
+        },
+        {
+          "beforeMs": 0.014589843749490683,
+          "afterMs": 0.02156250000007276,
+          "speedup": 0.676630434756705
+        }
+      ]
+    }
+  ],
+  "sourceAfter": {
+    "baseline": {
+      "commit": "501b73819ed7e9bbf7adbb74b03df01045701973",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "dist/chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "dist/chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "dist/numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+        "dist/redux.js": "215b3d3b44943418b59edd4f7784468871be33e8c6bce79bcc9aa8895348b01f",
+        "dist/shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "dist/state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    },
+    "candidate": {
+      "commit": "8f91db6813af688510c45cf9efe59db39ee4a282",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4a4vyg4c.js": "0e57ea1f30490dbc7b2ed3e14e966285ca539c32475409bdecc5c30db60ec1b1",
+        "dist/chunk-5ph2cz4r.js": "97cf406785f0c15eb5d473785206dc60e3084eb2dac148819800f7ccd7121c0a",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-pf6r2ezs.js": "3437c3f387398e23ef8dde8c46f1c2cf4818c32fa8826f8f99ea6c31ff499dcf",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "64d07df6030a90cdfc7c9b2ffa09a4d8986cd364e438f82fc3e8af5a27a5e1a2",
+        "dist/numeric.js": "17477eed88271d0c167df98c60f26fd8ea653755584e305d5c87f87c748b42a2",
+        "dist/redux.js": "2554fe4f7db53a9607f8cd0eeb42c8c456cdd5c600ed29ad277959fd9c547f81",
+        "dist/shared.js": "d7f229d5bc727973ef8ae600cafea4f4e4bbedcc2bc64fa7f086cb51d2bb8be7",
+        "dist/state.js": "2154754ca94062b3617e1888253b3c7a21faa8bfdfe7b2c127887c5513d670c3",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "357e7071041916b62fe192cdd7b5da175182d6dc5ee462e3196a5263e62190ad",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list-to-array.test.ts": "0c04a33381bf07669418bd4496d8b631e7eab3c306a2953e40772fe8d2242e44",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "runtime": "bun",
+  "version": "1.4.2",
+  "checkedAt": "2026-11-04T18:05:30.113Z",
+  "checks": {
+    "count": 24,
+    "passed": [
+      "numeric list boundaries: 0",
+      "numeric list boundaries: 1",
+      "numeric list boundaries: 31",
+      "numeric list boundaries: 32",
+      "numeric list boundaries: 33",
+      "numeric list boundaries: 1024",
+      "numeric list boundaries: 1025",
+      "numeric list boundaries: 32769",
+      "number: explicit byte order and zero new scan views",
+      "boolean: explicit byte order and zero new scan views",
+      "iterator suspension, interleaving, callbacks and actual shared growth",
+      "number: shared attachment",
+      "number: copy attachment",
+      "boolean: shared attachment",
+      "boolean: copy attachment",
+      "SharedLinkedList<number>: forward/reverse scans and growth",
+      "SharedLinkedList<boolean>: forward/reverse scans and growth",
+      "SharedLinkedList<string>: forward/reverse scans and growth",
+      "SharedLinkedList<object>: forward/reverse scans and growth",
+      "SharedDoublyLinkedList<number>: forward/reverse scans and growth",
+      "SharedDoublyLinkedList<boolean>: forward/reverse scans and growth",
+      "SharedDoublyLinkedList<string>: forward/reverse scans and growth",
+      "SharedDoublyLinkedList<object>: forward/reverse scans and growth",
+      "nested descriptors still decode across list leaves"
+    ]
+  },
+  "worker": "not run: Bun uses the same-realm attachment checks"
+}
