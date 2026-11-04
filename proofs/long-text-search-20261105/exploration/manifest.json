@@ -1,0 +1,33 @@
+{
+  "status": "exploration-only",
+  "fixedBaseline": "501b73819ed7e9bbf7adbb74b03df01045701973",
+  "method": "One early baseline process and one process per experiment in Node24.22.1 and Bun1.4.2. 2048 rows, five warm-up batches, nine measured batches, four compilation-plus-scan repetitions per batch. Same data in every variant. Not process-paired; not used for final acceptance or a performance guarantee.",
+  "files": {
+    "baseline.source.txt": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+    "bun-base.json": "95fb181f1fe6d87a694755dea67d2bd650b36262218ea4f8c11619c4267d955d",
+    "bun-byte.json": "04f884154d269e8b416b76503e8e974910616c65880b47cc24ca3b2b9b6622c7",
+    "bun-candidate.json": "42cbbd9507138273360f7fa48edce5a40e80f90fb6af397d31078022fb6823c6",
+    "bun-indexof.json": "128de8d922c315a12fcf6065267ae4f7874967adf4e858ef811747fbd766b2ff",
+    "bun-initial.json": "d69211b7ad52b0ccf1c414fa7bd6d1dd56d3b4feb4ecab4f7f849e77e663d9e1",
+    "bun-typed.json": "8a54a0a69c1ecce598aea1a942b461ca7f0bb72ea263b38a7c37c8ce67935505",
+    "byte.source.txt": "66f93e2aec95a7504bd70ce7d1468308bf3426f2e9b95cb1d251ae670854f75c",
+    "dataview.source.txt": "7f95cfeab5f4cc038ab3ef57317030c400f07dfe387e51f177a8680b6f7b8293",
+    "driver.mjs": "27ab0bb7560710ff6d1a87f23431ae37cf82f9dcefbd74878a953a744b94ea2e",
+    "indexof.source.txt": "88e95f57895d696f4df09775556ce0c4be5319ec1410391e0e698876d8c23ea9",
+    "initial.source.txt": "180832bfe92b4a413510574aef20681076fb554e9d1b888b6223a6aef31a512f",
+    "node-base.json": "7310f8a407b344f38dd5e3255865df2b298e928882ae346cdff948f7ff676ebd",
+    "node-byte.json": "ec1f83eb9c208670c21afc776d055739fa81ae648d4ee676f2adad11c9f53596",
+    "node-candidate.json": "9c0d93f72ab5f3269e00f98fa7523c950c9f70d9dd6d04ad3f7305d56c04367f",
+    "node-indexof.json": "35060a19713924f2273396228b9612ef905993aa20362b5038cea003773db5d3",
+    "node-initial.json": "c94f23749c9e85d588dc6af60f2005bda1e49f1b610ac8f487a569dde1ee363c",
+    "node-typed.json": "d4f1ae35417dd4b7ba285df92d721538c2b473035f884f02b9a8408f15ce03f4",
+    "typed.source.txt": "fec7355280034b9508d61de6faf67bc375b9ff8a8733766fe7fa0e87d147eb43"
+  },
+  "variants": {
+    "candidate": "DataView word skip; rejected for severe Bun regression. Source reconstructed from the applied patch and the saved byte-based source. Original build hashes were not captured.",
+    "byte": "Rejected: immediate-hit and overlapping-prefix controls slowed in the exploratory run.",
+    "typed": "Rejected: no reliable cross-runtime win; several Bun controls slowed.",
+    "indexof": "Rejected: repeated native candidate jumps slowed the adversarial repeated-prefix workload.",
+    "initial": "One initial native prefix skip plus length rejection. Same production source as the final paired trial; these unpaired timings are only retained development evidence."
+  }
+}

@@ -11,6 +11,7 @@ import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
 import { matchScheduler } from './query-control.mjs';
+import { assertInvestigationReport } from './investigation-report.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const baseRoot = resolve(root, '.proof-baseline/website/_site');
 const currentRoot = resolve(root, 'website/_site');
@@ -98,12 +99,8 @@ try {
               try { return await peer.request('run', { entries: 100000, source }, 180000); }
               finally { peer.close(); }
             }, meta.sourceCommit ?? meta.commit ?? 'unknown');
-            assert.equal(result.raw.length, 28);
+            assertInvestigationReport(result);
             assert.equal(result.config.entries, 100000);
-            assert.deepEqual(Object.keys(result.samples).sort(), ['centralized', 'immutable', 'replicated', 'shared']);
-            for (const path of Object.values(result.samples)) for (const values of Object.values(path)) {
-              assert.equal(values.length, 7); assert.ok(values.every(x => Number.isFinite(x) && x >= 0));
-            }
             assert.deepEqual(errors, []);
             const record = { engine, browserVersion: browser.version(), repeat, variant: variant.name, fixture: variant.fixture, ...result };
             runs.push(record); writeFileSync(resolve(out, `${engine}-${variant.fixture}-${variant.name}-${repeat}.json`), JSON.stringify(record, null, 2));
@@ -141,7 +138,7 @@ try {
   for (const group of byQuery) group.medians = Object.fromEntries(['initialMs', 'queryMs', 'updateMs'].map(phase => [phase, median(group.samples.map(x => x[phase]))]));
   writeFileSync(resolve(out, 'by-query.json'), JSON.stringify(byQuery, null, 2));
   writeFileSync(resolve(out, 'summary.json'), JSON.stringify({ schema: 'zerocopy-query-audit/v1', repeats: rounds, summary,
-    note: 'Original retains shipped timers. Matched uses the same scheduler for every path and public bulk append caller but keeps the original collection runtime. Optimized uses snapshot-local leaf reads, bounded string interning, and public bulk append. All input, role counts, reference checks, seven samples and rotation are unchanged. Each repeat uses a fresh browser context and workers. Unique-message diagnostics are retained separately with one run per control per browser. Results apply only to these workloads; not memory measurements.' }, null, 2));
+    note: 'Original retains shipped timers. Matched uses the same scheduler for every path and public bulk append caller but keeps the original collection runtime. Optimized uses snapshot-local leaf reads, bounded string interning, and public bulk append. The four common cases retain input, role counts, reference checks and seven samples. A v3 runner adds full-copy Immutable.js and native cases, changing the rotation and total worker count when compared with v2. These extra cases remain in raw and by-query diagnostics; the summary compares the four common cases. Each repeat uses a fresh browser context and workers. Unique-message diagnostics are retained separately with one run per control per browser. Results apply only to these workloads; not memory measurements.' }, null, 2));
 } finally {
   for (const variant of servers) { variant.server.closeAllConnections(); await new Promise(resolve => variant.server.close(resolve)); }
 }

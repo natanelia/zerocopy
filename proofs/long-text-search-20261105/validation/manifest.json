@@ -1,0 +1,31 @@
+{
+  "runtimeCommit": "1e66085b90c081398f3008188592a59dc8da3d70",
+  "runtimeSha256": "180832bfe92b4a413510574aef20681076fb554e9d1b888b6223a6aef31a512f",
+  "files": {
+    "text-search-long.test.ts": "54e49165a756604448485696f1d2a5f0d4a27e9a8af49bfadd35fc695bcc600c",
+    "proofs/long-text-search-worker.mjs": "717a4a209f0e8b1c3a309f72a5d88fc7b8353e0af16f4a3fb56eb18427f0e12c",
+    "proofs/long-text-search-worker.node.mjs": "77f51afeb6e3e6ab752e104c58af6f04430df06f2f06ae68839c181b5846115f"
+  },
+  "checks": [
+    {
+      "command": "bun --bun node_modules/vitest/vitest.mjs run",
+      "exitCode": 0,
+      "filesPassed": 51,
+      "testsPassed": 1060,
+      "log": "vitest.log"
+    },
+    {
+      "command": "bun --bun node_modules/vitest/vitest.mjs run text-search-long.test.ts && node --test proofs/text-search.mjs proofs/text-batch.mjs proofs/text-kernel.mjs && node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0,
+      "newTestsPassed": 5,
+      "existingNodeTestsPassed": 12,
+      "log": "targeted-and-types.log"
+    },
+    {
+      "command": "node --test proofs/long-text-search-worker.node.mjs",
+      "exitCode": 0,
+      "testsPassed": 1,
+      "log": "node-worker.log"
+    }
+  ]
+}
