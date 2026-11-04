@@ -95,7 +95,7 @@ try {
       await page.waitForFunction(() => document.querySelector('#investigation-bench-status').textContent.startsWith('Complete.'), {}, { timeout: 120000 });
       // Three result phases, each with one row for all six benchmark methods.
        assert.deepEqual(INVESTIGATION_CASES.map(item => item.id), [
-         'shared', 'immutable', 'immutable-full', 'replicated', 'replicated-full', 'centralized',
+         'shared', 'replicated-full', 'immutable-full', 'replicated', 'immutable', 'centralized',
        ]);
        const phases = page.locator('.architecture-result');
        assert.equal(await phases.count(), 3);
