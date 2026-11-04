@@ -1,0 +1,80 @@
+{
+  "scope": "Combined list, long-text-search and map-view source integration; no performance timing claims",
+  "integrationLocalCommit": "7672fc9339bcd6ee33a735986cb218933e931da9",
+  "sources": {
+    "shared-list.ts": {
+      "sha256": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+      "matchesCheckout": "zerocopy-list"
+    },
+    "text-search.ts": {
+      "sha256": "180832bfe92b4a413510574aef20681076fb554e9d1b888b6223a6aef31a512f",
+      "matchesCheckout": "zerocopy-search"
+    },
+    "arena.ts": {
+      "sha256": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+      "matchesCheckout": "zerocopy-map-view"
+    },
+    "shared-map.ts": {
+      "sha256": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+      "matchesCheckout": "zerocopy-map-view"
+    },
+    "shared-list-to-array.test.ts": {
+      "sha256": "cea22ad44870fcfb95e81eae948f28c03baf599e5051578c0722c83ff180e6dd",
+      "matchesCheckout": "zerocopy-list"
+    },
+    "text-search-long.test.ts": {
+      "sha256": "54e49165a756604448485696f1d2a5f0d4a27e9a8af49bfadd35fc695bcc600c",
+      "matchesCheckout": "zerocopy-search"
+    },
+    "map-values-view.test.ts": {
+      "sha256": "95273817c7d8c3ba94924d19b66d1edb4d2f7b7ca7a31cb8cfc3fdd494d3ba9b",
+      "matchesCheckout": "zerocopy-map-view"
+    },
+    "primitive-sequence-scan.test.ts": {
+      "sha256": "b0bc7706715d0a8dc2dc4fc4598478c4199310dc9dd84c5fcfa44c00a7f5a06e",
+      "matchesCheckout": "zerocopy-map-view"
+    }
+  },
+  "portableBundles": {
+    "chunk-4pqgvvxp.js": "b53bec60c40d975c4eb90d920e0e281474e5af72bc9e6cb42f30f86cb556bbd8",
+    "chunk-5qfqrsqm.js": "19c0c761d9bce5d3877c2339854c92d0a2df55240101d3995bbce88f6e33d2e9",
+    "chunk-6t3aw271.js": "73fd26b44637157c74333baf26b35ce35b01d0fd2bf71368186f2bc150388445",
+    "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+    "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+    "geometry.js": "496a6b96f14f6e1689c22ab8905f8f5b5c3cdf6c4a25f95b93acc62fd55703f5",
+    "numeric.js": "418f7e33233ff84d18eb5bf0ed76d9b3cae8616feb24aca6369eac922c15c74e",
+    "redux.js": "366c3e95a44024551bbabfcafca9982e04616de905e436b128a4fabcaf35dda0",
+    "shared.js": "d8c565b60aa23736c3ea4e8076d72d5510b61b83f4f9d8c59328a1a08787fe55",
+    "state.js": "945d757db7468b063e5ec54732852a1bbbe612c771015217fadc98e9435f89f1",
+    "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+    "worker.js": "ee2a9319df44e5997a22e6cf417ad052baa6a3805245ee9911511746f85f6387"
+  },
+  "runs": [
+    {
+      "log": "combined-initial-failure.txt",
+      "status": "failed",
+      "passed": 1075,
+      "failed": 1,
+      "cause": "Existing default-arena growth fixture timed out while comparing unrelated historical storage; repaired by a private Arena without changing assertions or timeout"
+    },
+    {
+      "log": "combined-default-interrupted.txt",
+      "status": "interrupted_no_verdict",
+      "exitCode": 130,
+      "note": "Default shared-module rerun after fixture repair was stopped after prolonged execution. It is not a passing result."
+    },
+    {
+      "log": "combined-isolated-pass.txt",
+      "status": "passed",
+      "files": 53,
+      "tests": 1076,
+      "vitestSeconds": 36.54,
+      "testTimeoutMs": 5000,
+      "moduleIsolation": true,
+      "typecheck": "passed",
+      "realNodeWorkerTests": 3,
+      "command": "bun --bun node_modules/vitest/vitest.mjs run --isolate --reporter=verbose"
+    }
+  ],
+  "testConfigurationNote": "The repository default remains isolate:false. The combined passing run explicitly enabled per-file module isolation; individual candidates passed their default full suites."
+}

@@ -1,0 +1,7 @@
+Reuses successful combined WASM/browser/declaration builds; only the growth-test constructor changed.
+Integration revision: 7672fc9339bcd6ee33a735986cb218933e931da9
+COMMAND: ['bun', 'run', 'test']
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-integration
+

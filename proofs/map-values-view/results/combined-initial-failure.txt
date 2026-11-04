@@ -1,0 +1,44 @@
+COMMAND: ['bun', 'run', 'build:wasm']
+$ node scripts/build-wasm.mjs
+COMMAND: ['bun', 'run', 'build:browser']
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233073 bytes
+COMMAND: ['bun', 'run', 'build:types']
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+COMMAND: ['bun', 'run', 'test']
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-integration
+
+ ❯ primitive-sequence-scan.test.ts (6 tests | 1 failed) 44397ms
+     × does not read a growing writer or a fork in the middle of a scan 44381ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  primitive-sequence-scan.test.ts > primitive sequence scan fast paths > does not read a growing writer or a fork in the middle of a scan
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> primitive-sequence-scan.test.ts:37:30
+     35|     const before = owner.buf.slice(HEAP_START, oldEnd);
+     36|     const visited: number[] = [];
+     37|     list.forEach((value, index) => {
+       |                              ^
+     38|       if (index === 20) {
+     39|         const grown = list.pushMany(Array.from({ length: 50000 }, (_, …
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 52 passed (53)
+      Tests  1 failed | 1075 passed (1076)
+   Start at  12:26:37
+   Duration  71.39s (transform 1.26s, setup 0ms, import 2.21s, tests 172.18s, environment 10ms)
+
+[vitest-pool]: Timeout terminating threads worker for test files /workspace/scratch/83f1d4baba1f/zerocopy-integration/primitive-sequence-scan.test.ts.
+error: script "test" exited with code 1
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['bun', 'run', 'test']' returned non-zero exit status 1.

@@ -1,0 +1,67 @@
+{
+  "disposition": "Excluded from primary performance claims; exact bytes retained.",
+  "reasons": {
+    "pilot": "Asymmetric keys() setup; 36 paired processes. This is exploratory only.",
+    "aborted-asymmetric": "Same setup defect; interrupted after 105 processes. Raw status preserved.",
+    "interrupted-validation": "No test verdict; global Arena fixture isolated before the successful full validation.",
+    "interrupted-guard-update": "Two symmetric processes before a final driver-identity guard; interrupted and excluded. Subsequent occupied-path retry refused overwrite."
+  },
+  "files": {
+    "pilot.mjs": {
+      "sha256": "d6b85daa056a7dde46ece03fc66924881f65f92eeeec1ed465dbe8db06dad952",
+      "bytes": 11121
+    },
+    "results/pilot.json": {
+      "sha256": "6f5dd0f3943ae2536deb80e56a301b228d0aa22af7f81bb7b2179435d21b182b",
+      "bytes": 558092
+    },
+    "results/pilot-validation.txt": {
+      "sha256": "7807cdba6d81c4352201f33dbfa15ff22203786ccb81fba2745277d3db9de491",
+      "bytes": 6796
+    },
+    "results/aborted-asymmetric/benchmark.mjs": {
+      "sha256": "52e7f200202da56d6a32d6aa3ff3abaaf786a194f36d420d28fc1154a67f8004",
+      "bytes": 13497
+    },
+    "results/aborted-asymmetric/manifest.json": {
+      "sha256": "67bd4a13e0dfb68223dcc29a18f736f495e5cdfd4ca3d45095675ffce53fccd8",
+      "bytes": 789
+    },
+    "results/aborted-asymmetric/progress.txt": {
+      "sha256": "2d69d28b41b7d32d2a00fbb0db27c8958d8c1b00b72f5bf828d0361f2fb4d4c2",
+      "bytes": 454
+    },
+    "results/aborted-asymmetric/raw.json": {
+      "sha256": "ce58d471ffe6deace467ac086f4fd7d2c4d7796197a051c52acbc5b27d5c1458",
+      "bytes": 3326206
+    },
+    "results/interrupted-validation/manifest.json": {
+      "sha256": "1fcffca3703961acf8407d9fe7a7829be66ccaff821e7e7fa7be2d3a7ad28aae",
+      "bytes": 729
+    },
+    "results/interrupted-validation/map-values-view.test.txt": {
+      "sha256": "92148bb4d033c8d3f0a3120fe17060a617e1fffc8f1608e01ff980500b6a67f2",
+      "bytes": 8948
+    },
+    "results/interrupted-validation/validation.txt": {
+      "sha256": "d5d54182a1b1b9579df1087f0c1e17b14a90e8712dc256a56f4a48df2d29c0bd",
+      "bytes": 66
+    },
+    "results/interrupted-guard-update/benchmark.mjs": {
+      "sha256": "468f709c85ecd7529dee1f23388859d7981409523fbec7da18e2e9b4725a490e",
+      "bytes": 14082
+    },
+    "results/interrupted-guard-update/manifest.json": {
+      "sha256": "538e05531598f3cff70bda700053810ff0a905e4c5597542e593de6c44db3ba7",
+      "bytes": 691
+    },
+    "results/interrupted-guard-update/overwrite-refusal.txt": {
+      "sha256": "ba22b5a455ee60f86f99c5d29cff52e4b89a00604a158b4a6fc0c877f250bb48",
+      "bytes": 726
+    },
+    "results/interrupted-guard-update/raw.json": {
+      "sha256": "7afd92d1ab59555311c2d8fb02c4d64513e103678315a9fdce63eb42dbb642cc",
+      "bytes": 49785
+    }
+  }
+}

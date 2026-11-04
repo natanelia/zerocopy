@@ -67,6 +67,7 @@ jobs:
           node proofs/node-worker.mjs
           node proofs/redux-node.mjs
           node proofs/typed-json-worker.mjs
+          node --test proofs/map-values-view/worker.mjs
       - name: Check the installed npm tarball
         run: bun run check:package
       - name: Verify historical evidence
