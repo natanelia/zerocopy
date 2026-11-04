@@ -169,7 +169,7 @@ try {
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
       record({ type: 'phase', name: 'complete benchmark and export' });
       await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
-      const caseIds = ['shared', 'native-incremental', 'native-full', 'immutable-incremental', 'immutable-full', 'immer-incremental', 'immer-full'];
+      const caseIds = ['shared', 'native-full', 'immutable-full', 'immer-full', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
       assert.deepEqual(await page.locator('[data-preview-case]').evaluateAll(rows => rows.map(row => row.dataset.previewCase)), caseIds);
       assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'No fake pre-run timing results');
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
