@@ -1,0 +1,1 @@
+{"file":"proofs/list-batch-tail-20261105/results/node-01.json","sha256":"4982a77277a436e2f4ea78ba335787d9401096256d124313abc12fcc2f5b7a06","bytes":5842591,"runtime":"node","checkedPairs":112,"checkedSubjects":224,"checkedMeasuredBatches":2016,"warmupTimedMsRange":[96.13593300000004,969.7321870000002],"measuredBatchMsRange":[2.3129050000000007,56.24800899999991]}

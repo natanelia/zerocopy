@@ -1,0 +1,20 @@
+diff --git a/arena.ts b/arena.ts
+index 9327312..a7757cc 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -816,8 +816,13 @@ export class Arena {
+   encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {
+     this.assertWritable();
+     const raw = type === 'number' ? values : values.map(value => this.encode(type, value));
+-    const input = this.alloc((length + raw.length) * 8), dv = this.dv;
+-    if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
++    const count = raw.length;
++    // Serialization and the input length getter may reenter this arena. Check
++    // the frontier only afterward; an old snapshot never reads the new suffix.
++    const extend = length !== 0 && prefix + length * 8 === this.used;
++    const fresh = this.alloc((extend ? count : length + count) * 8);
++    const input = extend ? prefix : fresh, dv = this.dv;
++    if (length && !extend) this.bytes.copyWithin(input, prefix, prefix + length * 8);
+     for (let i = 0; i < raw.length; i++) {
+       if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
+       dv.setFloat64(input + (length + i) * 8, raw[i], true);

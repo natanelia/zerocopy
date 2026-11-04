@@ -1,0 +1,6 @@
+{
+  "status": "cancelled-before-start",
+  "samples": 0,
+  "reason": "Pre-run review found that an exotic input length can invoke numeric coercion after the frontier check. The first pilot command was still queued on perf.lock; no result JSON or timings existed. Its driver/source patch are preserved under exploration. The queued command checks this cancellation record before importing or timing either build.",
+  "replacement": "pilot-02.json"
+}

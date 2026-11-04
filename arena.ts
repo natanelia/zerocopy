@@ -816,8 +816,22 @@ export class Arena {
   encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {
     this.assertWritable();
     const raw = type === 'number' ? values : values.map(value => this.encode(type, value));
-    const input = this.alloc((length + raw.length) * 8), dv = this.dv;
-    if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
+    const count = raw.length;
+    let input: number;
+    if (Number.isSafeInteger(count) && count >= 0) {
+      // Validate before crossing the u32 WASM boundary. Serialization and the
+      // input length getter have finished before the helper checks the frontier.
+      const bytes = (length + count) * 8;
+      this.assertWritable();
+      if (!Number.isSafeInteger(bytes) || bytes < 0 || bytes > 0x7ffe0000) throw new RangeError('Allocation exceeds the arena limit');
+      input = this.wasm.tailReserve(prefix, length, bytes) >>> 0;
+    } else {
+      // Preserve the original arithmetic and allocation behavior for exotic
+      // lengths, including coercions that reenter this arena.
+      input = this.alloc((length + count) * 8);
+      if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
+    }
+    const dv = this.dv;
     for (let i = 0; i < raw.length; i++) {
       if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
       dv.setFloat64(input + (length + i) * 8, raw[i], true);
