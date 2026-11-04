@@ -1,0 +1,42 @@
+diff --git a/arena.ts b/arena.ts
+index 9327312..194d52f 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -747,12 +747,36 @@ export class Arena {
+       // Prepare UTF-8 only when it is needed. ASCII records go directly into
+       // one fresh allocation. No per-record WASM calls or encoding buffers.
+       const encodedKeys = new Map<string, Uint8Array>(), encodedValues = new Map<string, Uint8Array>();
++      let samples: [string, Uint8Array][] | undefined, reused: Map<string, Uint8Array> | undefined;
++      let probed = 0, misses = 0;
+       let total = (latest.size * 4 + 7) & ~7;
+       for (const [key, value] of latest) {
+         if (typeof value !== 'string') throw new TypeError('Expected a string');
+         let keyLength = key.length, valueLength = value.length;
+         for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }
+-        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
++        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) {
++          // Probe only the first 16 Unicode values. Unique batches keep the
++          // key-indexed path without hashing every value. A reuse cache also
++          // stops after 16 total misses if the input later becomes unique.
++          let b: Uint8Array | undefined;
++          if (reused) {
++            b = reused.get(value);
++            if (!b && ++misses === 16) reused = undefined;
++          } else if (probed < 16) {
++            if (samples) for (const [seen, bytes] of samples) if (seen === value) { b = bytes; break; }
++            if (b) { reused = new Map(samples); samples = undefined; probed = 16; }
++          }
++          if (!b) {
++            b = encoder.encode(value);
++            if (reused) reused.set(value, b);
++            else if (probed < 16) {
++              (samples ??= []).push([value, b]);
++              if (++probed === 16) samples = undefined;
++            }
++          }
++          encodedValues.set(key, b);
++          valueLength = b.length; break;
++        }
+         total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
+       }
+       const input = this.alloc(total), dv = this.dv, bytes = this.bytes;

@@ -1,0 +1,25 @@
+diff --git a/arena.ts b/arena.ts
+index 9327312..98bc6d2 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -752,13 +752,18 @@ export class Arena {
+         if (typeof value !== 'string') throw new TypeError('Expected a string');
+         let keyLength = key.length, valueLength = value.length;
+         for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }
+-        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
++        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) {
++          // Repeated values share only temporary preparation, never leaf storage.
++          let b = encodedValues.get(value);
++          if (!b) { b = encoder.encode(value); encodedValues.set(value, b); }
++          valueLength = b.length; break;
++        }
+         total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
+       }
+       const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
+       let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+       for (const [key, value] of latest) {
+-        const k = encodedKeys.get(key), v = encodedValues.get(key);
++        const k = encodedKeys.get(key), v = encodedValues.get(value);
+         const keyLength = k?.length ?? key.length, valueLength = v?.length ?? value.length;
+         let hash = 2166136261;
+         for (let i = 0; i < keyLength; i++) { const c = k ? k[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }

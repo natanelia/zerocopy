@@ -1,0 +1,38 @@
+{
+  "candidateCommit": "5af34a401d1fab271c483821d26c4ca8f4b1c04e",
+  "disposition": "Rejected; no formal study or further variant. Repeated-value gains did not offset remaining control costs. Node replacement long unique ratio 1.081 (both slower), fresh activation/abandonment guard 1.199 (both slower). Bun fresh long unique ratio 1.119 (both slower), short unique 1.065 (both slower), small unique 1.057 (both slower). All 68 processes and both complete runtime summaries retained. Two-process screening ratios are not statistical confidence claims.",
+  "files": {
+    "arena.ts": {
+      "bytes": 47248,
+      "sha256": "d265b89ded172d50ac817b136f701da76a438e6752b9d9365549b20c4e9c2433"
+    },
+    "candidate.patch": {
+      "bytes": 3601,
+      "sha256": "d2357279d44bd0a163822404c92eeebb1bc8be5988db46526798399c027c516a"
+    },
+    "pilot-output.txt": {
+      "bytes": 13755,
+      "sha256": "9ce1814fa864eecb67bad29921151c02bef40f262c9b938bdfb01e22d688157b"
+    },
+    "pilot.mjs": {
+      "bytes": 16235,
+      "sha256": "de56018696f71669431fa0f283bfb055f725650bfe8e0851cd966f16b48ee2d5"
+    },
+    "raw.json": {
+      "bytes": 989858,
+      "sha256": "4c4bc8f995a01e63d7b1460715fdd0bae54b573a4be733c9a3799688ae74141e"
+    },
+    "regression-tests.ts": {
+      "bytes": 9210,
+      "sha256": "161cc2090dd0d885594e384ffe966647cd786761ab00e1f6aa5e5b6557ef8464"
+    },
+    "validation.txt": {
+      "bytes": 562,
+      "sha256": "9a3e26d8d50a9a25920268de58b9c5d3a5ee2f5ecee0b29ed0842fe1597ab9fe"
+    },
+    "worker.mjs": {
+      "bytes": 3237,
+      "sha256": "c8564a8d8ab41bd99eeba8a94c22647f9d8396370dc2cc4bbf463ca37df5b8ca"
+    }
+  }
+}

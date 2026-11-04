@@ -1,0 +1,10 @@
+Built 12 portable modules: 233157 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-map
+
+
+ Test Files  3 passed (3)
+      Tests  109 passed (109)
+   Start at  13:09:28
+   Duration  4.81s (transform 510ms, setup 0ms, import 820ms, tests 7.24s, environment 1ms)
+

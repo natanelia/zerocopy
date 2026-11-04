@@ -1,0 +1,1 @@
+Verified 3 lossless archives, 192 paired processes, 96 recomputed summaries, and the report table; source and driver digests match.

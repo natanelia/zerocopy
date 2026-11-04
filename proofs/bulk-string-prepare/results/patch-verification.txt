@@ -1,0 +1,3 @@
+v1: patch reconstructs exact archived arena.ts from09b1a385a7c2ac9b027a4055335ae2f9449abe6e; SHA-256 da2805611b089ac28362eed67c7a5fdc568a706d4aa66dc4c319a65d3fef3a61
+v2: patch reconstructs exact archived arena.ts from09b1a385a7c2ac9b027a4055335ae2f9449abe6e; SHA-256 58b88698de21703792bca4d7b9de79a6d3f7b79ba14ea0f9952cb58e826aef28
+v3: patch reconstructs exact archived arena.ts from09b1a385a7c2ac9b027a4055335ae2f9449abe6e; SHA-256 d265b89ded172d50ac817b136f701da76a438e6752b9d9365549b20c4e9c2433

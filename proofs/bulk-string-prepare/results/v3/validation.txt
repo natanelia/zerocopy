@@ -1,0 +1,20 @@
+Built 12 portable modules: 234809 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-map
+
+
+ Test Files  3 passed (3)
+      Tests  66 passed (66)
+   Start at  13:47:43
+   Duration  4.02s (transform 1.49s, setup 0ms, import 2.08s, tests 3.59s, environment 1ms)
+
+✔ bulk Unicode snapshots survive growth and reset in a worker (shared) (162.961473ms)
+✔ bulk Unicode snapshots survive growth and reset in a worker (copy) (99.829254ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 439.308108

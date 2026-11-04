@@ -1,0 +1,65 @@
+diff --git a/arena.ts b/arena.ts
+index 9327312..e4672c2 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -10,6 +10,7 @@ export { freezeJSON } from './freeze-json';
+ const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
+ const encoder = new TextEncoder();
+ const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
++const nonAscii = /[^\x00-\x7f]/;
+ let nextId = 0;
+ const PRESENT = Symbol("present; primitive value not decoded");
+ interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
+@@ -37,6 +38,42 @@ export function hashBytes(bytes: Uint8Array): number {
+   for (let i = 0; i < bytes.length; i++) h = Math.imul(h ^ bytes[i], 16777619);
+   return h >>> 0;
+ }
++function hasRepeatedUnicodeValues(latest: ReadonlyMap<string, unknown>): boolean {
++  // Bound both the entry scan and comparisons, including all-ASCII batches.
++  // String equality avoids hashing novel values during this small preflight.
++  const samples: string[] = [];
++  let visited = 0, unicode = 0, repeats = 0;
++  for (const value of latest.values()) {
++    if (typeof value !== 'string') return false; // The ordinary loop reports it.
++    if (nonAscii.test(value)) {
++      if (samples.includes(value)) { if (++repeats === 4) return true; }
++      else samples.push(value);
++      if (++unicode === 16) return false;
++    }
++    if (++visited === 64) return false;
++  }
++  return false;
++}
++function prepareRepeatedStrings(latest: ReadonlyMap<string, unknown>, encodedKeys: Map<string, Uint8Array>, encodedValues: Map<string, Uint8Array>): number {
++  let reused: Map<string, Uint8Array> | undefined = new Map(), misses = 0, total = 0;
++  for (const [key, value] of latest) {
++    if (typeof value !== 'string') throw new TypeError('Expected a string');
++    let keyLength = key.length, valueLength = value.length;
++    for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }
++    for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) {
++      let b = reused?.get(value);
++      if (!b) {
++        b = encoder.encode(value);
++        // A repeated prefix need not describe the remainder. Stop hashing new
++        // values after a fixed total miss budget; all payloads stay inline.
++        if (reused) { if (++misses === 16) reused = undefined; else reused.set(value, b); }
++      }
++      encodedValues.set(key, b); valueLength = b.length; break;
++    }
++    total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
++  }
++  return total;
++}
+ export function popcount(x: number): number {
+   x -= (x >>> 1) & 0x55555555;
+   x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+@@ -748,7 +785,8 @@ export class Arena {
+       // one fresh allocation. No per-record WASM calls or encoding buffers.
+       const encodedKeys = new Map<string, Uint8Array>(), encodedValues = new Map<string, Uint8Array>();
+       let total = (latest.size * 4 + 7) & ~7;
+-      for (const [key, value] of latest) {
++      if (latest.size >= 256 && hasRepeatedUnicodeValues(latest)) total += prepareRepeatedStrings(latest, encodedKeys, encodedValues);
++      else for (const [key, value] of latest) {
+         if (typeof value !== 'string') throw new TypeError('Expected a string');
+         let keyLength = key.length, valueLength = value.length;
+         for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }

@@ -1,0 +1,34 @@
+{
+  "candidateCommit": "579e9fefd5b8f4bbcf4b80055e84a6533c764fac",
+  "disposition": "Rejected. Bounded in-loop sampling and reuse did not keep controls neutral: Node short unique ratio 1.172, small unique 1.060; Bun long unique 1.215, ASCII short unique 1.085, mixed long 1.114. The fresh early-repeat guard was adverse/noisy (Node 1.268, Bun 1.067). All 64 processes retained; two-process screens do not establish confidence bounds.",
+  "files": {
+    "arena.ts": {
+      "bytes": 46265,
+      "sha256": "58b88698de21703792bca4d7b9de79a6d3f7b79ba14ea0f9952cb58e826aef28"
+    },
+    "candidate.patch": {
+      "bytes": 2351,
+      "sha256": "9028d5c8b59948a8a6490b4a2bc7b632eff4dc902771bd0f77c6daa56e3cc182"
+    },
+    "pilot-output.txt": {
+      "bytes": 12858,
+      "sha256": "4ca7afb82d3bff9936d7f58f2a7795c13320bcc8d719de9cb43e082be030a7b7"
+    },
+    "pilot.mjs": {
+      "bytes": 15688,
+      "sha256": "aae07374ce59a73200039f6206b2e1d6b478646d54864f38568e815fa28703be"
+    },
+    "raw.json": {
+      "bytes": 1046652,
+      "sha256": "6ba3cbdb31553a28c6acffbdbb64ba62512a2f0ad9fc4ccf5482208c8abf32d3"
+    },
+    "regression-tests.ts": {
+      "bytes": 7599,
+      "sha256": "55a500849c40a549ba88b115401c407301a20149c7368e33a86c3d88398d3160"
+    },
+    "validation.txt": {
+      "bytes": 563,
+      "sha256": "5bac51d941712d0b5d6e70b9f512eff28ec9fa74c720d3e9ce9806827871c18e"
+    }
+  }
+}

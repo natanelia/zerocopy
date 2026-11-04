@@ -1,0 +1,30 @@
+{
+  "format": "lossless gzip, mtime=0",
+  "note": "Each original archive manifest describes the uncompressed raw.json. Decompress raw.json.gz to recover the exact recorded bytes and verify against both manifests. No samples were dropped or rewritten.",
+  "files": {
+    "results/v1/raw.json.gz": {
+      "uncompressedName": "raw.json",
+      "uncompressedBytes": 989346,
+      "uncompressedSha256": "07310e44a810f933857100eeb1dcd7fe8c073bc0fd82583cd342e4a1f6aec596",
+      "gzipBytes": 160895,
+      "gzipSha256": "eec1636a774241035ce7dcae13ce536fa2c319c23db906bc20b97f592e35ccea",
+      "roundTripVerified": true
+    },
+    "results/v2/raw.json.gz": {
+      "uncompressedName": "raw.json",
+      "uncompressedBytes": 1046652,
+      "uncompressedSha256": "6ba3cbdb31553a28c6acffbdbb64ba62512a2f0ad9fc4ccf5482208c8abf32d3",
+      "gzipBytes": 170586,
+      "gzipSha256": "eaf86ede61a5b6b4a2fca9c91a7594d8fa5aef828e1ee329b358ad6994c659f1",
+      "roundTripVerified": true
+    },
+    "results/v3/raw.json.gz": {
+      "uncompressedName": "raw.json",
+      "uncompressedBytes": 989858,
+      "uncompressedSha256": "4c4bc8f995a01e63d7b1460715fdd0bae54b573a4be733c9a3799688ae74141e",
+      "gzipBytes": 161394,
+      "gzipSha256": "5fdb0e0854126817799339082d5e4926b057abf27f49d25bf61156026efd92ec",
+      "roundTripVerified": true
+    }
+  }
+}

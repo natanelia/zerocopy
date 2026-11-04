@@ -1,0 +1,33 @@
+{
+  "disposition": "Rejected: strong repeated-value gains accompanied by material Node long-unique regressions. Node long unique ratio 1.115; fresh long unique ratio 1.207; Bun small unique ratio 1.055. All 60 processes and both complete runtime summaries retained.",
+  "files": {
+    "arena.ts": {
+      "bytes": 45403,
+      "sha256": "da2805611b089ac28362eed67c7a5fdc568a706d4aa66dc4c319a65d3fef3a61"
+    },
+    "pilot.mjs": {
+      "bytes": 15464,
+      "sha256": "b038ecc29556c37b614db3c062ce8c2da6c8366085c315ed1d284b92a116db71"
+    },
+    "regression-tests.ts": {
+      "bytes": 6419,
+      "sha256": "00f803f3cde24aa86c26de27d472257da8f865f333db48a97c8a220bb431de48"
+    },
+    "validation.txt": {
+      "bytes": 276,
+      "sha256": "255cf98103f94d5f413f5402933e5b7aa54f78233354d04e3654da8248c4a2f0"
+    },
+    "candidate.patch": {
+      "bytes": 1641,
+      "sha256": "0b12c1c76ba094915f4726846067e6b5cf8b495ee214a09226243c782d90919c"
+    },
+    "pilot-output.txt": {
+      "bytes": 12002,
+      "sha256": "30535d7d9df99b1aaaf7efeb761d15d9c975a0988938d645e60f0f85750f48f3"
+    },
+    "raw.json": {
+      "bytes": 989346,
+      "sha256": "07310e44a810f933857100eeb1dcd7fe8c073bc0fd82583cd342e4a1f6aec596"
+    }
+  }
+}
