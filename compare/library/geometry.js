@@ -3,7 +3,7 @@ import {
 } from "./chunk-t2acd52e.js";
 import {
   SharedList2
-} from "./chunk-jyz2w9p4.js";
+} from "./chunk-72y7f44w.js";
 
 // geometry-wasm.ts
 function loadGeometryWasm() {

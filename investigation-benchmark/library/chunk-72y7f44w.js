@@ -116,9 +116,20 @@ function compileStringSearch(arena, term, options = {}) {
     prefix[i] = j;
   }
   return (raw) => {
-    const end = raw + 4 + view.getUint32(raw, true);
+    let start = raw + 4;
+    const byteLength = view.getUint32(raw, true), end = start + byteLength;
+    if (sensitive) {
+      if (byteLength < length)
+        return false;
+      if (bytes[start] !== needle[0]) {
+        const first = bytes.subarray(start, end).indexOf(needle[0]);
+        if (first < 0)
+          return false;
+        start += first;
+      }
+    }
     let j = 0;
-    for (let p = raw + 4;p < end; p++) {
+    for (let p = start;p < end; p++) {
       let code = bytes[p];
       if (!sensitive) {
         if (code > 127)

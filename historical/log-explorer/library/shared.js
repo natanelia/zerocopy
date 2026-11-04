@@ -20,7 +20,7 @@ import {
   compactMany2,
   getWorkerData2,
   initWorker2
-} from "./chunk-enwn105b.js";
+} from "./chunk-d6nwnfzc.js";
 import {
   resetMap2,
   SharedMap2
@@ -28,7 +28,7 @@ import {
 import {
   resetSharedList2,
   SharedList2
-} from "./chunk-jyz2w9p4.js";
+} from "./chunk-72y7f44w.js";
 import {
   configureMemory2,
   json2,

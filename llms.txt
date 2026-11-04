@@ -2,7 +2,7 @@
 
 Shared immutable collections. Reads are local; tasks are optional.
 
-Source: https://github.com/natanelia/zerocopy/commit/86e22efbd01d0805205a21b3272539988da2f94e
+Source: https://github.com/natanelia/zerocopy/commit/8247dcbbcc0db6e8f3c0609513c8d6a3b1579d6c
 
 - [Get started with shared state and Web Workers](https://natanelia.github.io/zerocopy/markdown/getting-started.md): Set up zerocopy in JavaScript or TypeScript. Share immutable state with a Web Worker using SharedArrayBuffer and read locally on both threads.
 - [How sharing works](https://natanelia.github.io/zerocopy/markdown/mental-model.md): One writer, immutable snapshots, and local reads. A model you can reason about.
