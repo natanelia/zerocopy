@@ -1,0 +1,1982 @@
+{
+  "method": "One build per fresh Chromium process; balanced AB/BA process pairs; shared loopback URL; 6 warm-up batches and 9 measured batches; full arrays checked after timing. Setup and validation excluded. Supplementary diagnostic measurements, not a universal performance guarantee.",
+  "kind": "map",
+  "date": "2026-11-04T18:08:00.978Z",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "rounds": 4,
+  "source": {
+    "baseline": {
+      "commit": "501b73819ed7e9bbf7adbb74b03df01045701973",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "dist/chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "dist/chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "dist/numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+        "dist/redux.js": "215b3d3b44943418b59edd4f7784468871be33e8c6bce79bcc9aa8895348b01f",
+        "dist/shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "dist/state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    },
+    "candidate": {
+      "commit": "501b73819ed7e9bbf7adbb74b03df01045701973",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-7kj1qpjd.js": "0692472cdaaf33d2830bf529d0948f3ad73467a0b9246dfe39bf18f36dcbe513",
+        "dist/chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+        "dist/chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+        "dist/chunk-nxt1n507.js": "4796b255a831d68434e454461542d33028afa84a702296c961867bba9fc1db4b",
+        "dist/chunk-vp7p8bkb.js": "f6fbcf3a3e5fcd9134964f302e73297e7c6000ce440aefd96c209569ce100001",
+        "dist/geometry.js": "4868942e110deeef0f6c5c671485ff4570797274a2a2e36df49bc999d9a4d571",
+        "dist/numeric.js": "3f26d20db8916d071e5773d80b86fe5e3b14d0efda992ade21fa131bd5c69820",
+        "dist/redux.js": "1180da6a77d285e34f9c64c78d65da67c8a7b9d4c8dbb95c4e87026720033091",
+        "dist/shared.js": "997173af823b36d72f5e34d9f80581437ebf71209c937bf4c3c22657ec606ba7",
+        "dist/state.js": "2d98916a153d8c4ec841f51f3e03549fea9dec9d787dba26f0d19cf058a18d79",
+        "dist/tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+        "dist/worker.js": "f66c7d8a800cbb40bb61cb2fe6580bc6f8631d0fe428c4e25753657fe538baf2",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "map-values-view.test.ts": "92148bb4d033c8d3f0a3120fe17060a617e1fffc8f1608e01ff980500b6a67f2",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    }
+  },
+  "driverSha256": "7b54a6027daeca1d1b9a98dbe9d01de8268d1865d78624ef9a827e9a35178a5c",
+  "correctness": {
+    "assertions": 24
+  },
+  "processes": [
+    {
+      "round": 0,
+      "variant": "baseline",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            30.00499999988824,
+            21.925000000745058,
+            22.315000000409782,
+            23.309999999590218,
+            21.320000000298023,
+            22.37999999988824
+          ],
+          "samplesMs": [
+            22.459999999962747,
+            21.610000000335276,
+            20.615000000223517,
+            20.58999999985099,
+            19.609999999403954,
+            18.8199999993667,
+            20.825000000186265,
+            19.645000000484288,
+            19.684999999590218
+          ],
+          "medianMsPerOperation": 0.08042968749941792
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            121.11500000022352,
+            99.41500000003725,
+            128.39000000059605,
+            120.00499999988824,
+            103.01999999955297,
+            137.8850000007078
+          ],
+          "samplesMs": [
+            147.44000000040978,
+            139.6949999993667,
+            95.45000000018626,
+            88.9199999999255,
+            120.53000000026077,
+            150.41500000003725,
+            95.92999999970198,
+            88.96500000078231,
+            102.51499999966472
+          ],
+          "medianMsPerOperation": 6.407187499979045
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            24.519999999552965,
+            23.200000000186265,
+            22.445000000298023,
+            23.834999999962747,
+            23.920000000856817,
+            22.87999999988824
+          ],
+          "samplesMs": [
+            24,
+            22.269999999552965,
+            22.484999999403954,
+            21.855000000447035,
+            25.994999999180436,
+            22.334999999962747,
+            22.56000000052154,
+            24.5,
+            24.3199999993667
+          ],
+          "medianMsPerOperation": 0.08812500000203727
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            104.70999999996275,
+            95.01499999966472,
+            99.38999999966472,
+            114.18499999959022,
+            135.54000000003725,
+            110.71999999973923
+          ],
+          "samplesMs": [
+            103.4199999999255,
+            104.55499999970198,
+            97.61000000033528,
+            100.58499999996275,
+            103.13999999966472,
+            101.21499999985099,
+            102.07500000018626,
+            92.3199999993667,
+            91.23000000044703
+          ],
+          "medianMsPerOperation": 6.325937499990687
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            23.355000000447035,
+            23.21999999973923,
+            22.66000000014901,
+            22.87000000011176,
+            26.015000000596046,
+            24.705000000074506
+          ],
+          "samplesMs": [
+            24.34999999962747,
+            27.625,
+            23.195000000298023,
+            21.019999999552965,
+            21.959999999962747,
+            22.640000000596046,
+            25.06000000052154,
+            24.809999999590218,
+            22.890000000596046
+          ],
+          "medianMsPerOperation": 0.09060546875116415
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            20.865000000223517,
+            21.729999999515712,
+            21.269999999552965,
+            21.475000000558794,
+            21.580000000074506,
+            21.87999999988824
+          ],
+          "samplesMs": [
+            21.59499999973923,
+            22.520000000484288,
+            23.75499999988824,
+            22.100000000558794,
+            23.580000000074506,
+            25.020000000484288,
+            21.199999999254942,
+            25.639999999664724,
+            22.625
+          ],
+          "medianMsPerOperation": 0.08837890625
+        }
+      ]
+    },
+    {
+      "round": 0,
+      "variant": "candidate",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            22.040000000037253,
+            17.790000000037253,
+            16.37000000011176,
+            15.294999999925494,
+            17.080000000074506,
+            15.635000000707805
+          ],
+          "samplesMs": [
+            15.259999999776483,
+            15.575000000186265,
+            16.15500000026077,
+            15.339999999850988,
+            16.274999999441206,
+            16.53500000014901,
+            17.93500000052154,
+            17.174999999813735,
+            16.235000000335276
+          ],
+          "medianMsPerOperation": 0.06341796875130967
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            95.2399999992922,
+            77.4550000000745,
+            91.26999999955297,
+            98.81000000052154,
+            178.11000000033528,
+            111.16500000003725
+          ],
+          "samplesMs": [
+            79.34499999973923,
+            77.95000000018626,
+            79.27999999932945,
+            114.6149999992922,
+            87.52999999932945,
+            125.60999999940395,
+            122.625,
+            97.17499999981374,
+            155.45000000018626
+          ],
+          "medianMsPerOperation": 6.0734374999883585
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            22.234999999403954,
+            19.570000000298023,
+            19.41000000014901,
+            20.31499999947846,
+            19.679999999701977,
+            25.43999999947846
+          ],
+          "samplesMs": [
+            29.759999999776483,
+            25.385000000707805,
+            24.91000000014901,
+            25.34999999962747,
+            25.66000000014901,
+            25.09499999973923,
+            26.144999999552965,
+            24.919999999925494,
+            26.184999999590218
+          ],
+          "medianMsPerOperation": 0.09916015625276486
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            171.76499999966472,
+            159.0699999993667,
+            154.8300000000745,
+            148.964999999851,
+            131.45000000018626,
+            90.71499999985099
+          ],
+          "samplesMs": [
+            87.63499999977648,
+            84.82000000029802,
+            84.4550000000745,
+            83.81000000052154,
+            99.59499999973923,
+            97.1000000005588,
+            115.63499999977648,
+            94.56500000040978,
+            110.68999999947846
+          ],
+          "medianMsPerOperation": 5.910312500025611
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            29.37999999988824,
+            30.884999999776483,
+            32.8199999993667,
+            20.91000000014901,
+            21.565000000409782,
+            22.975000000558794
+          ],
+          "samplesMs": [
+            23.53500000014901,
+            21.480000000447035,
+            23.955000000074506,
+            22.65000000037253,
+            29.71999999973923,
+            24.12999999988824,
+            27.059999999590218,
+            27.614999999292195,
+            30.239999999292195
+          ],
+          "medianMsPerOperation": 0.09425781249956344
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            20.75,
+            21.84499999973923,
+            21.87000000011176,
+            23.299999999813735,
+            23.50499999988824,
+            22.209999999962747
+          ],
+          "samplesMs": [
+            23.205000000074506,
+            20.020000000484288,
+            19.66000000014901,
+            21.115000000223517,
+            19.700000000186265,
+            19.84499999973923,
+            20.820000000298023,
+            19.52500000037253,
+            19.365000000223517
+          ],
+          "medianMsPerOperation": 0.07751953124898137
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "variant": "candidate",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            29.860000000335276,
+            31.529999999329448,
+            19.105000000447035,
+            14.239999999292195,
+            20.540000000037253,
+            15.380000000819564
+          ],
+          "samplesMs": [
+            19.139999999664724,
+            16.83999999985099,
+            15.160000000149012,
+            15.065000000409782,
+            15.474999999627471,
+            16.880000000819564,
+            17.08999999985099,
+            21.695000000298023,
+            17.695000000298023
+          ],
+          "medianMsPerOperation": 0.06593750000320142
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            99.9550000000745,
+            71.87999999988824,
+            72.73500000033528,
+            75.22000000067055,
+            74.68499999959022,
+            84.56499999947846
+          ],
+          "samplesMs": [
+            82.70000000018626,
+            78.4750000005588,
+            78.41500000003725,
+            98.95000000018626,
+            83.26999999955297,
+            77.49499999918044,
+            73.29000000003725,
+            77.00499999988824,
+            121.84499999973923
+          ],
+          "medianMsPerOperation": 4.904687500034925
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            18.019999999552965,
+            17.78000000026077,
+            17.020000000484288,
+            21.770000000484288,
+            20.205000000074506,
+            20.084999999962747
+          ],
+          "samplesMs": [
+            19.25,
+            18.190000000409782,
+            22.665000000037253,
+            25.16499999910593,
+            20.21499999985099,
+            19.700000000186265,
+            19.66000000014901,
+            19.154999999329448,
+            18.459999999962747
+          ],
+          "medianMsPerOperation": 0.07679687500058208
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            102.3500000005588,
+            115.50999999977648,
+            119.17499999981374,
+            118.875,
+            121.13999999966472,
+            137.52500000037253
+          ],
+          "samplesMs": [
+            117.50499999988824,
+            111.48500000033528,
+            101.34499999973923,
+            110.75,
+            114.04999999981374,
+            98.65000000037253,
+            95.5800000000745,
+            90.34499999973923,
+            86.16500000003725
+          ],
+          "medianMsPerOperation": 6.334062499983702
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            21.959999999962747,
+            20.895000000484288,
+            20.72499999962747,
+            23.919999999925494,
+            21.41000000014901,
+            23.165000000037253
+          ],
+          "samplesMs": [
+            22.570000000298023,
+            20.87000000011176,
+            24.520000000484288,
+            20.02500000037253,
+            24.24500000011176,
+            22.90500000026077,
+            24.09999999962747,
+            20.56000000052154,
+            23.33999999985099
+          ],
+          "medianMsPerOperation": 0.08947265625101863
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            19.91000000014901,
+            24.179999999701977,
+            22.360000000335276,
+            28.179999999701977,
+            23.330000000074506,
+            19
+          ],
+          "samplesMs": [
+            21.940000000409782,
+            20.83999999985099,
+            22.31000000052154,
+            19.47499999962747,
+            21.71999999973923,
+            23.21999999973923,
+            22.765000000596046,
+            22.739999999292195,
+            25.394999999552965
+          ],
+          "medianMsPerOperation": 0.08714843750203727
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "variant": "baseline",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            41.21999999973923,
+            23.134999999776483,
+            35.3050000006333,
+            21.71999999973923,
+            24.40000000037253,
+            18.52500000037253
+          ],
+          "samplesMs": [
+            24.27500000037253,
+            26.864999999292195,
+            23.58999999985099,
+            28.37000000011176,
+            25.825000000186265,
+            24.014999999664724,
+            19.634999999776483,
+            26.830000000074506,
+            18.78000000026077
+          ],
+          "medianMsPerOperation": 0.09482421875145519
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            145.29999999981374,
+            153.70000000018626,
+            229.45000000018626,
+            189.61500000022352,
+            125.10500000044703,
+            128.75
+          ],
+          "samplesMs": [
+            187.07000000029802,
+            217.02999999932945,
+            230.86500000022352,
+            185.47000000067055,
+            155.50999999977648,
+            159.68999999947846,
+            155.839999999851,
+            135.02500000037253,
+            105.87000000011176
+          ],
+          "medianMsPerOperation": 9.980624999967404
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            18.65500000026077,
+            18.84499999973923,
+            18.540000000037253,
+            18.705000000074506,
+            19.02500000037253,
+            17.875
+          ],
+          "samplesMs": [
+            18.834999999962747,
+            18.885000000707805,
+            19.084999999962747,
+            18.899999999441206,
+            19.00499999988824,
+            19.87000000011176,
+            20.3199999993667,
+            19.56499999947846,
+            19
+          ],
+          "medianMsPerOperation": 0.07423828124956344
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            105.64499999955297,
+            110.1499999994412,
+            132.3300000000745,
+            139.98500000033528,
+            124.31000000052154,
+            162.285000000149
+          ],
+          "samplesMs": [
+            134.24500000011176,
+            105.19500000029802,
+            119.12999999988824,
+            135.54999999981374,
+            113.89499999955297,
+            130.3199999993667,
+            135.87000000011176,
+            103.65999999921769,
+            103
+          ],
+          "medianMsPerOperation": 7.445624999993015
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            27.790000000037253,
+            24.59499999973923,
+            26.595000000670552,
+            27.99500000011176,
+            26.46499999985099,
+            24.980000000447035
+          ],
+          "samplesMs": [
+            24.834999999962747,
+            25.184999999590218,
+            25.790000000037253,
+            23.96500000078231,
+            25.384999999776483,
+            23.52500000037253,
+            24.365000000223517,
+            25.109999999403954,
+            24.434999999590218
+          ],
+          "medianMsPerOperation": 0.09701171874985448
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            23.259999999776483,
+            24.364999999292195,
+            22.87999999988824,
+            22.87000000011176,
+            27.59499999973923,
+            26.705000000074506
+          ],
+          "samplesMs": [
+            23.294999999925494,
+            23.595000000670552,
+            25.509999999776483,
+            23.665000000037253,
+            22.320000000298023,
+            27.490000000223517,
+            43.74000000022352,
+            23.575000000186265,
+            21.83999999985099
+          ],
+          "medianMsPerOperation": 0.09216796875261934
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "variant": "baseline",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            32.60499999951571,
+            20.90000000037253,
+            18.87999999988824,
+            20.154999999329448,
+            18.915000000037253,
+            18.639999999664724
+          ],
+          "samplesMs": [
+            19.50499999988824,
+            18.989999999292195,
+            21.9449999993667,
+            21.459999999962747,
+            21.49500000011176,
+            25.96999999973923,
+            21.865000000223517,
+            17.625,
+            17.759999999776483
+          ],
+          "medianMsPerOperation": 0.08382812499985448
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            201.589999999851,
+            167.964999999851,
+            211.86500000022352,
+            156.27500000037253,
+            103.49000000022352,
+            87.32000000029802
+          ],
+          "samplesMs": [
+            85.72999999951571,
+            85.12000000011176,
+            86.55499999970198,
+            91.37000000011176,
+            129.11500000022352,
+            105.59499999973923,
+            105.78000000026077,
+            135.87000000011176,
+            135.79999999981374
+          ],
+          "medianMsPerOperation": 6.599687499983702
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            30.24500000011176,
+            30.619999999180436,
+            30.290000000037253,
+            30.269999999552965,
+            30.75,
+            30.614999999292195
+          ],
+          "samplesMs": [
+            30.9300000006333,
+            30.705000000074506,
+            30.390000000596046,
+            30.924999999813735,
+            30.99500000011176,
+            30.544999999925494,
+            30.77500000037253,
+            29.490000000223517,
+            30.644999999552965
+          ],
+          "medianMsPerOperation": 0.11994140625029104
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            143.66500000003725,
+            120.51500000059605,
+            111.34499999973923,
+            97.99000000022352,
+            104.03000000026077,
+            95.26499999966472
+          ],
+          "samplesMs": [
+            126.83499999996275,
+            101.77000000048429,
+            114.07500000018626,
+            108.27500000037253,
+            97.25499999988824,
+            121.28500000014901,
+            95.05499999970198,
+            89.50999999977648,
+            89.49500000011176
+          ],
+          "medianMsPerOperation": 6.360625000030268
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            24.884999999776483,
+            24.955000000074506,
+            24.955000000074506,
+            25.174999999813735,
+            24.820000000298023,
+            30.604999999515712
+          ],
+          "samplesMs": [
+            23.56499999947846,
+            24,
+            24.774999999441206,
+            25.08999999985099,
+            39.110000000335276,
+            32.889999999664724,
+            25.9300000006333,
+            28.125,
+            28.50499999988824
+          ],
+          "medianMsPerOperation": 0.10128906250247383
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            26.509999999776483,
+            25.40500000026077,
+            25.24500000011176,
+            23.450000000186265,
+            23.580000000074506,
+            23.770000000484288
+          ],
+          "samplesMs": [
+            24.27500000037253,
+            22.165000000037253,
+            24.31000000052154,
+            22.929999999701977,
+            21.690000000409782,
+            35.69500000029802,
+            34.68500000052154,
+            25.334999999962747,
+            25.259999999776483
+          ],
+          "medianMsPerOperation": 0.09496093750203727
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "variant": "candidate",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            29.179999999701977,
+            17.675000000745058,
+            15.200000000186265,
+            17.174999999813735,
+            15.724999999627471,
+            16.59999999962747
+          ],
+          "samplesMs": [
+            17.384999999776483,
+            16.764999999664724,
+            15.549999999813735,
+            16.610000000335276,
+            15.214999999850988,
+            16.540000000037253,
+            16.34999999962747,
+            17.990000000223517,
+            15.34499999973923
+          ],
+          "medianMsPerOperation": 0.06460937500014552
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            94.28500000014901,
+            82.88999999966472,
+            73.48499999940395,
+            98.00499999988824,
+            89.4300000006333,
+            108.66500000003725
+          ],
+          "samplesMs": [
+            86.24500000011176,
+            82.5,
+            80.28500000014901,
+            88.1800000006333,
+            82.37000000011176,
+            88.94500000029802,
+            86.95499999914318,
+            90.92999999970198,
+            85.82499999925494
+          ],
+          "medianMsPerOperation": 5.390312500006985
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            19.429999999701977,
+            19.304999999701977,
+            19.27500000037253,
+            17.880000000819564,
+            17.445000000298023,
+            18.635000000707805
+          ],
+          "samplesMs": [
+            17.875,
+            18.12999999988824,
+            16.6800000006333,
+            18.315000000409782,
+            24.580000000074506,
+            24.58999999985099,
+            24.87000000011176,
+            24.860000000335276,
+            24.81499999947846
+          ],
+          "medianMsPerOperation": 0.09601562500029104
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            115.05999999959022,
+            100.63499999977648,
+            86,
+            81.15000000037253,
+            81.47999999951571,
+            92.97999999951571
+          ],
+          "samplesMs": [
+            86.41500000003725,
+            87.22499999962747,
+            88.6699999999255,
+            90.18499999959022,
+            96.44500000029802,
+            89.03500000014901,
+            87.61500000022352,
+            97.04999999981374,
+            90.1350000007078
+          ],
+          "medianMsPerOperation": 5.564687500009313
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            23.334999999962747,
+            22.570000000298023,
+            20.455000000074506,
+            20.915000000037253,
+            20.87999999988824,
+            22.415000000037253
+          ],
+          "samplesMs": [
+            22.83999999985099,
+            21.470000000670552,
+            21.804999999701977,
+            19.065000000409782,
+            22.915000000037253,
+            20.75,
+            20.27500000037253,
+            22.190000000409782,
+            20.47499999962747
+          ],
+          "medianMsPerOperation": 0.08386718750261934
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            21.980000000447035,
+            19.5,
+            19.970000000670552,
+            18.09999999962747,
+            18.24500000011176,
+            21
+          ],
+          "samplesMs": [
+            20.179999999701977,
+            20.09499999973923,
+            18.735000000335276,
+            18.634999999776483,
+            20.614999999292195,
+            20.81499999947846,
+            30.544999999925494,
+            18.304999999701977,
+            18.84999999962747
+          ],
+          "medianMsPerOperation": 0.07849609374898137
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "variant": "candidate",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            25.360000000335276,
+            16.299999999813735,
+            16.934999999590218,
+            15.089999999850988,
+            15.840000000782311,
+            15.325000000186265
+          ],
+          "samplesMs": [
+            15.975000000558794,
+            15.340000000782311,
+            15.109999999403954,
+            16.095000000670552,
+            18.34499999973923,
+            17.265000000596046,
+            15.615000000223517,
+            16.190000000409782,
+            14.480000000447035
+          ],
+          "medianMsPerOperation": 0.06240234375218279
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            95.58499999996275,
+            118.16500000003725,
+            77.7949999999255,
+            79.02500000037253,
+            75.16000000014901,
+            82.38499999977648
+          ],
+          "samplesMs": [
+            119.75999999977648,
+            85.625,
+            76.81500000040978,
+            76.44500000029802,
+            112.41500000003725,
+            103.57500000018626,
+            73.68999999947846,
+            114.14499999955297,
+            81.98500000033528
+          ],
+          "medianMsPerOperation": 5.3515625
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            16.665000000037253,
+            16.320000000298023,
+            15.990000000223517,
+            16.78000000026077,
+            19.470000000670552,
+            19.459999999962747
+          ],
+          "samplesMs": [
+            21.584999999962747,
+            20.41000000014901,
+            19.41000000014901,
+            16.875,
+            17.475000000558794,
+            17.5,
+            17.195000000298023,
+            17.5,
+            17.294999999925494
+          ],
+          "medianMsPerOperation": 0.068359375
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            94.51500000059605,
+            85.50999999977648,
+            87.37999999988824,
+            102.26999999955297,
+            85.8999999994412,
+            82.95999999996275
+          ],
+          "samplesMs": [
+            106.26999999955297,
+            104.0449999999255,
+            81.44000000040978,
+            79.34499999973923,
+            84.25999999977648,
+            83.1949999993667,
+            81.90000000037253,
+            78.82000000029802,
+            85.28000000026077
+          ],
+          "medianMsPerOperation": 5.199687499960419
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            22.304999999701977,
+            20.509999999776483,
+            20.24500000011176,
+            21.665000000037253,
+            22.889999999664724,
+            23.72499999962747
+          ],
+          "samplesMs": [
+            23.46499999985099,
+            25.75,
+            23.445000000298023,
+            19.389999999664724,
+            19.72499999962747,
+            20.12999999988824,
+            20.065000000409782,
+            19.31000000052154,
+            19.78500000014901
+          ],
+          "medianMsPerOperation": 0.07837890625160071
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            18.479999999515712,
+            17.729999999515712,
+            21.144999999552965,
+            20.019999999552965,
+            20.49500000011176,
+            22.845000000670552
+          ],
+          "samplesMs": [
+            22.74500000011176,
+            25.87999999988824,
+            29.264999999664724,
+            22.62000000011176,
+            22.21499999985099,
+            23.269999999552965,
+            19.959999999962747,
+            19.5,
+            20.264999999664724
+          ],
+          "medianMsPerOperation": 0.08835937500043656
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "variant": "baseline",
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "rows": [
+        {
+          "name": "SharedMap<number>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            29.419999999925494,
+            21.90500000026077,
+            19.4300000006333,
+            17.490000000223517,
+            18.21500000078231,
+            19.709999999962747
+          ],
+          "samplesMs": [
+            19.140000000596046,
+            18.799999999813735,
+            19.34999999962747,
+            18.080000000074506,
+            18.744999999180436,
+            19.1949999993667,
+            19.169999999925494,
+            20.84499999973923,
+            17.815000000409782
+          ],
+          "medianMsPerOperation": 0.0747656250023283
+        },
+        {
+          "name": "SharedMap<number>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            152.18500000052154,
+            124.76500000059605,
+            107.90999999921769,
+            122.5449999999255,
+            119.08499999996275,
+            88.23499999940395
+          ],
+          "samplesMs": [
+            89.82500000018626,
+            126.73499999940395,
+            83.88999999966472,
+            96.5100000007078,
+            91.05499999970198,
+            90.5,
+            100.625,
+            84.08499999996275,
+            83.08999999985099
+          ],
+          "medianMsPerOperation": 5.65625
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            18.919999999925494,
+            19.125,
+            18.195000000298023,
+            19.96500000078231,
+            19.009999999776483,
+            18.419999999925494
+          ],
+          "samplesMs": [
+            18.565000000409782,
+            21.334999999962747,
+            26.610000000335276,
+            29.769999999552965,
+            29.514999999664724,
+            20.690000000409782,
+            25.634999999776483,
+            24.399999999441206,
+            27.41000000014901
+          ],
+          "medianMsPerOperation": 0.10013671874912689
+        },
+        {
+          "name": "SharedMap<boolean>.values",
+          "size": 65536,
+          "repeat": 16,
+          "warmupMs": [
+            148.18500000052154,
+            142.68500000052154,
+            127.12000000011176,
+            130.84999999962747,
+            110.11500000022352,
+            149.28000000026077
+          ],
+          "samplesMs": [
+            104.0699999993667,
+            100.08999999985099,
+            95.5,
+            94.56000000052154,
+            106.59999999962747,
+            110.08499999996275,
+            157.5100000007078,
+            111.71499999985099,
+            125.125
+          ],
+          "medianMsPerOperation": 6.662499999976717
+        },
+        {
+          "name": "SharedMap<string>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            27.9300000006333,
+            27.144999999552965,
+            25.354999999515712,
+            26.28500000014901,
+            28.77500000037253,
+            27.4300000006333
+          ],
+          "samplesMs": [
+            28.184999999590218,
+            27.18999999947846,
+            29.334999999962747,
+            25.604999999515712,
+            27.549999999813735,
+            26.320000000298023,
+            24.580000000074506,
+            25.825000000186265,
+            25.84999999962747
+          ],
+          "medianMsPerOperation": 0.10281250000116415
+        },
+        {
+          "name": "SharedMap<object>.values",
+          "size": 1024,
+          "repeat": 256,
+          "warmupMs": [
+            24.730000000447035,
+            23.084999999962747,
+            24.244999999180436,
+            24.334999999962747,
+            26.134999999776483,
+            25.18500000052154
+          ],
+          "samplesMs": [
+            25.044999999925494,
+            23.81499999947846,
+            23.83999999985099,
+            24.490000000223517,
+            23.450000000186265,
+            24.434999999590218,
+            23.8050000006333,
+            25.125,
+            22.419999999925494
+          ],
+          "medianMsPerOperation": 0.09312499999941792
+        }
+      ]
+    }
+  ],
+  "browserVersion": "153.0.8010.0",
+  "summary": [
+    {
+      "name": "SharedMap<number>.values",
+      "size": 1024,
+      "beforeMs": 0.0821289062496362,
+      "afterMs": 0.0640136718757276,
+      "medianPairedSpeedup": 1.2828541572354815,
+      "pairs": [
+        {
+          "beforeMs": 0.08042968749941792,
+          "afterMs": 0.06341796875130967,
+          "speedup": 1.2682476131460287
+        },
+        {
+          "beforeMs": 0.09482421875145519,
+          "afterMs": 0.06593750000320142,
+          "speedup": 1.4380924170138578
+        },
+        {
+          "beforeMs": 0.08382812499985448,
+          "afterMs": 0.06460937500014552,
+          "speedup": 1.2974607013249342
+        },
+        {
+          "beforeMs": 0.0747656250023283,
+          "afterMs": 0.06240234375218279,
+          "speedup": 1.1981220657231013
+        }
+      ]
+    },
+    {
+      "name": "SharedMap<number>.values",
+      "size": 65536,
+      "beforeMs": 6.5034374999813735,
+      "afterMs": 5.3709375000034925,
+      "medianPairedSpeedup": 1.1406475695383813,
+      "pairs": [
+        {
+          "beforeMs": 6.407187499979045,
+          "afterMs": 6.0734374999883585,
+          "speedup": 1.0549524054526496
+        },
+        {
+          "beforeMs": 9.980624999967404,
+          "afterMs": 4.904687500034925,
+          "speedup": 2.034915578188485
+        },
+        {
+          "beforeMs": 6.599687499983702,
+          "afterMs": 5.390312500006985,
+          "speedup": 1.2243608325074196
+        },
+        {
+          "beforeMs": 5.65625,
+          "afterMs": 5.3515625,
+          "speedup": 1.056934306569343
+        }
+      ]
+    },
+    {
+      "name": "SharedMap<boolean>.values",
+      "size": 1024,
+      "beforeMs": 0.09413085937558208,
+      "afterMs": 0.08640625000043656,
+      "medianPairedSpeedup": 1.107934975951372,
+      "pairs": [
+        {
+          "beforeMs": 0.08812500000203727,
+          "afterMs": 0.09916015625276486,
+          "speedup": 0.8887138073623204
+        },
+        {
+          "beforeMs": 0.07423828124956344,
+          "afterMs": 0.07679687500058208,
+          "speedup": 0.9666836215536213
+        },
+        {
+          "beforeMs": 0.11994140625029104,
+          "afterMs": 0.09601562500029104,
+          "speedup": 1.2491863303491226
+        },
+        {
+          "beforeMs": 0.10013671874912689,
+          "afterMs": 0.068359375,
+          "speedup": 1.4648571428443704
+        }
+      ]
+    },
+    {
+      "name": "SharedMap<boolean>.values",
+      "size": 65536,
+      "beforeMs": 6.5115625000034925,
+      "afterMs": 5.737500000017462,
+      "medianPairedSpeedup": 1.1592616512405902,
+      "pairs": [
+        {
+          "beforeMs": 6.325937499990687,
+          "afterMs": 5.910312500025611,
+          "speedup": 1.0703220007340177
+        },
+        {
+          "beforeMs": 7.445624999993015,
+          "afterMs": 6.334062499983702,
+          "speedup": 1.1754896640208672
+        },
+        {
+          "beforeMs": 6.360625000030268,
+          "afterMs": 5.564687500009313,
+          "speedup": 1.143033638460313
+        },
+        {
+          "beforeMs": 6.662499999976717,
+          "afterMs": 5.199687499960419,
+          "speedup": 1.281327002829965
+        }
+      ]
+    },
+    {
+      "name": "SharedMap<string>.values",
+      "size": 1024,
+      "beforeMs": 0.09915039062616415,
+      "afterMs": 0.08666992187681899,
+      "medianPairedSpeedup": 1.1459963985110995,
+      "pairs": [
+        {
+          "beforeMs": 0.09060546875116415,
+          "afterMs": 0.09425781249956344,
+          "speedup": 0.9612515540988583
+        },
+        {
+          "beforeMs": 0.09701171874985448,
+          "afterMs": 0.08947265625101863,
+          "speedup": 1.084261078353198
+        },
+        {
+          "beforeMs": 0.10128906250247383,
+          "afterMs": 0.08386718750261934,
+          "speedup": 1.207731718669001
+        },
+        {
+          "beforeMs": 0.10281250000116415,
+          "afterMs": 0.07837890625160071,
+          "speedup": 1.3117368552085968
+        }
+      ]
+    },
+    {
+      "name": "SharedMap<object>.values",
+      "size": 1024,
+      "beforeMs": 0.09264648437601863,
+      "afterMs": 0.08282226562550932,
+      "medianPairedSpeedup": 1.098841576915169,
+      "pairs": [
+        {
+          "beforeMs": 0.08837890625,
+          "afterMs": 0.07751953124898137,
+          "speedup": 1.1400856639101689
+        },
+        {
+          "beforeMs": 0.09216796875261934,
+          "afterMs": 0.08714843750203727,
+          "speedup": 1.057597489920169
+        },
+        {
+          "beforeMs": 0.09496093750203727,
+          "afterMs": 0.07849609374898137,
+          "speedup": 1.2097536701088334
+        },
+        {
+          "beforeMs": 0.09312499999941792,
+          "afterMs": 0.08835937500043656,
+          "speedup": 1.0539345711641557
+        }
+      ]
+    }
+  ],
+  "sourceAfter": {
+    "baseline": {
+      "commit": "501b73819ed7e9bbf7adbb74b03df01045701973",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "5ad9f7e4c4e7b9279b646fd758f3955c2597dd4f5f72a9a1445c487e3656cfb4",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "dist/chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "dist/chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "dist/chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "dist/chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "dist/geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "dist/numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+        "dist/redux.js": "215b3d3b44943418b59edd4f7784468871be33e8c6bce79bcc9aa8895348b01f",
+        "dist/shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "dist/state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "dist/tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "dist/worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "55d09411e48c47c9ba779648e7cc889cb7b9ab7c1026027a87cd872e88c00857",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    },
+    "candidate": {
+      "commit": "226b53ce5dfe77b16ee15958d491eb5a9613ed7e",
+      "files": {
+        "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+        "arena.ts": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+        "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+        "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+        "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+        "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+        "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+        "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+        "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+        "dist/chunk-7kj1qpjd.js": "0692472cdaaf33d2830bf529d0948f3ad73467a0b9246dfe39bf18f36dcbe513",
+        "dist/chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+        "dist/chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+        "dist/chunk-nxt1n507.js": "4796b255a831d68434e454461542d33028afa84a702296c961867bba9fc1db4b",
+        "dist/chunk-vp7p8bkb.js": "f6fbcf3a3e5fcd9134964f302e73297e7c6000ce440aefd96c209569ce100001",
+        "dist/geometry.js": "4868942e110deeef0f6c5c671485ff4570797274a2a2e36df49bc999d9a4d571",
+        "dist/numeric.js": "3f26d20db8916d071e5773d80b86fe5e3b14d0efda992ade21fa131bd5c69820",
+        "dist/redux.js": "1180da6a77d285e34f9c64c78d65da67c8a7b9d4c8dbb95c4e87026720033091",
+        "dist/shared.js": "997173af823b36d72f5e34d9f80581437ebf71209c937bf4c3c22657ec606ba7",
+        "dist/state.js": "2d98916a153d8c4ec841f51f3e03549fea9dec9d787dba26f0d19cf058a18d79",
+        "dist/tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+        "dist/worker.js": "f66c7d8a800cbb40bb61cb2fe6580bc6f8631d0fe428c4e25753657fe538baf2",
+        "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+        "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+        "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+        "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+        "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+        "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+        "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+        "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+        "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+        "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+        "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+        "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+        "map-projection.test.ts": "e6b49a58f561d440ef0e5af2f0877c7981fc9806d1a3794f20370b59f0ee81f2",
+        "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+        "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+        "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+        "map-values-view.test.ts": "92148bb4d033c8d3f0a3120fe17060a617e1fffc8f1608e01ff980500b6a67f2",
+        "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+        "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+        "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+        "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+        "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+        "primitive-sequence-scan.test.ts": "3f4aee49c7d3466bb517c22459756fbe06dce538e2a7fc409bc599e8103db308",
+        "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+        "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+        "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+        "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+        "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+        "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+        "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+        "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+        "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+        "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+        "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+        "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+        "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+        "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+        "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+        "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+        "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+        "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+        "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+        "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+        "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+        "shared-list.ts": "5d3e610c5d7167bede0fba9493ee1c35b6b6133e242667d1c122111cdd4a16dd",
+        "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+        "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+        "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+        "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+        "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+        "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+        "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+        "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+        "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+        "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+        "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+        "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+        "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+        "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+        "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+        "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+        "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+        "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+        "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+        "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+        "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+        "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+        "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+        "text-search.ts": "51e2d9d9de0b1bf23297cb0fd4df0209af3eedbd05c26c2697968c24629d9459",
+        "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+        "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+        "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+        "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+        "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+        "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+        "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+        "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+        "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+        "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+        "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+        "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+        "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+        "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+        "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+        "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+        "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+        "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+      }
+    }
+  }
+}

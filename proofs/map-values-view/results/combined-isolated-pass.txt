@@ -1,0 +1,1128 @@
+Combined integration check with fresh module isolation per test file. Default 5s test timeout unchanged.
+Integration revision: 7672fc9339bcd6ee33a735986cb218933e931da9
+COMMAND: ['bun', '--bun', 'node_modules/vitest/vitest.mjs', 'run', '--isolate', '--reporter=verbose']
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-integration
+
+ ✓ typed-values.test.ts > typed JSON values > keeps old snapshots, forks, input ownership, and deeply frozen reads 63ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > preserves all f64 values and indexes at leaf boundaries on writer and reader 29ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > does not read a growing writer or a fork in the middle of a scan 168ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > preserves boolean decoding, UTF-8 strings and immutable JSON objects 7ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > SharedLinkedList: retains numeric scans, boolean scans and source versions 16ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > SharedDoublyLinkedList: retains numeric scans, boolean scans and source versions 41ms
+ ✓ primitive-sequence-scan.test.ts > primitive sequence scan fast paths > preserves reverse traversal and source indexes for a doubly linked list 2ms
+ ✓ typed-values.test.ts > typed JSON values > covers bulk operations, callbacks, arrays, and detached iteration tuples 133ms
+ ✓ typed-values.test.ts > typed JSON values > supports map, worker reconstruction, and compaction 140ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 0 124ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 1 72ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 31 51ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 32 30ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 33 28ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 1024 92ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 1025 101ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > vector branches and compaction at 4097 182ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > map: insert 1598ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable map with its original semantics 1680ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > frontier append uses exactly eight fresh bytes, while a fork copies its visible prefix 7ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > SharedLinkedList: mixed block edits retain all sampled branches 683ms
+ ✓ typed-values.test.ts > typed JSON values > supports list, worker reconstruction, and compaction 1847ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > SharedDoublyLinkedList: mixed block edits retain all sampled branches 715ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > map: replace 1187ms
+ ✓ performance-revision.test.ts > frontier tails and blocked persistent sequences > compaction drops a consumed queue prefix without changing its source 555ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable set with its original semantics 1473ms
+ ✓ typed-values.test.ts > typed JSON values > supports stack, worker reconstruction, and compaction 1493ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > map: delete 1140ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > SharedMap: inserts, overwrites and deletes preserve forks 1439ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable list with its original semantics 1448ms
+ ✓ typed-values.test.ts > typed JSON values > supports queue, worker reconstruction, and compaction 1290ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > ordered map: insert 1163ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > SharedOrderedMap: inserts, overwrites and deletes preserve forks 1578ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > ordered map: replace 1175ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable stack with its original semantics 1593ms
+ ✓ typed-values.test.ts > typed JSON values > supports linked list, worker reconstruction, and compaction 1431ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > ordered map: delete 1208ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable queue with its original semantics 1378ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > SharedSortedMap: inserts, overwrites and deletes preserve forks 1721ms
+ ✓ typed-values.test.ts > typed JSON values > supports doubly linked list, worker reconstruction, and compaction 1481ms
+ ✓ typed-values.test.ts > typed JSON values > supports ordered map, worker reconstruction, and compaction 93ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > sorted map: insert 1558ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable linked list with its original semantics 1435ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > sorted journal boundaries, empty keys, NUL, BOM and long shared UTF-8 prefixes 51ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > numeric lookup caching distinguishes roots, missing values, NaN and negative zero 11ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > compaction removes dead history and does not parse primitive JSON payloads 1416ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > compaction shares repeated live nested snapshots and releases obsolete dependencies 38ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > set variants, stacks, heaps and custom sort order survive compaction 26ms
+ ✓ performance-revision.test.ts > maps, journals and raw live-data compaction > worker wire format rejects the former layout 1ms
+ ✓ typed-values.test.ts > typed JSON values > supports sorted map, worker reconstruction, and compaction 120ms
+ ✓ typed-values.test.ts > typed JSON values > supports priority queue, worker reconstruction, and compaction 1399ms
+ ✓ typed-values.test.ts > typed JSON values > preserves nested descriptors through forks, compaction, growth, and resets 126ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > returns complete native UTF-8 bytes across temporary-buffer boundaries 87ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > uses ordinary buffers when a runtime rejects shared TextEncoder output 96ms
+ ✓ typed-values.test.ts > typed JSON values > keeps special keys as data and freezes array values 130ms
+ ✓ typed-values.test.ts > existing object codec reuse > uses the same codec instance, runtime names, and native UTF-8 bytes 91ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > returns native allocated bytes when TextEncoder.encodeInto is absent 106ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > matches native bytes and exact allocation for encoded string values 93ms
+ ✓ typed-values.test.ts > existing object codec reuse > calls native JSON.stringify once per scalar write without a validation walk 86ms
+ ✓ typed-values.test.ts > existing object codec reuse > uses native JSON semantics for unchecked inputs, including hooks and negative zero 86ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > matches native bytes and exact allocation for encoded object values 150ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > keeps prepared bytes independent from subsequent scratch use 106ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > keeps native leaf payloads, prefixes, and alignment for string 75ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > keeps native leaf payloads, prefixes, and alignment for object 57ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' handles exact shared-scratch capacity and oversized keys 74ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable doubly linked list with its original semantics 1286ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' handles exact shared-scratch capacity and oversized keys 79ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' handles exact shared-scratch capacity and oversized keys 145ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' 'string' preserves snapshots and attachments while the writer grows 67ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > sorted map: replace 1807ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' 'object' preserves snapshots and attachments while the writer grows 77ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' 'string' preserves snapshots and attachments while the writer grows 64ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' 'object' preserves snapshots and attachments while the writer grows 111ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' 'string' preserves snapshots and attachments while the writer grows 55ms
+ ✓ typed-values.test.ts > existing object codec reuse > keeps byte allocation identical for large typed and untyped batches 1072ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' 'object' preserves snapshots and attachments while the writer grows 48ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'list' 'string' preserves snapshots and attachments while the writer grows 40ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'list' 'object' preserves snapshots and attachments while the writer grows 43ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'stack' 'string' preserves snapshots and attachments while the writer grows 59ms
+ ✓ typed-values.test.ts > existing object codec reuse > uses existing object descriptors for transport and mixed nested collections 55ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'stack' 'object' preserves snapshots and attachments while the writer grows 117ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'queue' 'string' preserves snapshots and attachments while the writer grows 92ms
+ ✓ typed-values.test.ts > existing object codec reuse > keeps native bigint errors without changing published snapshots 109ms
+ ✓ typed-values.test.ts > existing object codec reuse > keeps native cycle errors without changing published snapshots 92ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'queue' 'object' preserves snapshots and attachments while the writer grows 89ms
+ ✓ typed-values.test.ts > existing object codec reuse > does not register a separate json runtime codec 69ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function map(type) {
+	return nested("SharedMap", type);
+} retains the wire description for SharedMap 69ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function list(type) {
+	return nested("SharedList", type);
+} retains the wire description for SharedList 47ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'linked list' 'string' preserves snapshots and attachments while the writer grows 87ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'linked list' 'object' preserves snapshots and attachments while the writer grows 69ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'doubly linked list' 'string' preserves snapshots and attachments while the writer grows 112ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'doubly linked list' 'object' preserves snapshots and attachments while the writer grows 101ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function stack(type) {
+	return nested("SharedStack", type);
+} retains the wire description for SharedStack 105ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function queue(type) {
+	return nested("SharedQueue", type);
+} retains the wire description for SharedQueue 86ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable ordered map with its original semantics 1503ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function linkedList(type) {
+	return nested("SharedLinkedList", type);
+} retains the wire description for SharedLinkedList 92ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function doublyLinkedList(type) {
+	return nested("SharedDoublyLinkedList", type);
+} retains the wire description for SharedDoublyLinkedList 54ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'priority queue' 'string' preserves snapshots and attachments while the writer grows 86ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function orderedMap(type) {
+	return nested("SharedOrderedMap", type);
+} retains the wire description for SharedOrderedMap 49ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function sortedMap(type) {
+	return nested("SharedSortedMap", type);
+} retains the wire description for SharedSortedMap 68ms
+ ✓ typed-values.test.ts > nested descriptor helpers > function priorityQueue(type) {
+	return nested("SharedPriorityQueue", type);
+} retains the wire description for SharedPriorityQueue 58ms
+ ✓ typed-values.test.ts > nested descriptor helpers > retains string and number set types without adding object set support 95ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'priority queue' 'object' preserves snapshots and attachments while the writer grows 90ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' serializes hooks once before reentrant writes and growth, large=false 79ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' serializes hooks once before reentrant writes and growth, large=true 90ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' serializes hooks once before reentrant writes and growth, large=false 82ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > sorted map: delete 1563ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' serializes hooks once before reentrant writes and growth, large=true 122ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' serializes hooks once before reentrant writes and growth, large=false 96ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedMap 91ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedList 89ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedSet 84ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' serializes hooks once before reentrant writes and growth, large=true 126ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'list' serializes hooks once before reentrant writes and growth, large=false 65ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedStack 52ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedQueue 89ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'list' serializes hooks once before reentrant writes and growth, large=true 206ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedLinkedList 154ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedDoublyLinkedList 70ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'stack' serializes hooks once before reentrant writes and growth, large=false 106ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedOrderedMap 75ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedOrderedSet 152ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'stack' serializes hooks once before reentrant writes and growth, large=true 168ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable ordered set with its original semantics 1490ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedSortedMap 130ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedSortedSet 71ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'queue' serializes hooks once before reentrant writes and growth, large=false 164ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'queue' serializes hooks once before reentrant writes and growth, large=true 69ms
+ ✓ immutable-proof.test.ts > immutable published bytes and handles, all 12 structures > SharedPriorityQueue 59ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > map: bulk insert, overwrite, duplicate and exact hash collision 1185ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'linked list' serializes hooks once before reentrant writes and growth, large=false 81ms
+ ✓ immutable-proof.test.ts > forked model histories > HAMT: 500 branching versions 314ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'linked list' serializes hooks once before reentrant writes and growth, large=true 152ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'doubly linked list' serializes hooks once before reentrant writes and growth, large=false 70ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'doubly linked list' serializes hooks once before reentrant writes and growth, large=true 124ms
+ ✓ immutable-proof.test.ts > forked model histories > ordered: 500 branching versions 130ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'priority queue' serializes hooks once before reentrant writes and growth, large=false 114ms
+ ✓ immutable-proof.test.ts > forked model histories > sorted: 500 branching versions 158ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'priority queue' serializes hooks once before reentrant writes and growth, large=true 114ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > keeps bytes intact when getters and toJSON reenter different arenas 77ms
+ ✓ immutable-proof.test.ts > forked model histories > singly: 500 branching versions and AVL ranks 149ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'scalar map' recovers after failed serialization without changing a retained root 147ms
+ ✓ immutable-proof.test.ts > forked model histories > doubly: 500 branching versions and AVL ranks 121ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'bulk map' recovers after failed serialization without changing a retained root 107ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'scalar list' recovers after failed serialization without changing a retained root 148ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'bulk list' recovers after failed serialization without changing a retained root 84ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable sorted map with its original semantics 1313ms
+ ✓ immutable-proof.test.ts > forked model histories > vector: partial blocks, level growth, overwrite, pop and forks 440ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'map' preserves nested descriptors and read-only child attachments 87ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'ordered map' preserves nested descriptors and read-only child attachments 83ms
+ ✓ immutable-proof.test.ts > forked model histories > queue and stack: 400 branching versions 118ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > set: insert 1446ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'sorted map' preserves nested descriptors and read-only child attachments 153ms
+ ✓ immutable-proof.test.ts > forked model histories > SharedSet: 400 branching versions 144ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'list' preserves nested descriptors and read-only child attachments 180ms
+ ✓ immutable-proof.test.ts > forked model histories > SharedOrderedSet: 400 branching versions 177ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'stack' preserves nested descriptors and read-only child attachments 184ms
+ ✓ immutable-proof.test.ts > forked model histories > SharedSortedSet: 400 branching versions 133ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'queue' preserves nested descriptors and read-only child attachments 140ms
+ ✓ immutable-proof.test.ts > forked model histories > heap: branching histories, order, size and leftist ranks (max=false) 127ms
+ ✓ immutable-proof.test.ts > forked model histories > heap: branching histories, order, size and leftist ranks (max=true) 91ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'linked list' preserves nested descriptors and read-only child attachments 114ms
+ ✓ immutable-proof.test.ts > FNV-1a exact collision: scalar, bulk, merge, overwrite and delete 130ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'doubly linked list' preserves nested descriptors and read-only child attachments 143ms
+ ✓ utf8-write.test.ts > UTF-8 value writes > 'priority queue' preserves nested descriptors and read-only child attachments 138ms
+ ✓ immutable-proof.test.ts > batching has no 8-bit owner epoch or 1024-live-root limit 139ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects an omitted map root instead of successfully restoring an empty map 100ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable sorted set with its original semantics 1430ms
+ ✓ immutable-proof.test.ts > large keys, values, batches and UTF-16 replacement have no packed-pointer truncation 189ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > accepts generated nonempty and empty descriptors 91ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > also accepts public transport descriptors without prior compaction 58ms
+ ✓ immutable-proof.test.ts > caller inputs and returned JSON objects cannot change stored values 169ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > accepts raw empty descriptors produced by public removal 21ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > requires every mandatory producer field 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > rejects incorrectly typed fields and fields from unrelated descriptors 30ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > validates the complete value type grammar 40ms
+ ✓ immutable-proof.test.ts > reentrant and interleaved iterators survive nested reads and memory growth 144ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedMap' > rejects missing live pointers and out-of-range or misaligned pointers 32ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > accepts generated nonempty and empty descriptors 119ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > ordered set: insert 1459ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > also accepts public transport descriptors without prior compaction 55ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > accepts raw empty descriptors produced by public removal 45ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > requires every mandatory producer field 27ms
+ ✓ immutable-proof.test.ts > worker snapshot attachment, nested dependencies, reset and read-only writes (copy=true) 444ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > rejects incorrectly typed fields and fields from unrelated descriptors 49ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > validates the complete value type grammar 11ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSet' > rejects missing live pointers and out-of-range or misaligned pointers 30ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > accepts generated nonempty and empty descriptors 109ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > also accepts public transport descriptors without prior compaction 68ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > accepts raw empty descriptors produced by public removal 28ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > requires every mandatory producer field 15ms
+ ✓ immutable-proof.test.ts > worker snapshot attachment, nested dependencies, reset and read-only writes (copy=false) 195ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > rejects incorrectly typed fields and fields from unrelated descriptors 32ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > validates the complete value type grammar 24ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedList' > rejects missing live pointers and out-of-range or misaligned pointers 27ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > accepts generated nonempty and empty descriptors 107ms
+ ✓ immutable-proof.test.ts > nested values remain valid after their originating arena is reset 139ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > also accepts public transport descriptors without prior compaction 46ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > accepts raw empty descriptors produced by public removal 26ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > requires every mandatory producer field 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > rejects incorrectly typed fields and fields from unrelated descriptors 28ms
+ ✓ immutable-proof.test.ts > bulk vector construction has a deterministic linear allocation bound 96ms
+ ✓ immutable-proof.test.ts > empty map keys do not alias cached values; UTF-8 BOM is content 105ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > validates the complete value type grammar 30ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedStack' > rejects missing live pointers and out-of-range or misaligned pointers 25ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > accepts generated nonempty and empty descriptors 100ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > also accepts public transport descriptors without prior compaction 52ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > accepts raw empty descriptors produced by public removal 22ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > requires every mandatory producer field 20ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > rejects incorrectly typed fields and fields from unrelated descriptors 32ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable priority queue with its original semantics 1443ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/0 10ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/1 7ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/4 7ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/5 9ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/4096 114ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > validates the complete value type grammar 25ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedQueue' > rejects missing live pointers and out-of-range or misaligned pointers 27ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > accepts generated nonempty and empty descriptors 115ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > preserves repeated snapshot aliases and deeply freezes the restored state 25ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > preserves undefined, sparse arrays, special numbers, and null-prototype records 1ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > escapes tag-like user objects and prototype property names 0ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > restores nested dependencies and can export them to a worker again 57ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > checkpoints a read-only worker view and restores it as a writable collection 59ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > also accepts public transport descriptors without prior compaction 57ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > accepts raw empty descriptors produced by public removal 14ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > requires every mandatory producer field 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > rejects incorrectly typed fields and fields from unrelated descriptors 46ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > gives two imports distinct arena IDs before they are combined into a nested snapshot 77ms
+ ✓ redux-checkpoint.test.ts > complete checkpoint round trips > exports live data only and does not allocate in the source arena 44ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/12287 264ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > validates the complete value type grammar 13ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedLinkedList' > rejects missing live pointers and out-of-range or misaligned pointers 16ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > accepts generated nonempty and empty descriptors 49ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > also accepts public transport descriptors without prior compaction 49ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid version 8ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid binary format 20ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid duplicate arena 25ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid missing arena 14ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid arena length 16ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid checksum 19ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid base64 21ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid unknown class 16ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid bad pointer 10ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid missing snapshot 12ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid invalid number 12ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects an invalid duplicate object key 10ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > enforces configured resource limits 21ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > rejects unsupported values, accessors, symbols and cycles without executing getters 1ms
+ ✓ redux-checkpoint.test.ts > checkpoint validation > does not silently serialize custom comparator functions 1ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > accepts raw empty descriptors produced by public removal 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > requires every mandatory producer field 8ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > rejects incorrectly typed fields and fields from unrelated descriptors 23ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > validates the complete value type grammar 27ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedDoublyLinkedList' > rejects missing live pointers and out-of-range or misaligned pointers 19ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > accepts generated nonempty and empty descriptors 75ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > sorted set: insert 1609ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/12288 253ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > also accepts public transport descriptors without prior compaction 39ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > accepts raw empty descriptors produced by public removal 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > requires every mandatory producer field 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > rejects incorrectly typed fields and fields from unrelated descriptors 27ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > validates the complete value type grammar 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedMap' > rejects missing live pointers and out-of-range or misaligned pointers 14ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > accepts generated nonempty and empty descriptors 41ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > also accepts public transport descriptors without prior compaction 49ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary string/12289 215ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > accepts raw empty descriptors produced by public removal 16ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > requires every mandatory producer field 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > rejects incorrectly typed fields and fields from unrelated descriptors 31ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > validates the complete value type grammar 16ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedOrderedSet' > rejects missing live pointers and out-of-range or misaligned pointers 21ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > accepts generated nonempty and empty descriptors 84ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/0 5ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/1 6ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/4 5ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/5 10ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/4096 160ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > also accepts public transport descriptors without prior compaction 32ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > accepts raw empty descriptors produced by public removal 18ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > requires every mandatory producer field 18ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > rejects incorrectly typed fields and fields from unrelated descriptors 29ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > validates the complete value type grammar 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedMap' > rejects missing live pointers and out-of-range or misaligned pointers 12ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > accepts generated nonempty and empty descriptors 48ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > also accepts public transport descriptors without prior compaction 45ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > list: append across a full leaf 649ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > accepts raw empty descriptors produced by public removal 13ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > requires every mandatory producer field 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > rejects incorrectly typed fields and fields from unrelated descriptors 16ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > validates the complete value type grammar 17ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedSortedSet' > rejects missing live pointers and out-of-range or misaligned pointers 16ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > accepts generated nonempty and empty descriptors 44ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/12287 348ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > also accepts public transport descriptors without prior compaction 41ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > accepts raw empty descriptors produced by public removal 18ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > requires every mandatory producer field 10ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > rejects incorrectly typed fields and fields from unrelated descriptors 19ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > validates the complete value type grammar 14ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > 'SharedPriorityQueue' > rejects missing live pointers and out-of-range or misaligned pointers 11ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > requires the numeric backing value type for SharedSet 10ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > requires the numeric backing value type for SharedOrderedSet 8ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > requires the numeric backing value type for SharedSortedSet 11ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > preserves the optional orderStable compatibility field for SharedOrderedMap 26ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > preserves the optional orderStable compatibility field for SharedOrderedSet 18ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects a SharedMap descriptor relabeled as SharedStack 14ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects a SharedList descriptor relabeled as SharedQueue 9ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/12288 247ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects a SharedLinkedList descriptor relabeled as SharedList 15ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects a SharedOrderedMap descriptor relabeled as SharedMap 10ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects a SharedPriorityQueue descriptor relabeled as SharedStack 7ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > rejects impossible sequence sizes and truncated tail storage 52ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > requires complete direct root headers in size-33 sequence descriptors 3ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > requires complete direct root headers in size-65 sequence descriptors 3ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > does not invoke descriptor accessors or accept inherited required fields 11ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > keeps valid sequence boundaries and nested descriptors at size 32 34ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > keeps valid sequence boundaries and nested descriptors at size 33 42ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > keeps valid sequence boundaries and nested descriptors at size 1025 42ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > list: replace a tree value 582ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw queue descriptors after 1 dequeues 17ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw queue descriptors after 35 dequeues 23ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw queue descriptors after 69 dequeues 17ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw list descriptors popped across size 33 31ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw list descriptors popped across size 65 56ms
+ ✓ bulk-input-storage.test.ts > bulk input boundary object/12289 274ms
+ ✓ bulk-input-storage.test.ts > normalized boundary string/12288 25ms
+ ✓ bulk-input-storage.test.ts > normalized boundary string/12289 30ms
+ ✓ bulk-input-storage.test.ts > normalized boundary object/12288 25ms
+ ✓ bulk-input-storage.test.ts > normalized boundary object/12289 70ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw list descriptors popped across size 1025 29ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw list descriptors popped across size 1057 62ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw ordered descriptors with deleted and reinserted entries 78ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw 'SharedLinkedList' edits with all remaining values in blocks 50ms
+ ✓ checkpoint-descriptor-validation.test.ts > checkpoint descriptors preserve data or reject malformed metadata > accepts raw 'SharedDoublyLinkedList' edits with all remaining values in blocks 33ms
+ ✓ bulk-input-storage.test.ts > Unicode, duplicate validation, long values and source callback order 16ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive number/0 22ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive number/1 16ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive number/2 11ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive boolean/0 13ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive boolean/1 14ms
+ ✓ bulk-input-storage.test.ts > legacy invalid primitive boolean/2 7ms
+ ✓ bulk-input-storage.test.ts > legacy numeric, boolean and set allocation controls 27ms
+ ✓ bulk-input-storage.test.ts > string validation and object serialization errors precede table staging 11ms
+ ✓ bulk-input-storage.test.ts > object callbacks can reenter scratch, grow memory, retain side results and fail 7ms
+ ✓ bulk-input-storage.test.ts > nested descriptors, unchanged leaf aliases and attached read-only guards 30ms
+ ✓ bulk-input-storage.test.ts > tagged journal, empty iterator and real overlay string 43ms
+ ✓ bulk-input-storage.test.ts > tagged journal, empty iterator and real overlay object 45ms
+ ✓ bulk-input-storage.test.ts > eight full FNV collisions reach terminal buckets and preserve forks 35ms
+ ✓ bulk-input-storage.test.ts > fixed recursive allocation failure/recovery string/96 20ms
+ ✓ bulk-input-storage.test.ts > fixed recursive allocation failure/recovery string/160 22ms
+ ✓ bulk-input-storage.test.ts > fixed recursive allocation failure/recovery object/96 21ms
+ ✓ bulk-input-storage.test.ts > fixed recursive allocation failure/recovery object/160 17ms
+ ✓ bulk-input-storage.test.ts > terminal collision failure/recovery string 21ms
+ ✓ bulk-input-storage.test.ts > terminal collision failure/recovery object 13ms
+ ✓ bulk-input-storage.test.ts > normalization reference remains replacement-character based 16ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > list: replace a tail value 776ms
+ ✓ geometry.test.ts > bboxXY > returns independent bounds with exact signed-zero and NaN handling 15ms
+ ✓ geometry.test.ts > bboxXY > rejects incomplete points and incorrect collection types 1ms
+ ✓ geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth 1971ms
+ ✓ geometry.test.ts > bboxXY > keeps old arenas and separate kernel instances independent 11ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 0 interleaved points 9ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 1 interleaved points 20ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 2 interleaved points 14ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 7 interleaved points 18ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 8 interleaved points 12ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 15 interleaved points 17ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 16 interleaved points 2ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 17 interleaved points 22ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 31 interleaved points 17ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 32 interleaved points 10ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 33 interleaved points 16ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 511 interleaved points 11ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 512 interleaved points 21ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 513 interleaved points 14ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > allocates only reachable path nodes for empty, root, interior and tied insertion 15ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > keeps signed-zero, equal and infinite priorities and old snapshots 29ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > uses normal allocator alignment after a four-byte-aligned record 9ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > can use the final available node and preserves snapshots after later failure 555ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > shares one lookup without materializing all-to-all dependency maps 267ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > failed multi-node insertion changes only unpublished allocation bytes 307ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > exports empty, singleton, and two-arena payloads without dependency iterators 21ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > keeps a single dependency backing field and avoids dependency getters during reads 7ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > preserves legacy first-ID order across overlapping closed and observed registries 31ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > follows singleton dependency values even when their key is the owner ID 8ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > preserves distinct self-excluding dependency maps when observed 37ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=false) > shared/copy readers and compaction retain the shape across growth 44ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > allocates only reachable path nodes for empty, root, interior and tied insertion 15ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > keeps signed-zero, equal and infinite priorities and old snapshots 31ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > uses normal allocator alignment after a four-byte-aligned record 15ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > honors mutations of an observed dependency map without changing sibling maps 50ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > preserves DFS order and duplicate-ID precedence after extending a reader graph 113ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > preserves same-arena nesting, aliases, forks, and read-only behavior 11ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > resolves cross-arena nesting and cycles in the arena dependency graph 23ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > isolates overlapping arena IDs across attachments, including deferred nested reads 32ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > re-exports reader groups reached from writer-owned dependency maps 20ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=false) > retains ordinary invalid transport and missing nested arena errors 17ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > list: bulk append across leaves 913ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > can use the final available node and preserves snapshots after later failure 592ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > shares one lookup without materializing all-to-all dependency maps 446ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > failed multi-node insertion changes only unpublished allocation bytes 284ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > exports empty, singleton, and two-arena payloads without dependency iterators 42ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > keeps a single dependency backing field and avoids dependency getters during reads 28ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > preserves legacy first-ID order across overlapping closed and observed registries 202ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > linked list: append 742ms
+ ✓ shared-priority-queue-insert.test.ts > heap insertion (max=true) > shared/copy readers and compaction retain the shape across growth 31ms
+ ✓ shared-priority-queue-insert.test.ts > validation and serialization failures precede heap node allocation 3ms
+ ✓ shared-priority-queue-insert.test.ts > encoded strings, objects and nested values keep their payloads on promotion 79ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > follows singleton dependency values even when their key is the owner ID 62ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > preserves distinct self-excluding dependency maps when observed 54ms
+ ✓ nested.test.ts > Nested Data Structures > SharedMap containing nested structures > SharedMap<SharedSet<string>> 106ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > honors mutations of an observed dependency map without changing sibling maps 33ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > preserves DFS order and duplicate-ID precedence after extending a reader graph 342ms
+ ✓ nested.test.ts > Nested Data Structures > SharedMap containing nested structures > SharedMap<SharedList<number>> 153ms
+ ✓ nested.test.ts > Nested Data Structures > SharedMap containing nested structures > SharedMap<SharedMap<string>> 84ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > preserves same-arena nesting, aliases, forks, and read-only behavior 26ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > resolves cross-arena nesting and cycles in the arena dependency graph 63ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > isolates overlapping arena IDs across attachments, including deferred nested reads 124ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > matches scalar for 16385 interleaved points 23ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > includes boundaries and rejects NaN coordinates in either axis 11ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > preserves attached and old snapshots after append, edit, and growth 2083ms
+ ✓ nested.test.ts > Nested Data Structures > SharedList containing nested structures > SharedList<SharedMap<number>> 68ms
+ ✓ nested.test.ts > Nested Data Structures > SharedList containing nested structures > SharedList<SharedSet<string>> 94ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > re-exports reader groups reached from writer-owned dependency maps 114ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > rejects incomplete points, incorrect list types, and incorrect bounds 15ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > works when the SIMD probe selects the scalar fallback 24ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > numeric-kernels.wasm reads only complete points at the memory boundary 20ms
+ ✓ numeric-spatial.test.ts > countPointsInBox > numeric-kernels-simd.wasm reads only complete points at the memory boundary 49ms
+ ✓ nested.test.ts > Nested Data Structures > SharedStack containing nested structures > SharedStack<SharedMap<string>> 84ms
+ ✓ worker-attachment.test.ts > worker attachment registry (copy=true) > retains ordinary invalid transport and missing nested arena errors 120ms
+ ✓ nested.test.ts > Nested Data Structures > SharedQueue containing nested structures > SharedQueue<SharedList<number>> 147ms
+ ✓ nested.test.ts > Nested Data Structures > SharedLinkedList containing nested structures > SharedLinkedList<SharedSet<string>> 75ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > linked list: insert 1167ms
+ ✓ nested.test.ts > Nested Data Structures > SharedDoublyLinkedList containing nested structures > SharedDoublyLinkedList<SharedMap<number>> 150ms
+ ✓ text-search-long.test.ts > long text search candidate skipping > preserves starts, overlaps, final-byte hits and every byte alignment 294ms
+ ✓ nested.test.ts > Nested Data Structures > SharedOrderedMap containing nested structures > SharedOrderedMap<SharedList<string>> 141ms
+ ✓ nested.test.ts > Nested Data Structures > SharedSortedMap containing nested structures > SharedSortedMap<SharedSet<number>> 79ms
+ ✓ nested.test.ts > Nested Data Structures > SharedPriorityQueue containing nested structures > SharedPriorityQueue<SharedMap<string>> 52ms
+ ✓ nested.test.ts > Nested Data Structures > Immutability with nested structures > modifying nested structure does not affect stored version 85ms
+ ✓ nested.test.ts > Nested Data Structures > Iteration with nested structures > forEach with nested maps 89ms
+ ✓ nested.test.ts > Nested Data Structures > Iteration with nested structures > entries with nested lists 75ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > linked list: remove 846ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > keeps both generator methods and native iterator prototypes unchanged 27ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves creation, return-before-next, throw-before-next, and zero-root laziness 106ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > doubly linked list: append 625ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > preserves snapshots while every prefix is inserted and then overwritten 1823ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > matches exact baseline pointer order and independent recursion across all trie shapes 414ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > keeps the byte hash unchanged across word boundaries 48ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > invalidates lanes on forks and interleaved maps in the same arena 44ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > remains valid after bulk updates, deletes, and low-level inserts 35ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > checks complete keys when full hashes collide 17ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > supports UTF-8 keys, long values and the generic codec path 26ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > resets partly updated scratch after allocation failure 172ms
+ ✓ text-search-long.test.ts > long text search candidate skipping > keeps prefix fallback linear for adversarial repeated prefixes 28ms
+ ✓ text-search-long.test.ts > long text search candidate skipping > never searches outside a string ending at the final memory byte 51ms
+ ✓ text-search-long.test.ts > long text search candidate skipping > does not decode ASCII misses or retain answers from another snapshot 1793ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > captures after caller growth before first next and survives two interleaved paused traversals 77ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > resumes journal yields across growth and captures each recursive iterator independently 250ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > finishes user callbacks before using the writer index 184ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > retains close, throw, callback reentry and fresh iteration after termination 103ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > keeps worker snapshots read-only with independent WASM globals 37ms
+ ✓ map-set-index.test.ts > bounded writer prefix index > retains insertion order for ordered maps 73ms
+ ✓ text-search-long.test.ts > long text search candidate skipping > keeps compiled searches valid in real workers while the owner grows 245ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and number values 117ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and boolean values 163ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > concurrent reads from multiple workers 68ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and string values 137ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > workers see updated map after set operations 68ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > workers see map after delete operations 86ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and object values 126ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > workers handle missing keys 59ms
+ ✓ map-set-path.test.ts > scalar map write path > preserves every retained root while adding and replacing distinct keys 316ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > stress test - 2 workers, 100 keys 75ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > empty SharedMap 35ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > 3 workers same key simultaneously 56ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and SharedMap<number> values 170ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves public projection order, Unicode and SharedList<number> values 122ms
+ ✓ workers.test.ts > SharedMap Multi-Worker Tests > unicode keys and values 72ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > doubly linked list: insert 1551ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > preserves natural UTF-8 byte order independently of baseline traversal 26ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > keeps shared attachments and ordinary/sorted sets unchanged 85ms
+ ✓ workers.test.ts > SharedList Multi-Worker Tests > SharedList<number> shared across workers 102ms
+ ✓ workers.test.ts > SharedList Multi-Worker Tests > SharedList<string> shared across workers 80ms
+ ✓ workers.test.ts > SharedList Multi-Worker Tests > SharedList<object> shared across workers 73ms
+ ✓ trie-view-capture.test.ts > radix view capture with unchanged HAMT controls > keeps copy attachments and ordinary/sorted sets unchanged 167ms
+ ✓ workers.test.ts > SharedList Multi-Worker Tests > SharedList after set operation 82ms
+ ✓ workers.test.ts > SharedList Multi-Worker Tests > SharedList after pop operation 70ms
+ ✓ workers.test.ts > SharedSet Multi-Worker Tests > SharedSet shared across workers 46ms
+ ✓ workers.test.ts > SharedSet Multi-Worker Tests > SharedSet after delete operation 30ms
+ ✓ redux.test.ts > Redux Toolkit integration > keeps Immer, serializability checks, old states, and action replay working 22ms
+ ✓ redux.test.ts > Redux Toolkit integration > preserves state identity for guarded no-op writes 1ms
+ ✓ redux.test.ts > Redux Toolkit integration > still reports an unrelated non-serializable action value 1ms
+ ✓ redux.test.ts > Redux Toolkit integration > does not decode collections during dispatch checks or summary rendering 2ms
+ ✓ redux.test.ts > Redux Toolkit integration > rejects forged collection prototypes and does not trust root descriptors 0ms
+ ✓ redux.test.ts > Redux Toolkit integration > retains snapshots after legacy dispose, auto-GC settings, growth, and reset 26ms
+ ✓ redux.test.ts > Redux Toolkit integration > supports real DevTools time travel, view selection, and committing an old state 9ms
+ ✓ redux.test.ts > selectors > retains uncached object identity across repeated reads and unrelated writes 28ms
+ ✓ workers.test.ts > Seamless Worker API > all structures via getWorkerData/initWorker 105ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedMap<string> zero-copy 79ms
+ ✓ redux.test.ts > selectors > does not reuse a pointer identity from a different arena 64ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedMap with a fresh writable arena 93ms
+ ✓ map-set-path.test.ts > scalar map write path > does not change any old payload byte 984ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedMap<number> zero-copy 51ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedMap<boolean> zero-copy 42ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedMap<object> zero-copy 83ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedList<number> zero-copy (Node.js) 0ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedList<string> zero-copy (Node.js) 0ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedList<boolean> zero-copy (Node.js) 0ms
+ ✓ workers.test.ts > Zero-Copy Data Type Tests > SharedList<object> zero-copy (Node.js) 0ms
+ ✓ map-set-path.test.ts > scalar map write path > keeps the compact allocation bound without allocating another index 12ms
+ ✓ map-set-path.test.ts > scalar map write path > falls back for forks, scalar writes after bulk updates, and deletions 20ms
+ ✓ map-set-path.test.ts > scalar map write path > handles two maps, an ordered map, and a list in the same writer arena 24ms
+ ✓ map-set-path.test.ts > scalar map write path > compares full keys for exact hash collisions 21ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 0 18ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 1 16ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedList with a fresh writable arena 33ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedSet with a fresh writable arena 21ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedStack with a fresh writable arena 32ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedQueue with a fresh writable arena 40ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 2 14ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 3 24ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 4 5ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 5 6ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 6 9ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 7 6ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 8 16ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 9 17ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedLinkedList with a fresh writable arena 37ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedDoublyLinkedList with a fresh writable arena 27ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedOrderedMap with a fresh writable arena 14ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedOrderedSet with a fresh writable arena 9ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedSortedMap with a fresh writable arena 13ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedSortedSet with a fresh writable arena 10ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > doubly linked list: remove 949ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 10 11ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 11 24ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 12 12ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 13 6ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 14 44ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 15 6ms
+ ✓ redux.test.ts > portable state codec > round-trips SharedPriorityQueue with a fresh writable arena 29ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedMap 3ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedList 27ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedSet 17ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedStack 33ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 16 9ms
+ ✓ map-set-path.test.ts > scalar map write path > checks exact short-key bytes at length 17 6ms
+ ✓ map-set-path.test.ts > scalar map write path > preserves Unicode replacement semantics and empty keys and values 19ms
+ ✓ map-set-path.test.ts > scalar map write path > keeps size correct after large-record fallbacks and memory growth 32ms
+ ✓ map-set-path.test.ts > scalar map write path > keeps old handles valid after reset and interleaved object serialization 28ms
+ ✓ map-set-path.test.ts > scalar map write path > preserves numeric special values and no-op cache behavior 7ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedQueue 34ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedLinkedList 25ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedDoublyLinkedList 39ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedOrderedMap 10ms
+ ✓ map-set-path.test.ts > scalar map write path > invalidates partial writer hints after allocation failure 48ms
+ ✓ map-set-path.test.ts > scalar map write path > rejects writes through attached readers and rejects invalid primitive values 15ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedOrderedSet 35ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedSortedMap 24ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedSortedSet 31ms
+ ✓ redux.test.ts > portable state codec > round-trips empty SharedPriorityQueue 33ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > keeps empty roots and never-started generators free of view access 18ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: refreshes once per nonempty traversal at block and tail boundaries 373ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: preserves interleaved forward, reverse, forked and independent iterators across growth 52ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: captures after first next, including roots created after the previous view 21ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: forward callbacks can reenter, fork and grow the owner 44ms
+ ✓ redux.test.ts > portable state codec > restores nested snapshots, frozen JSON, and future writes 45ms
+ ✓ redux.test.ts > portable state codec > preserves queue offsets, stack order, map order, and heap direction 88ms
+ ✓ redux.test.ts > portable state codec > preserves special numbers, undefined fields, sparse arrays, and null prototypes 1ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: early return and callback throws do not affect later scans 11ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList<number>: source, shared, fixed-size copy, forks and compaction agree 83ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList<boolean>: source, shared, fixed-size copy, forks and compaction agree 57ms
+ ✓ redux.test.ts > portable state codec > does not pollute prototypes when restoring object or map keys 36ms
+ ✓ redux.test.ts > portable state codec > rejects functions, dates, cycles, accessors, and custom comparators 4ms
+ ✓ redux.test.ts > portable state codec > validates versions, collection types, and duplicate map keys 46ms
+ ✓ redux.test.ts > portable state codec > enforces text, depth, node, and collection limits 1ms
+ ✓ redux.test.ts > portable state codec > exports read-only worker snapshots without writes or source resets 123ms
+ ✓ redux.test.ts > DevTools display and portable serialization > defaults to bounded display summaries and leaves real state unchanged 0ms
+ ✓ redux.test.ts > DevTools display and portable serialization > round-trips collection state and escapes reserved markers 17ms
+ ✓ redux.test.ts > DevTools display and portable serialization > keeps portable data independent of source arenas after compaction and reset 89ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList<string>: source, shared, fixed-size copy, forks and compaction agree 89ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList<object>: source, shared, fixed-size copy, forks and compaction agree 57ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 0 14ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 1 24ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 2 19ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > queue: enqueue after a partial drain at a leaf boundary 987ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedLinkedList: nested decode can reenter block scans and grow the outer arena 58ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: refreshes once per nonempty traversal at block and tail boundaries 255ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 3 46ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 15 12ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 16 15ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 17 11ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 31 30ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 32 21ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: preserves interleaved forward, reverse, forked and independent iterators across growth 49ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: captures after first next, including roots created after the previous view 40ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: forward callbacks can reenter, fork and grow the owner 10ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: reverse callbacks can reenter, fork and grow the owner 34ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 33 23ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 63 1ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 64 32ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 65 24ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 1023 11ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 1024 22ms
+ ✓ redux-wide-json.test.ts > restores a wide JSON object without spreading its fields into function arguments 862ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: early return and callback throws do not affect later scans 20ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList<number>: source, shared, fixed-size copy, forks and compaction agree 58ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList<boolean>: source, shared, fixed-size copy, forks and compaction agree 61ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 1025 20ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 32768 42ms
+ ✓ numeric.test.ts > numeric countInRange > matches scalar semantics at size 32769 37ms
+ ✓ numeric.test.ts > numeric countInRange > preserves old snapshots through edits, pop, forks, and memory growth 19ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList<string>: source, shared, fixed-size copy, forks and compaction agree 54ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList<object>: source, shared, fixed-size copy, forks and compaction agree 34ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > SharedDoublyLinkedList: nested decode can reenter block scans and grow the outer arena 36ms
+ ✓ block-traversal-view.test.ts > block traversal snapshot views > supports fixed and growing shared memories and rejects unsupported unshared imports 69ms
+ ✓ map-projection.test.ts > ordered map projection > retains replacement, deletion, reinsertion, Unicode and old-fork order 28ms
+ ✓ map-projection.test.ts > sorted map projection > sorted keys skip value decoding, including cold JSON larger than the cache 66ms
+ ✓ map-projection.test.ts > sorted map projection > retains replacement, deletion, reinsertion, Unicode and old-fork order 51ms
+ ✓ map-projection.test.ts > custom sorted map projection > sorted keys skip value decoding, including cold JSON larger than the cache 75ms
+ ✓ map-projection.test.ts > custom sorted map projection > retains replacement, deletion, reinsertion, Unicode and old-fork order 28ms
+ ✓ map-projection.test.ts > ordered read-only projections > values preserve every f64 value 39ms
+ ✓ map-projection.test.ts > ordered read-only projections > attached iterator remains valid across memory growth (copy=false) 31ms
+ ✓ map-projection.test.ts > ordered read-only projections > attached iterator remains valid across memory growth (copy=true) 72ms
+ ✓ map-projection.test.ts > sorted read-only projections > values preserve every f64 value 35ms
+ ✓ map-projection.test.ts > sorted read-only projections > natural sorted values skip key decoding 31ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > stack: number 988ms
+ ✓ map-projection.test.ts > sorted read-only projections > attached iterator remains valid across memory growth (copy=false) 18ms
+ ✓ map-projection.test.ts > sorted read-only projections > attached iterator remains valid across memory growth (copy=true) 31ms
+ ✓ map-projection.test.ts > custom comparator ties keep stable natural order and comparator receiver 30ms
+ ✓ map-projection.test.ts > sets retain ordered, natural and custom traversal 34ms
+ ✓ numeric.test.ts > numeric countInRange > reads attached arenas without allocating or changing shared bytes 755ms
+ ✓ map-projection.test.ts > cold nested projections keep read-only child snapshots (copy=false) 58ms
+ ✓ map-projection.test.ts > cold nested projections keep read-only child snapshots (copy=true) 73ms
+ ✓ numeric.test.ts > numeric countInRange > rejects non-numeric lists and non-number bounds 17ms
+ ✓ numeric.test.ts > numeric countInRange > uses the scalar fallback when the SIMD probe fails 68ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps number value order across leaf shapes, edits and forks 191ms
+ ✓ numeric.test.ts > numeric countInRange > numeric-kernels.wasm does not overread the last visible pair 47ms
+ ✓ numeric.test.ts > numeric countInRange > numeric-kernels-simd.wasm does not overread the last visible pair 96ms
+ ✓ map-projection.test.ts > natural sorted projection methods preserve their generator function and iterator prototypes 42ms
+ ✓ map-projection.test.ts > natural sorted keys stay lazy when a writer grows before first next 39ms
+ ✓ map-projection.test.ts > natural sorted values stay lazy when a writer grows before first next 39ms
+ ✓ map-projection.test.ts > natural sorted keys stop decoding after return, throw, or an early break 67ms
+ ✓ map-projection.test.ts > natural sorted values stop decoding after return, throw, or an early break 49ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps paused number iterators independent while the writer grows 39ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached number values immutable (copy=false) 34ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached number values immutable (copy=true) 69ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps boolean value order across leaf shapes, edits and forks 225ms
+ ✓ map-memory.test.ts > compact immutable HAMT records > scalar construction has bounded allocation without compaction or dropping snapshots 164ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps paused boolean iterators independent while the writer grows 28ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached boolean values immutable (copy=false) 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached boolean values immutable (copy=true) 83ms
+ ✓ map-memory.test.ts > compact immutable HAMT records > long-distance forks materialize pointers without truncating their addresses 30ms
+ ✓ map-memory.test.ts > compact immutable HAMT records > batch ownership is local to the call and published payload bytes never change 67ms
+ ✓ map-memory.test.ts > compact immutable HAMT records > unaligned map records can interleave with aligned vector and stack records 34ms
+ ✓ map-values-view.test.ts > map values with one captured view > preserves negative zero, infinities, NaN and unaligned numeric payloads 31ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps default and captured-view leaf decoding equivalent with value prefixes 33ms
+ ✓ map-values-view.test.ts > map values with one captured view > handles legacy nested journals with a paused traversal 29ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps generator laziness, early return and throw behavior 39ms
+ ✓ map-values-view.test.ts > map values with one captured view > retains the string, frozen JSON and nested snapshot decoding paths 109ms
+ ✓ primitive-scan-portability.test.ts > preserves scan byte order, view reuse and snapshot lifetimes 569ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps generic value iteration stable when nested reconstruction grows and forks the owning arena 36ms
+ ✓ map-memory.test.ts > compact immutable HAMT records > coalesced changes preserve negative size deltas and empty branches 26ms
+ ✓ map-memory.test.ts > small root-specific read indexes > presence checks do not replace boolean values or confuse missing keys 10ms
+ ✓ map-memory.test.ts > small root-specific read indexes > prefix indexes are root-specific through forks, removals, and shared memory growth 224ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > stack: string payload then node 1185ms
+ ✓ map-memory.test.ts > small root-specific read indexes > historical roots reuse prefix indexes beyond the value-cache limit 175ms
+ ✓ shared-stack.test.ts > SharedStack > basic operations > empty stack 12ms
+ ✓ shared-stack.test.ts > SharedStack > basic operations > push and peek 9ms
+ ✓ shared-stack.test.ts > SharedStack > basic operations > pop returns new stack 5ms
+ ✓ shared-stack.test.ts > SharedStack > basic operations > pop to empty 12ms
+ ✓ shared-stack.test.ts > SharedStack > immutability > push does not modify original 16ms
+ ✓ shared-stack.test.ts > SharedStack > immutability > pop does not modify original 1ms
+ ✓ shared-stack.test.ts > SharedStack > immutability > branching versions 18ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > empty list 9ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > prepend 3ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > append 13ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > mixed prepend/append 11ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > removeFirst 8ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > removeLast 10ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > removeFirst to empty 27ms
+ ✓ shared-stack.test.ts > SharedStack > type: number > integers 30ms
+ ✓ shared-stack.test.ts > SharedStack > type: number > floats 7ms
+ ✓ shared-stack.test.ts > SharedStack > type: number > special values 18ms
+ ✓ shared-stack.test.ts > SharedStack > type: string > basic strings 24ms
+ ✓ shared-stack.test.ts > SharedStack > type: string > empty string 19ms
+ ✓ shared-stack.test.ts > SharedStack > type: string > unicode 17ms
+ ✓ map-memory.test.ts > small root-specific read indexes > same-prefix and exact-hash collisions retain complete key checks 21ms
+ ✓ map-memory.test.ts > small root-specific read indexes > Unicode aliases and cache-budget replacements do not keep stale values 21ms
+ ✓ map-memory.test.ts > small root-specific read indexes > ordered prefixes, numeric values, and object decoders remain separate 39ms
+ ✓ map-memory.test.ts > small root-specific read indexes > worker format rejects older map layouts and attachments do not write shared bytes 31ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > removeLast to empty 23ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > basic operations > get by index 15ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertAfter > insert in middle 31ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertAfter > insert at end 16ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertAfter > insert out of bounds 22ms
+ ✓ shared-stack.test.ts > SharedStack > type: string > long strings 24ms
+ ✓ shared-stack.test.ts > SharedStack > type: boolean > true and false 22ms
+ ✓ shared-stack.test.ts > SharedStack > type: object > simple objects 19ms
+ ✓ shared-stack.test.ts > SharedStack > type: object > nested objects 14ms
+ ✓ shared-stack.test.ts > SharedStack > type: object > arrays 21ms
+ ✓ shared-stack.test.ts > SharedStack > stress tests > 1000 pushes 19ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertBefore > insert in middle 19ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertBefore > insert at head 1ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > insertBefore > insert out of bounds 23ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > remove by index > remove first 16ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > remove by index > remove middle 13ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > remove by index > remove last 12ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > remove by index > remove out of bounds 14ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > immutability > prepend does not modify original 6ms
+ ✓ shared-stack.test.ts > SharedStack > stress tests > 1000 push/pop cycles 32ms
+ ✓ shared-stack.test.ts > SharedStack > stress tests > many string pushes 12ms
+ ✓ shared-stack.test.ts > SharedStack > LIFO order > maintains LIFO order 13ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > immutability > append does not modify original 18ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > immutability > prepend branching works 15ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: number > integers 13ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: number > floats 25ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: number > special values 14ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: string > basic strings 7ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: string > empty string 10ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: string > unicode 8ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: string > long strings 19ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: boolean > true and false 7ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: object > simple objects 20ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: object > nested objects 10ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > type: object > arrays 15ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > bidirectional iteration > forEach 20ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > bidirectional iteration > forEachReverse 21ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > empty list 12ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > prepend 9ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > append 10ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > mixed prepend/append 24ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > removeFirst 13ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > removeFirst to empty 12ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > basic operations > get by index 9ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > insertAfter > insert in middle 7ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > bidirectional iteration > toArray 19ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > bidirectional iteration > toArrayReverse 21ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > optimized access from closer end > get from front half 8ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > optimized access from closer end > get from back half 41ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > stress tests > 1000 appends 14ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > insertAfter > insert at end 8ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > insertAfter > insert out of bounds 17ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > removeAfter > remove in middle 14ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > removeAfter > remove last element 14ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > removeAfter > remove out of bounds 9ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > immutability > prepend does not modify original 6ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > immutability > append does not modify original 34ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > stress tests > 1000 prepends 21ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > stress tests > random access 10ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > stress tests > many removals 21ms
+ ✓ shared-doubly-linked-list.test.ts > SharedDoublyLinkedList > stress tests > alternating removeFirst/removeLast 11ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > immutability > prepend branching works 22ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: number > integers 10ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: number > floats 5ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: number > special values 21ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: string > basic strings 17ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: string > empty string 9ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: string > unicode 10ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: string > long strings 8ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: boolean > true and false 11ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: object > simple objects 12ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedMap string: cached hits, misses, empty roots and forks 21ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedMap number: cached hits, misses, empty roots and forks 5ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedMap boolean: cached hits, misses, empty roots and forks 6ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedOrderedMap string: cached hits, misses, empty roots and forks 15ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedOrderedMap number: cached hits, misses, empty roots and forks 4ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedOrderedMap boolean: cached hits, misses, empty roots and forks 4ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedSortedMap string: cached hits, misses, empty roots and forks 23ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedSortedMap number: cached hits, misses, empty roots and forks 3ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > SharedSortedMap boolean: cached hits, misses, empty roots and forks 3ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > keeps NaN, negative zero, zero and missing values distinct 2ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > uses the right codec and ordered prefix in one shared arena 7ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > falls back correctly beyond the entry and string-value budgets 436ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: object > nested objects 8ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > type: object > arrays 12ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > iteration > forEach 14ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > iteration > toArray 17ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > iteration > empty forEach 28ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > stress tests > 1000 appends 5ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > stack: JSON payload then node 921ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > stress tests > 1000 prepends 40ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > stress tests > random access 33ms
+ ✓ shared-linked-list.test.ts > SharedLinkedList > stress tests > many string appends 10ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > handles Unicode, empty strings and the scratch boundary 2ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > does not confuse full-hash collisions 1ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > read caches do not write any shared bytes in worker attachments 36ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > vector leaf hints remain correct across edits, forks and growth 89ms
+ ✓ hot-path.test.ts > bounded hot paths preserve immutable snapshots > a stack stores encoded values, not mutable caller objects 3ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar null 2ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar true 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar false 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar 0 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar -0 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar 12.5 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar  0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar text 0ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves scalar undefined 0ms
+ ✓ freeze-json.test.ts > JSON freezing > freezes mixed arrays, empty containers, and every nested coordinate 2ms
+ ✓ freeze-json.test.ts > JSON freezing > preserves own special names and null-prototype records 1ms
+ ✓ freeze-json.test.ts > JSON freezing > ignores inherited enumerable properties and accessors 0ms
+ ✓ freeze-json.test.ts > JSON freezing > continues through a shallow-frozen parent 0ms
+ ✓ freeze-json.test.ts > JSON freezing > handles 20,000 nested arrays without recursive calls 278ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > matches encoded values across key and value character classes 18ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > keeps cached strings consistent with replacement of unpaired surrogates 3ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > uses the complete scratch range without writing into old payloads 11ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded key boundaries at 16383 BMP characters 12ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded key boundaries at 16384 BMP characters 18ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded key boundaries at 16385 BMP characters 15ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded value boundaries at 12287 supplementary characters 8ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded value boundaries at 12288 supplementary characters 16ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > handles encoded value boundaries at 12289 supplementary characters 14ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > preserves alias keys, cached values, and retained roots after bulk changes 10ms
+ ✓ map-set-utf8.test.ts > direct UTF-8 scalar writes > rejects writes through an independently attached read-only view 14ms
+ ✓ freeze-json.test.ts > JSON freezing > handles a wide array without a function-argument limit 199ms
+ ✓ freeze-json.test.ts > JSON freezing > uses the same semantics for direct object-codec reads 1ms
+ ✓ heap-entry-views.test.ts > heap entries view capture > keeps the generator method shape and touches no view before an actual entry 7ms
+ ✓ heap-entry-views.test.ts > heap entries view capture > requests one existing view per visited node on owners and read-only attachments 245ms
+ ✓ heap-entry-views.test.ts > heap entries view capture > preserves suspended, interleaved and early-terminated iterators through owner growth 12ms
+ ✓ heap-entry-views.test.ts > heap entries view capture > preserves binary64 values and priorities in detached entry tuples 37ms
+ ✓ heap-entry-views.test.ts > heap entries view capture > keeps custom decoder receiver, order, reentrant growth and exceptions 11ms
+ ✓ shared-list.test.ts > SharedList > empty list has size 0 15ms
+ ✓ shared-list.test.ts > SharedList > push increases size 18ms
+ ✓ shared-list.test.ts > SharedList > get returns correct index 8ms
+ ✓ shared-list.test.ts > SharedList > get out of bounds returns undefined 8ms
+ ✓ shared-list.test.ts > SharedList > set updates value 13ms
+ ✓ shared-list.test.ts > SharedList > set out of bounds returns same list 17ms
+ ✓ shared-list.test.ts > SharedList > pop removes last 15ms
+ ✓ worker.test.ts > shared state and session protocol > automatically publishes a single collection and preserves old snapshots 22ms
+ ✓ worker.test.ts > shared state and session protocol > batches same-turn updates and supports the value setter 2ms
+ ✓ worker.test.ts > shared state and session protocol > suppresses no-ops, including newly allocated record wrappers 3ms
+ ✓ worker.test.ts > shared state and session protocol > does not publish an update that returns to the last committed snapshot 1ms
+ ✓ worker.test.ts > shared state and session protocol > suppresses distinct record captures restored to the last committed handles 2ms
+ ✓ worker.test.ts > shared state and session protocol > publishes record roots atomically and preserves unchanged wrapper identity 12ms
+ ✓ worker.test.ts > shared state and session protocol > batches nested and empty updates with immediate publication 1ms
+ ✓ worker.test.ts > shared state and session protocol > batches nested and empty updates with microtask publication 1ms
+ ✓ worker.test.ts > shared state and session protocol > flushes pending publication without a duplicate microtask publication 1ms
+ ✓ worker.test.ts > shared state and session protocol > flushes newer pending state installed by a publication subscriber 1ms
+ ✓ worker.test.ts > shared state and session protocol > keeps the manual session API 2ms
+ ✓ worker.test.ts > shared state and session protocol > handles a reader that starts first 2ms
+ ✓ worker.test.ts > shared state and session protocol > shares memory handles once per connection, then sends descriptors 1ms
+ ✓ worker.test.ts > shared state and session protocol > copies every publication only when copy mode is selected 41ms
+ ✓ shared-list.test.ts > SharedList > pop on empty returns same 7ms
+ ✓ shared-list.test.ts > SharedList > immutability - original unchanged 9ms
+ ✓ shared-list.test.ts > SharedList > values iteration 8ms
+ ✓ shared-list.test.ts > SharedList > forEach with index 18ms
+ ✓ shared-list.test.ts > SharedList > toArray 13ms
+ ✓ shared-list.test.ts > SharedList > pushMany 27ms
+ ✓ shared-list.test.ts > SharedList > crosses 32-element boundary 12ms
+ ✓ worker.test.ts > shared state and session protocol > does not confuse identical root offsets from different arenas 19ms
+ ✓ worker.test.ts > shared state and session protocol > attaches nested dependencies and keeps old nested values readable 34ms
+ ✓ worker.test.ts > shared state and session protocol > attaches a compacted arena without invalidating retained snapshots 22ms
+ ✓ worker-records.test.ts > worker metadata keeps plain string keys, copy=false 49ms
+ ✓ worker-records.test.ts > worker metadata keeps plain string keys, copy=true 59ms
+stderr | worker.test.ts > shared state and session protocol > reports queue overflow instead of silently dropping all-mode snapshots
+[zerocopy/worker] Error: Shared session pending queue overflow
+    at /workspace/scratch/83f1d4baba1f/zerocopy-integration/worker.ts:429:32
+    at emit (/workspace/scratch/83f1d4baba1f/zerocopy-integration/worker.test.ts:24:91)
+    at processTicksAndRejections (native)
+
+ ✓ shared-list.test.ts > SharedList > crosses 1024-element boundary 23ms
+ ✓ shared-list.test.ts > SharedList > many elements 28ms
+ ✓ shared-list.test.ts > SharedList > version isolation 25ms
+ ✓ shared-list.test.ts > SharedList > string type 27ms
+ ✓ shared-list.test.ts > SharedList > string set 8ms
+ ✓ worker.test.ts > shared state and session protocol > connects multiple readers and can disconnect one without closing its port 55ms
+ ✓ worker.test.ts > shared state and session protocol > isolates named sessions on one endpoint and leaves ordinary messages alone 24ms
+ ✓ worker.test.ts > shared state and session protocol > bounds in-flight latest delivery while a reader does not acknowledge 2ms
+ ✓ worker.test.ts > shared state and session protocol > supports every-publication delivery with a bounded queue 1ms
+ ✓ worker.test.ts > shared state and session protocol > reports queue overflow instead of silently dropping all-mode snapshots 11ms
+ ✓ worker.test.ts > shared state and session protocol > supports latest-only async iteration and closes pending reads on disposal 1ms
+ ✓ worker.test.ts > shared state and session protocol > rejects a bounded all-mode iterator on overflow 1ms
+ ✓ worker.test.ts > shared state and session protocol > supports aborting a pending stream 1ms
+ ✓ worker.test.ts > shared state and session protocol > keeps the session alive when a subscriber throws 35ms
+ ✓ worker.test.ts > shared state and session protocol > rejects a failed send and releases the channel for reuse 2ms
+ ✓ worker.test.ts > shared state and session protocol > rejects initialization timeout and removes listeners 16ms
+ ✓ worker.test.ts > shared state and session protocol > rejects a connection when aborted 1ms
+ ✓ worker.test.ts > shared state and session protocol > cancels scheduled publication and closes readers on disposal 1ms
+ ✓ worker.test.ts > shared state and session protocol > rejects unsupported state without changing the current value 1ms
+ ✓ worker.test.ts > shared state and session protocol > supports the one-shot helpers 1ms
+ ✓ worker.test.ts > shared state and session protocol > binds Redux selections and unsubscribes on disposal 1ms
+ ✓ worker.test.ts > shared state and session protocol > covers a source update made while subscribe is installed 1ms
+ ✓ worker.test.ts > shared state and session protocol > does not allocate in the source arena during publication 1ms
+ ✓ worker-records.test.ts > rejects symbol names rather than silently losing a typed collection 39ms
+ ✓ worker-records.test.ts > collects deep arena graphs iteratively and deduplicates cycles 48ms
+ ✓ shared-list.test.ts > SharedList > boolean type 13ms
+ ✓ shared-list.test.ts > SharedList > object type 15ms
+ ✓ shared-list.test.ts > SharedList > string interning 12ms
+ ✓ shared-list.test.ts > SharedList > many strings 14ms
+ ✓ json-read-cache.test.ts > immutable JSON read cache > shares cached JSON scalars and objects between both decoder entry points 16ms
+ ✓ json-read-cache.test.ts > immutable JSON read cache > keeps the 2048-entry limit while freezing values that do not enter the cache 9ms
+ ✓ json-read-cache.test.ts > immutable JSON read cache > includes the exact 2 MiB byte boundary and leaves later values uncached 13ms
+ ✓ json-read-cache.test.ts > immutable JSON read cache > does not retain an oversized value or consume the budget for smaller values 19ms
+ ✓ json-read-cache.test.ts > refreshes an older view before an uncached number read 2ms
+ ✓ json-read-cache.test.ts > refreshes an older view before an uncached boolean read 10ms
+ ✓ json-read-cache.test.ts > refreshes an older view before an uncached string read 13ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedMap updates a frozen field without drafting collection internals 23ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedSet updates a frozen field without drafting collection internals 2ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedList updates a frozen field without drafting collection internals 14ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedStack updates a frozen field without drafting collection internals 11ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedQueue updates a frozen field without drafting collection internals 24ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedLinkedList updates a frozen field without drafting collection internals 17ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > supports small limits without counting schema tuples as collection items 37ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > counts holes and plain record fields on both sides of the codec 3ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > rejects hand-written object payloads that JSON storage would change 31ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > preserves exact tied-priority dequeue behavior, maxHeap=false 75ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > preserves exact tied-priority dequeue behavior, maxHeap=true 9ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > rejects malformed heap graphs and wrong heap ordering 88ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > iterates priority queues without allocating WASM nodes, including attached views 16ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedDoublyLinkedList updates a frozen field without drafting collection internals 17ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedOrderedMap updates a frozen field without drafting collection internals 17ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedOrderedSet updates a frozen field without drafting collection internals 1ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedSortedMap updates a frozen field without drafting collection internals 11ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedSortedSet updates a frozen field without drafting collection internals 1ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > SharedPriorityQueue updates a frozen field without drafting collection internals 12ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > round-trips real DevTools JSAN, including our reserved marker 11ms
+ ✓ redux-regression.test.ts > Redux persistence boundary regressions > preserves literal JSAN marker keys through both supported codecs 1ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > preserves typed snapshots in Toolkit reducers and selectors 36ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > round-trips nested collections into writable snapshots through the existing codec 53ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > produces the same persistence envelope as an untyped object collection 1ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > retains native JSON normalization after persistence 18ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > keeps existing validation for hand-written object imports: "u" 9ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > keeps existing validation for hand-written object imports: "n" 17ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > keeps existing validation for hand-written object imports: "n" 19ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > keeps existing validation for hand-written object imports: "n" 16ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > keeps existing validation for hand-written object imports: "a" 12ms
+ ✓ typed-json-redux.test.ts > typed JSON Redux integration > rejects the removed draft json descriptor in persistence data 0ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > keeps 1,200 retained states readable through updates, reset, compaction and deprecated GC calls 99ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > does not accept forged snapshots, unknown subclasses, or mutable classes 1ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > retains serializability warnings outside collections, including action payloads 1ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > retains mutation detection for ordinary state 2ms
+ ✓ redux-rtk.test.ts > Redux Toolkit integration > does not scan or allocate collection data in development checks or summary views 14ms
+ ✓ redux-rtk.test.ts > Redux DevTools > uses real instrumentation to jump between retained immutable states 17ms
+ ✓ redux-rtk.test.ts > Redux DevTools > exports and imports real lifted history through the JSAN replacer/reviver 88ms
+ ✓ redux-rtk.test.ts > Redux DevTools > escapes user objects that contain the DevTools tag 1ms
+ ✓ redux-rtk.test.ts > Redux DevTools > makes summary mode explicit without disabling time travel 2ms
+ ✓ redux-rtk.test.ts > stable entry selectors > keeps object identity after the global decode cache is full and unrelated entries change 55ms
+ ✓ redux-rtk.test.ts > stable entry selectors > does not confuse equal offsets in different arenas, or different keys 34ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > basic operations > empty queue 8ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > basic operations > enqueue and peek (min-heap) 2ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > basic operations > dequeue returns new queue with next priority 22ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > basic operations > dequeue to empty 14ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > max-heap > max-heap returns highest priority first 16ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > max-heap > max-heap dequeue order 9ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > value types > number values 10ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > value types > boolean values 7ms
+ ✓ shared-queue.test.ts > SharedQueue > basic operations > empty queue 13ms
+ ✓ shared-queue.test.ts > SharedQueue > basic operations > enqueue and peek 11ms
+ ✓ shared-queue.test.ts > SharedQueue > basic operations > dequeue returns new queue 2ms
+ ✓ shared-queue.test.ts > SharedQueue > basic operations > dequeue to empty 13ms
+ ✓ shared-queue.test.ts > SharedQueue > immutability > enqueue does not modify original 7ms
+ ✓ shared-queue.test.ts > SharedQueue > immutability > dequeue does not modify original 3ms
+ ✓ shared-queue.test.ts > SharedQueue > immutability > branching versions 16ms
+ ✓ shared-queue.test.ts > SharedQueue > type: number > integers 8ms
+ ✓ shared-queue.test.ts > SharedQueue > type: number > floats 19ms
+ ✓ shared-queue.test.ts > SharedQueue > type: string > basic strings 6ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > value types > object values 34ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > value types > string values 11ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > immutability > enqueue does not modify original 14ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > immutability > dequeue does not modify original 11ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > immutability > branching creates independent versions 16ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > edge cases > same priority values 17ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > edge cases > negative priorities 21ms
+ ✓ shared-priority-queue.test.ts > SharedPriorityQueue > edge cases > many items 3ms
+ ✓ shared-queue.test.ts > SharedQueue > type: string > empty string 10ms
+ ✓ shared-queue.test.ts > SharedQueue > type: string > unicode 15ms
+ ✓ shared-queue.test.ts > SharedQueue > type: string > long strings 0ms
+ ✓ shared-queue.test.ts > SharedQueue > type: boolean > true and false 17ms
+ ✓ shared-queue.test.ts > SharedQueue > type: object > simple objects 7ms
+ ✓ shared-queue.test.ts > SharedQueue > type: object > nested objects 8ms
+ ✓ shared-queue.test.ts > SharedQueue > type: object > arrays 10ms
+ ✓ shared-queue.test.ts > SharedQueue > stress tests > 1000 enqueues 5ms
+ ✓ shared-queue.test.ts > SharedQueue > stress tests > 1000 enqueue/dequeue cycles 16ms
+ ✓ shared-queue.test.ts > SharedQueue > stress tests > many string enqueues 11ms
+ ✓ worker-tasks.test.ts > typed task executors > dispatches against the requested shared-state revision 36ms
+ ✓ worker-tasks.test.ts > typed task executors > keeps one immutable snapshot for an async task 20ms
+ ✓ worker-tasks.test.ts > typed task executors > schedules work across borrowed pool endpoints and keeps input order 16ms
+ ✓ shared-queue.test.ts > SharedQueue > FIFO order > maintains FIFO order 15ms
+ ✓ shared-queue.test.ts > SharedQueue > FIFO order > FIFO with strings 6ms
+ ✓ shared-sorted.test.ts > SharedSortedMap > basic operations 9ms
+ ✓ shared-sorted.test.ts > SharedSortedMap > delete 4ms
+ ✓ shared-sorted.test.ts > SharedSortedMap > branching creates independent versions 19ms
+ ✓ shared-sorted.test.ts > SharedSortedMap > set branching 13ms
+ ✓ shared-sorted.test.ts > SharedSortedSet > basic operations 1ms
+ ✓ shared-sorted.test.ts > SharedSortedSet > delete 18ms
+ ✓ shared-sorted.test.ts > SharedSortedSet > branching creates independent versions 2ms
+ ✓ shared-sorted.test.ts > SharedSortedSet > add branching 1ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > preserves marker objects and strings, JSON-only=false 9ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > preserves marker objects and strings, JSON-only=true 0ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > preserves ordinary undefined properties, holes, special numbers, and repeated values 1ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > does not interpret empty user keys as a second wire envelope 0ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > preserves null prototypes and own __proto__ fields without changing prototypes 1ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > restores real collection classes without changing source snapshots 25ms
+ ✓ redux-jsan.test.ts > portable DevTools transport boundary > rejects cycles rather than replacing them with a false value 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedMap agrees with its leaf grammar 4ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedList agrees with its leaf grammar 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedStack agrees with its leaf grammar 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedQueue agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedLinkedList agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedDoublyLinkedList agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedOrderedMap agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedSortedMap agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedPriorityQueue agrees with its leaf grammar 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedSet agrees with its leaf grammar 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedOrderedSet agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > SharedSortedSet agrees with its leaf grammar 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<invalid> consistently 2ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedList<SharedSet<object>> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedList<SharedSortedSet<boolean>> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedSet<SharedMap<number>> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number>> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<<number>> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number><string> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap< number> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number>  consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number>
+ consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<number>  consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedBogus<number> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<SharedList<number> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<constructor> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > rejects SharedMap<__proto__> consistently 0ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > handles primitives and unchecked non-string input without throwing 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > validates generated compositions and damaged delimiters 55ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > reuses immutable metadata without allowing cache poisoning 1ms
+ ✓ descriptor-validation.test.ts > complete descriptor validation > bounds cached descriptors and does not retain oversized keys 13ms
+ ✓ shared-list-to-array.test.ts > SharedList array materialization > keeps the original leaves when nested reconstruction grows the arena and creates a fork 137ms
+ ✓ shared-list-to-array.test.ts > SharedList array materialization > returns fresh mutable arrays without sharing elements with primitive snapshot storage 38ms
+ ✓ ordered-empty-regression.test.ts > ordered iteration stays empty after the last deletion and handles re-insertion 28ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > priority queue: min enqueue 2070ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > permits physical differences only for bounded generic-map construction, including update seeds 6ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > retains exact cross-arm physical checks on every unchanged fixture path 3ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects missing or mismatched verified logical evidence 1ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > still rejects within-build payload, descriptor, length and backing changes 1ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > records verified actual outputs and all retained write snapshots 5ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects actual keys corruption in both fixture oracles 1ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects actual value corruption in both fixture oracles 1ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects actual type corruption in both fixture oracles 2ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects actual size corruption in both fixture oracles 1ms
+ ✓ proof-storage-integrity.test.ts > allocation-aware proof storage guards > rejects actual field corruption in both fixture oracles 3ms
+ ✓ shared-set.test.ts > SharedSet > empty set has size 0 14ms
+ ✓ shared-set.test.ts > SharedSet > add increases size 1ms
+ ✓ shared-set.test.ts > SharedSet > add duplicate does not increase size 0ms
+ ✓ shared-set.test.ts > SharedSet > has returns true for existing 0ms
+ ✓ shared-set.test.ts > SharedSet > delete removes element 1ms
+ ✓ shared-set.test.ts > SharedSet > delete non-existent returns same set 0ms
+ ✓ shared-set.test.ts > SharedSet > immutability - original unchanged 0ms
+ ✓ shared-set.test.ts > SharedSet > values iteration 2ms
+ ✓ shared-set.test.ts > SharedSet > forEach 0ms
+ ✓ shared-set.test.ts > SharedSet > addMany 1ms
+ ✓ shared-set.test.ts > SharedSet > addMany with existing returns same if no new 0ms
+ ✓ shared-set.test.ts > SharedSet > numeric values 0ms
+ ✓ shared-set.test.ts > SharedSet > many elements 11ms
+ ✓ shared-map.test.ts > SharedMap > empty get returns undefined 12ms
+ ✓ shared-map.test.ts > SharedMap > set and get single value 1ms
+ ✓ shared-map.test.ts > SharedMap > immutability - original unchanged 1ms
+ ✓ shared-map.test.ts > SharedMap > multiple keys 0ms
+ ✓ shared-map.test.ts > SharedMap > overwrite key 0ms
+ ✓ shared-map.test.ts > SharedMap > many keys 4ms
+ ✓ shared-map.test.ts > SharedMap > hash collision handling 1ms
+ ✓ shared-map.test.ts > SharedMap > missing key returns undefined 0ms
+ ✓ shared-map.test.ts > SharedMap > empty string key and value 0ms
+ ✓ shared-map.test.ts > SharedMap > unicode keys and values 2ms
+ ✓ shared-map.test.ts > SharedMap > long keys 0ms
+ ✓ shared-map.test.ts > SharedMap > branching at multiple levels 8ms
+ ✓ shared-map.test.ts > SharedMap > version isolation 0ms
+ ✓ shared-map.test.ts > SharedMap > structural sharing - nodes reused 0ms
+ ✓ tanstack-db-collection.test.ts > SharedCollection > inserts and retrieves items 8ms
+ ✓ tanstack-db-collection.test.ts > SharedCollection > updates items immutably 1ms
+ ✓ tanstack-db-collection.test.ts > SharedCollection > deletes items 1ms
+ ✓ tanstack-db-collection.test.ts > SharedCollection > converts to array 2ms
+ ✓ tanstack-db-collection.test.ts > SharedCollection > zero-copy worker transfer via root pointer 1ms
+ ✓ tanstack-db-collection.test.ts > sharedCollectionConfig > provides TanStack DB SyncConfig interface 1ms
+ ✓ tanstack-db-collection.test.ts > sharedCollectionConfig > sync loads initial data 1ms
+ ✓ tanstack-db-collection.test.ts > sharedCollectionConfig > supports worker state sharing 0ms
+ ✓ tanstack-db-collection.test.ts > withSharedCache > mirrors upstream sync writes to SharedArrayBuffer 1ms
+ ✓ tanstack-db-collection.test.ts > withSharedCache > handles updates and deletes 0ms
+ ✓ tanstack-db-collection.test.ts > withSharedCache > provides zero-copy state for workers 0ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > priority queue: min dequeue 1218ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > priority queue: max enqueue 990ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > priority queue: max dequeue 982ms
+ ✓ allocation-failure.test.ts > bounded-memory writes preserve every published snapshot > can make a smaller write after a partial failure without rewinding the arena 12ms
+
+ Test Files  53 passed (53)
+      Tests  1076 passed (1076)
+   Start at  12:35:45
+   Duration  36.54s (transform 1.26s, setup 0ms, import 4.04s, tests 127.95s, environment 11ms)
+
+COMMAND: ['bun', 'run', 'typecheck']
+$ tsc --noEmit
+COMMAND: ['node', '--test', 'proofs/long-text-search-worker.node.mjs', 'proofs/map-values-view/worker.mjs']
+✔ long searches keep compiled shared and copied snapshots in real Node workers after growth (168.984982ms)
+✔ paused primitive map values survive writer growth (shared) (77.059927ms)
+✔ paused primitive map values survive writer growth (copy) (66.612533ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 262.91845
+ALL ISOLATED COMBINED CHECKS PASSED

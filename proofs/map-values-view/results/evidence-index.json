@@ -1,0 +1,54 @@
+{
+  "2026-11-04-primary-linux-x64.json.gz": {
+    "bytes": 707317,
+    "sha256": "47d5253e8aa16b323239c3080af84d992da026ac9d0c6506b63dae50c1abd65e",
+    "uncompressed": {
+      "bytes": 5721637,
+      "sha256": "9cc3fdbfd256a1d34beb14bbe13315fd1f07dc611d347602621216e1f41cbf92"
+    }
+  },
+  "browser.json": {
+    "bytes": 89228,
+    "sha256": "b8a22a18df54991f06fa8be0a0adc08707b25542092a9b6e14544e4894152dc0"
+  },
+  "combined-default-interrupted.txt": {
+    "bytes": 313,
+    "sha256": "7b76b28687090781496e9a9ee60b3b4b0bc6cd9d5c260f475be5332d4d12d616"
+  },
+  "combined-initial-failure.txt": {
+    "bytes": 2183,
+    "sha256": "2767d6d8684f73a71d7c65514c8de215cf721ae325316dc3063b7a7de1a71868"
+  },
+  "combined-isolated-pass.txt": {
+    "bytes": 133033,
+    "sha256": "e2d19eefdf8a64f3c21d65e3b2a95b32b36a76e2bb02240344d54ff724a01c9f"
+  },
+  "combined-validation.json": {
+    "bytes": 3764,
+    "sha256": "6d91528d1e4ba9adf8fdc8b73983869dec2d1f6da36d2cf35f318c75abbd1128"
+  },
+  "exploration-manifest.json": {
+    "bytes": 2842,
+    "sha256": "a44bb5c0bec73e2b0484593e7bb6cdc15e3dbd7410082136306713a6f993ed18"
+  },
+  "exploration.tar.gz": {
+    "bytes": 501222,
+    "sha256": "83a313e775e8a45d8aa6137ed750a552babc7e964fae184e204dc7ec928ee8a6"
+  },
+  "final-checks.txt": {
+    "bytes": 1204,
+    "sha256": "fd4514bc3259a670ecb66bc54827e7cb3fa9124a37aa7bd81f981d93866aaee7"
+  },
+  "primary-summary.json": {
+    "bytes": 35009,
+    "sha256": "2175c07771c9f165bd8b0b2a08ceca0ac8631d6e38eff0200410987f598b787f"
+  },
+  "rejected-v1.tar.gz": {
+    "bytes": 153774,
+    "sha256": "6673ae246d2d1d4e2cf3eee7df2c19d3b8870f01341be3f191f89339400855a6"
+  },
+  "validation.txt": {
+    "bytes": 132005,
+    "sha256": "280fa303b00bead4767edf54876a3c055471bd85f2d2b90447a9cafb63413940"
+  }
+}

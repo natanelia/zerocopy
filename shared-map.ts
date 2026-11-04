@@ -68,7 +68,13 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     for (const leaf of a.leaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)];
   }
   *keys(): Generator<string> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
-  *values(): Generator<ValueOf<T>> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf); }
+  *values(): Generator<ValueOf<T>> {
+    if (!this.root) return;
+    const a = this.arena, view = a.dv;
+    // Published leaves already fit this view. Shared growth cannot detach it,
+    // even when a consumer pauses iteration to create another snapshot.
+    for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf, 0, view);
+  }
   forEach(fn: (value: ValueOf<T>, key: string) => void): void { const a = this.arena; for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf)); }
   toWorkerData() { return Object.freeze({ root: this.root, valueType: this.valueType, size: this.size }); }
   static fromWorkerData<T extends string>(root: number, valueType: T, size?: number, source: Arena = defaultArena()): SharedMap<T> {

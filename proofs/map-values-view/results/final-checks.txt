@@ -1,0 +1,32 @@
+✔ ignores fenced examples but retains surrounding prose (1.415309ms)
+✔ matches punctuation, duplicate headings, and explicit anchors (2.485958ms)
+✔ checks local links and anchors without fetching external URLs (1.613161ms)
+✔ compares numeric table rows as a multiset, without changing precision (0.385318ms)
+✔ strict CLI rejects changed rows and evidence, not documentation edits (1061.692414ms)
+✔ strict CLI checks relocated benchmark reports against old and new layouts (719.120869ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1929.882062
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (55 Markdown files).
+✔ paused primitive map values survive writer growth (shared) (109.931319ms)
+✔ paused primitive map values survive writer growth (copy) (78.215372ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 316.498528
+
+Final README link pass:
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (55 Markdown files).

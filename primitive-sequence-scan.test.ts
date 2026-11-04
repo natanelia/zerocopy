@@ -29,7 +29,7 @@ describe('primitive sequence scan fast paths', () => {
 
   it('does not read a growing writer or a fork in the middle of a scan', () => {
     const expected = Array.from({ length: 2051 }, (_, i) => i);
-    const list = new SharedList('number').pushMany(expected);
+    const list = new SharedList('number', 0, 0, 0, new Arena()).pushMany(expected);
     const fork = list.set(31, -31).set(1024, -1024);
     const owner = arenaOf(list), oldEnd = owner.used;
     const before = owner.buf.slice(HEAP_START, oldEnd);

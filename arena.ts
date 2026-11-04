@@ -487,10 +487,10 @@ export class Arena {
     return next;
   }
   leafKey(p: number): string { return this.string(p + 16, this.dv.getUint32(p + 8, true)); }
-  leafValue(type: string, p: number, prefix = 0): any {
-    const dv = this.dv, ptr = p + 16 + dv.getUint32(p + 8, true) + prefix;
+  leafValue(type: string, p: number, prefix = 0, dv: DataView = this.dv): any {
+    const ptr = p + 16 + dv.getUint32(p + 8, true) + prefix;
     if (type === 'number') return dv.getFloat64(ptr, true);
-    if (type === 'boolean') return this.bytes[ptr] !== 0;
+    if (type === 'boolean') return dv.getUint8(ptr) !== 0;
     return this.decodeAt(type, ptr, dv.getUint32(p + 12, true) - prefix);
   }
   sameValue(root: number, key: string, type: string, value: any, prefix = 0, sorted = false): boolean {
