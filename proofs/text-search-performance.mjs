@@ -1,7 +1,7 @@
 /** End-to-end text-search proof against PR13 before compiled byte matching.
- * The four common cases retain identical data, predicates and samples per path.
- * Newer runners also record two full-copy publication cases; these have no PR13
- * counterpart. Fixture variants and extra publication cases are diagnostic only.
+ * Both revisions keep identical data, predicates, task yields and reference checks.
+ * Current adds full-copy replica cases; verify each revision's case count separately.
+ * Fixture variants are diagnostic only.
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -10,7 +10,6 @@ import { cpSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync }
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
-import { assertInvestigationReport } from './investigation-report.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = resolve(root, 'proofs/results/text-search'); mkdirSync(out, { recursive: true });
 const median = values => { const a = [...values].sort((a,b)=>a-b), i=a.length>>1; return a.length%2?a[i]:(a[i-1]+a[i])/2; };
@@ -70,7 +69,12 @@ try {
               const peer=new Peer(new URL('./assets/explorer-bench-runner.mjs',location.href));
               try{return await peer.request('run',{entries:100000},180000);}finally{peer.close();}
             });
-            assertInvestigationReport(result);
+            const paths = v.variant === 'before'
+               ? ['centralized', 'immutable', 'replicated', 'shared']
+               : ['centralized', 'immutable', 'immutable-full', 'replicated', 'replicated-full', 'shared'];
+             assert.equal(result.raw.length, paths.length * 7);
+             assert.deepEqual(Object.keys(result.samples).sort(), paths);
+            for(const phases of Object.values(result.samples))for(const values of Object.values(phases))assert.ok(values.length===7&&values.every(x=>Number.isFinite(x)&&x>=0));
             assert.deepEqual(errors,[]);
             const source=JSON.parse(readFileSync(resolve(v.dir,'build.json'),'utf8')).sourceCommit;
             const record={engine,browserVersion:browser.version(),variant:v.variant,fixture:kind,repeat,source,...result};
@@ -89,5 +93,5 @@ try {
   }
   for(const group of groups.values())group.medians=Object.fromEntries(['initialMs','queryMs','updateMs'].map(k=>[k,median(group.samples.map(s=>s[k]))]));
   writeFileSync(resolve(out,'by-query.json'),JSON.stringify([...groups.values()],null,2));
-  writeFileSync(resolve(out,'manifest.json'),JSON.stringify({schema:'zerocopy-text-search-proof/v1',repetitions,runCount:runs.length,records:runs.reduce((n,r)=>n+r.raw.length,0),note:'Baseline is PR13 before compiled text search. Both use the same 4096-index task yields, bulk appends, field/row layout and unchanged Immutable.js. Query preparation is timed. The historical v2 runner has four cases; v3 adds full-copy Immutable.js and native cases. These extra cases have no baseline counterpart and change the rotation and total worker count; they remain separate diagnostics, not additional paired comparisons. All cases retain seven samples and full independent reference checks. Original, unique IDs, absent ASCII text and 20% Unicode-prefix diagnostics run for every case. No precomputed index, decoded dataset cache or artificial delay. No universal performance threshold; retain losing cases.'},null,2));
+  writeFileSync(resolve(out,'manifest.json'),JSON.stringify({schema:'zerocopy-text-search-proof/v1',repetitions,runCount:runs.length,records:runs.reduce((n,r)=>n+r.raw.length,0),note:'Baseline is PR13 before compiled text search. Both use the same 4096-index task yields, bulk appends, field/row layout and unchanged Immutable.js. Query preparation is timed. Baseline has four cases (28 samples), while the current benchmark also measures full-copy Immutable.js and native replicas (six cases, 42 samples); like-for-like cases retain their names. Full independent reference checks. Original, unique IDs, absent ASCII text and 20% Unicode-prefix diagnostics run for every architecture. No precomputed index, decoded dataset cache or artificial delay. No universal performance threshold; retain losing cases.'},null,2));
 }finally{for(const v of variants){v.server.closeAllConnections();await new Promise(r=>v.server.close(r));}}
