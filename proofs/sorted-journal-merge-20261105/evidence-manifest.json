@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "decision": "rejected; evidence only, no performance PR",
+  "baselineCommit": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "localMeasuredCommit": "7e7cb376b0559755780c88cd493a7f053b8585f3",
+  "studies": {
+    "results/pilot-01.json.gz": {
+      "phase": "pilot",
+      "candidateCommit": "7e7cb376b0559755780c88cd493a7f053b8585f3",
+      "rawBytes": 727409,
+      "rawSha256": "44093e864ce4d9b5bf9be27ad86bdf88239968ea319ca81a28c712f63bed104b",
+      "storedBytes": 52630,
+      "storedSha256": "0fd2ab20af61e47c293178c36ebff9d5c4e98216cc4bf01c0ac62aa3646d62f4",
+      "pairs": 40,
+      "summaries": 20,
+      "roundTripVerified": true
+    },
+    "results/formal-01.json.gz": {
+      "phase": "formal",
+      "candidateCommit": "7e7cb376b0559755780c88cd493a7f053b8585f3",
+      "rawBytes": 2049656,
+      "rawSha256": "8d628dd9bf5d10f64f042917657b5bf2acd1b06ac6c1ac60e6c452a2e1dd5ff2",
+      "storedBytes": 130121,
+      "storedSha256": "0da1409d835ea5e897fa3a24c4bfaba5f81dbf2dfb0ccf2802afcbf86ba59e6b",
+      "pairs": 136,
+      "summaries": 24,
+      "roundTripVerified": true
+    }
+  },
+  "files": {
+    "README.md": {
+      "bytes": 15596,
+      "sha256": "0fbdc4a04e90559e7363856a1182fb5d27f56b46e64b538d04cc9166d71228c9"
+    },
+    "archive-manifest.json": {
+      "bytes": 1301,
+      "sha256": "00c2a984a025ab985b58872b71023ce13148207c0ff1ad41ced9135d3535a37c"
+    },
+    "benchmark.mjs": {
+      "bytes": 15824,
+      "sha256": "aeb2c35285f3ec0b8fd8d4ff85d7dfbdbf6d740700029af4ad85f7a1c171e099"
+    },
+    "plan.md": {
+      "bytes": 5883,
+      "sha256": "2dab10851ec017d57a44856ae87458db56fbf99898dc5779bf09a82450741c48"
+    },
+    "results/focused-validation-01.json": {
+      "bytes": 1422,
+      "sha256": "de3d297b1cfc4cf4119e7d2faabfd40eae7cf4bcda328a545b3d6022ed66fc25"
+    },
+    "results/focused-validation-01.txt": {
+      "bytes": 670,
+      "sha256": "cd2d6ce1e011100842b9ef7513d252d11ef519e1917c6ce0d3c7357cfdf50ca5"
+    },
+    "results/formal-01.txt": {
+      "bytes": 18579,
+      "sha256": "457a2135bbfaf3c28169fda498ce839b9f3f15e0656c9cde405e3a96146a311c"
+    },
+    "results/packaging-cleanup.json": {
+      "bytes": 1653,
+      "sha256": "412132bd29d615f9081fe892a457d4f8617bfcedd9b4f29a36c23786d13aeaa7"
+    },
+    "results/packaging-validation.txt": {
+      "bytes": 870,
+      "sha256": "3d4ccba37770def8fe6a2643d9e939bfed9391947b993e34e6c59696276bd1d5"
+    },
+    "results/pilot-01.txt": {
+      "bytes": 7970,
+      "sha256": "54d64e99d1bca113b1008997e6e49616a3dcc921b508d6b2c38f3fc6a00dc176"
+    },
+    "source/arena.ts.txt": {
+      "bytes": 45397,
+      "sha256": "ca323693263f98edfd9906c1ca4ea51f7cd92622ffbfb2776bc7e9a5f29fc8c3"
+    },
+    "source/ci.yml.txt": {
+      "bytes": 3836,
+      "sha256": "0dff23242cf7bad1c8b2d132b90037c6295a625ac8c4e65ac13c1972907101a5"
+    },
+    "source/sorted-journal-merge.test.ts.txt": {
+      "bytes": 10444,
+      "sha256": "2adca528a87b96fb7d382469b1c685b3a542b863d046328e91cfb3ad9dcea582"
+    },
+    "verify.mjs": {
+      "bytes": 11848,
+      "sha256": "3dca30e007a22bf89d03ecf29f2142ebb62632a4f0c4bde31788f75fea7e7eec"
+    },
+    "worker.mjs": {
+      "bytes": 3254,
+      "sha256": "d700d2cc3b3b1ccbb5edc76b5e6e455e82d11fd46c3120409cfae95fd3947221"
+    },
+    "workloads.mjs": {
+      "bytes": 5448,
+      "sha256": "5cf92f4c58afab979d0f2827f7856244998494b2ae9cf0d953e21dfecb37880b"
+    }
+  }
+}

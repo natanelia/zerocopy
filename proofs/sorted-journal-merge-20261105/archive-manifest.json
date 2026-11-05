@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "status": "rejected",
+  "baselineCommit": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "localMeasuredCommit": "7e7cb376b0559755780c88cd493a7f053b8585f3",
+  "localCommitMayNotBeFetchableFromGitHub": true,
+  "scope": "Exact modified source, new test and CI bytes from the measured candidate. All other runtime files equal the fixed baseline. The four frozen driver files remain at the proof directory root.",
+  "files": {
+    "source/arena.ts.txt": {
+      "originalPath": "arena.ts",
+      "manifestPart": "production",
+      "bytes": 45397,
+      "sha256": "ca323693263f98edfd9906c1ca4ea51f7cd92622ffbfb2776bc7e9a5f29fc8c3",
+      "gitBlob": "74298a9660ab67ab0bfc721f5affbaf02d8d0d3a"
+    },
+    "source/sorted-journal-merge.test.ts.txt": {
+      "originalPath": "sorted-journal-merge.test.ts",
+      "manifestPart": "tests",
+      "bytes": 10444,
+      "sha256": "2adca528a87b96fb7d382469b1c685b3a542b863d046328e91cfb3ad9dcea582",
+      "gitBlob": "af9ac0e9b65967abe6c5607a680e457f6c7a7b99"
+    },
+    "source/ci.yml.txt": {
+      "originalPath": ".github/workflows/ci.yml",
+      "manifestPart": "ci",
+      "bytes": 3836,
+      "sha256": "0dff23242cf7bad1c8b2d132b90037c6295a625ac8c4e65ac13c1972907101a5",
+      "gitBlob": "67c4eb1a0ed0e5c69e4473b20927303fb6df4f7a"
+    }
+  }
+}

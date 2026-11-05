@@ -1,0 +1,162 @@
+import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
+import { describe, it } from 'vitest';
+import { Arena, arenaOf, HEAP_START } from './arena';
+import { structureRegistry } from './codec';
+import { SharedSortedMap, SharedSortedSet, SharedList, getWorkerData, initWorker } from './shared';
+
+const encoder = new TextEncoder(), decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const normalize = (key: string) => decoder.decode(encoder.encode(key));
+const order = <T>(model: Map<string, T>) => [...model].sort(([a], [b]) => Buffer.compare(encoder.encode(a), encoder.encode(b)));
+const key = (i: number) => `m-${String(i).padStart(6, '0')}`;
+function fixture() {
+  const a = new Arena(), model = new Map<string, number>();
+  let map = new SharedSortedMap('number', undefined, 0, 0, a);
+  for (let i = 0; i < 31; i++) { map = map.set(key(i), i + .25); model.set(key(i), i + .25); }
+  assert.notEqual(a.dv.getUint32(map.root, true), 0xffffffff);
+  return { a, map, model };
+}
+function comparisons(a: Arena) {
+  const original = a.wasm; let calls = 0;
+  (a as any).wasm = { ...original, compareLeaves(left: number, right: number) { calls++; return original.compareLeaves(left, right); } };
+  return { count: () => calls, reset: () => { calls = 0; }, restore: () => { (a as any).wasm = original; } };
+}
+function unchanged(a: Arena, before: Uint8Array) {
+  assert.equal(Buffer.compare(a.buf.subarray(HEAP_START, HEAP_START + before.length), before), 0);
+}
+
+describe('sorted journal comparison reuse', () => {
+  for (const operation of ['keys', 'values', 'entries', 'forEach'] as const) it(`${operation} compares each base leaf once with a single later pending key`, () => {
+    const { a, map: base, model } = fixture(), map = base.set('z-last', -1);
+    model.set('z-last', -1);
+    assert.equal(a.dv.getUint32(map.root, true), 0xffffffff);
+    assert.equal(a.dv.getUint32(map.root + 12, true), 1);
+    const expected = order(model), before = a.buf.slice(HEAP_START, a.used), counter = comparisons(a);
+    try {
+      if (operation === 'forEach') {
+        const actual: [string, number][] = []; map.forEach((value, key) => actual.push([key, value]));
+        assert.deepEqual(actual, expected);
+      } else {
+        const actual = [...map[operation]()];
+        assert.deepEqual(actual, operation === 'keys' ? expected.map(row => row[0]) : operation === 'values' ? expected.map(row => row[1]) : expected);
+      }
+      assert.equal(counter.count(), 31);
+    } finally { counter.restore(); }
+    unchanged(a, before);
+  });
+
+  for (const count of [0, 1, 2, 3, 4]) it(`merges ${count} pending keys before, between and after the base without duplicate overwritten leaves`, () => {
+    const { a, map: base, model } = fixture(), original = new Map(model);
+    let map = base;
+    const changes = [['z-last', -1], [key(7), -7], ['a-first', -2], [key(15) + 'x', -15]] as const;
+    for (const [k, value] of changes.slice(0, count)) { map = map.set(k, value); model.set(k, value); }
+    if (count) assert.equal(a.dv.getUint32(map.root + 12, true), count);
+    const before = a.buf.slice(HEAP_START, a.used), expected = order(model);
+    assert.equal(map.size, model.size);
+    assert.deepEqual([...map.entries()], expected);
+    assert.deepEqual([...map.keys()], expected.map(row => row[0]));
+    assert.deepEqual([...map.values()], expected.map(row => row[1]));
+    assert.deepEqual([...base.entries()], order(original));
+    unchanged(a, before);
+  });
+
+  it('keeps UTF-8 order, empty keys, BOM and surrogate aliases with special numeric values and forks', () => {
+    const a = new Arena(), model = new Map<string, number>();
+    let map = new SharedSortedMap('number', undefined, 0, 0, a);
+    const keys = ['', '\ue000', ...Array.from({ length: 29 }, (_, i) => key(i))];
+    keys.forEach((k, i) => { map = map.set(k, i); model.set(k, i); });
+    const base = map, baseModel = new Map(model);
+    for (const [k, value] of [['\ud800', 1], ['\ufffd', 2], ['\0', -0], ['\ufeff', NaN], ['🙂', Infinity]] as const) {
+      map = map.set(k, value); model.set(normalize(k), value);
+    }
+    assert.equal(a.dv.getUint32(map.root + 12, true), 4);
+    const before = a.buf.slice(HEAP_START, a.used), fork = map.delete('\0').set('fork', -Infinity), forkModel = new Map(model);
+    forkModel.delete('\0'); forkModel.set('fork', -Infinity);
+    assert.deepEqual([...map.entries()], order(model)); assert.deepEqual([...fork.entries()], order(forkModel));
+    assert.deepEqual([...base.entries()], order(baseModel)); unchanged(a, before);
+  });
+
+  it('keeps creation lazy, handles empty/canonical roots, and stops comparison work on close or throw', () => {
+    const { a, map: base } = fixture(), map = base.set('z-last', 99), counter = comparisons(a);
+    try {
+      assert.deepEqual([...a.radixLeaves(0)], []); assert.equal(counter.count(), 0);
+      assert.equal([...base.values()].length, 31); assert.equal(counter.count(), 0);
+      const unopened = map.values(); assert.equal(counter.count(), 0); unopened.return(undefined);
+      const error = new Error('consumer'); assert.throws(() => map.values().throw(error), caught => caught === error);
+      assert.equal(counter.count(), 0);
+      const delayed = map.values(); a.alloc(a.memory.buffer.byteLength + 65536);
+      assert.equal(delayed.next().value, .25); assert.equal(counter.count(), 1); delayed.return(undefined);
+      assert.equal(delayed.next().done, true); assert.equal(counter.count(), 1);
+      counter.reset(); const failed = map.values(); failed.next();
+      assert.throws(() => failed.throw(error), caught => caught === error); assert.equal(counter.count(), 1);
+      assert.equal(failed.next().done, true); assert.equal(counter.count(), 1);
+      counter.reset(); for (const _ of map.values()) break; assert.equal(counter.count(), 1);
+    } finally { counter.restore(); }
+  });
+
+  for (const copy of [false, true]) it(`keeps two paused journal scans after writer growth and forks (copy=${copy})`, async () => {
+    const { a, map: base, model } = fixture(); let map = base;
+    for (const [k, value] of [['a-first', -1], ['a-second', -2], [key(7), -7], ['z-last', -3]] as const) {
+      map = map.set(k, value); model.set(k, value);
+    }
+    const reader = (await initWorker(getWorkerData({ map }, { copy }))).map, expected = order(model);
+    const keys = reader.keys(), values = map.values();
+    const actualKeys = [keys.next().value], actualValues = [values.next().value];
+    const before = a.buf.slice(HEAP_START, a.used), oldBuffer = a.memory.buffer;
+    a.alloc(a.memory.buffer.byteLength + 65536);
+    const fork = map.delete(key(7)).set('new-fork', 123);
+    assert.notEqual(a.memory.buffer, oldBuffer);
+    let pending = true;
+    while (pending) {
+      pending = false; const k = keys.next(), v = values.next();
+      if (!k.done) { pending = true; actualKeys.push(k.value); }
+      if (!v.done) { pending = true; actualValues.push(v.value); }
+    }
+    assert.deepEqual(actualKeys, expected.map(row => row[0])); assert.deepEqual(actualValues, expected.map(row => row[1]));
+    assert.throws(() => reader.set('forbidden', 1), /read-only/);
+    assert.equal(map.has('new-fork'), false); assert.equal(fork.get('new-fork'), 123); unchanged(a, before);
+  });
+
+  it('recomputes after pending yields when nested decoding grows the owner and reenters the same snapshot', () => {
+    const a = new Arena(), child = new SharedList('number', 0, 0, 0, new Arena()).pushMany([1, 2]), changed = child.set(0, 9);
+    let map = new SharedSortedMap('SharedList<number>', undefined, 0, 0, a);
+    const model = new Map<string, number[]>();
+    for (let i = 0; i < 31; i++) { map = map.set(key(i), child); model.set(key(i), [1, 2]); }
+    for (const k of ['a-first', 'a-second', key(7), 'z-last']) { map = map.set(k, changed); model.set(k, [9, 2]); }
+    const expected = order(model), before = a.buf.slice(HEAP_START, a.used), oldBuffer = a.memory.buffer;
+    const factory = structureRegistry.SharedList!, original = factory.fromWorkerData; let entered = false, fork: typeof map | undefined;
+    factory.fromWorkerData = function (data, source) {
+      if (!entered) {
+        entered = true; a.alloc(a.memory.buffer.byteLength + 65536); fork = map.set('after-fork', child);
+        assert.deepEqual([...map.keys()], expected.map(row => row[0]));
+      }
+      return original.call(factory, data, source);
+    };
+    try {
+      assert.deepEqual([...map.values()].map(value => value.toArray()), expected.map(row => row[1]));
+      assert.equal(entered, true); assert.notEqual(a.memory.buffer, oldBuffer);
+      assert.equal(fork!.has('after-fork'), true); assert.equal(map.has('after-fork'), false); unchanged(a, before);
+    } finally { factory.fromWorkerData = original; }
+  });
+
+  for (const type of ['boolean', 'string', 'object'] as const) it(`preserves ${type} values for insertions and overwrites`, () => {
+    const a = new Arena(), model = new Map<string, any>(); let map = new SharedSortedMap(type, undefined, 0, 0, a);
+    const value = (i: number): any => type === 'boolean' ? !!(i & 1) : type === 'string' ? `\ufeffRésumé界🙂-${i}` : { i, values: [i, { ok: true }] };
+    for (let i = 0; i < 31; i++) { map = map.set(key(i), value(i)); model.set(key(i), value(i)); }
+    for (const [k, i] of [['a-first', 101], [key(4), 104], [key(11) + 'x', 111], ['z-last', 199]] as const) {
+      map = map.set(k, value(i)); model.set(k, value(i));
+    }
+    assert.deepEqual([...map.entries()], order(model));
+    if (type === 'object') for (const value of map.values()) assert.ok(Object.isFrozen(value) && Object.isFrozen((value as any).values));
+  });
+
+  it('keeps sorted-set type identities and natural ordering', () => {
+    const a = new Arena(); let set = SharedSortedSet.fromWorkerData<string | number>({ root: 0, size: 0 }, a);
+    for (let i = 0; i < 31; i++) set = set.add(i);
+    const old = set; for (const value of [NaN, '1', '🙂', '']) set = set.add(value);
+    assert.equal(arenaOf(set), a); assert.equal(a.dv.getUint32(set.toWorkerData().root + 12, true), 4);
+    const encoded = [...Array.from({ length: 31 }, (_, i) => i), NaN, '1', '🙂', ''].map(value => [typeof value === 'number' ? `n:${value}` : `s:${value}`, value] as const);
+    encoded.sort(([a], [b]) => Buffer.compare(encoder.encode(a), encoder.encode(b)));
+    assert.deepEqual([...set.values()], encoded.map(row => row[1])); assert.equal(old.size, 31);
+  });
+});

@@ -1,0 +1,21 @@
+Built 12 portable modules: 233085 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-map
+
+
+ Test Files  4 passed (4)
+      Tests  62 passed (62)
+   Start at  19:52:43
+   Duration  1.55s (transform 707ms, setup 0ms, import 1.32s, tests 2.10s, environment 1ms)
+
+Sorted journal scans retained complete old outputs after a pending yield, writer growth and reset (shared).
+Sorted journal scans retained complete old outputs after a pending yield, writer growth and reset (copy).
+✔ proofs/sorted-journal-merge-20261105/worker.mjs (220.730967ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 228.193673

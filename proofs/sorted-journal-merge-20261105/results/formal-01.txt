@@ -1,0 +1,160 @@
+node values-tail-4096 ab pair 1: 0.654 candidate/baseline
+node keys-tail-4096 ab pair 1: 1.316 candidate/baseline
+node values-long-prefix-4096 ab pair 1: 0.775 candidate/baseline
+node entries-mixed-4096 ab pair 1: 0.636 candidate/baseline
+node values-overwrite-4096 ab pair 1: 0.707 candidate/baseline
+node values-front-4096 ab pair 1: 1.161 candidate/baseline
+node values-small-32 ab pair 1: 0.896 candidate/baseline
+node values-canonical-control ab pair 1: 1.115 candidate/baseline
+node values-canonical-control aa-baseline pair 1: 1.036 candidate/baseline
+node map-get-control ab pair 1: 0.988 candidate/baseline
+node map-get-control aa-baseline pair 1: 1.065 candidate/baseline
+node empty-projections ab pair 1: 1.299 candidate/baseline
+node keys-tail-4096 ab pair 2: 0.797 candidate/baseline
+node values-long-prefix-4096 ab pair 2: 0.755 candidate/baseline
+node entries-mixed-4096 ab pair 2: 1.444 candidate/baseline
+node values-overwrite-4096 ab pair 2: 1.040 candidate/baseline
+node values-front-4096 ab pair 2: 1.002 candidate/baseline
+node values-small-32 ab pair 2: 1.193 candidate/baseline
+node values-canonical-control ab pair 2: 1.042 candidate/baseline
+node values-canonical-control aa-baseline pair 2: 0.756 candidate/baseline
+node map-get-control ab pair 2: 0.820 candidate/baseline
+node map-get-control aa-baseline pair 2: 0.893 candidate/baseline
+node empty-projections ab pair 2: 1.189 candidate/baseline
+node values-tail-4096 ab pair 2: 0.957 candidate/baseline
+node values-long-prefix-4096 ab pair 3: 0.889 candidate/baseline
+node entries-mixed-4096 ab pair 3: 1.066 candidate/baseline
+node values-overwrite-4096 ab pair 3: 0.668 candidate/baseline
+node values-front-4096 ab pair 3: 0.840 candidate/baseline
+node values-small-32 ab pair 3: 0.853 candidate/baseline
+node values-canonical-control ab pair 3: 1.110 candidate/baseline
+node values-canonical-control aa-baseline pair 3: 0.874 candidate/baseline
+node map-get-control ab pair 3: 1.151 candidate/baseline
+node map-get-control aa-baseline pair 3: 0.968 candidate/baseline
+node empty-projections ab pair 3: 0.963 candidate/baseline
+node values-tail-4096 ab pair 3: 1.088 candidate/baseline
+node keys-tail-4096 ab pair 3: 0.849 candidate/baseline
+node entries-mixed-4096 ab pair 4: 1.298 candidate/baseline
+node values-overwrite-4096 ab pair 4: 0.962 candidate/baseline
+node values-front-4096 ab pair 4: 0.978 candidate/baseline
+node values-small-32 ab pair 4: 1.033 candidate/baseline
+node values-canonical-control ab pair 4: 1.051 candidate/baseline
+node values-canonical-control aa-baseline pair 4: 0.953 candidate/baseline
+node map-get-control ab pair 4: 0.945 candidate/baseline
+node map-get-control aa-baseline pair 4: 0.935 candidate/baseline
+node empty-projections ab pair 4: 1.210 candidate/baseline
+node values-tail-4096 ab pair 4: 1.021 candidate/baseline
+node keys-tail-4096 ab pair 4: 0.920 candidate/baseline
+node values-long-prefix-4096 ab pair 4: 0.772 candidate/baseline
+node values-overwrite-4096 ab pair 5: 0.872 candidate/baseline
+node values-front-4096 ab pair 5: 0.745 candidate/baseline
+node values-small-32 ab pair 5: 0.836 candidate/baseline
+node values-canonical-control ab pair 5: 0.983 candidate/baseline
+node map-get-control ab pair 5: 1.004 candidate/baseline
+node empty-projections ab pair 5: 1.413 candidate/baseline
+node values-tail-4096 ab pair 5: 1.086 candidate/baseline
+node keys-tail-4096 ab pair 5: 0.977 candidate/baseline
+node values-long-prefix-4096 ab pair 5: 0.706 candidate/baseline
+node entries-mixed-4096 ab pair 5: 0.715 candidate/baseline
+node values-front-4096 ab pair 6: 0.922 candidate/baseline
+node values-small-32 ab pair 6: 1.167 candidate/baseline
+node values-canonical-control ab pair 6: 1.049 candidate/baseline
+node map-get-control ab pair 6: 0.951 candidate/baseline
+node empty-projections ab pair 6: 1.124 candidate/baseline
+node values-tail-4096 ab pair 6: 1.157 candidate/baseline
+node keys-tail-4096 ab pair 6: 0.830 candidate/baseline
+node values-long-prefix-4096 ab pair 6: 0.796 candidate/baseline
+node entries-mixed-4096 ab pair 6: 0.848 candidate/baseline
+node values-overwrite-4096 ab pair 6: 1.156 candidate/baseline
+bun values-tail-4096 ab pair 1: 0.783 candidate/baseline
+bun keys-tail-4096 ab pair 1: 0.831 candidate/baseline
+bun values-long-prefix-4096 ab pair 1: 0.709 candidate/baseline
+bun entries-mixed-4096 ab pair 1: 0.908 candidate/baseline
+bun values-overwrite-4096 ab pair 1: 0.902 candidate/baseline
+bun values-front-4096 ab pair 1: 0.950 candidate/baseline
+bun values-small-32 ab pair 1: 0.949 candidate/baseline
+bun values-canonical-control ab pair 1: 1.011 candidate/baseline
+bun values-canonical-control aa-baseline pair 1: 0.981 candidate/baseline
+bun map-get-control ab pair 1: 1.099 candidate/baseline
+bun map-get-control aa-baseline pair 1: 0.969 candidate/baseline
+bun empty-projections ab pair 1: 1.173 candidate/baseline
+bun keys-tail-4096 ab pair 2: 0.877 candidate/baseline
+bun values-long-prefix-4096 ab pair 2: 0.760 candidate/baseline
+bun entries-mixed-4096 ab pair 2: 0.674 candidate/baseline
+bun values-overwrite-4096 ab pair 2: 1.119 candidate/baseline
+bun values-front-4096 ab pair 2: 1.024 candidate/baseline
+bun values-small-32 ab pair 2: 0.840 candidate/baseline
+bun values-canonical-control ab pair 2: 0.994 candidate/baseline
+bun values-canonical-control aa-baseline pair 2: 1.105 candidate/baseline
+bun map-get-control ab pair 2: 1.148 candidate/baseline
+bun map-get-control aa-baseline pair 2: 1.099 candidate/baseline
+bun empty-projections ab pair 2: 1.140 candidate/baseline
+bun values-tail-4096 ab pair 2: 0.828 candidate/baseline
+bun values-long-prefix-4096 ab pair 3: 0.656 candidate/baseline
+bun entries-mixed-4096 ab pair 3: 0.616 candidate/baseline
+bun values-overwrite-4096 ab pair 3: 0.936 candidate/baseline
+bun values-front-4096 ab pair 3: 0.972 candidate/baseline
+bun values-small-32 ab pair 3: 0.783 candidate/baseline
+bun values-canonical-control ab pair 3: 0.944 candidate/baseline
+bun values-canonical-control aa-baseline pair 3: 1.184 candidate/baseline
+bun map-get-control ab pair 3: 0.875 candidate/baseline
+bun map-get-control aa-baseline pair 3: 1.258 candidate/baseline
+bun empty-projections ab pair 3: 0.982 candidate/baseline
+bun values-tail-4096 ab pair 3: 0.732 candidate/baseline
+bun keys-tail-4096 ab pair 3: 1.038 candidate/baseline
+bun entries-mixed-4096 ab pair 4: 0.926 candidate/baseline
+bun values-overwrite-4096 ab pair 4: 0.916 candidate/baseline
+bun values-front-4096 ab pair 4: 0.869 candidate/baseline
+bun values-small-32 ab pair 4: 0.885 candidate/baseline
+bun values-canonical-control ab pair 4: 0.996 candidate/baseline
+bun values-canonical-control aa-baseline pair 4: 1.002 candidate/baseline
+bun map-get-control ab pair 4: 0.943 candidate/baseline
+bun map-get-control aa-baseline pair 4: 1.059 candidate/baseline
+bun empty-projections ab pair 4: 0.854 candidate/baseline
+bun values-tail-4096 ab pair 4: 0.737 candidate/baseline
+bun keys-tail-4096 ab pair 4: 0.867 candidate/baseline
+bun values-long-prefix-4096 ab pair 4: 0.673 candidate/baseline
+bun values-overwrite-4096 ab pair 5: 0.835 candidate/baseline
+bun values-front-4096 ab pair 5: 1.156 candidate/baseline
+bun values-small-32 ab pair 5: 0.587 candidate/baseline
+bun values-canonical-control ab pair 5: 1.025 candidate/baseline
+bun map-get-control ab pair 5: 1.012 candidate/baseline
+bun empty-projections ab pair 5: 1.252 candidate/baseline
+bun values-tail-4096 ab pair 5: 1.032 candidate/baseline
+bun keys-tail-4096 ab pair 5: 0.776 candidate/baseline
+bun values-long-prefix-4096 ab pair 5: 0.680 candidate/baseline
+bun entries-mixed-4096 ab pair 5: 0.895 candidate/baseline
+bun values-front-4096 ab pair 6: 0.807 candidate/baseline
+bun values-small-32 ab pair 6: 1.008 candidate/baseline
+bun values-canonical-control ab pair 6: 0.976 candidate/baseline
+bun map-get-control ab pair 6: 1.039 candidate/baseline
+bun empty-projections ab pair 6: 0.965 candidate/baseline
+bun values-tail-4096 ab pair 6: 0.996 candidate/baseline
+bun keys-tail-4096 ab pair 6: 1.132 candidate/baseline
+bun values-long-prefix-4096 ab pair 6: 0.765 candidate/baseline
+bun entries-mixed-4096 ab pair 6: 1.064 candidate/baseline
+bun values-overwrite-4096 ab pair 6: 0.885 candidate/baseline
+{"runtime":"node","name":"values-tail-4096","mode":"ab","pairs":6,"beforeMedianMs":0.5874409453125002,"afterMedianMs":0.6041510703124997,"ratio":0.9777334503838241,"pairRatios":[0.6535700196907658,0.9568670587018879,1.088370625713816,1.0211165629905654,1.086448063092431,1.1569591175732146],"minRatio":0.6535700196907658,"maxRatio":1.1569591175732146,"lower95":0.7863137952165626,"upper95":1.2157521663932798,"degreesOfFreedom":5}
+{"runtime":"node","name":"keys-tail-4096","mode":"ab","pairs":6,"beforeMedianMs":1.0103199000000003,"afterMedianMs":0.9352229000000009,"ratio":0.9339833844303751,"pairRatios":[1.3155264830972366,0.7970170869056494,0.8493857559734556,0.9195824836817124,0.9769856469947731,0.8296288122699776],"minRatio":0.7970170869056494,"maxRatio":1.3155264830972366,"lower95":0.770631177804078,"upper95":1.1319616796165937,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-long-prefix-4096","mode":"ab","pairs":6,"beforeMedianMs":0.8803651886792454,"afterMedianMs":0.6530755943396223,"ratio":0.7802108629358648,"pairRatios":[0.7746171015977146,0.7547747903751627,0.8892345704944435,0.7719196581870077,0.7062945444876376,0.7957803265307396],"minRatio":0.7062945444876376,"maxRatio":0.8892345704944435,"lower95":0.720610351909196,"upper95":0.8447408353631766,"degreesOfFreedom":5}
+{"runtime":"node","name":"entries-mixed-4096","mode":"ab","pairs":6,"beforeMedianMs":1.3406041136363638,"afterMedianMs":1.3063112727272737,"ratio":0.957549331170383,"pairRatios":[0.6364853566734934,1.4442361224582096,1.065796934472952,1.2977875404159631,0.7147737534650352,0.8481910002648639],"minRatio":0.6364853566734934,"maxRatio":1.4442361224582096,"lower95":0.6782782539305999,"upper95":1.3518061596571003,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-overwrite-4096","mode":"ab","pairs":6,"beforeMedianMs":0.6708614999999991,"afterMedianMs":0.5743853560606074,"ratio":0.8836023570258582,"pairRatios":[0.7072999653338454,1.0400891889173551,0.6679325047101995,0.9617371590878875,0.8715707581858184,1.1555143654899176],"minRatio":0.6679325047101995,"maxRatio":1.1555143654899176,"lower95":0.7042219450826231,"upper95":1.1086748017346293,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-front-4096","mode":"ab","pairs":6,"beforeMedianMs":0.5715082313432842,"afterMedianMs":0.522629970149252,"ratio":0.932388702297678,"pairRatios":[1.1611971878643867,1.0020065030284697,0.8401917369662949,0.9780143369853118,0.7453869483046057,0.9219345452759077],"minRatio":0.7453869483046057,"maxRatio":1.1611971878643867,"lower95":0.7942671754908686,"upper95":1.0945292956807362,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-small-32","mode":"ab","pairs":6,"beforeMedianMs":0.005531336888586959,"afterMedianMs":0.004948344497282604,"ratio":0.9861346071561494,"pairRatios":[0.895954501287958,1.193472855051557,0.8532652943319983,1.0330257848806823,0.8358046400750732,1.1673972822594876],"minRatio":0.8358046400750732,"maxRatio":1.193472855051557,"lower95":0.8356120955769546,"upper95":1.16377140610868,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-canonical-control","mode":"ab","pairs":6,"beforeMedianMs":0.4000105176470583,"afterMedianMs":0.4187910470588242,"ratio":1.057325192350525,"pairRatios":[1.1150844050025641,1.0417490129055802,1.1103199066533453,1.0507406448176861,0.9829816853117342,1.0487972891211697],"minRatio":0.9829816853117342,"maxRatio":1.1150844050025641,"lower95":1.0068547046917191,"upper95":1.1103256082230522,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-canonical-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.43869260588235326,"afterMedianMs":0.3738939352941175,"ratio":0.8986113580332579,"pairRatios":[1.036182347285349,0.7559410258201589,0.8737794684721373,0.9527120838434877],"minRatio":0.7559410258201589,"maxRatio":1.036182347285349,"lower95":0.7253157090887421,"upper95":1.1133115726955505,"degreesOfFreedom":3}
+{"runtime":"node","name":"map-get-control","mode":"ab","pairs":6,"beforeMedianMs":0.24231276953125036,"afterMedianMs":0.23403474218749976,"ratio":0.9716536778073768,"pairRatios":[0.9876420716702351,0.8204715479912216,1.151045007832856,0.9448202949924793,1.003629270909461,0.9514611236864836],"minRatio":0.8204715479912216,"maxRatio":1.151045007832856,"lower95":0.8662610628153368,"upper95":1.089868759110855,"degreesOfFreedom":5}
+{"runtime":"node","name":"map-get-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.2370869687499999,"afterMedianMs":0.23624728906250025,"ratio":0.9630874372309943,"pairRatios":[1.0646678157313672,0.8933571437001231,0.9675794466388425,0.9348393752602701],"minRatio":0.8933571437001231,"maxRatio":1.0646678157313672,"lower95":0.8555445411603514,"upper95":1.084148594407687,"degreesOfFreedom":3}
+{"runtime":"node","name":"empty-projections","mode":"ab","pairs":6,"beforeMedianMs":0.0008404262390136735,"afterMedianMs":0.0010741072235107424,"ratio":1.1913810923705264,"pairRatios":[1.2988988358976328,1.1894089127798488,0.9625860532263536,1.2101286293577755,1.4132786778901978,1.1243429393367317],"minRatio":0.9625860532263536,"maxRatio":1.4132786778901978,"lower95":1.0384318085314055,"upper95":1.3668580792660316,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-tail-4096","mode":"ab","pairs":6,"beforeMedianMs":0.35416803448275846,"afterMedianMs":0.28274733620689624,"ratio":0.8431970480937305,"pairRatios":[0.7825666522341558,0.8275898816722954,0.7322382806217869,0.7371382277081437,1.0319864997529415,0.9962367898723433],"minRatio":0.7322382806217869,"maxRatio":1.0319864997529415,"lower95":0.7203682740241059,"upper95":0.9869691483528453,"degreesOfFreedom":5}
+{"runtime":"bun","name":"keys-tail-4096","mode":"ab","pairs":6,"beforeMedianMs":1.0429933166666654,"afterMedianMs":0.9377010333333373,"ratio":0.9121446689129699,"pairRatios":[0.8306669391953558,0.8767992005829752,1.0375907939503655,0.8672955185568402,0.7764779137558938,1.1317042715577508],"minRatio":0.7764779137558938,"maxRatio":1.1317042715577508,"lower95":0.7852273000422942,"upper95":1.0595758667350683,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-long-prefix-4096","mode":"ab","pairs":6,"beforeMedianMs":0.5388112731958765,"afterMedianMs":0.382928979381444,"ratio":0.7060510637106279,"pairRatios":[0.7087296052887447,0.7603095259687389,0.6563016568507569,0.6730423383926233,0.6799944254900017,0.7654105175397311],"minRatio":0.6563016568507569,"maxRatio":0.7654105175397311,"lower95":0.6595666655233505,"upper95":0.7558115511664839,"degreesOfFreedom":5}
+{"runtime":"bun","name":"entries-mixed-4096","mode":"ab","pairs":6,"beforeMedianMs":1.315472107142858,"afterMedianMs":1.186367404761906,"ratio":0.8324305812298197,"pairRatios":[0.9082264423597777,0.6741815494487314,0.6159413410517933,0.9256461280431391,0.89536589729238,1.0644671488051456],"minRatio":0.6159413410517933,"maxRatio":1.0644671488051456,"lower95":0.6680178247620535,"upper95":1.0373086568662138,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-overwrite-4096","mode":"ab","pairs":6,"beforeMedianMs":0.3322034428571442,"afterMedianMs":0.3122925619047627,"ratio":0.9278968531986735,"pairRatios":[0.9018459767340611,1.1186098707452186,0.9355885241435604,0.9155736505052701,0.8347161575404789,0.8848511100266399],"minRatio":0.8347161575404789,"maxRatio":1.1186098707452186,"lower95":0.8359359930399377,"upper95":1.0299742771512244,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-front-4096","mode":"ab","pairs":6,"beforeMedianMs":0.2903032617187504,"afterMedianMs":0.27021537500000026,"ratio":0.9565199102926071,"pairRatios":[0.9498792801063081,1.0237395364689614,0.971575781061817,0.8689377511714472,1.1556989447363981,0.8072278436439037],"minRatio":0.8072278436439037,"maxRatio":1.1556989447363981,"lower95":0.8385183915354673,"upper95":1.0911273360513738,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-small-32","mode":"ab","pairs":6,"beforeMedianMs":0.002866183463694886,"afterMedianMs":0.0024254610991901434,"ratio":0.8299085919456921,"pairRatios":[0.9494190367540529,0.8403343068614767,0.7827716055619842,0.8850649031871686,0.5865023278343411,1.0078400491431614],"minRatio":0.5865023278343411,"maxRatio":1.0078400491431614,"lower95":0.6785578815568742,"upper95":1.0150177158137583,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-canonical-control","mode":"ab","pairs":6,"beforeMedianMs":0.2006290967741939,"afterMedianMs":0.20229546129032255,"ratio":0.9907153364825674,"pairRatios":[1.0109390878520157,0.9938377521614199,0.9442637285119064,0.9956539383789084,1.0251871413101508,0.9764453990453912],"minRatio":0.9442637285119064,"maxRatio":1.0251871413101508,"lower95":0.9612825207780236,"upper95":1.021049334328233,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-canonical-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.21032536129032303,"afterMedianMs":0.2201028516129026,"ratio":1.0648609788959305,"pairRatios":[0.9811387936247458,1.1051201864126996,1.1835671109448895,1.0019332827115583],"minRatio":0.9811387936247458,"maxRatio":1.1835671109448895,"lower95":0.9264734630216451,"upper95":1.2239194641117392,"degreesOfFreedom":3}
+{"runtime":"bun","name":"map-get-control","mode":"ab","pairs":6,"beforeMedianMs":0.16602165040650396,"afterMedianMs":0.16926789227642258,"ratio":1.0152047580217345,"pairRatios":[1.0985233292061833,1.1475111323006053,0.8754771775064777,0.9430697153832392,1.012297733408431,1.0391034412600366],"minRatio":0.8754771775064777,"maxRatio":1.1475111323006053,"lower95":0.9148964120094286,"upper95":1.1265108127884396,"degreesOfFreedom":5}
+{"runtime":"bun","name":"map-get-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.15783098170731677,"afterMedianMs":0.1689831605691062,"ratio":1.0911454071209148,"pairRatios":[0.9687869611893172,1.0987174358859944,1.257891707700449,1.0587001146190624],"minRatio":0.9687869611893172,"maxRatio":1.257891707700449,"lower95":0.9180997355371914,"upper95":1.2968071478469965,"degreesOfFreedom":3}
+{"runtime":"bun","name":"empty-projections","mode":"ab","pairs":6,"beforeMedianMs":0.0005736363255828656,"afterMedianMs":0.0005922935884880266,"ratio":1.0519342207399387,"pairRatios":[1.1727754737151639,1.1401846477888733,0.9818638741452483,0.8541403909273783,1.2522483972846725,0.9648735729675815],"minRatio":0.8541403909273783,"maxRatio":1.2522483972846725,"lower95":0.903988908532882,"upper95":1.2240920151992014,"degreesOfFreedom":5}

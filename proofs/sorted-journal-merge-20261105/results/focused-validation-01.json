@@ -1,0 +1,25 @@
+{
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "status": "passed",
+  "command": "flock /workspace/scratch/83f1d4baba1f/perf.lock bash -c [bun scripts/build-browser.ts && bun --bun node_modules/vitest/vitest.mjs run sorted-journal-merge.test.ts shared-sorted.test.ts trie-view-capture.test.ts map-projection.test.ts && node --test proofs/sorted-journal-merge-20261105/worker.mjs && node node_modules/typescript/bin/tsc --noEmit]",
+  "tests": {
+    "files": 4,
+    "tests": 62,
+    "workerFiles": 1
+  },
+  "node": "v24.22.1",
+  "bun": "1.4.2",
+  "files": {
+    "arena.ts": "ca323693263f98edfd9906c1ca4ea51f7cd92622ffbfb2776bc7e9a5f29fc8c3",
+    "sorted-journal-merge.test.ts": "2adca528a87b96fb7d382469b1c685b3a542b863d046328e91cfb3ad9dcea582",
+    "proofs/sorted-journal-merge-20261105/worker.mjs": "d700d2cc3b3b1ccbb5edc76b5e6e455e82d11fd46c3120409cfae95fd3947221",
+    "proofs/sorted-journal-merge-20261105/benchmark.mjs": "aeb2c35285f3ec0b8fd8d4ff85d7dfbdbf6d740700029af4ad85f7a1c171e099",
+    "proofs/sorted-journal-merge-20261105/workloads.mjs": "5cf92f4c58afab979d0f2827f7856244998494b2ae9cf0d953e21dfecb37880b",
+    "proofs/sorted-journal-merge-20261105/plan.md": "2dab10851ec017d57a44856ae87458db56fbf99898dc5779bf09a82450741c48"
+  },
+  "log": {
+    "path": "results/focused-validation-01.txt",
+    "bytes": 670,
+    "sha256": "cd2d6ce1e011100842b9ef7513d252d11ef519e1917c6ce0d3c7357cfdf50ca5"
+  }
+}

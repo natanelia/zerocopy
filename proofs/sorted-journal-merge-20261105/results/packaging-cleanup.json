@@ -1,0 +1,28 @@
+{
+  "status": "complete",
+  "note": "A packaging preflight found exact physical duplicates after the initial Git removal/archive operations. This check was before docs validation; no benchmark or test rerun occurred. Only byte-verified duplicates were removed. The reason for their persistence was not established.",
+  "actions": [
+    {
+      "path": "sorted-journal-merge.test.ts",
+      "bytes": 10444,
+      "sha256": "2adca528a87b96fb7d382469b1c685b3a542b863d046328e91cfb3ad9dcea582",
+      "preservedAs": "proofs/sorted-journal-merge-20261105/source/sorted-journal-merge.test.ts.txt",
+      "action": "removed exact untracked duplicate"
+    },
+    {
+      "path": "proofs/sorted-journal-merge-20261105/results/pilot-01.json",
+      "bytes": 727409,
+      "sha256": "44093e864ce4d9b5bf9be27ad86bdf88239968ea319ca81a28c712f63bed104b",
+      "preservedAs": "proofs/sorted-journal-merge-20261105/results/pilot-01.json.gz",
+      "action": "removed exact decompressed duplicate"
+    },
+    {
+      "path": "proofs/sorted-journal-merge-20261105/results/formal-01.json",
+      "bytes": 2049656,
+      "sha256": "8d628dd9bf5d10f64f042917657b5bf2acd1b06ac6c1ac60e6c452a2e1dd5ff2",
+      "preservedAs": "proofs/sorted-journal-merge-20261105/results/formal-01.json.gz",
+      "action": "removed exact decompressed duplicate"
+    }
+  ],
+  "subsequentChecks": "The same byte-identical untracked copies reappeared across tool calls after removal. They are excluded from the immutable Git tree and are removed again after the final commit with byte equality checked. No default tests run after archiving; the cause of repeated persistence is not established."
+}

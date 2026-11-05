@@ -1,0 +1,7 @@
+{"path":"proofs/sorted-journal-merge-20261105/results/pilot-01.json.gz","rawBytes":727409,"rawSha256":"44093e864ce4d9b5bf9be27ad86bdf88239968ea319ca81a28c712f63bed104b","phase":"pilot","pairs":40,"summaries":20,"checkedCalls":7159620,"checkedElements":408319380}
+{"path":"proofs/sorted-journal-merge-20261105/results/formal-01.json.gz","rawBytes":2049656,"rawSha256":"8d628dd9bf5d10f64f042917657b5bf2acd1b06ac6c1ac60e6c452a2e1dd5ff2","phase":"formal","pairs":136,"summaries":24,"checkedCalls":33589407,"checkedElements":2355829766}
+Formal source identities and common repeat plans exactly match the recorded pilot.
+Archived measured source and focused validation identities verified without pinning current runtime files.
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (59 Markdown files).
