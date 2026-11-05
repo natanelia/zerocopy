@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run primitive-compaction.test.ts performance-revision.test.ts typed-values.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-compact
+
+
+ Test Files  3 passed (3)
+      Tests  82 passed (82)
+   Start at  19:51:02
+   Duration  12.96s (transform 422ms, setup 0ms, import 590ms, tests 34.78s, environment 1ms)
+

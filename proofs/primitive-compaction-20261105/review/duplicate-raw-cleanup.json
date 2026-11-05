@@ -1,0 +1,47 @@
+{
+  "description": "Byte-identical uncompressed copies excluded from this archive. Each complete study is retained losslessly in its canonical gzip record. Copies under rejected-v2 of V1 pilot/formal are not additional V2 runs.",
+  "copies": [
+    {
+      "path": "rejected-v1/results/formal-01.json",
+      "canonical": "rejected-v1/results/formal-01.json.gz",
+      "bytes": 1428673,
+      "sha256": "839f370458e0ccb16717d72fc9c004b173d33929a845123b8fb701cebcd95dcd"
+    },
+    {
+      "path": "rejected-v1/results/pilot-01.json",
+      "canonical": "rejected-v1/results/pilot-01.json.gz",
+      "bytes": 486846,
+      "sha256": "a0fe8661dc2ada191a918a4b408ac086ac7c87f30d8f1e4614b7c1361fdb2aac"
+    },
+    {
+      "path": "rejected-v2/results/formal-01.json",
+      "canonical": "rejected-v1/results/formal-01.json.gz",
+      "bytes": 1428673,
+      "sha256": "839f370458e0ccb16717d72fc9c004b173d33929a845123b8fb701cebcd95dcd"
+    },
+    {
+      "path": "rejected-v2/results/pilot-01.json",
+      "canonical": "rejected-v1/results/pilot-01.json.gz",
+      "bytes": 486846,
+      "sha256": "a0fe8661dc2ada191a918a4b408ac086ac7c87f30d8f1e4614b7c1361fdb2aac"
+    },
+    {
+      "path": "rejected-v2/results/pilot-v2.json",
+      "canonical": "rejected-v2/results/pilot-v2.json.gz",
+      "bytes": 491519,
+      "sha256": "f0c048082e3a32e8afbd62c9423c9c0aad929908413a8025ad490732863c23fd"
+    },
+    {
+      "path": "results/formal-v3.json",
+      "canonical": "results/formal-v3.json.gz",
+      "bytes": 1417555,
+      "sha256": "c910330262fd58dc266c6da33603176856eb1ba2f001bb534de66900ac079fcc"
+    },
+    {
+      "path": "results/pilot-v3.json",
+      "canonical": "results/pilot-v3.json.gz",
+      "bytes": 500768,
+      "sha256": "3890255085f7e3ac1a30f6aeca14885e70db04639d861ce8ead0df6bdf63f8df"
+    }
+  ]
+}

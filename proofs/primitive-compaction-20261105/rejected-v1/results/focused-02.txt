@@ -1,0 +1,32 @@
+$ bun --bun node_modules/vitest/vitest.mjs run primitive-compaction.test.ts performance-revision.test.ts typed-values.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-compact
+
+ ❯ primitive-compaction.test.ts (8 tests | 2 failed) 13836ms
+     × number spans preserve branch boundaries, edits and old snapshots 5144ms
+     × boolean spans preserve branch boundaries, edits and old snapshots 5109ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  primitive-compaction.test.ts > primitive vector compaction > number spans preserve branch boundaries, edits and old snapshots
+ FAIL  primitive-compaction.test.ts > primitive vector compaction > boolean spans preserve branch boundaries, edits and old snapshots
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> primitive-compaction.test.ts:29:33
+     27|         const before = bytes(edited), rebuilt = compact(edited);
+     28|         expect(rebuilt.toArray()).toEqual(expected);
+     29|         expect(old.toArray()).toEqual(values);
+       |                                 ^
+     30|         expect(bytes(edited)).toEqual(before);
+     31|         expect(arenaOf(rebuilt)).not.toBe(a);
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 58 passed (60)
+   Start at  19:39:18
+   Duration  14.11s (transform 398ms, setup 0ms, import 584ms, tests 35.51s, environment 1ms)
+
+error: script "test" exited with code 1

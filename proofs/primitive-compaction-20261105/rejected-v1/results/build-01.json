@@ -1,0 +1,29 @@
+[
+  {
+    "command": [
+      "bun",
+      "run",
+      "build:wasm"
+    ],
+    "seconds": 4.2360437770003045,
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "run",
+      "build:browser"
+    ],
+    "seconds": 0.03229970299798879,
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "run",
+      "build:types"
+    ],
+    "seconds": 1.6704495860030875,
+    "exitCode": 0
+  }
+]

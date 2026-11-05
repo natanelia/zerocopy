@@ -1,0 +1,2 @@
+Primitive compaction preserved old bytes, aliases and read-only source boundaries after growth/reset (shared).
+Primitive compaction preserved old bytes, aliases and read-only source boundaries after growth/reset (copy).

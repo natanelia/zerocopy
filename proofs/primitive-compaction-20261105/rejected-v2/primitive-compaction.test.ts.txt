@@ -1,0 +1,101 @@
+import assert from 'node:assert/strict';
+import { describe, expect, test } from 'vitest';
+import { Arena, arenaOf, HEAP_START } from './arena';
+import { SharedList, SharedQueue, compact, compactMany, configureMemory, getWorkerData, initWorker } from './shared';
+
+const number = (i: number) => [NaN, -0, Infinity, -Infinity, i + 0.25, -i - 0.5][i % 6];
+const bytes = (item: object) => {
+  const a = arenaOf(item); return a.buf.slice(HEAP_START, a.used);
+};
+function drain(queue: SharedQueue<any>): unknown[] {
+  const result = [];
+  while (queue.size) { result.push(queue.peek()); queue = queue.dequeue(); }
+  return result;
+}
+
+describe('primitive vector compaction', () => {
+  for (const type of ['number', 'boolean'] as const) {
+    for (const size of [0, 1, 31, 32, 33, 1024, 1025, 32768, 32769, 65535, 65536, 65537]) {
+      test(`${type} spans preserve branch boundaries, edits and old snapshots at ${size}`, () => {
+        const a = new Arena(), values = Array.from({ length: size }, (_, i) => type === 'number' ? number(i) : i % 3 === 0);
+        const old = new SharedList(type, 0, 0, 0, a).pushMany(values as any);
+        const expected = values.slice();
+        let edited = old;
+        for (const i of [0, 31, 32, 1023, 1024, size - 1]) if (i >= 0 && i < size) {
+          const value = type === 'number' ? -0 : false;
+          expected[i] = value; edited = edited.set(i, value as any);
+        }
+        const before = bytes(edited), rebuilt = compact(edited);
+        assert.deepEqual(rebuilt.toArray(), expected);
+        assert.deepEqual(old.toArray(), values);
+        assert.deepEqual(bytes(edited), before);
+        expect(arenaOf(rebuilt)).not.toBe(a);
+        expect(rebuilt.push((type === 'number' ? 42 : true) as any).size).toBe(size + 1);
+        assert.deepEqual(rebuilt.toArray(), expected);
+      });
+    }
+    test(`${type} queues copy only their live spans at every tail boundary`, () => {
+      for (const consumed of [0, 1, 31, 32, 33, 47]) for (const size of [0, 1, 31, 32, 33, 1025]) {
+        const a = new Arena();
+        let queue = new SharedQueue(type, 0, 0, 0, undefined, a);
+        const values = Array.from({ length: consumed + size }, (_, i) => type === 'number' ? number(i) : i % 3 === 0);
+        for (const value of values) queue = queue.enqueue(value as any);
+        const original = queue;
+        for (let i = 0; i < consumed; i++) queue = queue.dequeue();
+        const before = bytes(queue), rebuilt = compact(queue);
+        expect(drain(rebuilt)).toEqual(values.slice(consumed));
+        expect(drain(original)).toEqual(values);
+        expect(bytes(queue)).toEqual(before);
+        expect(rebuilt.tail).toBe(0);
+        expect(rebuilt.enqueue((type === 'number' ? 42 : true) as any).size).toBe(size + 1);
+        expect(drain(rebuilt)).toEqual(values.slice(consumed));
+      }
+    });
+  }
+  test('retains raw IEEE-754 bits, including distinct NaN payloads', () => {
+    const a = new Arena(), list = new SharedList('number', 0, 0, 0, a).pushMany(Array(65537).fill(0));
+    const patterns = [0x7ff8000000000042n, 0xfff8000000000123n, 0x8000000000000000n, 0x0000000000000001n];
+    const positions = [0, 1, 31, 32, 1023, 1024, 32767, 32768, 65535, 65536];
+    // Build valid primitive slots with distinct IEEE-754 payloads before use.
+    const address = (item: SharedList<'number'>, i: number) => i >= ((item.size - 1) & ~31)
+      ? item.tail + (i & 31) * 8 : (arenaOf(item).wasm.vecLeaf(item.root, item.depth, i) >>> 0) + (i & 31) * 8;
+    for (const i of positions) a.dv.setBigUint64(address(list, i), patterns[i % patterns.length], true);
+    const rebuilt = compact(list), b = arenaOf(rebuilt);
+    for (const i of positions) expect(b.dv.getBigUint64(address(rebuilt, i), true)).toBe(patterns[i % patterns.length]);
+  });
+  test('relocates nested collections alongside primitive spans and retains aliases', () => {
+    const child = new SharedList('number').pushMany(Array.from({ length: 65537 }, (_, i) => number(i)));
+    const strings = new SharedList('string').pushMany(['界🙂', '\ufeff', '\0']);
+    const outer = new SharedList('SharedList<number>').pushMany([child, child]);
+    const rebuilt = compactMany({ child, strings, outer, alias: child });
+    expect(rebuilt.child).toBe(rebuilt.alias);
+    assert.deepEqual(rebuilt.outer.toArray().map(item => item.toArray()), [child.toArray(), child.toArray()]);
+    expect(rebuilt.strings.toArray()).toEqual(strings.toArray());
+    expect(getWorkerData(rebuilt).arenas).toHaveLength(1);
+    expect(arenaOf(rebuilt.outer.get(0)!)).toBe(arenaOf(rebuilt.child));
+  });
+  test('compacts read-only shared/copy attachments after source growth into writable arenas', async () => {
+    const a = new Arena(), expected = Array.from({ length: 4097 }, (_, i) => number(i));
+    const source = new SharedList('number', 0, 0, 0, a).pushMany(expected);
+    for (const copy of [false, true]) {
+      const attached = await initWorker(getWorkerData({ source }, { copy }));
+      const before = bytes(source), oldBuffer = a.memory.buffer;
+      a.alloc(oldBuffer.byteLength);
+      expect(a.memory.buffer).not.toBe(oldBuffer);
+      const result = compact(attached.source);
+      expect(result.toArray()).toEqual(expected);
+      expect(result.push(42).toArray()).toEqual([...expected, 42]);
+      expect(() => attached.source.push(42)).toThrow(/read-only/);
+      expect(bytes(source).subarray(0, before.length)).toEqual(before);
+    }
+  });
+  test('an exhausted destination leaves its source and retained branches readable', () => {
+    const source = new SharedList('number').pushMany(Array.from({ length: 32769 }, (_, i) => number(i)));
+    const before = bytes(source), fork = source.set(32, 99);
+    configureMemory({ maximumBytes: 131072 });
+    try { expect(() => compact(source)).toThrow(); }
+    finally { configureMemory({ maximumBytes: 256 * 1024 * 1024 }); }
+    expect(bytes(source).subarray(0, before.length)).toEqual(before);
+    expect(source.get(32)).toBe(number(32)); expect(fork.get(32)).toBe(99);
+  });
+});

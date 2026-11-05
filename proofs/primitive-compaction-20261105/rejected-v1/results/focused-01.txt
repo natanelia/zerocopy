@@ -1,0 +1,60 @@
+$ bun --bun node_modules/vitest/vitest.mjs run primitive-compaction.test.ts performance-revision.test.ts typed-values.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-compact
+
+ ❯ primitive-compaction.test.ts (8 tests | 3 failed) 9523ms
+     × relocates nested collections alongside primitive spans and retains aliases 11ms
+     × compacts read-only shared/copy attachments after source growth into writable arenas 6ms
+     × an exhausted destination leaves its source and retained branches readable 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  primitive-compaction.test.ts > primitive vector compaction > relocates nested collections alongside primitive spans and retains aliases
+TypeError: Expected a number
+ ❯ encodeRange arena.ts:822:39
+    820|     if (length) this.bytes.copyWithin(input, prefix, prefix + length *…
+    821|     for (let i = 0; i < raw.length; i++) {
+    822|       if (typeof raw[i] !== 'number') throw new TypeError('Expected a …
+       |                                       ^
+    823|       dv.setFloat64(input + (length + i) * 8, raw[i], true);
+    824|     }
+ ❯ pushMany shared-list.ts:58:21
+ ❯ primitive-compaction.test.ts:65:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  primitive-compaction.test.ts > primitive vector compaction > compacts read-only shared/copy attachments after source growth into writable arenas
+TypeError: Expected a number
+ ❯ encodeRange arena.ts:822:39
+    820|     if (length) this.bytes.copyWithin(input, prefix, prefix + length *…
+    821|     for (let i = 0; i < raw.length; i++) {
+    822|       if (typeof raw[i] !== 'number') throw new TypeError('Expected a …
+       |                                       ^
+    823|       dv.setFloat64(input + (length + i) * 8, raw[i], true);
+    824|     }
+ ❯ pushMany shared-list.ts:58:21
+ ❯ primitive-compaction.test.ts:77:57
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  primitive-compaction.test.ts > primitive vector compaction > an exhausted destination leaves its source and retained branches readable
+TypeError: Expected a number
+ ❯ encodeRange arena.ts:822:39
+    820|     if (length) this.bytes.copyWithin(input, prefix, prefix + length *…
+    821|     for (let i = 0; i < raw.length; i++) {
+    822|       if (typeof raw[i] !== 'number') throw new TypeError('Expected a …
+       |                                       ^
+    823|       dv.setFloat64(input + (length + i) * 8, raw[i], true);
+    824|     }
+ ❯ pushMany shared-list.ts:58:21
+ ❯ primitive-compaction.test.ts:91:45
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 57 passed (60)
+   Start at  19:38:26
+   Duration  9.94s (transform 486ms, setup 0ms, import 639ms, tests 27.10s, environment 1ms)
+
+error: script "test" exited with code 1

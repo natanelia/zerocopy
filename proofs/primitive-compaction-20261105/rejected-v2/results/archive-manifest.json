@@ -1,0 +1,10 @@
+[
+  {
+    "path": "results/pilot-v2.json.gz",
+    "originalBytes": 491519,
+    "originalSha256": "f0c048082e3a32e8afbd62c9423c9c0aad929908413a8025ad490732863c23fd",
+    "compressedBytes": 89308,
+    "compressedSha256": "bf0f5fb1dc9f4a94b68c21e1d99953e5421061a085d13e3a314b21fdd23f933f",
+    "mode": "pilot"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "path": "results/pilot-01.json.gz",
+    "originalBytes": 486846,
+    "originalSha256": "a0fe8661dc2ada191a918a4b408ac086ac7c87f30d8f1e4614b7c1361fdb2aac",
+    "compressedBytes": 90279,
+    "compressedSha256": "bc0b42a247e7812c1ec0d2d7efb99090c8640c0129a6d28fea4c4d2ca28e3215",
+    "mode": "pilot"
+  },
+  {
+    "path": "results/formal-01.json.gz",
+    "originalBytes": 1428673,
+    "originalSha256": "839f370458e0ccb16717d72fc9c004b173d33929a845123b8fb701cebcd95dcd",
+    "compressedBytes": 257495,
+    "compressedSha256": "7a41da46c3186ad1f7068985ff237f1bb14c8f663aedca3acf41eddcf18c59f6",
+    "mode": "formal"
+  }
+]

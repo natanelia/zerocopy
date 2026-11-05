@@ -1,0 +1,90 @@
+pilot: node pair 1/2 before, list-number-large verified
+pilot: node pair 1/2 after, list-number-large verified
+pilot: node pair 1/2 before, list-number-boundary verified
+pilot: node pair 1/2 after, list-number-boundary verified
+pilot: node pair 1/2 before, list-number-small verified
+pilot: node pair 1/2 after, list-number-small verified
+pilot: node pair 1/2 before, list-boolean verified
+pilot: node pair 1/2 after, list-boolean verified
+pilot: node pair 1/2 before, queue-number verified
+pilot: node pair 1/2 after, queue-number verified
+pilot: node pair 1/2 before, queue-boolean verified
+pilot: node pair 1/2 after, queue-boolean verified
+pilot: node pair 1/2 before, list-empty verified
+pilot: node pair 1/2 after, list-empty verified
+pilot: node pair 1/2 before, list-string verified
+pilot: node pair 1/2 after, list-string verified
+pilot: node pair 1/2 before, list-object verified
+pilot: node pair 1/2 after, list-object verified
+pilot: node pair 2/2 after, list-object verified
+pilot: node pair 2/2 before, list-object verified
+pilot: node pair 2/2 after, list-string verified
+pilot: node pair 2/2 before, list-string verified
+pilot: node pair 2/2 after, list-empty verified
+pilot: node pair 2/2 before, list-empty verified
+pilot: node pair 2/2 after, queue-boolean verified
+pilot: node pair 2/2 before, queue-boolean verified
+pilot: node pair 2/2 after, queue-number verified
+pilot: node pair 2/2 before, queue-number verified
+pilot: node pair 2/2 after, list-boolean verified
+pilot: node pair 2/2 before, list-boolean verified
+pilot: node pair 2/2 after, list-number-small verified
+pilot: node pair 2/2 before, list-number-small verified
+pilot: node pair 2/2 after, list-number-boundary verified
+pilot: node pair 2/2 before, list-number-boundary verified
+pilot: node pair 2/2 after, list-number-large verified
+pilot: node pair 2/2 before, list-number-large verified
+pilot: bun pair 1/2 before, list-number-large verified
+pilot: bun pair 1/2 after, list-number-large verified
+pilot: bun pair 1/2 before, list-number-boundary verified
+pilot: bun pair 1/2 after, list-number-boundary verified
+pilot: bun pair 1/2 before, list-number-small verified
+pilot: bun pair 1/2 after, list-number-small verified
+pilot: bun pair 1/2 before, list-boolean verified
+pilot: bun pair 1/2 after, list-boolean verified
+pilot: bun pair 1/2 before, queue-number verified
+pilot: bun pair 1/2 after, queue-number verified
+pilot: bun pair 1/2 before, queue-boolean verified
+pilot: bun pair 1/2 after, queue-boolean verified
+pilot: bun pair 1/2 before, list-empty verified
+pilot: bun pair 1/2 after, list-empty verified
+pilot: bun pair 1/2 before, list-string verified
+pilot: bun pair 1/2 after, list-string verified
+pilot: bun pair 1/2 before, list-object verified
+pilot: bun pair 1/2 after, list-object verified
+pilot: bun pair 2/2 after, list-object verified
+pilot: bun pair 2/2 before, list-object verified
+pilot: bun pair 2/2 after, list-string verified
+pilot: bun pair 2/2 before, list-string verified
+pilot: bun pair 2/2 after, list-empty verified
+pilot: bun pair 2/2 before, list-empty verified
+pilot: bun pair 2/2 after, queue-boolean verified
+pilot: bun pair 2/2 before, queue-boolean verified
+pilot: bun pair 2/2 after, queue-number verified
+pilot: bun pair 2/2 before, queue-number verified
+pilot: bun pair 2/2 after, list-boolean verified
+pilot: bun pair 2/2 before, list-boolean verified
+pilot: bun pair 2/2 after, list-number-small verified
+pilot: bun pair 2/2 before, list-number-small verified
+pilot: bun pair 2/2 after, list-number-boundary verified
+pilot: bun pair 2/2 before, list-number-boundary verified
+pilot: bun pair 2/2 after, list-number-large verified
+pilot: bun pair 2/2 before, list-number-large verified
+node list-number-large: 3.7707 -> 0.9525 ms, ratio 0.254
+node list-number-boundary: 1.6232 -> 0.6050 ms, ratio 0.373
+node list-number-small: 0.0731 -> 0.0488 ms, ratio 0.672
+node list-boolean: 0.5632 -> 0.4860 ms, ratio 0.808
+node queue-number: 0.5573 -> 0.4771 ms, ratio 0.822
+node queue-boolean: 0.1251 -> 0.1429 ms, ratio 1.145
+node list-empty: 0.0381 -> 0.0353 ms, ratio 0.930
+node list-string: 0.8140 -> 0.7137 ms, ratio 0.879
+node list-object: 0.1268 -> 0.1178 ms, ratio 0.928
+bun list-number-large: 4.2443 -> 2.2401 ms, ratio 0.523
+bun list-number-boundary: 2.3178 -> 1.6448 ms, ratio 0.717
+bun list-number-small: 1.0453 -> 1.0976 ms, ratio 1.051
+bun list-boolean: 1.2889 -> 1.2042 ms, ratio 0.938
+bun queue-number: 1.4394 -> 1.1543 ms, ratio 0.798
+bun queue-boolean: 1.1569 -> 1.0984 ms, ratio 0.953
+bun list-empty: 1.0603 -> 0.9899 ms, ratio 0.934
+bun list-string: 1.7972 -> 1.9582 ms, ratio 1.079
+bun list-object: 1.1841 -> 1.4062 ms, ratio 1.188

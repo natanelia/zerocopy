@@ -1,0 +1,80 @@
+pilot: node pair 1/2 before, list-number-large verified
+pilot: node pair 1/2 after, list-number-large verified
+pilot: node pair 1/2 before, list-number-small verified
+pilot: node pair 1/2 after, list-number-small verified
+pilot: node pair 1/2 before, list-boolean verified
+pilot: node pair 1/2 after, list-boolean verified
+pilot: node pair 1/2 before, queue-number verified
+pilot: node pair 1/2 after, queue-number verified
+pilot: node pair 1/2 before, queue-boolean verified
+pilot: node pair 1/2 after, queue-boolean verified
+pilot: node pair 1/2 before, list-empty verified
+pilot: node pair 1/2 after, list-empty verified
+pilot: node pair 1/2 before, list-string verified
+pilot: node pair 1/2 after, list-string verified
+pilot: node pair 1/2 before, list-object verified
+pilot: node pair 1/2 after, list-object verified
+pilot: node pair 2/2 after, list-object verified
+pilot: node pair 2/2 before, list-object verified
+pilot: node pair 2/2 after, list-string verified
+pilot: node pair 2/2 before, list-string verified
+pilot: node pair 2/2 after, list-empty verified
+pilot: node pair 2/2 before, list-empty verified
+pilot: node pair 2/2 after, queue-boolean verified
+pilot: node pair 2/2 before, queue-boolean verified
+pilot: node pair 2/2 after, queue-number verified
+pilot: node pair 2/2 before, queue-number verified
+pilot: node pair 2/2 after, list-boolean verified
+pilot: node pair 2/2 before, list-boolean verified
+pilot: node pair 2/2 after, list-number-small verified
+pilot: node pair 2/2 before, list-number-small verified
+pilot: node pair 2/2 after, list-number-large verified
+pilot: node pair 2/2 before, list-number-large verified
+pilot: bun pair 1/2 before, list-number-large verified
+pilot: bun pair 1/2 after, list-number-large verified
+pilot: bun pair 1/2 before, list-number-small verified
+pilot: bun pair 1/2 after, list-number-small verified
+pilot: bun pair 1/2 before, list-boolean verified
+pilot: bun pair 1/2 after, list-boolean verified
+pilot: bun pair 1/2 before, queue-number verified
+pilot: bun pair 1/2 after, queue-number verified
+pilot: bun pair 1/2 before, queue-boolean verified
+pilot: bun pair 1/2 after, queue-boolean verified
+pilot: bun pair 1/2 before, list-empty verified
+pilot: bun pair 1/2 after, list-empty verified
+pilot: bun pair 1/2 before, list-string verified
+pilot: bun pair 1/2 after, list-string verified
+pilot: bun pair 1/2 before, list-object verified
+pilot: bun pair 1/2 after, list-object verified
+pilot: bun pair 2/2 after, list-object verified
+pilot: bun pair 2/2 before, list-object verified
+pilot: bun pair 2/2 after, list-string verified
+pilot: bun pair 2/2 before, list-string verified
+pilot: bun pair 2/2 after, list-empty verified
+pilot: bun pair 2/2 before, list-empty verified
+pilot: bun pair 2/2 after, queue-boolean verified
+pilot: bun pair 2/2 before, queue-boolean verified
+pilot: bun pair 2/2 after, queue-number verified
+pilot: bun pair 2/2 before, queue-number verified
+pilot: bun pair 2/2 after, list-boolean verified
+pilot: bun pair 2/2 before, list-boolean verified
+pilot: bun pair 2/2 after, list-number-small verified
+pilot: bun pair 2/2 before, list-number-small verified
+pilot: bun pair 2/2 after, list-number-large verified
+pilot: bun pair 2/2 before, list-number-large verified
+node list-number-large: 4.2283 -> 0.9751 ms, ratio 0.233
+node list-number-small: 0.0442 -> 0.0622 ms, ratio 1.361
+node list-boolean: 0.5528 -> 0.6317 ms, ratio 1.128
+node queue-number: 0.5357 -> 0.6450 ms, ratio 1.358
+node queue-boolean: 0.1709 -> 0.0859 ms, ratio 0.502
+node list-empty: 0.0343 -> 0.0361 ms, ratio 1.051
+node list-string: 0.5882 -> 0.7310 ms, ratio 1.217
+node list-object: 0.1256 -> 0.1211 ms, ratio 0.966
+bun list-number-large: 4.2882 -> 2.2287 ms, ratio 0.515
+bun list-number-small: 0.9275 -> 1.0318 ms, ratio 1.113
+bun list-boolean: 1.2973 -> 1.0586 ms, ratio 0.813
+bun queue-number: 1.1566 -> 1.2837 ms, ratio 1.112
+bun queue-boolean: 1.0255 -> 1.1425 ms, ratio 1.116
+bun list-empty: 1.0047 -> 0.9782 ms, ratio 0.979
+bun list-string: 1.6354 -> 1.9667 ms, ratio 1.196
+bun list-object: 1.2039 -> 1.0945 ms, ratio 0.909

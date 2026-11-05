@@ -1,0 +1,47 @@
+{
+  "localCommit": "8fa98cf855e0775fda6d17ec04329f9a1d6e1fc5",
+  "files": [
+    {
+      "source": "compaction.ts",
+      "archive": "compaction.ts",
+      "gitBlob": "42d48b3921e3dc9f66557e43914f83ed5fde5c0b",
+      "bytes": 12086,
+      "sha256": "76c78e12725b9b2604686de8eabcf3b4b5f1a929992d6492d4f26d1a57d93276"
+    },
+    {
+      "source": "primitive-compaction.test.ts",
+      "archive": "primitive-compaction.test.ts.txt",
+      "gitBlob": "a7ca27e64dbebeea3fcacca6bd42d500fd50ee91",
+      "bytes": 6028,
+      "sha256": "cb22a1bf8abc0804f08a2f3ffd235e742a2b8389749ab46b7a154abadb7f5a8f"
+    },
+    {
+      "source": ".github/workflows/ci.yml",
+      "archive": "ci.yml",
+      "gitBlob": "160d819887969d2d3f98851ff9ba6d9bfe062169",
+      "bytes": 3914,
+      "sha256": "ceb3a96f939a35441ff22bc9aafbe53e169aabd0d672736c5c94ac662fd12762"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/benchmark.mjs",
+      "archive": "benchmark.mjs",
+      "gitBlob": "c80af8395f8b2d3ced06793f5cd6831aeec8cf23",
+      "bytes": 12004,
+      "sha256": "49709f0ffb212f671d2497b3c72174d4b2844a01611ecb27dab15f4d4297942e"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/PLAN.md",
+      "archive": "PLAN.md",
+      "gitBlob": "fc1ec3e987ae8fcd3b137100deca934a5bf81656",
+      "bytes": 2952,
+      "sha256": "d1e1b02edf0d651f892bbe22aa25903b10114de4e0982c50a2f14c2c8d11f855"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/worker.mjs",
+      "archive": "worker.mjs",
+      "gitBlob": "915a6357eac7b50391aa0b7e5463ec7e7e61ea23",
+      "bytes": 3567,
+      "sha256": "35101100639223abfea731b9a8bbd7abc9f5cb6b7c19d495476cda3b464fa678"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "variant": "v1",
+    "mode": "pilot",
+    "schema": "zerocopy-compaction-base64/isolated-v1",
+    "path": "rejected-v1/results/pilot-01.json.gz",
+    "driver": "rejected-v1/benchmark.mjs",
+    "compactionSource": "rejected-v1/compaction.ts",
+    "caseCount": 8,
+    "originalBytes": 486846,
+    "originalSha256": "a0fe8661dc2ada191a918a4b408ac086ac7c87f30d8f1e4614b7c1361fdb2aac"
+  },
+  {
+    "variant": "v1",
+    "mode": "formal",
+    "schema": "zerocopy-compaction-base64/isolated-v1",
+    "path": "rejected-v1/results/formal-01.json.gz",
+    "driver": "rejected-v1/benchmark.mjs",
+    "compactionSource": "rejected-v1/compaction.ts",
+    "caseCount": 8,
+    "originalBytes": 1428673,
+    "originalSha256": "839f370458e0ccb16717d72fc9c004b173d33929a845123b8fb701cebcd95dcd"
+  },
+  {
+    "variant": "v2",
+    "mode": "pilot",
+    "schema": "zerocopy-compaction-base64/isolated-v1",
+    "path": "rejected-v2/results/pilot-v2.json.gz",
+    "driver": "rejected-v2/benchmark.mjs",
+    "compactionSource": "rejected-v2/compaction.ts",
+    "caseCount": 9,
+    "originalBytes": 491519,
+    "originalSha256": "f0c048082e3a32e8afbd62c9423c9c0aad929908413a8025ad490732863c23fd"
+  },
+  {
+    "variant": "v3",
+    "mode": "pilot",
+    "schema": "zerocopy-compaction-base64/isolated-v1",
+    "path": "results/pilot-v3.json.gz",
+    "driver": "benchmark.mjs",
+    "compactionSource": "measured-source/compaction.ts",
+    "caseCount": 9,
+    "originalBytes": 500768,
+    "originalSha256": "3890255085f7e3ac1a30f6aeca14885e70db04639d861ce8ead0df6bdf63f8df"
+  },
+  {
+    "variant": "v3",
+    "mode": "formal",
+    "schema": "zerocopy-compaction-base64/isolated-v1",
+    "path": "results/formal-v3.json.gz",
+    "driver": "benchmark.mjs",
+    "compactionSource": "measured-source/compaction.ts",
+    "caseCount": 9,
+    "originalBytes": 1417555,
+    "originalSha256": "c910330262fd58dc266c6da33603176856eb1ba2f001bb534de66900ac079fcc"
+  }
+]

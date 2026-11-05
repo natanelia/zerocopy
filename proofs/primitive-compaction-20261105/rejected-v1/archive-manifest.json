@@ -1,0 +1,54 @@
+{
+  "localCommit": "972d07804f7c5224b10038c5e4adb050a44d652d",
+  "files": [
+    {
+      "source": "compaction.ts",
+      "archive": "compaction.ts",
+      "gitBlob": "9fe2e24d415e4df188248194b705690b017a0db3",
+      "bytes": 12370,
+      "sha256": "4cd7e26ab458461e8932c8ef3e3206cdb953db11f1faf50bb207ae5f6cfb1ee2"
+    },
+    {
+      "source": "primitive-compaction.test.ts",
+      "archive": "primitive-compaction.test.ts.txt",
+      "gitBlob": "4c1562764791aa9f41f6e48f97c7107cf8cfd2ea",
+      "bytes": 5892,
+      "sha256": "3d99d2f4d0c4bfcc9ba18b9bc1034df9d477566d31acf1371fb5d8b6afd85543"
+    },
+    {
+      "source": ".github/workflows/ci.yml",
+      "archive": "ci.yml",
+      "gitBlob": "160d819887969d2d3f98851ff9ba6d9bfe062169",
+      "bytes": 3914,
+      "sha256": "ceb3a96f939a35441ff22bc9aafbe53e169aabd0d672736c5c94ac662fd12762"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/benchmark.mjs",
+      "archive": "benchmark.mjs",
+      "gitBlob": "d54d6bc3bba6e006a7435b5e5c5414b2e0200cd3",
+      "bytes": 11835,
+      "sha256": "7b2136c33b02bd126505421af780d19dc415226dfaed081bbe9b5742f35edfba"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/PLAN.md",
+      "archive": "PLAN.md",
+      "gitBlob": "df0df38a9914000f70a5ef63822e4a18c9891b5a",
+      "bytes": 2690,
+      "sha256": "28326d4a885de9430048e6bd82eb15df1723cc9e7eb62bf525dab93485401fcf"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/CONFIRMATION-PLAN.md",
+      "archive": "CONFIRMATION-PLAN.md",
+      "gitBlob": "f6d7e9afcfbea12ccf08404548a24e5ba2d8b84c",
+      "bytes": 1305,
+      "sha256": "8d4b052cdc928ce5402df5f2b50a2fd48a9f33f341d007e408d002fd7edfd203"
+    },
+    {
+      "source": "proofs/primitive-compaction-20261105/worker.mjs",
+      "archive": "worker.mjs",
+      "gitBlob": "fa1cdf0eb9dd1146338b751c95bdf155d04366be",
+      "bytes": 3566,
+      "sha256": "4d34430b7f8b88a075fc5cd797482e72c300932ee79c1e6a5d685e616e18ddbb"
+    }
+  ]
+}
