@@ -1,0 +1,35 @@
+file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:129
+      throw new Error(child.stderr || String(child.error));
+            ^
+
+Error: node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 0
+- -0
+
+    at batch (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:55:12)
+    at subject (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:62:23)
+    at async file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:163:63 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: -0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.1
+
+    at run (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:129:13)
+    at main (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:139:24)
+    at file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/benchmark.mjs:164:12
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.1
