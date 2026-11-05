@@ -1,0 +1,722 @@
+{
+  "versions": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "study": "map-delete-many-20261105-v3",
+  "variants": [
+    {
+      "root": "/workspace/scratch/eb0e431b3aaf/zerocopy",
+      "hashes": {
+        "arena.ts": "a4a5fc53a66baf943688ccf357095afab02b0ff538711542e384d2b01004243f",
+        "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+        "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+        "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+        "dist/chunk-eg3tkaph.js": "8b88d5d48a92cb6828f9e2cb7d78e15c3566f46e8f232555bd40bccf3ed5e175",
+        "dist/chunk-gar6as5k.js": "bc18857cba161cef0f5fde1c81cff08e2d3832856be28cb2dfae11825e7f0e9b",
+        "dist/chunk-sbahvxa1.js": "d21ec929ef09b3c565822a252153d7bbdbd37cb48446c8f21305c4a353038c84",
+        "dist/chunk-vb9htdwy.js": "2a6100b66b94e1361cc82edc6dc51321ec41f2874cb40845a91970eab5f340f2",
+        "dist/chunk-wejmnps7.js": "5539fd6ab8fc4b38a575237345c1f22a9c7cb5d71c644645cfb761cb44d683d3",
+        "dist/geometry.js": "0c140a9f1b4870740f2eff884d5523e334b5e9c36d98af7dfd83b1c93fa0b8f2",
+        "dist/numeric.js": "aa63c568057a52b9c0780d0bef8ad6a9f9a9b4c46c420f96db05a2ff6f3336d4",
+        "dist/redux.js": "765bdfe57d5f33347c386cc74543e1f01e366b36ede3380079ee6f9575efc00f",
+        "dist/shared.js": "bd5acd7719fd9a32ba051aacfa03d8d493fd1ffd3bdacf8ba8d68c5176dab01a",
+        "dist/state.js": "7ae73f6895357216afd34647348a3645145b74789bf6d93f61e7955c325681d0",
+        "dist/tanstack-db-collection.js": "f226086536017a0146f1cc487fc21c1eb56ed7020365623592c78dca382bd1f1",
+        "dist/worker.js": "741e21f9b52bb827f442c9d5e791aa85c97330b3120900c4fc333f21525adc81"
+      },
+      "rows": [
+        {
+          "name": "delete-1024-of-4096",
+          "expectedDigest": "788c843b3bbcd38994b29ba7d2dfd5f7ccd4f1e005c854bdc60e436a932e69df",
+          "fixture": {
+            "size": 4096,
+            "operation": "deleteMany",
+            "keys": 1024,
+            "uniqueKeys": 1024,
+            "construction": "bulk",
+            "resultSize": 3072,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 64856,
+              "allocatedBytesPerOperation": 64856,
+              "sourceBytes": 186192,
+              "capacityBytes": 327680
+            }
+          ]
+        },
+        {
+          "name": "delete-4096-of-16384",
+          "expectedDigest": "6eea227fc1f7cb8ae6492906df2160659651671256cc10612e318ac0d52c41f7",
+          "fixture": {
+            "size": 16384,
+            "operation": "deleteMany",
+            "keys": 4096,
+            "uniqueKeys": 4096,
+            "construction": "scalar",
+            "resultSize": 12288,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 318160,
+              "allocatedBytesPerOperation": 318160,
+              "sourceBytes": 1741752,
+              "capacityBytes": 2162688
+            }
+          ]
+        },
+        {
+          "name": "unicode-256-of-2048",
+          "expectedDigest": "aad49a33e3d1f75375e0616a3575a25f8b58c8ed57a6f682aad14aa3d1b2af4a",
+          "fixture": {
+            "size": 2048,
+            "operation": "deleteMany",
+            "keys": 256,
+            "uniqueKeys": 256,
+            "construction": "bulk",
+            "resultSize": 1792,
+            "unicode": true,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 14076,
+              "allocatedBytesPerOperation": 14076,
+              "sourceBytes": 123428,
+              "capacityBytes": 262144
+            }
+          ]
+        },
+        {
+          "name": "small-four-control",
+          "expectedDigest": "4e3277b17f6325d09a2e067570bb3a2b00bdfc105ea276bd549ee14277ab3fcf",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 4,
+            "uniqueKeys": 4,
+            "construction": "bulk",
+            "resultSize": 124,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 120,
+              "allocatedBytesPerOperation": 120,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "small-eight-control",
+          "expectedDigest": "1675056c35d1bde465e0558093e875bbd7cbebbc8129b795975943c0a252125d",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 8,
+            "uniqueKeys": 8,
+            "construction": "bulk",
+            "resultSize": 120,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 268,
+              "allocatedBytesPerOperation": 268,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "small-sixteen-control",
+          "expectedDigest": "923c1361d116f5f3c7ec6d58e5b15564af4123d3700325e5a0d94b760d6c896d",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 16,
+            "uniqueKeys": 16,
+            "construction": "bulk",
+            "resultSize": 112,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 568,
+              "allocatedBytesPerOperation": 568,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "missing-control",
+          "expectedDigest": "9c517cdf81e8c53de73ef0d12e41eebbde9bf6e9c46a80575c5be20ef97bea61",
+          "fixture": {
+            "size": 1024,
+            "operation": "deleteMany",
+            "keys": 128,
+            "uniqueKeys": 128,
+            "construction": "bulk",
+            "resultSize": 1024,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 0,
+              "allocatedBytesPerOperation": 0,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "hit-then-misses-control",
+          "expectedDigest": "f833bafdb61cd6657fc9a847ee4316e6bf0281712150d99f29a5801850cd6633",
+          "fixture": {
+            "size": 1024,
+            "operation": "deleteMany",
+            "keys": 1024,
+            "uniqueKeys": 1024,
+            "construction": "bulk",
+            "resultSize": 1020,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": 4,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 164,
+              "allocatedBytesPerOperation": 164,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "empty-control",
+          "expectedDigest": "1c832c2e7da07040a8229ff6f7ad67694db693d5f0391053f4db770d5d5f084a",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 0,
+            "uniqueKeys": 0,
+            "construction": "bulk",
+            "resultSize": 128,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 0,
+              "allocatedBytesPerOperation": 0,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "long-key-control",
+          "expectedDigest": "5f8e4962f6925e9084eeec0d7b725e960ae6e1e646c49d9c8e2f132834f41526",
+          "fixture": {
+            "size": 66,
+            "operation": "deleteMany",
+            "keys": 7,
+            "uniqueKeys": 6,
+            "construction": "bulk",
+            "resultSize": 60,
+            "unicode": false,
+            "long": true,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 160,
+              "allocatedBytesPerOperation": 160,
+              "sourceBytes": 103100,
+              "capacityBytes": 196608
+            }
+          ]
+        },
+        {
+          "name": "scalar-delete-control",
+          "expectedDigest": "b52523a7e20617c0293740ff9315a82c1342a844c05c388e8547ec90b9dbc4ee",
+          "fixture": {
+            "size": 128,
+            "operation": "delete",
+            "keys": 1,
+            "uniqueKeys": 1,
+            "construction": "bulk",
+            "resultSize": 127,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 48,
+              "allocatedBytesPerOperation": 48,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "bulk-set-control",
+          "expectedDigest": "50be52219445cc002a861a0dadb7a114f91be8d97c39b2a0ce281b5dfae82a58",
+          "fixture": {
+            "size": 1024,
+            "operation": "setMany",
+            "keys": 256,
+            "uniqueKeys": 256,
+            "construction": "bulk",
+            "resultSize": 1024,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 15468,
+              "allocatedBytesPerOperation": 15468,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "root": "/workspace/scratch/eb0e431b3aaf/zerocopy-map-batch-delete",
+      "hashes": {
+        "arena.ts": "7f5d43a536b27ea6e39756e866f08d2cb5eaa234c5176858e9082aefe12366d6",
+        "persistent-core.as.ts": "f86c0e33ba60a8a3bc3902ddb88720099bc5904913de77e3ace7390c5f62987c",
+        "shared-map.ts": "596025ed625fcb8741ed6f4a0a78e139a59a2e0df923ed1d40c8e1fa499f2800",
+        "persistent-core.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "shared-map.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "shared-list.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "linked-list.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "singly-linked-list.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "doubly-linked-list.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "ordered-map.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "sorted-tree.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "priority-queue.wasm": "e43aa9d99529a8ee8c41e3e8937afb12f36e5c9b379c69ccbc2f615cd41e50ad",
+        "dist/chunk-2v7m48vv.js": "255707eed0238a959d5676f770e7bb40bda57e20b9fa8b96a641fee8b77c9011",
+        "dist/chunk-707fc2de.js": "4e09e9a2bc7c784b10994ebef3ed2e4942b7f19754fba1edbf1e138a3a01e08b",
+        "dist/chunk-a6s2xtrz.js": "356fb0576c6cc4d2065fd7887de382c0e03e28e79939344fd77b38c01d7d6d07",
+        "dist/chunk-fd80pm34.js": "c4eddf905e4ff901216d9c9c7f56f3db4b784264c55905e8a8c1715dd5cbcaef",
+        "dist/chunk-nhz9gnrk.js": "349d164d517ebd6f7813d15769061dc033620b5a1007527ee0bc303f90bebf3b",
+        "dist/geometry.js": "94b21c19313c3befa92632fcf664e2806e957ecd95d6438e4e1a96be8155f603",
+        "dist/numeric.js": "cb5ca295dd0293feb1db26fb609959547d1a8a1114b426e2c751143344dcc546",
+        "dist/redux.js": "efb06a28bf19467927808147c891cbae3468b88398e218e5723f66aa4e4aba2c",
+        "dist/shared.js": "5fe45d50f921bd0043a7096955e26029b29ecbc05988fdc47e0e97d952ba298f",
+        "dist/state.js": "3f4e51a2302204ba728e0abb38adc423f1b7f6dc0cc07de6adbc903f32035f45",
+        "dist/tanstack-db-collection.js": "88ab7c44209d44c6421b67db35c40d63500464d7761bdd61dd914e235873df06",
+        "dist/worker.js": "14a2d311ab23fc3d63d2ade214032ebfb41afea5d5a58dd1057254e5185c5b2c"
+      },
+      "rows": [
+        {
+          "name": "delete-1024-of-4096",
+          "expectedDigest": "788c843b3bbcd38994b29ba7d2dfd5f7ccd4f1e005c854bdc60e436a932e69df",
+          "fixture": {
+            "size": 4096,
+            "operation": "deleteMany",
+            "keys": 1024,
+            "uniqueKeys": 1024,
+            "construction": "bulk",
+            "resultSize": 3072,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 30272,
+              "allocatedBytesPerOperation": 30272,
+              "sourceBytes": 186192,
+              "capacityBytes": 327680
+            }
+          ]
+        },
+        {
+          "name": "delete-4096-of-16384",
+          "expectedDigest": "6eea227fc1f7cb8ae6492906df2160659651671256cc10612e318ac0d52c41f7",
+          "fixture": {
+            "size": 16384,
+            "operation": "deleteMany",
+            "keys": 4096,
+            "uniqueKeys": 4096,
+            "construction": "scalar",
+            "resultSize": 12288,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 99932,
+              "allocatedBytesPerOperation": 99932,
+              "sourceBytes": 1741752,
+              "capacityBytes": 1966080
+            }
+          ]
+        },
+        {
+          "name": "unicode-256-of-2048",
+          "expectedDigest": "aad49a33e3d1f75375e0616a3575a25f8b58c8ed57a6f682aad14aa3d1b2af4a",
+          "fixture": {
+            "size": 2048,
+            "operation": "deleteMany",
+            "keys": 256,
+            "uniqueKeys": 256,
+            "construction": "bulk",
+            "resultSize": 1792,
+            "unicode": true,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 7672,
+              "allocatedBytesPerOperation": 7672,
+              "sourceBytes": 123428,
+              "capacityBytes": 262144
+            }
+          ]
+        },
+        {
+          "name": "small-four-control",
+          "expectedDigest": "4e3277b17f6325d09a2e067570bb3a2b00bdfc105ea276bd549ee14277ab3fcf",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 4,
+            "uniqueKeys": 4,
+            "construction": "bulk",
+            "resultSize": 124,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 120,
+              "allocatedBytesPerOperation": 120,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "small-eight-control",
+          "expectedDigest": "1675056c35d1bde465e0558093e875bbd7cbebbc8129b795975943c0a252125d",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 8,
+            "uniqueKeys": 8,
+            "construction": "bulk",
+            "resultSize": 120,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 332,
+              "allocatedBytesPerOperation": 332,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "small-sixteen-control",
+          "expectedDigest": "923c1361d116f5f3c7ec6d58e5b15564af4123d3700325e5a0d94b760d6c896d",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 16,
+            "uniqueKeys": 16,
+            "construction": "bulk",
+            "resultSize": 112,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 496,
+              "allocatedBytesPerOperation": 496,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "missing-control",
+          "expectedDigest": "9c517cdf81e8c53de73ef0d12e41eebbde9bf6e9c46a80575c5be20ef97bea61",
+          "fixture": {
+            "size": 1024,
+            "operation": "deleteMany",
+            "keys": 128,
+            "uniqueKeys": 128,
+            "construction": "bulk",
+            "resultSize": 1024,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 0,
+              "allocatedBytesPerOperation": 0,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "hit-then-misses-control",
+          "expectedDigest": "f833bafdb61cd6657fc9a847ee4316e6bf0281712150d99f29a5801850cd6633",
+          "fixture": {
+            "size": 1024,
+            "operation": "deleteMany",
+            "keys": 1024,
+            "uniqueKeys": 1024,
+            "construction": "bulk",
+            "resultSize": 1020,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": 4,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 164,
+              "allocatedBytesPerOperation": 164,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "empty-control",
+          "expectedDigest": "1c832c2e7da07040a8229ff6f7ad67694db693d5f0391053f4db770d5d5f084a",
+          "fixture": {
+            "size": 128,
+            "operation": "deleteMany",
+            "keys": 0,
+            "uniqueKeys": 0,
+            "construction": "bulk",
+            "resultSize": 128,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 0,
+              "allocatedBytesPerOperation": 0,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "long-key-control",
+          "expectedDigest": "5f8e4962f6925e9084eeec0d7b725e960ae6e1e646c49d9c8e2f132834f41526",
+          "fixture": {
+            "size": 66,
+            "operation": "deleteMany",
+            "keys": 7,
+            "uniqueKeys": 6,
+            "construction": "bulk",
+            "resultSize": 60,
+            "unicode": false,
+            "long": true,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 160,
+              "allocatedBytesPerOperation": 160,
+              "sourceBytes": 103100,
+              "capacityBytes": 196608
+            }
+          ]
+        },
+        {
+          "name": "scalar-delete-control",
+          "expectedDigest": "b52523a7e20617c0293740ff9315a82c1342a844c05c388e8547ec90b9dbc4ee",
+          "fixture": {
+            "size": 128,
+            "operation": "delete",
+            "keys": 1,
+            "uniqueKeys": 1,
+            "construction": "bulk",
+            "resultSize": 127,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 48,
+              "allocatedBytesPerOperation": 48,
+              "sourceBytes": 5536,
+              "capacityBytes": 131072
+            }
+          ]
+        },
+        {
+          "name": "bulk-set-control",
+          "expectedDigest": "50be52219445cc002a861a0dadb7a114f91be8d97c39b2a0ce281b5dfae82a58",
+          "fixture": {
+            "size": 1024,
+            "operation": "setMany",
+            "keys": 256,
+            "uniqueKeys": 256,
+            "construction": "bulk",
+            "resultSize": 1024,
+            "unicode": false,
+            "long": false,
+            "hitsThenMisses": null,
+            "reset": "fresh source before each timed batch; setup and oracle verification excluded",
+            "retained": "every returned snapshot retained until full verification after the timed batch"
+          },
+          "observations": [
+            {
+              "operations": 1,
+              "allocatedBytes": 15468,
+              "allocatedBytesPerOperation": 15468,
+              "sourceBytes": 48144,
+              "capacityBytes": 131072
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

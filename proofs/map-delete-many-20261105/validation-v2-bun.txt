@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-map-batch-delete
+
+
+ Test Files  6 passed (6)
+      Tests  163 passed (163)
+   Start at  08:50:07
+   Duration  27.37s (transform 222ms, setup 0ms, import 288ms, tests 26.98s, environment 0ms)
+

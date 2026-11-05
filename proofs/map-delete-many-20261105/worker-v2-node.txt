@@ -1,0 +1,10 @@
+✔ bulk map deletion preserves paused shared readers (154.470346ms)
+✔ bulk map deletion preserves paused copy readers (124.38559ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 284.985714

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-map-delete-baseline-tests
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  09:05:41
+   Duration  2.94s (transform 167ms, setup 0ms, import 207ms, tests 2.66s, environment 0ms)
+

@@ -1,0 +1,112 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-map-batch-delete
+
+ ❯ map-delete-many.test.ts (21 tests | 7 failed) 2560ms
+     × preserves a subclass delete override for every key 9ms
+     × preserves a own delete override for every key 2ms
+     × preserves a prototype delete override for every key 4ms
+     × freezes a private root exposed to a late override at input index 4 9ms
+     × freezes a private root exposed to a late override at input index 7 5ms
+     × reads a delete getter exactly once per key, including a late invalid callable 7ms
+     × uses the native allocation frontier without observing an overridden used getter 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > preserves a subclass delete override for every key
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > preserves a own delete override for every key
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > preserves a prototype delete override for every key
+TypeError: Map keys must be strings
+ ❯ deleteMany arena.ts:722:36
+    720|       }
+    721|       this.assertWritable();
+    722|       if (typeof key !== 'string') throw new TypeError('Map keys must …
+       |                                    ^
+    723|       if (!root) continue;
+    724|       if (!mark) mark = this.used;
+ ❯ deleteMany shared-map.ts:62:36
+ ❯ map-delete-many.test.ts:205:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > freezes a private root exposed to a late override at input index 4
+AssertionError: expected [] to deeply equal [ 'key-4' ]
+
+- Expected
++ Received
+
+- [
+-   "key-4",
+- ]
++ []
+
+ ❯ map-delete-many.test.ts:236:21
+    234|       for (let i = 0; i < 80; i++) expected.delete(i === hookIndex ? '…
+    235|       for (let i = 0; i < hookIndex; i++) seen.delete(`key-${i}`);
+    236|       expect(calls).toEqual([`key-${hookIndex}`]); expect(observed).to…
+       |                     ^
+    237|       expectMap(observed!, seen); expectMap(next, expected); expectMap…
+    238|       expect(a.buf.slice(65536, observedEnd)).toEqual(observedBytes);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > freezes a private root exposed to a late override at input index 7
+AssertionError: expected [] to deeply equal [ 'key-7' ]
+
+- Expected
++ Received
+
+- [
+-   "key-7",
+- ]
++ []
+
+ ❯ map-delete-many.test.ts:236:21
+    234|       for (let i = 0; i < 80; i++) expected.delete(i === hookIndex ? '…
+    235|       for (let i = 0; i < hookIndex; i++) seen.delete(`key-${i}`);
+    236|       expect(calls).toEqual([`key-${hookIndex}`]); expect(observed).to…
+       |                     ^
+    237|       expectMap(observed!, seen); expectMap(next, expected); expectMap…
+    238|       expect(a.buf.slice(65536, observedEnd)).toEqual(observedBytes);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > reads a delete getter exactly once per key, including a late invalid callable
+AssertionError: expected 4 to be 16 // Object.is equality
+
+- Expected
++ Received
+
+- 16
++ 4
+
+ ❯ map-delete-many.test.ts:248:79
+    246|     Object.defineProperty(a, 'delete', { configurable: true, get() { c…
+    247|     const keys = input.slice(0, 16).map(([key]) => key);
+    248|     expectMap(base.deleteMany(keys), new Map(input.slice(16))); expect…
+       |                                                                               ^
+    249|     calls = 0; invalidAt = 8;
+    250|     expect(() => base.deleteMany(keys)).toThrow(TypeError); expect(cal…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  map-delete-many.test.ts > SharedMap.deleteMany private paths > uses the native allocation frontier without observing an overridden used getter
+Error: used getter must not run
+ ❯ used map-delete-many.test.ts:255:69
+    253|
+    254|   it('uses the native allocation frontier without observing an overrid…
+    255|     class CustomArena extends Arena { override get used(): number { th…
+       |                                                                     ^
+    256|     const a = new CustomArena(), input = entries(128), base = new Shar…
+    257|     const end = a.wasm.getHeapEnd() >>> 0, bytes = a.buf.slice(65536, …
+ ❯ deleteMany arena.ts:724:25
+ ❯ deleteMany shared-map.ts:62:36
+ ❯ map-delete-many.test.ts:258:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 14 passed (21)
+   Start at  09:04:44
+   Duration  2.89s (transform 196ms, setup 0ms, import 254ms, tests 2.56s, environment 0ms)
+

@@ -1,0 +1,214 @@
+import { describe, expect, it } from 'vitest';
+import { Arena, arenaOf, hashBytes, normalizeKey } from './arena';
+import { SharedMap, getWorkerData, initWorker } from './shared';
+import collisions from './proofs/bulk-input-collisions.json';
+
+const entries = (count: number) => Array.from({ length: count }, (_, i) => [`key-${i}`, i] as const);
+const sorted = (map: { entries(): Iterable<readonly [string, unknown]> }) =>
+  [...map.entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+const reader = <T extends string>(map: SharedMap<T>) => {
+  const a = arenaOf(map);
+  return SharedMap.fromWorkerData(map.root, map.valueType, map.size,
+    new Arena({ memory: a.memory, used: a.used, readOnly: true }));
+};
+function expectMap(map: SharedMap<any>, model: Map<string, unknown>) {
+  expect(map.size).toBe(model.size);
+  expect(arenaOf(map).wasm.mapSize(map.root)).toBe(model.size);
+  expect(sorted(map)).toEqual(sorted(model));
+  expect(sorted(reader(map))).toEqual(sorted(model));
+  for (const [key, value] of model) { expect(map.has(key)).toBe(true); expect(map.get(key)).toEqual(value); }
+}
+
+describe('SharedMap.deleteMany private paths', () => {
+  it.each(['bulk', 'scalar'] as const)('keeps old roots and forks unchanged after %s construction', construction => {
+    const a = new Arena(), input = entries(2048), model = new Map<string, unknown>(input);
+    let base = new SharedMap('number', 0, 0, a);
+    if (construction === 'bulk') base = base.setMany(input);
+    else for (const [key, value] of input) base = base.set(key, value);
+    const fork = base.set('fork', -1).delete('key-1000');
+    const forkModel = new Map(model); forkModel.set('fork', -1); forkModel.delete('key-1000');
+    // Warm both lookup cache routes before the mutation.
+    for (const [key] of input) { base.has(key); base.get(key); fork.get(key); }
+    const end = a.used, oldBytes = a.buf.slice(65536, end);
+    const keys = Array.from({ length: 1300 }, (_, i) => i % 5 === 0 ? `missing-${i}` : `key-${(i * 73) % 2048}`);
+    keys.push(...keys.slice(0, 100));
+    const expected = new Map(model); for (const key of keys) expected.delete(key);
+    const next = base.deleteMany(keys);
+    expect(next).not.toBe(base); expect(Object.isFrozen(next)).toBe(true);
+    expectMap(base, model); expectMap(fork, forkModel); expectMap(next, expected);
+    expect(a.buf.slice(65536, end)).toEqual(oldBytes);
+    // Writer directories must still resolve the original fork and new root.
+    const written = next.set('key-77', 99).set('new', 5), writtenModel = new Map(expected);
+    writtenModel.set('key-77', 99); writtenModel.set('new', 5);
+    expectMap(written, writtenModel); expectMap(next, expected);
+    expectMap(fork.set('fork-after', 3), new Map([...forkModel, ['fork-after', 3]]));
+  });
+
+  it('retains identity on empty and all-missing inputs, including duplicate misses', () => {
+    const map = new SharedMap('number', 0, 0, new Arena()).setMany(entries(128));
+    const before = arenaOf(map).used;
+    expect(map.deleteMany([])).toBe(map);
+    expect(map.deleteMany(['absent', 'absent', 'other'])).toBe(map);
+    expect(arenaOf(map).used).toBe(before);
+    const empty = new SharedMap('number', 0, 0, new Arena());
+    expect(empty.deleteMany(['missing', 'missing'])).toBe(empty);
+  });
+
+  it('removes every key once and keeps validating keys after the map becomes empty', () => {
+    const input = entries(256), base = new SharedMap('number', 0, 0, new Arena()).setMany(input);
+    const keys = input.map(([key]) => key), next = base.deleteMany([...keys, ...keys]);
+    expectMap(next, new Map()); expectMap(base, new Map(input));
+    expect(() => base.deleteMany([...keys, 0] as any)).toThrow(TypeError);
+  });
+
+  it('handles full-hash collision buckets, duplicate deletions and surviving collision order', () => {
+    const encoder = new TextEncoder();
+    for (const key of collisions.keys) expect(hashBytes(encoder.encode(key))).toBe(collisions.target);
+    const input = [...entries(256), ...collisions.keys.map((key, i) => [key, i + 1000] as const)];
+    const base = new SharedMap('number', 0, 0, new Arena()).setMany(input);
+    const model = new Map<string, unknown>(input);
+    const keys = ['key-1', collisions.keys[2], collisions.keys[2], ...collisions.keys.slice(3), 'key-2'];
+    for (const key of keys) model.delete(key);
+    const next = base.deleteMany(keys); expectMap(next, model);
+    expect([...next.keys()].filter(key => collisions.keys.includes(key))).toEqual(collisions.keys.slice(0, 2));
+    const last = next.deleteMany(collisions.keys); for (const key of collisions.keys) model.delete(key);
+    expectMap(last, model); expectMap(base, new Map(input));
+  });
+
+  it('preserves UTF-8 replacement equivalence, BOM, empty keys and embedded NUL', () => {
+    const input: [string, string][] = [
+      ['', 'empty'], ['\0', 'nul'], ['\ufeff', 'bom'], ['🙂路', 'unicode'],
+      ['\ud800', 'replacement'], ['\ufffd', 'last'], ['\udc00a', 'low'], ['a\ud800', 'high'], ['keep', 'kept'],
+    ];
+    const base = new SharedMap('string', 0, 0, new Arena()).setMany(input);
+    const model = new Map(input.map(([key, value]) => [normalizeKey(key), value]));
+    const keys = ['\udc00', '', '\0', '🙂路', 'a\ufffd', '\ufffda'];
+    for (const key of keys) model.delete(normalizeKey(key));
+    expectMap(base.deleteMany(keys), model);
+    expect(base.get('\ud800')).toBe('last'); expect(base.get('\ufeff')).toBe('bom');
+  });
+
+  it('freezes intermediate paths before long-key fallback lookups can retain their roots', () => {
+    const longKeys = ['x'.repeat(49153), '界'.repeat(17000), 'z'.repeat(49152)];
+    const input = [...entries(512), ...longKeys.map((key, i) => [key, i + 1000] as const)];
+    const base = new SharedMap('number', 0, 0, new Arena()).setMany(input);
+    // Existing slots are especially important: an absent lookup can update a
+    // slot created on an older root, even though misses are not newly cached.
+    for (const key of longKeys) base.get(key);
+    const keys = [
+      ...Array.from({ length: 100 }, (_, i) => `key-${i}`), longKeys[0], longKeys[0],
+      ...Array.from({ length: 100 }, (_, i) => `key-${i + 100}`), longKeys[1],
+      'm'.repeat(49153), ...Array.from({ length: 100 }, (_, i) => `key-${i + 200}`), longKeys[2],
+    ];
+    const model = new Map<string, unknown>(input); for (const key of keys) model.delete(key);
+    const next = base.deleteMany(keys); expectMap(next, model);
+    for (const key of longKeys) { expect(next.has(key)).toBe(false); expect(next.get(key)).toBeUndefined(); }
+    expectMap(base, new Map(input));
+  });
+
+  it('preserves value types and nested snapshot identity through deletion and copy/shared attachment', async () => {
+    const nested = new SharedMap('number', 0, 0, new Arena()).set('inner', 7);
+    const type = 'SharedMap<number>';
+    const a = new Arena();
+    const objects = new SharedMap('object', 0, 0, a).setMany([['a', { list: [1, 2] }], ['b', { keep: true }]]);
+    const nestedMap = new SharedMap(type, 0, 0, a).setMany([['a', nested], ['b', nested]] as any);
+    const booleans = new SharedMap('boolean', 0, 0, a).setMany([['a', true], ['b', false]]);
+    const next = { objects: objects.deleteMany(['a']), nestedMap: nestedMap.deleteMany(['a']), booleans: booleans.deleteMany(['a']) };
+    for (const copy of [false, true]) {
+      const attached = await initWorker(getWorkerData({ ...next, old: objects }, { copy }));
+      expect(attached.objects.get('b')).toEqual({ keep: true });
+      expect(Object.isFrozen(attached.objects.get('b'))).toBe(true);
+      expect((attached.nestedMap.get('b') as any).get('inner')).toBe(7);
+      expect(attached.booleans.get('b')).toBe(false); expect(attached.old.get('a')).toEqual({ list: [1, 2] });
+    }
+  });
+
+  it('streams custom iterators and preserves snapshots published by reentrant callbacks', () => {
+    const a = new Arena(), input = entries(512), base = new SharedMap('number', 0, 0, a).setMany(input);
+    const sourceBytes = a.buf.slice(65536, a.used), sourceEnd = a.used;
+    const published: { snapshot: SharedMap<'number'>; model: Map<string, unknown>; start: number; end: number; bytes: Uint8Array }[] = [];
+    const events: string[] = [], model = new Map<string, unknown>(input);
+    const keys = {
+      *[Symbol.iterator]() {
+        events.push('start'); const firstEnd = a.used;
+        for (let i = 0; i < 200; i++) {
+          if (i === 1) { expect(a.used).toBeGreaterThan(firstEnd); events.push('first-deleted'); }
+          if (i % 20 === 1) {
+            expect(base.get('key-0')).toBe(0); expect(reader(base).has('key-0')).toBe(true);
+            const start = a.used, snapshot = base.deleteMany(['key-300', 'key-301']).set(`fork-${i}`, i).set('key-511', -i);
+            const expected = new Map<string, unknown>(input); expected.delete('key-300'); expected.delete('key-301'); expected.set(`fork-${i}`, i); expected.set('key-511', -i);
+            published.push({ snapshot, model: expected, start, end: a.used, bytes: a.buf.slice(start, a.used) });
+          }
+          model.delete(`key-${i}`); yield `key-${i}`;
+        }
+        events.push('end');
+      },
+    };
+    const next = base.deleteMany(keys as any);
+    expect(events).toEqual(['start', 'first-deleted', 'end']); expectMap(next, model);
+    for (const item of published) {
+      expectMap(item.snapshot, item.model); expect(a.buf.slice(item.start, item.end)).toEqual(item.bytes);
+      const updated = item.snapshot.set('after', -1); expectMap(updated, new Map([...item.model, ['after', -1]]));
+    }
+    expect(a.buf.slice(65536, sourceEnd)).toEqual(sourceBytes); expectMap(base, new Map(input));
+  });
+
+  it('reads getters once in order, stops at an invalid key and closes the iterator', () => {
+    const a = new Arena(), input = entries(128), base = new SharedMap('number', 0, 0, a).setMany(input);
+    const used = a.used, old = a.buf.slice(65536, used), events: string[] = [];
+    const keys = {
+      *[Symbol.iterator]() {
+        try { events.push('first'); yield 'key-1'; events.push('invalid'); yield 7; events.push('unreached'); yield 'key-2'; }
+        finally { events.push('closed'); }
+      },
+    };
+    expect(() => base.deleteMany(keys as any)).toThrow(TypeError);
+    expect(events).toEqual(['first', 'invalid', 'closed']); expect(a.used).toBeGreaterThan(used);
+    expect(a.buf.slice(65536, used)).toEqual(old); expectMap(base, new Map(input));
+    const accesses: number[] = [], array = ['key-1', 'key-2'];
+    Object.defineProperty(array, 0, { get() { accesses.push(0); return 'key-1'; } });
+    Object.defineProperty(array, 1, { get() { accesses.push(1); throw new Error('getter'); } });
+    expect(() => base.deleteMany(array)).toThrow('getter'); expect(accesses).toEqual([0, 1]);
+    expect(() => base.deleteMany(new Array(2))).toThrow(TypeError);
+    expectMap(base, new Map(input));
+  });
+
+  it('rejects read-only writes before inspecting the iterator, even for no keys', () => {
+    const base = new SharedMap('number', 0, 0, new Arena()).set('a', 1), attached = reader(base);
+    let accesses = 0;
+    const input = Object.defineProperty({}, Symbol.iterator, { get() { accesses++; throw new Error('iterator'); } });
+    expect(() => attached.deleteMany(input as any)).toThrow(/read-only/); expect(accesses).toBe(0);
+    expect(() => attached.deleteMany([])).toThrow(/read-only/);
+    expect(() => new SharedMap('number', 0, 0, new Arena()).deleteMany([false] as any)).toThrow(TypeError);
+  });
+
+  it('keeps published nodes intact when a later delete runs out of fixed-capacity memory', () => {
+    let succeeded = 0, failedAfterAllocation = 0;
+    for (const headroom of [0, 8, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]) {
+      const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true }), a = new Arena({ memory });
+      const input = entries(256), base = new SharedMap('number', 0, 0, a).setMany(input);
+      const used = a.used, bytes = a.buf.slice(65536, used), retained = reader(base);
+      a.alloc(0); a.alloc(memory.buffer.byteLength - a.used - headroom); const start = a.used;
+      try {
+        const next = base.deleteMany(input.slice(0, 160).map(([key]) => key)); succeeded++;
+        expectMap(next, new Map(input.slice(160)));
+      } catch (error) {
+        expect(error).toBeInstanceOf(WebAssembly.RuntimeError);
+        if (a.used > start) failedAfterAllocation++;
+      }
+      expect(a.buf.slice(65536, used)).toEqual(bytes); expectMap(base, new Map(input)); expectMap(retained, new Map(input));
+    }
+    expect(succeeded).toBeGreaterThan(0); expect(failedAfterAllocation).toBeGreaterThan(0);
+  });
+
+  it('keeps retained roots readable across actual shared-memory growth', () => {
+    const a = new Arena({ memory: new WebAssembly.Memory({ initial: 2, maximum: 32, shared: true }) });
+    const input = entries(512), base = new SharedMap('number', 0, 0, a).setMany(input), attached = reader(base);
+    const oldBuffer = a.memory.buffer, end = a.used, bytes = a.buf.slice(65536, end);
+    a.alloc(0); a.alloc(oldBuffer.byteLength - a.used - 8);
+    const next = base.deleteMany(input.slice(0, 300).map(([key]) => key));
+    expect(a.memory.buffer.byteLength).toBeGreaterThan(oldBuffer.byteLength);
+    expectMap(next, new Map(input.slice(300))); expectMap(attached, new Map(input));
+    expect(a.buf.slice(65536, end)).toEqual(bytes);
+  });
+});

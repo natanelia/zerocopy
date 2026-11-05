@@ -1,0 +1,131 @@
+{
+  "study": "map-delete-many-20261105",
+  "decision": "Rejected; no production PR. Formal V3 control regressions failed the declared gate. No A/A study was run after rejection.",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "evidence": {
+    "pilot-v1.json.gz": {
+      "sha256": "22d393d2e23662a6f53e7154988b8194a645b137d0c735851fb48f81b41d1c8e",
+      "uncompressedSha256": "06ed14685390ad5322c05aa3f059498aa000e0221f0f46f7986d615e4b903ec3",
+      "uncompressedBytes": 3923755
+    },
+    "pilot-v2.json.gz": {
+      "sha256": "7271a048e32b852871126a709caecfe8ebde6f0d42142612583b2fcd86743f9a",
+      "uncompressedSha256": "c1418a4d1499abdaedd7fb0f2c694dd5d58b7858de3f638cc9e43ba9b72a7ec8",
+      "uncompressedBytes": 4402361
+    },
+    "pilot-v3.json.gz": {
+      "sha256": "d27aed5f23447aa5be11c129857c60a810bc3af967394f66398b8ae35c30bff9",
+      "uncompressedSha256": "e7bcad421ff5bc9ddbe78c1e77c68ef2240872805497457f0375e83a9fffbf5c",
+      "uncompressedBytes": 4510251
+    },
+    "final-v3.json.gz": {
+      "sha256": "26b30f79b1bb5a598ffa9acbd05f426b1573457d9b9bd71d6bb6deafa140a027",
+      "uncompressedSha256": "5de90d15d2e53e22cb4dc7ac4f744cd9e098319c50486dbf2c671e41810c7790",
+      "uncompressedBytes": 31691917,
+      "storage": {
+        "type": "concatenated-chunks",
+        "bytes": 1532914,
+        "chunkLimitBytes": 196608,
+        "chunks": [
+          {
+            "path": "final-v3.json.gz.parts/part-000.bin",
+            "bytes": 196608,
+            "sha256": "bd4a9e6559b7c32f5a75f30096166d24e18813496e8c26b768d668f34fc64676"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-001.bin",
+            "bytes": 196608,
+            "sha256": "dbc712f7fdc92f9a3d0d912118e8a8d807258745939990f6f75966af16c362c4"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-002.bin",
+            "bytes": 196608,
+            "sha256": "a5988aa562afe348ec79b8e70167189e458fccf5995b5b4cbe02548cd059b8ee"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-003.bin",
+            "bytes": 196608,
+            "sha256": "0144ea8c322b2e1ff1d0baf1a1ca45db76a79c0da8fe6255405206e6f27f2ec4"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-004.bin",
+            "bytes": 196608,
+            "sha256": "54edeea19fff1c78e07a77495842c9a0e316268ed0c0be17f088ea205ee720e9"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-005.bin",
+            "bytes": 196608,
+            "sha256": "9935023f95d6c3b81db180665cd8f0e809e1c6c8f93a1eee488f9b4aff641b9c"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-006.bin",
+            "bytes": 196608,
+            "sha256": "d719599f741c9e567f7a8cdf71d101856673e20d5bfcd80abde5f9e24b234957"
+          },
+          {
+            "path": "final-v3.json.gz.parts/part-007.bin",
+            "bytes": 156658,
+            "sha256": "900a0a5440f4bf772e7f6178b346a8377b1f1785959560ae6b40ec4173f08b2f"
+          }
+        ]
+      }
+    }
+  },
+  "artifacts": {
+    "README.md": "011fc6ad25f9b19ccb5c99627ad9bd9da6ee30b51e4f251872d929597ae6e13d",
+    "archive/arena-v1.ts.txt": "120876109069941f7093a66bdd21eff2b099ea66c075b7b2ac9a143d80126dff",
+    "archive/arena-v2.ts.txt": "7222d7700f26977980e35ef43ad7f84e91bb1af0f1c1396a0e8b7f12f7ea0f2c",
+    "archive/arena-v3.ts.txt": "7f5d43a536b27ea6e39756e866f08d2cb5eaa234c5176858e9082aefe12366d6",
+    "archive/map-delete-many-v1.test.ts.txt": "705a046f55fe8062c63eec22dfc0b1c4d9e17d0b1588115a7054faa84702b924",
+    "archive/map-delete-many-v2.test.ts.txt": "39a81761b25de28c9de73c5bcaef02f156f264ca24ab62907b236bdc919f1c70",
+    "archive/map-delete-many.test-v3.ts.txt": "2576fa727d7ed2325930cb5b4ffbce20cd09a5b80ef295402a4d031141f4d909",
+    "archive/persistent-core-v1.as.ts.txt": "f86c0e33ba60a8a3bc3902ddb88720099bc5904913de77e3ace7390c5f62987c",
+    "archive/persistent-core.as-v3.ts.txt": "f86c0e33ba60a8a3bc3902ddb88720099bc5904913de77e3ace7390c5f62987c",
+    "archive/shared-map-v1.ts.txt": "596025ed625fcb8741ed6f4a0a78e139a59a2e0df923ed1d40c8e1fa499f2800",
+    "archive/shared-map-v3.ts.txt": "596025ed625fcb8741ed6f4a0a78e139a59a2e0df923ed1d40c8e1fa499f2800",
+    "design-v1.md": "620c53db8f93a5ac8a8de8b11edf57204e15d757291984640577d582b30ab7a0",
+    "design-v2.md": "9aebc86ca00a1179fca14c991dc66d27f09b63561ce6209b3adbc1eddc864650",
+    "design-v3.md": "efda576b2b5b90c054079c40157db6b8e651072d32c060f480c97eb0e139a035",
+    "final-v3.json.gz.parts/part-000.bin": "bd4a9e6559b7c32f5a75f30096166d24e18813496e8c26b768d668f34fc64676",
+    "final-v3.json.gz.parts/part-001.bin": "dbc712f7fdc92f9a3d0d912118e8a8d807258745939990f6f75966af16c362c4",
+    "final-v3.json.gz.parts/part-002.bin": "a5988aa562afe348ec79b8e70167189e458fccf5995b5b4cbe02548cd059b8ee",
+    "final-v3.json.gz.parts/part-003.bin": "0144ea8c322b2e1ff1d0baf1a1ca45db76a79c0da8fe6255405206e6f27f2ec4",
+    "final-v3.json.gz.parts/part-004.bin": "54edeea19fff1c78e07a77495842c9a0e316268ed0c0be17f088ea205ee720e9",
+    "final-v3.json.gz.parts/part-005.bin": "9935023f95d6c3b81db180665cd8f0e809e1c6c8f93a1eee488f9b4aff641b9c",
+    "final-v3.json.gz.parts/part-006.bin": "d719599f741c9e567f7a8cdf71d101856673e20d5bfcd80abde5f9e24b234957",
+    "final-v3.json.gz.parts/part-007.bin": "900a0a5440f4bf772e7f6178b346a8377b1f1785959560ae6b40ec4173f08b2f",
+    "freeze-v3.json": "8b2031b7be7d46af9692014197b189dff62412d8e81da2f72da25b31c26e1dba",
+    "inspect-native-codegen.py": "d54ab61877553d8e60b1616c45408fe1c3a096849234f6540efdbfeb51779fe5",
+    "native-codegen.json": "39da1218803ad0516dfe38ecd5d4f1792a52a9482a95c71afd0c887b887fff4e",
+    "paired-benchmark-v3.mjs": "7aad4273597c6daf7200345729f24605e58f9c74e4c7bab4c2e491930ab75e23",
+    "paired-benchmark.mjs": "ab612d5c552559125728175e13c31bb73e4d648c5e83175df12e0f773aff72e3",
+    "pilot-v1.json.gz": "22d393d2e23662a6f53e7154988b8194a645b137d0c735851fb48f81b41d1c8e",
+    "pilot-v2.json.gz": "7271a048e32b852871126a709caecfe8ebde6f0d42142612583b2fcd86743f9a",
+    "pilot-v3.json.gz": "d27aed5f23447aa5be11c129857c60a810bc3af967394f66398b8ae35c30bff9",
+    "smoke-v2-bun.json": "b43625e07d714092806ae607b32df01e1df8f995865b63015793ac3108f58758",
+    "smoke-v2-node.json": "32b829f7280f27b5ba276b13710c0a602f805030a0cc4aa7c2be8ddd620d5375",
+    "smoke-v3-bun.json": "325f5a9e9fafe4fd0527e0ae4bb70e97df6b1435e94d12e7c9101495f911e3fc",
+    "smoke-v3-node.json": "d1ed784f6b0f124f08873015d4097e1fdaa951f34cbdc2f06ca80b417260422d",
+    "smoke-v3.mjs": "2f2c6192cae23334281738b9a9d8fc40b97aba87cefbb49b07749ef446f74860",
+    "smoke.mjs": "f58717ff946eaef51074104dd296359d67cc6ce197855c46b549cd7095606cbe",
+    "validation-baseline-bun.txt": "b721f117118e31ddb8754d3d86b05b78e147ceff6f0329f2d5a840eca8b1d69d",
+    "validation-bun.txt": "a08fbb4794c2f38a058ea3c1afd823049a739209d78712b7722b44ef34864739",
+    "validation-node.txt": "bb20865f9c3f87d45793702b784777c4f0e72606beae1c6dca15f9b8c47502d3",
+    "validation-v2-baseline-bun.txt": "0e6761ade5684a3ce8b69919f823ed5800f1153b688c9d450b1c3c77733bce8c",
+    "validation-v2-bun.txt": "281053002b1641df3ce45843af542ceda7c0c226ef648a287b47c35a7fab54b3",
+    "validation-v2-node.txt": "fa30e74f6fbb436a06ac2e06723e44d38d55ebd9a9340d6d3334357dc92a01e1",
+    "validation-v2-override-failures.txt": "fc586afa274a9511b03127d00c6da57fffada52b802f8708a70f69cf39077e5b",
+    "validation-v3-baseline-bun.txt": "232927baca00b96cdc1452736ea9d157aaa99df7b6ba158ee95157c3f7b0852f",
+    "validation-v3-bun.txt": "ed19ead8f872ebc71840e6fe09db87d7d5cc4a739a05a877673d653a99a59187",
+    "validation-v3-node.txt": "950fe5b1f97cdd6f0bee0711933d7469b646e5ef32fb6b61c7d2dd6a569b6fc4",
+    "verify-archive.py": "0deef0fbfd84f7e1b126e3fb935926b2296f3f6712c4bedc9763c262d2655a6e",
+    "verify-v3.py": "d8dcb22d4c0a3272215243953eb71b856b5328120e31d38397a3a158ea70afaf",
+    "verify.py": "2248848875c6f2adc2ef1684b3299a8a20b8c3b58b9c555187bc3b25eca24548",
+    "worker-baseline-node.txt": "72fdb55b346d9777c6741d1a782c6d54a2654748efd48784575fc32f2be57dac",
+    "worker-v2-node.txt": "5aca74a8e739bb7f56bfec0bb448c37b2c8b8b19b5f3c4a46434884c2fd02e4f",
+    "worker-v3-node.txt": "c6ba0dcf7d4e258ee6ac5318c9e39046ee1d329e72404a8d4031562aa1c18e49",
+    "worker.mjs": "4338047d14fac0f218bd7d886c16123e4275412b092f9845d0af060e106f5dd8",
+    "workloads-v3.mjs": "29560f2a84cf5fb4aea2112db2fd359859d4eefbe0addb7dd0580345d3ebd3c0",
+    "workloads.mjs": "33d3fba548f115e1cec0cdf0bbe7af74ea151802f309a312e25d1ede34659051"
+  }
+}
