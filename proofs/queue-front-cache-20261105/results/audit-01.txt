@@ -1,0 +1,1 @@
+Both archive round trips, all source/bundle/driver hashes, all 40 paired ratios and all 20 summaries independently verified. All 560 measured batches retained; no source changes during measurement.

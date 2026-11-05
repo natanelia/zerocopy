@@ -1,0 +1,23 @@
+{
+  "schema": "zerocopy-rejected-queue-cache-archives/v1",
+  "files": [
+    {
+      "path": "results/node-pilot-01.json.gz",
+      "bytes": 98253,
+      "sha256": "2523ed5b848ebdc6ef07a63055a722fa246955f58404a7332e27ebe3fe7e732f",
+      "originalPath": "results/node-pilot-01.json",
+      "originalBytes": 1536810,
+      "originalSha256": "af68921325b7bbb6939a2b175d475dfb812d9403e4df24527b00c4f12765fefe",
+      "roundTripVerified": true
+    },
+    {
+      "path": "results/bun-pilot-01.json.gz",
+      "bytes": 136535,
+      "sha256": "201453451e70b711d07e269b99831e34c92904af6cdbd4d90427c6c7c857a1f0",
+      "originalPath": "results/bun-pilot-01.json",
+      "originalBytes": 2693230,
+      "originalSha256": "219c81411b74e80b55db8ee76ca00842a6e923ae138771a95f9bd08a59d53cad",
+      "roundTripVerified": true
+    }
+  ]
+}

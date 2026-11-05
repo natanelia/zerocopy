@@ -49,7 +49,7 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
   peek(): ValueOf<T> | undefined {
     if (!this.size) return undefined;
     const a = this.arena, start = (this.tail + this.size - 1) & ~31;
-    const raw = this.tail >= start ? a.dv.getFloat64(this.block + (this.tail - start) * 8, true) : a.wasm.vecGet(this.head, this.depth, this.tail);
+    const raw = this.tail >= start ? a.dv.getFloat64(this.block + (this.tail - start) * 8, true) : a.vectorValue(this.head, this.depth, this.tail);
     return a.decode(this.valueType, raw);
   }
   get isEmpty(): boolean { return this.size === 0; }
