@@ -29,10 +29,10 @@ import {
   SharedPriorityQueue2,
   compactMany2,
   getWorkerData2
-} from "./chunk-6t3aw271.js";
+} from "./chunk-jvqhy0ph.js";
 import {
   createSharedSession2
-} from "./chunk-4pqgvvxp.js";
+} from "./chunk-n9d6bkps.js";
 
 // redux-heap-codec.ts
 function readReduxHeap(heap, encode) {
@@ -289,10 +289,9 @@ function createZerocopyCodec(options = {}) {
         }
         if (!Array.isArray(input) && !isPlainRecord(input))
           fail("only plain records, arrays, and shared collections are supported");
-        const descriptors = Object.getOwnPropertyDescriptors(input);
-        for (const key of Reflect.ownKeys(descriptors)) {
-          const descriptor = descriptors[key];
-          if (descriptor.enumerable && (typeof key === "symbol" || !hasOwn(descriptor, "value")))
+        for (const key of Reflect.ownKeys(input)) {
+          const descriptor = Object.getOwnPropertyDescriptor(input, key);
+          if (descriptor?.enumerable && (typeof key === "symbol" || !hasOwn(descriptor, "value")))
             fail("enumerable symbols and accessors are not supported");
         }
         if (Array.isArray(input)) {

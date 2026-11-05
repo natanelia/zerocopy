@@ -20,7 +20,7 @@ import {
   compactMany2,
   getWorkerData2,
   initWorker2
-} from "./chunk-6t3aw271.js";
+} from "./chunk-jvqhy0ph.js";
 import {
   resetMap2,
   SharedMap2

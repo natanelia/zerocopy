@@ -669,8 +669,19 @@ class SharedSortedMap2 extends Snapshot {
     }
   }
   forEach(fn) {
-    for (const [key, value] of this.entries())
-      fn(value, key);
+    const entries = this.entries;
+    if (this.comparator || entries !== defaultEntries) {
+      for (const [key, value] of Reflect.apply(entries, this, []))
+        fn(value, key);
+      return;
+    }
+    if (!this.root)
+      return;
+    const a = this.arena, view = a.dv;
+    for (const leaf of a.radixLeaves(this.root)) {
+      const key = a.string(leaf + 16, view.getUint32(leaf + 8, true));
+      fn(a.leafValue(this.valueType, leaf, 0, view), key);
+    }
   }
   toWorkerData() {
     if (this.comparator)
@@ -681,6 +692,7 @@ class SharedSortedMap2 extends Snapshot {
     return new SharedSortedMap2(d.valueType, undefined, d.root, d.size, source);
   }
 }
+var defaultEntries = SharedSortedMap2.prototype.entries;
 structureRegistry.SharedSortedMap = { fromWorkerData: (d, a) => SharedSortedMap2.fromWorkerData(d, a) };
 
 // shared-sorted-set.ts
