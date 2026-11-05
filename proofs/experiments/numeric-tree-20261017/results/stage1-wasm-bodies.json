@@ -1,0 +1,99 @@
+{
+  "baseline": [
+    {
+      "index": 0,
+      "bytes": 160,
+      "sha256": "6fcaed16c0af29eec3f60ee66c97ca5aca83477848a05e2bc6def36258a35ff3"
+    },
+    {
+      "index": 1,
+      "bytes": 96,
+      "sha256": "47515eee3c71f913066c46ad9f344ded0b96d7318e001abd3acc3c6311705caa"
+    },
+    {
+      "index": 2,
+      "bytes": 140,
+      "sha256": "7d2c94d4791f37dd0a8e750fc62731951e4cfc26b9cb6888e72b618064b6361e"
+    },
+    {
+      "index": 3,
+      "bytes": 168,
+      "sha256": "f72602cfa7a2617bc8505586c70a8d4abfcfb34a66743d13bd5251a216762e7f"
+    },
+    {
+      "index": 4,
+      "bytes": 71,
+      "sha256": "9b656bcea4ee546fe94bb68d2fef33cfaff71747f23c3f34b44323702ce3dda1"
+    }
+  ],
+  "stage1": [
+    {
+      "index": 0,
+      "bytes": 160,
+      "sha256": "6fcaed16c0af29eec3f60ee66c97ca5aca83477848a05e2bc6def36258a35ff3"
+    },
+    {
+      "index": 1,
+      "bytes": 143,
+      "sha256": "83b77f5c6695c256444b9cfadf0194d73966899e37a44a9ec51df0a3d6ce7339"
+    },
+    {
+      "index": 2,
+      "bytes": 168,
+      "sha256": "f72602cfa7a2617bc8505586c70a8d4abfcfb34a66743d13bd5251a216762e7f"
+    },
+    {
+      "index": 3,
+      "bytes": 229,
+      "sha256": "f27f599be6fb7fe04b6619af8d4a18953f53ae78c43b59ab8cbb3ab19edab4b4"
+    }
+  ],
+  "same_body_indices": [
+    0
+  ],
+  "matches": [
+    {
+      "baseline": 0,
+      "stage1": 0,
+      "sha256": "6fcaed16c0af29eec3f60ee66c97ca5aca83477848a05e2bc6def36258a35ff3"
+    },
+    {
+      "baseline": 3,
+      "stage1": 2,
+      "sha256": "f72602cfa7a2617bc8505586c70a8d4abfcfb34a66743d13bd5251a216762e7f"
+    }
+  ],
+  "source": {
+    "baseline": {
+      "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+      "files": {
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+      }
+    },
+    "candidate": {
+      "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+      "files": {
+        "numeric-kernels.as.ts": "fa7d635b30f8b3757c50e697f45d9641015f19e824a5b7f8a4c0770837d7c8dd",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "d6436b6dfc7a2366dc7747f8c583dcd7dfc4316190ef074f2252125ba78d593c"
+      }
+    },
+    "driver": "f26c5a44ab69591a96e6d00f28d206a2f3d4d31a82c31e557d2425f8aadb717a"
+  },
+  "control_bodies": {
+    "treeBox": {
+      "baseline": 0,
+      "stage1": 0
+    },
+    "countPointsInBox": {
+      "baseline": 3,
+      "stage1": 2
+    }
+  }
+}

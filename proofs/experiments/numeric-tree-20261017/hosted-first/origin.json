@@ -1,0 +1,26 @@
+{
+  "repository": "natanelia/zerocopy",
+  "runId": 38997133985,
+  "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/38997133985",
+  "headCommit": "6b9a8f1184071bf254fc6ef2ec00ec76a6fc2299",
+  "recordedAt": "2026-10-17T03:14:49.541497+00:00",
+  "status": "The first green hosted status is invalid. tee hid failed producer commands before the workflow enabled pipefail. Preserve all raw results.",
+  "archives": [
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-x64-first.zip",
+      "artifactId": 12087307487,
+      "artifactUrl": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/12087307487",
+      "bytes": 148193,
+      "sha256": "d12001e8add59df3b446711984952409631525114a70948f99b7bee005b6b728",
+      "matchesOfficialDigest": true
+    },
+    {
+      "path": "proofs/experiments/numeric-tree-20261017/hosted-first/numeric-tree-arm64-first.zip",
+      "artifactId": 12087881941,
+      "artifactUrl": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/12087881941",
+      "bytes": 143775,
+      "sha256": "b88b7637e96bb76e5301a2c3dc8c29052e86afecee702759e8453b7223dc249c",
+      "matchesOfficialDigest": true
+    }
+  ]
+}

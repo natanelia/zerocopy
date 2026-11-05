@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "run",
+    "test",
+    "geometry.test.ts",
+    "numeric.test.ts",
+    "numeric-spatial.test.ts"
+  ],
+  "cwd": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "startedAt": "2026-10-17T03:31:27.740535+00:00",
+  "completedAt": "2026-10-17T03:31:30.255597+00:00",
+  "elapsedSeconds": 2.515041165999719,
+  "exitCode": 0,
+  "log": "focused-tests.txt",
+  "logSha256": "5292e16539d92b68af15d330601fdb8bf0f2d5037cc22a23a694d4eada602981",
+  "testSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+}

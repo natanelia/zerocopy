@@ -1,0 +1,147 @@
+TAP version 13
+# Subtest: inventory covers additions, modifications and deletions
+ok 1 - inventory covers additions, modifications and deletions
+  ---
+  duration_ms: 56.453346
+  type: 'test'
+  ...
+# Subtest: missing, extra, wrong-size and wrong-hash inventory entries fail
+ok 2 - missing, extra, wrong-size and wrong-hash inventory entries fail
+  ---
+  duration_ms: 73.308344
+  type: 'test'
+  ...
+# Subtest: wrong baseline identity fails
+ok 3 - wrong baseline identity fails
+  ---
+  duration_ms: 46.941809
+  type: 'test'
+  ...
+# Subtest: unstaged baseline and candidate source changes fail
+ok 4 - unstaged baseline and candidate source changes fail
+  ---
+  duration_ms: 56.097115
+  type: 'test'
+  ...
+# Subtest: symbolic links are hashed as link text, not their target contents
+ok 5 - symbolic links are hashed as link text, not their target contents
+  ---
+  duration_ms: 50.076638
+  type: 'test'
+  ...
+# Subtest: compiler snapshot includes exact transitive packages and their license files
+ok 6 - compiler snapshot includes exact transitive packages and their license files
+  ---
+  duration_ms: 84.214531
+  type: 'test'
+  ...
+# Subtest: final gate checks raw status and refuses missing or failed endpoints
+ok 7 - final gate checks raw status and refuses missing or failed endpoints
+  ---
+  duration_ms: 29.51989
+  type: 'test'
+  ...
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":1,"block":0,"position":0,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":2,"block":0,"position":1,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":3,"block":0,"position":2,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":4,"block":0,"position":3,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":5,"block":1,"position":0,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":6,"block":1,"position":1,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":7,"block":1,"position":2,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":8,"block":1,"position":3,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":9,"block":2,"position":0,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":10,"block":2,"position":1,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":11,"block":2,"position":2,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":12,"block":2,"position":3,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":13,"block":3,"position":0,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":14,"block":3,"position":1,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":15,"block":3,"position":2,"role":"A","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-CHILD {"kind":"aa","index":16,"block":3,"position":3,"role":"B","status":null,"error":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n\\nnull !== 0\\n"}
+# NUMERIC-PROCESS-SUMMARY {"kind":"aa","plan":{"version":1,"blocks":4,"warmup":7,"samples":21,"work":8000000,"sizes":[1,2,31,32,33,1024,1057,32768,32801,262144,1048609],"regressionFloor":0.95,"improvementFloor":1.05,"aaCeiling":1.0526315789473684,"childTimeoutMs":240000},"driver":"d10d8f237d9e873d816d547d4edb22cc38b48678e7a8103edf7dde61a5676a39","runtime":null,"fullCoverage":true,"complete":true,"error":"AssertionError [ERR_ASSERTION]: Failed child cannot be excluded\\n\\nnull !== 0\\n","pass":false,"rows":[]}
+# Subtest: balanced ABBA/BAAB schedule has eight pairs with equal role positions
+ok 8 - balanced ABBA/BAAB schedule has eight pairs with equal role positions
+  ---
+  duration_ms: 0.889328
+  type: 'test'
+  ...
+# Subtest: full fixed cohort retains all 48 endpoints and all old thresholds
+ok 9 - full fixed cohort retains all 48 endpoints and all old thresholds
+  ---
+  duration_ms: 0.962588
+  type: 'test'
+  ...
+# Subtest: median rejects invalid observations without dropping them
+ok 10 - median rejects invalid observations without dropping them
+  ---
+  duration_ms: 0.784009
+  type: 'test'
+  ...
+# Subtest: identical stable builds pass equivalence
+ok 11 - identical stable builds pass equivalence
+  ---
+  duration_ms: 7.456215
+  type: 'test'
+  ...
+# Subtest: stable regressions fail without adjusting thresholds
+ok 12 - stable regressions fail without adjusting thresholds
+  ---
+  duration_ms: 8.009392
+  type: 'test'
+  ...
+# Subtest: large target requires more than five percent improvement
+ok 13 - large target requires more than five percent improvement
+  ---
+  duration_ms: 8.221661
+  type: 'test'
+  ...
+# Subtest: log-linear time drift cancels within balanced four-child blocks
+ok 14 - log-linear time drift cancels within balanced four-child blocks
+  ---
+  duration_ms: 2.83993
+  type: 'test'
+  ...
+# Subtest: process dispersion widens the interval and can prevent clearance
+ok 15 - process dispersion widens the interval and can prevent clearance
+  ---
+  duration_ms: 0.168263
+  type: 'test'
+  ...
+# Subtest: failed or missing children cannot produce acceptance
+ok 16 - failed or missing children cannot produce acceptance
+  ---
+  duration_ms: 1.200675
+  type: 'test'
+  ...
+# Subtest: missing, extra, reordered and invalid raw samples fail closed
+ok 17 - missing, extra, reordered and invalid raw samples fail closed
+  ---
+  duration_ms: 4.897995
+  type: 'test'
+  ...
+# Subtest: existing output is never overwritten
+ok 18 - existing output is never overwritten
+  ---
+  duration_ms: 1.448818
+  type: 'test'
+  ...
+# Subtest: an unavailable runtime retains every planned failed child and exits without clearance
+ok 19 - an unavailable runtime retains every planned failed child and exits without clearance
+  ---
+  duration_ms: 68.348927
+  type: 'test'
+  ...
+# Subtest: a changed input between size cohorts is rejected before timing
+ok 20 - a changed input between size cohorts is rejected before timing
+  ---
+  duration_ms: 29.527606
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 461.962166

@@ -1,0 +1,26 @@
+{
+  "runId": 38998487385,
+  "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/38998487385",
+  "prHeadCommit": "85eee3354b85f8d7d6121a72579ddc8e06a57112",
+  "testedMergeCommit": "2ac1950417e6a9151eaa6b5fb48afc3cc4998399",
+  "conclusion": "failure on both architectures; the corrected shell propagated failed gates",
+  "archives": [
+    {
+      "index": 0,
+      "name": "numeric-tree-arm64-second.zip",
+      "artifactId": 12087439063,
+      "bytes": 144712,
+      "sha256": "10096611d910f04d6eb05a79d66525f20dfd447ec998c9fe539f97caf6a4609e",
+      "verified": true
+    },
+    {
+      "index": 1,
+      "name": "numeric-tree-x64-second.zip",
+      "artifactId": 12087389083,
+      "bytes": 149086,
+      "sha256": "953e91c8a2b6c371dedaff6454794a616ddc098086327e874e48841fbf5fb255",
+      "verified": true
+    }
+  ],
+  "distinction": "This Numeric tree comparison run is separate from the Worker sessions and Numeric performance proof geometry timeouts retained in hosted-second-ci."
+}

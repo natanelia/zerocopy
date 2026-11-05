@@ -1,0 +1,55 @@
+{
+  "source": "persistent-core.wasm",
+  "sourceSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+  "method": "Restore the exact copies specified by scripts/build-wasm.mjs. No compilation or source change.",
+  "files": [
+    {
+      "path": "shared-map.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "shared-list.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "linked-list.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "singly-linked-list.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "doubly-linked-list.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "ordered-map.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "sorted-tree.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "path": "priority-queue.wasm",
+      "existedBefore": false,
+      "bytes": 26180,
+      "sha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    }
+  ]
+}

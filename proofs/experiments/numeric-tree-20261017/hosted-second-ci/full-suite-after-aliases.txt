@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/736c0a2657a3/zerocopy-numeric
+
+
+ Test Files  50 passed (50)
+      Tests  1062 passed (1062)
+   Start at  10:34:18
+   Duration  33.40s (transform 1.33s, setup 0ms, import 2.81s, tests 126.02s, environment 11ms)
+

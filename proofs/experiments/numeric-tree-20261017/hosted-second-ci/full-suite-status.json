@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "run",
+    "test"
+  ],
+  "cwd": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "startedAt": "2026-10-17T03:31:43.171522+00:00",
+  "completedAt": "2026-10-17T03:32:26.041195+00:00",
+  "elapsedSeconds": 42.86968044599962,
+  "exitCode": 1,
+  "log": "full-suite.txt",
+  "logSha256": "8c373542f537ba24dead0e15423a675eddcff545d18e605eda7baf0e0c419c18",
+  "testSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+}

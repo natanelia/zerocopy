@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run geometry.test.ts numeric.test.ts numeric-spatial.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/736c0a2657a3/zerocopy-numeric
+
+
+ Test Files  3 passed (3)
+      Tests  56 passed (56)
+   Start at  10:31:28
+   Duration  2.08s (transform 500ms, setup 0ms, import 711ms, tests 2.91s, environment 1ms)
+

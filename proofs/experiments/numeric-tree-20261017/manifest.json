@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "kind": "current-file-inventory",
+  "baselineCommit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+  "baselineTree": "eb3bd4217f132e13b01c42f9b9c6bdc5aa92afab",
+  "sourceParent": "01814f2f79f625a453a142f2831c687b3331812a",
+  "fileCount": 104,
+  "inventorySha256": "c3674310bed038652e44b1e82cc080a5985716ac7f2f38950fba2a3edb0e4114",
+  "notes": [
+    "All changed paths, Git modes, byte counts and SHA-256 hashes are committed by this canonical inventory digest.",
+    "The inventory excludes this file to avoid a recursive digest. Re-run inventory() to inspect each entry.",
+    "The complete version-2 manifest remains immutable in the parent commit and earlier experiment reports.",
+    "Historical outcomes and binary digests remain in original artifacts. This is not performance clearance."
+  ]
+}
