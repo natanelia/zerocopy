@@ -1,0 +1,21 @@
+COMMAND: bun run build:wasm
+$ node scripts/build-wasm.mjs
+COMMAND: bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233073 bytes
+COMMAND: bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+COMMAND: bun run test
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-final-base
+
+
+ Test Files  53 passed (53)
+      Tests  1076 passed (1076)
+   Start at  13:04:31
+   Duration  46.38s (transform 2.02s, setup 0ms, import 3.35s, tests 157.96s, environment 14ms)
+
+COMMAND: bun run typecheck
+$ tsc --noEmit
+FINAL BASELINE BUILD AND VALIDATION PASSED

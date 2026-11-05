@@ -1,0 +1,22 @@
+file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/worker.mjs:41
+      const message = value => { cleanup(); value.error ? reject(new Error(value.error)) : resolve(value); };
+                                                                 ^
+
+Error: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ '917e87b62737cf3bcc5418ca82f87435a6de2d89eeb955675b6fa3144ab6fe71'
+- 'ea42b242eda117a43d0bcd63cf1a6df76aaa4796ab09a2fd8a9e12959d0306c2'
+
+    at inspect (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/worker.mjs:26:44)
+    at MessagePort.<anonymous> (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/worker.mjs:30:11)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:869:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)
+    at Worker.message (file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-query/proofs/tanstack-values-20261105/worker.mjs:41:66)
+    at Worker.wrapper (node:events:639:12)
+    at Worker.emit (node:events:514:28)
+    at MessagePort.<anonymous> (node:internal/worker:350:14)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:869:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)
+
+Node.js v24.22.1
