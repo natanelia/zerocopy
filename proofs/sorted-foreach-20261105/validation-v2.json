@@ -1,0 +1,50 @@
+{
+  "sourceSha256": "936c2d5d4e299f56e24e583a18f8653c9cc6dc308a7fc9d37c1fc1c7c40db08b",
+  "started": "2026-11-05T02:33:45.513162+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "sorted-map-foreach.test.ts",
+        "shared-sorted.test.ts",
+        "trie-view-capture.test.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "proofs/sorted-foreach-20261105/worker.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--emitDeclarationOnly",
+        "--noEmit",
+        "false",
+        "--declarationMap",
+        "false",
+        "--outDir",
+        "dist/types"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "finished": "2026-11-05T02:33:51.040431+00:00",
+  "logSha256": "f1c04bc6eced46a8d88309a5c089ee24d75bc3ab0ef9ec9ed685a3147609d367"
+}

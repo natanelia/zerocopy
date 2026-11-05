@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import { performance } from 'node:perf_hooks';
+import { SharedSortedMap, resetSortedMap } from './dist/shared.js';
+
+const cases = {
+  'number-4096': { size: 4096, type: 'number', repeats: 48 },
+  'number-64': { size: 64, type: 'number', repeats: 2048 },
+  'boolean-4096': { size: 4096, type: 'boolean', repeats: 48 },
+  'string-1024': { size: 1024, type: 'string', repeats: 128 },
+  'json-256': { size: 256, type: 'object', repeats: 512 },
+  'empty': { size: 0, type: 'number', repeats: 32768 },
+  'custom-1024': { size: 1024, type: 'number', repeats: 64, comparator: true },
+  'entries-4096': { size: 4096, type: 'number', repeats: 32, entries: true },
+};
+const name = process.argv[2], spec = cases[name];
+assert.ok(spec, `Unknown case ${name}`);
+const descending = (a, b) => a === b ? 0 : a < b ? 1 : -1;
+resetSortedMap();
+let map = new SharedSortedMap(spec.type, spec.comparator ? descending : undefined);
+const native = new Map();
+for (let i = 0; i < spec.size; i++) {
+  const id = (i * 17) % spec.size, key = `row/${String(id).padStart(6, '0')}`;
+  const value = spec.type === 'number' ? id * 0.5 : spec.type === 'boolean' ? !!(id % 2)
+    : spec.type === 'string' ? `name/${id}/🙂` : { id, label: `record-${id}`, child: { value: id * 3 } };
+  map = map.set(key, value); native.set(key, value);
+}
+const expected = [...native].sort(([a], [b]) => spec.comparator ? descending(a, b) : Buffer.compare(Buffer.from(a), Buffer.from(b)));
+const collect = () => { const output = []; map.forEach((value, key) => output.push([key, value])); return output; };
+assert.deepEqual(collect(), expected);
+assert.deepEqual([...map.entries()], expected);
+const magnitude = value => spec.type === 'number' ? value : spec.type === 'boolean' ? +value : spec.type === 'string' ? value.length : value.id;
+const expectedSum = expected.reduce((sum, [key, value]) => sum + magnitude(value) + key.length, 0);
+let sum = 0, count = 0;
+const visit = spec.type === 'number' ? (value, key) => { count++; sum += value + key.length; }
+  : spec.type === 'boolean' ? (value, key) => { count++; sum += +value + key.length; }
+  : spec.type === 'string' ? (value, key) => { count++; sum += value.length + key.length; }
+  : (value, key) => { count++; sum += value.id + key.length; };
+const run = spec.entries ? () => { for (const [key, value] of map.entries()) visit(value, key); }
+  : () => map.forEach(visit);
+function batch() {
+  sum = 0; count = 0;
+  const start = performance.now();
+  for (let i = 0; i < spec.repeats; i++) run();
+  const elapsed = performance.now() - start;
+  assert.equal(sum, expectedSum * spec.repeats); assert.equal(count, spec.size * spec.repeats);
+  return elapsed / spec.repeats;
+}
+let warmupMilliseconds = 0, warmupBatches = 0;
+while (warmupMilliseconds < 250 || warmupBatches < 8) { warmupMilliseconds += batch() * spec.repeats; warmupBatches++; }
+const samplesMs = Array.from({ length: 9 }, () => batch());
+assert.deepEqual(collect(), expected);
+const sorted = [...samplesMs].sort((a, b) => a - b);
+console.log(JSON.stringify({ name, runtime: typeof Bun === 'undefined' ? `Node ${process.version}` : `Bun ${Bun.version}`, spec, warmupMilliseconds, warmupBatches, samplesMs, medianMs: sorted[4], checksum: sum, count, validated: true }));

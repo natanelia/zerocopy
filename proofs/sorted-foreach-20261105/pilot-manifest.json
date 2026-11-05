@@ -1,0 +1,39 @@
+{
+  "beforeBundleSha256": {
+    "chunk-4pqgvvxp.js": "b53bec60c40d975c4eb90d920e0e281474e5af72bc9e6cb42f30f86cb556bbd8",
+    "chunk-5qfqrsqm.js": "19c0c761d9bce5d3877c2339854c92d0a2df55240101d3995bbce88f6e33d2e9",
+    "chunk-6t3aw271.js": "73fd26b44637157c74333baf26b35ce35b01d0fd2bf71368186f2bc150388445",
+    "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+    "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+    "geometry.js": "496a6b96f14f6e1689c22ab8905f8f5b5c3cdf6c4a25f95b93acc62fd55703f5",
+    "numeric.js": "418f7e33233ff84d18eb5bf0ed76d9b3cae8616feb24aca6369eac922c15c74e",
+    "redux.js": "366c3e95a44024551bbabfcafca9982e04616de905e436b128a4fabcaf35dda0",
+    "shared.js": "d8c565b60aa23736c3ea4e8076d72d5510b61b83f4f9d8c59328a1a08787fe55",
+    "state.js": "945d757db7468b063e5ec54732852a1bbbe612c771015217fadc98e9435f89f1",
+    "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+    "worker.js": "ee2a9319df44e5997a22e6cf417ad052baa6a3805245ee9911511746f85f6387"
+  },
+  "afterBundleSha256": {
+    "chunk-5qfqrsqm.js": "19c0c761d9bce5d3877c2339854c92d0a2df55240101d3995bbce88f6e33d2e9",
+    "chunk-dwnqd8wd.js": "61b7c8051c4108b3682a3bd5738dc786ba40e7272b2772b17bdd94d9f834a643",
+    "chunk-f3trte3k.js": "b1b4a92b9579c537462827f10e33028bf9a9643023447974b7a20224cbf2e8b0",
+    "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+    "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+    "geometry.js": "496a6b96f14f6e1689c22ab8905f8f5b5c3cdf6c4a25f95b93acc62fd55703f5",
+    "numeric.js": "418f7e33233ff84d18eb5bf0ed76d9b3cae8616feb24aca6369eac922c15c74e",
+    "redux.js": "67a347d23ae2583b2453463146d11441be516586f9712f9aa87b6b1a066d5c05",
+    "shared.js": "d882d81f4cdd721b02e916537d2ec896a7f26efdd69262768160fd365d3c7fdd",
+    "state.js": "882b3adf8ce3a53f01d979c6bf7018579bbd810b4779695b335b153c626d12cc",
+    "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+    "worker.js": "30d862e37b6bb0c2b84998c745d3c73f9964c9ae878b3b76cfc9bbaea2dafe99"
+  },
+  "baselineCommit": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "wasmSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+  "artifactSha256": {
+    "baseline-shared-sorted-map.ts.txt": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+    "candidate-shared-sorted-map.ts.txt": "5e3df99b5b215a20a3d9353c6147434f1f756a47ebcc3d6663b151b14b20f9b6",
+    "pilot-case.mjs.txt": "21f65fe1d33f4b4ef08ce6add46d3d426c15b5d313f3426c8f3275d5756266a6",
+    "pilot-run.mjs.txt": "aecc8f4dd7660923090b7d1bf2a2f76db4c0928fee222c008f73eebb2494c989"
+  },
+  "note": "Pilot manifest recorded after completion from untouched build snapshots; study source hashes were recorded before timing."
+}

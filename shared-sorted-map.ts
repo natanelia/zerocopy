@@ -61,11 +61,28 @@ export class SharedSortedMap<T extends string = SharedSortedMapType> extends Sna
     if (this.comparator) { for (const [, value] of this.entries()) yield value; }
     else { const a = this.arena; for (const leaf of a.radixLeaves(this.root)) yield a.leafValue(this.valueType, leaf); }
   }
-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { for (const [key, value] of this.entries()) fn(value, key); }
+  forEach(fn: (value: ValueOf<T>, key: string) => void): void {
+    const entries = this.entries;
+    if (this.comparator || entries !== defaultEntries) {
+      for (const [key, value] of Reflect.apply(entries, this, [])) fn(value, key);
+      return;
+    }
+    if (!this.root) return;
+    // Visit the natural order without allocating entry pairs or forwarding each
+    // value through two more generators. Published leaves fit in this view even
+    // if a callback grows the arena; iteration keeps all traversal state local.
+    const a = this.arena, view = a.dv;
+    for (const leaf of a.radixLeaves(this.root)) {
+      const key = a.string(leaf + 16, view.getUint32(leaf + 8, true));
+      fn(a.leafValue(this.valueType, leaf, 0, view), key);
+    }
+  }
   toWorkerData() {
     if (this.comparator) throw new Error('Custom comparator functions cannot be sent to workers');
     return Object.freeze({ root: this.root, size: this.size, valueType: this.valueType });
   }
   static fromWorkerData<T extends string>(d: { root: number; size: number; valueType: T }, source: Arena = defaultArena()): SharedSortedMap<T> { return new SharedSortedMap(d.valueType, undefined, d.root, d.size, source); }
 }
+// Preserve dynamic entries() overrides, including later prototype replacement.
+const defaultEntries = SharedSortedMap.prototype.entries;
 structureRegistry.SharedSortedMap = { fromWorkerData: (d, a) => SharedSortedMap.fromWorkerData(d, a) };

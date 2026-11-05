@@ -1,0 +1,24 @@
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { cpus, platform, release } from 'node:os';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('.', import.meta.url));
+const cases = ['number-4096', 'number-64', 'boolean-4096', 'string-1024', 'json-256', 'empty', 'custom-1024', 'entries-4096'];
+const runtimes = { node: process.execPath, bun: '/workspace/scratch/83f1d4baba1f/tools/bun' };
+const results = { study: 'sorted-foreach-pilot-v1', started: new Date().toISOString(), cpu: cpus()[0].model, platform: `${platform()} ${release()}`, source: { baseline: '77599337867dbf785a5f0311d34637d0b36678fc', before: '96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68', after: '5e3df99b5b215a20a3d9353c6147434f1f756a47ebcc3d6663b151b14b20f9b6' }, subjects: [] };
+mkdirSync(`${root}/results`, { recursive: true });
+for (let pair = 0; pair < 2; pair++) for (const [runtime, executable] of Object.entries(runtimes)) for (const name of cases) {
+  for (const variant of pair % 2 ? ['after', 'before'] : ['before', 'after']) {
+    rmSync(`${root}/subject/dist`, { recursive: true, force: true });
+    cpSync(`${root}/${variant}/dist`, `${root}/subject/dist`, { recursive: true });
+    const start = new Date().toISOString();
+    const child = spawnSync('taskset', ['-c', '2', executable, `${root}/subject/case.mjs`, name], { encoding: 'utf8' });
+    if (child.status !== 0) { console.error(child.stdout, child.stderr); process.exit(child.status ?? 1); }
+    const result = { pair, runtime, variant, start, ...JSON.parse(child.stdout) };
+    results.subjects.push(result);
+    writeFileSync(`${root}/results/pilot-v1.json`, JSON.stringify(results, null, 2) + '\n');
+    console.log(`${runtime} ${name} pair=${pair} ${variant} ${(result.medianMs * 1000).toFixed(3)} us`);
+  }
+}
+results.finished = new Date().toISOString();
+writeFileSync(`${root}/results/pilot-v1.json`, JSON.stringify(results, null, 2) + '\n');
