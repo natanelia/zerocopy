@@ -1,0 +1,11 @@
+{
+  "browser": "153.0.8010.0",
+  "mode": "checkpoint",
+  "crossOriginIsolated": true,
+  "checks": [
+    "checkpoint decode/deserialize: sparse/null-prototype/special-value tree, aliases and writable imports",
+    "shared worker: restored checkpoint map remains readable and read-only",
+    "copy worker: restored checkpoint map remains readable and read-only"
+  ],
+  "timingMeasurements": false
+}

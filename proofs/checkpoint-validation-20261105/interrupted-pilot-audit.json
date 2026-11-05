@@ -1,0 +1,181 @@
+{
+  "schema": "zerocopy-interrupted-pilot-audit/v1",
+  "classification": "interrupted; incomplete experiment",
+  "originalStatusUnchanged": "running",
+  "originalRawSha256": "ab4208820196406ba4b61f54e8ca3fc3f80bff447c26dac38b2452b1c556a7a5",
+  "originalRawBytes": 251460,
+  "startedAt": "2026-11-05T11:24:13.259Z",
+  "lastSavedSubjectCompletedAt": "2026-11-05T11:24:49.004Z",
+  "plannedSubjects": 64,
+  "retainedSubjects": 63,
+  "retainedMeasuredBatches": 567,
+  "completePairs": 31,
+  "unpairedSubjects": [
+    {
+      "runtime": "node",
+      "caseName": "decode-array-8192",
+      "pair": 1,
+      "presentVariant": "after"
+    }
+  ],
+  "missingSubject": {
+    "runtime": "node",
+    "pair": 1,
+    "variant": "before",
+    "caseName": "decode-array-8192"
+  },
+  "checks": {
+    "strictSchedulePrefix": true,
+    "uniqueSubjects": true,
+    "sourceSnapshotsAndArchivesMatchLaunchHashes": true,
+    "baselineCommitDeclared": "b07bffe073a7f7d60f1dd7731358c16d1075eb45",
+    "driverAndArchivedWorkloadHashesMatch": true,
+    "warmupAndMeasurementCountsValid": true,
+    "outputVerificationCountsValid": true,
+    "allRetainedMediansAndCompletePairEstimatesRecomputed": true,
+    "rawBytesUnmodified": true,
+    "endOfStudySourceBuildIdentityChecksVerified": false,
+    "completeExperimentVerified": false
+  },
+  "sourceArchives": {
+    "archive/redux-checkpoint-v1.ts.txt": "7f2714d5de59b9320c25084c10d80a8c7586a4cb299aca5338a0c7b4fdc00c92",
+    "archive/workloads-v1.mjs": "8a3c2a9279465525010c1e0742ba59c58fdbcc19087348e3b3395c18bba74173"
+  },
+  "completePairEstimatesOnly": [
+    {
+      "runtime": "node",
+      "caseName": "decode-array-8192",
+      "completePairs": 1,
+      "pairedRatio": 1.1306639835378254,
+      "fasterPairs": 0,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "decode-record-4096",
+      "completePairs": 2,
+      "pairedRatio": 0.6746698604988741,
+      "fasterPairs": 2,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "decode-nested-512",
+      "completePairs": 2,
+      "pairedRatio": 0.9060297081627455,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "decode-mixed-256",
+      "completePairs": 2,
+      "pairedRatio": 0.9475484532360293,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "deserialize-nested-512",
+      "completePairs": 2,
+      "pairedRatio": 0.9550591727538233,
+      "fasterPairs": 2,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "small-empty-trees",
+      "completePairs": 2,
+      "pairedRatio": 1.394021074804565,
+      "fasterPairs": 0,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "snapshot-only-control",
+      "completePairs": 2,
+      "pairedRatio": 0.9897174869819475,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "caseName": "primitive-control",
+      "completePairs": 2,
+      "pairedRatio": 0.9248722755923292,
+      "fasterPairs": 2,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "decode-array-8192",
+      "completePairs": 2,
+      "pairedRatio": 0.7560287254368114,
+      "fasterPairs": 2,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "decode-record-4096",
+      "completePairs": 2,
+      "pairedRatio": 1.0450861286249395,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "decode-nested-512",
+      "completePairs": 2,
+      "pairedRatio": 0.9057611724521473,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "decode-mixed-256",
+      "completePairs": 2,
+      "pairedRatio": 0.8040401482754396,
+      "fasterPairs": 2,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "deserialize-nested-512",
+      "completePairs": 2,
+      "pairedRatio": 0.8716849326707197,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "small-empty-trees",
+      "completePairs": 2,
+      "pairedRatio": 1.0217589251826404,
+      "fasterPairs": 1,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "snapshot-only-control",
+      "completePairs": 2,
+      "pairedRatio": 1.2172970227399171,
+      "fasterPairs": 0,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "caseName": "primitive-control",
+      "completePairs": 2,
+      "pairedRatio": 0.9887976101645757,
+      "fasterPairs": 1,
+      "interval95": null
+    }
+  ],
+  "limitations": [
+    "The interruption cause is unknown; the raw recording contains no completion or structured failure record.",
+    "Launch-time source/build identities are retained, but final identity checks and the missing subject cannot be recovered or inferred.",
+    "One unpaired candidate is preserved but excluded from all paired estimates.",
+    "This incomplete two-pair pilot is not pooled with V2 or used to establish a confirmed performance improvement.",
+    "The normal complete-study verifier remains unchanged and rejects this incomplete recording."
+  ]
+}

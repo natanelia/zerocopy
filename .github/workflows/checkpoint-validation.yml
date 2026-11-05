@@ -1,0 +1,100 @@
+name: Checkpoint validation verification
+
+on:
+  pull_request:
+    paths:
+      - 'arena.ts'
+      - 'shared*.ts'
+      - 'redux*.ts'
+      - 'compaction.ts'
+      - 'checkpoint*.test.ts'
+      - '*.as.ts'
+      - 'proofs/checkpoint-validation-20261105/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/checkpoint-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'arena.ts'
+      - 'shared*.ts'
+      - 'redux*.ts'
+      - 'compaction.ts'
+      - 'checkpoint*.test.ts'
+      - '*.as.ts'
+      - 'proofs/checkpoint-validation-20261105/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/checkpoint-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build native and portable modules
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:redux
+      - name: Run focused regressions in Node and Bun
+        shell: bash
+        run: |
+          mkdir -p proofs/checkpoint-validation-20261105/ci-logs
+          node node_modules/vitest/vitest.mjs run checkpoint-validation-pass.test.ts redux-checkpoint.test.ts checkpoint-descriptor-validation.test.ts --maxWorkers=1 2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run checkpoint-validation-pass.test.ts redux-checkpoint.test.ts checkpoint-descriptor-validation.test.ts --maxWorkers=1 2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/bun-tests.log
+      - name: Verify every workload output without timing
+        shell: bash
+        run: |
+          node proofs/checkpoint-validation-20261105/smoke.mjs 2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/node-smoke.log
+          bun proofs/checkpoint-validation-20261105/smoke.mjs 2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/bun-smoke.log
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Verify Chromium page and worker behavior
+        shell: bash
+        run: node proofs/checkpoint-validation-20261105/browser-check.mjs . checkpoint 2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/chromium.log
+      - name: Independently verify saved evidence without rerunning timings
+        shell: bash
+        run: |
+          python3 proofs/checkpoint-validation-20261105/verify.py \
+            proofs/checkpoint-validation-20261105/results/pilot-v2.json.gz \
+            proofs/checkpoint-validation-20261105/results/final-v3.json.gz \
+            proofs/checkpoint-validation-20261105/results/aa-v3.json.gz \
+            2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/evidence.log
+          python3 proofs/checkpoint-validation-20261105/audit-interrupted-pilot.py \
+            2>&1 | tee proofs/checkpoint-validation-20261105/ci-logs/interrupted-pilot-audit.log
+      - name: Retain correctness logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-validation-${{ github.sha }}
+          path: proofs/checkpoint-validation-20261105/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

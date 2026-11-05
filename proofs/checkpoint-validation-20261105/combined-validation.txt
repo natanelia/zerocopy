@@ -1,0 +1,83 @@
+
+## portable build
+["/workspace/scratch/83f1d4baba1f/tools/bun", "scripts/build-browser.ts"]
+Built 12 portable modules: 239157 bytes
+
+## declarations
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--emitDeclarationOnly", "--noEmit", "false", "--declarationMap", "false", "--outDir", "dist/types"]
+
+## full Bun suite
+["/workspace/scratch/83f1d4baba1f/tools/bun", "run", "test"]
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/4f8eb583f2d1/zerocopy-integration
+
+
+ Test Files  57 passed (57)
+      Tests  1147 passed (1147)
+   Start at  05:55:50
+   Duration  36.87s (transform 1.37s, setup 0ms, import 2.79s, tests 142.19s, environment 15ms)
+
+
+## main types
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--noEmit"]
+
+## Redux types
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.redux.json"]
+
+## typed values
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.typed-values.json"]
+
+## geometry types
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.geometry.json"]
+
+## worker types
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.worker.json"]
+
+## existing Node worker proof
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/node-worker.mjs"]
+{"passed":true,"runtime":"v24.22.1","structures":12,"nested":true,"concurrentReadsAtLeast":10000,"largeRetainedSequences":4,"workerSharesBackingMemory":true,"repeatedAttachment":true,"resetKeepsOldSnapshots":true}
+
+## existing Redux Node proof
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/redux-node.mjs"]
+{"node":"v24.22.1","packageExports":true,"sharedClassIdentity":true,"toolkit":true,"portableRestore":true}
+
+## typed JSON worker proof
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/typed-json-worker.mjs"]
+Typed JSON worker tests passed: shared memory, copy transport, nested values, retained snapshots, memory growth, and compaction.
+
+## new sequence worker proof
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/redux-sequence-reads-20261105/worker.mjs"]
+shared Redux sequence worker: complete numeric/boolean outputs, old roots and bytes preserved across owner edits/growth
+copy Redux sequence worker: complete numeric/boolean outputs, old roots and bytes preserved across owner edits/growth
+
+## late reader override
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/redux-sequence-reads-20261105/late-import.mjs"]
+Late Redux import (portable, reader getters): preserved exact overrides
+
+## late decoder override
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/redux-sequence-reads-20261105/late-import.mjs", "--decode"]
+Late Redux import (portable, decoder): preserved exact overrides
+
+## Chromium both improvements
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "proofs/redux-sequence-reads-20261105/browser-check.mjs", "/workspace/scratch/4f8eb583f2d1/zerocopy-integration", "both"]
+{
+  "browser": "153.0.8010.0",
+  "mode": "both",
+  "crossOriginIsolated": true,
+  "checks": [
+    "portable numeric/boolean stack and offset-queue encoding",
+    "shared worker: old/new sequence roots after owner edits and growth",
+    "copy worker: old/new sequence roots after owner edits and growth",
+    "checkpoint decode/deserialize: sparse/null-prototype/special-value tree, aliases and writable imports",
+    "shared worker: restored checkpoint map remains readable and read-only",
+    "copy worker: restored checkpoint map remains readable and read-only"
+  ],
+  "timingMeasurements": false
+}
+
+## installed package consumers
+["/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node", "scripts/check-package.mjs"]
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Package zerocopy@0.2.1: 145 files, 218107 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.
