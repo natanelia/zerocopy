@@ -1,0 +1,14 @@
+{
+  "browser": "153.0.8010.0",
+  "mode": "both",
+  "crossOriginIsolated": true,
+  "checks": [
+    "portable numeric/boolean stack and offset-queue encoding",
+    "shared worker: old/new sequence roots after owner edits and growth",
+    "copy worker: old/new sequence roots after owner edits and growth",
+    "checkpoint decode/deserialize: sparse/null-prototype/special-value tree, aliases and writable imports",
+    "shared worker: restored checkpoint map remains readable and read-only",
+    "copy worker: restored checkpoint map remains readable and read-only"
+  ],
+  "timingMeasurements": false
+}

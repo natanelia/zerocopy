@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-dispatch-baseline-tests
+
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  09:27:47
+   Duration  494ms (transform 214ms, setup 0ms, import 284ms, tests 20ms, environment 0ms)
+

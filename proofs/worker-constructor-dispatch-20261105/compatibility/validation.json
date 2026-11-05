@@ -1,0 +1,59 @@
+{
+  "measuredSourceSha256": "e4db8ac20621b59df72dae638700ff03495ed5024fbb780dcc17565b64644ca0",
+  "testSourceSha256": "d9df77cb44e5130703b96ac7eff2382ebfaf36a5a8565b7594b8b3228925b8cf",
+  "portableBuild": "passed; bundle hashes match formal-01 source.after.bundles",
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "passed": true
+  },
+  "candidateTests": {
+    "files": [
+      "worker-constructor-dispatch.test.ts",
+      "worker-records.test.ts",
+      "worker-attachment.test.ts"
+    ],
+    "node": {
+      "passed": 41,
+      "failed": 0
+    },
+    "bun": {
+      "passed": 41,
+      "failed": 0
+    }
+  },
+  "baselineNewTests": {
+    "commit": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+    "node": {
+      "passed": 11,
+      "failed": 0
+    },
+    "bun": {
+      "passed": 11,
+      "failed": 0
+    },
+    "logs": [
+      "baseline-node.txt",
+      "baseline-bun.txt"
+    ]
+  },
+  "workloadSmoke": {
+    "runtimes": [
+      "node",
+      "bun"
+    ],
+    "cases": 9,
+    "fullOutputsAndInvariantsMatch": true,
+    "command": "node proofs/worker-constructor-dispatch-20261105/smoke.mjs BASELINE CANDIDATE"
+  },
+  "nodeWorker": {
+    "command": "node proofs/node-worker.mjs",
+    "driverSha256": "415cf7624f7797d175be6b4236e718ba3486489a18bcd121b5af18538dba613a",
+    "result": "node-worker.json"
+  },
+  "browser": {
+    "command": "CHROMIUM_EXECUTABLE=CHROMIUM node proofs/checkpoint-validation-20261105/browser-check.mjs . both",
+    "driverSha256": "c0d167a6e15f0ceae9313261bce4bc0df65cf3a8b38cab62d7bc74119cc975c6",
+    "result": "browser.json",
+    "timingMeasurements": false
+  }
+}

@@ -1,0 +1,234 @@
+formal: node mixed-128-shared pair 1/6 before: 62.527 us, verified
+formal: node mixed-128-shared pair 1/6 after: 47.562 us, verified
+formal: node late-128-shared pair 1/6 before: 73.300 us, verified
+formal: node late-128-shared pair 1/6 after: 39.510 us, verified
+formal: node mixed-128-copied pair 1/6 before: 312.091 us, verified
+formal: node mixed-128-copied pair 1/6 after: 333.125 us, verified
+formal: node late-128-copied pair 1/6 before: 91.921 us, verified
+formal: node late-128-copied pair 1/6 after: 44.948 us, verified
+formal: node early-map-128-control pair 1/6 before: 35.980 us, verified
+formal: node early-map-128-control pair 1/6 after: 34.032 us, verified
+formal: node small-four-control pair 1/6 before: 4.305 us, verified
+formal: node small-four-control pair 1/6 after: 2.174 us, verified
+formal: node single-map-shared pair 1/6 before: 0.883 us, verified
+formal: node single-map-shared pair 1/6 after: 1.042 us, verified
+formal: node single-late-shared pair 1/6 before: 1.199 us, verified
+formal: node single-late-shared pair 1/6 after: 1.108 us, verified
+formal: node single-map-copied pair 1/6 before: 29.431 us, verified
+formal: node single-map-copied pair 1/6 after: 17.718 us, verified
+formal: bun mixed-128-shared pair 1/6 before: 34.829 us, verified
+formal: bun mixed-128-shared pair 1/6 after: 26.834 us, verified
+formal: bun late-128-shared pair 1/6 before: 32.815 us, verified
+formal: bun late-128-shared pair 1/6 after: 22.884 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun mixed-128-copied pair 1/6 before: 97.655 us, verified
+formal: bun mixed-128-copied pair 1/6 after: 113.508 us, verified
+formal: bun late-128-copied pair 1/6 before: 39.012 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun late-128-copied pair 1/6 after: 42.858 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun early-map-128-control pair 1/6 before: 26.197 us, verified
+formal: bun early-map-128-control pair 1/6 after: 18.184 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun small-four-control pair 1/6 before: 2.236 us, verified
+formal: bun small-four-control pair 1/6 after: 1.863 us, verified
+formal: bun single-map-shared pair 1/6 before: 1.251 us, verified
+formal: bun single-map-shared pair 1/6 after: 1.165 us, verified
+formal: bun single-late-shared pair 1/6 before: 1.147 us, verified
+formal: bun single-late-shared pair 1/6 after: 1.332 us, verified
+formal: bun single-map-copied pair 1/6 before: 9.089 us, verified
+formal: bun single-map-copied pair 1/6 after: 8.657 us, verified
+formal: bun single-map-copied pair 2/6 after: 10.888 us, verified
+formal: bun single-map-copied pair 2/6 before: 11.908 us, verified
+formal: bun single-late-shared pair 2/6 after: 0.971 us, verified
+formal: bun single-late-shared pair 2/6 before: 1.417 us, verified
+formal: bun single-map-shared pair 2/6 after: 1.176 us, verified
+formal: bun single-map-shared pair 2/6 before: 1.391 us, verified
+formal: bun small-four-control pair 2/6 after: 1.751 us, verified
+formal: bun small-four-control pair 2/6 before: 3.046 us, verified
+formal: bun early-map-128-control pair 2/6 after: 17.539 us, verified; 4/9 measured batches <2 ms (retained)
+formal: bun early-map-128-control pair 2/6 before: 33.690 us, verified
+formal: bun late-128-copied pair 2/6 after: 24.171 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun late-128-copied pair 2/6 before: 43.941 us, verified
+formal: bun mixed-128-copied pair 2/6 after: 117.974 us, verified
+formal: bun mixed-128-copied pair 2/6 before: 100.054 us, verified
+formal: bun late-128-shared pair 2/6 after: 21.185 us, verified; 3/9 measured batches <2 ms (retained)
+formal: bun late-128-shared pair 2/6 before: 42.868 us, verified
+formal: bun mixed-128-shared pair 2/6 after: 25.964 us, verified
+formal: bun mixed-128-shared pair 2/6 before: 30.380 us, verified
+formal: node single-map-copied pair 2/6 after: 8.546 us, verified
+formal: node single-map-copied pair 2/6 before: 11.201 us, verified
+formal: node single-late-shared pair 2/6 after: 1.043 us, verified
+formal: node single-late-shared pair 2/6 before: 1.345 us, verified
+formal: node single-map-shared pair 2/6 after: 1.579 us, verified
+formal: node single-map-shared pair 2/6 before: 0.829 us, verified
+formal: node small-four-control pair 2/6 after: 2.218 us, verified
+formal: node small-four-control pair 2/6 before: 4.183 us, verified
+formal: node early-map-128-control pair 2/6 after: 37.610 us, verified
+formal: node early-map-128-control pair 2/6 before: 49.798 us, verified
+formal: node late-128-copied pair 2/6 after: 65.770 us, verified
+formal: node late-128-copied pair 2/6 before: 77.891 us, verified
+formal: node mixed-128-copied pair 2/6 after: 176.498 us, verified
+formal: node mixed-128-copied pair 2/6 before: 356.000 us, verified
+formal: node late-128-shared pair 2/6 after: 39.261 us, verified
+formal: node late-128-shared pair 2/6 before: 112.427 us, verified
+formal: node mixed-128-shared pair 2/6 after: 46.821 us, verified
+formal: node mixed-128-shared pair 2/6 before: 64.898 us, verified
+formal: node mixed-128-shared pair 3/6 before: 58.250 us, verified
+formal: node mixed-128-shared pair 3/6 after: 47.826 us, verified
+formal: node late-128-shared pair 3/6 before: 69.480 us, verified
+formal: node late-128-shared pair 3/6 after: 36.995 us, verified
+formal: node mixed-128-copied pair 3/6 before: 381.681 us, verified
+formal: node mixed-128-copied pair 3/6 after: 322.118 us, verified
+formal: node late-128-copied pair 3/6 before: 124.853 us, verified
+formal: node late-128-copied pair 3/6 after: 46.925 us, verified
+formal: node early-map-128-control pair 3/6 before: 34.271 us, verified
+formal: node early-map-128-control pair 3/6 after: 34.245 us, verified
+formal: node small-four-control pair 3/6 before: 3.649 us, verified
+formal: node small-four-control pair 3/6 after: 2.035 us, verified
+formal: node single-map-shared pair 3/6 before: 0.993 us, verified
+formal: node single-map-shared pair 3/6 after: 0.978 us, verified
+formal: node single-late-shared pair 3/6 before: 1.271 us, verified
+formal: node single-late-shared pair 3/6 after: 1.138 us, verified
+formal: node single-map-copied pair 3/6 before: 17.019 us, verified
+formal: node single-map-copied pair 3/6 after: 10.068 us, verified
+formal: bun mixed-128-shared pair 3/6 before: 40.454 us, verified
+formal: bun mixed-128-shared pair 3/6 after: 29.455 us, verified
+formal: bun late-128-shared pair 3/6 before: 39.443 us, verified
+formal: bun late-128-shared pair 3/6 after: 21.905 us, verified; 4/9 measured batches <2 ms (retained)
+formal: bun mixed-128-copied pair 3/6 before: 118.404 us, verified
+formal: bun mixed-128-copied pair 3/6 after: 93.495 us, verified
+formal: bun late-128-copied pair 3/6 before: 51.873 us, verified
+formal: bun late-128-copied pair 3/6 after: 30.929 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun early-map-128-control pair 3/6 before: 32.711 us, verified
+formal: bun early-map-128-control pair 3/6 after: 22.350 us, verified; 3/9 measured batches <2 ms (retained)
+formal: bun small-four-control pair 3/6 before: 2.766 us, verified
+formal: bun small-four-control pair 3/6 after: 1.501 us, verified
+formal: bun single-map-shared pair 3/6 before: 1.001 us, verified
+formal: bun single-map-shared pair 3/6 after: 0.958 us, verified
+formal: bun single-late-shared pair 3/6 before: 1.682 us, verified
+formal: bun single-late-shared pair 3/6 after: 0.980 us, verified
+formal: bun single-map-copied pair 3/6 before: 8.632 us, verified
+formal: bun single-map-copied pair 3/6 after: 12.502 us, verified
+formal: bun single-map-copied pair 4/6 after: 10.988 us, verified
+formal: bun single-map-copied pair 4/6 before: 9.361 us, verified
+formal: bun single-late-shared pair 4/6 after: 1.559 us, verified
+formal: bun single-late-shared pair 4/6 before: 1.521 us, verified
+formal: bun single-map-shared pair 4/6 after: 1.006 us, verified
+formal: bun single-map-shared pair 4/6 before: 1.245 us, verified
+formal: bun small-four-control pair 4/6 after: 2.272 us, verified
+formal: bun small-four-control pair 4/6 before: 3.792 us, verified
+formal: bun early-map-128-control pair 4/6 after: 35.247 us, verified
+formal: bun early-map-128-control pair 4/6 before: 44.048 us, verified
+formal: bun late-128-copied pair 4/6 after: 47.527 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun late-128-copied pair 4/6 before: 62.621 us, verified
+formal: bun mixed-128-copied pair 4/6 after: 127.364 us, verified
+formal: bun mixed-128-copied pair 4/6 before: 163.075 us, verified
+formal: bun late-128-shared pair 4/6 after: 36.352 us, verified
+formal: bun late-128-shared pair 4/6 before: 38.054 us, verified
+formal: bun mixed-128-shared pair 4/6 after: 26.535 us, verified
+formal: bun mixed-128-shared pair 4/6 before: 44.001 us, verified
+formal: node single-map-copied pair 4/6 after: 15.290 us, verified
+formal: node single-map-copied pair 4/6 before: 8.660 us, verified
+formal: node single-late-shared pair 4/6 after: 1.057 us, verified
+formal: node single-late-shared pair 4/6 before: 1.426 us, verified
+formal: node single-map-shared pair 4/6 after: 1.518 us, verified
+formal: node single-map-shared pair 4/6 before: 1.475 us, verified
+formal: node small-four-control pair 4/6 after: 2.640 us, verified
+formal: node small-four-control pair 4/6 before: 2.993 us, verified
+formal: node early-map-128-control pair 4/6 after: 32.896 us, verified
+formal: node early-map-128-control pair 4/6 before: 39.293 us, verified
+formal: node late-128-copied pair 4/6 after: 44.174 us, verified
+formal: node late-128-copied pair 4/6 before: 95.561 us, verified
+formal: node mixed-128-copied pair 4/6 after: 382.716 us, verified
+formal: node mixed-128-copied pair 4/6 before: 488.558 us, verified
+formal: node late-128-shared pair 4/6 after: 50.466 us, verified
+formal: node late-128-shared pair 4/6 before: 127.075 us, verified
+formal: node mixed-128-shared pair 4/6 after: 66.775 us, verified
+formal: node mixed-128-shared pair 4/6 before: 85.311 us, verified
+formal: node mixed-128-shared pair 5/6 before: 96.412 us, verified
+formal: node mixed-128-shared pair 5/6 after: 63.111 us, verified
+formal: node late-128-shared pair 5/6 before: 81.865 us, verified
+formal: node late-128-shared pair 5/6 after: 45.652 us, verified
+formal: node mixed-128-copied pair 5/6 before: 446.172 us, verified
+formal: node mixed-128-copied pair 5/6 after: 380.743 us, verified
+formal: node late-128-copied pair 5/6 before: 94.229 us, verified
+formal: node late-128-copied pair 5/6 after: 51.395 us, verified
+formal: node early-map-128-control pair 5/6 before: 39.983 us, verified
+formal: node early-map-128-control pair 5/6 after: 37.632 us, verified
+formal: node small-four-control pair 5/6 before: 4.222 us, verified
+formal: node small-four-control pair 5/6 after: 2.981 us, verified
+formal: node single-map-shared pair 5/6 before: 1.010 us, verified
+formal: node single-map-shared pair 5/6 after: 0.897 us, verified
+formal: node single-late-shared pair 5/6 before: 1.396 us, verified
+formal: node single-late-shared pair 5/6 after: 1.513 us, verified
+formal: node single-map-copied pair 5/6 before: 11.750 us, verified
+formal: node single-map-copied pair 5/6 after: 9.310 us, verified
+formal: bun mixed-128-shared pair 5/6 before: 34.114 us, verified
+formal: bun mixed-128-shared pair 5/6 after: 30.014 us, verified
+formal: bun late-128-shared pair 5/6 before: 38.002 us, verified
+formal: bun late-128-shared pair 5/6 after: 15.369 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun mixed-128-copied pair 5/6 before: 140.792 us, verified
+formal: bun mixed-128-copied pair 5/6 after: 91.850 us, verified
+formal: bun late-128-copied pair 5/6 before: 62.274 us, verified
+formal: bun late-128-copied pair 5/6 after: 20.631 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun early-map-128-control pair 5/6 before: 33.740 us, verified
+formal: bun early-map-128-control pair 5/6 after: 23.271 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun small-four-control pair 5/6 before: 2.888 us, verified
+formal: bun small-four-control pair 5/6 after: 2.182 us, verified
+formal: bun single-map-shared pair 5/6 before: 1.317 us, verified
+formal: bun single-map-shared pair 5/6 after: 1.142 us, verified
+formal: bun single-late-shared pair 5/6 before: 1.435 us, verified
+formal: bun single-late-shared pair 5/6 after: 1.421 us, verified
+formal: bun single-map-copied pair 5/6 before: 12.621 us, verified
+formal: bun single-map-copied pair 5/6 after: 13.859 us, verified
+formal: bun single-map-copied pair 6/6 after: 9.173 us, verified
+formal: bun single-map-copied pair 6/6 before: 9.080 us, verified
+formal: bun single-late-shared pair 6/6 after: 1.299 us, verified
+formal: bun single-late-shared pair 6/6 before: 1.295 us, verified
+formal: bun single-map-shared pair 6/6 after: 1.180 us, verified
+formal: bun single-map-shared pair 6/6 before: 1.207 us, verified
+formal: bun small-four-control pair 6/6 after: 1.795 us, verified
+formal: bun small-four-control pair 6/6 before: 2.484 us, verified
+formal: bun early-map-128-control pair 6/6 after: 19.535 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun early-map-128-control pair 6/6 before: 33.452 us, verified
+formal: bun late-128-copied pair 6/6 after: 24.172 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun late-128-copied pair 6/6 before: 62.039 us, verified
+formal: bun mixed-128-copied pair 6/6 after: 130.814 us, verified
+formal: bun mixed-128-copied pair 6/6 before: 120.482 us, verified
+formal: bun late-128-shared pair 6/6 after: 20.510 us, verified
+formal: bun late-128-shared pair 6/6 before: 44.020 us, verified
+formal: bun mixed-128-shared pair 6/6 after: 36.302 us, verified
+formal: bun mixed-128-shared pair 6/6 before: 51.017 us, verified
+formal: node single-map-copied pair 6/6 after: 19.810 us, verified
+formal: node single-map-copied pair 6/6 before: 14.224 us, verified
+formal: node single-late-shared pair 6/6 after: 1.011 us, verified
+formal: node single-late-shared pair 6/6 before: 1.270 us, verified
+formal: node single-map-shared pair 6/6 after: 1.084 us, verified
+formal: node single-map-shared pair 6/6 before: 0.981 us, verified
+formal: node small-four-control pair 6/6 after: 3.309 us, verified
+formal: node small-four-control pair 6/6 before: 2.748 us, verified
+formal: node early-map-128-control pair 6/6 after: 35.306 us, verified
+formal: node early-map-128-control pair 6/6 before: 36.162 us, verified
+formal: node late-128-copied pair 6/6 after: 50.001 us, verified
+formal: node late-128-copied pair 6/6 before: 76.161 us, verified
+formal: node mixed-128-copied pair 6/6 after: 276.160 us, verified
+formal: node mixed-128-copied pair 6/6 before: 385.580 us, verified
+formal: node late-128-shared pair 6/6 after: 43.978 us, verified
+formal: node late-128-shared pair 6/6 before: 73.593 us, verified
+formal: node mixed-128-shared pair 6/6 after: 66.030 us, verified
+formal: node mixed-128-shared pair 6/6 before: 69.671 us, verified
+node mixed-128-shared: 67.284 -> 55.468 us, paired ratio 0.776 (0.681-0.885)
+node late-128-shared: 77.729 -> 41.744 us, paired ratio 0.487 (0.388-0.610)
+node mixed-128-copied: 383.630 -> 327.622 us, paired ratio 0.773 (0.592-1.010)
+node late-128-copied: 93.075 -> 48.463 us, paired ratio 0.543 (0.403-0.732)
+node early-map-128-control: 37.727 -> 34.776 us, paired ratio 0.905 (0.808-1.013)
+node small-four-control: 3.916 -> 2.429 us, paired ratio 0.694 (0.485-0.993)
+node single-map-shared: 0.987 -> 1.063 us, paired ratio 1.143 (0.863-1.516)
+node single-late-shared: 1.308 -> 1.082 us, paired ratio 0.862 (0.744-0.999)
+node single-map-copied: 12.987 -> 12.679 us, paired ratio 0.899 (0.559-1.447)
+bun mixed-128-shared: 37.641 -> 28.144 us, paired ratio 0.752 (0.651-0.869)
+bun late-128-shared: 38.749 -> 21.545 us, paired ratio 0.570 (0.411-0.791)
+bun mixed-128-copied: 119.443 -> 115.741 us, paired ratio 0.918 (0.706-1.193)
+bun late-128-copied: 56.956 -> 27.550 us, paired ratio 0.573 (0.362-0.906)
+bun early-map-128-control: 33.571 -> 20.943 us, paired ratio 0.656 (0.560-0.768)
+bun small-four-control: 2.827 -> 1.829 us, paired ratio 0.663 (0.554-0.794)
+bun single-map-shared: 1.248 -> 1.153 us, paired ratio 0.896 (0.827-0.970)
+bun single-late-shared: 1.426 -> 1.316 us, paired ratio 0.883 (0.665-1.171)
+bun single-map-copied: 9.225 -> 10.938 us, paired ratio 1.086 (0.911-1.296)

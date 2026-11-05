@@ -1,0 +1,18 @@
+aa: node early-map-128-control pair 1/4 before: 36.424 us, verified
+aa: node early-map-128-control pair 1/4 after: 37.636 us, verified
+aa: bun early-map-128-control pair 1/4 before: 33.589 us, verified
+aa: bun early-map-128-control pair 1/4 after: 29.742 us, verified
+aa: bun early-map-128-control pair 2/4 after: 26.545 us, verified
+aa: bun early-map-128-control pair 2/4 before: 41.274 us, verified
+aa: node early-map-128-control pair 2/4 after: 32.439 us, verified
+aa: node early-map-128-control pair 2/4 before: 38.695 us, verified
+aa: node early-map-128-control pair 3/4 before: 37.308 us, verified
+aa: node early-map-128-control pair 3/4 after: 33.222 us, verified
+aa: bun early-map-128-control pair 3/4 before: 24.621 us, verified
+aa: bun early-map-128-control pair 3/4 after: 34.472 us, verified
+aa: bun early-map-128-control pair 4/4 after: 23.348 us, verified
+aa: bun early-map-128-control pair 4/4 before: 26.082 us, verified
+aa: node early-map-128-control pair 4/4 after: 37.852 us, verified
+aa: node early-map-128-control pair 4/4 before: 36.212 us, verified
+node early-map-128-control: 36.866 -> 35.429 us, paired ratio 0.948 (0.796-1.128)
+bun early-map-128-control: 29.835 -> 28.143 us, paired ratio 0.919 (0.553-1.529)
