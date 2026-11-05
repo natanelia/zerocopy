@@ -1,0 +1,896 @@
+
+$ bun run build:wasm
+$ node scripts/build-wasm.mjs
+
+$ bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 236284 bytes
+
+$ bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+
+$ bun run typecheck
+$ tsc --noEmit
+
+$ bun run typecheck:redux
+$ tsc --noEmit -p tsconfig.redux.json
+
+$ bun run typecheck:values
+$ tsc --noEmit -p tsconfig.typed-values.json && tsc --noEmit -p tsconfig.typed-values.json --exactOptionalPropertyTypes false
+
+$ bun run typecheck:geometry
+$ tsc --noEmit -p tsconfig.geometry.json
+
+$ bun run test
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-integration
+
+
+ Test Files  58 passed (58)
+      Tests  1126 passed (1126)
+   Start at  18:46:29
+   Duration  40.62s (transform 1.44s, setup 0ms, import 2.41s, tests 143.65s, environment 14ms)
+
+
+$ node proofs/block-traversal-worker-check.mjs
+{
+  "module": "file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-integration/dist/shared.js",
+  "checks": [
+    {
+      "name": "SharedLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    }
+  ]
+}
+
+$ node proofs/ordered-map-projections-20261105/worker.mjs
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (shared).
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (copy).
+
+$ node proofs/tanstack-values-20261105/worker.mjs
+{"ok":true,"actualWorkers":2,"transports":["shared","copy"],"rows":257,"retainedAfterGrowth":true,"readOnly":true}
+
+$ node --test proofs/checkpoint-base64-20261105/correctness.mjs
+{"runtime":"node","mode":"auto","nativeAvailable":false,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"auto","nativeAvailable":true,"nativeCalls":13,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"fallback","nativeAvailable":true,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+✔ Node runtime path (154.113136ms)
+✔ Bun native runtime path (119.280268ms)
+✔ Bun forced portable fallback (139.434303ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 505.749713
+
+$ node --test proofs/list-batch-tail-20261105/worker.mjs
+✔ small bulk appends preserve active readers (shared) (88.409064ms)
+ℹ {"copy":false,"concurrentReads":35681,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+✔ small bulk appends preserve active readers (copy) (74.401821ms)
+ℹ {"copy":true,"concurrentReads":19585,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 253.203876
+
+$ node --test proofs/map-values-view/worker.mjs
+✔ paused primitive map values survive writer growth (shared) (76.304778ms)
+✔ paused primitive map values survive writer growth (copy) (81.683511ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 251.95334
+
+$ node proofs/redux-node.mjs
+{"node":"v24.22.1","packageExports":true,"sharedClassIdentity":true,"toolkit":true,"portableRestore":true}
+
+$ node --test scripts/check-docs.node.mjs
+✔ ignores fenced examples but retains surrounding prose (1.058586ms)
+✔ matches punctuation, duplicate headings, and explicit anchors (1.63902ms)
+✔ checks local links and anchors without fetching external URLs (1.430109ms)
+✔ compares numeric table rows as a multiset, without changing precision (0.361148ms)
+✔ strict CLI rejects changed rows and evidence, not documentation edits (853.582213ms)
+✔ strict CLI checks relocated benchmark reports against old and new layouts (527.251945ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1489.062342
+
+$ node scripts/check-docs.mjs --base 77599337867dbf785a5f0311d34637d0b36678fc --preserve
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (71 Markdown files).
+
+$ npm pack --dry-run --json
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[
+  {
+    "id": "zerocopy@0.2.1",
+    "name": "zerocopy",
+    "version": "0.2.1",
+    "size": 215986,
+    "unpackedSize": 1063087,
+    "shasum": "33afe73104ba47d612dfa77c0058195b9b090adf",
+    "integrity": "sha512-pfRA6wr0GPHrOa0HmLCGPR62kNEJqBjM9jGQbX/2FtPFU1ETxEDqwfH/a3JkcvrWcVgJKQTqgI3W9TkU4BnGlA==",
+    "filename": "zerocopy-0.2.1.tgz",
+    "files": [
+      {
+        "path": ".gitattributes",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "size": 7885,
+        "mode": 420
+      },
+      {
+        "path": "LICENSE",
+        "size": 1066,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 7253,
+        "mode": 420
+      },
+      {
+        "path": "REDUX.md",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "arena.ts",
+        "size": 46723,
+        "mode": 420
+      },
+      {
+        "path": "codec.ts",
+        "size": 3318,
+        "mode": 420
+      },
+      {
+        "path": "compaction.ts",
+        "size": 11302,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-89q5m7sv.js",
+        "size": 40829,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-531sbegw.js",
+        "size": 12955,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-a0ae8jyy.js",
+        "size": 43116,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-pssdgvrw.js",
+        "size": 84896,
+        "mode": 420
+      },
+      {
+        "path": "dist/chunk-r06m005t.js",
+        "size": 3185,
+        "mode": 420
+      },
+      {
+        "path": "dist/geometry.js",
+        "size": 2072,
+        "mode": 420
+      },
+      {
+        "path": "dist/numeric.js",
+        "size": 4303,
+        "mode": 420
+      },
+      {
+        "path": "dist/redux.js",
+        "size": 38180,
+        "mode": 420
+      },
+      {
+        "path": "dist/shared.js",
+        "size": 2141,
+        "mode": 420
+      },
+      {
+        "path": "dist/state.js",
+        "size": 224,
+        "mode": 420
+      },
+      {
+        "path": "dist/tanstack-db-collection.js",
+        "size": 3701,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/arena.d.ts",
+        "size": 5283,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/codec.d.ts",
+        "size": 677,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/compaction.d.ts",
+        "size": 6020,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/freeze-json.d.ts",
+        "size": 362,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry-runtime.d.ts",
+        "size": 405,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry-wasm.d.ts",
+        "size": 56,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/geometry.d.ts",
+        "size": 689,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/memory.d.ts",
+        "size": 515,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/numeric-wasm.d.ts",
+        "size": 68,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/numeric.d.ts",
+        "size": 1152,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/read-cache.d.ts",
+        "size": 945,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-checkpoint.d.ts",
+        "size": 1988,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-codec.d.ts",
+        "size": 2279,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-heap-codec.d.ts",
+        "size": 732,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-internal.d.ts",
+        "size": 1553,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux-jsan.d.ts",
+        "size": 678,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/redux.d.ts",
+        "size": 4339,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/set-key.d.ts",
+        "size": 223,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-doubly-linked-list.d.ts",
+        "size": 2449,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-linked-list.d.ts",
+        "size": 2160,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-list.d.ts",
+        "size": 2528,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-map.d.ts",
+        "size": 2853,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-ordered-map.d.ts",
+        "size": 2112,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-ordered-set.d.ts",
+        "size": 1097,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-priority-queue.d.ts",
+        "size": 2071,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-queue.d.ts",
+        "size": 1835,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-set.d.ts",
+        "size": 741,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-sorted-map.d.ts",
+        "size": 1879,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-sorted-set.d.ts",
+        "size": 1049,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared-stack.d.ts",
+        "size": 1534,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/shared.d.ts",
+        "size": 8603,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/state.d.ts",
+        "size": 232,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/tanstack-db-collection.d.ts",
+        "size": 3200,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/text-search.d.ts",
+        "size": 933,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/types.d.ts",
+        "size": 7285,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/utf8.d.ts",
+        "size": 493,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/wasm-utils.d.ts",
+        "size": 571,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-protocol.d.ts",
+        "size": 3614,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-redux.d.ts",
+        "size": 815,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker-tasks.d.ts",
+        "size": 3261,
+        "mode": 420
+      },
+      {
+        "path": "dist/types/worker.d.ts",
+        "size": 3055,
+        "mode": 420
+      },
+      {
+        "path": "dist/worker.js",
+        "size": 682,
+        "mode": 420
+      },
+      {
+        "path": "docs/api.md",
+        "size": 14374,
+        "mode": 420
+      },
+      {
+        "path": "docs/architecture.md",
+        "size": 7767,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/feature-memory-rss-eight.svg",
+        "size": 2335,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/feature-memory-rss.svg",
+        "size": 3625,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-readers.svg",
+        "size": 4481,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-retained.svg",
+        "size": 2570,
+        "mode": 420
+      },
+      {
+        "path": "docs/assets/memory-rss.svg",
+        "size": 2566,
+        "mode": 420
+      },
+      {
+        "path": "docs/benchmarks.md",
+        "size": 16654,
+        "mode": 420
+      },
+      {
+        "path": "docs/feature-map-memory.md",
+        "size": 8192,
+        "mode": 420
+      },
+      {
+        "path": "docs/geometry-performance.md",
+        "size": 9660,
+        "mode": 420
+      },
+      {
+        "path": "docs/geometry.md",
+        "size": 3757,
+        "mode": 420
+      },
+      {
+        "path": "docs/getting-started.md",
+        "size": 10164,
+        "mode": 420
+      },
+      {
+        "path": "docs/memory-comparison.md",
+        "size": 10411,
+        "mode": 420
+      },
+      {
+        "path": "docs/migration.md",
+        "size": 7293,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric-experiment-followup.md",
+        "size": 3061,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric-performance.md",
+        "size": 5160,
+        "mode": 420
+      },
+      {
+        "path": "docs/numeric.md",
+        "size": 2076,
+        "mode": 420
+      },
+      {
+        "path": "docs/primitive-scan-performance.md",
+        "size": 6128,
+        "mode": 420
+      },
+      {
+        "path": "docs/README.md",
+        "size": 2303,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux-checkpoints.md",
+        "size": 5558,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux-compatibility.md",
+        "size": 3592,
+        "mode": 420
+      },
+      {
+        "path": "docs/redux.md",
+        "size": 12276,
+        "mode": 420
+      },
+      {
+        "path": "docs/spatial-bulk-performance.md",
+        "size": 3663,
+        "mode": 420
+      },
+      {
+        "path": "docs/spatial-bulk.md",
+        "size": 2997,
+        "mode": 420
+      },
+      {
+        "path": "docs/tanstack.md",
+        "size": 3696,
+        "mode": 420
+      },
+      {
+        "path": "docs/task-quickstart.md",
+        "size": 3373,
+        "mode": 420
+      },
+      {
+        "path": "docs/text-search.md",
+        "size": 4539,
+        "mode": 420
+      },
+      {
+        "path": "docs/use-cases.md",
+        "size": 5275,
+        "mode": 420
+      },
+      {
+        "path": "docs/worker-sessions.md",
+        "size": 11018,
+        "mode": 420
+      },
+      {
+        "path": "docs/worker-sharing.md",
+        "size": 7799,
+        "mode": 420
+      },
+      {
+        "path": "docs/workers.md",
+        "size": 22987,
+        "mode": 420
+      },
+      {
+        "path": "doubly-linked-list.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "freeze-json.ts",
+        "size": 907,
+        "mode": 420
+      },
+      {
+        "path": "geometry-kernels.wasm",
+        "size": 571,
+        "mode": 420
+      },
+      {
+        "path": "geometry-runtime.ts",
+        "size": 1073,
+        "mode": 420
+      },
+      {
+        "path": "geometry-wasm.ts",
+        "size": 167,
+        "mode": 420
+      },
+      {
+        "path": "geometry.ts",
+        "size": 1166,
+        "mode": 420
+      },
+      {
+        "path": "linked-list.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "memory.ts",
+        "size": 1381,
+        "mode": 420
+      },
+      {
+        "path": "numeric-kernels-simd.wasm",
+        "size": 782,
+        "mode": 420
+      },
+      {
+        "path": "numeric-kernels.wasm",
+        "size": 720,
+        "mode": 420
+      },
+      {
+        "path": "numeric-wasm.ts",
+        "size": 372,
+        "mode": 420
+      },
+      {
+        "path": "numeric.ts",
+        "size": 3539,
+        "mode": 420
+      },
+      {
+        "path": "ordered-map.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 4029,
+        "mode": 420
+      },
+      {
+        "path": "persistent-core.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "priority-queue.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "read-cache.ts",
+        "size": 2598,
+        "mode": 420
+      },
+      {
+        "path": "redux-checkpoint.ts",
+        "size": 16961,
+        "mode": 420
+      },
+      {
+        "path": "redux-codec.ts",
+        "size": 14156,
+        "mode": 420
+      },
+      {
+        "path": "redux-heap-codec.ts",
+        "size": 3429,
+        "mode": 420
+      },
+      {
+        "path": "redux-internal.ts",
+        "size": 2382,
+        "mode": 420
+      },
+      {
+        "path": "redux-jsan.ts",
+        "size": 3514,
+        "mode": 420
+      },
+      {
+        "path": "redux.ts",
+        "size": 6625,
+        "mode": 420
+      },
+      {
+        "path": "set-key.ts",
+        "size": 478,
+        "mode": 420
+      },
+      {
+        "path": "shared-doubly-linked-list.ts",
+        "size": 6754,
+        "mode": 420
+      },
+      {
+        "path": "shared-linked-list.ts",
+        "size": 5857,
+        "mode": 420
+      },
+      {
+        "path": "shared-list.ts",
+        "size": 10795,
+        "mode": 420
+      },
+      {
+        "path": "shared-list.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "shared-map.ts",
+        "size": 6107,
+        "mode": 420
+      },
+      {
+        "path": "shared-map.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "shared-ordered-map.ts",
+        "size": 6295,
+        "mode": 420
+      },
+      {
+        "path": "shared-ordered-set.ts",
+        "size": 1789,
+        "mode": 420
+      },
+      {
+        "path": "shared-priority-queue.ts",
+        "size": 4614,
+        "mode": 420
+      },
+      {
+        "path": "shared-queue.ts",
+        "size": 4007,
+        "mode": 420
+      },
+      {
+        "path": "shared-set.ts",
+        "size": 1629,
+        "mode": 420
+      },
+      {
+        "path": "shared-sorted-map.ts",
+        "size": 4805,
+        "mode": 420
+      },
+      {
+        "path": "shared-sorted-set.ts",
+        "size": 2062,
+        "mode": 420
+      },
+      {
+        "path": "shared-stack.ts",
+        "size": 3064,
+        "mode": 420
+      },
+      {
+        "path": "shared.ts",
+        "size": 8421,
+        "mode": 420
+      },
+      {
+        "path": "singly-linked-list.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "sorted-tree.wasm",
+        "size": 26531,
+        "mode": 420
+      },
+      {
+        "path": "state.ts",
+        "size": 227,
+        "mode": 420
+      },
+      {
+        "path": "tanstack-db-collection.ts",
+        "size": 5614,
+        "mode": 420
+      },
+      {
+        "path": "text-search.ts",
+        "size": 6980,
+        "mode": 420
+      },
+      {
+        "path": "types.ts",
+        "size": 10963,
+        "mode": 420
+      },
+      {
+        "path": "utf8.ts",
+        "size": 1377,
+        "mode": 420
+      },
+      {
+        "path": "wasm-utils.ts",
+        "size": 1417,
+        "mode": 420
+      },
+      {
+        "path": "worker-protocol.ts",
+        "size": 9074,
+        "mode": 420
+      },
+      {
+        "path": "worker-redux.ts",
+        "size": 1084,
+        "mode": 420
+      },
+      {
+        "path": "worker-tasks.ts",
+        "size": 26617,
+        "mode": 420
+      },
+      {
+        "path": "worker.ts",
+        "size": 23752,
+        "mode": 420
+      }
+    ],
+    "entryCount": 143,
+    "bundled": []
+  }
+]
+
+$ bun run check:package
+$ node scripts/check-package.mjs
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Package zerocopy@0.2.1: 143 files, 215986 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.
