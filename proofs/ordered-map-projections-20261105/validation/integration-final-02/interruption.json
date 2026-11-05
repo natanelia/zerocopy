@@ -1,0 +1,6 @@
+{
+  "status": "interrupted",
+  "exitCode": 130,
+  "observedAt": "2026-11-05T01:10:34.271405+00:00",
+  "reason": "Vitest remained at the startup banner without any test result; interrupted before its runner timeout. No failing test result was emitted. Retry uses identical source and commands with private generated caches cleared."
+}

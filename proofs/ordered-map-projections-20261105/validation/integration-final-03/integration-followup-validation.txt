@@ -1,0 +1,24 @@
+
+$ bun run test
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-integration
+
+
+ Test Files  58 passed (58)
+      Tests  1127 passed (1127)
+   Start at  19:10:34
+   Duration  41.42s (transform 1.25s, setup 0ms, import 2.24s, tests 147.79s, environment 14ms)
+
+
+$ node proofs/block-callback-20261105/verify.mjs
+results/node-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/node-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+{"formalPairs":120,"screenPairs":40,"measuredBatches":2720,"allArchiveRoundTripsVerified":true}
+
+$ node scripts/check-docs.mjs --base 77599337867dbf785a5f0311d34637d0b36678fc --preserve
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (75 Markdown files).

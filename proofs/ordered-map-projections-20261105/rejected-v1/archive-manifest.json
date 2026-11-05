@@ -1,0 +1,45 @@
+{
+  "commit": "4e2455527ec3b18b5e8b05e7e1860e65964bd250",
+  "pilot": {
+    "path": "../results/pilot-v1.json.gz",
+    "rawBytes": 712391,
+    "rawSha256": "629e10d59561d246ed059b862c0b5411175b7085f6c756f522160803720098ec",
+    "storedBytes": 52759,
+    "storedSha256": "d262d6e87fbbfcb021c6ddabe37ca990c9a99bf4e77e646aa55ccc91bdff0a86",
+    "roundTripVerified": true
+  },
+  "files": {
+    "rejected-v1/benchmark.mjs": {
+      "bytes": 15792,
+      "sha256": "c57d4b68af94f8f1137f725995c89241eb3df25233369101ff8c6866d075dd25"
+    },
+    "rejected-v1/plan.md": {
+      "bytes": 5455,
+      "sha256": "a847ec832368da0d2bc94268f8a20606f309e713cd24b157cae65be711cf477d"
+    },
+    "rejected-v1/source/ci.yml": {
+      "bytes": 3845,
+      "sha256": "636d30c8f7dcb36da14a20428f9707da5776837bd0715453e440cfad5b910ee9"
+    },
+    "rejected-v1/source/shared-ordered-map.ts": {
+      "bytes": 6295,
+      "sha256": "d3959461eae2dffa5b047e23c0c3fbae220975ef13606fa69db33bfb2962b178"
+    },
+    "rejected-v1/worker.mjs": {
+      "bytes": 4015,
+      "sha256": "78749621bdf56efefa3f3c794e949caaa43c60e1bf3088881107aa709de22ec7"
+    },
+    "rejected-v1/workloads.mjs": {
+      "bytes": 5112,
+      "sha256": "ed210f10715f8ae540b73c59e36f06525d4119098214333f3ef6338413742ab4"
+    },
+    "rejected-v1/source/ordered-map-projections.test.ts.txt": {
+      "bytes": 12309,
+      "sha256": "9e25c6c3d84fec5f30ef45a2a30e0d400bf57e9abb995642a969c1e0ff367916"
+    },
+    "rejected-v1/source/map-projection.test.ts.txt": {
+      "bytes": 8904,
+      "sha256": "ce29b4b663e01d7eb3ed4eb567bb6711d95e15c6cc135cca337476f70b796c97"
+    }
+  }
+}
