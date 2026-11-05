@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "scripts/check-docs.mjs",
+    "--base",
+    "77599337867dbf785a5f0311d34637d0b36678fc",
+    "--preserve"
+  ],
+  "exit": 0,
+  "wallSeconds": 0.10401558876037598,
+  "logSha256": "ecf72e2b9aefef8a974f092bdcb1d3c97a5c1ad45479cc5111188df82d5d40e9"
+}

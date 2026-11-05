@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "decision": "rejected after complete cross-runtime pilot; no confirmation or runtime PR",
+  "files": {
+    "PLAN.md": {
+      "bytes": 8118,
+      "sha256": "670f88161fb276485e69331e0c4169fdba33f6ded8853a640dbdba122d3fa177"
+    },
+    "README.md": {
+      "bytes": 14012,
+      "sha256": "52e1d382e8b7ad8743d4e054ae1cf532cbcdf6b1668488b3a8406fce74e79f89"
+    },
+    "benchmark.mjs": {
+      "bytes": 15688,
+      "sha256": "02eb102890ad1ddebe47dbf16de8c2e5541999eee26382048b7c0a151d7c51aa"
+    },
+    "compatibility.mjs": {
+      "bytes": 5459,
+      "sha256": "42e069e97c7499c9bd14f1fddbc73c9e873f54929cf8c79776346dd0b2349972"
+    },
+    "fixtures.mjs": {
+      "bytes": 6996,
+      "sha256": "178c9468e585c7db8bdcf0783e2615b0bf21860301ce233e9c6f354cf6e35958"
+    },
+    "results/pilot-01.json.gz": {
+      "bytes": 94725,
+      "sha256": "1da0c725572dd31960be0e7827d22097bcc49edf87a7365071317166359f2bb3"
+    },
+    "review/independent-audit.py": {
+      "bytes": 15291,
+      "sha256": "8f4c505dd5f620a913a913b30415e7cc24a23236c4c5fe260db20cfd521d5dbf"
+    },
+    "review/independent-pilot.txt": {
+      "bytes": 2903,
+      "sha256": "136712be286a052ef7a36c0619aae803f1e97d7d1ede01fcfed22af20d33a119"
+    },
+    "review/independent-source-audit.txt": {
+      "bytes": 1008,
+      "sha256": "27304b4541e3f5cc36c702600e103869d3d0204686284548665f5c602a1b46c1"
+    },
+    "source/arena.ts.txt": {
+      "bytes": 45608,
+      "sha256": "b33f8f95e7d2e548bd9471effbb414cbe725d95ceea8208b1d7e6b26806c406f"
+    },
+    "source/numeric-key-scratch.test.ts.txt": {
+      "bytes": 6621,
+      "sha256": "d628e0b959586b2aab048ecc666e54f8811b634555bf50507160dbfe5de8d9ca"
+    },
+    "source/utf8.ts.txt": {
+      "bytes": 1377,
+      "sha256": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3"
+    },
+    "validation/baseline-build.json": {
+      "bytes": 11394,
+      "sha256": "bf7657b9364cf2d7c33f497be32ffdad3524011e38a6b2479f0a924421443698"
+    },
+    "validation/baseline-build.txt": {
+      "bytes": 257,
+      "sha256": "2e097ce0f96a9bdefea41d364b80ba1d9b84168506f267f030892296a40ad7db"
+    },
+    "validation/bun-compatibility-01.json": {
+      "bytes": 22359,
+      "sha256": "062d2ae17ea3ce5d9486e4bb00ac307390802f0397fdc7d18835ad2c8548d4c5"
+    },
+    "validation/docs-01.json": {
+      "bytes": 278,
+      "sha256": "eb2f53cd408f53960e358926c3e59bd20d514c086629c915e14031cf5c8e0afe"
+    },
+    "validation/docs-01.txt": {
+      "bytes": 148,
+      "sha256": "ecf72e2b9aefef8a974f092bdcb1d3c97a5c1ad45479cc5111188df82d5d40e9"
+    },
+    "validation/initial-01.json": {
+      "bytes": 4372,
+      "sha256": "c685278c47974ca38f7ab16b526f726d2547ef8560c2d526dc0bdcbab8a7c398"
+    },
+    "validation/initial-01.txt": {
+      "bytes": 2660,
+      "sha256": "ec07755f7a2b4bbe4548c13da961034c4b885bcd3b22591d7fef065e65f3c69e"
+    },
+    "validation/node-compatibility-01.json": {
+      "bytes": 21000,
+      "sha256": "9117f546908e2cabaf56075d4d34c2ecfea468cb40cf1957c416efe18552e39a"
+    },
+    "validation/packaging-01.json": {
+      "bytes": 501,
+      "sha256": "9e7cf23997d9bd547286e9a0765aaa7c8de7d249ddb24d8f8ee39ec95e1d910b"
+    },
+    "validation/packaging-02.json": {
+      "bytes": 1164,
+      "sha256": "d334de0019948d98df0e2cfdd0de9a84619ac3d7760a2bc09380885d8ee83f93"
+    },
+    "verify.mjs": {
+      "bytes": 14674,
+      "sha256": "5dd949a2a047708cb530c42bcdbd28b173527a25193450d9165e1a064894dbae"
+    },
+    "worker.mjs": {
+      "bytes": 5880,
+      "sha256": "94d84c70906a3f7816601491ec5290800281e52a52bbb0f39d40dca167dc4779"
+    }
+  },
+  "studies": [
+    {
+      "id": "pilot-01",
+      "path": "results/pilot-01.json.gz",
+      "phase": "pilot",
+      "measuredCommit": "ee80a1c2353a867f0efda4356d17b949ee16d0be",
+      "changedProduction": [
+        "arena.ts"
+      ],
+      "sources": {
+        "arena.ts": "source/arena.ts.txt",
+        "utf8.ts": "source/utf8.ts.txt",
+        "numeric-key-scratch.test.ts": "source/numeric-key-scratch.test.ts.txt"
+      },
+      "drivers": {
+        "benchmark.mjs": "benchmark.mjs",
+        "fixtures.mjs": "fixtures.mjs",
+        "worker.mjs": "worker.mjs",
+        "compatibility.mjs": "compatibility.mjs",
+        "PLAN.md": "PLAN.md"
+      },
+      "stored": {
+        "bytes": 94725,
+        "sha256": "1da0c725572dd31960be0e7827d22097bcc49edf87a7365071317166359f2bb3"
+      },
+      "raw": {
+        "bytes": 2048060,
+        "sha256": "0f3b1cade92e39f53eee64ccd9a672d0e81c5a5a00528856916eaf042a63689c"
+      }
+    }
+  ]
+}

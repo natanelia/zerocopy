@@ -1,0 +1,28 @@
+PASS saved pilot: 2048060 raw bytes; SHA-256 0f3b1cade92e39f53eee64ccd9a672d0e81c5a5a00528856916eaf042a63689c
+Native input digests, key unit/byte lengths, caps, initial/full-heap/descriptor storage equality, counts, warm-up and balanced process sequence verified.
+runtime | workload | before ms/operation | after ms/operation | paired after/before | pair ratios
+node | map-unicode-short | 0.650186783 | 0.354039117 | 0.543759025 | 0.508512270, 0.581448855
+node | map-unicode-medium | 0.718550020 | 0.544616571 | 0.758322778 | 0.765683485, 0.751032831
+node | map-unicode-one | 0.000505048 | 0.000283037 | 0.560088991 | 0.542976810, 0.577740470
+node | map-unicode-replace | 0.672890967 | 0.441094600 | 0.655323758 | 0.661242599, 0.649457897
+node | ordered-unicode-short | 0.670466583 | 0.451647850 | 0.672815487 | 0.700215011, 0.646488111
+node | sorted-unicode-short | 0.688378567 | 0.417596483 | 0.606789335 | 0.601776329, 0.611844102
+node | map-ascii-control | 0.252468350 | 0.252077300 | 0.998953331 | 1.058376241, 0.942866741
+node | map-long-fitting-control | 1.174675677 | 1.239487839 | 1.055172134 | 1.130569365, 0.984803115
+node | map-oversized-control | 1.973824107 | 1.890487417 | 0.963061597 | 0.878933211, 1.055242455
+node | map-json-control | 0.364535710 | 0.396168926 | 1.085678101 | 1.122102380, 1.050436181
+bun | map-unicode-short | 0.274519450 | 0.315355033 | 1.149166013 | 1.186218781, 1.113270627
+bun | map-unicode-medium | 0.391049318 | 0.401334336 | 1.026372659 | 1.030707530, 1.022056018
+bun | map-unicode-one | 0.000192478 | 0.000256557 | 1.355868800 | 1.070323689, 1.717592744
+bun | map-unicode-replace | 0.327837283 | 0.375996383 | 1.144529147 | 1.073110949, 1.220700403
+bun | ordered-unicode-short | 0.264158150 | 0.389255883 | 1.463726989 | 1.262596288, 1.696897668
+bun | sorted-unicode-short | 0.306396533 | 0.387531183 | 1.266199099 | 1.188300613, 1.349204183
+bun | map-ascii-control | 0.180501233 | 0.183204717 | 1.022486709 | 0.899811149, 1.161887216
+bun | map-long-fitting-control | 2.887178968 | 2.906613290 | 1.006974296 | 0.997369225, 1.016671867
+bun | map-oversized-control | 1.383678417 | 1.490005905 | 1.076579255 | 1.090443259, 1.062891520
+bun | map-json-control | 0.322494097 | 0.362598748 | 1.123112084 | 1.179344457, 1.069560928
+Verified 80 measured-process medians, 40 ratios, 20 rows, 560 measured batches; plus 40 calibrations and 2808 total timed warm/calibration/measured batches.
+Measured-subject recorded checks: calls=5038820, writes=33090560, output elements=54295480, retained base elements=141312. Untimed initial checks are separate.
+node: actual timed warm-up 150.234909–561.641756 ms; shortest batch 6.897803 ms; below-target batches 135/280.
+bun: actual timed warm-up 150.542989–787.719209 ms; shortest batch 4.642525 ms; below-target batches 171/280.
+No library import, build, unit test, performance measurement or source change was performed.

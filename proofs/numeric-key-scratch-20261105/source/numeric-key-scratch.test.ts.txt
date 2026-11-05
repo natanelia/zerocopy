@@ -1,0 +1,117 @@
+import { describe, expect, test } from 'vitest';
+import { Buffer } from 'node:buffer';
+import { Arena, HEAP_START, arenaOf } from './arena';
+import { SharedMap, SharedOrderedMap, SharedSortedMap, getWorkerData, initWorker } from './shared';
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const normalize = (key: string) => decoder.decode(encoder.encode(key));
+const compare = (a: string, b: string) => Buffer.compare(encoder.encode(a), encoder.encode(b));
+const fixtures = [
+  { name: 'map', create: (a: Arena) => new SharedMap('number', 0, 0, a) },
+  { name: 'ordered', create: (a: Arena) => new SharedOrderedMap('number', 0, 0, 0, 0, a) },
+  { name: 'sorted', create: (a: Arena) => new SharedSortedMap('number', undefined, 0, 0, a) },
+];
+const inputs = [
+  '', 'ascii', '\ufeffheader', 'a\0界🙂', '\ud800', '\udc00', '\ufffd',
+  'x\ud800y', 'x\udc00y', '\ue000', '🙂',
+  '界'.repeat(16381), '界'.repeat(16380) + '\ud800',
+  '界'.repeat(16379) + '🙂', 'é'.repeat(16382), 'a'.repeat(16381) + '界', '界'.repeat(16382),
+  '界'.repeat(16381) + 'a', '界'.repeat(16381) + 'aa',
+  'a'.repeat(49140) + '🙂', 'a'.repeat(49141) + '🙂',
+  '界'.repeat(49145),
+];
+
+function bytesEqual(a: Uint8Array, b: Uint8Array) {
+  expect(a.byteLength).toBe(b.byteLength);
+  expect(Buffer.compare(a, b)).toBe(0);
+}
+function verify(map: any, model: Map<string, number>, name: string) {
+  expect(map.size).toBe(model.size);
+  const expected = [...model];
+  const actual = [...map.entries()];
+  expect(actual.length).toBe(expected.length);
+  if (name === 'ordered') expect(actual).toEqual(expected);
+  else expect(actual.sort((a, b) => compare(a[0], b[0]))).toEqual(expected.sort((a, b) => compare(a[0], b[0])));
+  if (name === 'sorted') expect([...map.keys()]).toEqual([...model.keys()].sort(compare));
+  for (const [key, value] of model) expect(map.get(key)).toBe(value);
+  expect(Object.isFrozen(map)).toBe(true);
+}
+
+describe('bounded reusable numeric-key encoding', () => {
+  test.each(fixtures)('$name keeps exact Unicode keys, replacement equivalence and numeric values', ({ name, create }) => {
+    const arena = new Arena();
+    let map: any = create(arena), model = new Map<string, number>();
+    const specials = [0, -0, NaN, Infinity, -Infinity, 1.25];
+    for (const [index, key] of inputs.entries()) {
+      const value = specials[index % specials.length];
+      const before = map, beforeModel = new Map(model), end = arena.used;
+      const published = arena.buf.slice(HEAP_START, end);
+      map = map.set(key, value); model.set(normalize(key), value);
+      // Reuse the helper for another type before any key reads. No borrowed key
+      // bytes may be retained in a leaf or token after the numeric write.
+      arena.encode('object', { text: 'different🙂\ud800' });
+      expect(map.get(key)).toBe(value);
+      verify(before, beforeModel, name); verify(map, model, name);
+      bytesEqual(arena.buf.slice(HEAP_START, end), published);
+      const leaf = name === 'sorted' ? arena.radixFind(map.root, key) : arena.find(map.root, key);
+      const expected = encoder.encode(key);
+      expect(arena.dv.getUint32(leaf + 8, true)).toBe(expected.length);
+      bytesEqual(arena.buf.slice(leaf + 16, leaf + 16 + expected.length), expected);
+    }
+  });
+
+  test.each(fixtures)('$name preserves old snapshots, forks and readers through growth', async ({ name, create }) => {
+    const arena = new Arena();
+    let base: any = create(arena);
+    const expected = new Map<string, number>();
+    for (let i = 0; i < 96; i++) { const key = `路/${i}/🙂`; base = base.set(key, i); expected.set(key, i); }
+    const fork = base.set('fork\ud800', -0), forkExpected = new Map(expected).set('fork�', -0);
+    const attached = await initWorker(getWorkerData({ base, fork }, { copy: false }));
+    const end = arena.used, published = arena.buf.slice(HEAP_START, end), oldBuffer = arena.memory.buffer;
+    arena.memory.grow(2);
+    let next = base.set('界'.repeat(49145), 9);
+    const nextExpected = new Map(expected).set('界'.repeat(49145), 9);
+    next = next.set('after🙂', Infinity); nextExpected.set('after🙂', Infinity);
+    expect(arena.memory.buffer).not.toBe(oldBuffer);
+    bytesEqual(arena.buf.slice(HEAP_START, end), published);
+    for (const old of [base, attached.base]) verify(old, expected, name);
+    for (const old of [fork, attached.fork]) verify(old, forkExpected, name);
+    verify(next, nextExpected, name);
+    for (const copy of [false, true]) {
+      const readers = await initWorker(getWorkerData({ next }, { copy }));
+      verify(readers.next, nextExpected, name);
+      const owner = arenaOf(readers.next), used = owner.used, allBytes = owner.buf.slice(0, used);
+      expect(() => readers.next.set('blocked界', 4)).toThrow(/read-only/);
+      expect(owner.used).toBe(used); bytesEqual(owner.buf.slice(0, used), allBytes);
+    }
+  });
+
+  test.each(fixtures)('$name retains published bytes after allocation failure and retries safely', ({ name, create }) => {
+    const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+    const arena = new Arena({ memory });
+    let base: any = create(arena); const expected = new Map<string, number>();
+    for (let i = 0; i < 24; i++) { const key = `界/${i}`; base = base.set(key, i); expected.set(key, i); }
+    const mark = arena.used, published = arena.buf.slice(HEAP_START, mark);
+    arena.alloc(memory.buffer.byteLength - arena.used - 24);
+    expect(() => base.set('not-published🙂', 123)).toThrow();
+    bytesEqual(arena.buf.slice(HEAP_START, mark), published); verify(base, expected, name);
+    // Only unpublished test filler is rewound, as in the existing failure proof.
+    arena.wasm.setHeapEnd(mark);
+    const next = base.set('retry\ud800', 5);
+    verify(next, new Map(expected).set('retry�', 5), name);
+    expect(next.has('not-published🙂')).toBe(false);
+    bytesEqual(arena.buf.slice(HEAP_START, mark), published);
+  });
+
+  test.each(fixtures)('$name rejects invalid inputs before touching numeric scratch', ({ create }) => {
+    const arena = new Arena(), map: any = create(arena).set('kept界', 1);
+    const used = arena.used, bytes = arena.buf.slice(0, used);
+    let coerced = false;
+    const invalid = { toString() { coerced = true; return '界'; }, valueOf() { coerced = true; return 1; } };
+    expect(() => map.set(invalid, 1)).toThrow(TypeError);
+    expect(() => map.set('界', invalid)).toThrow(TypeError);
+    expect(coerced).toBe(false); expect(arena.used).toBe(used);
+    bytesEqual(arena.buf.slice(0, used), bytes);
+  });
+});

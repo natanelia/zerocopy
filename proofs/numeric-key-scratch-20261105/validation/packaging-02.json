@@ -1,0 +1,12 @@
+{
+  "phase": "packaging-only; no runtime change or measurement",
+  "failedLocalCommit": "48d6bce8b3e00ad0fad555b923e7b0706b080391",
+  "failure": "A byte-identical uncompressed raw JSON mirror reappeared after verified removal. The final ledger refresh asserted that it was absent and stopped. The surrounding shell lacked fail-fast behavior, so a later metadata commit included the raw mirror and stale provisional ledger. The saved verifier rejected the stale README identity before any publication.",
+  "observedRawBytes": 2048060,
+  "observedRawSha256": "0f3b1cade92e39f53eee64ccd9a672d0e81c5a5a00528856916eaf042a63689c",
+  "rootCauseOfMirrorReappearance": "unknown; bytes equal the independently audited recording",
+  "repair": "Remove the verified mirror from the index, select an explicit intended artifact list, derive the ledger from immutable staged blobs, require a successful verifier before commit and replay the final committed verifier from its own Git blobs before producing a publication manifest.",
+  "runtimeTestsAndCiRestoredTo": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "benchmarksRerun": false,
+  "sourcesOrTimingSamplesChanged": false
+}

@@ -1,0 +1,10 @@
+
+$ bun run build:wasm
+$ node scripts/build-wasm.mjs
+
+$ bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233073 bytes
+
+$ bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types

@@ -1,0 +1,106 @@
+{
+  "status": "complete",
+  "startedAt": 1793848505.0752175,
+  "head": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "sourceBefore": {
+    "arena.ts": "b33f8f95e7d2e548bd9471effbb414cbe725d95ceea8208b1d7e6b26806c406f",
+    "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "numeric-key-scratch.test.ts": "d628e0b959586b2aab048ecc666e54f8811b634555bf50507160dbfe5de8d9ca",
+    "proofs/numeric-key-scratch-20261105/fixtures.mjs": "178c9468e585c7db8bdcf0783e2615b0bf21860301ce233e9c6f354cf6e35958",
+    "proofs/numeric-key-scratch-20261105/compatibility.mjs": "42e069e97c7499c9bd14f1fddbc73c9e873f54929cf8c79776346dd0b2349972",
+    "proofs/numeric-key-scratch-20261105/PLAN.md": "670f88161fb276485e69331e0c4169fdba33f6ded8853a640dbdba122d3fa177",
+    "proofs/numeric-key-scratch-20261105/worker.mjs": "94d84c70906a3f7816601491ec5290800281e52a52bbb0f39d40dca167dc4779",
+    "proofs/numeric-key-scratch-20261105/benchmark.mjs": "02eb102890ad1ddebe47dbf16de8c2e5541999eee26382048b7c0a151d7c51aa"
+  },
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:wasm"
+      ],
+      "exit": 0,
+      "wallSeconds": 4.9497971534729
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:browser"
+      ],
+      "exit": 0,
+      "wallSeconds": 0.025699853897094727
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:types"
+      ],
+      "exit": 0,
+      "wallSeconds": 1.9782226085662842
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck"
+      ],
+      "exit": 0,
+      "wallSeconds": 1.753941535949707
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "test",
+        "numeric-key-scratch.test.ts",
+        "utf8-write.test.ts",
+        "map-set-index.test.ts"
+      ],
+      "exit": 0,
+      "wallSeconds": 4.38684344291687
+    },
+    {
+      "command": [
+        "node",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/compatibility.mjs",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/validation/node-compatibility-01.json"
+      ],
+      "exit": 0,
+      "wallSeconds": 0.40375852584838867
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/compatibility.mjs",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/validation/bun-compatibility-01.json"
+      ],
+      "exit": 0,
+      "wallSeconds": 0.18764042854309082
+    },
+    {
+      "command": [
+        "node",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/worker.mjs",
+        "/workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js"
+      ],
+      "exit": 0,
+      "wallSeconds": 0.35036230087280273
+    }
+  ],
+  "sourceAfter": {
+    "arena.ts": "b33f8f95e7d2e548bd9471effbb414cbe725d95ceea8208b1d7e6b26806c406f",
+    "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "numeric-key-scratch.test.ts": "d628e0b959586b2aab048ecc666e54f8811b634555bf50507160dbfe5de8d9ca",
+    "proofs/numeric-key-scratch-20261105/fixtures.mjs": "178c9468e585c7db8bdcf0783e2615b0bf21860301ce233e9c6f354cf6e35958",
+    "proofs/numeric-key-scratch-20261105/compatibility.mjs": "42e069e97c7499c9bd14f1fddbc73c9e873f54929cf8c79776346dd0b2349972",
+    "proofs/numeric-key-scratch-20261105/PLAN.md": "670f88161fb276485e69331e0c4169fdba33f6ded8853a640dbdba122d3fa177",
+    "proofs/numeric-key-scratch-20261105/worker.mjs": "94d84c70906a3f7816601491ec5290800281e52a52bbb0f39d40dca167dc4779",
+    "proofs/numeric-key-scratch-20261105/benchmark.mjs": "02eb102890ad1ddebe47dbf16de8c2e5541999eee26382048b7c0a151d7c51aa"
+  },
+  "finishedAt": 1793848519.1189039,
+  "logSha256": "ec07755f7a2b4bbe4548c13da961034c4b885bcd3b22591d7fef065e65f3c69e"
+}

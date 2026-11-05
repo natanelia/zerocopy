@@ -1,0 +1,10 @@
+{
+  "reason": "Remove only the byte-identical raw duplicate after independent arithmetic and live-identity audits; complete raw bytes remain losslessly gzip archived.",
+  "removedPath": "results/pilot-01.json",
+  "rawBytes": 2048060,
+  "rawSha256": "0f3b1cade92e39f53eee64ccd9a672d0e81c5a5a00528856916eaf042a63689c",
+  "storedPath": "results/pilot-01.json.gz",
+  "storedBytes": 94725,
+  "storedSha256": "1da0c725572dd31960be0e7827d22097bcc49edf87a7365071317166359f2bb3",
+  "roundTripVerified": true
+}

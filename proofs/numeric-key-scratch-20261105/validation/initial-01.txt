@@ -1,0 +1,26 @@
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:wasm
+$ node scripts/build-wasm.mjs
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233287 bytes
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+$ /workspace/scratch/83f1d4baba1f/tools/bun run typecheck
+$ tsc --noEmit
+$ /workspace/scratch/83f1d4baba1f/tools/bun run test numeric-key-scratch.test.ts utf8-write.test.ts map-set-index.test.ts
+$ bun --bun node_modules/vitest/vitest.mjs run numeric-key-scratch.test.ts "utf8-write.test.ts" map-set-index.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch
+
+
+ Test Files  3 passed (3)
+      Tests  83 passed (83)
+   Start at  21:15:14
+   Duration  4.11s (transform 1.61s, setup 0ms, import 1.79s, tests 5.59s, environment 0ms)
+
+$ node /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/compatibility.mjs /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/validation/node-compatibility-01.json
+{"status":"complete","runtime":"node","freshProcesses":3,"capability":{"sharedEncodeInto":true,"read":4,"written":10}}
+$ /workspace/scratch/83f1d4baba1f/tools/bun /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/compatibility.mjs /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/validation/bun-compatibility-01.json
+{"status":"complete","runtime":"bun","freshProcesses":3,"capability":{"sharedEncodeInto":true,"read":4,"written":10}}
+$ node /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/proofs/numeric-key-scratch-20261105/worker.mjs /workspace/scratch/83f1d4baba1f/zerocopy-r4-key-scratch/dist/shared.js
+{"status":"complete","workers":[{"phase":"complete","checks":147,"transport":"shared"},{"phase":"complete","checks":147,"transport":"copy"}],"runtime":{"node":"24.22.1","acorn":"8.18.0","ada":"4.0.0","amaro":"1.1.11","ares":"1.34.9","brotli":"1.2.0","cldr":"48.0","icu":"78.3","llhttp":"9.4.3","merve":"1.2.2","modules":"137","napi":"10","nbytes":"0.1.4","ncrypto":"0.0.1","nghttp2":"1.70.0","nghttp3":"","ngtcp2":"","openssl":"3.5.9","simdjson":"4.6.11","simdutf":"6.4.0","sqlite":"3.53.4","tz":"2026e","undici":"7.30.1","unicode":"17.0","uv":"1.52.1","uvwasi":"0.0.23","v8":"13.6.233.17-node.58","zlib":"1.3.2.1-motley-285e94b","zstd":"1.5.7"}}

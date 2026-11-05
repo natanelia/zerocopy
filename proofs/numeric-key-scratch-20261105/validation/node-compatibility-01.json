@@ -1,0 +1,760 @@
+{
+  "status": "complete",
+  "startedAt": "2026-11-05T03:15:18.235Z",
+  "processes": [
+    {
+      "mode": "native",
+      "status": 0,
+      "stderr": "",
+      "result": {
+        "status": "complete",
+        "mode": "native",
+        "runtime": "node",
+        "versions": {
+          "node": "24.22.1",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.9",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "137",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "3.5.9",
+          "simdjson": "4.6.11",
+          "simdutf": "6.4.0",
+          "sqlite": "3.53.4",
+          "tz": "2026e",
+          "undici": "7.30.1",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "13.6.233.17-node.58",
+          "zlib": "1.3.2.1-motley-285e94b",
+          "zstd": "1.5.7"
+        },
+        "capability": {
+          "sharedEncodeInto": true,
+          "read": 4,
+          "written": 10
+        },
+        "observations": [
+          {
+            "collection": "SharedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-over-limit",
+            "encoded": 4,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          }
+        ],
+        "storage": [
+          {
+            "collection": "SharedMap",
+            "descriptor": {
+              "root": 328008,
+              "valueType": "number",
+              "size": 8
+            },
+            "used": 328020,
+            "payloadSha256": "9c32c7d4ae0eaf52491379e28593f0f4d0e3f974b9ff4e4411895cfb0af3297b"
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "descriptor": {
+              "root": 328112,
+              "head": 328128,
+              "tail": 8,
+              "size": 8,
+              "valueType": "number",
+              "orderStable": true
+            },
+            "used": 328136,
+            "payloadSha256": "31721b02f84b97b573ea832f640148036ab3fdb61e614c39048770921c10978a"
+          },
+          {
+            "collection": "SharedSortedMap",
+            "descriptor": {
+              "root": 328128,
+              "size": 8,
+              "valueType": "number"
+            },
+            "used": 328152,
+            "payloadSha256": "79ca8819a02b2bf4e32d1612da41d8882bd02892107a7ee43d8e306cbef97b5e"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "missing-encodeInto",
+      "status": 0,
+      "stderr": "",
+      "result": {
+        "status": "complete",
+        "mode": "missing-encodeInto",
+        "runtime": "node",
+        "versions": {
+          "node": "24.22.1",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.9",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "137",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "3.5.9",
+          "simdjson": "4.6.11",
+          "simdutf": "6.4.0",
+          "sqlite": "3.53.4",
+          "tz": "2026e",
+          "undici": "7.30.1",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "13.6.233.17-node.58",
+          "zlib": "1.3.2.1-motley-285e94b",
+          "zstd": "1.5.7"
+        },
+        "capability": {
+          "sharedEncodeInto": true,
+          "read": 4,
+          "written": 10
+        },
+        "observations": [
+          {
+            "collection": "SharedMap",
+            "name": "short",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-pair",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-lone",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "after-overflow",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "short",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-pair",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-lone",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-over-limit",
+            "encoded": 4,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "after-overflow",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "short",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-pair",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-lone",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "after-overflow",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          }
+        ],
+        "storage": [
+          {
+            "collection": "SharedMap",
+            "descriptor": {
+              "root": 328008,
+              "valueType": "number",
+              "size": 8
+            },
+            "used": 328020,
+            "payloadSha256": "9c32c7d4ae0eaf52491379e28593f0f4d0e3f974b9ff4e4411895cfb0af3297b"
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "descriptor": {
+              "root": 328112,
+              "head": 328128,
+              "tail": 8,
+              "size": 8,
+              "valueType": "number",
+              "orderStable": true
+            },
+            "used": 328136,
+            "payloadSha256": "31721b02f84b97b573ea832f640148036ab3fdb61e614c39048770921c10978a"
+          },
+          {
+            "collection": "SharedSortedMap",
+            "descriptor": {
+              "root": 328128,
+              "size": 8,
+              "valueType": "number"
+            },
+            "used": 328152,
+            "payloadSha256": "79ca8819a02b2bf4e32d1612da41d8882bd02892107a7ee43d8e306cbef97b5e"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "reject-shared-destination",
+      "status": 0,
+      "stderr": "",
+      "result": {
+        "status": "complete",
+        "mode": "reject-shared-destination",
+        "runtime": "node",
+        "versions": {
+          "node": "24.22.1",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.9",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.3",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "137",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "3.5.9",
+          "simdjson": "4.6.11",
+          "simdutf": "6.4.0",
+          "sqlite": "3.53.4",
+          "tz": "2026e",
+          "undici": "7.30.1",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "13.6.233.17-node.58",
+          "zlib": "1.3.2.1-motley-285e94b",
+          "zstd": "1.5.7"
+        },
+        "capability": {
+          "sharedEncodeInto": true,
+          "read": 4,
+          "written": 10
+        },
+        "observations": [
+          {
+            "collection": "SharedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "native-over-limit",
+            "encoded": 4,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "short",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-limit",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-pair",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "eligible-lone",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-fitting",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-byte-limit",
+            "encoded": 1,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "native-over-limit",
+            "encoded": 3,
+            "into": 0,
+            "ordinaryDestinations": 0
+          },
+          {
+            "collection": "SharedSortedMap",
+            "name": "after-overflow",
+            "encoded": 0,
+            "into": 1,
+            "ordinaryDestinations": 1
+          }
+        ],
+        "storage": [
+          {
+            "collection": "SharedMap",
+            "descriptor": {
+              "root": 328008,
+              "valueType": "number",
+              "size": 8
+            },
+            "used": 328020,
+            "payloadSha256": "9c32c7d4ae0eaf52491379e28593f0f4d0e3f974b9ff4e4411895cfb0af3297b"
+          },
+          {
+            "collection": "SharedOrderedMap",
+            "descriptor": {
+              "root": 328112,
+              "head": 328128,
+              "tail": 8,
+              "size": 8,
+              "valueType": "number",
+              "orderStable": true
+            },
+            "used": 328136,
+            "payloadSha256": "31721b02f84b97b573ea832f640148036ab3fdb61e614c39048770921c10978a"
+          },
+          {
+            "collection": "SharedSortedMap",
+            "descriptor": {
+              "root": 328128,
+              "size": 8,
+              "valueType": "number"
+            },
+            "used": 328152,
+            "payloadSha256": "79ca8819a02b2bf4e32d1612da41d8882bd02892107a7ee43d8e306cbef97b5e"
+          }
+        ]
+      }
+    }
+  ],
+  "completedAt": "2026-11-05T03:15:18.570Z"
+}

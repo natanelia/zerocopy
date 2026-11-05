@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "scope": "Read-only hashes of the completed pilot measured trees and frozen proof files; no library import, build, test or timing.",
+  "rawBytes": 2048060,
+  "rawSha256": "0f3b1cade92e39f53eee64ccd9a672d0e81c5a5a00528856916eaf042a63689c",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "candidate": "ee80a1c2353a867f0efda4356d17b949ee16d0be",
+  "existingFileHashesChecked": 283,
+  "absentOptionalPathsChecked": 4,
+  "driverHashesChecked": 5,
+  "groups": {
+    "baseline": {
+      "production": 59,
+      "tests": 53,
+      "support": 6,
+      "wasm": 12,
+      "bundles": 12,
+      "ci": 1
+    },
+    "candidate": {
+      "production": 59,
+      "tests": 54,
+      "support": 6,
+      "wasm": 12,
+      "bundles": 12,
+      "ci": 1
+    }
+  },
+  "arenaHashes": {
+    "baseline": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+    "candidate": "b33f8f95e7d2e548bd9471effbb414cbe725d95ceea8208b1d7e6b26806c406f"
+  },
+  "allWasmFilesUnchanged": true
+}
