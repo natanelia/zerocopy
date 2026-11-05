@@ -8,18 +8,22 @@ import {
   hashBytes,
   vectorDepth,
   arenaOf,
-  Arena
-} from "./chunk-naz6wrqq.js";
+  Snapshot,
+  Arena,
+  primitiveReadProtocol
+} from "./chunk-sbahvxa1.js";
 import {
   SharedMap2
-} from "./chunk-frvxra5e.js";
+} from "./chunk-vb9htdwy.js";
 import {
   SharedList2
-} from "./chunk-5qfqrsqm.js";
+} from "./chunk-eg3tkaph.js";
 import {
   SharedSet2,
   SharedStack2,
+  stackReadProtocol,
   SharedQueue2,
+  queueReadProtocol,
   SharedLinkedList2,
   SharedDoublyLinkedList2,
   SharedOrderedMap2,
@@ -29,10 +33,10 @@ import {
   SharedPriorityQueue2,
   compactMany2,
   getWorkerData2
-} from "./chunk-jvqhy0ph.js";
+} from "./chunk-gar6as5k.js";
 import {
   createSharedSession2
-} from "./chunk-n9d6bkps.js";
+} from "./chunk-wejmnps7.js";
 
 // redux-heap-codec.ts
 function readReduxHeap(heap, encode) {
@@ -102,6 +106,38 @@ function restoreReduxHeap(rows, type, isMaxHeap, arena, decode, check) {
     view.setUint32(p + 28, sizes[i], true);
   }
   return new SharedPriorityQueue2(type, { root, size: rows.length, isMaxHeap }, arena);
+}
+
+// redux-sequence-codec.ts
+function readReduxPrimitiveSequence(kind, sequence, encode, items) {
+  if (sequence.size < 32 || sequence.valueType !== "number" && sequence.valueType !== "boolean")
+    return false;
+  const reads = kind === "SharedStack" ? stackReadProtocol : queueReadProtocol, prototype = reads.prototype;
+  if (Object.getOwnPropertyDescriptor(prototype, "peek")?.value !== reads.peek || Object.getOwnPropertyDescriptor(prototype, reads.nextName)?.value !== reads.next || Object.getOwnPropertyDescriptor(prototype, "isEmpty")?.get !== reads.empty || Object.getPrototypeOf(prototype) !== Snapshot.prototype || Object.hasOwn(prototype, "arena") || Object.getOwnPropertyDescriptor(Snapshot.prototype, "arena")?.get !== primitiveReadProtocol.owner)
+    return false;
+  const arena = arenaOf(sequence);
+  if (Object.getPrototypeOf(arena) !== Arena.prototype || Object.hasOwn(arena, "decode") || Object.hasOwn(arena, "dv") || Object.hasOwn(arena, "refresh") || Object.getOwnPropertyDescriptor(Arena.prototype, "decode")?.value !== primitiveReadProtocol.decode || Object.getOwnPropertyDescriptor(Arena.prototype, "dv")?.get !== primitiveReadProtocol.view || Object.getOwnPropertyDescriptor(Arena.prototype, "refresh")?.value !== primitiveReadProtocol.refresh)
+    return false;
+  const isNumber = sequence.valueType === "number";
+  if (kind === "SharedStack") {
+    const stack = sequence;
+    let value = stack.peek(), head = stack.head;
+    const view = arena.dv;
+    for (let i = 0;i < stack.size; i++) {
+      items.push(encode(value));
+      head = view.getUint32(head, true);
+      const raw = head ? view.getFloat64(head + 8, true) : 0;
+      value = isNumber ? raw : raw !== 0;
+    }
+  } else {
+    const queue = sequence, end = queue.tail + queue.size;
+    const tailStart = end - 1 & ~31, view = arena.dv;
+    for (let i = queue.tail;i < end; i++) {
+      const raw = i >= tailStart ? view.getFloat64(queue.block + (i - tailStart) * 8, true) : arena.wasm.vecGet(queue.head, queue.depth, i);
+      items.push(encode(isNumber ? raw : raw !== 0));
+    }
+  }
+  return true;
 }
 
 // redux-codec.ts
@@ -272,16 +308,22 @@ function createZerocopyCodec(options = {}) {
               readReduxHeap(collection, (item) => walk(item, depth + 1))
             ];
           } else if (kind === "SharedStack") {
-            let cursor = collection;
-            while (!cursor.isEmpty) {
-              items.push(walk(cursor.peek(), depth + 1));
-              cursor = cursor.pop();
+            const stack = collection;
+            if (stack.size < 32 || stack.valueType !== "number" && stack.valueType !== "boolean" || !readReduxPrimitiveSequence(kind, stack, (item) => walk(item, depth + 1), items)) {
+              let cursor = stack;
+              while (!cursor.isEmpty) {
+                items.push(walk(cursor.peek(), depth + 1));
+                cursor = cursor.pop();
+              }
             }
           } else if (kind === "SharedQueue") {
-            let cursor = collection;
-            while (!cursor.isEmpty) {
-              items.push(walk(cursor.peek(), depth + 1));
-              cursor = cursor.dequeue();
+            const queue = collection;
+            if (queue.size < 32 || queue.valueType !== "number" && queue.valueType !== "boolean" || !readReduxPrimitiveSequence(kind, queue, (item) => walk(item, depth + 1), items)) {
+              let cursor = queue;
+              while (!cursor.isEmpty) {
+                items.push(walk(cursor.peek(), depth + 1));
+                cursor = cursor.dequeue();
+              }
             }
           } else
             collection.forEach((item) => items.push(walk(item, depth + 1)));
@@ -764,6 +806,64 @@ function decodeZerocopyState(input, options = {}) {
   }
   let nodes = 0;
   const active = new WeakSet;
+  const validate = (node, depth) => {
+    if (++nodes > bound.maxNodes || depth > bound.maxDepth)
+      fail2("state tree exceeds codec limits");
+    if (!Array.isArray(node) || active.has(node))
+      fail2("invalid or cyclic state node");
+    const tag = node[0], value = node[1];
+    if (tag === "null" && node.length === 1)
+      return;
+    if (tag === "undefined" && node.length === 1)
+      return;
+    if (node.length !== 2)
+      fail2("invalid state node length");
+    if (tag === "string" && typeof value === "string")
+      return;
+    if (tag === "boolean" && typeof value === "boolean")
+      return;
+    if (tag === "number") {
+      if (typeof value === "number" && Number.isFinite(value))
+        return;
+      if (value === "NaN" || value === "+Infinity" || value === "-Infinity" || value === "-0")
+        return;
+      fail2("invalid number node");
+    }
+    if (tag === "snapshot" && typeof value === "string" && descriptors.has(value))
+      return;
+    const array = tag === "array" && Array.isArray(value);
+    const object = (tag === "object" || tag === "null-object") && Array.isArray(value);
+    if (!array && !object)
+      fail2("unknown or invalid state node");
+    active.add(node);
+    try {
+      if (array) {
+        if (value.length > bound.maxNodes)
+          fail2("array exceeds codec limits");
+        const length = value.length;
+        if (typeof length === "number" && length !== length >>> 0)
+          new Array(length);
+        for (let i = 0;i < value.length; i++) {
+          if (Array.isArray(value[i]) && value[i].length === 1 && value[i][0] === "hole") {
+            if (++nodes > bound.maxNodes)
+              fail2("state tree exceeds codec limits");
+          } else
+            validate(value[i], depth + 1);
+        }
+        return;
+      }
+      const keys = Object.create(null);
+      for (const pair of value) {
+        if (!Array.isArray(pair) || pair.length !== 2 || typeof pair[0] !== "string" || Object.hasOwn(keys, pair[0]))
+          fail2("invalid object entry");
+        const key = pair[0];
+        validate(pair[1], depth + 1);
+        keys[key] = undefined;
+      }
+    } finally {
+      active.delete(node);
+    }
+  };
   const walk = (node, depth, resolve) => {
     if (++nodes > bound.maxNodes || depth > bound.maxDepth)
       fail2("state tree exceeds codec limits");
@@ -824,7 +924,7 @@ function decodeZerocopyState(input, options = {}) {
       active.delete(node);
     }
   };
-  walk(input.tree, 0);
+  validate(input.tree, 0);
   const arenas = new Map;
   for (const [id, data] of copies)
     arenas.set(id, new Arena({ ...data, id, readOnly: true }));
