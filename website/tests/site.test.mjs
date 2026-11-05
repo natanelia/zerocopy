@@ -135,14 +135,20 @@ test('the catalog is the sole live comparison and old workloads stay historical'
   }
 });
 
-test('benchmark pages disclose their worker copy strategies and retain method context', () => {
+test('benchmark pages disclose copy strategies while preserving the original catalog layout', () => {
   const catalog = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
-  for (const text of ['incremental copy', 'full copy', 'only changed pairs', 'entire current catalog', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference', '49 measured samples']) assert.ok(catalog.includes(text), text);
+  for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
+  assert.match(catalog, /<h1>One product catalog\.<br>Four implementations\.<\/h1>/);
+  assert.doesNotMatch(catalog, /feature-benchmark-preview|data-preview-case|feature-preview-status/);
+  assert.ok(catalog.includes('<div id="feature-benchmark-results" aria-live="polite"></div>'));
+  const css = readFileSync(join(out, 'assets/feature.css'), 'utf8');
+  assert.doesNotMatch(css, /feature-benchmark-preview|feature-preview-status/);
   const historical = readFileSync(join(out, 'historical/log-benchmark/index.html'), 'utf8');
   for (const text of ['incremental copy', 'full copy', '42 measured samples', 'Queries use data already attached']) assert.ok(historical.includes(text), text);
   const live = readFileSync(join(out, 'compare/index.html'), 'utf8');
-  assert.equal((live.match(/INCREMENTAL COPY/g) ?? []).length, 3);
-  assert.match(live, /Incremental copy baseline/);
+  assert.equal((live.match(/LOCAL REPLICAS/g) ?? []).length, 3);
+  assert.equal((live.match(/Edits clone only 100 changed ID\/object pairs\./g) ?? []).length, 3);
+  assert.doesNotMatch(live, /Incremental copy baseline/);
   const logLive = readFileSync(join(out, 'historical/log-compare/index.html'), 'utf8');
   assert.match(logLive, /Incremental copy is the default/);
   assert.match(logLive, /Full copy · all events every update/);

@@ -15,22 +15,7 @@ function summarize(values) {
   const sorted = [...values].sort((a, b) => a - b);
   return { median: sorted[3], min: sorted[0], max: sorted[6], p25: (sorted[1] + sorted[2]) / 2, p75: (sorted[4] + sorted[5]) / 2 };
 }
-function clearPreview(message = 'Not measured on this device yet.') {
-  for (const row of document.querySelectorAll('[data-preview-case]')) {
-    row.querySelector('[data-preview-ms]').textContent = '—';
-    row.querySelector('.feature-timing-fill').style.width = '0%';
-  }
-  $('feature-preview-status').textContent = message;
-}
 function render(value) {
-  const maxUpdate = Math.max(.001, ...BENCHMARK_CASES.map(({ id }) => value.summary[id].updatePublicationMs.median));
-  for (const { id } of BENCHMARK_CASES) {
-    const row = document.querySelector(`[data-preview-case="${id}"]`);
-    const median = value.summary[id].updatePublicationMs.median;
-    row.querySelector('[data-preview-ms]').textContent = `${median.toFixed(2)} ms`;
-    row.querySelector('.feature-timing-fill').style.width = `${median / maxUpdate * 100}%`;
-  }
-  $('feature-preview-status').textContent = 'Measured in this browser: median replace + publication time, seven samples per case.';
   const fragment = document.createDocumentFragment();
   for (const [phase, label] of Object.entries(PHASES)) {
     const section = document.createElement('section'); section.className = 'feature-timing-group'; section.dataset.phase = phase;
@@ -79,7 +64,7 @@ async function sample({ id, kind, updateMode }, count, token) {
 $('feature-benchmark-form').addEventListener('submit', async event => {
   event.preventDefault(); if (running || !ready) return;
   const token = ++generation, count = Number($('feature-count').value), raw = [];
-  result = undefined; running = true; controls(); $('feature-benchmark-results').replaceChildren(); clearPreview('Measuring seven cases; timings appear only after the full run passes.');
+  result = undefined; running = true; controls(); $('feature-benchmark-results').replaceChildren();
   try {
     for (let round = 0; round < WARMUPS + SAMPLES; round++) {
       for (let offset = 0; offset < BENCHMARK_CASES.length; offset++) {
@@ -103,12 +88,11 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
       method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. The four baseline cases (shared snapshots and three incremental-copy implementations) measure all nine phases; three additional full-copy cases measure ONLY editPublicationMs and updatePublicationMs. All full-copy cases must still build and load the same catalog, update the same 100 objects and verify current and retained answers, but do not record redundant construction or query phases. Initial replica publication always clones the full catalog. Incremental edits clone only the 100 changed pairs, whereas full edits clone the entire updated dataset to each reader including encoding, reconstruction/freezing and both acknowledgements. SharedMap publishes shared descriptors. Owner updates are identical between copy modes; Native copies its index once to retain the initial revision. Publication counts are logical product deliveries, not bytes or local copy counts. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Cases rotate; all warmups and samples retained. No DOM paint or memory measurement.',
       summary: Object.fromEntries(cases.map(({ id, measuredPhases }) => [id, Object.fromEntries(measuredPhases.map(phase => [phase, summarize(measured.filter(record => record.caseId === id).map(record => record[phase]))]))])), raw };
     render(result); $('feature-benchmark-status').textContent = `Complete. All ${SAMPLES * BENCHMARK_CASES.length} measured samples and ${WARMUPS * BENCHMARK_CASES.length} warm-ups passed current and retained-revision checks.`;
-  } catch (error) { if (token === generation) { clearPreview('No completed benchmark results.'); $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; } }
+  } catch (error) { if (token === generation) { $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; } }
   finally { if (token === generation) { running = false; controls(); } }
 });
 $('feature-cancel').addEventListener('click', () => {
   generation++; current?.close(); current = undefined; running = false; result = undefined; controls();
-  clearPreview('Stopped. No partial results are shown.');
   $('feature-benchmark-status').textContent = 'Stopped. No partial run is shown as a completed benchmark.';
 });
 $('feature-export').addEventListener('click', () => {
@@ -119,7 +103,6 @@ $('feature-export').addEventListener('click', () => {
 });
 window.addEventListener('pagehide', () => {
   generation++; current?.close(); current = undefined; running = false; result = undefined; controls();
-  clearPreview('Session released; run the benchmark again for fresh timings.');
   $('feature-benchmark-status').textContent = 'Session released after navigation. Run a new benchmark to continue.';
   $('feature-benchmark-results').replaceChildren();
 });

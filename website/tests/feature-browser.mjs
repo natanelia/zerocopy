@@ -173,8 +173,9 @@ try {
       const baselineIds = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
       const editedPhases = ['editPublicationMs', 'updatePublicationMs'];
       const allPhases = ['generationMs', 'constructionMs', 'publicationMs', 'firstQueryMs', 'repeatQueryMs', 'updateMs', ...editedPhases, 'updatedQueryMs'];
-      assert.deepEqual(await page.locator('[data-preview-case]').evaluateAll(rows => rows.map(row => row.dataset.previewCase)), caseIds);
-      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'No fake pre-run timing results');
+      assert.equal((await page.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'One product catalog. Four implementations.');
+      assert.equal(await page.locator('.feature-benchmark-preview, [data-preview-case], #feature-preview-status').count(), 0, 'No preview panel or placeholder bars');
+      assert.equal(await page.locator('#feature-benchmark-results').innerText(), '', 'Charts appear only after a completed run');
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 90000 });
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
@@ -188,9 +189,6 @@ try {
       for (const phase of allPhases) {
         assert.deepEqual(raw.config.phaseCaseIds[phase], editedPhases.includes(phase) ? caseIds : baselineIds, phase);
       }
-      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(),
-        caseIds.map(id => `${raw.summary[id].updatePublicationMs.median.toFixed(2)} ms`));
-      assert.match(await page.locator('#feature-preview-status').innerText(), /median replace \+ publication time/);
       assert.equal(raw.config.samplesPerCase, 7); assert.equal(raw.config.warmups, 2);
       for (const item of raw.cases) {
         const samples = raw.raw.filter(sample => sample.caseId === item.id);
@@ -223,10 +221,14 @@ try {
         assert.deepEqual(record.publication.initial, { recordsPerReader: initialRecords, totalRecords: initialRecords * 2 });
         assert.deepEqual(record.publication.edit, { recordsPerReader: editRecords, totalRecords: editRecords * 2 });
       }
+      assert.equal(await page.locator('.feature-timing-group').count(), allPhases.length);
       for (const section of await page.locator('.feature-timing-group').all()) {
         const phase = await section.getAttribute('data-phase');
         assert.deepEqual(await section.locator('[data-case]').evaluateAll(rows => rows.map(row => row.dataset.case)),
           editedPhases.includes(phase) ? caseIds : baselineIds, `${phase}: correct visible cases and order`);
+        const visibleIds = editedPhases.includes(phase) ? caseIds : baselineIds;
+        assert.deepEqual(await section.locator('.feature-timing-value').allTextContents(),
+          visibleIds.map(id => `${raw.summary[id][phase].median.toFixed(2)} ms`), `${phase}: displayed bars match measured medians`);
       }
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(raw, null, 2));
       for (const width of [390, 320]) {
@@ -236,7 +238,7 @@ try {
       await page.setViewportSize({ width: 1440, height: 1000 });
       record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
-      assert.deepEqual(await page.locator('[data-preview-ms]').allTextContents(), Array(7).fill('—'), 'Stop clears previous medians');
+      assert.equal(await page.locator('#feature-benchmark-results .feature-timing-row').count(), 0, 'Stop clears previous bars');
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), true);
       await page.locator('#feature-run').click(); await page.goto(origin + meta.base + 'docs/catalog/'); await page.goBack();
       await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);
@@ -271,6 +273,10 @@ try {
       const plain = await plainContext.newPage();
       await plain.goto(origin + meta.base + 'explorer/'); await plain.waitForURL(origin + meta.base + 'compare/');
       assert.match(await plain.locator('h1').innerText(), /product/i);
+      await plain.goto(origin + meta.base + 'investigation-benchmark/');
+      assert.equal((await plain.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'One product catalog. Four implementations.');
+      assert.equal(await plain.locator('.feature-benchmark-preview, [data-preview-case]').count(), 0);
+      assert.equal(await plain.locator('#feature-benchmark-results').innerText(), '');
       await plain.goto(origin + meta.base + 'docs/memory-comparison/');
       assert.equal(await plain.locator('[data-feature-memory-chart]').count(), 2);
       assert.match(await plain.locator('[data-feature-memory-chart="rss-eight"]').innerText(), /Separate 8-reader run/);
