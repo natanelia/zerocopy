@@ -162,6 +162,7 @@ test('old demo and guide routes redirect directly without allocating demo worker
     assert.ok(html.includes(`http-equiv="refresh" content="0;url=${meta.base}${target}"`));
     assert.ok(html.includes(`href="${meta.base}${target}">Continue directly`));
     assert.ok(html.includes('location.replace('));
+    assert.ok(html.includes('location.search + location.hash'));
     assert.doesNotMatch(html, /feature-load|feature\.mjs|capability\.mjs/);
   }
   const home = readFileSync(join(out, 'index.html'), 'utf8');
