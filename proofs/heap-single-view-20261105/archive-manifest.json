@@ -1,0 +1,44 @@
+{
+  "schema": "zerocopy-heap-single-view-archives/v1",
+  "createdAt": "2026-11-05T02:23:16.292837+00:00",
+  "method": "Lossless gzip level9, mtime0; exact original bytes/SHA256 checked after decompression; complete original records backed up outside the worktree.",
+  "verifierSha256": "d394e6f65b8ee7fd8f3dd612bec194236ae978f37dc82094f2c938b72259885d",
+  "files": [
+    {
+      "path": "results/node-pilot-01.json.gz",
+      "bytes": 65942,
+      "sha256": "e1ac94cd37ceae70428e33a403ac6648956dc526c9d1b85ceaab0cdb5a57ca84",
+      "originalPath": "results/node-pilot-01.json",
+      "originalBytes": 842289,
+      "originalSha256": "bdf163eac6d1b8a682a5522f87dfd3009f1017aa07db76339ca3cbc9a7cbd222",
+      "roundTripVerified": true
+    },
+    {
+      "path": "results/bun-pilot-01.json.gz",
+      "bytes": 73532,
+      "sha256": "22c836be9f274022aee7eb766b1d8ecb0bdf8db5c0cb087d4ff5236f79703a16",
+      "originalPath": "results/bun-pilot-01.json",
+      "originalBytes": 947263,
+      "originalSha256": "e4f8b21a1b9cb1aa4fbf78d35893dcbb47e0d144d4bd7da587798a6d8299ccf0",
+      "roundTripVerified": true
+    },
+    {
+      "path": "results/node-formal-01.json.gz",
+      "bytes": 187339,
+      "sha256": "d9e91f6ff21f7b28b08b4b683307df04a9ddc2ec162367150c57437f50de34bb",
+      "originalPath": "results/node-formal-01.json",
+      "originalBytes": 2619367,
+      "originalSha256": "4d497cf4251bd0cd3e57897e4cbd9513355979a4a61923c94c536358564c5cd3",
+      "roundTripVerified": true
+    },
+    {
+      "path": "results/bun-formal-01.json.gz",
+      "bytes": 214612,
+      "sha256": "b91f8e2bac5ee8e1574b922392dacd8e4fbc869fc1dfbd0dd2c0b581886887fc",
+      "originalPath": "results/bun-formal-01.json",
+      "originalBytes": 2996466,
+      "originalSha256": "160cd7f98aefcac0ee354892949bf3146a511730b28235b36af35e9f0a04dab5",
+      "roundTripVerified": true
+    }
+  ]
+}

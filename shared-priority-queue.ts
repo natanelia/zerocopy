@@ -53,8 +53,12 @@ export class SharedPriorityQueue<T extends string = SharedPriorityQueueType> ext
    */
   *entries(): Generator<[ValueOf<T>, number]> {
     const arena = this.arena, pending = this.root ? [this.root] : [];
+    if (!pending.length) return;
+    // Every node in this immutable snapshot already fits the shared view.
+    // Growth while decoding or between yields cannot detach it.
+    const view = arena.dv;
     while (pending.length) {
-      const node = pending.pop()!, view = arena.dv;
+      const node = pending.pop()!;
       const priority = view.getFloat64(node, true);
       const value = arena.decode(this.valueType, view.getFloat64(node + 8, true));
       // Published nodes remain in this shared view if decoding grows memory.

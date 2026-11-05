@@ -39,7 +39,7 @@ describe('heap entries view capture', () => {
     } finally { log.restore(); }
   });
 
-  it('requests one existing view per visited node on owners and read-only attachments', () => {
+  it('requests one existing view per nonempty traversal on owners and read-only attachments', () => {
     for (const size of [0, 1, 31, 32, 33, 65, 1057, 4097]) {
       const { item, owner } = heap(size);
       const expected = [...item.entries()], bytes = owner.buf.slice(HEAP_START, owner.used);
@@ -50,7 +50,7 @@ describe('heap entries view capture', () => {
         try {
           const result = [...attached.entries()];
           expect(result).toEqual(expected);
-          expect(log.count).toEqual({ getters: size, refreshes: size });
+          expect(log.count).toEqual({ getters: size ? 1 : 0, refreshes: size ? 1 : 0 });
           expect(reader.state()).toEqual(state);
           expect(attached.toWorkerData()).toEqual(descriptor);
         } finally { log.restore(); }

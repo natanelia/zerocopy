@@ -1,0 +1,10 @@
+Built 12 portable modules: 233122 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-heap
+
+
+ Test Files  3 passed (3)
+      Tests  35 passed (35)
+   Start at  19:55:29
+   Duration  1.92s (transform 390ms, setup 0ms, import 508ms, tests 2.16s, environment 2ms)
+

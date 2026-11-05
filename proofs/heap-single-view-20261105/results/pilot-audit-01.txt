@@ -1,0 +1,31 @@
+node: 20 completed pairs / 40 measured processes / 280 measured batches
+empty-full: after/before 1.010197; pairs 0.943958, 1.081084
+singleton-close: after/before 0.991817; pairs 1.006522, 0.977327
+number-small: after/before 0.579957; pairs 0.602601, 0.558164
+number-large: after/before 0.490200; pairs 0.413993, 0.580435
+max-ties: after/before 0.680862; pairs 0.556195, 0.833474
+boolean-full: after/before 0.539056; pairs 0.510929, 0.568730
+string-overflow: after/before 1.009972; pairs 1.095960, 0.930730
+object-warm: after/before 0.604555; pairs 0.567435, 0.644103
+materialize: after/before 0.636865; pairs 0.618157, 0.656138
+unchanged-peek: after/before 0.665732; pairs 0.697631, 0.635292
+  pair 0 before: 13 warm batches/156.348 ms; last-three warm median 8.709 ms; measured median 11.076 ms; range 7.208..11.203 ms
+  pair 0 after: 17 warm batches/158.088 ms; last-three warm median 11.252 ms; measured median 7.727 ms; range 7.202..11.417 ms
+  pair 1 before: 11 warm batches/153.093 ms; last-three warm median 11.906 ms; measured median 11.782 ms; range 7.600..12.037 ms
+  pair 1 after: 15 warm batches/151.875 ms; last-three warm median 7.461 ms; measured median 7.485 ms; range 7.152..8.708 ms
+bun: 20 completed pairs / 40 measured processes / 280 measured batches
+empty-full: after/before 1.244387; pairs 0.992293, 1.560526
+singleton-close: after/before 1.123239; pairs 1.140650, 1.106094
+number-small: after/before 0.829201; pairs 0.932576, 0.737285
+number-large: after/before 0.895596; pairs 0.956084, 0.838935
+max-ties: after/before 0.765765; pairs 0.752022, 0.779759
+boolean-full: after/before 0.697977; pairs 0.586384, 0.830808
+string-overflow: after/before 1.110867; pairs 1.341230, 0.920070
+object-warm: after/before 0.938308; pairs 0.955292, 0.921627
+materialize: after/before 0.917453; pairs 1.125928, 0.747579
+unchanged-peek: after/before 1.080018; pairs 1.042198, 1.119210
+  pair 0 before: 14 warm batches/156.264 ms; last-three warm median 7.286 ms; measured median 7.560 ms; range 6.972..8.743 ms
+  pair 0 after: 10 warm batches/159.267 ms; last-three warm median 11.904 ms; measured median 7.879 ms; range 7.026..16.976 ms
+  pair 1 before: 13 warm batches/151.032 ms; last-three warm median 6.505 ms; measured median 6.651 ms; range 6.486..6.998 ms
+  pair 1 after: 13 warm batches/158.618 ms; last-three warm median 7.698 ms; measured median 7.444 ms; range 6.801..14.060 ms
+This arithmetic-only pilot audit uses every recorded process median. Unchanged peek is a control and is not an effect claim. No timing source/workload changes were made after the pilot; the predeclared confirmation increases measured warm-up and replication only.
