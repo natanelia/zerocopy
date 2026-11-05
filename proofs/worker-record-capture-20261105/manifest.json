@@ -1,0 +1,31 @@
+{
+  "schema": "worker-record-capture-evidence/v1",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "changedSources": [
+    "worker-protocol.ts"
+  ],
+  "candidateSourceSha256": "3695b49f8c0730d2f9172d63cb728da1bbdb1c0bf139fc324dc9054d6074ed77",
+  "evidence": {
+    "pilot.json.gz": {
+      "sha256": "7ef135774effd25bfd01a5f8c79fb59b9bad0928e8c8a373d8b4532432b6de6d",
+      "uncompressedSha256": "056f4130efe52035d319a7a6aa5371e3e17b038d7fadf96dea1da0f94cef50e5",
+      "uncompressedBytes": 581733
+    },
+    "formal.json.gz": {
+      "sha256": "d19b28a55e7b8e063b09d0822071e847a108c6027330ea208fe7fc5dd2c0bb50",
+      "uncompressedSha256": "d97f9f9f2f26f1b4647d07b44df5eb7bfcad90c9f8ad950211b1053349e5986c",
+      "uncompressedBytes": 2077224
+    },
+    "aa.json.gz": {
+      "sha256": "d0a1620d82e549b249a5ab9ab641a71a1c0f7b04538ee49c503990b27f5c8f45",
+      "uncompressedSha256": "7829adc8466d33e777adb3f87274f791e312170a3a783b8882c136a2bea99fce",
+      "uncompressedBytes": 253500
+    }
+  },
+  "decision": "Rejected: repeated adverse Node single-collection control remains unresolved; no optimization PR.",
+  "archive": {
+    "measured-source/worker-protocol.ts.txt": "3695b49f8c0730d2f9172d63cb728da1bbdb1c0bf139fc324dc9054d6074ed77",
+    "measured-source/worker-record-capture.test.ts.txt": "13a7f6f2f95e65a7fa83f6106ceb9284fd58b55bdefd10495d1e442a0824a434",
+    "measured-source/worker-record-capture.yml": "cd23205c36a19e61332c4ab82a1671aead9dce25126935d2cb522ab57f75be0d"
+  }
+}

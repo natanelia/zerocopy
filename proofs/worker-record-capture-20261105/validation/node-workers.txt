@@ -1,0 +1,1 @@
+Worker record capture proof passed: 132 names, special keys, shared/copy transports, unchanged identities, retained values, growth, validation failures and compaction.

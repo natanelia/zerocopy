@@ -1,0 +1,172 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { SharedList, SharedMap, getWorkerData } from './shared';
+import { createSharedState } from './worker';
+
+const disposals: (() => void)[] = [];
+afterEach(() => { for (const dispose of disposals.splice(0)) dispose(); });
+const create = (input: any) => {
+  const state = createSharedState(input, { copy: false, publish: { strategy: 'immediate' } });
+  disposals.push(() => state.dispose());
+  return state;
+};
+
+describe('worker record capture', () => {
+  it.each([false, true])('captures wide records without modifying retained inputs, frozen=%s', frozen => {
+    const before = new SharedMap('number').set('value', 1), after = before.set('value', 2);
+    const initial = Object.fromEntries(Array.from({ length: 256 }, (_, i) => [`collection-${i}`, before]));
+    const next = { ...initial, 'collection-128': after };
+    if (frozen) { Object.freeze(initial); Object.freeze(next); }
+    const initialKeys = Object.keys(initial), nextKeys = Object.keys(next);
+    const bytes = getWorkerData({ before, after }, { copy: true });
+    const state = create(initial), retained = state.current;
+    const events: number[] = [];
+    state.subscribe((_, version) => events.push(version));
+    expect(state.publish(next)).toBe(1);
+    expect(state.publish({ ...next })).toBe(1);
+    expect(state.current['collection-128']).toBe(after);
+    expect(retained['collection-128']).toBe(before);
+    expect(Object.getPrototypeOf(state.current)).toBeNull();
+    expect(Object.isFrozen(state.current)).toBe(true);
+    expect(Object.keys(initial)).toEqual(initialKeys);
+    expect(Object.keys(next)).toEqual(nextKeys);
+    expect(Object.isFrozen(initial)).toBe(frozen);
+    expect(Object.isFrozen(next)).toBe(frozen);
+    expect(events).toEqual([1]);
+    expect(getWorkerData({ before, after }, { copy: true })).toEqual(bytes);
+  });
+
+  it('retains special string names, numeric ordering and aliases', () => {
+    const list = new SharedList('number').pushMany([1, 2]);
+    const source = Object.create(null);
+    source.__proto__ = list; source.constructor = list; source['10'] = list;
+    source.hasOwnProperty = list; source['2'] = list;
+    const state = create(source);
+    expect(Object.getPrototypeOf(state.current)).toBeNull();
+    expect(Object.keys(state.current)).toEqual(['2', '10', '__proto__', 'constructor', 'hasOwnProperty']);
+    for (const key of Object.keys(source)) expect(state.current[key]).toBe(list);
+  });
+
+  it('ignores hidden fields and symbols without evaluating accessors', () => {
+    const map = new SharedMap('number').set('x', 1), source: any = { map };
+    let calls = 0;
+    Object.defineProperty(source, 'hidden', { get() { calls++; throw new Error('must not run'); } });
+    Object.defineProperty(source, Symbol('hidden'), { get() { calls++; throw new Error('must not run'); } });
+    const state = create(source);
+    expect(Object.keys(state.current)).toEqual(['map']);
+    expect(state.current.map).toBe(map);
+    expect(calls).toBe(0);
+  });
+
+  it.each(['get', 'set'] as const)('rejects enumerable %s accessors and leaves publication unchanged', kind => {
+    const map = new SharedMap('number').set('x', 1), state = create({ map });
+    const retained = state.current, source: any = { map };
+    let calls = 0;
+    Object.defineProperty(source, 'invalid', {
+      enumerable: true, [kind]() { calls++; throw new Error('must not run'); },
+    });
+    expect(() => state.publish(source)).toThrow('Shared state cannot have getters or setters');
+    expect(state.current).toBe(retained);
+    expect(state.version).toBe(0);
+    expect(calls).toBe(0);
+  });
+
+  it('checks enumerable symbols before reading ordinary descriptors', () => {
+    const symbol = Symbol('invalid'), seen: (string | symbol)[] = [];
+    const target: any = { map: new SharedMap('number'), [symbol]: 1 };
+    const source = new Proxy(target, {
+      getOwnPropertyDescriptor(object, key) { seen.push(key); return Reflect.getOwnPropertyDescriptor(object, key); },
+    });
+    expect(() => create(source)).toThrow('Shared state cannot have enumerable symbol keys');
+    expect(seen).toEqual([symbol]);
+  });
+
+  it('preserves both own-key passes and descriptor trap order including hidden symbols', () => {
+    const map = new SharedMap('number').set('x', 1), hidden = Symbol('hidden');
+    const target: any = { '2': map, first: map, '10': map };
+    Object.defineProperty(target, hidden, { value: map, configurable: true });
+    const seen: string[] = [];
+    const source = new Proxy(target, {
+      ownKeys() { seen.push('keys'); return ['first', '10', hidden, '2']; },
+      getOwnPropertyDescriptor(object, key) {
+        seen.push(typeof key === 'symbol' ? 'symbol' : key);
+        return Reflect.getOwnPropertyDescriptor(object, key);
+      },
+    });
+    const state = create(source);
+    expect(seen).toEqual(['keys', 'symbol', 'keys', 'first', '10', 'symbol', '2']);
+    expect(Object.keys(state.current)).toEqual(['2', '10', 'first']);
+    for (const key of Object.keys(state.current)) expect(state.current[key]).toBe(map);
+  });
+
+  it('reads later descriptors before rejecting an earlier accessor', () => {
+    const target: any = {}, seen: string[] = [];
+    Object.defineProperty(target, 'first', { enumerable: true, configurable: true, get() { throw new Error('must not run'); } });
+    target.second = new SharedMap('number');
+    const source = new Proxy(target, {
+      getOwnPropertyDescriptor(object, key) { seen.push(String(key)); return Reflect.getOwnPropertyDescriptor(object, key); },
+    });
+    expect(() => create(source)).toThrow('Shared state cannot have getters or setters');
+    expect(seen).toEqual(['first', 'second']);
+  });
+
+  it('keeps a later descriptor failure ahead of an earlier accessor error', () => {
+    const target: any = {}, failure = new Error('later trap failed'), seen: string[] = [];
+    Object.defineProperty(target, 'first', { enumerable: true, configurable: true, get() { throw new Error('must not run'); } });
+    target.second = new SharedMap('number');
+    const source = new Proxy(target, {
+      getOwnPropertyDescriptor(object, key) {
+        seen.push(String(key));
+        if (key === 'second') throw failure;
+        return Reflect.getOwnPropertyDescriptor(object, key);
+      },
+    });
+    expect(() => create(source)).toThrow(failure);
+    expect(seen).toEqual(['first', 'second']);
+  });
+
+  it('retains the descriptor snapshot when later traps mutate earlier input', () => {
+    const before = new SharedMap('number').set('x', 1), after = before.set('x', 2);
+    const target = { first: before, later: before };
+    const source = new Proxy(target, {
+      getOwnPropertyDescriptor(object, key) {
+        if (key === 'later') object.first = after;
+        return Reflect.getOwnPropertyDescriptor(object, key);
+      },
+    });
+    const state = create(source);
+    expect(target.first).toBe(after);
+    expect(state.current.first).toBe(before);
+    expect(state.current.later).toBe(before);
+  });
+
+  it('skips keys whose descriptors disappear and ignores added keys until the next capture', () => {
+    const map = new SharedMap('number'), target: any = { first: map, removed: map };
+    const source = new Proxy(target, {
+      getOwnPropertyDescriptor(object, key) {
+        if (key === 'first') { delete object.removed; object.added = map; }
+        return Reflect.getOwnPropertyDescriptor(object, key);
+      },
+    });
+    const state = create(source);
+    expect(Object.keys(state.current)).toEqual(['first']);
+    expect(state.publish(source)).toBe(1);
+    expect(Object.keys(state.current)).toEqual(['first', 'added']);
+  });
+
+  it('keeps single collections and empty records distinct', () => {
+    const map = new SharedMap('number'), single = create(map), record = create({});
+    expect(single.current).toBe(map);
+    expect(single.publish(map)).toBe(0);
+    expect(Object.getPrototypeOf(record.current)).toBeNull();
+    expect(Object.keys(record.current)).toEqual([]);
+    expect(() => single.publish({ map })).toThrow(/single-collection and record/);
+    expect(() => record.publish(map)).toThrow(/single-collection and record/);
+  });
+
+  it('keeps descriptor validation ahead of unsupported collection validation', () => {
+    const source: any = { unsupported: 1 };
+    Object.defineProperty(source, 'accessor', { enumerable: true, get() { throw new Error('must not run'); } });
+    expect(() => create(source)).toThrow('Shared state cannot have getters or setters');
+    expect(() => create({ unsupported: 1 })).toThrow('Unsupported shared structure: unsupported');
+  });
+});

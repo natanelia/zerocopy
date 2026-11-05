@@ -1,0 +1,36 @@
+aa: node publish-record-128 pair 1/4 before: 145.141 us, verified
+aa: node publish-record-128 pair 1/4 after: 143.535 us, verified
+aa: node publish-single pair 1/4 before: 2.150 us, verified
+aa: node publish-single pair 1/4 after: 2.110 us, verified
+aa: bun publish-record-128 pair 1/4 before: 54.787 us, verified
+aa: bun publish-record-128 pair 1/4 after: 63.051 us, verified
+aa: bun publish-single pair 1/4 before: 1.402 us, verified
+aa: bun publish-single pair 1/4 after: 1.154 us, verified
+aa: bun publish-single pair 2/4 after: 1.130 us, verified
+aa: bun publish-single pair 2/4 before: 1.453 us, verified
+aa: bun publish-record-128 pair 2/4 after: 81.300 us, verified
+aa: bun publish-record-128 pair 2/4 before: 85.519 us, verified
+aa: node publish-single pair 2/4 after: 2.938 us, verified
+aa: node publish-single pair 2/4 before: 2.319 us, verified
+aa: node publish-record-128 pair 2/4 after: 138.138 us, verified
+aa: node publish-record-128 pair 2/4 before: 158.208 us, verified
+aa: node publish-record-128 pair 3/4 before: 210.232 us, verified
+aa: node publish-record-128 pair 3/4 after: 184.548 us, verified
+aa: node publish-single pair 3/4 before: 2.707 us, verified
+aa: node publish-single pair 3/4 after: 2.504 us, verified
+aa: bun publish-record-128 pair 3/4 before: 64.041 us, verified
+aa: bun publish-record-128 pair 3/4 after: 81.885 us, verified
+aa: bun publish-single pair 3/4 before: 1.509 us, verified
+aa: bun publish-single pair 3/4 after: 1.840 us, verified
+aa: bun publish-single pair 4/4 after: 1.733 us, verified
+aa: bun publish-single pair 4/4 before: 1.800 us, verified
+aa: bun publish-record-128 pair 4/4 after: 75.013 us, verified
+aa: bun publish-record-128 pair 4/4 before: 71.067 us, verified
+aa: node publish-single pair 4/4 after: 2.866 us, verified
+aa: node publish-single pair 4/4 before: 2.418 us, verified
+aa: node publish-record-128 pair 4/4 after: 216.832 us, verified
+aa: node publish-record-128 pair 4/4 before: 172.766 us, verified
+node publish-record-128: 165.487 -> 164.042 us, paired ratio 0.988 (0.754-1.294)
+node publish-single: 2.369 -> 2.685 us, paired ratio 1.080 (0.851-1.371)
+bun publish-record-128: 67.554 -> 78.156 us, paired ratio 1.102 (0.902-1.347)
+bun publish-single: 1.481 -> 1.444 us, paired ratio 0.931 (0.676-1.283)

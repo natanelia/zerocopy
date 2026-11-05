@@ -1,0 +1,13 @@
+arena.ts(524,59): error TS2532: Object is possibly 'undefined'.
+arena.ts(524,93): error TS2532: Object is possibly 'undefined'.
+arena.ts(524,132): error TS2532: Object is possibly 'undefined'.
+arena.ts(528,59): error TS2532: Object is possibly 'undefined'.
+arena.ts(528,93): error TS2532: Object is possibly 'undefined'.
+arena.ts(528,132): error TS2532: Object is possibly 'undefined'.
+arena.ts(530,57): error TS2532: Object is possibly 'undefined'.
+arena.ts(667,13): error TS2532: Object is possibly 'undefined'.
+arena.ts(668,9): error TS2532: Object is possibly 'undefined'.
+arena.ts(669,9): error TS2532: Object is possibly 'undefined'.
+arena.ts(671,50): error TS2532: Object is possibly 'undefined'.
+redux-jsan.ts(29,57): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'any[] | Record<string, unknown>'.
+  No index signature with a parameter of type 'string' was found on type 'any[] | Record<string, unknown>'.
