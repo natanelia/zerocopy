@@ -1,0 +1,11 @@
+--- baseline/dist/chunk-5qfqrsqm.js
++++ candidate/dist/chunk-4hm7g7v3.js
+@@ -5,7 +5,7 @@
+   checkedSize,
+   Snapshot,
+   Arena
+-} from "./chunk-naz6wrqq.js";
++} from "./chunk-jstkgpvn.js";
+ 
+ // text-search.ts
+ function compileStringSearch(arena, term, options = {}) {

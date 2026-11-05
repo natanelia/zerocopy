@@ -1,0 +1,47 @@
+{
+  "module": "file:///workspace/scratch/83f1d4baba1f/zerocopy-r3-list/dist/shared.js",
+  "checks": [
+    {
+      "name": "SharedLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    }
+  ]
+}
