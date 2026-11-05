@@ -1,0 +1,53 @@
+{
+  "schema": "zerocopy-heap-generic-view-archives/v1",
+  "createdAt": "2026-11-05T02:44:25.942489+00:00",
+  "method": "Lossless gzip level9, mtime0; exact original bytes and SHA256 checked after decompression; complete originals also backed up outside the worktree.",
+  "verifierSha256": "b7d81b80526629f23b2e826e23712d8498f73d3676c289a485e53e58656e0bd7",
+  "files": [
+    {
+      "path": "results/node-pilot-01.json.gz",
+      "bytes": 91396,
+      "sha256": "2ffc382374f40f0fc8354b6a052aff4149ced17e9561b22119138cb43dc32df3",
+      "originalPath": "results/node-pilot-01.json",
+      "originalBytes": 1238847,
+      "originalSha256": "4abc228b605a63015701fe7e6236ebae350858c0f7083cc8efd36b9d7365a1a4",
+      "roundTripVerified": true
+    },
+    {
+      "path": "results/bun-pilot-01.json.gz",
+      "bytes": 109324,
+      "sha256": "89341924a3e61cb27d9fc3bb7d7037138a1082dab09e034f2707cddfeafa1c9a",
+      "originalPath": "results/bun-pilot-01.json",
+      "originalBytes": 1483563,
+      "originalSha256": "84bccea1b38d2e82582dd0ccd550fb19f32b02e86c7634bcb70092dd6c1a8d8c",
+      "roundTripVerified": true
+    }
+  ],
+  "measuredInputs": [
+    {
+      "path": "measured/baseline-shared-priority-queue.ts.txt",
+      "bytes": 4614,
+      "sha256": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc"
+    },
+    {
+      "path": "measured/candidate-shared-priority-queue.ts.txt",
+      "bytes": 5329,
+      "sha256": "9dd91242e8e73774146c5f104bf7c24fd0d863a616f78178048b25dfacbbd863"
+    },
+    {
+      "path": "measured/candidate.patch.txt",
+      "bytes": 1250,
+      "sha256": "d66eb9a39d7d665733f2cd5f8828f98a40fe841f9fb9db68b2ed48631f820e24"
+    },
+    {
+      "path": "measured/heap-entry-generic-view.test.ts.txt",
+      "bytes": 5928,
+      "sha256": "7327d3ab6a08b81bc7fb97cd813903f3d7b114db562244514a6972f4b7fa4554"
+    },
+    {
+      "path": "measured/heap-entry-views.test.ts.txt",
+      "bytes": 6441,
+      "sha256": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf"
+    }
+  ]
+}

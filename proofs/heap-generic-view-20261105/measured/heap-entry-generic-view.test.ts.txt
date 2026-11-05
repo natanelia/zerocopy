@@ -1,0 +1,112 @@
+import { describe, expect, it } from 'vitest';
+import { Arena, HEAP_START } from './arena';
+import { SharedList } from './shared-list';
+import { SharedPriorityQueue } from './shared-priority-queue';
+
+type FixtureType = 'number' | 'boolean' | 'string' | 'object' | 'SharedList<number>';
+function fixture(type: FixtureType, size: number) {
+  const owner = new Arena(), inputs = new Map<number, any>();
+  let item = new SharedPriorityQueue(type, { maxHeap: true }, owner);
+  for (let i = 0; i < size; i++) {
+    const native = type === 'number' ? i + .25 : type === 'boolean' ? i % 3 === 0
+      : type === 'string' ? `value-${i}-界🙂` : type === 'object' ? { id: i, nested: [i, i % 2 === 0] }
+        : [i, -0, NaN];
+    const value = type === 'SharedList<number>' ? new SharedList('number', 0, 0, 0, owner).pushMany(native as number[]) : native;
+    const priority = (i * 37) % Math.max(1, size);
+    inputs.set(priority, native); item = item.enqueue(value, priority);
+  }
+  const expected: [any, number][] = [], view = owner.dv;
+  function visit(node: number): void {
+    if (!node) return;
+    const priority = view.getFloat64(node, true);
+    expect(inputs.has(priority)).toBe(true);
+    expected.push([inputs.get(priority), priority]); inputs.delete(priority);
+    visit(view.getUint32(node + 16, true)); visit(view.getUint32(node + 20, true));
+  }
+  visit(item.root); expect(inputs.size).toBe(0); expect(expected.length).toBe(size);
+  return { owner, item, expected };
+}
+
+function entryViewRequests(owner: Arena) {
+  const getter = Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get!, decode = owner.decode;
+  let inDecode = 0, requests = 0;
+  Object.defineProperty(owner, 'dv', { configurable: true, get() {
+    if (!inDecode) requests++;
+    return getter.call(this);
+  } });
+  owner.decode = function (type, raw) {
+    inDecode++;
+    try { return decode.call(this, type, raw); } finally { inDecode--; }
+  };
+  return { count: () => requests, reset: () => { requests = 0; },
+    restore() { delete (owner as any).dv; owner.decode = decode; } };
+}
+
+describe('heap entry view scope', () => {
+  it('uses one traversal view for cold and warm boolean/JSON owners and read-only readers', () => {
+    for (const type of ['boolean', 'object'] as const) for (const size of [0, 1, 33, 1057]) {
+      const { owner, item, expected } = fixture(type, size);
+      const bytes = owner.buf.slice(HEAP_START, owner.used);
+      for (const reader of [owner, new Arena({ memory: owner.memory, used: owner.used, readOnly: true }),
+        new Arena({ copy: owner.copy(), used: owner.used, readOnly: true })]) {
+        const attached = SharedPriorityQueue.fromWorkerData(item.toWorkerData(), reader), state = reader.state();
+        const trace = entryViewRequests(reader);
+        try {
+          attached.entries().return(undefined);
+          expect(trace.count()).toBe(0);
+          for (let pass = 0; pass < 2; pass++) {
+            trace.reset();
+            const entries = [...attached.entries()];
+            expect(entries).toEqual(expected);
+            expect(trace.count()).toBe(size ? 1 : 0);
+            if (type === 'object') for (const [value] of entries) {
+              expect(Object.isFrozen(value)).toBe(true); expect(Object.isFrozen((value as { nested: unknown[] }).nested)).toBe(true);
+            }
+          }
+          expect(reader.state()).toEqual(state);
+        } finally { trace.restore(); }
+        expect(Buffer.compare(reader.buf.subarray(HEAP_START, reader.used), bytes)).toBe(0);
+      }
+    }
+  });
+
+  it('keeps per-node entry views for numbers, strings and nested snapshots', () => {
+    for (const type of ['number', 'string', 'SharedList<number>'] as const) for (const size of [0, 1, 33]) {
+      const { owner, item, expected } = fixture(type, size);
+      for (const reader of [owner, new Arena({ id: owner.id, memory: owner.memory, used: owner.used, readOnly: true }),
+        new Arena({ id: owner.id, copy: owner.copy(), used: owner.used, readOnly: true })]) {
+        const attached = SharedPriorityQueue.fromWorkerData(item.toWorkerData(), reader), trace = entryViewRequests(reader);
+        let entries: [any, number][] = [];
+        try { entries = [...attached.entries()]; expect(trace.count()).toBe(size); }
+        finally { trace.restore(); }
+        expect(type === 'SharedList<number>' ? entries.map(([value, priority]) => [value.toArray(), priority]) : entries).toEqual(expected);
+      }
+    }
+  });
+
+  it('preserves decoder reentry, growth, exceptions and old bytes in both fast branches', () => {
+    for (const type of ['boolean', 'object'] as const) {
+      const { owner, item, expected } = fixture(type, 33), decode = owner.decode;
+      const bytes = owner.buf.slice(HEAP_START, owner.used), end = owner.used;
+      let inside = false, calls = 0;
+      owner.decode = function (valueType, raw) {
+        expect(this).toBe(owner); expect(valueType).toBe(type);
+        if (!inside && ++calls === 1) {
+          owner.memory.grow(1); inside = true;
+          try { expect(item.entries().next().value).toEqual(expected[0]); } finally { inside = false; }
+        }
+        return decode.call(this, valueType, raw);
+      };
+      try {
+        expect([...item.entries()]).toEqual(expected); expect(calls).toBe(33);
+        const failure = new Error('decoder rejected payload'); let seen = 0;
+        owner.decode = function (valueType, raw) { if (++seen === 3) throw failure; return decode.call(this, valueType, raw); };
+        const iterator = item.entries();
+        expect(iterator.next().value).toEqual(expected[0]); expect(iterator.next().value).toEqual(expected[1]);
+        expect(() => iterator.next()).toThrow(failure); expect(iterator.next()).toEqual({ done: true, value: undefined });
+        expect(seen).toBe(3);
+      } finally { owner.decode = decode; }
+      expect(Buffer.compare(owner.buf.subarray(HEAP_START, end), bytes)).toBe(0);
+    }
+  });
+});

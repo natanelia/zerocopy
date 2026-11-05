@@ -1,0 +1,6 @@
+results/node-pilot-01.json.gz: archive hashes, complete subjects, pairing, medians and summary estimates verified
+results/bun-pilot-01.json.gz: archive hashes, complete subjects, pairing, medians and summary estimates verified
+Archived candidate sources and exact original fallback verified; no live production hash gate
+before: all 86 recorded source/bundle hashes match
+after: all 86 recorded source/bundle hashes match
+{"screenPairs":44,"measuredBatches":616,"allArchiveRoundTripsVerified":true}

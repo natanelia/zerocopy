@@ -1,0 +1,23 @@
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233653 bytes
+$ bun --bun node_modules/vitest/vitest.mjs run heap-entry-views.test.ts heap-entry-generic-view.test.ts shared-priority-queue.test.ts shared-priority-queue-insert.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-heap-narrow
+
+
+ Test Files  4 passed (4)
+      Tests  38 passed (38)
+   Start at  20:34:54
+   Duration  1.74s (transform 370ms, setup 0ms, import 543ms, tests 2.96s, environment 1ms)
+
+$ tsc --noEmit
+✔ paused heap entries retain one snapshot through writer growth (shared) (116.705922ms)
+✔ paused heap entries retain one snapshot through writer growth (copy) (109.123316ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 324.545893

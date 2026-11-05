@@ -1,0 +1,4 @@
+Original fallback loop including its method ending is byte-identical in candidate.
+Baseline: 77599337867dbf785a5f0311d34637d0b36678fc
+Candidate local source freeze: 442f6a58138c00de0951d7f4592da997700a474e
+Fallback SHA-256: 6f4f04b29b956e17b6885a8229c9e29c8fce1c3603d05af92e0f0aa79984289f
