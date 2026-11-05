@@ -1,0 +1,160 @@
+node keys-object-large ab pair 1: 0.184 candidate/baseline
+node keys-object-churn ab pair 1: 0.488 candidate/baseline
+node keys-number-small ab pair 1: 0.443 candidate/baseline
+node values-number-large ab pair 1: 0.165 candidate/baseline
+node values-string-churn ab pair 1: 0.433 candidate/baseline
+node values-boolean-small ab pair 1: 0.326 candidate/baseline
+node ordered-set-churn ab pair 1: 0.485 candidate/baseline
+node entries-number-control ab pair 1: 1.022 candidate/baseline
+node entries-number-control aa-baseline pair 1: 1.009 candidate/baseline
+node lookup-number-control ab pair 1: 0.837 candidate/baseline
+node empty-projections ab pair 1: 0.425 candidate/baseline
+node empty-projections aa-baseline pair 1: 0.920 candidate/baseline
+node keys-object-churn ab pair 2: 0.424 candidate/baseline
+node keys-number-small ab pair 2: 0.400 candidate/baseline
+node values-number-large ab pair 2: 0.239 candidate/baseline
+node values-string-churn ab pair 2: 0.424 candidate/baseline
+node values-boolean-small ab pair 2: 0.392 candidate/baseline
+node ordered-set-churn ab pair 2: 0.304 candidate/baseline
+node entries-number-control ab pair 2: 0.876 candidate/baseline
+node entries-number-control aa-baseline pair 2: 0.969 candidate/baseline
+node lookup-number-control ab pair 2: 0.893 candidate/baseline
+node empty-projections ab pair 2: 0.370 candidate/baseline
+node empty-projections aa-baseline pair 2: 0.864 candidate/baseline
+node keys-object-large ab pair 2: 0.167 candidate/baseline
+node keys-number-small ab pair 3: 0.726 candidate/baseline
+node values-number-large ab pair 3: 0.137 candidate/baseline
+node values-string-churn ab pair 3: 0.382 candidate/baseline
+node values-boolean-small ab pair 3: 0.399 candidate/baseline
+node ordered-set-churn ab pair 3: 0.462 candidate/baseline
+node entries-number-control ab pair 3: 0.953 candidate/baseline
+node entries-number-control aa-baseline pair 3: 1.104 candidate/baseline
+node lookup-number-control ab pair 3: 1.007 candidate/baseline
+node empty-projections ab pair 3: 0.362 candidate/baseline
+node empty-projections aa-baseline pair 3: 1.452 candidate/baseline
+node keys-object-large ab pair 3: 0.174 candidate/baseline
+node keys-object-churn ab pair 3: 0.466 candidate/baseline
+node values-number-large ab pair 4: 0.184 candidate/baseline
+node values-string-churn ab pair 4: 0.379 candidate/baseline
+node values-boolean-small ab pair 4: 0.329 candidate/baseline
+node ordered-set-churn ab pair 4: 0.411 candidate/baseline
+node entries-number-control ab pair 4: 0.956 candidate/baseline
+node entries-number-control aa-baseline pair 4: 1.038 candidate/baseline
+node lookup-number-control ab pair 4: 0.978 candidate/baseline
+node empty-projections ab pair 4: 0.373 candidate/baseline
+node empty-projections aa-baseline pair 4: 0.947 candidate/baseline
+node keys-object-large ab pair 4: 0.192 candidate/baseline
+node keys-object-churn ab pair 4: 0.465 candidate/baseline
+node keys-number-small ab pair 4: 0.522 candidate/baseline
+node values-string-churn ab pair 5: 0.424 candidate/baseline
+node values-boolean-small ab pair 5: 0.342 candidate/baseline
+node ordered-set-churn ab pair 5: 0.443 candidate/baseline
+node entries-number-control ab pair 5: 0.998 candidate/baseline
+node lookup-number-control ab pair 5: 0.994 candidate/baseline
+node empty-projections ab pair 5: 0.472 candidate/baseline
+node keys-object-large ab pair 5: 0.179 candidate/baseline
+node keys-object-churn ab pair 5: 0.410 candidate/baseline
+node keys-number-small ab pair 5: 0.697 candidate/baseline
+node values-number-large ab pair 5: 0.159 candidate/baseline
+node values-boolean-small ab pair 6: 0.344 candidate/baseline
+node ordered-set-churn ab pair 6: 0.503 candidate/baseline
+node entries-number-control ab pair 6: 0.921 candidate/baseline
+node lookup-number-control ab pair 6: 0.957 candidate/baseline
+node empty-projections ab pair 6: 0.361 candidate/baseline
+node keys-object-large ab pair 6: 0.201 candidate/baseline
+node keys-object-churn ab pair 6: 0.446 candidate/baseline
+node keys-number-small ab pair 6: 0.479 candidate/baseline
+node values-number-large ab pair 6: 0.209 candidate/baseline
+node values-string-churn ab pair 6: 0.361 candidate/baseline
+bun keys-object-large ab pair 1: 0.150 candidate/baseline
+bun keys-object-churn ab pair 1: 0.705 candidate/baseline
+bun keys-number-small ab pair 1: 0.659 candidate/baseline
+bun values-number-large ab pair 1: 0.164 candidate/baseline
+bun values-string-churn ab pair 1: 0.922 candidate/baseline
+bun values-boolean-small ab pair 1: 0.522 candidate/baseline
+bun ordered-set-churn ab pair 1: 0.813 candidate/baseline
+bun entries-number-control ab pair 1: 0.928 candidate/baseline
+bun entries-number-control aa-baseline pair 1: 1.021 candidate/baseline
+bun lookup-number-control ab pair 1: 0.918 candidate/baseline
+bun empty-projections ab pair 1: 0.500 candidate/baseline
+bun empty-projections aa-baseline pair 1: 1.262 candidate/baseline
+bun keys-object-churn ab pair 2: 0.764 candidate/baseline
+bun keys-number-small ab pair 2: 0.629 candidate/baseline
+bun values-number-large ab pair 2: 0.201 candidate/baseline
+bun values-string-churn ab pair 2: 0.783 candidate/baseline
+bun values-boolean-small ab pair 2: 0.498 candidate/baseline
+bun ordered-set-churn ab pair 2: 0.839 candidate/baseline
+bun entries-number-control ab pair 2: 1.059 candidate/baseline
+bun entries-number-control aa-baseline pair 2: 0.798 candidate/baseline
+bun lookup-number-control ab pair 2: 0.972 candidate/baseline
+bun empty-projections ab pair 2: 0.556 candidate/baseline
+bun empty-projections aa-baseline pair 2: 0.953 candidate/baseline
+bun keys-object-large ab pair 2: 0.178 candidate/baseline
+bun keys-number-small ab pair 3: 0.653 candidate/baseline
+bun values-number-large ab pair 3: 0.207 candidate/baseline
+bun values-string-churn ab pair 3: 0.622 candidate/baseline
+bun values-boolean-small ab pair 3: 0.424 candidate/baseline
+bun ordered-set-churn ab pair 3: 0.826 candidate/baseline
+bun entries-number-control ab pair 3: 1.107 candidate/baseline
+bun entries-number-control aa-baseline pair 3: 0.939 candidate/baseline
+bun lookup-number-control ab pair 3: 0.950 candidate/baseline
+bun empty-projections ab pair 3: 0.601 candidate/baseline
+bun empty-projections aa-baseline pair 3: 1.183 candidate/baseline
+bun keys-object-large ab pair 3: 0.157 candidate/baseline
+bun keys-object-churn ab pair 3: 0.666 candidate/baseline
+bun values-number-large ab pair 4: 0.216 candidate/baseline
+bun values-string-churn ab pair 4: 0.835 candidate/baseline
+bun values-boolean-small ab pair 4: 0.416 candidate/baseline
+bun ordered-set-churn ab pair 4: 0.715 candidate/baseline
+bun entries-number-control ab pair 4: 1.133 candidate/baseline
+bun entries-number-control aa-baseline pair 4: 1.052 candidate/baseline
+bun lookup-number-control ab pair 4: 0.847 candidate/baseline
+bun empty-projections ab pair 4: 0.702 candidate/baseline
+bun empty-projections aa-baseline pair 4: 0.948 candidate/baseline
+bun keys-object-large ab pair 4: 0.185 candidate/baseline
+bun keys-object-churn ab pair 4: 0.708 candidate/baseline
+bun keys-number-small ab pair 4: 0.508 candidate/baseline
+bun values-string-churn ab pair 5: 0.639 candidate/baseline
+bun values-boolean-small ab pair 5: 0.519 candidate/baseline
+bun ordered-set-churn ab pair 5: 0.690 candidate/baseline
+bun entries-number-control ab pair 5: 1.174 candidate/baseline
+bun lookup-number-control ab pair 5: 0.901 candidate/baseline
+bun empty-projections ab pair 5: 0.648 candidate/baseline
+bun keys-object-large ab pair 5: 0.130 candidate/baseline
+bun keys-object-churn ab pair 5: 0.558 candidate/baseline
+bun keys-number-small ab pair 5: 0.438 candidate/baseline
+bun values-number-large ab pair 5: 0.255 candidate/baseline
+bun values-boolean-small ab pair 6: 0.376 candidate/baseline
+bun ordered-set-churn ab pair 6: 0.778 candidate/baseline
+bun entries-number-control ab pair 6: 0.973 candidate/baseline
+bun lookup-number-control ab pair 6: 0.873 candidate/baseline
+bun empty-projections ab pair 6: 0.528 candidate/baseline
+bun keys-object-large ab pair 6: 0.158 candidate/baseline
+bun keys-object-churn ab pair 6: 0.851 candidate/baseline
+bun keys-number-small ab pair 6: 0.496 candidate/baseline
+bun values-number-large ab pair 6: 0.195 candidate/baseline
+bun values-string-churn ab pair 6: 0.656 candidate/baseline
+{"runtime":"node","name":"keys-object-large","mode":"ab","pairs":6,"beforeMedianMs":5.259789,"afterMedianMs":0.9455849444444435,"ratio":0.18251301060988306,"pairRatios":[0.1842527611875277,0.16692065717368143,0.17426831512737545,0.19172792748958684,0.17875964756068546,0.20121742331332426],"minRatio":0.16692065717368143,"maxRatio":0.20121742331332426,"lower95":0.17008535521981233,"upper95":0.19584871959630692,"degreesOfFreedom":5}
+{"runtime":"node","name":"keys-object-churn","mode":"ab","pairs":6,"beforeMedianMs":0.7287660000000011,"afterMedianMs":0.3322444375,"ratio":0.4489996880169695,"pairRatios":[0.48751082529441214,0.42421069562658953,0.46553687670945654,0.46530372137370973,0.4097425363165409,0.4463840740545738],"minRatio":0.4097425363165409,"maxRatio":0.48751082529441214,"lower95":0.41948979763507105,"upper95":0.4805855135831349,"degreesOfFreedom":5}
+{"runtime":"node","name":"keys-number-small","mode":"ab","pairs":6,"beforeMedianMs":0.005272309286898841,"afterMedianMs":0.0026188178842629028,"ratio":0.5311796289935572,"pairRatios":[0.4431449298847955,0.40043431989439443,0.7261595222951802,0.5219705676025658,0.6966684614824761,0.479365956713145],"minRatio":0.40043431989439443,"maxRatio":0.7261595222951802,"lower95":0.41168904902132064,"upper95":0.6853517209857116,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-number-large","mode":"ab","pairs":6,"beforeMedianMs":1.1582891523437517,"afterMedianMs":0.20130020703124973,"ratio":0.17912789666830148,"pairRatios":[0.16534476378926125,0.23886496909770663,0.1367217621327168,0.1843641991921092,0.158550770338462,0.2092925911890291],"minRatio":0.1367217621327168,"maxRatio":0.23886496909770663,"lower95":0.14505037392733391,"upper95":0.2212114487956044,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-string-churn","mode":"ab","pairs":6,"beforeMedianMs":0.8461340357142857,"afterMedianMs":0.34345588775510216,"ratio":0.39964352879175513,"pairRatios":[0.4331108524349898,0.42442046208813194,0.38205620433312665,0.3787282310021185,0.42439218223758507,0.3609267072290333],"minRatio":0.3609267072290333,"maxRatio":0.4331108524349898,"lower95":0.3689490087323996,"upper95":0.43289166341403124,"degreesOfFreedom":5}
+{"runtime":"node","name":"values-boolean-small","mode":"ab","pairs":6,"beforeMedianMs":0.0050665428771972595,"afterMedianMs":0.0018180316162109411,"ratio":0.3541766161693338,"pairRatios":[0.3259927672488669,0.39203238573804133,0.3991580616244991,0.32878257599525157,0.3419189008543636,0.344201365177805],"minRatio":0.3259927672488669,"maxRatio":0.3991580616244991,"lower95":0.3227967974145478,"upper95":0.3886069392443923,"degreesOfFreedom":5}
+{"runtime":"node","name":"ordered-set-churn","mode":"ab","pairs":6,"beforeMedianMs":0.7561188019801974,"afterMedianMs":0.3188017079207923,"ratio":0.42889899191447795,"pairRatios":[0.48503216864658866,0.3039897149446378,0.4615995648888581,0.4107171515592759,0.44272199023612924,0.502992367754245],"minRatio":0.3039897149446378,"maxRatio":0.502992367754245,"lower95":0.3539872123672133,"upper95":0.519663815071455,"degreesOfFreedom":5}
+{"runtime":"node","name":"entries-number-control","mode":"ab","pairs":6,"beforeMedianMs":1.7191360666666657,"afterMedianMs":1.6888629166666647,"ratio":0.9530560279849623,"pairRatios":[1.0220509583212627,0.8763423119624314,0.9526288379400262,0.9560143908306287,0.9975990775076692,0.920916112875078],"minRatio":0.8763423119624314,"maxRatio":1.0220509583212627,"lower95":0.8994752302254884,"upper95":1.0098285777705838,"degreesOfFreedom":5}
+{"runtime":"node","name":"entries-number-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":1.7398509500000008,"afterMedianMs":1.7476186333333334,"ratio":1.0287570863063034,"pairRatios":[1.0086156047740402,0.9690748986336236,1.1035807244003661,1.0383989138334133],"minRatio":0.9690748986336236,"maxRatio":1.1035807244003661,"lower95":0.942987614641629,"upper95":1.1223277232836666,"degreesOfFreedom":3}
+{"runtime":"node","name":"lookup-number-control","mode":"ab","pairs":6,"beforeMedianMs":0.2221491914062499,"afterMedianMs":0.21189780468749975,"ratio":0.9422905169728,"pairRatios":[0.8366762527935249,0.8928154379245885,1.007283426055333,0.9778195694067149,0.9940422865707141,0.9571379070494939],"minRatio":0.8366762527935249,"maxRatio":1.007283426055333,"lower95":0.8736614804061795,"upper95":1.0163105943094368,"degreesOfFreedom":5}
+{"runtime":"node","name":"empty-projections","mode":"ab","pairs":6,"beforeMedianMs":0.0009371843566894529,"afterMedianMs":0.00037277888488769506,"ratio":0.3917603782368489,"pairRatios":[0.42523636848637125,0.3702906642820877,0.3616233916806987,0.3729859984978732,0.47165415499211494,0.36089194552730797],"minRatio":0.36089194552730797,"maxRatio":0.47165415499211494,"lower95":0.3492491990980142,"upper95":0.439446087070931,"degreesOfFreedom":5}
+{"runtime":"node","name":"empty-projections","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.0010134468994140635,"afterMedianMs":0.0009321748504638669,"ratio":1.0224866625138673,"pairRatios":[0.9195123364318456,0.8641278902878003,1.4522952724070743,0.9471965346016972],"minRatio":0.8641278902878003,"maxRatio":1.4522952724070743,"lower95":0.701206900172991,"upper95":1.4909707459536157,"degreesOfFreedom":3}
+{"runtime":"bun","name":"keys-object-large","mode":"ab","pairs":6,"beforeMedianMs":7.141432203124985,"afterMedianMs":1.125743343749999,"ratio":0.1585963111887882,"pairRatios":[0.15019391502614324,0.17842494468893375,0.1566809721956359,0.18549746440824422,0.1295287896513804,0.15773571522921304],"minRatio":0.1295287896513804,"maxRatio":0.18549746440824422,"lower95":0.13858909066572112,"upper95":0.18149184616096395,"degreesOfFreedom":5}
+{"runtime":"bun","name":"keys-object-churn","mode":"ab","pairs":6,"beforeMedianMs":0.6358906953124999,"afterMedianMs":0.4366031328124995,"ratio":0.7029757705876625,"pairRatios":[0.7046257619626206,0.7644216011690944,0.6660874040335812,0.7077909234229396,0.55813521813498,0.8514811405253238],"minRatio":0.55813521813498,"maxRatio":0.8514811405253238,"lower95":0.6060435867678311,"upper95":0.8154115394057145,"degreesOfFreedom":5}
+{"runtime":"bun","name":"keys-number-small","mode":"ab","pairs":6,"beforeMedianMs":0.0030854707946777367,"afterMedianMs":0.0017551834106445327,"ratio":0.5569367750679667,"pairRatios":[0.6591178205274191,0.6289003508676598,0.6526576180249727,0.5080222163113994,0.43779362286776646,0.49596717701917037],"minRatio":0.43779362286776646,"maxRatio":0.6591178205274191,"lower95":0.46489960688251697,"upper95":0.6671947380275823,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-number-large","mode":"ab","pairs":6,"beforeMedianMs":0.6579197812500002,"afterMedianMs":0.13629095432692284,"ratio":0.20469936757228402,"pairRatios":[0.16386963822181405,0.2009035702826285,0.2073318069994372,0.21649905784853288,0.2550963643772338,0.1951581277579616],"minRatio":0.16386963822181405,"maxRatio":0.2550963643772338,"lower95":0.1759650432480916,"upper95":0.23812588177196092,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-string-churn","mode":"ab","pairs":6,"beforeMedianMs":0.6797668203124987,"afterMedianMs":0.47775483593750057,"ratio":0.7346101474263851,"pairRatios":[0.9220961292375776,0.7826095446429675,0.6217123335027842,0.8348574913999969,0.639375328561946,0.6562396905366715],"minRatio":0.6217123335027842,"maxRatio":0.9220961292375776,"lower95":0.6194914535126836,"upper95":0.8711210875337222,"degreesOfFreedom":5}
+{"runtime":"bun","name":"values-boolean-small","mode":"ab","pairs":6,"beforeMedianMs":0.0030816427527151245,"afterMedianMs":0.0014195314536340881,"ratio":0.45576023165503204,"pairRatios":[0.5222657172657289,0.4980389758943192,0.4243715599384561,0.41636749364468806,0.5186430170415084,0.3759863607014879],"minRatio":0.3759863607014879,"maxRatio":0.5222657172657289,"lower95":0.3948570997976284,"upper95":0.5260571200687729,"degreesOfFreedom":5}
+{"runtime":"bun","name":"ordered-set-churn","mode":"ab","pairs":6,"beforeMedianMs":0.5340015124999994,"afterMedianMs":0.42074693750000025,"ratio":0.7745020837856639,"pairRatios":[0.812696590267442,0.8388375523759152,0.8255147494326837,0.7150154016274578,0.68961331010647,0.7778276411179251],"minRatio":0.68961331010647,"maxRatio":0.8388375523759152,"lower95":0.7115433603327983,"upper95":0.8430315160382861,"degreesOfFreedom":5}
+{"runtime":"bun","name":"entries-number-control","mode":"ab","pairs":6,"beforeMedianMs":1.2967666160714293,"afterMedianMs":1.3291578035714298,"ratio":1.0588173808074564,"pairRatios":[0.9284065513876476,1.059479491464074,1.1069541793172077,1.13287377643991,1.1744493434765784,0.9726356014515208],"minRatio":0.9284065513876476,"maxRatio":1.1744493434765784,"lower95":0.9619714794589899,"upper95":1.1654131851502108,"degreesOfFreedom":5}
+{"runtime":"bun","name":"entries-number-control","mode":"aa-baseline","pairs":4,"beforeMedianMs":1.258733910714286,"afterMedianMs":1.2753932410714293,"ratio":0.9471084417933829,"pairRatios":[1.02052819969785,0.7978977579528431,0.9392660080046292,1.0520538506716932],"minRatio":0.7978977579528431,"maxRatio":1.0520538506716932,"lower95":0.7776008209004561,"upper95":1.1535666840957723,"degreesOfFreedom":3}
+{"runtime":"bun","name":"lookup-number-control","mode":"ab","pairs":6,"beforeMedianMs":0.1768118551020414,"afterMedianMs":0.1545580959183674,"ratio":0.9093350788857213,"pairRatios":[0.918209541209773,0.9722628996506965,0.9502667114874874,0.8473533322339131,0.9014249329397301,0.8725263082772946],"minRatio":0.8473533322339131,"maxRatio":0.9722628996506965,"lower95":0.8614648100555807,"upper95":0.9598654246117737,"degreesOfFreedom":5}
+{"runtime":"bun","name":"empty-projections","mode":"ab","pairs":6,"beforeMedianMs":0.0007232677230834955,"afterMedianMs":0.00044510616302490154,"ratio":0.5851609366871835,"pairRatios":[0.5004590079455727,0.5558128506918798,0.6012901456109474,0.7019742055124978,0.6476355166110697,0.5279818169518944],"minRatio":0.5004590079455727,"maxRatio":0.7019742055124978,"lower95":0.5116473932899094,"upper95":0.6692369125989154,"degreesOfFreedom":5}
+{"runtime":"bun","name":"empty-projections","mode":"aa-baseline","pairs":4,"beforeMedianMs":0.0006875992355346678,"afterMedianMs":0.0007557933120727542,"ratio":1.0775568226239913,"pairRatios":[1.2615024159040846,0.9526097567128649,1.183051418651231,0.9483179947002345],"minRatio":0.9483179947002345,"maxRatio":1.2615024159040846,"lower95":0.852430995535233,"upper95":1.3621380640370198,"degreesOfFreedom":3}

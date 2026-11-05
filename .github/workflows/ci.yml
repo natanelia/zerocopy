@@ -62,6 +62,10 @@ jobs:
       - name: Check typed task examples from Markdown
         shell: bash
         run: node scripts/check-worker-docs.mjs 2>&1 | tee worker-docs.log
+      - name: Verify ordered-map projections and saved evidence
+        run: |
+          node proofs/ordered-map-projections-20261105/worker.mjs
+          node proofs/ordered-map-projections-20261105/verify.mjs proofs/ordered-map-projections-20261105/results/pilot-v1.json.gz proofs/ordered-map-projections-20261105/results/pilot-v2.json.gz proofs/ordered-map-projections-20261105/results/formal-v2.json.gz
       - name: Check built Node entry points
         run: |
           node proofs/node-worker.mjs

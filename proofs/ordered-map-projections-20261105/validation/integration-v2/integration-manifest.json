@@ -1,0 +1,250 @@
+{
+  "purpose": "Correctness/package integration only; performance was measured on each standalone candidate.",
+  "started": "2026-11-05T00:55:41.010850+00:00",
+  "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "commit": "17e43e2775bc9fb6cf3145632ce4bb73beb0d9da",
+  "tree": "6aa52382d8fc886ad58dee7ee69d2288fc8205d9",
+  "runtimeSourceSha256": {
+    "arena.ts": "aa9431233c9f53ff3cdfae2b12ac9830c9548e86adc99ad301d808d17cc48dbb",
+    "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+    "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+    "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+    "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+    "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+    "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+    "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+    "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+    "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+    "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+    "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+    "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+    "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+    "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "persistent-core.as.ts": "968cbe532d9ffc0e82310287af296f4ce2c6e77efba1beec0ec03185e6c9b267",
+    "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+    "redux-checkpoint.ts": "23ea362f1ca20d6c6771527b8dd2fcf8c2b3d009ae0d53039f87c836240ebf7b",
+    "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+    "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+    "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+    "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+    "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+    "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+    "shared-doubly-linked-list.ts": "4baf5bd675059f79e0f38b11b03f6bc7777fa648741182947d1b38b3efdfec67",
+    "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+    "shared-linked-list.ts": "12e50b36e2e5e458dd3ff6fc82e3461c62f1d44f17e186a3029244de179559b1",
+    "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+    "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+    "shared-ordered-map.ts": "67d337fcd58b05a0f179e99a48a6a21e14ba6697ad5e5d54062ab71509eefed7",
+    "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+    "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+    "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+    "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+    "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+    "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+    "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+    "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+    "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+    "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+    "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+    "tanstack-db-collection.ts": "066007cbc9713d435c873835a593fc063a28c189dd05c43d547bb873d7ff5535",
+    "text-search.ts": "4af3b6c4a11d3f350dedaac52b2af4244356aa22bca79b90c6a52e1be020c04a",
+    "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+    "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+    "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+    "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+    "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+    "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+    "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+    "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea"
+  },
+  "node": "v24.22.1",
+  "bun": "1.4.2",
+  "runnerSha256": "99d95308812088225aab35d3fd2365968cc92d4d8669a6e90c6ca4a57b891b1f",
+  "environment": {
+    "npm_config_offline": "true",
+    "timingLock": "perf.lock held by caller"
+  },
+  "steps": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:wasm"
+      ],
+      "exitCode": 0,
+      "seconds": 4.786344108997582
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:browser"
+      ],
+      "exitCode": 0,
+      "seconds": 0.03244922099838732
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:types"
+      ],
+      "exitCode": 0,
+      "seconds": 1.8980550429987488
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 1.6703668800000742
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "exitCode": 0,
+      "seconds": 0.9671780149983533
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:values"
+      ],
+      "exitCode": 0,
+      "seconds": 4.836833117002243
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:geometry"
+      ],
+      "exitCode": 0,
+      "seconds": 0.4660627650009701
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "seconds": 31.998840923002717
+    },
+    {
+      "command": [
+        "node",
+        "proofs/block-traversal-worker-check.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.46538846700059366
+    },
+    {
+      "command": [
+        "node",
+        "proofs/ordered-map-projections-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.21654688800117583
+    },
+    {
+      "command": [
+        "node",
+        "proofs/tanstack-values-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.21544402799918316
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/checkpoint-base64-20261105/correctness.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.6167774489986186
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/list-batch-tail-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.3166479680003249
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/map-values-view/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.31459088399788016
+    },
+    {
+      "command": [
+        "node",
+        "proofs/redux-node.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.11411088299792027
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "scripts/check-docs.node.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.372388209001656
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-docs.mjs",
+        "--base",
+        "77599337867dbf785a5f0311d34637d0b36678fc",
+        "--preserve"
+      ],
+      "exitCode": 0,
+      "seconds": 0.11446694899859722
+    },
+    {
+      "command": [
+        "npm",
+        "pack",
+        "--dry-run",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 0.4695655790019373
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "check:package"
+      ],
+      "exitCode": 0,
+      "seconds": 2.4750833630023408
+    }
+  ],
+  "status": "passed",
+  "finished": "2026-11-05T00:56:34.383774+00:00",
+  "validationLogSha256": "fd07c0aafa46cc66dbd9654e2d0c76ef16fe1bbe8a4e1d479c0698f9f67dd7c7"
+}
