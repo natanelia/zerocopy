@@ -1,0 +1,48 @@
+{
+  "schema": "zerocopy-list-set-noop-packaging/v1",
+  "status": "passed",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "scope": "Saved artifacts and documentation only; no runtime build, library import, unit test or performance measurement.",
+  "checks": [
+    {
+      "name": "report arithmetic",
+      "status": "passed",
+      "formalRows": 20,
+      "formalPairRatios": 120,
+      "pilotRows": 20,
+      "pilotPairRatios": 40
+    },
+    {
+      "name": "saved Node archive verification",
+      "status": "passed",
+      "exitCode": 0,
+      "seconds": 0.1944167940018815,
+      "log": "results/archive-verification-01.txt",
+      "bytes": 596,
+      "sha256": "fb9a246606600a5afc28891a3ecadffcdf83362c44eecc6d24e577f2763ff656",
+      "isolatedSealedArtifacts": true
+    },
+    {
+      "name": "independent Python archive audit",
+      "status": "passed",
+      "exitCode": 0,
+      "seconds": 1.8490996530017583,
+      "log": "results/independent-archived-audit-01.txt",
+      "bytes": 8119,
+      "sha256": "9330af0c18fbbf9d6a78edf781054854d8a3af5d88fe8add14199e5af2e896f7",
+      "isolatedSealedArtifacts": true
+    },
+    {
+      "name": "strict documentation preservation",
+      "status": "passed",
+      "exitCode": 0,
+      "seconds": 0.1254114280018257,
+      "log": "results/docs-01.txt",
+      "bytes": 148,
+      "sha256": "a423d2c5cfbf7ef58d8c7930f48d36d39351e59f208f254dc258810f1dd70f2c",
+      "isolatedSealedArtifacts": false
+    }
+  ],
+  "activeProductionTestsAndCiMatchBaseline": true,
+  "archivedOnlyNoRawMirrorsOrLibraryBuild": true
+}

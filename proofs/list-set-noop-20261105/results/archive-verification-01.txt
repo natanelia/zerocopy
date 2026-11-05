@@ -1,0 +1,3 @@
+{"path":"results/pilot-01.json.gz","rawSha256":"38149259eacaa7d0f7cbd78d7aed7569a87ca8d1e29f10d50582f4e4b751a920","phase":"pilot","status":"verified","freshSubjects":120,"summaryRows":20,"pairs":40}
+{"path":"results/formal-01.json.gz","rawSha256":"e4b493c93a4cbfd430497b4aff0cf61d2c9d0f72f4d7af07766fc6d03beda87d","phase":"formal","status":"verified","freshSubjects":240,"summaryRows":20,"pairs":120}
+{"status":"passed","immutableFiles":27,"studies":2,"freshSubjects":360,"pairs":160,"measuredBatches":3200,"checkedCalls":2084489,"checkedElements":10178996999,"checkedSourceElements":1380106158}

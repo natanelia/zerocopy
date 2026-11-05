@@ -1,0 +1,27 @@
+{
+  "localMeasuredSource": "11c73280eeaa636894851a48411fcbb5957dac54",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "files": {
+    "persistent-core.as.ts": {
+      "path": "measured-source/persistent-core.as.ts.txt",
+      "bytes": 44812,
+      "sha256": "6bf2d7ae51bd39606b50e6446e80434e2cbb4125688b212066345aa41e505618"
+    },
+    "shared-list.ts": {
+      "path": "measured-source/shared-list.ts.txt",
+      "bytes": 10795,
+      "sha256": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811"
+    },
+    "allocation-failure.test.ts": {
+      "path": "measured-source/allocation-failure.test.ts.txt",
+      "bytes": 13670,
+      "sha256": "84ea6016bc2bc2b67ae638acb70fb670ba2295065d066cbca90754e88bcbe453"
+    },
+    "list-set-noop.test.ts": {
+      "path": "measured-source/list-set-noop.test.ts.txt",
+      "bytes": 8934,
+      "sha256": "d8eccb52ba3c4a24cb46da644d07ace8faa247c4a7de6725ac042e0a1eb94235"
+    }
+  },
+  "publicationMode": "proof-only; active production and tests restored to the baseline"
+}

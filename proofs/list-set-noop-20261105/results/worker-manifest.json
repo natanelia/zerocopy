@@ -1,0 +1,75 @@
+{
+  "schema": "zerocopy-list-set-noop-worker/v1",
+  "status": "passed",
+  "localSource": "11c7328",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "command": "flock /workspace/scratch/83f1d4baba1f/perf.lock node proofs/list-set-noop-20261105/worker.mjs dist/shared.js /workspace/scratch/83f1d4baba1f/zerocopy-r4-base/dist/shared.js",
+  "groups": [
+    {
+      "passed": true,
+      "runtime": "v24.22.1",
+      "reader": "current",
+      "copy": false,
+      "zeroAllocationNoops": true,
+      "changedPathFormat": true,
+      "signedZero": true,
+      "suspendedIterators": true,
+      "concurrentReadsAtLeast": 4096,
+      "writerGrew": true,
+      "resetAndForks": true,
+      "oldAndNewAttachments": true
+    },
+    {
+      "passed": true,
+      "runtime": "v24.22.1",
+      "reader": "current",
+      "copy": true,
+      "zeroAllocationNoops": true,
+      "changedPathFormat": true,
+      "signedZero": true,
+      "suspendedIterators": true,
+      "concurrentReadsAtLeast": 4096,
+      "writerGrew": true,
+      "resetAndForks": true,
+      "oldAndNewAttachments": true
+    },
+    {
+      "passed": true,
+      "runtime": "v24.22.1",
+      "reader": "baseline",
+      "copy": false,
+      "zeroAllocationNoops": true,
+      "changedPathFormat": true,
+      "signedZero": true,
+      "suspendedIterators": true,
+      "concurrentReadsAtLeast": 4096,
+      "writerGrew": true,
+      "resetAndForks": true,
+      "oldAndNewAttachments": true
+    },
+    {
+      "passed": true,
+      "runtime": "v24.22.1",
+      "reader": "baseline",
+      "copy": true,
+      "zeroAllocationNoops": true,
+      "changedPathFormat": true,
+      "signedZero": true,
+      "suspendedIterators": true,
+      "concurrentReadsAtLeast": 4096,
+      "writerGrew": true,
+      "resetAndForks": true,
+      "oldAndNewAttachments": true
+    }
+  ],
+  "files": {
+    "worker.mjs": {
+      "bytes": 7513,
+      "sha256": "c7ed7925faf6cdb633904443a63229ac698a0a208743f15036d35153d0487a9d"
+    },
+    "results/worker-01.txt": {
+      "bytes": 1048,
+      "sha256": "6761c9af22e425a9dff19a8fc8e7c3a2d9247e8e8e63d336cb9b00b781dff7c2"
+    }
+  }
+}

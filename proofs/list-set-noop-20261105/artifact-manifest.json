@@ -1,0 +1,226 @@
+{
+  "schema": "zerocopy-list-set-noop-artifacts/v1",
+  "decision": "rejected; proof-only archive; no improvement PR",
+  "reason": "All no-op targets improved, but common changed-write and read controls retained material cost or uncertainty; notably all six formal Node changed-number pairs were slower.",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "localMeasuredSource": "11c73280eeaa636894851a48411fcbb5957dac54",
+  "localConfirmationProvenance": "9582516e478f2db9f7b1d7cb27edd18b68f2336b",
+  "sourcePublication": "Active production, active tests and CI are restored to the baseline. Measured candidate files are text artifacts only.",
+  "experiments": [
+    {
+      "stage": "source-freeze",
+      "localCommit": "11c73280eeaa636894851a48411fcbb5957dac54",
+      "scope": "child-first exact-bit no-op tree and tail writes; fixed ten-case matrix and driver"
+    },
+    {
+      "stage": "focused-validation",
+      "result": "passed",
+      "tests": 73,
+      "testFiles": 3,
+      "builds": [
+        "WASM",
+        "portable browser modules"
+      ],
+      "typecheck": true,
+      "record": "results/focused-validation-manifest.json"
+    },
+    {
+      "stage": "untimed-workloads",
+      "result": "passed",
+      "rows": 40,
+      "scope": "both builds, all ten cases, Node and Bun",
+      "record": "results/workload-check-01.txt"
+    },
+    {
+      "stage": "pilot",
+      "result": "completed; unresolved adverse controls retained",
+      "record": "results/pilot-01.json.gz"
+    },
+    {
+      "stage": "real-worker-compatibility",
+      "result": "passed",
+      "groups": 4,
+      "scope": "current and baseline readers with shared and copied transports",
+      "record": "results/worker-manifest.json"
+    },
+    {
+      "stage": "confirmation-predeclaration",
+      "localCommit": "9582516e478f2db9f7b1d7cb27edd18b68f2336b",
+      "record": "CONFIRMATION.md",
+      "sourceOrDriverChanges": false
+    },
+    {
+      "stage": "formal",
+      "result": "completed; performance gate rejected",
+      "record": "results/formal-01.json.gz"
+    },
+    {
+      "stage": "independent-audits",
+      "result": "passed",
+      "records": [
+        "results/independent-pilot-audit-01.txt",
+        "results/independent-formal-audit-01.txt"
+      ],
+      "scope": "saved arithmetic, native expected digests, allocation/counter/order checks and measured source/build identities; no timing"
+    },
+    {
+      "stage": "archive",
+      "result": "proof-only",
+      "rawStudiesLosslesslyPreserved": true,
+      "furtherRuntimeTestsOrMeasurements": false
+    }
+  ],
+  "studies": [
+    {
+      "phase": "pilot",
+      "path": "results/pilot-01.json.gz",
+      "storedBytes": 97673,
+      "storedSha256": "21244357fe7f32ddff0ab0a7277e5b5b5c88772b1d56adfcbe1908d82bcb5a60",
+      "rawBytes": 2468512,
+      "rawSha256": "38149259eacaa7d0f7cbd78d7aed7569a87ca8d1e29f10d50582f4e4b751a920",
+      "losslessRoundTripVerified": true,
+      "pairs": 40,
+      "measuredProcesses": 80,
+      "summaryRows": 20
+    },
+    {
+      "phase": "formal",
+      "path": "results/formal-01.json.gz",
+      "storedBytes": 440384,
+      "storedSha256": "ee6f4605812ddd1ba33995742100e2aac71a2e7aed9d4e5ae62dc075f65e5873",
+      "rawBytes": 12657575,
+      "rawSha256": "e4b493c93a4cbfd430497b4aff0cf61d2c9d0f72f4d7af07766fc6d03beda87d",
+      "losslessRoundTripVerified": true,
+      "pairs": 120,
+      "measuredProcesses": 240,
+      "summaryRows": 20
+    }
+  ],
+  "measuredSources": {
+    "persistent-core.as.ts": "measured-source/persistent-core.as.ts.txt",
+    "shared-list.ts": "measured-source/shared-list.ts.txt",
+    "allocation-failure.test.ts": "measured-source/allocation-failure.test.ts.txt",
+    "list-set-noop.test.ts": "measured-source/list-set-noop.test.ts.txt"
+  },
+  "files": {
+    "CONFIRMATION.md": {
+      "bytes": 4280,
+      "sha256": "1cb640c4d424105e5039530d5fd0987e052d244173028e046b89881b9b0dbcac"
+    },
+    "PLAN.md": {
+      "bytes": 6831,
+      "sha256": "6de7b639fc8512fbbc57c33658d02908973a8106d44390c0dac0be2bb6cc6fbf"
+    },
+    "README.md": {
+      "bytes": 18398,
+      "sha256": "ce365083774f1aedabffd85d75909a341ebc103a43714d21eac2d4bd55c85a98"
+    },
+    "benchmark.mjs": {
+      "bytes": 15181,
+      "sha256": "7805361e59216b65856ebeb3897d9dcd506ff3499492157eb9630346a2f9a863"
+    },
+    "check-workloads.mjs": {
+      "bytes": 1096,
+      "sha256": "f746d502d1f2b9d7808890c6d7375bba5efa9ad4e0a1d21dc21f9b6ff2b34ae2"
+    },
+    "independent-audit.py": {
+      "bytes": 20122,
+      "sha256": "6585cc6028e073e77bc4334c7422e001e624345d004277ee36a27241af251811"
+    },
+    "measured-source/allocation-failure.test.ts.txt": {
+      "bytes": 13670,
+      "sha256": "84ea6016bc2bc2b67ae638acb70fb670ba2295065d066cbca90754e88bcbe453"
+    },
+    "measured-source/list-set-noop.test.ts.txt": {
+      "bytes": 8934,
+      "sha256": "d8eccb52ba3c4a24cb46da644d07ace8faa247c4a7de6725ac042e0a1eb94235"
+    },
+    "measured-source/manifest.json": {
+      "bytes": 1039,
+      "sha256": "c453500818f9705d89098868556552d7f71202fee7dae477ffa67a06d9ab00db"
+    },
+    "measured-source/persistent-core.as.ts.txt": {
+      "bytes": 44812,
+      "sha256": "6bf2d7ae51bd39606b50e6446e80434e2cbb4125688b212066345aa41e505618"
+    },
+    "measured-source/shared-list.ts.txt": {
+      "bytes": 10795,
+      "sha256": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811"
+    },
+    "pilot-summary.md": {
+      "bytes": 3993,
+      "sha256": "c908b98e11fc3954cca85672a17c69f351ec06158e2083cafa79e37305c91ad0"
+    },
+    "results/focused-validation-01.txt": {
+      "bytes": 282,
+      "sha256": "09875846226cddeaa09933c9974f2d73254e3f0767c42cad848e03dac28be3a2"
+    },
+    "results/focused-validation-manifest.json": {
+      "bytes": 5619,
+      "sha256": "65fe979a42e51a256c3448ed3d176e59379766cf8580b4ac5e6c344037b0b36b"
+    },
+    "results/formal-01.json.gz": {
+      "bytes": 440384,
+      "sha256": "ee6f4605812ddd1ba33995742100e2aac71a2e7aed9d4e5ae62dc075f65e5873"
+    },
+    "results/formal-01.txt": {
+      "bytes": 15147,
+      "sha256": "e336b97a9ecf375cd549c26e2b17b78b67e6707a6897352c4a8bee673bf368eb"
+    },
+    "results/independent-formal-audit-01.txt": {
+      "bytes": 4721,
+      "sha256": "163ce9e1e03d2dea156c8204ce578f8b3ab09bfce4cc65faf0bf00e1e8928763"
+    },
+    "results/independent-pilot-audit-01.txt": {
+      "bytes": 3508,
+      "sha256": "6537c8dbe43c4cbb688eb9c9217457e57a38109b218765e452e109ef21cd275c"
+    },
+    "results/packaging-preparation-01.txt": {
+      "bytes": 832,
+      "sha256": "39ffd910db14e52f8ae1641572f4fa4005604b669fbd9b48e237f208da11fcdd"
+    },
+    "results/pilot-01.json.gz": {
+      "bytes": 97673,
+      "sha256": "21244357fe7f32ddff0ab0a7277e5b5b5c88772b1d56adfcbe1908d82bcb5a60"
+    },
+    "results/pilot-01.txt": {
+      "bytes": 7560,
+      "sha256": "a36e37dceea4efcf6fca9b1269530ef709a9b81655cae359b4e802545e987712"
+    },
+    "results/worker-01.txt": {
+      "bytes": 1048,
+      "sha256": "6761c9af22e425a9dff19a8fc8e7c3a2d9247e8e8e63d336cb9b00b781dff7c2"
+    },
+    "results/worker-manifest.json": {
+      "bytes": 2128,
+      "sha256": "0318a6a121adf0181a34fbd4e9cad54558b8bb9fc3139b9efb2b9ca01ac930f1"
+    },
+    "results/workload-check-01.txt": {
+      "bytes": 14690,
+      "sha256": "1e69eb790cde65c9de089453bb103ec64a34fb991f9483630b0919e733c89d6e"
+    },
+    "verify.mjs": {
+      "bytes": 13430,
+      "sha256": "a1f33f8f0cd45a2f2713e0a85b4466114d4462e1b2641be90ebab6b218dbfbd5"
+    },
+    "worker.mjs": {
+      "bytes": 7513,
+      "sha256": "c7ed7925faf6cdb633904443a63229ac698a0a208743f15036d35153d0487a9d"
+    },
+    "workloads.mjs": {
+      "bytes": 6050,
+      "sha256": "12da5289f93942bcc216a0e2337f59b652522acf2aa0595f5446fec7c0a33ac2"
+    }
+  },
+  "generatedPackagingOutputs": [
+    "results/archive-verification-01.txt",
+    "results/independent-archived-audit-01.txt",
+    "results/docs-01.txt",
+    "results/packaging-gate-manifest.json"
+  ],
+  "excludedLocalMirrors": [
+    "results/pilot-01.json",
+    "results/formal-01.json"
+  ],
+  "packagingOutputNote": "Outputs are produced by verification itself and excluded from the immutable input hash list; publication Git blobs cover every committed file."
+}

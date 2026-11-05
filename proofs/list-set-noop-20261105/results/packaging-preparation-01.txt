@@ -1,0 +1,8 @@
+Archive preparation record
+
+Attempt 1 stopped before writing the artifact manifest: AssertionError at the guard excluding duplicate plaintext raw JSON files. Both untracked plaintext mirrors were present again after backup/move. No study or compressed artifact was changed.
+
+Follow-up read-only checks confirmed both mirrors, both gzip decompressions and the external original-byte backups are byte-identical, with the recorded original SHA-256 values. The archive explicitly excludes plaintext mirrors from its input ledger and Git staging; it includes both complete gzip files and original-byte hashes. No timing, library import or runtime test was performed.
+
+Pilot raw SHA-256: 38149259eacaa7d0f7cbd78d7aed7569a87ca8d1e29f10d50582f4e4b751a920
+Formal raw SHA-256: e4b493c93a4cbfd430497b4aff0cf61d2c9d0f72f4d7af07766fc6d03beda87d
