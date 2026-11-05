@@ -1,0 +1,26 @@
+{
+  "localMeasuredSource": "ca20cb2bb4310c74a73ef0dc8623ab9b6f039191",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "files": {
+    "persistent-core.as.ts": {
+      "path": "measured-source/persistent-core.as.ts.txt",
+      "bytes": 44677,
+      "sha256": "0116724aa326d8219ae62cc0907c851761cc48f43ef61673bd3cc41769a1e143"
+    },
+    "shared-list.ts": {
+      "path": "measured-source/shared-list.ts.txt",
+      "bytes": 10795,
+      "sha256": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811"
+    },
+    "allocation-failure.test.ts": {
+      "path": "measured-source/allocation-failure.test.ts.txt",
+      "bytes": 13592,
+      "sha256": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901"
+    },
+    "list-set-lookup.test.ts": {
+      "path": "measured-source/list-set-lookup.test.ts.txt",
+      "bytes": 10283,
+      "sha256": "cf5735c3887a922de0e7e2dfefd6a442c2c35b35683c70aaecedf2b1b7fb7abc"
+    }
+  }
+}

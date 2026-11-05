@@ -1,0 +1,114 @@
+{
+  "schema": "zerocopy-list-set-lookup-artifacts/v1",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "localMeasuredSource": "ca20cb2bb4310c74a73ef0dc8623ab9b6f039191",
+  "localConfirmation": "a9be81a6e728c5cb379c1de25be81da92a7e2e2c",
+  "studies": [
+    {
+      "path": "results/pilot-01.json.gz",
+      "storedBytes": 104648,
+      "storedSha256": "f8544058f3925db0ce44a4b5425ace4e7bbeac91bc2af648c271d9049c48d00b",
+      "rawBytes": 2763377,
+      "rawSha256": "66f0cb0a8908bc45809269df7fb86ef607c8df70fd0aee8c365f18cbeae866db"
+    },
+    {
+      "path": "results/formal-01.json.gz",
+      "storedBytes": 443432,
+      "storedSha256": "76f5458a7d2396eadf08527be075778f8d77758d897e902e39ae5a4c79115b2e",
+      "rawBytes": 13312596,
+      "rawSha256": "42a3e74e824357a6d1cbc6648c3976ef3c47db41a45add1e25a6c5e05efa1c99"
+    }
+  ],
+  "measuredSources": {
+    "persistent-core.as.ts": "measured-source/persistent-core.as.ts.txt",
+    "shared-list.ts": "measured-source/shared-list.ts.txt",
+    "allocation-failure.test.ts": "measured-source/allocation-failure.test.ts.txt",
+    "list-set-lookup.test.ts": "measured-source/list-set-lookup.test.ts.txt"
+  },
+  "files": {
+    "CONFIRMATION.md": {
+      "bytes": 4353,
+      "sha256": "b926282a781c30b2744b1add9ffe5d9e5dbdfea2c2c911391f990d513b7a3754"
+    },
+    "PLAN.md": {
+      "bytes": 8644,
+      "sha256": "c42cfafe661a11912d705ad2ead9bdd55435abf0f22ca7c01a83d8f61ab25310"
+    },
+    "README.md": {
+      "bytes": 17916,
+      "sha256": "cdbe7bb733ec3726ca82dd2cd8f2cc563b180a401b9585231610187aed019daa"
+    },
+    "benchmark.mjs": {
+      "bytes": 15873,
+      "sha256": "c44431a80ea33bfc8abd3b0b04c4ec91d17414c6543bd455ca14a762669db6e8"
+    },
+    "check-workloads.mjs": {
+      "bytes": 1096,
+      "sha256": "f746d502d1f2b9d7808890c6d7375bba5efa9ad4e0a1d21dc21f9b6ff2b34ae2"
+    },
+    "independent-audit.py": {
+      "bytes": 20382,
+      "sha256": "9906b843e34c5adf1f6c987e8a203d6e8b0a7ffb4e6bc7d22ee9bcee3907304a"
+    },
+    "measured-source/allocation-failure.test.ts.txt": {
+      "bytes": 13592,
+      "sha256": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901"
+    },
+    "measured-source/list-set-lookup.test.ts.txt": {
+      "bytes": 10283,
+      "sha256": "cf5735c3887a922de0e7e2dfefd6a442c2c35b35683c70aaecedf2b1b7fb7abc"
+    },
+    "measured-source/manifest.json": {
+      "bytes": 955,
+      "sha256": "60b4458589c5b48aa0ee0ec90bdf5e3694ddffd81e018d8d7e819f29341fff93"
+    },
+    "measured-source/persistent-core.as.ts.txt": {
+      "bytes": 44677,
+      "sha256": "0116724aa326d8219ae62cc0907c851761cc48f43ef61673bd3cc41769a1e143"
+    },
+    "measured-source/shared-list.ts.txt": {
+      "bytes": 10795,
+      "sha256": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811"
+    },
+    "pilot-summary.md": {
+      "bytes": 4182,
+      "sha256": "aa667a2da505e8320a412c391befa4dc17aa299ae626ab246166e56922376329"
+    },
+    "results/formal-01.txt": {
+      "bytes": 15153,
+      "sha256": "3902ec1924519fa9382a5f8f8a7cf02b37b03e33ce28cbed7d8d7b2c903d0dd0"
+    },
+    "results/independent-formal-audit-01.txt": {
+      "bytes": 4721,
+      "sha256": "c26c7a7978c3072f6af131cb4e1b939012eea2a32b3f93bdcb642706b3f9597b"
+    },
+    "results/independent-pilot-audit-01.txt": {
+      "bytes": 3510,
+      "sha256": "ac3e2980feb2886c41573e5a944d8f21f7f469b6e3cf1d1ee0d59d01185af739"
+    },
+    "results/pilot-01.txt": {
+      "bytes": 7602,
+      "sha256": "bd2e46bdd7f71146755a43f304eb3c28422c17ae526cc208a9108da61fbdce16"
+    },
+    "results/validation-01.txt": {
+      "bytes": 16178,
+      "sha256": "6d3ef392e6fe3fdf8db58d59976d0f36e3fb60cc1d3fb33bc07c61fddb45e13d"
+    },
+    "results/validation-manifest.json": {
+      "bytes": 6554,
+      "sha256": "549d01f166434af53dc6f96a30ac9184dce898a96915c95187c0ccaed1e5841b"
+    },
+    "verify.mjs": {
+      "bytes": 13457,
+      "sha256": "f95edf7224b5f54776e5c002e8a30a0879954ebc38a2f78542b738acc7170969"
+    },
+    "worker.mjs": {
+      "bytes": 7691,
+      "sha256": "a23af1905e4b1410d9ad2adbfeff4020e67d73e8a0761c6fb8193f66c717a6de"
+    },
+    "workloads.mjs": {
+      "bytes": 6104,
+      "sha256": "6550651f14568d1c4135ffb99f93e75aa6c045de9c2c53368f304339383f9b0f"
+    }
+  }
+}

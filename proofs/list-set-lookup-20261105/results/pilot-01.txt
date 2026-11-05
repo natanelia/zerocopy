@@ -1,0 +1,60 @@
+node tail-number-noop pair 1: 0.965 candidate/baseline
+node tree-number-noop pair 1: 0.205 candidate/baseline
+node tree-boolean-noop pair 1: 0.269 candidate/baseline
+node tree-string-noop pair 1: 0.283 candidate/baseline
+node tail-number-changed pair 1: 1.083 candidate/baseline
+node tree-number-changed pair 1: 0.842 candidate/baseline
+node tree-boolean-changed pair 1: 1.126 candidate/baseline
+node tree-string-changed pair 1: 0.936 candidate/baseline
+node tree-json-reencode pair 1: 0.786 candidate/baseline
+node get-control pair 1: 0.875 candidate/baseline
+node tree-number-noop pair 2: 0.228 candidate/baseline
+node tree-boolean-noop pair 2: 0.353 candidate/baseline
+node tree-string-noop pair 2: 0.275 candidate/baseline
+node tail-number-changed pair 2: 1.474 candidate/baseline
+node tree-number-changed pair 2: 1.006 candidate/baseline
+node tree-boolean-changed pair 2: 0.903 candidate/baseline
+node tree-string-changed pair 2: 0.994 candidate/baseline
+node tree-json-reencode pair 2: 0.935 candidate/baseline
+node get-control pair 2: 1.489 candidate/baseline
+node tail-number-noop pair 2: 0.921 candidate/baseline
+bun tail-number-noop pair 1: 1.209 candidate/baseline
+bun tree-number-noop pair 1: 0.187 candidate/baseline
+bun tree-boolean-noop pair 1: 0.257 candidate/baseline
+bun tree-string-noop pair 1: 0.121 candidate/baseline
+bun tail-number-changed pair 1: 1.138 candidate/baseline
+bun tree-number-changed pair 1: 0.901 candidate/baseline
+bun tree-boolean-changed pair 1: 1.156 candidate/baseline
+bun tree-string-changed pair 1: 0.900 candidate/baseline
+bun tree-json-reencode pair 1: 1.119 candidate/baseline
+bun get-control pair 1: 1.166 candidate/baseline
+bun tree-number-noop pair 2: 0.117 candidate/baseline
+bun tree-boolean-noop pair 2: 0.182 candidate/baseline
+bun tree-string-noop pair 2: 0.172 candidate/baseline
+bun tail-number-changed pair 2: 0.873 candidate/baseline
+bun tree-number-changed pair 2: 0.953 candidate/baseline
+bun tree-boolean-changed pair 2: 1.172 candidate/baseline
+bun tree-string-changed pair 2: 0.760 candidate/baseline
+bun tree-json-reencode pair 2: 0.882 candidate/baseline
+bun get-control pair 2: 0.984 candidate/baseline
+bun tail-number-noop pair 2: 0.868 candidate/baseline
+{"runtime":"node","name":"tail-number-noop","pairs":2,"beforeMedianMs":0.09281324299065419,"afterMedianMs":0.08753675545171341,"ratio":0.9423800369004811,"pairRatios":[0.9646568681606346,0.9206176447402531],"minRatio":0.9206176447402531,"maxRatio":0.9646568681606346}
+{"runtime":"node","name":"tree-number-noop","pairs":2,"beforeMedianMs":0.4042570333333325,"afterMedianMs":0.08749569999999948,"ratio":0.21615753210405625,"pairRatios":[0.20521572782786823,0.22768273747764375],"minRatio":0.20521572782786823,"maxRatio":0.22768273747764375}
+{"runtime":"node","name":"tree-boolean-noop","pairs":2,"beforeMedianMs":0.3188336249999999,"afterMedianMs":0.09917725000000033,"ratio":0.30780388079194676,"pairRatios":[0.2685145426735908,0.3528420773311852],"minRatio":0.2685145426735908,"maxRatio":0.3528420773311852}
+{"runtime":"node","name":"tree-string-noop","pairs":2,"beforeMedianMs":0.3253895312500008,"afterMedianMs":0.0907714531249999,"ratio":0.2790040908977926,"pairRatios":[0.28324033502263835,0.2748312055607546],"minRatio":0.2748312055607546,"maxRatio":0.28324033502263835}
+{"runtime":"node","name":"tail-number-changed","pairs":2,"beforeMedianMs":0.09360494711538454,"afterMedianMs":0.11842500480769229,"ratio":1.2634634345514026,"pairRatios":[1.0827858716160172,1.474289508474976],"minRatio":1.0827858716160172,"maxRatio":1.474289508474976}
+{"runtime":"node","name":"tree-number-changed","pairs":2,"beforeMedianMs":0.44643506666666705,"afterMedianMs":0.40914920000000166,"ratio":0.9203454391200007,"pairRatios":[0.8416337746238929,1.0064184124353945],"minRatio":0.8416337746238929,"maxRatio":1.0064184124353945}
+{"runtime":"node","name":"tree-boolean-changed","pairs":2,"beforeMedianMs":0.3708995624999991,"afterMedianMs":0.3707569062499996,"ratio":1.0082109730035955,"pairRatios":[1.1255010441565556,0.9031438676688288],"minRatio":0.9031438676688288,"maxRatio":1.1255010441565556}
+{"runtime":"node","name":"tree-string-changed","pairs":2,"beforeMedianMs":0.35098614062500033,"afterMedianMs":0.33836371874999926,"ratio":0.9647974086511656,"pairRatios":[0.9360789660508997,0.9943969189554352],"minRatio":0.9360789660508997,"maxRatio":0.9943969189554352}
+{"runtime":"node","name":"tree-json-reencode","pairs":2,"beforeMedianMs":1.1044227833333329,"afterMedianMs":0.9434660666666663,"ratio":0.8574728540049907,"pairRatios":[0.7864358509746133,0.9349264716814124],"minRatio":0.7864358509746133,"maxRatio":0.9349264716814124}
+{"runtime":"node","name":"get-control","pairs":2,"beforeMedianMs":0.026011480957031263,"afterMedianMs":0.02947336669921874,"ratio":1.1411617906585783,"pairRatios":[0.8748375954981248,1.4885622647682433],"minRatio":0.8748375954981248,"maxRatio":1.4885622647682433}
+{"runtime":"bun","name":"tail-number-noop","pairs":2,"beforeMedianMs":0.05709898437499994,"afterMedianMs":0.05923236523437497,"ratio":1.0245353051345896,"pairRatios":[1.2094127234311878,0.8679192562893108],"minRatio":0.8679192562893108,"maxRatio":1.2094127234311878}
+{"runtime":"bun","name":"tree-number-noop","pairs":2,"beforeMedianMs":0.37231186666666266,"afterMedianMs":0.056848300000001475,"ratio":0.14787801145056997,"pairRatios":[0.18650391178921435,0.11725172979368864],"minRatio":0.11725172979368864,"maxRatio":0.18650391178921435}
+{"runtime":"bun","name":"tree-boolean-noop","pairs":2,"beforeMedianMs":0.27575145312500027,"afterMedianMs":0.061502015624999906,"ratio":0.21588364904357057,"pairRatios":[0.25675792241751505,0.18151630721089018],"minRatio":0.18151630721089018,"maxRatio":0.25675792241751505}
+{"runtime":"bun","name":"tree-string-noop","pairs":2,"beforeMedianMs":0.3378001093749998,"afterMedianMs":0.04854592187499929,"ratio":0.14414333071440466,"pairRatios":[0.12073695116247703,0.17208733191781522],"minRatio":0.12073695116247703,"maxRatio":0.17208733191781522}
+{"runtime":"bun","name":"tail-number-changed","pairs":2,"beforeMedianMs":0.05436454589843753,"afterMedianMs":0.054502493164062416,"ratio":0.9964143220594363,"pairRatios":[1.137740865750725,0.8726429111342952],"minRatio":0.8726429111342952,"maxRatio":1.137740865750725}
+{"runtime":"bun","name":"tree-number-changed","pairs":2,"beforeMedianMs":0.38139223333332856,"afterMedianMs":0.35335456666666876,"ratio":0.9264657458469658,"pairRatios":[0.901124109253429,0.952520046255225],"minRatio":0.901124109253429,"maxRatio":0.952520046255225}
+{"runtime":"bun","name":"tree-boolean-changed","pairs":2,"beforeMedianMs":0.27605248437499874,"afterMedianMs":0.32114328124999947,"ratio":1.164220318507823,"pairRatios":[1.156013008705714,1.1724858974934798],"minRatio":1.156013008705714,"maxRatio":1.1724858974934798}
+{"runtime":"bun","name":"tree-string-changed","pairs":2,"beforeMedianMs":0.36641590624999987,"afterMedianMs":0.30517220312500015,"ratio":0.8269129242197493,"pairRatios":[0.9000127466201007,0.7597503333253185],"minRatio":0.7597503333253185,"maxRatio":0.9000127466201007}
+{"runtime":"bun","name":"tree-json-reencode","pairs":2,"beforeMedianMs":1.2897513333333328,"afterMedianMs":1.282790300000003,"ratio":0.9938530391938382,"pairRatios":[1.1193580950277608,0.8824199046778968],"minRatio":0.8824199046778968,"maxRatio":1.1193580950277608}
+{"runtime":"bun","name":"get-control","pairs":2,"beforeMedianMs":0.016900764160156262,"afterMedianMs":0.018100751464843745,"ratio":1.0710986390540915,"pairRatios":[1.1656990222041392,0.9841753941032461],"minRatio":0.9841753941032461,"maxRatio":1.1656990222041392}

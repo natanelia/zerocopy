@@ -1,0 +1,6 @@
+{"path":"results/pilot-01.json.gz","rawSha256":"66f0cb0a8908bc45809269df7fb86ef607c8df70fd0aee8c365f18cbeae866db","phase":"pilot","status":"verified","freshSubjects":120,"summaryRows":20,"pairs":40}
+{"path":"results/formal-01.json.gz","rawSha256":"42a3e74e824357a6d1cbc6648c3976ef3c47db41a45add1e25a6c5e05efa1c99","phase":"formal","status":"verified","freshSubjects":240,"summaryRows":20,"pairs":120}
+{"status":"passed","immutableFiles":23,"studies":2,"freshSubjects":360,"pairs":160,"measuredBatches":3200,"checkedCalls":2051240,"checkedElements":11138212676,"checkedSourceElements":1515384988}
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (60 Markdown files).

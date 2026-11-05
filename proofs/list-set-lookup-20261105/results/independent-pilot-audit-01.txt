@@ -1,0 +1,33 @@
+
+PASS pilot-01.json: phase=pilot; raw_bytes=2763377; raw_sha256=66f0cb0a8908bc45809269df7fb86ef607c8df70fd0aee8c365f18cbeae866db
+Source: baseline=77599337867dbf785a5f0311d34637d0b36678fc; recorded candidate=ca20cb2bb4310c74a73ef0dc8623ab9b6f039191; measured runtime=ca20cb2bb4310c74a73ef0dc8623ab9b6f039191
+Identity checks: source/WASM relationship constraints and 3 frozen driver files; 292 optional measured-tree files
+runtime | case | before ms/1024 calls | after ms/1024 calls | paired after/before | 95% interval (formal only) | pair ratios
+node | tail-number-noop | 0.092813243 | 0.087536755 | 0.942380037 | not inferred | 0.964656868, 0.920617645
+node | tree-number-noop | 0.404257033 | 0.087495700 | 0.216157532 | not inferred | 0.205215728, 0.227682737
+node | tree-boolean-noop | 0.318833625 | 0.099177250 | 0.307803881 | not inferred | 0.268514543, 0.352842077
+node | tree-string-noop | 0.325389531 | 0.090771453 | 0.279004091 | not inferred | 0.283240335, 0.274831206
+node | tail-number-changed | 0.093604947 | 0.118425005 | 1.263463435 | not inferred | 1.082785872, 1.474289508
+node | tree-number-changed | 0.446435067 | 0.409149200 | 0.920345439 | not inferred | 0.841633775, 1.006418412
+node | tree-boolean-changed | 0.370899562 | 0.370756906 | 1.008210973 | not inferred | 1.125501044, 0.903143868
+node | tree-string-changed | 0.350986141 | 0.338363719 | 0.964797409 | not inferred | 0.936078966, 0.994396919
+node | tree-json-reencode | 1.104422783 | 0.943466067 | 0.857472854 | not inferred | 0.786435851, 0.934926472
+node | get-control | 0.026011481 | 0.029473367 | 1.141161791 | not inferred | 0.874837595, 1.488562265
+bun | tail-number-noop | 0.057098984 | 0.059232365 | 1.024535305 | not inferred | 1.209412723, 0.867919256
+bun | tree-number-noop | 0.372311867 | 0.056848300 | 0.147878011 | not inferred | 0.186503912, 0.117251730
+bun | tree-boolean-noop | 0.275751453 | 0.061502016 | 0.215883649 | not inferred | 0.256757922, 0.181516307
+bun | tree-string-noop | 0.337800109 | 0.048545922 | 0.144143331 | not inferred | 0.120736951, 0.172087332
+bun | tail-number-changed | 0.054364546 | 0.054502493 | 0.996414322 | not inferred | 1.137740866, 0.872642911
+bun | tree-number-changed | 0.381392233 | 0.353354567 | 0.926465746 | not inferred | 0.901124109, 0.952520046
+bun | tree-boolean-changed | 0.276052484 | 0.321143281 | 1.164220319 | not inferred | 1.156013009, 1.172485897
+bun | tree-string-changed | 0.366415906 | 0.305172203 | 0.826912924 | not inferred | 0.900012747, 0.759750333
+bun | tree-json-reencode | 1.289751333 | 1.282790300 | 0.993853039 | not inferred | 1.119358095, 0.882419905
+bun | get-control | 0.016900764 | 0.018100751 | 1.071098639 | not inferred | 1.165699022, 0.984175394
+Verified 80 measured-process medians; 40 paired ratios; 20 summary rows; 560 measured batches
+Also checked 40 calibration records; 4154 total initial/warm/calibration/measured batches
+Measured subjects recorded 272206 fully checked final results and 1059845702 output elements
+Measured subjects recorded 140642800 source elements checked; every batch matched independently predicted shared allocation
+node: actual timed warm-up 150.608324–307.944016 ms; min measured batch 1.133004 ms; below-20-ms batches 168/280; max warm-up batches 100
+bun: actual timed warm-up 150.080661–395.206311 ms; min measured batch 0.611132 ms; below-20-ms batches 188/280; max warm-up batches 179
+
+All requested saved-data audits passed. No library import, build, test, benchmark or timing run was performed.
