@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-set-foreach
+
+
+ Test Files  4 passed (4)
+      Tests  64 passed (64)
+   Start at  09:26:44
+   Duration  2.45s (transform 430ms, setup 0ms, import 887ms, tests 1.31s, environment 0ms)
+

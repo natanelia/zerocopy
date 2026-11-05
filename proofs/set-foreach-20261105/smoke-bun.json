@@ -1,0 +1,561 @@
+{
+  "runtime": "bun",
+  "versions": {
+    "node": "26.3.0",
+    "bun": "1.4.2",
+    "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+    "openssl": "1.1.0",
+    "llhttp": "9.3.0",
+    "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+    "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+    "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+    "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+    "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+    "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+    "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+    "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+    "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+    "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+    "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+    "v8": "14.6.202.34-node.20",
+    "uv": "1.48.0",
+    "napi": "10",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "sqlite": "3.53.2",
+    "modules": "147"
+  },
+  "rows": [
+    {
+      "name": "set-strings-1024",
+      "expectedDigest": "11192075c87b0e43ddc1eca503846e879b7ffe5a5f3ef3992157ec6f22f07f93",
+      "fixture": {
+        "kind": "set",
+        "pattern": "strings",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 154740,
+        "originalBytesDigest": "226f1ecc2449bdc28f900a75dd1522853780abca90777ae07d47df2a14320762",
+        "descriptor": {
+          "root": 154728,
+          "valueType": "number",
+          "size": 1024
+        },
+        "inputDigest": "68862faa5a42a44dbb1ec8e869986813bc661e4faf387c5817e581d03a3a1eea",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-strings-8192",
+      "expectedDigest": "83d6b382a2f5511c0c7ee31a4ad142f9e16c904fb157d0c268c0f2188c84f4bb",
+      "fixture": {
+        "kind": "set",
+        "pattern": "strings",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 1005480,
+        "originalBytesDigest": "2d9c6e00edfda1fcb45a4efb31c2ddc10c0690fa600b932e0bb3609a451202b5",
+        "descriptor": {
+          "root": 1005468,
+          "valueType": "number",
+          "size": 8192
+        },
+        "inputDigest": "81f99691ac0e00f1428e7e76d133fbd0e4ff5909ad9418dcd5fe53e4d23f7e18",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-mixed-1024",
+      "expectedDigest": "ed63f17357796043ef5d4d645f57b670378201b8f1e4e8725d535e33fa4996d3",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 1089900,
+        "originalBytesDigest": "3ea1496b10500eda6e1e54539007defa8db0c3a329fdd3ef4f432aba5a9a9fe7",
+        "descriptor": {
+          "root": 1089888,
+          "valueType": "number",
+          "size": 1024
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-mixed-8192",
+      "expectedDigest": "ccf475c41900a69973880bd95e58f5a176b8ed5f4f40a8f17aa4b01df67286cd",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 1904280,
+        "originalBytesDigest": "7385da7845dc7aff904567f50b80f751e81662fe88430b43b9b0d4cbaff109ed",
+        "descriptor": {
+          "root": 1904268,
+          "valueType": "number",
+          "size": 8192
+        },
+        "inputDigest": "52a1fc436938f15164de38f8f05b0bfef6db6d9bc2122ca64103d1888be0274e",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-small-4",
+      "expectedDigest": "63488b4c5411da578b8710f5dfc6cdeae77b66fd69acd77e9ff9fb8afcebb6b5",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 4,
+        "operation": "forEach",
+        "nativeBytes": 1904456,
+        "originalBytesDigest": "c3a4f7da5ba4d74642f8d0358a5d303e4b778c1ffa9299fb178ea61a682a6477",
+        "descriptor": {
+          "root": 1904444,
+          "valueType": "number",
+          "size": 4
+        },
+        "inputDigest": "d99653c729ac3c51915d46dd76e4dca11d438140c5593d135703b6d3e989baa6",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-empty-0",
+      "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 0,
+        "operation": "forEach",
+        "nativeBytes": 1904456,
+        "originalBytesDigest": "c3a4f7da5ba4d74642f8d0358a5d303e4b778c1ffa9299fb178ea61a682a6477",
+        "descriptor": {
+          "root": 0,
+          "valueType": "number",
+          "size": 0
+        },
+        "inputDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-values-1024",
+      "expectedDigest": "ed63f17357796043ef5d4d645f57b670378201b8f1e4e8725d535e33fa4996d3",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "values",
+        "nativeBytes": 1988876,
+        "originalBytesDigest": "2546533d28ad5769c5966ab675eb35f59a2662ca5a95392525517ef04572760e",
+        "descriptor": {
+          "root": 1988864,
+          "valueType": "number",
+          "size": 1024
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "set-override-1024",
+      "expectedDigest": "ed63f17357796043ef5d4d645f57b670378201b8f1e4e8725d535e33fa4996d3",
+      "fixture": {
+        "kind": "set",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "override",
+        "nativeBytes": 2073296,
+        "originalBytesDigest": "38b30136c28d533c7e05ec87063b54fdabf80a985afc6d838fc4ccd0fb7bbcdf",
+        "descriptor": {
+          "root": 2073284,
+          "valueType": "number",
+          "size": 1024
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-strings-1024",
+      "expectedDigest": "68862faa5a42a44dbb1ec8e869986813bc661e4faf387c5817e581d03a3a1eea",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "strings",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 169048,
+        "originalBytesDigest": "57d133be7630db50721df07c29049d4828ffeef1db2e27447fa4d3b110b5f63a",
+        "descriptor": {
+          "root": 169028,
+          "head": 169040,
+          "tail": 1024,
+          "size": 1024,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "68862faa5a42a44dbb1ec8e869986813bc661e4faf387c5817e581d03a3a1eea",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-strings-8192",
+      "expectedDigest": "81f99691ac0e00f1428e7e76d133fbd0e4ff5909ad9418dcd5fe53e4d23f7e18",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "strings",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 1136280,
+        "originalBytesDigest": "dc5de431505ed99266d5546f611b55e628c6158bbbf53bd62084ff30a1cdc0f9",
+        "descriptor": {
+          "root": 1136260,
+          "head": 1136272,
+          "tail": 8192,
+          "size": 8192,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "81f99691ac0e00f1428e7e76d133fbd0e4ff5909ad9418dcd5fe53e4d23f7e18",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-mixed-1024",
+      "expectedDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 1235104,
+        "originalBytesDigest": "79226f3e6e4e54cad8e9d2e4a5d280118e4c208d8741c6fd36b241ce6d4766a3",
+        "descriptor": {
+          "root": 1235080,
+          "head": 1235096,
+          "tail": 1024,
+          "size": 1024,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-mixed-8192",
+      "expectedDigest": "52a1fc436938f15164de38f8f05b0bfef6db6d9bc2122ca64103d1888be0274e",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 2166344,
+        "originalBytesDigest": "cbd473c11052eea6c75785f8c69f16ab88cab0889d4c13ca5920d86a8ff3cf36",
+        "descriptor": {
+          "root": 2166320,
+          "head": 2166336,
+          "tail": 8192,
+          "size": 8192,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "52a1fc436938f15164de38f8f05b0bfef6db6d9bc2122ca64103d1888be0274e",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-small-4",
+      "expectedDigest": "d99653c729ac3c51915d46dd76e4dca11d438140c5593d135703b6d3e989baa6",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 4,
+        "operation": "forEach",
+        "nativeBytes": 2166576,
+        "originalBytesDigest": "76da4c8bce8a4f0089b68e12583075790194725d9bdc2b4594fa7338a2dadade",
+        "descriptor": {
+          "root": 2166552,
+          "head": 2166568,
+          "tail": 4,
+          "size": 4,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "d99653c729ac3c51915d46dd76e4dca11d438140c5593d135703b6d3e989baa6",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-empty-0",
+      "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 0,
+        "operation": "forEach",
+        "nativeBytes": 2166576,
+        "originalBytesDigest": "76da4c8bce8a4f0089b68e12583075790194725d9bdc2b4594fa7338a2dadade",
+        "descriptor": {
+          "root": 0,
+          "head": 0,
+          "tail": 0,
+          "size": 0,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-values-1024",
+      "expectedDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "values",
+        "nativeBytes": 2265400,
+        "originalBytesDigest": "185874d6788064fecdc6bed5c05ef7e1cbe3cf98426b2d65e6a8ed64ee9faae4",
+        "descriptor": {
+          "root": 2265376,
+          "head": 2265392,
+          "tail": 1024,
+          "size": 1024,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "ordered-override-1024",
+      "expectedDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+      "fixture": {
+        "kind": "ordered",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "override",
+        "nativeBytes": 2364224,
+        "originalBytesDigest": "1eb13894deca8c7421c53972bcb537392726ac3705735c91fa36ddf5732084ee",
+        "descriptor": {
+          "root": 2364200,
+          "head": 2364216,
+          "tail": 1024,
+          "size": 1024,
+          "valueType": "number",
+          "orderStable": true
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-strings-1024",
+      "expectedDigest": "41772981e29bf4184656f14e38c88361fb0afdc99d3bb4631e8c13641c169f28",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "strings",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 238616,
+        "originalBytesDigest": "6c2e82d3d3ca2116a6be7909a36812211ad0e766c9b6f73f9ba6b20745a7aea6",
+        "descriptor": {
+          "root": 238584,
+          "size": 1024,
+          "valueType": "number"
+        },
+        "inputDigest": "68862faa5a42a44dbb1ec8e869986813bc661e4faf387c5817e581d03a3a1eea",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-strings-8192",
+      "expectedDigest": "850cc5708597233d123499eaa902dfd2136d614fb21ead1c96b2d9b012ea130c",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "strings",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 1734528,
+        "originalBytesDigest": "d96cd1795599981416817b5dce76f543651f1c62d8c72f8f457a0dc008512407",
+        "descriptor": {
+          "root": 1734504,
+          "size": 8192,
+          "valueType": "number"
+        },
+        "inputDigest": "81f99691ac0e00f1428e7e76d133fbd0e4ff5909ad9418dcd5fe53e4d23f7e18",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-mixed-1024",
+      "expectedDigest": "4edcd5d18be707b1b8d7ad2c7e9220992e7fb45e63a48c12fb5031d529abd9d3",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "forEach",
+        "nativeBytes": 1905432,
+        "originalBytesDigest": "fb000d1541346dc4a82dcf0c271677c8228d623ec70f26111172aed263caca90",
+        "descriptor": {
+          "root": 1905400,
+          "size": 1024,
+          "valueType": "number"
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-mixed-8192",
+      "expectedDigest": "c2db21b0222e747fb89e8085781666221ea02f46983d96bc1ec5ab78bf7e23eb",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 8192,
+        "operation": "forEach",
+        "nativeBytes": 3557088,
+        "originalBytesDigest": "307c541a189612f2927dde058b4216fa8d258762851e8b97efad336dce4fa852",
+        "descriptor": {
+          "root": 3557064,
+          "size": 8192,
+          "valueType": "number"
+        },
+        "inputDigest": "52a1fc436938f15164de38f8f05b0bfef6db6d9bc2122ca64103d1888be0274e",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-small-4",
+      "expectedDigest": "36312ca5a8201990287172f2dfee0e1829f85b98b10840367572c7df1dee8694",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 4,
+        "operation": "forEach",
+        "nativeBytes": 3557312,
+        "originalBytesDigest": "220e079f25a00c845726a8d05cbdfe58a0c71dbde99bad20cc69c84bf2bc6e1f",
+        "descriptor": {
+          "root": 3557280,
+          "size": 4,
+          "valueType": "number"
+        },
+        "inputDigest": "d99653c729ac3c51915d46dd76e4dca11d438140c5593d135703b6d3e989baa6",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-empty-0",
+      "expectedDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 0,
+        "operation": "forEach",
+        "nativeBytes": 3557312,
+        "originalBytesDigest": "220e079f25a00c845726a8d05cbdfe58a0c71dbde99bad20cc69c84bf2bc6e1f",
+        "descriptor": {
+          "root": 0,
+          "size": 0,
+          "valueType": "number"
+        },
+        "inputDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-values-1024",
+      "expectedDigest": "4edcd5d18be707b1b8d7ad2c7e9220992e7fb45e63a48c12fb5031d529abd9d3",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "values",
+        "nativeBytes": 3728216,
+        "originalBytesDigest": "a9e9de3b9162d3ba3add9ec1f552cadd573baee35ba11050fa7c269986b2c599",
+        "descriptor": {
+          "root": 3728184,
+          "size": 1024,
+          "valueType": "number"
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    },
+    {
+      "name": "sorted-override-1024",
+      "expectedDigest": "4edcd5d18be707b1b8d7ad2c7e9220992e7fb45e63a48c12fb5031d529abd9d3",
+      "fixture": {
+        "kind": "sorted",
+        "pattern": "mixed",
+        "size": 1024,
+        "operation": "override",
+        "nativeBytes": 3899120,
+        "originalBytesDigest": "b355d8ce3cda984bc0593d4298ae6fed0cd4cc7ac6b02ec277af3d6476663e2a",
+        "descriptor": {
+          "root": 3899088,
+          "size": 1024,
+          "valueType": "number"
+        },
+        "inputDigest": "7787f259ed9208c3be3a7586eb9efbebca1a8ef8549f367d71c43464739fc5af",
+        "callback": "append every visited value into a new array; retain and verify the complete array after each timed batch",
+        "oracle": "native Set membership/types; unchanged values() exact order; independent insertion/radix order where applicable",
+        "construction": "public add calls, or public map constructor/set plus set subclass constructor for the override control"
+      }
+    }
+  ]
+}

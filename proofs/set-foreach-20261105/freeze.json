@@ -1,0 +1,44 @@
+{
+  "frozenAt": "2026-11-05T15:27:24.473688+00:00",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "sourceAndProofs": {
+    "shared-set.ts": "cfa6ee8ceef0494c736e98d7560180ffec408f551834a15e32e2219e703b08bd",
+    "shared-ordered-set.ts": "0363960b3722f565f6f8178eca6b56bb2abc9665e044afc08c97712e1c1fd04d",
+    "shared-sorted-set.ts": "129fe5373e02fd7df74600839efe09f233a61397635e27afe730e47d2c1aa036",
+    "set-foreach.test.ts": "a0365b9ba37d67dbfb1e02a2adc8caf3133258dd703d69b02c5a4948b281685f",
+    "proofs/set-foreach-20261105/smoke.mjs": "f3d717637e793b05e79384cdf6c65eda6d0a7d3aceb5c266466019c4fa05edaf",
+    "proofs/set-foreach-20261105/workloads.mjs": "75c4891081fba95bee41740db04ddae0234fde0d2f0dacd8536a3a90474ef1f1",
+    "proofs/set-foreach-20261105/worker.mjs": "7e777db36a286a3de5376a5da339db02b492c469c0a07dff65ca15c98cfad941",
+    "proofs/set-foreach-20261105/paired-benchmark.mjs": "3c4dcd009d214fccde46b1a07e24324d9c6770ca1b3993455ee1b246d5edbb61",
+    "proofs/set-foreach-20261105/verify.py": "e8a6700d970b3c38982d21abec63e020530331e7d73eb3ef698367dc58f08394"
+  },
+  "wasm": {
+    "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+    "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+  },
+  "bundles": {
+    "chunk-sbahvxa1.js": "d21ec929ef09b3c565822a252153d7bbdbd37cb48446c8f21305c4a353038c84",
+    "redux.js": "884ad651f3d03bb46b4b49aaa9ed9d743e5fda77b727dbf45593c9b954c8f20e",
+    "chunk-sx9kn349.js": "c7fe613ccbece5ede6a22cc751da6d4e4719e9c096ebab978fbf90648ecc7d72",
+    "chunk-csh7jypc.js": "7cfb978923e206d9d4085afa7d0d5ad170265206e005afee135b3fcd2b57c2dd",
+    "numeric.js": "aa63c568057a52b9c0780d0bef8ad6a9f9a9b4c46c420f96db05a2ff6f3336d4",
+    "chunk-vb9htdwy.js": "2a6100b66b94e1361cc82edc6dc51321ec41f2874cb40845a91970eab5f340f2",
+    "geometry.js": "0c140a9f1b4870740f2eff884d5523e334b5e9c36d98af7dfd83b1c93fa0b8f2",
+    "worker.js": "c5f244896d18a858525446760807d143e46de742397216b057ef3e533d43a547",
+    "tanstack-db-collection.js": "f226086536017a0146f1cc487fc21c1eb56ed7020365623592c78dca382bd1f1",
+    "shared.js": "5f38043b3bcca7785cb67ccd62f1a77b4a3242818e82999192324bfd7539f056",
+    "chunk-eg3tkaph.js": "8b88d5d48a92cb6828f9e2cb7d78e15c3566f46e8f232555bd40bccf3ed5e175",
+    "state.js": "85d85563ab0ecc6359c1569328a4b1670c562530783177807168199fd262af9b"
+  },
+  "validation": "31 new regressions pass unchanged baseline and candidate in Node/Bun; candidate 64 tests; identical 24 complete smoke outputs in both runtimes; real Node worker shared/copy growth passes before/after"
+}

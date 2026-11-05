@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/eb0e431b3aaf/zerocopy-set-foreach-baseline-tests
+
+
+ Test Files  1 passed (1)
+      Tests  31 passed (31)
+   Start at  09:26:44
+   Duration  1.89s (transform 251ms, setup 0ms, import 325ms, tests 1.32s, environment 0ms)
+

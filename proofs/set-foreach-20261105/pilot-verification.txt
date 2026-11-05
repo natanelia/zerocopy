@@ -1,0 +1,1 @@
+Verified pilot.json: 48 processes, 432 measured batches, 12 independent paired estimates

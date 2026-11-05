@@ -1,0 +1,162 @@
+import { describe, expect, it } from 'vitest';
+import { Arena, arenaOf } from './arena';
+import { SharedMap } from './shared-map';
+import { SharedOrderedMap } from './shared-ordered-map';
+import { SharedSortedMap } from './shared-sorted-map';
+import { SharedSet, SharedOrderedSet, SharedSortedSet, getWorkerData, initWorker } from './shared';
+
+const variants = [
+  { name: 'SharedSet', Set: SharedSet, Map: SharedMap,
+    empty: (a: Arena) => new SharedSet(new SharedMap('number', 0, 0, a)),
+    wrap: (map: any) => new SharedSet(map) },
+  { name: 'SharedOrderedSet', Set: SharedOrderedSet, Map: SharedOrderedMap,
+    empty: (a: Arena) => new SharedOrderedSet(new SharedOrderedMap('number', 0, 0, 0, 0, a)),
+    wrap: (map: any) => new SharedOrderedSet(map) },
+  { name: 'SharedSortedSet', Set: SharedSortedSet, Map: SharedSortedMap,
+    empty: (a: Arena) => new SharedSortedSet(undefined, new SharedSortedMap('number', undefined, 0, 0, a)),
+    wrap: (map: any) => new SharedSortedSet(undefined, map) },
+];
+const input = ['', 's:tag', 'n:42', '\0', '\ufeffBOM', '😀', '東京', '\ud800', 0, -0, 1, '1', -2.5, NaN, Infinity, -Infinity];
+function populated(spec: typeof variants[number], values: readonly (string | number)[] = input, a = new Arena()): any {
+  let set: any = spec.empty(a);
+  for (const value of values) set = set.add(value);
+  return set;
+}
+function collect(set: any): unknown[] { const output: unknown[] = []; expect(set.forEach((value: unknown) => output.push(value))).toBeUndefined(); return output; }
+
+for (const spec of variants) describe(`${spec.name}.forEach`, () => {
+  it('preserves every value, type, order, callback argument and receiver without allocating shared bytes', () => {
+    const set = populated(spec), expected = [...set.values()], a = arenaOf(set);
+    const used = a.used, bytes = a.buf.slice(65536, used), output: unknown[] = [];
+    const result = set.forEach(function (this: unknown, value: unknown) {
+      expect(this).toBeUndefined(); expect(arguments.length).toBe(1); output.push(value);
+    });
+    expect(result).toBeUndefined(); expect(output).toEqual(expected);
+    expect(output).toContain(1); expect(output).toContain('1'); expect(output.some(value => Number.isNaN(value))).toBe(true);
+    expect(a.used).toBe(used); expect(a.buf.slice(65536, used)).toEqual(bytes);
+    expect(Object.isFrozen(set)).toBe(true); expect([...set.values()]).toEqual(expected);
+  });
+
+  it('does not call a callback for an empty set, and rejects a non-callable callback only when visiting a value', () => {
+    const empty = spec.empty(new Arena());
+    expect(empty.forEach(null as any)).toBeUndefined();
+    expect(() => populated(spec).forEach(null)).toThrow(TypeError);
+  });
+
+  it('uses subclass values overrides with the set receiver', () => {
+    const Base: any = spec.Set;
+    let seenThis: unknown;
+    class Custom extends Base { *values() { seenThis = this; yield 'override'; yield 73; } }
+    const custom = new Custom();
+    expect(collect(custom)).toEqual(['override', 73]); expect(seenThis).toBe(custom);
+  });
+
+  it('observes late values replacement once per call, including replacement inside a callback', () => {
+    const prototype = spec.Set.prototype, original = Object.getOwnPropertyDescriptor(prototype, 'values')!;
+    const set = populated(spec), expected = [...set.values()], first: unknown[] = [];
+    try {
+      set.forEach((value: unknown) => {
+        first.push(value);
+        Object.defineProperty(prototype, 'values', { ...original, value: function* () { expect(this).toBe(set); yield 'late'; } });
+      });
+      expect(first).toEqual(expected); expect(collect(set)).toEqual(['late']);
+    } finally { Object.defineProperty(prototype, 'values', original); }
+  });
+
+  it('reads values getters exactly once, preserving native, custom, non-callable and throwing results', () => {
+    const prototype = spec.Set.prototype, original = Object.getOwnPropertyDescriptor(prototype, 'values')!;
+    const set = populated(spec), expected = [...set.values()], error = new Error('values getter');
+    let reads = 0, mode = 'native';
+    try {
+      Object.defineProperty(prototype, 'values', { configurable: true, get() {
+        expect(this).toBe(set); reads++;
+        if (mode === 'throw') throw error;
+        if (mode === 'invalid') return null;
+        if (mode === 'custom') return function* () { expect(this).toBe(set); yield 'getter'; };
+        return original.value;
+      } });
+      expect(collect(set)).toEqual(expected); expect(reads).toBe(1);
+      mode = 'custom'; expect(collect(set)).toEqual(['getter']); expect(reads).toBe(2);
+      mode = 'invalid'; expect(() => collect(set)).toThrow(TypeError); expect(reads).toBe(3);
+      mode = 'throw'; expect(() => collect(set)).toThrow(error); expect(reads).toBe(4);
+    } finally { Object.defineProperty(prototype, 'values', original); }
+  });
+
+  it('preserves the custom values iterator protocol and closes it when the callback throws', () => {
+    const prototype = spec.Set.prototype, original = Object.getOwnPropertyDescriptor(prototype, 'values')!;
+    const set = populated(spec), events: string[] = [], error = new Error('callback');
+    try {
+      Object.defineProperty(prototype, 'values', { ...original, value: function () {
+        expect(this).toBe(set); events.push('values');
+        return { [Symbol.iterator]() {
+          events.push('iterator');
+          return { next() { events.push('next'); return { value: 'custom', done: false }; },
+            return() { events.push('return'); throw new Error('close'); } };
+        } };
+      } });
+      expect(() => set.forEach((value: unknown) => { expect(value).toBe('custom'); events.push('callback'); throw error; })).toThrow(error);
+      expect(events).toEqual(['values', 'iterator', 'next', 'callback', 'return']);
+    } finally { Object.defineProperty(prototype, 'values', original); }
+  });
+
+  it('preserves underlying keys getters and iterator closing, including decoding errors', () => {
+    const Base: any = spec.Map, events: string[] = [], callbackError = new Error('callback');
+    let mode = 'callback', keysReads = 0, seenMap: unknown;
+    class CustomMap extends Base {}
+    Object.defineProperty(CustomMap.prototype, 'keys', { configurable: true, get() {
+      keysReads++; seenMap = this;
+      return function () {
+        expect(this).toBe(map); events.push('keys');
+        return { [Symbol.iterator]() {
+          events.push('iterator'); let index = 0;
+          return { next() { events.push('next'); return index++ === 0 ? { value: 's:first', done: false }
+            : mode === 'decode' ? { value: null, done: false } : { value: 'n:4', done: false }; },
+            return() { events.push('return'); return { done: true }; } };
+        } };
+      };
+    } });
+    const map = new CustomMap('number'), set = spec.wrap(map), output: unknown[] = [];
+    expect(() => set.forEach((value: unknown) => { output.push(value); events.push('callback'); throw callbackError; })).toThrow(callbackError);
+    expect(output).toEqual(['first']); expect(events).toEqual(['keys', 'iterator', 'next', 'callback', 'return']);
+    expect(keysReads).toBe(1); expect(seenMap).toBe(map);
+    mode = 'decode'; events.length = 0; output.length = 0;
+    expect(() => set.forEach((value: unknown) => { output.push(value); events.push('callback'); })).toThrow(TypeError);
+    expect(output).toEqual(['first']); expect(events).toEqual(['keys', 'iterator', 'next', 'callback', 'next', 'return']);
+    expect(keysReads).toBe(2);
+  });
+
+  it('keeps traversal stable through nested callbacks, snapshot writes and actual memory growth', () => {
+    const a = new Arena({ memory: new WebAssembly.Memory({ initial: 2, maximum: 16, shared: true }) });
+    const set = populated(spec, Array.from({ length: 64 }, (_, i) => i % 2 ? `value-${i}` : i), a);
+    const expected = [...set.values()], oldBuffer = a.memory.buffer, used = a.used, bytes = a.buf.slice(65536, used);
+    const output: unknown[] = []; let fork: any;
+    set.forEach((value: unknown) => {
+      output.push(value);
+      if (output.length === 3) {
+        expect(collect(set)).toEqual(expected);
+        a.alloc(oldBuffer.byteLength - a.used + 8);
+        fork = set.add('new snapshot').delete(expected[0]);
+      }
+    });
+    expect(a.memory.buffer.byteLength).toBeGreaterThan(oldBuffer.byteLength);
+    expect(output).toEqual(expected); expect(collect(set)).toEqual(expected);
+    expect(fork.has('new snapshot')).toBe(true); expect(fork.has(expected[0])).toBe(false);
+    expect(a.buf.slice(65536, used)).toEqual(bytes);
+  });
+
+  it.each([false, true])('visits attached worker snapshots without changing memory (copy=%s)', async copy => {
+    const source = populated(spec), expected = [...source.values()];
+    const attached: any = (await initWorker(getWorkerData({ source }, { copy }))).source, a = arenaOf(attached);
+    const used = a.used, bytes = a.buf.slice(0, used);
+    expect(collect(attached)).toEqual(expected);
+    expect(a.used).toBe(used); expect(a.buf.slice(0, used)).toEqual(bytes);
+    expect([...source.values()]).toEqual(expected);
+  });
+});
+
+it('preserves custom sorted-set comparator order', () => {
+  let set = new SharedSortedSet((a, b) => b.length - a.length || (a < b ? -1 : a > b ? 1 : 0));
+  for (const value of ['z', 'long', 200, 'a', '00', 4]) set = set.add(value);
+  expect(collect(set)).toEqual([...set.values()]);
+  expect(collect(set)).toEqual(['long', 200, '00', 4, 'a', 'z']);
+});

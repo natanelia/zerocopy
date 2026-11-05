@@ -1,0 +1,47 @@
+{
+  "status": "rejected; evidence only; no PR",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "evidence": {
+    "pilot.json.gz": {
+      "sha256": "a21805d07583edb58dea8957f6ea7a543936a81ee7fc8c959a87fafdea2eb95a",
+      "uncompressedSha256": "b1fe3bc0721a186133316d2b4050e6e48cbb51d586bc232a03cdc3534f04f0d5",
+      "uncompressedBytes": 217952
+    }
+  },
+  "artifacts": {
+    "generator-return-candidate.json": "dace311e1c56b71573eb13ef08d16427406554b870ed759e8fea13db0130ab9a",
+    "validation-baseline-node.txt": "ed2d2b94d239a5cdf2b2d5fff508784d46851191b0bc554a7ff8660bcff4eb29",
+    "freeze.json": "52b594f5621bee79a1d3c1083e16b098b3164c27b5e94ebf4bc2ab742766bbed",
+    "smoke-baseline-bun.json": "075bc0c00dd11fd75bdc8eaeeca96ff64ed69bacfabc65901b8352836e2b8423",
+    "pilot-verification.txt": "9fd1e025e243672093415fa6f01078f395962b0c03fa71574ea101865c24bced",
+    "pilot.log": "fee1a1b6027f30de5c59c0d7063a2a6e55f8c298dd5117cd3282c6fa7504e086",
+    "draft-nan-assertion-bun.txt": "f16488eddb2df1b3edc774b5de3979a21a58433c649930fac71caea339e2cf81",
+    "validation-bun.txt": "6c3084185488be6f74c5fe09e30a167fa52925c268660618cf2b1d38cbd65dc7",
+    "build-browser.txt": "6d736caef478b1d2ede07bd81cdf543cec2b6a55bfc1bb0cc8442975a7dd4427",
+    "smoke.mjs": "f3d717637e793b05e79384cdf6c65eda6d0a7d3aceb5c266466019c4fa05edaf",
+    "generator-return-baseline.json": "e4c0f079b0f5a818c8d267a33fc2996cedb3c3b06d3e5c563ee2e99868636975",
+    "pilot.md": "46b41e7dace8217a87b7783ef43c0acda714ed38939610e3d93e2f9df8a772a4",
+    "validation-baseline-bun.txt": "b17704c91caa84aa83d50f354d3ad93a490d96949e947a851d66fee5e0da53fe",
+    "workloads.mjs": "75c4891081fba95bee41740db04ddae0234fde0d2f0dacd8536a3a90474ef1f1",
+    "README.md": "87014d421ec9f97e1756220ccd5c18698349d4e7a358ba10198f7f537becec92",
+    "generator-return-compatibility.mjs": "8971ba925829fd2e63db20f722553b742bf83500f015149b5585db9d0bf1c9e9",
+    "PLAN.md": "c9e706de5b7ab9107f6b0b1454d8ad1904a3a15bae23020d2e7e7746808de737",
+    "smoke-bun.json": "075bc0c00dd11fd75bdc8eaeeca96ff64ed69bacfabc65901b8352836e2b8423",
+    "worker-node.json": "6174f03aaea42a7aae7bfde0d66d3f7f9f73360e8077a850932cb687783dcd97",
+    "worker.mjs": "7e777db36a286a3de5376a5da339db02b492c469c0a07dff65ca15c98cfad941",
+    "paired-benchmark.mjs": "3c4dcd009d214fccde46b1a07e24324d9c6770ca1b3993455ee1b246d5edbb61",
+    "verify.py": "e8a6700d970b3c38982d21abec63e020530331e7d73eb3ef698367dc58f08394",
+    "smoke-baseline-node.json": "966acc492a3f3a8bd97787785e0787200559583c3de507ead304411630bf89ef",
+    "pilot.json.gz": "a21805d07583edb58dea8957f6ea7a543936a81ee7fc8c959a87fafdea2eb95a",
+    "draft-nan-assertion-node.txt": "cf1dca72a6cecb6dee7e8d56c85c46aae2711be551b8de25dd6ed154efc73941",
+    "smoke-node.json": "966acc492a3f3a8bd97787785e0787200559583c3de507ead304411630bf89ef",
+    "typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation-node.txt": "a8fd603d40b37ef789eff8cbbd035a40ad753a039d59ab5f335b78750ffe3140",
+    "worker-baseline-node.json": "6174f03aaea42a7aae7bfde0d66d3f7f9f73360e8077a850932cb687783dcd97",
+    "measured-source/shared-sorted-set.ts.txt": "129fe5373e02fd7df74600839efe09f233a61397635e27afe730e47d2c1aa036",
+    "measured-source/set-foreach.test.ts.txt": "a0365b9ba37d67dbfb1e02a2adc8caf3133258dd703d69b02c5a4948b281685f",
+    "measured-source/shared-ordered-set.ts.txt": "0363960b3722f565f6f8178eca6b56bb2abc9665e044afc08c97712e1c1fd04d",
+    "measured-source/candidate.patch": "7e7d4aee78bdcb72ec4c9c3c603f35ed03b40ce3eb82c417e2ae36dc30f916a9",
+    "measured-source/shared-set.ts.txt": "cfa6ee8ceef0494c736e98d7560180ffec408f551834a15e32e2219e703b08bd"
+  }
+}

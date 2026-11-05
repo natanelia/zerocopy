@@ -1,0 +1,67 @@
+diff --git a/shared-ordered-set.ts b/shared-ordered-set.ts
+index 91de983..1c999e2 100644
+--- a/shared-ordered-set.ts
++++ b/shared-ordered-set.ts
+@@ -13,8 +13,16 @@ export class SharedOrderedSet<T extends string | number = string | number> exten
+   delete(value: T): SharedOrderedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedOrderedSet(map); }
+   get size(): number { return this._map.size; }
+   *values(): Generator<T> { for (const key of this._map.keys()) yield decodeSetKey(key) as T; }
+-  forEach(fn: (value: T) => void): void { for (const value of this.values()) fn(value); }
++  forEach(fn: (value: T) => void): void {
++    const values = this.values;
++    if (values !== nativeValues) {
++      for (const value of Reflect.apply(values, this, [])) fn(value);
++      return;
++    }
++    for (const key of this._map.keys()) fn(decodeSetKey(key) as T);
++  }
+   toWorkerData() { return this._map.toWorkerData(); }
+   static fromWorkerData<T extends string | number>(d: { root: number; head: number; tail: number; size: number }, a?: Arena): SharedOrderedSet<T> { return new SharedOrderedSet(SharedOrderedMap.fromWorkerData({ ...d, valueType: 'number' }, a)); }
+ }
++const nativeValues = SharedOrderedSet.prototype.values;
+ structureRegistry.SharedOrderedSet = { fromWorkerData: (d, a) => SharedOrderedSet.fromWorkerData(d, a) };
+diff --git a/shared-set.ts b/shared-set.ts
+index 67952e8..8edb4d3 100644
+--- a/shared-set.ts
++++ b/shared-set.ts
+@@ -12,9 +12,17 @@ export class SharedSet<T extends string | number = string | number> extends Snap
+   delete(value: T): SharedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedSet(map); }
+   get size(): number { return this._map.size; }
+   *values(): Generator<T> { for (const key of this._map.keys()) yield decodeSetKey(key) as T; }
+-  forEach(fn: (value: T) => void): void { for (const value of this.values()) fn(value); }
++  forEach(fn: (value: T) => void): void {
++    const values = this.values;
++    if (values !== nativeValues) {
++      for (const value of Reflect.apply(values, this, [])) fn(value);
++      return;
++    }
++    for (const key of this._map.keys()) fn(decodeSetKey(key) as T);
++  }
+   toWorkerData() { return this._map.toWorkerData(); }
+   addMany(values: readonly T[]): SharedSet<T> { const added = values.filter(value => !this.has(value)); return added.length ? new SharedSet(this._map.setMany(added.map(v => [encodeSetKey(v), 0] as const))) : this; }
+   static fromWorkerData<T extends string | number>(d: { root: number; size: number }, a?: Arena): SharedSet<T> { return new SharedSet(SharedMap.fromWorkerData(d.root, 'number', d.size, a)); }
+ }
++const nativeValues = SharedSet.prototype.values;
+ structureRegistry.SharedSet = { fromWorkerData: (d, a) => SharedSet.fromWorkerData(d, a) };
+diff --git a/shared-sorted-set.ts b/shared-sorted-set.ts
+index f5a00c9..2293f66 100644
+--- a/shared-sorted-set.ts
++++ b/shared-sorted-set.ts
+@@ -16,8 +16,16 @@ export class SharedSortedSet<T extends string | number = string | number> extend
+   delete(value: T): SharedSortedSet<T> { const map = this._map.delete(encodeSetKey(value)); return map === this._map ? this : new SharedSortedSet(this.comparator, map); }
+   get size(): number { return this._map.size; }
+   *values(): Generator<T> { for (const key of this._map.keys()) yield decodeSetKey(key) as T; }
+-  forEach(fn: (value: T) => void): void { for (const value of this.values()) fn(value); }
++  forEach(fn: (value: T) => void): void {
++    const values = this.values;
++    if (values !== nativeValues) {
++      for (const value of Reflect.apply(values, this, [])) fn(value);
++      return;
++    }
++    for (const key of this._map.keys()) fn(decodeSetKey(key) as T);
++  }
+   toWorkerData() { return this._map.toWorkerData(); }
+   static fromWorkerData<T extends string | number>(d: { root: number; size: number }, a?: Arena): SharedSortedSet<T> { return new SharedSortedSet(undefined, SharedSortedMap.fromWorkerData({ ...d, valueType: 'number' }, a)); }
+ }
++const nativeValues = SharedSortedSet.prototype.values;
+ structureRegistry.SharedSortedSet = { fromWorkerData: (d, a) => SharedSortedSet.fromWorkerData(d, a) };
