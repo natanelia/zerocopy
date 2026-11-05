@@ -1,0 +1,78 @@
+{
+  "started": "2026-11-05T01:49:34.050475+00:00",
+  "sourceSha256": {
+    "redux-codec.ts": "e4d93841254176540e9eb4aaafc303036187317167a586c22e604092e6acc362",
+    "shared-queue.ts": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678",
+    "redux-queue-traversal.test.ts": "bd1e4493af43641a6cb0b5d421311d2b364b031201c31618dd5540d34cffa719"
+  },
+  "steps": [
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:wasm"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:browser"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:types"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "test",
+        "redux-queue-traversal.test.ts",
+        "redux.test.ts",
+        "redux-regression.test.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/compatibility.mjs"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/worker.mjs"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "status": "passed",
+  "finished": "2026-11-05T01:49:48.571377+00:00",
+  "logSha256": "254be8090293ba2a7f038ba3362e1fccd17ac554d56665f16c39ef121e2930e2"
+}

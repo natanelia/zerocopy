@@ -1,0 +1,168 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { gunzipSync } from 'node:zlib';
+
+// Verify saved evidence, never require future production files to keep the
+// measured hashes. Exact measured sources are retained as inert .txt archives.
+const root = import.meta.dirname;
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const read = name => readFileSync(resolve(root, name));
+const median = values => {
+  const sorted = [...values].sort((a, b) => a - b), middle = sorted.length >> 1;
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+};
+const near = (actual, expected, label) => assert.ok(Number.isFinite(actual) && Number.isFinite(expected)
+  && Math.abs(actual - expected) <= Math.max(1e-12, Math.abs(expected) * 1e-10), `${label}: ${actual} != ${expected}`);
+const identity = (bytes, expected, label) => {
+  assert.equal(bytes.length, expected.bytes, `${label} length`);
+  assert.equal(sha(bytes), expected.sha256, `${label} SHA-256`);
+};
+const CASES = ['queue-empty', 'queue-one', 'queue-tail31', 'queue-offset34', 'queue-number4096',
+  'queue-stringify4096', 'queue-unicode1024', 'queue-json256', 'stack-number4096-control', 'plain-array4096-control'];
+const ledger = JSON.parse(read('evidence-manifest.json'));
+assert.equal(ledger.schema, 1);
+for (const [name, expected] of Object.entries(ledger.files)) identity(read(name), expected, name);
+
+let totalSubjects = 0, totalBatches = 0, totalPairs = 0;
+const studies = new Map();
+for (const entry of ledger.studies) {
+  const stored = read(entry.path), raw = entry.path.endsWith('.gz') ? gunzipSync(stored) : stored;
+  identity(stored, entry.stored, entry.path); identity(raw, entry.raw, `${entry.path} raw`);
+  const study = JSON.parse(raw);
+  assert.equal(study.schema, 1); assert.equal(study.status, 'complete'); assert.equal(study.phase, entry.phase);
+  assert.equal(study.source.baseline.commit, '77599337867dbf785a5f0311d34637d0b36678fc');
+  assert.equal(study.source.candidate.commit, entry.measuredCommit);
+  assert.equal(study.hardware.affinity, '2');
+  assert.deepEqual(study.cases.map(row => row.name), CASES);
+  assert.deepEqual(Object.keys(study.source.baseline.production), Object.keys(study.source.candidate.production));
+  assert.deepEqual(study.source.baseline.support, study.source.candidate.support);
+  assert.deepEqual(study.source.baseline.wasm, study.source.candidate.wasm);
+  const changed = Object.keys(study.source.baseline.production)
+    .filter(name => study.source.baseline.production[name] !== study.source.candidate.production[name]).sort();
+  assert.deepEqual(changed, entry.changedProduction);
+  for (const [name, path] of Object.entries(entry.sources)) {
+    const category = name.endsWith('.test.ts') ? 'tests' : 'production';
+    assert.equal(sha(read(path)), study.source.candidate[category][name], `Archived measured source: ${path}`);
+  }
+  for (const [name, path] of Object.entries(entry.drivers)) {
+    assert.equal(sha(read(path)), study.source.driver[name], `Archived measured driver: ${path}`);
+  }
+  assert.deepEqual(Object.keys(entry.drivers).sort(), Object.keys(study.source.driver).sort());
+  const config = study.config[study.phase], formal = study.phase === 'formal';
+  assert.equal(config.pairs, formal ? 6 : 2); assert.equal(config.samples, formal ? 11 : 7);
+  assert.equal(config.warmupMs, formal ? 500 : 150);
+  assert.equal(study.config.minWarmupBatches, 8); assert.equal(study.config.minWarmupElements, 32768);
+  assert.equal(study.config.maxWarmupBatches, 512);
+  assert.equal(study.pairs.length, 2 * CASES.length * config.pairs);
+  assert.equal(study.summary.length, 2 * CASES.length);
+  assert.equal(study.plans.length, 2 * CASES.length);
+  const expectedOrder = ['node', 'bun'].flatMap(runtime => Array.from({ length: config.pairs }, (_, pair) =>
+    [...CASES.slice(pair % CASES.length), ...CASES.slice(0, pair % CASES.length)]
+      .map(name => `${runtime}/${name}/${pair}`)).flat());
+  assert.deepEqual(study.pairs.map(row => `${row.runtime}/${row.name}/${row.pair}`), expectedOrder);
+  const subjects = [], sequences = new Set(), pairKeys = new Set();
+  for (const pair of study.pairs) {
+    const key = `${pair.runtime}/${pair.name}/${pair.pair}`;
+    assert.ok(!pairKeys.has(key), `Duplicate pair ${key}`); pairKeys.add(key);
+    assert.equal(pair.mode, 'ab'); assert.ok(['node', 'bun'].includes(pair.runtime));
+    assert.ok(CASES.includes(pair.name)); assert.ok(pair.pair >= 0 && pair.pair < config.pairs);
+    assert.deepEqual(pair.order, pair.pair % 2 ? ['after', 'before'] : ['before', 'after']);
+    const plan = study.plans.find(row => row.runtime === pair.runtime && row.name === pair.name);
+    assert.ok(plan);
+    for (const side of ['before', 'after']) {
+      const value = pair[side]; subjects.push(value);
+      assert.ok(!sequences.has(value.sequence)); sequences.add(value.sequence);
+      assert.equal(value.status, 'complete'); assert.equal(value.phase, 'measure');
+      assert.equal(value.runtime, pair.runtime); assert.equal(value.name, pair.name);
+      assert.equal(value.versions.node, pair.runtime === 'node' ? '24.22.1' : value.versions.node);
+      if (pair.runtime === 'bun') assert.equal(value.versions.bun, '1.4.2');
+      assert.equal(value.initialVerified, true); assert.equal(value.immutableBytesVerified, true);
+      assert.equal(value.repeat, plan.repeat); assert.equal(value.expectedDigest, plan.expectedDigest);
+      assert.equal(value.arenaSha256, plan.arenaSha256);
+      assert.ok(value.repeat >= 1 && value.repeat <= value.maxRepeat);
+      assert.equal(value.samples.length, config.samples);
+      assert.ok(value.warmup.length >= 8 && value.warmup.length <= 512);
+      const warmupMs = value.warmup.reduce((sum, row) => sum + row.ms, 0);
+      const warmupCalls = value.warmup.reduce((sum, row) => sum + row.repeat, 0);
+      near(warmupMs, value.warmupMs, `${key} warm-up duration`);
+      assert.ok(warmupMs >= config.warmupMs); assert.equal(warmupCalls, value.warmupCalls);
+      assert.ok(warmupCalls * Math.max(1, value.outputElements) >= 32768);
+      const batches = [...value.warmup, ...value.samples];
+      for (const row of batches) {
+        assert.equal(row.repeat, value.repeat); assert.equal(row.verifiedCalls, row.repeat);
+        assert.equal(row.verifiedElements, row.repeat * value.outputElements); assert.ok(row.ms > 0);
+      }
+      const calls = batches.reduce((sum, row) => sum + row.repeat, 0);
+      assert.equal(value.checkedCalls, calls); assert.equal(value.checkedElements, calls * value.outputElements);
+      near(median(value.samples.map(row => row.ms / row.repeat)), value.medianMs, `${key} ${side} median`);
+      near(Math.min(...value.samples.map(row => row.ms)), value.minBatchMs, `${key} minimum batch`);
+      assert.equal(value.belowTargetBatches, value.samples.filter(row => row.ms < study.config.targetBatchMs).length);
+      totalBatches += value.samples.length;
+    }
+    assert.equal(pair.before.repeat, pair.after.repeat);
+    assert.deepEqual(pair.before.versions, pair.after.versions);
+    assert.equal(pair[pair.order[1]].sequence, pair[pair.order[0]].sequence + 1);
+    assert.equal(pair.before.expectedDigest, pair.after.expectedDigest);
+    assert.equal(pair.before.arenaSha256, pair.after.arenaSha256);
+  }
+  for (const plan of study.plans) {
+    assert.ok(['node', 'bun'].includes(plan.runtime) && CASES.includes(plan.name));
+    assert.deepEqual(plan.order, CASES.indexOf(plan.name) % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']);
+    for (const value of Object.values(plan.calibration)) {
+      assert.equal(value.status, 'complete'); assert.equal(value.phase, 'calibrate');
+      assert.equal(value.runtime, plan.runtime); assert.equal(value.name, plan.name);
+      assert.equal(value.initialVerified, true); assert.equal(value.immutableBytesVerified, true);
+      assert.equal(value.expectedDigest, plan.expectedDigest); assert.equal(value.arenaSha256, plan.arenaSha256);
+      assert.ok(value.warmupMs >= 150 && value.warmup.length >= 8 && value.warmup.length <= 512);
+      const batches = [...value.warmup, ...value.calibration.flatMap(row => row.trials)];
+      for (const row of batches) {
+        assert.equal(row.verifiedCalls, row.repeat); assert.equal(row.verifiedElements, row.repeat * value.outputElements);
+        assert.ok(row.ms > 0);
+      }
+      const calls = batches.reduce((sum, row) => sum + row.repeat, 0);
+      assert.equal(value.checkedCalls, calls); assert.equal(value.checkedElements, calls * value.outputElements);
+      assert.equal(value.calibration.at(-1).repeat, value.repeat);
+    }
+    assert.equal(plan.repeat, Math.max(...Object.values(plan.calibration).map(row => row.repeat)));
+  }
+  for (const runtime of ['node', 'bun']) for (const name of CASES) {
+    const pairs = study.pairs.filter(row => row.runtime === runtime && row.name === name);
+    assert.equal(pairs.length, config.pairs);
+    const summaries = study.summary.filter(row => row.runtime === runtime && row.name === name);
+    assert.equal(summaries.length, 1); const summary = summaries[0];
+    assert.equal(summary.pairs, config.pairs); assert.equal(summary.mode, 'ab');
+    const ratios = pairs.map(pair => pair.after.medianMs / pair.before.medianMs), logs = ratios.map(Math.log);
+    const mean = logs.reduce((sum, x) => sum + x, 0) / logs.length;
+    near(summary.ratio, Math.exp(mean), `${runtime}/${name} paired ratio`);
+    assert.equal(summary.pairRatios.length, config.pairs);
+    ratios.forEach((ratio, index) => near(summary.pairRatios[index], ratio, `${runtime}/${name} pair ${index}`));
+    near(summary.minRatio, Math.min(...ratios), `${name} min ratio`);
+    near(summary.maxRatio, Math.max(...ratios), `${name} max ratio`);
+    near(summary.beforeMedianMs, median(pairs.map(row => row.before.medianMs)), `${name} baseline median`);
+    near(summary.afterMedianMs, median(pairs.map(row => row.after.medianMs)), `${name} candidate median`);
+    if (formal) {
+      const variance = logs.reduce((sum, x) => sum + (x - mean) ** 2, 0) / 5;
+      const half = 2.570581835636314 * Math.sqrt(variance / 6);
+      near(summary.lower95, Math.exp(mean - half), `${name} lower CI`);
+      near(summary.upper95, Math.exp(mean + half), `${name} upper CI`);
+      assert.equal(summary.degreesOfFreedom, 5);
+    } else { assert.equal(summary.lower95, undefined); assert.equal(summary.upper95, undefined); }
+  }
+  studies.set(entry.id, study); totalSubjects += subjects.length; totalPairs += study.pairs.length;
+  console.log(`${entry.id}: ${study.pairs.length} pairs, ${subjects.length} processes, ${study.summary.length} summary rows verified`);
+}
+for (const entry of ledger.studies.filter(row => row.phase === 'formal')) {
+  const formal = studies.get(entry.id), pilot = studies.get(entry.pilot);
+  assert.ok(pilot); assert.deepEqual(formal.source.driver, pilot.source.driver);
+  for (const side of ['baseline', 'candidate']) for (const category of ['production', 'support', 'wasm', 'bundles']) {
+    assert.deepEqual(formal.source[side][category], pilot.source[side][category]);
+  }
+  assert.deepEqual(formal.plans, pilot.plans); assert.deepEqual(formal.cases, pilot.cases);
+  assert.deepEqual(formal.config, pilot.config);
+  const pilotEntry = ledger.studies.find(row => row.id === entry.pilot);
+  assert.equal(formal.pilotFile.sha256, pilotEntry.raw.sha256);
+}
+console.log(JSON.stringify({ status: 'passed', artifactFiles: Object.keys(ledger.files).length,
+  studies: ledger.studies.length, processPairs: totalPairs, subjects: totalSubjects, measuredBatches: totalBatches }));

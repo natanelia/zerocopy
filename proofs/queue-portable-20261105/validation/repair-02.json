@@ -1,0 +1,104 @@
+{
+  "started": "2026-11-05T02:20:38.020313+00:00",
+  "sourceSha256": {
+    "arena.ts": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e",
+    "redux-codec.ts": "9e6b3b589b17cd4a733ae1aa3aceb5717c735008d53a5e485538e8095659d90b",
+    "shared-queue.ts": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678",
+    "redux-queue-traversal.test.ts": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167",
+    "proofs/queue-portable-20261105/compatibility.mjs": "6d89cfee1b9494913408a92c64e059b084c6978cb507c106d610303534dd5cb3"
+  },
+  "oldBuildCommit": "d910db0a5764f74f9d4f27c61e65ed0ac8dfd2f4",
+  "oldBuildBundles": {
+    "dist/chunk-5qfqrsqm.js": "19c0c761d9bce5d3877c2339854c92d0a2df55240101d3995bbce88f6e33d2e9",
+    "dist/chunk-cw0gqchw.js": "72296c39c16d924ba8da47850a1ba2dbd49bd7a63d3d526bc901616a10ca371a",
+    "dist/chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+    "dist/chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+    "dist/chunk-q274kkqp.js": "76b4e8a749e497bdeac230e5eade48d8e83d13a492a13ed7035ca62c0530b558",
+    "dist/geometry.js": "496a6b96f14f6e1689c22ab8905f8f5b5c3cdf6c4a25f95b93acc62fd55703f5",
+    "dist/numeric.js": "418f7e33233ff84d18eb5bf0ed76d9b3cae8616feb24aca6369eac922c15c74e",
+    "dist/redux.js": "0618435cc2ff973c50a7b48c902bb7cb58261c34c9971f36639ec14945f843a4",
+    "dist/shared.js": "a671fa013615d0423699a03324b423040f9705b75ca2d276133a6bb6f2fbf6d1",
+    "dist/state.js": "705ea02bcff488bbf7dd75d9c8c7b1c84ef4437853ff567be6e41ba39feae104",
+    "dist/tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+    "dist/worker.js": "60f9daef4af113e87b1b13c50f06b62b5ca952b53f9c45a9a720bb9374beb45a"
+  },
+  "steps": [
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/compatibility.mjs",
+        "pre-import",
+        "decode"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:browser"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:types"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "test",
+        "redux-queue-traversal.test.ts",
+        "redux.test.ts",
+        "redux-regression.test.ts"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/compatibility.mjs"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0
+    }
+  ],
+  "status": "passed",
+  "finished": "2026-11-05T02:20:49.133689+00:00",
+  "logSha256": "5f80c8943ca1c1cef3f64663d726716607bb982e7e5f2e0e82626fba5d21eac4"
+}

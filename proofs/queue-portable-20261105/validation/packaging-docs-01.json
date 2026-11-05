@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "scripts/check-docs.mjs",
+    "--base",
+    "77599337867dbf785a5f0311d34637d0b36678fc",
+    "--preserve"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-11-05T03:00:48.345012+00:00",
+  "completedAt": "2026-11-05T03:00:48.459647+00:00",
+  "logSha256": "a423d2c5cfbf7ef58d8c7930f48d36d39351e59f208f254dc258810f1dd70f2c"
+}

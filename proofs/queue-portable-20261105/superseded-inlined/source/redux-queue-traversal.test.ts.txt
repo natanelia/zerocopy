@@ -1,0 +1,206 @@
+import { describe, expect, it } from 'vitest';
+import { Arena, arenaOf } from './arena';
+import { structureRegistry } from './codec';
+import { SharedList, SharedQueue, getWorkerData, initWorker } from './shared';
+import { createZerocopyCodec, isSharedCollection } from './redux';
+
+const codec = createZerocopyCodec();
+function fresh(type: string, values: readonly any[], offset = 0, arena = new Arena()): SharedQueue<any> {
+  let queue = new SharedQueue<any>(type, 0, 0, 0, undefined, arena);
+  for (const value of values) queue = queue.enqueue(value);
+  for (let i = 0; i < offset; i++) queue = queue.dequeue();
+  return queue;
+}
+function logical(value: any): any {
+  if (typeof value === 'number') {
+    if (Number.isNaN(value)) return ['n', 'NaN'];
+    if (!Number.isFinite(value)) return ['n', value > 0 ? 'Infinity' : '-Infinity'];
+    if (Object.is(value, -0)) return ['n', '-0'];
+  }
+  if (value === undefined) return ['u'];
+  if (Array.isArray(value)) return ['a', value.map(logical)];
+  if (value !== null && typeof value === 'object') return ['o', Object.keys(value).map(key => [key, logical(value[key])])];
+  return value;
+}
+function envelope(type: string, values: readonly any[]) {
+  return { $zerocopyRedux: 1, value: ['c', 'SharedQueue', type, null, values.map(logical)] };
+}
+function outcome(action: () => unknown): unknown {
+  try { return { value: action() }; }
+  catch (error) { const failure = error as Error; return { error: failure.constructor.name, message: failure.message }; }
+}
+
+describe('portable queue block traversal', () => {
+  it('preserves exact output across block and vector boundaries and dequeued offsets', () => {
+    for (const [count, offset] of [[0, 0], [1, 0], [31, 0], [32, 0], [33, 0], [65, 31],
+      [65, 32], [65, 33], [1024, 0], [1025, 31], [1057, 1024], [1089, 1025]]) {
+      const values = Array.from({ length: count }, (_, i) => i + .25), source = fresh('number', values, offset);
+      const a = arenaOf(source), used = a.used, bytes = a.copy();
+      expect(codec.encode(source)).toEqual(envelope('number', values.slice(offset)));
+      expect(codec.stringify(source)).toBe(JSON.stringify(envelope('number', values.slice(offset))));
+      expect(a.used).toBe(used); expect(a.copy()).toEqual(bytes);
+    }
+  });
+
+  it('retains special scalars, Unicode strings and deeply frozen JSON values', () => {
+    const numbers = Array.from({ length: 97 }, (_, i) => [NaN, Infinity, -Infinity, -0, 0, i + .5][i % 6]);
+    const booleans = Array.from({ length: 97 }, (_, i) => !!(i & 1));
+    const strings = Array.from({ length: 97 }, (_, i) => [`\ufeffprefix-${i}`, `界🙂-${i}`, `NUL\0${i}`, `bad-\ud800-${i}`, `low-\udfff-${i}`][i % 5]);
+    const normalized = strings.map(value => new TextDecoder('utf-8', { ignoreBOM: true }).decode(new TextEncoder().encode(value)));
+    const objects = Array.from({ length: 97 }, (_, i) => ({ i, text: `界🙂-${i}`, deep: { coordinates: [[i, -i]], flags: [true, null] } }));
+    for (const [type, values, expected] of [['number', numbers, numbers], ['boolean', booleans, booleans],
+      ['string', strings, normalized], ['object', objects, JSON.parse(JSON.stringify(objects))]] as const) {
+      const source = fresh(type, values, 33), wanted = envelope(type, expected.slice(33));
+      expect(codec.encode(source)).toEqual(wanted); expect(codec.stringify(source)).toBe(JSON.stringify(wanted));
+      const restored = codec.parse(codec.stringify(source)) as SharedQueue<any>;
+      expect(codec.encode(restored)).toEqual(wanted); expect(arenaOf(restored)).not.toBe(arenaOf(source));
+      if (type === 'object') expect(Object.isFrozen((source.peek() as any).deep.coordinates[0])).toBe(true);
+    }
+    expect(Object.isFrozen(objects[33])).toBe(false);
+  });
+
+  it('keeps old snapshots, forks and public descriptors independent', () => {
+    const values = Array.from({ length: 1057 }, (_, i) => i), source = fresh('number', values, 31);
+    const fork = source.dequeue().enqueue(9001), a = arenaOf(source);
+    const restored = SharedQueue.fromWorkerData(source.toWorkerData(), a);
+    expect(codec.encode(restored)).toEqual(envelope('number', values.slice(31)));
+    expect(codec.encode(source)).toEqual(envelope('number', values.slice(31)));
+    expect(codec.encode(fork)).toEqual(envelope('number', [...values.slice(32), 9001]));
+  });
+
+  for (const copy of [false, true]) it(`exports an attached read-only queue without changing bytes (copy=${copy})`, async () => {
+    const values = Array.from({ length: 1057 }, (_, i) => `row-${i}-界🙂`), source = fresh('string', values, 31);
+    const { queue } = await initWorker<{ queue: SharedQueue<'string'> }>(getWorkerData({ queue: source }, { copy }));
+    const a = arenaOf(queue), used = a.used, bytes = a.copy();
+    expect(codec.encode(queue)).toEqual(envelope('string', values.slice(31)));
+    expect(codec.stringify(queue)).toBe(JSON.stringify(envelope('string', values.slice(31))));
+    expect(a.used).toBe(used); expect(a.copy()).toEqual(bytes);
+    expect(() => queue.enqueue('forbidden')).toThrow(/read-only/);
+  });
+
+  it('keeps a valid captured primitive view through memory growth during a scan', () => {
+    const values = Array.from({ length: 65 }, (_, i) => i + .25), queue = fresh('number', values);
+    const a = arenaOf(queue), view = a.dv, original = view.getFloat64, capacity = a.memory.buffer.byteLength;
+    let calls = 0;
+    view.getFloat64 = function (offset, littleEndian) {
+      if (!calls++) a.memory.grow(2);
+      return original.call(this, offset, littleEndian);
+    };
+    try {
+      expect(codec.encode(queue)).toEqual(envelope('number', values));
+      expect(calls).toBe(65); expect(a.memory.buffer.byteLength).toBeGreaterThan(capacity);
+    } finally { delete (view as any).getFloat64; }
+  });
+
+  it('keeps nested reconstruction and growth on the public-method loop', () => {
+    const a = new Arena(), child = new SharedList('number', 0, 0, 0, new Arena()).pushMany([1, 2, 3]);
+    const queue = fresh('SharedList<number>', Array.from({ length: 65 }, () => child), 31, a);
+    const original = structureRegistry.SharedList.fromWorkerData, capacity = a.memory.buffer.byteLength;
+    let calls = 0;
+    structureRegistry.SharedList.fromWorkerData = (data, arena) => {
+      if (!calls++) a.memory.grow(2);
+      return original(data, arena);
+    };
+    try {
+      expect(codec.encode(queue)).toEqual({ $zerocopyRedux: 1, value: ['c', 'SharedQueue', 'SharedList<number>', null,
+        Array.from({ length: 34 }, () => ['c', 'SharedList', 'number', null, [1, 2, 3]])] });
+      expect(calls).toBe(34); expect(a.memory.buffer.byteLength).toBeGreaterThan(capacity);
+    } finally { structureRegistry.SharedList.fromWorkerData = original; }
+  });
+
+  for (const method of ['peek', 'dequeue', 'isEmpty'] as const) it(`observes ${method} replacements made by nested reconstruction`, () => {
+    const child = new SharedList('number', 0, 0, 0, new Arena()).pushMany([1, 2, 3]);
+    const queue = fresh('SharedList<number>', Array.from({ length: 65 }, () => child));
+    const empty = fresh('SharedList<number>', []);
+    const factory = structureRegistry.SharedList.fromWorkerData;
+    const descriptor = Object.getOwnPropertyDescriptor(SharedQueue.prototype, method)!;
+    let reconstructions = 0;
+    structureRegistry.SharedList.fromWorkerData = (data, arena) => {
+      reconstructions++;
+      if (method === 'isEmpty') Object.defineProperty(SharedQueue.prototype, method, { ...descriptor, get() { return true; } });
+      else Object.defineProperty(SharedQueue.prototype, method, { ...descriptor,
+        value: method === 'peek' ? () => 777 : () => empty });
+      return factory(data, arena);
+    };
+    try {
+      const first = ['c', 'SharedList', 'number', null, [1, 2, 3]];
+      expect(codec.encode(queue)).toEqual({ $zerocopyRedux: 1, value: ['c', 'SharedQueue', 'SharedList<number>', null,
+        method === 'peek' ? [first, ...Array(64).fill(777)] : [first]] });
+      expect(reconstructions).toBe(1);
+    } finally {
+      structureRegistry.SharedList.fromWorkerData = factory;
+      Object.defineProperty(SharedQueue.prototype, method, descriptor);
+    }
+  });
+
+  for (const where of ['instance', 'prototype'] as const) for (const type of ['number', 'boolean', 'string', 'object'] as const) {
+    it(`observes queue changes made by a custom ${where} ${type} decoder without extra getter calls`, () => {
+      const values = Array.from({ length: 65 }, (_, i) => type === 'number' ? i + .25 : type === 'boolean' ? !!(i & 1)
+        : type === 'string' ? `界🙂-${i}` : { i });
+      const queue = fresh(type, values), a = arenaOf(queue), target = where === 'instance' ? a : Arena.prototype;
+      const decoder = Object.getOwnPropertyDescriptor(Arena.prototype, 'decode')!;
+      const previous = Object.getOwnPropertyDescriptor(target, 'decode');
+      const isEmpty = Object.getOwnPropertyDescriptor(SharedQueue.prototype, 'isEmpty')!;
+      let getters = 0, calls = 0;
+      const replacement = function (this: Arena, valueType: string, raw: number) {
+        calls++;
+        Object.defineProperty(SharedQueue.prototype, 'isEmpty', { ...isEmpty, get() { return true; } });
+        return decoder.value.call(this, valueType, raw);
+      };
+      Object.defineProperty(target, 'decode', { configurable: true, get() { getters++; return replacement; } });
+      try {
+        expect(codec.encode(queue)).toEqual(envelope(type, values.slice(0, 1)));
+        expect(getters).toBe(1); expect(calls).toBe(1);
+      } finally {
+        if (previous) Object.defineProperty(target, 'decode', previous); else delete (a as any).decode;
+        Object.defineProperty(SharedQueue.prototype, 'isEmpty', isEmpty);
+      }
+    });
+  }
+
+  it('preserves exact failure budgets against the original public-method loop', () => {
+    const numberQueue = fresh('number', Array.from({ length: 65 }, (_, i) => i), 31);
+    const objectQueue = fresh('object', Array.from({ length: 34 }, (_, i) => ({ i, nested: [i, { value: i }] })));
+    const descriptor = Object.getOwnPropertyDescriptor(SharedQueue.prototype, 'peek')!;
+    for (const source of [numberQueue, objectQueue]) for (const options of [
+      { maxNodes: 34 }, { maxNodes: 35 }, { maxNodes: 100 }, { maxNodes: 1000 },
+      { maxDepth: 1 }, { maxDepth: 2 }, { maxDepth: 4 }, { maxCollectionSize: 33 },
+      { maxCollectionSize: 34 }, { maxTextLength: 64 }, { maxTextLength: 8192 },
+    ]) {
+      const limited = createZerocopyCodec(options), direct = outcome(() => limited.stringify(source));
+      Object.defineProperty(SharedQueue.prototype, 'peek', { ...descriptor, value: function (this: SharedQueue<any>) { return descriptor.value.call(this); } });
+      try { expect(outcome(() => limited.stringify(source))).toEqual(direct); }
+      finally { Object.defineProperty(SharedQueue.prototype, 'peek', descriptor); }
+    }
+  });
+
+  for (const name of ['peek', 'dequeue'] as const) it(`preserves replacement ${name} accessors without extra getter calls`, () => {
+    const queue = fresh('number', Array.from({ length: 65 }, (_, i) => i));
+    const descriptor = Object.getOwnPropertyDescriptor(SharedQueue.prototype, name)!;
+    let getters = 0, calls = 0;
+    const replacement = function (this: SharedQueue<any>) { calls++; return descriptor.value.call(this); };
+    Object.defineProperty(SharedQueue.prototype, name, { configurable: true, get() { getters++; return replacement; } });
+    try {
+      expect(codec.encode(queue)).toEqual(envelope('number', Array.from({ length: 65 }, (_, i) => i)));
+      expect(getters).toBe(65); expect(calls).toBe(65);
+    } finally { Object.defineProperty(SharedQueue.prototype, name, descriptor); }
+  });
+
+  it('retains replacement isEmpty behavior and getter count', () => {
+    const queue = fresh('number', Array.from({ length: 65 }, (_, i) => i));
+    const descriptor = Object.getOwnPropertyDescriptor(SharedQueue.prototype, 'isEmpty')!;
+    let calls = 0;
+    Object.defineProperty(SharedQueue.prototype, 'isEmpty', { ...descriptor, get() { calls++; return this.size <= 32; } });
+    try {
+      expect(codec.encode(queue)).toEqual(envelope('number', Array.from({ length: 33 }, (_, i) => i)));
+      expect(calls).toBe(34);
+    } finally { Object.defineProperty(SharedQueue.prototype, 'isEmpty', descriptor); }
+  });
+
+  it('continues rejecting subclass overrides under exact built-in recognition', () => {
+    class CustomQueue extends SharedQueue<'number'> { override peek() { throw new Error('Subclass peek must not run'); } }
+    const queue = new CustomQueue('number', 0, 0, 0, undefined, new Arena());
+    expect(isSharedCollection(queue)).toBe(false);
+    expect(() => codec.encode(queue)).toThrow(/only plain records, arrays, and shared collections/);
+  });
+});

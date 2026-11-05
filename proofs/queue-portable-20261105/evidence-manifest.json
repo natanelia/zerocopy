@@ -1,0 +1,351 @@
+{
+  "schema": 1,
+  "decision": "rejected under fixed conservative plan; evidence only, no optimization PR",
+  "studies": [
+    {
+      "id": "pilot-01",
+      "phase": "pilot",
+      "disposition": "superseded-for-correctness",
+      "path": "results/pilot-01.json.gz",
+      "measuredCommit": "d910db0a5764f74f9d4f27c61e65ed0ac8dfd2f4",
+      "changedProduction": [
+        "redux-codec.ts",
+        "shared-queue.ts"
+      ],
+      "sources": {
+        "redux-codec.ts": "superseded-reentry/source/redux-codec.ts.txt",
+        "shared-queue.ts": "superseded-reentry/source/shared-queue.ts.txt",
+        "redux-queue-traversal.test.ts": "superseded-reentry/source/redux-queue-traversal.test.ts.txt"
+      },
+      "drivers": {
+        "benchmark.mjs": "superseded-reentry/benchmark.mjs",
+        "fixtures.mjs": "superseded-reentry/fixtures.mjs",
+        "worker.mjs": "superseded-reentry/worker.mjs",
+        "compatibility.mjs": "superseded-reentry/compatibility.mjs",
+        "PLAN.md": "superseded-reentry/PLAN.md"
+      },
+      "raw": {
+        "bytes": 672288,
+        "sha256": "5ce4cfbdf2fc1782e52e44fb4e38918dbc48dcb105b78b4fd15013ad4b10a22d"
+      },
+      "stored": {
+        "bytes": 50300,
+        "sha256": "dbf5035f3db76b70e25e7ab8194f10f66cc77097c96256e8518060bce87a5134"
+      }
+    },
+    {
+      "id": "pilot-02",
+      "phase": "pilot",
+      "disposition": "superseded-after-adverse-screen-controls",
+      "path": "results/pilot-02.json.gz",
+      "measuredCommit": "568aa128f31ef90fab2e2ff9e07dcee882864bc4",
+      "changedProduction": [
+        "arena.ts",
+        "redux-codec.ts",
+        "shared-queue.ts"
+      ],
+      "sources": {
+        "arena.ts": "superseded-inlined/source/arena.ts.txt",
+        "redux-codec.ts": "superseded-inlined/source/redux-codec.ts.txt",
+        "shared-queue.ts": "superseded-inlined/source/shared-queue.ts.txt",
+        "redux-queue-traversal.test.ts": "superseded-inlined/source/redux-queue-traversal.test.ts.txt"
+      },
+      "drivers": {
+        "benchmark.mjs": "superseded-inlined/benchmark.mjs",
+        "fixtures.mjs": "superseded-inlined/fixtures.mjs",
+        "worker.mjs": "superseded-inlined/worker.mjs",
+        "compatibility.mjs": "superseded-inlined/compatibility.mjs",
+        "PLAN.md": "superseded-inlined/PLAN.md"
+      },
+      "raw": {
+        "bytes": 659258,
+        "sha256": "417f69e5c4f2ceffbcf038bc0f522fcbe557a4c8b973803bbcf378b8ebb1d4fe"
+      },
+      "stored": {
+        "bytes": 49743,
+        "sha256": "92785dbe9b58dd378e51e0288d9b523cd76de35cf9f9013dbcfae37369212166"
+      }
+    },
+    {
+      "id": "pilot-03",
+      "phase": "pilot",
+      "disposition": "final-variant exploratory pilot; not pooled with confirmation",
+      "path": "results/pilot-03.json.gz",
+      "measuredCommit": "21172d84b71be2df0000b68757560e8d50f86381",
+      "changedProduction": [
+        "arena.ts",
+        "redux-codec.ts",
+        "shared-queue.ts"
+      ],
+      "sources": {
+        "arena.ts": "source-v3/arena.ts.txt",
+        "redux-codec.ts": "source-v3/redux-codec.ts.txt",
+        "shared-queue.ts": "source-v3/shared-queue.ts.txt",
+        "redux-queue-traversal.test.ts": "source-v3/redux-queue-traversal.test.ts.txt"
+      },
+      "drivers": {
+        "benchmark.mjs": "benchmark.mjs",
+        "fixtures.mjs": "fixtures.mjs",
+        "worker.mjs": "worker.mjs",
+        "compatibility.mjs": "compatibility.mjs",
+        "PLAN.md": "PLAN.md"
+      },
+      "raw": {
+        "bytes": 683019,
+        "sha256": "7f486d2196d0d44d91b3209931744fb02a06108c2e5e9922f3b6189a2eb4ddde"
+      },
+      "stored": {
+        "bytes": 51090,
+        "sha256": "1ae6397b93387d6dbe9d25d48eb6c996ac96384bd2eb18fcc178a92ba625c1cc"
+      }
+    },
+    {
+      "id": "formal-01",
+      "phase": "formal",
+      "pilot": "pilot-03",
+      "disposition": "rejected: recurring Bun JSON fallback cost",
+      "path": "results/formal-01.json.gz",
+      "measuredCommit": "21172d84b71be2df0000b68757560e8d50f86381",
+      "changedProduction": [
+        "arena.ts",
+        "redux-codec.ts",
+        "shared-queue.ts"
+      ],
+      "sources": {
+        "arena.ts": "source-v3/arena.ts.txt",
+        "redux-codec.ts": "source-v3/redux-codec.ts.txt",
+        "shared-queue.ts": "source-v3/shared-queue.ts.txt",
+        "redux-queue-traversal.test.ts": "source-v3/redux-queue-traversal.test.ts.txt"
+      },
+      "drivers": {
+        "benchmark.mjs": "benchmark.mjs",
+        "fixtures.mjs": "fixtures.mjs",
+        "worker.mjs": "worker.mjs",
+        "compatibility.mjs": "compatibility.mjs",
+        "PLAN.md": "PLAN.md"
+      },
+      "raw": {
+        "bytes": 1753792,
+        "sha256": "3a7c9f31a4bb4fb86b2b9ecfc4cd0881073a21f64e66391d9b76e0436cd71930"
+      },
+      "stored": {
+        "bytes": 118613,
+        "sha256": "77a1fbb215e7d34a5a6bbf4cf13816b97aed78c2fbbbb1aca358f5ee76286da0"
+      }
+    }
+  ],
+  "files": {
+    "PLAN.md": {
+      "bytes": 7984,
+      "sha256": "7878513754a6b14636c2d559788a1665644815cccac7431614b45b898ef9a1fe"
+    },
+    "README.md": {
+      "bytes": 21082,
+      "sha256": "edaf34a0e5c8cdf05633a21f11067d1c58602605036b78d224d4c061934aacaf"
+    },
+    "benchmark.mjs": {
+      "bytes": 15552,
+      "sha256": "c82e2641893cceec54148d74e2992fac346a389707eb765d719901798b300d5f"
+    },
+    "compatibility.mjs": {
+      "bytes": 3454,
+      "sha256": "6d89cfee1b9494913408a92c64e059b084c6978cb507c106d610303534dd5cb3"
+    },
+    "fixtures.mjs": {
+      "bytes": 5519,
+      "sha256": "29719b126f76285e17376fba8f73d5fea275d0fabe40a70b0261161971856501"
+    },
+    "results/formal-01.json.gz": {
+      "bytes": 118613,
+      "sha256": "77a1fbb215e7d34a5a6bbf4cf13816b97aed78c2fbbbb1aca358f5ee76286da0"
+    },
+    "results/formal-01.txt": {
+      "bytes": 15551,
+      "sha256": "dd8fb1df4515a8b2a0e76c48808f856b19a2f8ddae2e33d0085302e6a3077b12"
+    },
+    "results/pilot-01.json.gz": {
+      "bytes": 50300,
+      "sha256": "dbf5035f3db76b70e25e7ab8194f10f66cc77097c96256e8518060bce87a5134"
+    },
+    "results/pilot-01.txt": {
+      "bytes": 7880,
+      "sha256": "08da0e5f2507add8c3b7d508ea962c065c58f9c517726330b21ac9838745bd32"
+    },
+    "results/pilot-02.json.gz": {
+      "bytes": 49743,
+      "sha256": "92785dbe9b58dd378e51e0288d9b523cd76de35cf9f9013dbcfae37369212166"
+    },
+    "results/pilot-02.txt": {
+      "bytes": 7879,
+      "sha256": "641e736b362a0cc8211560bb1babe5cf3cb399761acfe8471297560c2877b99c"
+    },
+    "results/pilot-03.json.gz": {
+      "bytes": 51090,
+      "sha256": "1ae6397b93387d6dbe9d25d48eb6c996ac96384bd2eb18fcc178a92ba625c1cc"
+    },
+    "results/pilot-03.txt": {
+      "bytes": 7863,
+      "sha256": "c9c372ae1050d93700aae464b6be556026409032f46fad6300bed8ea15bca752"
+    },
+    "review/independent-audit-map.json": {
+      "bytes": 8634,
+      "sha256": "4460f6530908292f74c61271f339c8d1f535325f2d2918b1797f1055ac459ce1"
+    },
+    "review/independent-audit-map.py": {
+      "bytes": 5013,
+      "sha256": "81844212f5f7b7d8fa6f220d94f2df569d122ed2ac00e238da0ac944193e5f1b"
+    },
+    "source-v3/archive-manifest.json": {
+      "bytes": 931,
+      "sha256": "b78c8ef8901aa6452a03a7cddd9993dfb9ac2382cb393d03211fec9cd84d2071"
+    },
+    "source-v3/arena.ts.txt": {
+      "bytes": 45791,
+      "sha256": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e"
+    },
+    "source-v3/redux-codec.ts.txt": {
+      "bytes": 15524,
+      "sha256": "c21410fae47d10073cb1e6f888610a28e084583c72d1804b3150c873b851e38d"
+    },
+    "source-v3/redux-queue-traversal.test.ts.txt": {
+      "bytes": 12744,
+      "sha256": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167"
+    },
+    "source-v3/shared-queue.ts.txt": {
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    },
+    "superseded-inlined/PLAN.md": {
+      "bytes": 6957,
+      "sha256": "77f813a84a0905cce019c76aab7b1d58472f77b14f3900ba6e9b1d261c3380a7"
+    },
+    "superseded-inlined/archive-manifest.json": {
+      "bytes": 2534,
+      "sha256": "f2142d080341543c4de76079f13c2e95a6f772973f2396a87d941e83186ee065"
+    },
+    "superseded-inlined/benchmark.mjs": {
+      "bytes": 15552,
+      "sha256": "c82e2641893cceec54148d74e2992fac346a389707eb765d719901798b300d5f"
+    },
+    "superseded-inlined/compatibility.mjs": {
+      "bytes": 3454,
+      "sha256": "6d89cfee1b9494913408a92c64e059b084c6978cb507c106d610303534dd5cb3"
+    },
+    "superseded-inlined/fixtures.mjs": {
+      "bytes": 5519,
+      "sha256": "29719b126f76285e17376fba8f73d5fea275d0fabe40a70b0261161971856501"
+    },
+    "superseded-inlined/source/archive-manifest.json": {
+      "bytes": 891,
+      "sha256": "3838df768fe5417cb2844738910849882fd240f15842c9bf4012875359b85631"
+    },
+    "superseded-inlined/source/arena.ts.txt": {
+      "bytes": 45791,
+      "sha256": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e"
+    },
+    "superseded-inlined/source/redux-codec.ts.txt": {
+      "bytes": 15612,
+      "sha256": "9e6b3b589b17cd4a733ae1aa3aceb5717c735008d53a5e485538e8095659d90b"
+    },
+    "superseded-inlined/source/redux-queue-traversal.test.ts.txt": {
+      "bytes": 12744,
+      "sha256": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167"
+    },
+    "superseded-inlined/source/shared-queue.ts.txt": {
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    },
+    "superseded-inlined/worker.mjs": {
+      "bytes": 5550,
+      "sha256": "3cf56c812c90a5264fcec4dfe0681ceef1ba3d748e03b0e0fcc474a4c1252e26"
+    },
+    "superseded-reentry/PLAN.md": {
+      "bytes": 5895,
+      "sha256": "0cea9c45ac306c12f7aa8f63c1dfad1ccc9cbbb2562ccb2c32e16e0d71a3bce8"
+    },
+    "superseded-reentry/archive-manifest.json": {
+      "bytes": 2238,
+      "sha256": "22579989e27230936e803fe636955e0a19c2f786f426a7bc8cb3489bc59b2103"
+    },
+    "superseded-reentry/benchmark.mjs": {
+      "bytes": 15540,
+      "sha256": "3799517014863c38427411406a3f4c9b435377a8a4f87fefd709ec8ad86b8af2"
+    },
+    "superseded-reentry/compatibility.mjs": {
+      "bytes": 2670,
+      "sha256": "26a31f1731bd42cb264ca4a32aed2c0bcc127fc3b903073fba964fe312be7892"
+    },
+    "superseded-reentry/fixtures.mjs": {
+      "bytes": 5519,
+      "sha256": "29719b126f76285e17376fba8f73d5fea275d0fabe40a70b0261161971856501"
+    },
+    "superseded-reentry/source/redux-codec.ts.txt": {
+      "bytes": 15369,
+      "sha256": "e4d93841254176540e9eb4aaafc303036187317167a586c22e604092e6acc362"
+    },
+    "superseded-reentry/source/redux-queue-traversal.test.ts.txt": {
+      "bytes": 9057,
+      "sha256": "bd1e4493af43641a6cb0b5d421311d2b364b031201c31618dd5540d34cffa719"
+    },
+    "superseded-reentry/source/shared-queue.ts.txt": {
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    },
+    "superseded-reentry/worker.mjs": {
+      "bytes": 5550,
+      "sha256": "3cf56c812c90a5264fcec4dfe0681ceef1ba3d748e03b0e0fcc474a4c1252e26"
+    },
+    "validation/initial-01.json": {
+      "bytes": 1803,
+      "sha256": "c92948a37230f582e3c59257df754a714fc1ad38e0a7cafbf47f835e04236a2e"
+    },
+    "validation/initial-01.txt": {
+      "bytes": 1863,
+      "sha256": "254be8090293ba2a7f038ba3362e1fccd17ac554d56665f16c39ef121e2930e2"
+    },
+    "validation/packaging-cleanup.json": {
+      "bytes": 2823,
+      "sha256": "c288e97427ecc93e9a63fa009a817946a190dffd85405e86f7c31d73ed807651"
+    },
+    "validation/packaging-docs-01.json": {
+      "bytes": 348,
+      "sha256": "f0eb1878e27109d7231ca819ab1be2ee5ee0b5ff6f093c765b0b08a1f219a2db"
+    },
+    "validation/packaging-docs-01.txt": {
+      "bytes": 148,
+      "sha256": "a423d2c5cfbf7ef58d8c7930f48d36d39351e59f208f254dc258810f1dd70f2c"
+    },
+    "validation/repair-02.json": {
+      "bytes": 3497,
+      "sha256": "7cac87c6fbbce5ef53985a3cdf0f05e07727d378f660ad42d72f588b46629020"
+    },
+    "validation/repair-02.txt": {
+      "bytes": 4744,
+      "sha256": "5f80c8943ca1c1cef3f64663d726716607bb982e7e5f2e0e82626fba5d21eac4"
+    },
+    "validation/structural-03.json": {
+      "bytes": 1415,
+      "sha256": "6d9eef60b0280c53c555f9695cea34fd200ef2da4db55c5b16c0f4697e912a5e"
+    },
+    "validation/structural-03.txt": {
+      "bytes": 191,
+      "sha256": "7244db5e997fc9176e6cd956473e90dea553b00c92b276998e640d7fdfabac35"
+    },
+    "validation/structural-04.json": {
+      "bytes": 2815,
+      "sha256": "395ec3f520c0cfc727c8117e4510fb85fa0f2c4d90281d91b1dd1b4277c04fbc"
+    },
+    "validation/structural-04.txt": {
+      "bytes": 1966,
+      "sha256": "dfc074f10bb60e050095cf25692bc4f132c621e15e84d015aac30819e671b9fe"
+    },
+    "verify.mjs": {
+      "bytes": 11703,
+      "sha256": "d2b3510c382b37836a1912efba65a315512cc12a4891df84b9e9fd853d10ec21"
+    },
+    "worker.mjs": {
+      "bytes": 5550,
+      "sha256": "3cf56c812c90a5264fcec4dfe0681ceef1ba3d748e03b0e0fcc474a4c1252e26"
+    }
+  }
+}

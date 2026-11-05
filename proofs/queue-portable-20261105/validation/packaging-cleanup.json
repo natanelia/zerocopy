@@ -1,0 +1,60 @@
+{
+  "at": "2026-11-05T02:59:08.283329+00:00",
+  "reason": "Remove only byte-verified physical duplicates; exact sources and all raw observations remain archived. Reappearance of prior copies was observed but its cause was not established.",
+  "removed": [
+    {
+      "path": "proofs/queue-portable-20261105/results/pilot-01.json",
+      "preservedAs": "proofs/queue-portable-20261105/results/pilot-01.json.gz",
+      "bytes": 672288,
+      "sha256": "5ce4cfbdf2fc1782e52e44fb4e38918dbc48dcb105b78b4fd15013ad4b10a22d"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/results/pilot-02.json",
+      "preservedAs": "proofs/queue-portable-20261105/results/pilot-02.json.gz",
+      "bytes": 659258,
+      "sha256": "417f69e5c4f2ceffbcf038bc0f522fcbe557a4c8b973803bbcf378b8ebb1d4fe"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/results/pilot-03.json",
+      "preservedAs": "proofs/queue-portable-20261105/results/pilot-03.json.gz",
+      "bytes": 683019,
+      "sha256": "7f486d2196d0d44d91b3209931744fb02a06108c2e5e9922f3b6189a2eb4ddde"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/results/formal-01.json",
+      "preservedAs": "proofs/queue-portable-20261105/results/formal-01.json.gz",
+      "bytes": 1753792,
+      "sha256": "3a7c9f31a4bb4fb86b2b9ecfc4cd0881073a21f64e66391d9b76e0436cd71930"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/source/archive-manifest.json",
+      "preservedAs": "proofs/queue-portable-20261105/superseded-inlined/source/archive-manifest.json",
+      "bytes": 891,
+      "sha256": "3838df768fe5417cb2844738910849882fd240f15842c9bf4012875359b85631"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/source/arena.ts.txt",
+      "preservedAs": "proofs/queue-portable-20261105/superseded-inlined/source/arena.ts.txt",
+      "bytes": 45791,
+      "sha256": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/source/redux-codec.ts.txt",
+      "preservedAs": "proofs/queue-portable-20261105/superseded-inlined/source/redux-codec.ts.txt",
+      "bytes": 15612,
+      "sha256": "9e6b3b589b17cd4a733ae1aa3aceb5717c735008d53a5e485538e8095659d90b"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/source/redux-queue-traversal.test.ts.txt",
+      "preservedAs": "proofs/queue-portable-20261105/superseded-inlined/source/redux-queue-traversal.test.ts.txt",
+      "bytes": 12744,
+      "sha256": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167"
+    },
+    {
+      "path": "proofs/queue-portable-20261105/source/shared-queue.ts.txt",
+      "preservedAs": "proofs/queue-portable-20261105/superseded-inlined/source/shared-queue.ts.txt",
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    }
+  ]
+}

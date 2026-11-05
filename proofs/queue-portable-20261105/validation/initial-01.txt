@@ -1,0 +1,39 @@
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:wasm
+$ node scripts/build-wasm.mjs
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 234603 bytes
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run typecheck
+$ tsc --noEmit
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run typecheck:redux
+$ tsc --noEmit -p tsconfig.redux.json
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run test redux-queue-traversal.test.ts redux.test.ts redux-regression.test.ts
+$ bun --bun node_modules/vitest/vitest.mjs run redux-queue-traversal.test.ts redux.test.ts redux-regression.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-query
+
+
+ Test Files  4 passed (4)
+      Tests  74 passed (74)
+   Start at  19:49:42
+   Duration  5.08s (transform 793ms, setup 0ms, import 1.10s, tests 5.78s, environment 1ms)
+
+
+$ node proofs/queue-portable-20261105/compatibility.mjs
+{"ok":true,"phase":"pre-import","method":"peek","getters":65,"calls":65,"exportedHelper":false}
+{"ok":true,"phase":"pre-import","method":"dequeue","getters":65,"calls":65,"exportedHelper":false}
+{"ok":true,"phase":"pre-import","method":"isEmpty","getters":34,"calls":0,"exportedHelper":false}
+{"ok":true,"phase":"post-import","method":"peek","getters":65,"calls":65,"exportedHelper":false}
+{"ok":true,"phase":"post-import","method":"dequeue","getters":65,"calls":65,"exportedHelper":false}
+{"ok":true,"phase":"post-import","method":"isEmpty","getters":34,"calls":0,"exportedHelper":false}
+
+$ node proofs/queue-portable-20261105/worker.mjs
+{"ok":true,"workers":2,"transports":["shared","copy"],"queues":4,"freshAndWarmExports":true,"retainedAfterGrowthAndReset":true,"readOnly":true}

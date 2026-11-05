@@ -1,0 +1,56 @@
+{
+  "status": "superseded-for-correctness",
+  "commit": "d910db0a5764f74f9d4f27c61e65ed0ac8dfd2f4",
+  "reason": "A nested structureRegistry reconstruction may replace queue prototype read methods during encoding. The one-time original-method guard did not preserve those later method changes. No confirmation uses this source.",
+  "files": {
+    "source/redux-codec.ts.txt": {
+      "repoPath": "redux-codec.ts",
+      "bytes": 15369,
+      "sha256": "e4d93841254176540e9eb4aaafc303036187317167a586c22e604092e6acc362"
+    },
+    "source/shared-queue.ts.txt": {
+      "repoPath": "shared-queue.ts",
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    },
+    "source/redux-queue-traversal.test.ts.txt": {
+      "repoPath": "redux-queue-traversal.test.ts",
+      "bytes": 9057,
+      "sha256": "bd1e4493af43641a6cb0b5d421311d2b364b031201c31618dd5540d34cffa719"
+    },
+    "benchmark.mjs": {
+      "repoPath": "proofs/queue-portable-20261105/benchmark.mjs",
+      "bytes": 15540,
+      "sha256": "3799517014863c38427411406a3f4c9b435377a8a4f87fefd709ec8ad86b8af2"
+    },
+    "fixtures.mjs": {
+      "repoPath": "proofs/queue-portable-20261105/fixtures.mjs",
+      "bytes": 5519,
+      "sha256": "29719b126f76285e17376fba8f73d5fea275d0fabe40a70b0261161971856501"
+    },
+    "worker.mjs": {
+      "repoPath": "proofs/queue-portable-20261105/worker.mjs",
+      "bytes": 5550,
+      "sha256": "3cf56c812c90a5264fcec4dfe0681ceef1ba3d748e03b0e0fcc474a4c1252e26"
+    },
+    "compatibility.mjs": {
+      "repoPath": "proofs/queue-portable-20261105/compatibility.mjs",
+      "bytes": 2670,
+      "sha256": "26a31f1731bd42cb264ca4a32aed2c0bcc127fc3b903073fba964fe312be7892"
+    },
+    "PLAN.md": {
+      "repoPath": "proofs/queue-portable-20261105/PLAN.md",
+      "bytes": 5895,
+      "sha256": "0cea9c45ac306c12f7aa8f63c1dfad1ccc9cbbb2562ccb2c32e16e0d71a3bce8"
+    }
+  },
+  "study": {
+    "path": "../results/pilot-01.json.gz",
+    "rawBytes": 672288,
+    "rawSha256": "5ce4cfbdf2fc1782e52e44fb4e38918dbc48dcb105b78b4fd15013ad4b10a22d",
+    "storedBytes": 50300,
+    "storedSha256": "dbf5035f3db76b70e25e7ab8194f10f66cc77097c96256e8518060bce87a5134",
+    "pairs": 40,
+    "summaryRows": 20
+  }
+}

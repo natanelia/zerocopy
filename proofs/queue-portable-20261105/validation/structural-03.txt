@@ -1,0 +1,5 @@
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun run build:browser
+$ bun scripts/build-browser.ts
+/usr/bin/bash: line 1: bun: command not found
+error: script "build:browser" exited with code 127

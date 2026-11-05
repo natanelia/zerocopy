@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "variant": "final helper extraction",
+  "localMeasuredCommit": "21172d84b71be2df0000b68757560e8d50f86381",
+  "baselineCommit": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "files": {
+    "arena.ts.txt": {
+      "repoPath": "arena.ts",
+      "bytes": 45791,
+      "sha256": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e"
+    },
+    "redux-codec.ts.txt": {
+      "repoPath": "redux-codec.ts",
+      "bytes": 15524,
+      "sha256": "c21410fae47d10073cb1e6f888610a28e084583c72d1804b3150c873b851e38d"
+    },
+    "shared-queue.ts.txt": {
+      "repoPath": "shared-queue.ts",
+      "bytes": 4772,
+      "sha256": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678"
+    },
+    "redux-queue-traversal.test.ts.txt": {
+      "repoPath": "redux-queue-traversal.test.ts",
+      "bytes": 12744,
+      "sha256": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167"
+    }
+  }
+}

@@ -1,0 +1,60 @@
+node queue-empty ab pair 1: 2.245 candidate/baseline
+node queue-one ab pair 1: 0.819 candidate/baseline
+node queue-tail31 ab pair 1: 0.834 candidate/baseline
+node queue-offset34 ab pair 1: 0.220 candidate/baseline
+node queue-number4096 ab pair 1: 0.592 candidate/baseline
+node queue-stringify4096 ab pair 1: 0.577 candidate/baseline
+node queue-unicode1024 ab pair 1: 1.004 candidate/baseline
+node queue-json256 ab pair 1: 1.048 candidate/baseline
+node stack-number4096-control ab pair 1: 0.854 candidate/baseline
+node plain-array4096-control ab pair 1: 1.034 candidate/baseline
+node queue-one ab pair 2: 1.118 candidate/baseline
+node queue-tail31 ab pair 2: 1.154 candidate/baseline
+node queue-offset34 ab pair 2: 0.266 candidate/baseline
+node queue-number4096 ab pair 2: 0.729 candidate/baseline
+node queue-stringify4096 ab pair 2: 0.550 candidate/baseline
+node queue-unicode1024 ab pair 2: 1.207 candidate/baseline
+node queue-json256 ab pair 2: 0.939 candidate/baseline
+node stack-number4096-control ab pair 2: 1.371 candidate/baseline
+node plain-array4096-control ab pair 2: 0.628 candidate/baseline
+node queue-empty ab pair 2: 1.311 candidate/baseline
+bun queue-empty ab pair 1: 1.034 candidate/baseline
+bun queue-one ab pair 1: 0.944 candidate/baseline
+bun queue-tail31 ab pair 1: 0.854 candidate/baseline
+bun queue-offset34 ab pair 1: 0.439 candidate/baseline
+bun queue-number4096 ab pair 1: 0.391 candidate/baseline
+bun queue-stringify4096 ab pair 1: 0.463 candidate/baseline
+bun queue-unicode1024 ab pair 1: 0.916 candidate/baseline
+bun queue-json256 ab pair 1: 0.898 candidate/baseline
+bun stack-number4096-control ab pair 1: 1.206 candidate/baseline
+bun plain-array4096-control ab pair 1: 0.816 candidate/baseline
+bun queue-one ab pair 2: 1.096 candidate/baseline
+bun queue-tail31 ab pair 2: 0.811 candidate/baseline
+bun queue-offset34 ab pair 2: 0.654 candidate/baseline
+bun queue-number4096 ab pair 2: 0.362 candidate/baseline
+bun queue-stringify4096 ab pair 2: 0.632 candidate/baseline
+bun queue-unicode1024 ab pair 2: 0.848 candidate/baseline
+bun queue-json256 ab pair 2: 1.125 candidate/baseline
+bun stack-number4096-control ab pair 2: 1.179 candidate/baseline
+bun plain-array4096-control ab pair 2: 1.253 candidate/baseline
+bun queue-empty ab pair 2: 1.084 candidate/baseline
+{"runtime":"node","name":"queue-empty","mode":"ab","pairs":2,"beforeMedianMs":0.00030778756713867143,"afterMedianMs":0.0004936026992797861,"ratio":1.7155888487630822,"pairRatios":[2.2449288146726336,1.3110638870878566],"minRatio":1.3110638870878566,"maxRatio":2.2449288146726336}
+{"runtime":"node","name":"queue-one","mode":"ab","pairs":2,"beforeMedianMs":0.0006463423995971681,"afterMedianMs":0.0006244156494140621,"ratio":0.9566156846695759,"pairRatios":[0.8186547701521643,1.1178259768592667],"minRatio":0.8186547701521643,"maxRatio":1.1178259768592667}
+{"runtime":"node","name":"queue-tail31","mode":"ab","pairs":2,"beforeMedianMs":0.0065383941991223275,"afterMedianMs":0.006642167923752048,"ratio":0.9811616491450803,"pairRatios":[0.8341350559437826,1.1541034930654857],"minRatio":0.8341350559437826,"maxRatio":1.1541034930654857}
+{"runtime":"node","name":"queue-offset34","mode":"ab","pairs":2,"beforeMedianMs":0.005156425769980504,"afterMedianMs":0.001251473957115007,"ratio":0.2419002655688039,"pairRatios":[0.21984146641144162,0.26617243524360157],"minRatio":0.21984146641144162,"maxRatio":0.26617243524360157}
+{"runtime":"node","name":"queue-number4096","mode":"ab","pairs":2,"beforeMedianMs":0.5637833398437495,"afterMedianMs":0.3698080664062502,"ratio":0.656822901134142,"pairRatios":[0.5920957610573406,0.7286259281503131],"minRatio":0.5920957610573406,"maxRatio":0.7286259281503131}
+{"runtime":"node","name":"queue-stringify4096","mode":"ab","pairs":2,"beforeMedianMs":0.6781329240506327,"afterMedianMs":0.38303613924050584,"ratio":0.5635694203417616,"pairRatios":[0.5772565177095824,0.5502068522405822],"minRatio":0.5502068522405822,"maxRatio":0.5772565177095824}
+{"runtime":"node","name":"queue-unicode1024","mode":"ab","pairs":2,"beforeMedianMs":0.12423413035714301,"afterMedianMs":0.1366573892857143,"ratio":1.1005352843474996,"pairRatios":[1.0038508619454547,1.2065317249880914],"minRatio":1.0038508619454547,"maxRatio":1.2065317249880914}
+{"runtime":"node","name":"queue-json256","mode":"ab","pairs":2,"beforeMedianMs":3.1175312163461557,"afterMedianMs":3.086350725961534,"ratio":0.9917031559423747,"pairRatios":[1.047920189389216,0.938501957939457],"minRatio":0.938501957939457,"maxRatio":1.047920189389216}
+{"runtime":"node","name":"stack-number4096-control","mode":"ab","pairs":2,"beforeMedianMs":0.8052905172413789,"afterMedianMs":0.8727661465517249,"ratio":1.082057034539675,"pairRatios":[0.8543125012394853,1.3705142138246402],"minRatio":0.8543125012394853,"maxRatio":1.3705142138246402}
+{"runtime":"node","name":"plain-array4096-control","mode":"ab","pairs":2,"beforeMedianMs":2.0090346562500017,"afterMedianMs":1.5574236875,"ratio":0.8058834621556419,"pairRatios":[1.0344358244905232,0.6278283671157927],"minRatio":0.6278283671157927,"maxRatio":1.0344358244905232}
+{"runtime":"bun","name":"queue-empty","mode":"ab","pairs":2,"beforeMedianMs":0.00037772977447509803,"afterMedianMs":0.00040053522491455013,"ratio":1.058907284041202,"pairRatios":[1.0341586969877414,1.084248132768743],"minRatio":1.0341586969877414,"maxRatio":1.084248132768743}
+{"runtime":"bun","name":"queue-one","mode":"ab","pairs":2,"beforeMedianMs":0.00040924081420898404,"afterMedianMs":0.0004210281219482427,"ratio":1.0172645640809328,"pairRatios":[0.9441389171675391,1.0960539540508514],"minRatio":0.9441389171675391,"maxRatio":1.0960539540508514}
+{"runtime":"bun","name":"queue-tail31","mode":"ab","pairs":2,"beforeMedianMs":0.0029286603263589898,"afterMedianMs":0.002442089248172989,"ratio":0.8322412427587178,"pairRatios":[0.8543811299761306,0.8106750744459039],"minRatio":0.8106750744459039,"maxRatio":0.8543811299761306}
+{"runtime":"bun","name":"queue-offset34","mode":"ab","pairs":2,"beforeMedianMs":0.002856732054968076,"afterMedianMs":0.0015604697626821307,"ratio":0.5358162745897908,"pairRatios":[0.4388529157564182,0.6542034239887199],"minRatio":0.4388529157564182,"maxRatio":0.6542034239887199}
+{"runtime":"bun","name":"queue-number4096","mode":"ab","pairs":2,"beforeMedianMs":0.24557190969163067,"afterMedianMs":0.09226754405286339,"ratio":0.376244101069713,"pairRatios":[0.39144601431467607,0.36163255829182955],"minRatio":0.36163255829182955,"maxRatio":0.39144601431467607}
+{"runtime":"bun","name":"queue-stringify4096","mode":"ab","pairs":2,"beforeMedianMs":0.45109396568627447,"afterMedianMs":0.24046150000000027,"ratio":0.5409046769145164,"pairRatios":[0.4629195346493814,0.6320274855749993],"minRatio":0.4629195346493814,"maxRatio":0.6320274855749993}
+{"runtime":"bun","name":"queue-unicode1024","mode":"ab","pairs":2,"beforeMedianMs":0.09270538888888885,"afterMedianMs":0.08153334788359795,"ratio":0.8809327726542513,"pairRatios":[0.9156774270523398,0.8475064766360659],"minRatio":0.8475064766360659,"maxRatio":0.9156774270523398}
+{"runtime":"bun","name":"queue-json256","mode":"ab","pairs":2,"beforeMedianMs":2.632260495192309,"afterMedianMs":2.6514570144230776,"ratio":1.0049910307321068,"pairRatios":[0.897674148575105,1.1251376387024017],"minRatio":0.897674148575105,"maxRatio":1.1251376387024017}
+{"runtime":"bun","name":"stack-number4096-control","mode":"ab","pairs":2,"beforeMedianMs":0.3007493239436621,"afterMedianMs":0.3584872183098597,"ratio":1.1925507048833697,"pairRatios":[1.2058757814917778,1.1793728720204164],"minRatio":1.1793728720204164,"maxRatio":1.2058757814917778}
+{"runtime":"bun","name":"plain-array4096-control","mode":"ab","pairs":2,"beforeMedianMs":2.755305937500001,"afterMedianMs":2.8049208437500006,"ratio":1.011451054229788,"pairRatios":[0.8164772377358424,1.2529843917504717],"minRatio":0.8164772377358424,"maxRatio":1.2529843917504717}

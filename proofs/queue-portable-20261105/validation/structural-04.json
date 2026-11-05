@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-05T02:33:51.072284+00:00",
+  "sourceSha256": {
+    "arena.ts": "2eefa7de04e08f8926f805b887db8e0084afedb3729cbb745a6ca00060c1267e",
+    "redux-codec.ts": "c21410fae47d10073cb1e6f888610a28e084583c72d1804b3150c873b851e38d",
+    "shared-queue.ts": "4b2c0c64b80bcc85bbe70fc3e9e288848c500596b2227ff14c7b1b8cc7cb6678",
+    "redux-queue-traversal.test.ts": "555e807af0c3c65c8683879dd5402cd6d0381ddd530d52241b6a393957ccb167",
+    "proofs/queue-portable-20261105/PLAN.md": "7878513754a6b14636c2d559788a1665644815cccac7431614b45b898ef9a1fe",
+    "proofs/queue-portable-20261105/benchmark.mjs": "c82e2641893cceec54148d74e2992fac346a389707eb765d719901798b300d5f",
+    "proofs/queue-portable-20261105/fixtures.mjs": "29719b126f76285e17376fba8f73d5fea275d0fabe40a70b0261161971856501",
+    "proofs/queue-portable-20261105/compatibility.mjs": "6d89cfee1b9494913408a92c64e059b084c6978cb507c106d610303534dd5cb3",
+    "proofs/queue-portable-20261105/worker.mjs": "3cf56c812c90a5264fcec4dfe0681ceef1ba3d748e03b0e0fcc474a4c1252e26"
+  },
+  "toolDirectoryAddedToPath": "/workspace/scratch/83f1d4baba1f/tools",
+  "priorFailure": "structural-03 retained: child package script could not resolve bun in PATH; no source/build change",
+  "steps": [
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:browser"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 0.03198435999365756
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "build:types"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 1.7196201979968464
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 1.8199792949963012
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 0.9219952479979838
+    },
+    {
+      "command": [
+        "/workspace/scratch/83f1d4baba1f/tools/bun",
+        "run",
+        "test",
+        "redux-queue-traversal.test.ts",
+        "redux.test.ts",
+        "redux-regression.test.ts"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 4.885174820999964
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/compatibility.mjs"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 0.6677566920043319
+    },
+    {
+      "command": [
+        "node",
+        "proofs/queue-portable-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "wallSeconds": 0.21558555999945384
+    }
+  ],
+  "completedAt": "2026-11-05T02:34:01.337848+00:00",
+  "logSha256": "dfc074f10bb60e050095cf25692bc4f132c621e15e84d015aac30819e671b9fe"
+}
