@@ -37,12 +37,18 @@ jobs:
       - name: Verify task lifecycle with real Node workers
         shell: bash
         run: node --test --test-concurrency=1 --test-timeout=15000 proofs/worker-tasks.mjs proofs/worker-task-lifecycle.node.mjs 2>&1 | tee worker-tasks.log
+      - name: Verify linked callbacks across worker growth
+        run: |
+          node proofs/block-traversal-worker-check.mjs
+          node proofs/block-callback-20261105/verify.mjs
       - name: Verify list queries and bounded string reuse
         run: node --test proofs/list-query.mjs
       - name: Verify additional list pipeline regressions
         run: node --test proofs/list-query-regression.mjs
       - name: Verify lazy memory allocation
         run: node --test proofs/memory-startup.mjs
+      - name: Verify checkpoint Base64 compatibility
+        run: node --test proofs/checkpoint-base64-20261105/correctness.mjs
       - name: Check documentation links and recorded data
         env:
           DOCS_BASE: ${{ github.event.pull_request.base.sha }}
@@ -59,15 +65,25 @@ jobs:
         run: bunx playwright install --with-deps chromium
       - name: Check documented browser workers and isolation guards
         run: node scripts/check-doc-browser.mjs
+      - name: Check TanStack value materialization and recorded evidence
+        run: |
+          node proofs/tanstack-values-20261105/worker.mjs
+          node proofs/tanstack-values-20261105/verify.mjs proofs/tanstack-values-20261105/results/formal-01.json.gz
+          node proofs/tanstack-values-20261105/verify.mjs proofs/tanstack-values-20261105/results/pilot-02.json.gz
       - name: Check typed task examples from Markdown
         shell: bash
         run: node scripts/check-worker-docs.mjs 2>&1 | tee worker-docs.log
+      - name: Verify ordered-map projection workers
+        run: node proofs/ordered-map-projections-20261105/worker.mjs
       - name: Check built Node entry points
         run: |
           node proofs/node-worker.mjs
           node proofs/redux-node.mjs
           node proofs/typed-json-worker.mjs
           node --test proofs/map-values-view/worker.mjs
+          node --test proofs/list-batch-tail-20261105/worker.mjs
+          node proofs/sorted-foreach-20261105/worker.mjs
+          node proofs/sorted-foreach-20261105/verify.mjs
       - name: Check the installed npm tarball
         run: bun run check:package
       - name: Verify historical evidence

@@ -1,0 +1,129 @@
+Independent saved-evidence review: optimization round 4
+
+Result: PASS for the recorded combined correctness and package-validation
+claims. This review inspected saved evidence and immutable Git objects only.
+It did not rebuild, import the library, run tests, or measure performance.
+
+Recorded validation identity
+
+Baseline: 77599337867dbf785a5f0311d34637d0b36678fc
+Tested local commit: 913550f53e57d541c71b0bdbf7050eda92da17a2
+Tested tree: 2f075eabda070b51538d5653b5f8433cbe353527
+Node: v24.22.1
+Bun: 1.4.2
+Recorded interval: 2026-11-05 03:34:06.244161 through 03:35:11.970594 UTC
+
+The local commit is provenance, not a claim that it is fetchable from GitHub.
+
+Checked artifact identities
+
+integration-manifest.json
+  Bytes: 18,769
+  SHA-256: 235c8be1f57f494e34aa3ca7e4606e1322f78e4136eca2420f3abd755fb13112
+integration-validation.txt
+  Bytes: 10,461
+  SHA-256: e6dfb1ee27ae78ca81c4eb88b01ab5e7bab33e99ec7872e0e5014d9a14a69d54
+PLAN.md
+  Bytes: 3,027
+  SHA-256: 66aa3bd73234f146e6241365c669fed32edb4c66bc212a9d973e041ee1bb36dd
+integration-gate.py
+  SHA-256: 8b3e93a3951bca5d12696af87469a8292599944614c70d33960b49f2154a95a3
+
+The original validation log hash independently matches validationLogSha256
+in the manifest. The runner matches runnerSha256. PLAN.md is byte-identical
+to the plan stored at the tested commit. The recorded commit resolves to the
+recorded tree. Every one of the manifest's 119 root TypeScript source/test
+hashes was independently compared with that file's immutable blob at the
+tested commit; all 119 match.
+
+Command outcomes and test totals
+
+The manifest contains exactly 25 command steps, all with exitCode 0, and
+status "passed". Every recorded top-level command appears in the raw log.
+The log independently reports:
+
+  Test Files: 60 passed (60)
+  Tests: 1,159 passed (1,159)
+
+These are the default Bun/Vitest suite totals. They exclude the additional
+Node test-runner proofs and documentation tests that appear later in the
+same log. The 25 count refers to command gates, not individual assertions,
+worker groups, or total test cases.
+
+All three build gates passed: WASM, the portable JavaScript/browser bundle,
+and declarations. Project, Redux, typed-values, geometry and worker type
+checks passed. The typed-values script checks both configured optional-
+property modes within its single command gate.
+
+Eight listed standalone PR snapshots
+
+The fixed plan lists exactly these eight source snapshots:
+
+PR 50  766b2226324e4a8d37705ab82fd86207cb79622f  Long text-search loops
+PR 51  3b4042abcbe7b5745d24f6daf1e9aea66cb9d242  Bulk list tail reuse
+PR 53  5b53cd652fbc582c39c84c87c736903c7ec3c72c  Native checkpoint Base64
+PR 54  2f47642651712ce1b8fc6c67d8c65c0371c09e79  TanStack values materialization
+PR 55  2883a6e20943d721d0572c3d70a744fab6351be9  Linked-list block callbacks
+PR 56  cd1297394ee4ea80fa1d3a6454634865899a60c2  Ordered-map projections
+PR 57  af96028e0c30846354eb4a2f05d58f3dbcc269d5  Redux descriptor validation
+PR 58  254e5c288eaba5258a99db9c4c41c8a17271b6cb  Sorted-map callbacks
+
+This review verifies the saved plan and tested combined source identity.
+It does not independently re-query current GitHub PR status or certify that
+these historical snapshots remain the current remote heads.
+
+Worker, compatibility, package and documentation findings
+
+The log records successful Node worker lifecycle checks and affected
+collection proofs for linked traversal, ordered projections, TanStack
+values, list batches, map values, sorted callbacks, the standard worker
+protocol, Redux, and typed JSON. Checkpoint correctness passed for the Node
+runtime path, Bun's available native Base64 path, and Bun's forced fallback.
+
+The installed-package check passed with this exact logged result:
+  zerocopy@0.2.1: 143 package files, 216,502 bytes; Node/Bun exports,
+  immutable snapshots, Node worker sharing, and TypeScript consumer passed.
+The manifest records npm_config_offline=true for that check.
+
+Documentation tests passed. Strict preservation reported 72/72 historical
+benchmark rows unchanged, zero historical evidence files changed, and
+successful link/structure checks across 78 Markdown files at run time.
+Later report-only additions can change that Markdown-file count.
+
+Scope limits required in the final report
+
+- This is one combined correctness and installed-package gate. It is not a
+  combined benchmark, a combined speedup, or evidence that standalone PR
+  speedups can be added together.
+- Building a portable browser bundle is not real-browser execution. The
+  recorded gate contains no actual Chromium, Firefox, or Safari test run.
+- The default unit suite ran through Bun/Vitest. Separate Node workers and
+  Node/Bun installed consumers provide the additional runtime coverage
+  recorded in the log; this is not two complete unit-suite runs.
+- Only the block-callback and sorted-forEach archived performance verifiers
+  were replayed here. The gate did not replay all eight performance archives.
+- No rejected round-4 runtime is included in this combined source. Rejected
+  experiments retain their own evidence and must not inherit this gate as
+  validation of their candidate implementations.
+- The baseline has no committed transitive dependency lockfile. Its pinned
+  direct development dependencies do not make a future fresh installation
+  identical to the original installed dependency tree.
+
+Aggregate report review
+
+The combined-validation section accurately reports the 25 command gates,
+60/1,159 default suite result, extra worker/package checks, preserved
+historical documentation, tested identity, and absence of combined timing.
+It explicitly distinguishes portable bundle building from browser testing
+and names the two archived performance verifiers actually replayed.
+
+One concrete archive-description correction was requested and addressed:
+both the queue-front-cache archive and the broad heap-view archive retain
+experimental active source/tests. The other seven archives are proof-only.
+The .test.ts.txt statement is now qualified to those proof-only archives.
+The queue publication manifest contains shared-queue.ts and
+queue-front-cache.test.ts; the broad heap manifest contains
+shared-priority-queue.ts and heap-entry-views.test.ts. Those candidates are
+not part of the tested combined checkout.
+
+No remaining blocker was found in the reviewed combined-evidence claims.

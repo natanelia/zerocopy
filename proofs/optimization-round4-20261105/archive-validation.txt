@@ -1,0 +1,11 @@
+$ python3 /workspace/scratch/83f1d4baba1f/zerocopy-r4-integration/proofs/optimization-round4-20261105/verify.py
+{"status": "passed", "savedArtifacts": 9, "successfulCommands": 25, "activeUnitFiles": 60, "activeUnitTests": 1159, "scope": "Saved evidence only; no comparison with current production source."}
+
+exit=0
+
+$ node scripts/check-docs.mjs --base 77599337867dbf785a5f0311d34637d0b36678fc --preserve
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (78 Markdown files).
+
+exit=0

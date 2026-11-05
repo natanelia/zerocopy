@@ -524,6 +524,16 @@ export function heapPop(root: u32, isMax: bool): u32 { return root ? heapMerge(l
 
 // Extend a tail only at the allocation frontier. Bytes below heapEnd are never
 // rewritten. A fork or an intervening allocation copies the visible prefix.
+// The JS caller validates the total byte count before crossing the u32 boundary.
+export function tailReserve(tail: u32, length: u32, bytes: u32): u32 {
+  const prefixBytes = length * 8;
+  if (length && tail + prefixBytes == heapEnd) {
+    alloc(bytes - prefixBytes); return tail;
+  }
+  const p = alloc(bytes);
+  if (length) copyWords(p, tail, prefixBytes);
+  return p;
+}
 export function tailAppend(tail: u32, length: u32, value: f64): u32 {
   if (length && tail + length * 8 == heapEnd) {
     const p = alloc(8); store<f64>(p, value); return tail;

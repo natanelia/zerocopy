@@ -41,7 +41,7 @@ export class SharedCollection<T extends CollectionItem> {
 
   toArray(): T[] {
     const items: T[] = [];
-    for (const [_, value] of this.data.entries()) items.push(value as T);
+    for (const value of this.data.values()) items.push(value as T);
     return items;
   }
 

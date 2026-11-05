@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "scope": "Immutable saved artifacts; verification intentionally does not compare future production files.",
+  "files": [
+    {
+      "path": "PLAN.md",
+      "bytes": 3027,
+      "sha256": "66aa3bd73234f146e6241365c669fed32edb4c66bc212a9d973e041ee1bb36dd"
+    },
+    {
+      "path": "README.md",
+      "bytes": 13376,
+      "sha256": "91e184a748553c3912404c27b6b95b2f24c88e81e7f2902cce6cbe660e717d4f"
+    },
+    {
+      "path": "integration-gate.py",
+      "bytes": 5211,
+      "sha256": "8b3e93a3951bca5d12696af87469a8292599944614c70d33960b49f2154a95a3"
+    },
+    {
+      "path": "integration-manifest.json",
+      "bytes": 18769,
+      "sha256": "235c8be1f57f494e34aa3ca7e4606e1322f78e4136eca2420f3abd755fb13112"
+    },
+    {
+      "path": "integration-validation.txt",
+      "bytes": 10461,
+      "sha256": "e6dfb1ee27ae78ca81c4eb88b01ab5e7bab33e99ec7872e0e5014d9a14a69d54"
+    },
+    {
+      "path": "independent-audit.txt",
+      "bytes": 6348,
+      "sha256": "e7556322b6ae1023231a3f5591b34e9c31eea4d0f137f3bf37bdc538153584b5"
+    },
+    {
+      "path": "published-pr-snapshots.json",
+      "bytes": 2254,
+      "sha256": "a631a934b71f5ffeef8ce5461561a87d15d97836a31caa8c574ccdc001a83089"
+    },
+    {
+      "path": "published-experiments.json",
+      "bytes": 4341,
+      "sha256": "5f748832a62695441016b31e5a5b927412062f21c210d33d5e640825368bf110"
+    },
+    {
+      "path": "verify.py",
+      "bytes": 1676,
+      "sha256": "1ad7da0b203084d3eb449f1f19f8842f1c46e140651eaf6aa63b2f522d68e11c"
+    }
+  ]
+}

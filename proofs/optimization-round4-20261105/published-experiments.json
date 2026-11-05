@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-11-05 03:45:27 UTC",
+  "repository": "natanelia/zerocopy",
+  "baseline": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "scope": "Each immutable Git tree was verified during publication; all branch heads were read back again at checkedAt.",
+  "experiments": [
+    {
+      "id": "queue-front-cache",
+      "commit": "561130f572e6e819fa1ab52b400a902543ba766a",
+      "tree": "e45495b81dfe1a13007ebb0041b3a83bb4656948",
+      "branch": "experiments/rejected-queue-front-cache-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/561130f572e6e819fa1ab52b400a902543ba766a/proofs/queue-front-cache-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "sorted-journal-merge",
+      "commit": "69e0c2328a558b5529d558ef49655d8094a7c53f",
+      "tree": "45f23eebcd1db2f83f98c1f727f4eacd4e05702f",
+      "branch": "experiments/rejected-sorted-journal-merge-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/69e0c2328a558b5529d558ef49655d8094a7c53f/proofs/sorted-journal-merge-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "broad-heap-view",
+      "commit": "ba069cae250e8d36eabd0bc616f3a4da015e7a5c",
+      "tree": "e7b205ff48e5b2f1694180650da9199fa64ce8f7",
+      "branch": "experiments/rejected-heap-single-view-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/ba069cae250e8d36eabd0bc616f3a4da015e7a5c/proofs/heap-single-view-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "scoped-heap-view",
+      "commit": "ee57fdd76838bd4c9165d07528cd66540fc234d4",
+      "tree": "8d9e42132820952a5ec74e2326b87d1bb300591e",
+      "branch": "experiments/rejected-heap-generic-view-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/ee57fdd76838bd4c9165d07528cd66540fc234d4/proofs/heap-generic-view-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "large-list-compaction",
+      "commit": "bc55fa9e309dcc18dc8d40ae11fe44d36a42e0b9",
+      "tree": "004bd1f368652df22f11efe18102f3642c3e4ed8",
+      "branch": "experiments/rejected-large-list-compaction-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/bc55fa9e309dcc18dc8d40ae11fe44d36a42e0b9/proofs/primitive-compaction-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "portable-queue-codec",
+      "commit": "44177a698b11debb021ae59f1e7a44bf5a042ae4",
+      "tree": "5e2ed763b76b7c13d73ea26c84043ba4cb689de3",
+      "branch": "experiments/rejected-portable-queue-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/44177a698b11debb021ae59f1e7a44bf5a042ae4/proofs/queue-portable-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "child-first-list-set",
+      "commit": "80fa39bafe5311b74acb8f1a1994c552aafa2897",
+      "tree": "72d5bef8c0f4e996a4b1edc503f4c1930e56d89e",
+      "branch": "experiments/rejected-list-set-noop-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/80fa39bafe5311b74acb8f1a1994c552aafa2897/proofs/list-set-noop-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "numeric-key-scratch",
+      "commit": "b3a6998df52b7fd47bc17a3fa839ccb0101b7068",
+      "tree": "60357afa322a77af57420b7e8c7a3fb30b527edf",
+      "branch": "experiments/rejected-numeric-key-scratch-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/b3a6998df52b7fd47bc17a3fa839ccb0101b7068/proofs/numeric-key-scratch-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    },
+    {
+      "id": "lookup-first-list-set",
+      "commit": "c81fda059ef10e5503fedd21366b8ff1b9f331e3",
+      "tree": "54c76349790dca2e5deac81bc84ad0ca16651e79",
+      "branch": "experiments/rejected-list-set-lookup-20261105",
+      "report": "https://github.com/natanelia/zerocopy/blob/c81fda059ef10e5503fedd21366b8ff1b9f331e3/proofs/list-set-lookup-20261105/README.md",
+      "decision": "rejected; evidence branch only; no optimization PR"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+Built 12 portable modules: 233268 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-list
+
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  13:18:25
+   Duration  571ms (transform 176ms, setup 0ms, import 220ms, tests 282ms, environment 0ms)
+
+✔ small bulk appends preserve active readers (shared) (106.869467ms)
+ℹ {"copy":false,"concurrentReads":72513,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+✔ small bulk appends preserve active readers (copy) (74.053312ms)
+ℹ {"copy":true,"concurrentReads":37138,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 281.209885

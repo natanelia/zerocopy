@@ -1,0 +1,19 @@
+
+$ /workspace/scratch/83f1d4baba1f/tools/bun --bun node_modules/vitest/vitest.mjs run sorted-map-foreach.test.ts shared-sorted.test.ts trie-view-capture.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/c57a60a38461/zerocopy-sorted
+
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  20:33:45
+   Duration  1.54s (transform 574ms, setup 0ms, import 1.35s, tests 1.60s, environment 0ms)
+
+
+$ node proofs/sorted-foreach-20261105/worker.mjs
+shared sorted forEach worker: preserved old snapshot across owner edits and growth
+copy sorted forEach worker: preserved old snapshot across owner edits and growth
+
+$ node node_modules/typescript/bin/tsc --noEmit
+
+$ node node_modules/typescript/bin/tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types

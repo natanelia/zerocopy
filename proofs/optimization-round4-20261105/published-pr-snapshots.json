@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-11-05 03:43:52 UTC",
+  "repository": "natanelia/zerocopy",
+  "purpose": "Confirm published PR heads and open status after the recorded combined validation.",
+  "pullRequests": [
+    {
+      "number": 50,
+      "state": "open",
+      "merged": false,
+      "head": "766b2226324e4a8d37705ab82fd86207cb79622f",
+      "base": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+      "url": "https://github.com/natanelia/zerocopy/pull/50"
+    },
+    {
+      "number": 51,
+      "state": "open",
+      "merged": false,
+      "head": "3b4042abcbe7b5745d24f6daf1e9aea66cb9d242",
+      "base": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+      "url": "https://github.com/natanelia/zerocopy/pull/51"
+    },
+    {
+      "number": 53,
+      "state": "open",
+      "merged": false,
+      "head": "5b53cd652fbc582c39c84c87c736903c7ec3c72c",
+      "base": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+      "url": "https://github.com/natanelia/zerocopy/pull/53"
+    },
+    {
+      "number": 54,
+      "state": "open",
+      "merged": false,
+      "head": "2f47642651712ce1b8fc6c67d8c65c0371c09e79",
+      "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+      "url": "https://github.com/natanelia/zerocopy/pull/54"
+    },
+    {
+      "number": 55,
+      "state": "open",
+      "merged": false,
+      "head": "2883a6e20943d721d0572c3d70a744fab6351be9",
+      "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+      "url": "https://github.com/natanelia/zerocopy/pull/55"
+    },
+    {
+      "number": 56,
+      "state": "open",
+      "merged": false,
+      "head": "cd1297394ee4ea80fa1d3a6454634865899a60c2",
+      "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+      "url": "https://github.com/natanelia/zerocopy/pull/56"
+    },
+    {
+      "number": 57,
+      "state": "open",
+      "merged": false,
+      "head": "af96028e0c30846354eb4a2f05d58f3dbcc269d5",
+      "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+      "url": "https://github.com/natanelia/zerocopy/pull/57"
+    },
+    {
+      "number": 58,
+      "state": "open",
+      "merged": false,
+      "head": "254e5c288eaba5258a99db9c4c41c8a17271b6cb",
+      "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+      "url": "https://github.com/natanelia/zerocopy/pull/58"
+    }
+  ]
+}

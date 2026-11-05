@@ -1,0 +1,1 @@
+{"file":"proofs/list-batch-tail-20261105/results/bun-01.json","sha256":"d7b611ee4adf6ec3ce643c59da2dfa451d5b5d09c56cd89223cf19b01874ed9b","bytes":10512563,"runtime":"bun","checkedPairs":112,"checkedSubjects":224,"checkedMeasuredBatches":2016,"warmupTimedMsRange":[351.75000700000004,1526.5141279999996],"measuredBatchMsRange":[14.61131499999999,241.77375299999994]}

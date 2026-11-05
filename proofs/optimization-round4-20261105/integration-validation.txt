@@ -1,0 +1,232 @@
+
+$ bun run build:wasm
+$ node scripts/build-wasm.mjs
+
+$ bun run build:browser
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 236755 bytes
+
+$ bun run build:types
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+
+$ bun run typecheck
+$ tsc --noEmit
+
+$ bun run typecheck:redux
+$ tsc --noEmit -p tsconfig.redux.json
+
+$ bun run typecheck:values
+$ tsc --noEmit -p tsconfig.typed-values.json && tsc --noEmit -p tsconfig.typed-values.json --exactOptionalPropertyTypes false
+
+$ bun run typecheck:geometry
+$ tsc --noEmit -p tsconfig.geometry.json
+
+$ node node_modules/typescript/bin/tsc --noEmit -p tsconfig.worker.json
+
+$ bun run test
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r4-integration
+
+
+ Test Files  60 passed (60)
+      Tests  1159 passed (1159)
+   Start at  21:34:23
+   Duration  40.70s (transform 1.54s, setup 0ms, import 2.85s, tests 145.28s, environment 14ms)
+
+
+$ node --test --test-concurrency=1 --test-timeout=15000 proofs/worker-tasks.mjs proofs/worker-task-lifecycle.node.mjs
+✔ abrupt native port closure aborts an active task before explicit disposal (11.73959ms)
+✔ abrupt native port closure removes library listeners and preserves application listeners (5.792822ms)
+✔ a reported transport error aborts active work with the original Error (1.55852ms)
+✔ a shared-reader failure aborts its active task before reporting the failure (1.76134ms)
+✔ an aborted queued pool call rejects before the busy handler is released (2.59414ms)
+✔ an already-aborted call never occupies a busy pool queue (1.254863ms)
+✔ aborting a queued pool call returns its queue slot without reusing the busy worker (1.404364ms)
+✔ browser-style endpoints dispose active tasks without closing borrowed ports (1.854418ms)
+✔ node-style endpoints dispose active tasks without closing borrowed ports (1.387969ms)
+✔ on/off-only endpoints observe native close and release task listeners (1.318526ms)
+✔ throwing application error callbacks cannot prevent transport cleanup (1.403252ms)
+✔ server disposal immediately removes an initializing reader without waiting for its timeout (0.654356ms)
+✔ native closure immediately removes an initializing reader and server listeners (0.490444ms)
+✔ reader initialization failure preserves the server for a later client (1.699148ms)
+✔ a failed reader cancels only its client while another client remains usable (1.742812ms)
+✔ active cancellation keeps its pool slot until the handler exits (1.196145ms)
+✔ queued cancellation preserves FIFO and removes signal listeners after cancellation or completion (1.465954ms)
+✔ pool disposal rejects queued calls and removes every queued signal listener (2.444249ms)
+✔ pool map cancellation removes its queued feeder while another call is active (1.249986ms)
+✔ an actual Node Worker exit rejects active calls and closes the borrowed executor (64.808574ms)
+✔ immediate task reads include a pending source update (7.281579ms)
+✔ reader closure settles a task waiting for a future revision (7.122224ms)
+✔ cancellation removes a future-revision wait without starting the task (6.830053ms)
+✔ server disposal rejects pending calls and closes the client (6.814921ms)
+✔ large maps use bounded feeders even with no pending queue (53.528652ms)
+✔ large maps preserve ordering with a one-entry queue (7.367997ms)
+✔ the next queued job uses the worker that actually became idle (3.882232ms)
+✔ cancelled work keeps its pool slot until the handler really settles (12.029118ms)
+✔ failed call sends release bookkeeping and leave the client usable (0.799861ms)
+✔ failed cancellation still rejects and cleans up the connection (6.264999ms)
+✔ borrowed connection startup failures remove protocol listeners (20.759685ms)
+✔ pool factory failure cleans up every resource created so far (0.437475ms)
+✔ spawn constructor failure releases its owned resource once (0.308866ms)
+✔ pool validates queue limits before creating workers (0.591743ms)
+✔ empty maps still validate chunk size and disposal (0.886608ms)
+✔ inherited task properties are never callable (0.481581ms)
+✔ real MessagePorts share snapshots and report uncloneable results (2.572798ms)
+✔ real Node workers execute pool calls over shared WASM memory (74.074308ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 488.417697
+
+$ node proofs/block-traversal-worker-check.mjs
+{
+  "module": "file:///workspace/scratch/83f1d4baba1f/zerocopy-r4-integration/dist/shared.js",
+  "checks": [
+    {
+      "name": "SharedLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": false,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": false,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    },
+    {
+      "name": "SharedDoublyLinkedList",
+      "copy": true,
+      "reverse": true,
+      "pausedInsideBlocks": true,
+      "grownArenas": 2
+    }
+  ]
+}
+
+$ node proofs/ordered-map-projections-20261105/worker.mjs
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (shared).
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (copy).
+
+$ node proofs/tanstack-values-20261105/worker.mjs
+{"ok":true,"actualWorkers":2,"transports":["shared","copy"],"rows":257,"retainedAfterGrowth":true,"readOnly":true}
+
+$ node --test proofs/checkpoint-base64-20261105/correctness.mjs
+{"runtime":"node","mode":"auto","nativeAvailable":false,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"auto","nativeAvailable":true,"nativeCalls":13,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"fallback","nativeAvailable":true,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+✔ Node runtime path (144.309522ms)
+✔ Bun native runtime path (108.629515ms)
+✔ Bun forced portable fallback (132.448142ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 463.003711
+
+$ node --test proofs/list-batch-tail-20261105/worker.mjs
+✔ small bulk appends preserve active readers (shared) (85.542617ms)
+ℹ {"copy":false,"concurrentReads":31553,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+✔ small bulk appends preserve active readers (copy) (90.669742ms)
+ℹ {"copy":true,"concurrentReads":15233,"grownSize":32779,"initialBackingBytes":131072,"grownBackingBytes":655360,"tailFivePlusTwoBytes":16,"previousCopyBytes":56,"savedBytes":40}
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 280.696289
+
+$ node --test proofs/map-values-view/worker.mjs
+✔ paused primitive map values survive writer growth (shared) (72.614737ms)
+✔ paused primitive map values survive writer growth (copy) (58.051344ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 215.971048
+
+$ node proofs/sorted-foreach-20261105/worker.mjs
+shared sorted forEach worker: preserved old snapshot across owner edits and growth
+copy sorted forEach worker: preserved old snapshot across owner edits and growth
+
+$ node proofs/node-worker.mjs
+{"passed":true,"runtime":"v24.22.1","structures":12,"nested":true,"concurrentReadsAtLeast":10000,"largeRetainedSequences":4,"workerSharesBackingMemory":true,"repeatedAttachment":true,"resetKeepsOldSnapshots":true}
+
+$ node proofs/redux-node.mjs
+{"node":"v24.22.1","packageExports":true,"sharedClassIdentity":true,"toolkit":true,"portableRestore":true}
+
+$ node proofs/typed-json-worker.mjs
+Typed JSON worker tests passed: shared memory, copy transport, nested values, retained snapshots, memory growth, and compaction.
+
+$ node proofs/block-callback-20261105/verify.mjs
+results/node-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/node-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+{"formalPairs":120,"screenPairs":40,"measuredBatches":2720,"allArchiveRoundTripsVerified":true}
+
+$ node proofs/sorted-foreach-20261105/verify.mjs
+Sorted forEach evidence: lossless raw samples, source/harness hashes and all paired calculations verified
+
+$ node --test scripts/check-docs.node.mjs
+✔ ignores fenced examples but retains surrounding prose (1.024373ms)
+✔ matches punctuation, duplicate headings, and explicit anchors (1.674112ms)
+✔ checks local links and anchors without fetching external URLs (1.356123ms)
+✔ compares numeric table rows as a multiset, without changing precision (0.390597ms)
+✔ strict CLI rejects changed rows and evidence, not documentation edits (756.792835ms)
+✔ strict CLI checks relocated benchmark reports against old and new layouts (474.182153ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1335.785295
+
+$ node scripts/check-docs.mjs --base 77599337867dbf785a5f0311d34637d0b36678fc --preserve
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (78 Markdown files).
+
+$ bun run check:package
+$ node scripts/check-package.mjs
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Package zerocopy@0.2.1: 143 files, 216502 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.

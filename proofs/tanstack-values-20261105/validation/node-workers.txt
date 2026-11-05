@@ -1,0 +1,1 @@
+{"ok":true,"actualWorkers":2,"transports":["shared","copy"],"rows":257,"retainedAfterGrowth":true,"readOnly":true}

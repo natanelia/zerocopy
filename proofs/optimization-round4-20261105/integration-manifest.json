@@ -1,0 +1,393 @@
+{
+  "purpose": "Combined correctness and installed-package validation; no combined performance claim.",
+  "started": "2026-11-05T03:34:06.244161+00:00",
+  "base": "77599337867dbf785a5f0311d34637d0b36678fc",
+  "commit": "913550f53e57d541c71b0bdbf7050eda92da17a2",
+  "tree": "2f075eabda070b51538d5653b5f8433cbe353527",
+  "sourceSha256": {
+    "allocation-failure.test.ts": "523ebc83d8f134f52cb80486a7fda7b7d16260976b705d1667ea0d4d3a3d4901",
+    "arena.ts": "aa9431233c9f53ff3cdfae2b12ac9830c9548e86adc99ad301d808d17cc48dbb",
+    "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+    "block-callback-traversal.test.ts": "d5bb611396bef18ce9ab135ff0d9d8ec86b331350540f7a115fd32b67e933cd4",
+    "block-traversal-view.test.ts": "a260a60e669e35f8b4faf22edd4bd44a79f910e19841e7546ea04549183dac32",
+    "bulk-input-storage.test.ts": "870b94f13cf73d199b3ef0b6b801e7648ae7b981176d0ab5094e7085640b8285",
+    "checkpoint-descriptor-validation.test.ts": "b17d59c33d404409057d37d93a88318b9dc470aff5701e1dbf0159d8393ed074",
+    "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+    "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+    "descriptor-validation.test.ts": "6c99ab293c13a8b0e5c60bf7a0c170db00dc2f548e5a90d0df2341d3785d2e20",
+    "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "freeze-json.test.ts": "fec4b3f8d5c8da42bc350cc441b1b7938b726a1368b3e5b6985560f82c37a79e",
+    "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+    "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+    "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+    "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+    "geometry.test.ts": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+    "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+    "heap-entry-views.test.ts": "00ec4e02ebedcdbc29f94d92936139dd4c38ed3669e617e6e0c11d2993271cdf",
+    "hot-path.test.ts": "a8fc5a1286503c8e46034e348c6e45eaeaac53a7c3300198218fc68f5ac6594f",
+    "immutable-proof.test.ts": "84064a8911f08e299d8cd21421c2f33ffd2beb26f2c25b96608cf7e6a9495a94",
+    "json-read-cache.test.ts": "fe7b81ae5318554e534a881352858b6d48f3d09fab19278740139d36551969c8",
+    "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "map-memory.test.ts": "28e4d894334201d325a3bd69bc7e4fa41f51c74d6e1549b0183bb98a01cab259",
+    "map-projection.test.ts": "ce29b4b663e01d7eb3ed4eb567bb6711d95e15c6cc135cca337476f70b796c97",
+    "map-set-index.test.ts": "f038c6d14a1c32410abf9c97b9e5f0bd8afaf2439c262ffb21f7a9ef9c7d290a",
+    "map-set-path.test.ts": "bd123e80151ad8afe9cd5076ebac79623c3c075eb9ed906484df0789320c3d65",
+    "map-set-utf8.test.ts": "6eea637e8991586c9622aa867113c0de8a596266d4cb9ffe0dd9d0a439d573a8",
+    "map-values-view.test.ts": "95273817c7d8c3ba94924d19b66d1edb4d2f7b7ca7a31cb8cfc3fdd494d3ba9b",
+    "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+    "nested.test.ts": "4d9c6882a2994712e97164a73daa5bc31493af23880cd657b9e18d853c13b8df",
+    "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+    "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+    "numeric-spatial.test.ts": "c0736a6d2efcfbb7e89f8a57c353795ea40cf033f83d75cfe69857f33e206ca5",
+    "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+    "numeric.test.ts": "992d3a29ffb8039acd707b78355c932d642ffe0cd98a6a842f2bd30cabb0aca7",
+    "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+    "ordered-empty-regression.test.ts": "af35899a741347c11fbda6193555c740f0960375f188c22fcdac0b0fd785c5ee",
+    "ordered-map-projections.test.ts": "ee8b7a37f53ad2617389ceaa396ce83dd10bcdd32ff5e60a65de6e39d3bdadd4",
+    "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "performance-revision.test.ts": "84ac1a6afbc8362ed5df8d2d822d71b095fa67d1b3c69b20cb8326e24e6fa8b5",
+    "persistent-core.as.ts": "968cbe532d9ffc0e82310287af296f4ce2c6e77efba1beec0ec03185e6c9b267",
+    "primitive-scan-portability.test.ts": "571867057b05359bec09a9165e3f317afa043d9abcb4bbe2c56c03dfd09616a5",
+    "primitive-sequence-scan.test.ts": "b0bc7706715d0a8dc2dc4fc4598478c4199310dc9dd84c5fcfa44c00a7f5a06e",
+    "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "proof-storage-integrity.test.ts": "6a84b925a7f01c8d78260feb6ddf09a06770854b2cf8dccefb61e37581b793b2",
+    "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+    "redux-checkpoint.test.ts": "cb0a3f2b3e572cb9c8f2f5e74b7cd2f0c65316847af32cd198216952a85dba29",
+    "redux-checkpoint.ts": "23ea362f1ca20d6c6771527b8dd2fcf8c2b3d009ae0d53039f87c836240ebf7b",
+    "redux-codec.ts": "c8b11817dda513321d111f7d618381c6e2851f86cfdc2ebf96ca04c383afc241",
+    "redux-descriptor-scan.test.ts": "90052207252a6c2484f2be1d82ba521e06b691c328d3ff9da1a362f1edc4b9b7",
+    "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+    "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+    "redux-jsan.test.ts": "2b81464d25f5c6d306ab594ae5ed65bcec1cdf56fb218bfcc1d276df25fa4cb7",
+    "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+    "redux-regression.test.ts": "64614512d3ea09f4f99bc82f1686c742a97a758c0fa1e66917abb2aadbfbafbc",
+    "redux-rtk.test.ts": "0e9f5c75642c1cf211a86a02a59684ca2819df9c58e89db4bf7badd954753fc5",
+    "redux-wide-json.test.ts": "411579ec23a0d9ab964f576aba370cc86a1e90cd56095d14bb443bacb37c9867",
+    "redux.test.ts": "8d3d21a3223a2754e3d70dc897e86ed9c8292eb6e066e36f90135a331cafbaf3",
+    "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+    "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+    "shared-doubly-linked-list.test.ts": "1df65f49130dab935229d3d66f207e7f214799e03ab648ce8ce90eed5477613c",
+    "shared-doubly-linked-list.ts": "4baf5bd675059f79e0f38b11b03f6bc7777fa648741182947d1b38b3efdfec67",
+    "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+    "shared-linked-list.test.ts": "c349c1e9ab84cbb7cb4559a3d6bb307da1d5147748877118e60072e1cb47955f",
+    "shared-linked-list.ts": "12e50b36e2e5e458dd3ff6fc82e3461c62f1d44f17e186a3029244de179559b1",
+    "shared-list-batch-tail.test.ts": "b2c868bd778b2e4ad46a501d87f8a7e8afc5c1e592ecc8ff9d0bafcaf6da8e8d",
+    "shared-list-to-array.test.ts": "cea22ad44870fcfb95e81eae948f28c03baf599e5051578c0722c83ff180e6dd",
+    "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "shared-list.test.ts": "bfb1461abf49dcf47d9bdc6e9b07cd3c1671b30607aa6dfaca9d52e2444516d1",
+    "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+    "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "shared-map.test.ts": "cf3e224b876cf75c36d7914f6832b7f13ec30e78072f43a13f628d86d2be2bd0",
+    "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+    "shared-ordered-map.ts": "67d337fcd58b05a0f179e99a48a6a21e14ba6697ad5e5d54062ab71509eefed7",
+    "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+    "shared-priority-queue-insert.test.ts": "2a0b5d30e212710daa544276866eeb8fa657462d17e872d893adaab7e1f7d5dd",
+    "shared-priority-queue.test.ts": "51e81c637a312b50442755e24c03cdbf2a6480bfbb223dfbbcbb8db952178248",
+    "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+    "shared-queue.test.ts": "8458d377be9b2d4f16dcb25b47cb8b389bbe8693b6a26fac736d3ea87e3c99df",
+    "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+    "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+    "shared-set.test.ts": "9913d1a0ef61b0aecc17550418fa4bbc07ff0a9672f126162be1649c5fe8e025",
+    "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+    "shared-sorted-map.ts": "936c2d5d4e299f56e24e583a18f8653c9cc6dc308a7fc9d37c1fc1c7c40db08b",
+    "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+    "shared-sorted.test.ts": "6551a110f27caa52542fa6e9c6714903cde8a9d0077e76b8242419b1303a4a0a",
+    "shared-stack.test.ts": "15bcc106d17d9b0bc65008ddfa7bc57a09887361a3df80f08ced56fe5779ae8f",
+    "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+    "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+    "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+    "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "sorted-map-foreach.test.ts": "760587d087a489fb4d73ce81ecc4abe0f690c7d19b71531225ed1e452e11ef39",
+    "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+    "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+    "tanstack-db-collection.test.ts": "201344249a38af1b98d64b272817438cebb7bbc3aeab83a219ef6fc3f15bf1dd",
+    "tanstack-db-collection.ts": "066007cbc9713d435c873835a593fc063a28c189dd05c43d547bb873d7ff5535",
+    "tanstack-values.test.ts": "f97b95e66b8c450303c7f867a131593b40fb55911e7106ced8109134f36f4b0a",
+    "text-search-long.test.ts": "54e49165a756604448485696f1d2a5f0d4a27e9a8af49bfadd35fc695bcc600c",
+    "text-search-modes.test.ts": "d8f3bd3b420fd2336658bbb2980066d9290cb16a31a61b7a7e8f84477dffd9fb",
+    "text-search.ts": "4af3b6c4a11d3f350dedaac52b2af4244356aa22bca79b90c6a52e1be020c04a",
+    "trie-view-capture.test.ts": "be832872d1da2283e32902b30e26ea1435cae3c3635dc8ee5aaf47bfa3554857",
+    "typed-json-redux.test.ts": "db86e57dce0d750d03c9afdcec3cb218feaf4a1fa17a8f77270db75b90c58df2",
+    "typed-values.test.ts": "38b901131235c6610978b471c42101d44b53bfc744ca445049cdca93d4294e6c",
+    "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+    "utf8-write.test.ts": "61786fc84486f799c52a8cd9ed704eab339043eb04e4b4c16b798d6c2d826658",
+    "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+    "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+    "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+    "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+    "worker-attachment.test.ts": "5f0d092adc920a2c4aa99347ebbdfb23cd92977ecfe38c078365c6edfd98b9f0",
+    "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+    "worker-records.test.ts": "3205479a41e2da25dfe7b730a1c16677d2f817ef59f3af916472db9354499bf6",
+    "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+    "worker-tasks.test.ts": "6b14ad1b4f5d61db696320f1a56390154b663d509941d351e8381985d3a622fa",
+    "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+    "worker.test.ts": "f6dc5ed3b72b4eee16e87f99a97e955877d699ca462e6d42ea8591d5da393c9c",
+    "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea",
+    "workers.test.ts": "21319777b33d3d5c002f02f1cab13032b6cd0d91c0430c3b8c698627b802fc32"
+  },
+  "node": "v24.22.1",
+  "bun": "1.4.2",
+  "runnerSha256": "8b3e93a3951bca5d12696af87469a8292599944614c70d33960b49f2154a95a3",
+  "environment": {
+    "npm_config_offline": "true",
+    "timingLock": "perf.lock held by caller"
+  },
+  "steps": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:wasm"
+      ],
+      "exitCode": 0,
+      "seconds": 4.996329180001339
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:browser"
+      ],
+      "exitCode": 0,
+      "seconds": 0.03456446600466734
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "build:types"
+      ],
+      "exitCode": 0,
+      "seconds": 1.8741953700009617
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "seconds": 1.8792877970045083
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "exitCode": 0,
+      "seconds": 1.021466706006322
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:values"
+      ],
+      "exitCode": 0,
+      "seconds": 5.219158697997045
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck:geometry"
+      ],
+      "exitCode": 0,
+      "seconds": 0.5157442729978357
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "exitCode": 0,
+      "seconds": 1.0196039599977667
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "seconds": 40.95911677899858
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=15000",
+        "proofs/worker-tasks.mjs",
+        "proofs/worker-task-lifecycle.node.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.5691750299956766
+    },
+    {
+      "command": [
+        "node",
+        "proofs/block-traversal-worker-check.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.46680063600069843
+    },
+    {
+      "command": [
+        "node",
+        "proofs/ordered-map-projections-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.2173805979982717
+    },
+    {
+      "command": [
+        "node",
+        "proofs/tanstack-values-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.2148084860018571
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/checkpoint-base64-20261105/correctness.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.5666026229955605
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/list-batch-tail-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.3666045110003324
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "proofs/map-values-view/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.31588209199981065
+    },
+    {
+      "command": [
+        "node",
+        "proofs/sorted-foreach-20261105/worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.4183431599958567
+    },
+    {
+      "command": [
+        "node",
+        "proofs/node-worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.16430215400032466
+    },
+    {
+      "command": [
+        "node",
+        "proofs/redux-node.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.11423955200007185
+    },
+    {
+      "command": [
+        "node",
+        "proofs/typed-json-worker.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.26511875699361553
+    },
+    {
+      "command": [
+        "node",
+        "proofs/block-callback-20261105/verify.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.2147470300042187
+    },
+    {
+      "command": [
+        "node",
+        "proofs/sorted-foreach-20261105/verify.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 0.11489917099970626
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "scripts/check-docs.node.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.420113730004232
+    },
+    {
+      "command": [
+        "node",
+        "scripts/check-docs.mjs",
+        "--base",
+        "77599337867dbf785a5f0311d34637d0b36678fc",
+        "--preserve"
+      ],
+      "exitCode": 0,
+      "seconds": 0.1172333089998574
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "check:package"
+      ],
+      "exitCode": 0,
+      "seconds": 2.6277395720026107
+    }
+  ],
+  "status": "passed",
+  "finished": "2026-11-05T03:35:11.970594+00:00",
+  "activeFiles": 60,
+  "activeTests": 1159,
+  "validationLogSha256": "e6dfb1ee27ae78ca81c4eb88b01ab5e7bab33e99ec7872e0e5014d9a14a69d54",
+  "portableBuildSha256": {
+    "chunk-0b1an6fb.js": "a37045da4398dcefebb3d45f3236d8fb7399f5eccea4f5ba21dcbd834b5374ca",
+    "chunk-531sbegw.js": "5a840a3cbdb22cefe204e85ec78ed7143ca60977bfb079f5ed879779c1424e53",
+    "chunk-6w62gr2s.js": "ad3dc360935227c1a8668cf2d09a1a15a61bc9a9ba2d232881e7886a9cea347f",
+    "chunk-pssdgvrw.js": "10f157eefb85f0d61b1ed11d6305ab69df46935dc6959ef93d08aa52feda856c",
+    "chunk-r06m005t.js": "639b9bceab81bdbd5e92d26b72102934e21d3e14b0b0becdfbd7e6a2c9e5c53c",
+    "geometry.js": "85e489de36de0885634836dcb201f8e6f28f0f62e74ce9bdf95abc53a038e9ad",
+    "numeric.js": "282d4b88f20009997744485cd97e357f20ab82e4481b8d0e82d934bd48d5d846",
+    "redux.js": "4fca26e39f4dfbcce36cb059bacf8fd99d4aed29fc218bf60b066bc541f83013",
+    "shared.js": "e2b3222c39518bc2dfc255d723b9158c932638e451610bc6eba59641bbfd6e0e",
+    "state.js": "3eff70a614a42246c1f2ada32b55c8b61f0900be7c4987c96a2b14d760cdd2bf",
+    "tanstack-db-collection.js": "d7798243385bdd81b10da69a9add77c81f74fb482b82b10fda3abe7d38fe2837",
+    "worker.js": "6da79e6e787401f39155b7d3bc8c44218ffa77d077fd79f8a770b61f997b6393"
+  },
+  "wasmSha256": {
+    "doubly-linked-list.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+    "linked-list.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "ordered-map.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "persistent-core.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "priority-queue.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "shared-list.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "shared-map.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "singly-linked-list.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59",
+    "sorted-tree.wasm": "5df6abc1b99fe13197bd4cd20ed998dfc3acd1a7b693aa81ea710b940809be59"
+  }
+}

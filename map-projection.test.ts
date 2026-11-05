@@ -103,9 +103,8 @@ test.each([false, true])('cold nested projections keep read-only child snapshots
   for (const map of [readers.ordered, readers.sorted]) {
     const a = arenaOf(map), decode = vi.spyOn(a, 'leafValue');
     const keys = [...map.keys()];
-    // Ordered keys keep their baseline entry-backed behavior; sorted keys are
-    // the only projection here that promises to avoid child-value decoding.
-    if (map === readers.sorted) expect(decode).not.toHaveBeenCalled();
+    // Keys project independently of cold nested payload reconstruction.
+    expect(decode).not.toHaveBeenCalled();
     decode.mockRestore();
     const values = [...map.values()];
     expect(values).toHaveLength(2);
