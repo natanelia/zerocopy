@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/4f8eb583f2d1/zerocopy-redux-sequence
+
+
+ Test Files  9 passed (9)
+      Tests  169 passed (169)
+   Start at  05:27:54
+   Duration  9.92s (transform 394ms, setup 0ms, import 523ms, tests 9.21s, environment 0ms)
+

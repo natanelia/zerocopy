@@ -7,6 +7,7 @@ import { Arena, arenaOf } from './arena';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
 import { readReduxHeap, restoreReduxHeap } from './redux-heap-codec';
+import { readReduxPrimitiveSequence } from './redux-sequence-codec';
 
 const classes = Object.freeze({ SharedMap, SharedList, SharedSet, SharedStack,
   SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap,
@@ -138,11 +139,19 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
             return ['c', kind, type, (collection as SharedPriorityQueue<any>).isMaxHeap,
               readReduxHeap(collection as SharedPriorityQueue<any>, item => walk(item, depth + 1))];
           } else if (kind === 'SharedStack') {
-            let cursor = collection as SharedStack<any>;
-            while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.pop(); }
+            const stack = collection as SharedStack<any>;
+            if (stack.size < 32 || (stack.valueType !== 'number' && stack.valueType !== 'boolean')
+              || !readReduxPrimitiveSequence(kind, stack, item => walk(item, depth + 1), items)) {
+              let cursor = stack;
+              while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.pop(); }
+            }
           } else if (kind === 'SharedQueue') {
-            let cursor = collection as SharedQueue<any>;
-            while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.dequeue(); }
+            const queue = collection as SharedQueue<any>;
+            if (queue.size < 32 || (queue.valueType !== 'number' && queue.valueType !== 'boolean')
+              || !readReduxPrimitiveSequence(kind, queue, item => walk(item, depth + 1), items)) {
+              let cursor = queue;
+              while (!cursor.isEmpty) { items.push(walk(cursor.peek(), depth + 1)); cursor = cursor.dequeue(); }
+            }
           } else (collection as SharedList<any>).forEach(item => items.push(walk(item, depth + 1)));
           return ['c', kind, type, null, items];
         }

@@ -1,0 +1,11 @@
+{
+  "browser": "153.0.8010.0",
+  "mode": "sequence",
+  "crossOriginIsolated": true,
+  "checks": [
+    "portable numeric/boolean stack and offset-queue encoding",
+    "shared worker: old/new sequence roots after owner edits and growth",
+    "copy worker: old/new sequence roots after owner edits and growth"
+  ],
+  "timingMeasurements": false
+}
