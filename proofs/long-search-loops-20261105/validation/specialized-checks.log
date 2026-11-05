@@ -1,0 +1,40 @@
+$ node scripts/build-wasm.mjs
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233383 bytes
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+$ tsc --noEmit
+$ bun --bun node_modules/vitest/vitest.mjs run text-search-long.test.ts text-search-modes.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-search
+
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  13:07:30
+   Duration  2.16s (transform 378ms, setup 0ms, import 485ms, tests 1.95s, environment 0ms)
+
+✔ literal search preserves case, punctuation, null bytes and every short-needle boundary (56.484849ms)
+✔ seeded ASCII data exercises short and long needles at every byte position (60.4111ms)
+✔ Unicode case expansion, contextual casing, surrogate halves and UTF-8 replacements match JavaScript (4.886147ms)
+✔ seeded arbitrary UTF-16 texts and needles preserve includes semantics (174.740577ms)
+✔ query compilation never materializes an ASCII dataset or writes into a reader arena (17.130045ms)
+✔ invalid indices, invalid options and non-string collections are rejected predictably (0.51417ms)
+✔ compiled predicates retain their snapshot after forks, growth, pops and resets (658.340995ms)
+✔ real readers keep their compiled snapshot while the owner grows memory (153.560981ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1132.153353
+✔ long searches keep compiled shared and copied snapshots in real Node workers after growth (178.895165ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 183.390856
