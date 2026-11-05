@@ -221,6 +221,52 @@ export function decodeZerocopyState<T = unknown>(input: unknown, options: Zeroco
   // Validate the state tree before reading a single collection node.
   let nodes = 0;
   const active = new WeakSet<object>();
+  // This first pass checks the same tags and budgets as reconstruction below,
+  // without constructing a second, discarded state tree. Keep their input-read
+  // order aligned: direct packet inputs can contain getters and array proxies.
+  const validate = (node: unknown, depth: number): void => {
+    if (++nodes > bound.maxNodes || depth > bound.maxDepth) fail('state tree exceeds codec limits');
+    if (!Array.isArray(node) || active.has(node)) fail('invalid or cyclic state node');
+    const tag = node[0], value = node[1];
+    if (tag === 'null' && node.length === 1) return;
+    if (tag === 'undefined' && node.length === 1) return;
+    if (node.length !== 2) fail('invalid state node length');
+    if (tag === 'string' && typeof value === 'string') return;
+    if (tag === 'boolean' && typeof value === 'boolean') return;
+    if (tag === 'number') {
+      if (typeof value === 'number' && Number.isFinite(value)) return;
+      if (value === 'NaN' || value === '+Infinity' || value === '-Infinity' || value === '-0') return;
+      fail('invalid number node');
+    }
+    if (tag === 'snapshot' && typeof value === 'string' && descriptors.has(value)) return;
+    const array = tag === 'array' && Array.isArray(value);
+    const object = (tag === 'object' || tag === 'null-object') && Array.isArray(value);
+    if (!array && !object) fail('unknown or invalid state node');
+    // Only containers can recurse. Keep the ancestor check above the getters,
+    // but avoid adding and removing each scalar leaf from the active set.
+    active.add(node);
+    try {
+      if (array) {
+        if (value.length > bound.maxNodes) fail('array exceeds codec limits');
+        const length = value.length;
+        // Preserve the native constructor error for proxy-reported lengths.
+        if (typeof length === 'number' && length !== (length >>> 0)) new Array(length);
+        for (let i = 0; i < value.length; i++) {
+          if (Array.isArray(value[i]) && value[i].length === 1 && value[i][0] === 'hole') { if (++nodes > bound.maxNodes) fail('state tree exceeds codec limits'); }
+          else validate(value[i], depth + 1);
+        }
+        return;
+      }
+      const keys = Object.create(null);
+      for (const pair of value) {
+        if (!Array.isArray(pair) || pair.length !== 2 || typeof pair[0] !== 'string' || Object.hasOwn(keys, pair[0])) fail('invalid object entry');
+        const key = pair[0];
+        validate(pair[1], depth + 1);
+        // Coerce the key after visiting its child, as defineProperty does.
+        keys[key] = undefined;
+      }
+    } finally { active.delete(node); }
+  };
   const walk = (node: unknown, depth: number, resolve?: Readonly<Record<string, SharedCollection>>): unknown => {
     if (++nodes > bound.maxNodes || depth > bound.maxDepth) fail('state tree exceeds codec limits');
     if (!Array.isArray(node) || active.has(node)) fail('invalid or cyclic state node');
@@ -261,7 +307,7 @@ export function decodeZerocopyState<T = unknown>(input: unknown, options: Zeroco
       return fail('unknown or invalid state node');
     } finally { active.delete(node); }
   };
-  walk(input.tree, 0);
+  validate(input.tree, 0);
   const arenas = new Map<string, Arena>();
   for (const [id, data] of copies) arenas.set(id, new Arena({ ...data, id, readOnly: true }));
   for (const arena of arenas.values()) for (const dependency of arenas.values()) if (arena !== dependency) arena.dependencies.set(dependency.id, dependency);
