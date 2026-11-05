@@ -147,10 +147,11 @@ export function createZerocopyCodec(options: ZerocopyCodecOptions = {}) {
           return ['c', kind, type, null, items];
         }
         if (!Array.isArray(input) && !isPlainRecord(input)) fail('only plain records, arrays, and shared collections are supported');
-        const descriptors = Object.getOwnPropertyDescriptors(input);
-        for (const key of Reflect.ownKeys(descriptors)) {
-          const descriptor = descriptors[key as string];
-          if (descriptor.enumerable && (typeof key === 'symbol' || !hasOwn(descriptor, 'value'))) fail('enumerable symbols and accessors are not supported');
+        // Inspect one descriptor at a time. Materializing a second object that
+        // contains every property descriptor is especially costly for arrays.
+        for (const key of Reflect.ownKeys(input)) {
+          const descriptor = Object.getOwnPropertyDescriptor(input, key);
+          if (descriptor?.enumerable && (typeof key === 'symbol' || !hasOwn(descriptor, 'value'))) fail('enumerable symbols and accessors are not supported');
         }
         if (Array.isArray(input)) {
           size(input.length);

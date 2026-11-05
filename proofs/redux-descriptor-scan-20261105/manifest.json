@@ -1,0 +1,15 @@
+{
+  "schema": "zerocopy-redux-descriptors/integrity-v1",
+  "evidence": {
+    "pilot.json.gz": {
+      "sha256": "b6479de097bb8bb96f4015f97d5cabbf2f825a5dda5064ef02ec178d07030d45",
+      "uncompressedSha256": "a25dfe1de0c4e7f5e632b71ac044b96312bb40a7bc47e72317db63c2d759f3bf",
+      "uncompressedBytes": 398943
+    },
+    "formal.json.gz": {
+      "sha256": "94dd09979e3c6f4b348ebdf3976003c458847f6e989110d099375c375b0f70a6",
+      "uncompressedSha256": "5bd97c8815b0ba6be7d957cd3028d44b9825b101470d0adb49c295ab53409280",
+      "uncompressedBytes": 2796256
+    }
+  }
+}
