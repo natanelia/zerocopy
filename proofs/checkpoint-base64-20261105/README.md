@@ -145,7 +145,7 @@ separately from both formal studies. No data was discarded or overwritten.
 - The proofs cover sizes 0/1/2/3/31/32/33/1023/1024/1025/4096, special numbers,
   Unicode, nested collections, repeated snapshot references, old immutable
   values, writable restoration, shared/copy attachment, and malformed packets.
-- The proof is added to the existing built-entry-point CI step. Full repository
+- The proof runs in a dedicated compatibility CI step. Full repository
   CI runs on the published PR; the local focused log is
   [focused-validation.log](results/focused-validation.log).
 - [verify.py](verify.py) independently recomputes every subject median, paired

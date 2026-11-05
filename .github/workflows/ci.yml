@@ -43,6 +43,8 @@ jobs:
         run: node --test proofs/list-query-regression.mjs
       - name: Verify lazy memory allocation
         run: node --test proofs/memory-startup.mjs
+      - name: Verify checkpoint Base64 compatibility
+        run: node --test proofs/checkpoint-base64-20261105/correctness.mjs
       - name: Check documentation links and recorded data
         env:
           DOCS_BASE: ${{ github.event.pull_request.base.sha }}
@@ -68,7 +70,6 @@ jobs:
           node proofs/redux-node.mjs
           node proofs/typed-json-worker.mjs
           node --test proofs/map-values-view/worker.mjs
-          node --test proofs/checkpoint-base64-20261105/correctness.mjs
       - name: Check the installed npm tarball
         run: bun run check:package
       - name: Verify historical evidence
