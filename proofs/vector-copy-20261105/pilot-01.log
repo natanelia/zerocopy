@@ -1,0 +1,40 @@
+pilot: node tree-1024 pair 1/2 before: 338.725 us, verified
+pilot: node tree-1024 pair 1/2 after: 318.308 us, verified
+pilot: node tree-32768 pair 1/2 before: 401.659 us, verified
+pilot: node tree-32768 pair 1/2 after: 396.937 us, verified
+pilot: node tail-32 pair 1/2 before: 327.952 us, verified
+pilot: node tail-32 pair 1/2 after: 273.027 us, verified
+pilot: node get-control pair 1/2 before: 19.707 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: node get-control pair 1/2 after: 19.384 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun tree-1024 pair 1/2 before: 358.468 us, verified
+pilot: bun tree-1024 pair 1/2 after: 414.795 us, verified
+pilot: bun tree-32768 pair 1/2 before: 450.704 us, verified
+pilot: bun tree-32768 pair 1/2 after: 469.553 us, verified
+pilot: bun tail-32 pair 1/2 before: 325.411 us, verified
+pilot: bun tail-32 pair 1/2 after: 323.676 us, verified
+pilot: bun get-control pair 1/2 before: 92.549 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun get-control pair 1/2 after: 102.078 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun get-control pair 2/2 after: 90.689 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun get-control pair 2/2 before: 236.701 us, verified; 3/9 measured batches <2 ms (retained)
+pilot: bun tail-32 pair 2/2 after: 374.127 us, verified
+pilot: bun tail-32 pair 2/2 before: 311.924 us, verified
+pilot: bun tree-32768 pair 2/2 after: 441.394 us, verified
+pilot: bun tree-32768 pair 2/2 before: 379.755 us, verified
+pilot: bun tree-1024 pair 2/2 after: 380.791 us, verified
+pilot: bun tree-1024 pair 2/2 before: 364.586 us, verified
+pilot: node get-control pair 2/2 after: 24.399 us, verified; 8/9 measured batches <2 ms (retained)
+pilot: node get-control pair 2/2 before: 25.506 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: node tail-32 pair 2/2 after: 235.669 us, verified
+pilot: node tail-32 pair 2/2 before: 256.494 us, verified
+pilot: node tree-32768 pair 2/2 after: 422.252 us, verified
+pilot: node tree-32768 pair 2/2 before: 411.196 us, verified
+pilot: node tree-1024 pair 2/2 after: 302.717 us, verified
+pilot: node tree-1024 pair 2/2 before: 390.121 us, verified
+node tree-1024: 364.423 -> 310.512 us, paired ratio 0.854
+node tree-32768: 406.428 -> 409.594 us, paired ratio 1.007
+node tail-32: 292.223 -> 254.348 us, paired ratio 0.875
+node get-control: 22.606 -> 21.891 us, paired ratio 0.970
+bun tree-1024: 361.527 -> 397.793 us, paired ratio 1.099
+bun tree-32768: 415.229 -> 455.473 us, paired ratio 1.100
+bun tail-32: 318.668 -> 348.901 us, paired ratio 1.092
+bun get-control: 164.625 -> 96.384 us, paired ratio 0.650

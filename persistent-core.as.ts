@@ -477,7 +477,7 @@ export function vecGet(root: u32, depth: u32, index: u32): f64 { return load<f64
 function vecSetAt(root: u32, depth: u32, index: u32, value: f64): u32 {
   const bytes: u32 = depth ? 128 : 256;
   const p = alloc(bytes);
-  if (root) memory.copy(p, root, bytes); else memory.fill(p, 0, bytes);
+  if (root) copyWords(p, root, bytes); else memory.fill(p, 0, bytes);
   if (!depth) store<f64>(p + (index & 31) * 8, value);
   else {
     const off = ((index >> (depth * 5)) & 31) * 4;
@@ -533,7 +533,7 @@ export function tailAppend(tail: u32, length: u32, value: f64): u32 {
   store<f64>(p + length * 8, value); return p;
 }
 export function tailSet(tail: u32, length: u32, index: u32, value: f64): u32 {
-  const p = alloc(length * 8); memory.copy(p, tail, length * 8);
+  const p = alloc(length * 8); copyWords(p, tail, length * 8);
   store<f64>(p + index * 8, value); return p;
 }
 export function tailInsert(tail: u32, length: u32, index: u32, value: f64): u32 {
