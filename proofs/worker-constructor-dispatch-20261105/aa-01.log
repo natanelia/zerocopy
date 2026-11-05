@@ -1,0 +1,54 @@
+aa: node mixed-128-shared pair 1/4 before: 70.262 us, verified
+aa: node mixed-128-shared pair 1/4 after: 75.463 us, verified
+aa: node late-128-shared pair 1/4 before: 75.816 us, verified
+aa: node late-128-shared pair 1/4 after: 104.348 us, verified
+aa: node single-map-shared pair 1/4 before: 0.957 us, verified
+aa: node single-map-shared pair 1/4 after: 1.091 us, verified
+aa: bun mixed-128-shared pair 1/4 before: 54.938 us, verified
+aa: bun mixed-128-shared pair 1/4 after: 31.336 us, verified
+aa: bun late-128-shared pair 1/4 before: 38.611 us, verified
+aa: bun late-128-shared pair 1/4 after: 43.001 us, verified
+aa: bun single-map-shared pair 1/4 before: 1.408 us, verified
+aa: bun single-map-shared pair 1/4 after: 1.028 us, verified
+aa: bun single-map-shared pair 2/4 after: 1.206 us, verified
+aa: bun single-map-shared pair 2/4 before: 1.250 us, verified
+aa: bun late-128-shared pair 2/4 after: 50.898 us, verified
+aa: bun late-128-shared pair 2/4 before: 45.787 us, verified
+aa: bun mixed-128-shared pair 2/4 after: 39.287 us, verified
+aa: bun mixed-128-shared pair 2/4 before: 62.902 us, verified
+aa: node single-map-shared pair 2/4 after: 2.426 us, verified
+aa: node single-map-shared pair 2/4 before: 1.462 us, verified
+aa: node late-128-shared pair 2/4 after: 146.309 us, verified
+aa: node late-128-shared pair 2/4 before: 113.950 us, verified
+aa: node mixed-128-shared pair 2/4 after: 90.130 us, verified
+aa: node mixed-128-shared pair 2/4 before: 86.495 us, verified
+aa: node mixed-128-shared pair 3/4 before: 85.129 us, verified
+aa: node mixed-128-shared pair 3/4 after: 77.163 us, verified
+aa: node late-128-shared pair 3/4 before: 111.050 us, verified
+aa: node late-128-shared pair 3/4 after: 109.950 us, verified
+aa: node single-map-shared pair 3/4 before: 0.941 us, verified
+aa: node single-map-shared pair 3/4 after: 1.385 us, verified
+aa: bun mixed-128-shared pair 3/4 before: 70.468 us, verified
+aa: bun mixed-128-shared pair 3/4 after: 51.983 us, verified
+aa: bun late-128-shared pair 3/4 before: 57.065 us, verified
+aa: bun late-128-shared pair 3/4 after: 57.589 us, verified
+aa: bun single-map-shared pair 3/4 before: 1.902 us, verified
+aa: bun single-map-shared pair 3/4 after: 1.228 us, verified
+aa: bun single-map-shared pair 4/4 after: 1.621 us, verified
+aa: bun single-map-shared pair 4/4 before: 1.129 us, verified
+aa: bun late-128-shared pair 4/4 after: 44.279 us, verified
+aa: bun late-128-shared pair 4/4 before: 38.136 us, verified
+aa: bun mixed-128-shared pair 4/4 after: 40.026 us, verified
+aa: bun mixed-128-shared pair 4/4 before: 31.283 us, verified
+aa: node single-map-shared pair 4/4 after: 0.930 us, verified
+aa: node single-map-shared pair 4/4 before: 0.893 us, verified
+aa: node late-128-shared pair 4/4 after: 104.422 us, verified
+aa: node late-128-shared pair 4/4 before: 82.122 us, verified
+aa: node mixed-128-shared pair 4/4 after: 74.269 us, verified
+aa: node mixed-128-shared pair 4/4 before: 61.861 us, verified
+node mixed-128-shared: 77.695 -> 76.313 us, paired ratio 1.051 (0.874-1.263)
+node late-128-shared: 96.586 -> 107.186 us, paired ratio 1.221 (0.971-1.537)
+node single-map-shared: 0.949 -> 1.238 us, paired ratio 1.305 (0.922-1.845)
+bun mixed-128-shared: 58.920 -> 39.656 us, paired ratio 0.761 (0.428-1.355)
+bun late-128-shared: 42.199 -> 47.589 us, paired ratio 1.097 (0.998-1.206)
+bun single-map-shared: 1.329 -> 1.217 us, paired ratio 0.899 (0.511-1.580)

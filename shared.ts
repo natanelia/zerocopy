@@ -48,8 +48,8 @@ const constructors = {
   SharedSortedSet: SharedSortedSet<string | number>,
   SharedPriorityQueue: SharedPriorityQueue<any>,
 };
-const constructorEntries = Object.entries(constructors);
 export type SharedStructure = InstanceType<(typeof constructors)[keyof typeof constructors]>;
+
 // Named interfaces do not need a string index signature. Symbol keys cannot be
 // represented by Object.entries or the worker wire format.
 type StructureRecord<T> = Record<keyof T, SharedStructure> & Record<Extract<keyof T, symbol>, never>;
@@ -103,7 +103,20 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
   };
   const serialized: Record<string, SerializedStructure> = Object.create(null);
   for (const [name, structure] of Object.entries(structures) as [string, SharedStructure][]) {
-    const type = constructorEntries.find(([, ctor]) => structure instanceof ctor)?.[0];
+    // Preserve first-match order and dynamic hasInstance hooks, without a callback.
+    const type = structure instanceof SharedMap ? 'SharedMap'
+      : structure instanceof SharedList ? 'SharedList'
+      : structure instanceof SharedSet ? 'SharedSet'
+      : structure instanceof SharedStack ? 'SharedStack'
+      : structure instanceof SharedQueue ? 'SharedQueue'
+      : structure instanceof SharedLinkedList ? 'SharedLinkedList'
+      : structure instanceof SharedDoublyLinkedList ? 'SharedDoublyLinkedList'
+      : structure instanceof SharedOrderedMap ? 'SharedOrderedMap'
+      : structure instanceof SharedOrderedSet ? 'SharedOrderedSet'
+      : structure instanceof SharedSortedMap ? 'SharedSortedMap'
+      : structure instanceof SharedSortedSet ? 'SharedSortedSet'
+      : structure instanceof SharedPriorityQueue ? 'SharedPriorityQueue'
+      : undefined;
     if (!type) throw new TypeError(`Unsupported shared structure: ${name}`);
     const arena = arenaOf(structure);
     collect(arena);
