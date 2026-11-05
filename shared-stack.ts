@@ -45,4 +45,10 @@ export class SharedStack<T extends string = SharedStackType> extends Snapshot {
   toWorkerData() { return Object.freeze({ head: this.head, size: this.size, type: this.valueType }); }
   static fromWorkerData<T extends string>(d: { head: number; size: number; type: T }, source: Arena = defaultArena()): SharedStack<T> { return new SharedStack(d.type, d.head, d.size, undefined, source); }
 }
+/** Internal identities, captured before an optional Redux import can observe overrides. */
+export const stackReadProtocol = Object.freeze({
+  prototype: SharedStack.prototype, peek: SharedStack.prototype.peek,
+  next: SharedStack.prototype.pop, nextName: 'pop',
+  empty: Object.getOwnPropertyDescriptor(SharedStack.prototype, 'isEmpty')!.get,
+});
 structureRegistry.SharedStack = { fromWorkerData: (d, a) => SharedStack.fromWorkerData(d, a) };

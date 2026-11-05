@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/4f8eb583f2d1/zerocopy-redux-sequence
+
+
+ Test Files  56 passed (56)
+      Tests  1136 passed (1136)
+   Start at  05:45:59
+   Duration  36.31s (transform 1.46s, setup 0ms, import 2.73s, tests 138.74s, environment 14ms)
+

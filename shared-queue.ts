@@ -56,4 +56,10 @@ export class SharedQueue<T extends string = SharedQueueType> extends Snapshot {
   toWorkerData() { return Object.freeze({ head: this.head, tail: this.tail, size: this.size, type: this.valueType, block: this.block, depth: this.depth }); }
   static fromWorkerData<T extends string>(d: { head: number; tail: number; size: number; type: T; block: number; depth: number }, source: Arena = defaultArena()): SharedQueue<T> { return new SharedQueue(d.type, d.head, d.tail, d.size, undefined, source, d.block, d.depth); }
 }
+/** Internal identities, captured before an optional Redux import can observe overrides. */
+export const queueReadProtocol = Object.freeze({
+  prototype: SharedQueue.prototype, peek: SharedQueue.prototype.peek,
+  next: SharedQueue.prototype.dequeue, nextName: 'dequeue',
+  empty: Object.getOwnPropertyDescriptor(SharedQueue.prototype, 'isEmpty')!.get,
+});
 structureRegistry.SharedQueue = { fromWorkerData: (d, a) => SharedQueue.fromWorkerData(d, a) };

@@ -1,0 +1,85 @@
+{
+  "baseline": "b07bffe073a7f7d60f1dd7731358c16d1075eb45",
+  "encoding": "gzip; original JSON bytes round-trip exactly; mtime=0",
+  "evidence": {
+    "aa-fallback.json.gz": {
+      "path": "results/aa-fallback.json.gz",
+      "sha256": "0c1fc562c9004d0b0deb4894dcdba3ac87216ff3522911971ae39af49e10d0ab",
+      "uncompressedSha256": "011c9b73bd753243367498e6382bae69b929272e32fe5f0a6617e4f996c91b41",
+      "uncompressedBytes": 417593,
+      "status": "complete",
+      "subjects": 32,
+      "mode": "aa"
+    },
+    "aa.json.gz": {
+      "path": "results/aa.json.gz",
+      "sha256": "32f227cbd3e358e3ca101e2399c60b638c65a31007335c39a2dbdd2587e1c8fa",
+      "uncompressedSha256": "b5a04ea5fa3d2e3503969aa740f726ca3d71a0a0d5b7876fbd016c5c35e63a67",
+      "uncompressedBytes": 267465,
+      "status": "complete",
+      "subjects": 32,
+      "mode": "aa"
+    },
+    "boundary-aa.json.gz": {
+      "path": "results/boundary-aa.json.gz",
+      "sha256": "3d4ba0e22b664b37a167e48536796ed7802bf5a3b3f7d2f231a19114db8a7875",
+      "uncompressedSha256": "bcb1bca2621a346a428f7903474ea134653ff82a6b7c14b8f31fc92cf340be69",
+      "uncompressedBytes": 273775,
+      "status": "complete",
+      "subjects": 32,
+      "mode": "aa"
+    },
+    "boundary.json.gz": {
+      "path": "results/boundary.json.gz",
+      "sha256": "e33b5f856f70ba07d646155eee259a79693b748c35d974a2e619a7362fd8c892",
+      "uncompressedSha256": "b65de5b469d71716467bfc81316ccda283c1dbd02660ac2079984abbf8d68723",
+      "uncompressedBytes": 728284,
+      "status": "complete",
+      "subjects": 144,
+      "mode": "formal"
+    },
+    "formal.json.gz": {
+      "path": "results/formal.json.gz",
+      "sha256": "d6617be0ba3f456cfbd8bfd074fa8d7d058fbaf59020c30dd996199718dfae41",
+      "uncompressedSha256": "371429ee7cb99a4502f95a94f85acb8db928706097b2de2c6bc71b7624b20f58",
+      "uncompressedBytes": 1464263,
+      "status": "complete",
+      "subjects": 240,
+      "mode": "formal"
+    },
+    "pilot.json.gz": {
+      "path": "results/pilot.json.gz",
+      "sha256": "874f01232a4044aaa13e0aa0102dc76b4b5fd4ec9404b87a3ad93dd114042021",
+      "uncompressedSha256": "6e69737c42a114b09bee5ab1f10c53bc9bd4d647e2d66b97e09ed494bf9d0b78",
+      "uncompressedBytes": 440580,
+      "status": "complete",
+      "subjects": 80,
+      "mode": "pilot"
+    }
+  },
+  "files": {
+    "README.md": "9acf4aaaf0f903c61448cb81e614acdea64d6be4ae5c319078d70da301a33805",
+    "browser-check.mjs": "c0d167a6e15f0ceae9313261bce4bc0df65cf3a8b38cab62d7bc74119cc975c6",
+    "browser-result.json": "8a14c39cb333be8b61dc14e91f6b3dbcf21db40bc137174076b5f94398c989cc",
+    "late-import.mjs": "be66b71d9e986f66a7df17555736e291b3d8aa1be69adb0f588f9d3e8b62df30",
+    "paired-benchmark.mjs": "3c4dcd009d214fccde46b1a07e24324d9c6770ca1b3993455ee1b246d5edbb61",
+    "results/aa-fallback.json.gz": "0c1fc562c9004d0b0deb4894dcdba3ac87216ff3522911971ae39af49e10d0ab",
+    "results/aa.json.gz": "32f227cbd3e358e3ca101e2399c60b638c65a31007335c39a2dbdd2587e1c8fa",
+    "results/boundary-aa.json.gz": "3d4ba0e22b664b37a167e48536796ed7802bf5a3b3f7d2f231a19114db8a7875",
+    "results/boundary.json.gz": "e33b5f856f70ba07d646155eee259a79693b748c35d974a2e619a7362fd8c892",
+    "results/formal.json.gz": "d6617be0ba3f456cfbd8bfd074fa8d7d058fbaf59020c30dd996199718dfae41",
+    "results/pilot.json.gz": "874f01232a4044aaa13e0aa0102dc76b4b5fd4ec9404b87a3ad93dd114042021",
+    "validation/build.txt": "b1293e0ae3de78ff3a81782672614adec38f68a28b669493787844dbbb774fc1",
+    "validation/bun-redux.txt": "4a094f4594dc06657f4a3654e469db717e31747c4bf5b55656e84cbee63b1f1b",
+    "validation/full-suite-bun.txt": "e813ac0457d9ea575e6dfb848c4b41f6151ff88f867e5238f7251b96f583053d",
+    "validation/installed-package.txt": "2fa03d08caa8e27a0f4871fd8faeccdcab643c1f14479e3e3f9f5622b2b78374",
+    "validation/node-redux.txt": "99982c58fecf17beed95b7e3a8e933dd371362981b1260df70f1f4a6db842db9",
+    "validation/workers-and-late-import.txt": "ee0faf137e3d72b74c93ce8d9251aebdcc4c5f055b69a2f24a40574aedbaa18e",
+    "validation.md": "f25044b58aae66eeeee94fbc8941411df03024c2ec0f566d973b0548f68a4ef3",
+    "verify.py": "e8a6700d970b3c38982d21abec63e020530331e7d73eb3ef698367dc58f08394",
+    "worker.mjs": "2a533159a0b14cda7ea42ff2d458f3062fd20bfe9183b9db0c719d3e1ff0db3d",
+    "workloads-aa-fallback.mjs": "fd7cb101d7709e9850f0c3f2cc3650d21c206be51b65215b8d95181e7262c7ff",
+    "workloads-boundary.mjs": "6d54903adc50be656b731b0af9d8c55eb1992b8be6142bb1eb8a9ddafa3c69ab",
+    "workloads.mjs": "872240d433c14df83d7701844b72dd1a30ab2756e0e99f671985401517d0f4d1"
+  }
+}

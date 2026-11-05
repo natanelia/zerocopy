@@ -850,3 +850,9 @@ export class Arena {
     }
   }
 }
+
+/** Internal identities for optional readers that specialize primitive decoding. */
+export const primitiveReadProtocol = Object.freeze({
+  decode: Arena.prototype.decode, view: Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get,
+  refresh: Arena.prototype.refresh, owner: Object.getOwnPropertyDescriptor(Snapshot.prototype, 'arena')!.get,
+});
