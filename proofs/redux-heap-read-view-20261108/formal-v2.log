@@ -1,0 +1,182 @@
+formal: node min-4096-number-encode pair 1/6 before: 2221.417 us, verified
+formal: node min-4096-number-encode pair 1/6 after: 688.739 us, verified
+formal: node max-4096-boolean-encode pair 1/6 before: 1802.244 us, verified
+formal: node max-4096-boolean-encode pair 1/6 after: 582.128 us, verified
+formal: node min-32768-number-encode pair 1/6 before: 18328.360 us, verified
+formal: node min-32768-number-encode pair 1/6 after: 7746.281 us, verified
+formal: node min-4096-number-stringify pair 1/6 before: 2465.409 us, verified
+formal: node min-4096-number-stringify pair 1/6 after: 1388.622 us, verified
+formal: node min-32-number-boundary pair 1/6 before: 8.656 us, verified
+formal: node min-32-number-boundary pair 1/6 after: 3.204 us, verified; 2/9 measured batches <2 ms (retained)
+formal: node min-8-number-control pair 1/6 before: 3.699 us, verified
+formal: node min-8-number-control pair 1/6 after: 4.846 us, verified
+formal: node min-256-object-control pair 1/6 before: 2005.315 us, verified
+formal: node min-256-object-control pair 1/6 after: 1693.349 us, verified
+formal: bun min-4096-number-encode pair 1/6 before: 476.489 us, verified
+formal: bun min-4096-number-encode pair 1/6 after: 461.940 us, verified
+formal: bun max-4096-boolean-encode pair 1/6 before: 682.296 us, verified
+formal: bun max-4096-boolean-encode pair 1/6 after: 478.235 us, verified
+formal: bun min-32768-number-encode pair 1/6 before: 2680.296 us, verified
+formal: bun min-32768-number-encode pair 1/6 after: 1817.218 us, verified
+formal: bun min-4096-number-stringify pair 1/6 before: 908.647 us, verified
+formal: bun min-4096-number-stringify pair 1/6 after: 842.108 us, verified
+formal: bun min-32-number-boundary pair 1/6 before: 8.089 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 1/6 after: 7.398 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun min-8-number-control pair 1/6 before: 2.689 us, verified
+formal: bun min-8-number-control pair 1/6 after: 3.236 us, verified
+formal: bun min-256-object-control pair 1/6 before: 982.345 us, verified
+formal: bun min-256-object-control pair 1/6 after: 1766.600 us, verified
+formal: bun min-256-object-control pair 2/6 after: 1127.978 us, verified
+formal: bun min-256-object-control pair 2/6 before: 734.535 us, verified
+formal: bun min-8-number-control pair 2/6 after: 2.921 us, verified
+formal: bun min-8-number-control pair 2/6 before: 2.930 us, verified
+formal: bun min-32-number-boundary pair 2/6 after: 7.431 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 2/6 before: 7.934 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-4096-number-stringify pair 2/6 after: 936.400 us, verified
+formal: bun min-4096-number-stringify pair 2/6 before: 1046.768 us, verified
+formal: bun min-32768-number-encode pair 2/6 after: 1428.257 us, verified
+formal: bun min-32768-number-encode pair 2/6 before: 2846.717 us, verified
+formal: bun max-4096-boolean-encode pair 2/6 after: 514.637 us, verified
+formal: bun max-4096-boolean-encode pair 2/6 before: 575.548 us, verified
+formal: bun min-4096-number-encode pair 2/6 after: 483.479 us, verified
+formal: bun min-4096-number-encode pair 2/6 before: 1009.585 us, verified
+formal: node min-256-object-control pair 2/6 after: 1107.634 us, verified
+formal: node min-256-object-control pair 2/6 before: 1434.030 us, verified
+formal: node min-8-number-control pair 2/6 after: 3.979 us, verified
+formal: node min-8-number-control pair 2/6 before: 4.420 us, verified
+formal: node min-32-number-boundary pair 2/6 after: 6.032 us, verified; 1/9 measured batches <2 ms (retained)
+formal: node min-32-number-boundary pair 2/6 before: 12.375 us, verified
+formal: node min-4096-number-stringify pair 2/6 after: 1616.279 us, verified
+formal: node min-4096-number-stringify pair 2/6 before: 2220.214 us, verified
+formal: node min-32768-number-encode pair 2/6 after: 13297.432 us, verified
+formal: node min-32768-number-encode pair 2/6 before: 20210.244 us, verified
+formal: node max-4096-boolean-encode pair 2/6 after: 711.962 us, verified
+formal: node max-4096-boolean-encode pair 2/6 before: 1550.810 us, verified
+formal: node min-4096-number-encode pair 2/6 after: 852.066 us, verified
+formal: node min-4096-number-encode pair 2/6 before: 1774.304 us, verified
+formal: node min-4096-number-encode pair 3/6 before: 1825.375 us, verified
+formal: node min-4096-number-encode pair 3/6 after: 1155.723 us, verified
+formal: node max-4096-boolean-encode pair 3/6 before: 1381.576 us, verified
+formal: node max-4096-boolean-encode pair 3/6 after: 734.735 us, verified
+formal: node min-32768-number-encode pair 3/6 before: 27226.878 us, verified
+formal: node min-32768-number-encode pair 3/6 after: 16137.423 us, verified
+formal: node min-4096-number-stringify pair 3/6 before: 3119.602 us, verified
+formal: node min-4096-number-stringify pair 3/6 after: 1301.969 us, verified
+formal: node min-32-number-boundary pair 3/6 before: 6.086 us, verified
+formal: node min-32-number-boundary pair 3/6 after: 2.996 us, verified
+formal: node min-8-number-control pair 3/6 before: 2.310 us, verified
+formal: node min-8-number-control pair 3/6 after: 2.372 us, verified
+formal: node min-256-object-control pair 3/6 before: 860.534 us, verified
+formal: node min-256-object-control pair 3/6 after: 819.714 us, verified
+formal: bun min-4096-number-encode pair 3/6 before: 652.518 us, verified
+formal: bun min-4096-number-encode pair 3/6 after: 717.056 us, verified
+formal: bun max-4096-boolean-encode pair 3/6 before: 1242.657 us, verified
+formal: bun max-4096-boolean-encode pair 3/6 after: 426.703 us, verified
+formal: bun min-32768-number-encode pair 3/6 before: 3379.471 us, verified
+formal: bun min-32768-number-encode pair 3/6 after: 1893.008 us, verified
+formal: bun min-4096-number-stringify pair 3/6 before: 845.603 us, verified
+formal: bun min-4096-number-stringify pair 3/6 after: 847.278 us, verified
+formal: bun min-32-number-boundary pair 3/6 before: 7.697 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 3/6 after: 5.505 us, verified; 2/9 measured batches <2 ms (retained)
+formal: bun min-8-number-control pair 3/6 before: 3.745 us, verified
+formal: bun min-8-number-control pair 3/6 after: 3.841 us, verified
+formal: bun min-256-object-control pair 3/6 before: 1413.441 us, verified
+formal: bun min-256-object-control pair 3/6 after: 1646.792 us, verified
+formal: bun min-256-object-control pair 4/6 after: 2307.740 us, verified
+formal: bun min-256-object-control pair 4/6 before: 1515.396 us, verified
+formal: bun min-8-number-control pair 4/6 after: 5.412 us, verified
+formal: bun min-8-number-control pair 4/6 before: 4.118 us, verified
+formal: bun min-32-number-boundary pair 4/6 after: 13.838 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 4/6 before: 13.501 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-4096-number-stringify pair 4/6 after: 1405.209 us, verified
+formal: bun min-4096-number-stringify pair 4/6 before: 1232.971 us, verified
+formal: bun min-32768-number-encode pair 4/6 after: 2853.658 us, verified
+formal: bun min-32768-number-encode pair 4/6 before: 3700.203 us, verified
+formal: bun max-4096-boolean-encode pair 4/6 after: 481.346 us, verified
+formal: bun max-4096-boolean-encode pair 4/6 before: 714.334 us, verified
+formal: bun min-4096-number-encode pair 4/6 after: 432.048 us, verified
+formal: bun min-4096-number-encode pair 4/6 before: 655.001 us, verified
+formal: node min-256-object-control pair 4/6 after: 1597.855 us, verified
+formal: node min-256-object-control pair 4/6 before: 1558.839 us, verified
+formal: node min-8-number-control pair 4/6 after: 3.514 us, verified
+formal: node min-8-number-control pair 4/6 before: 2.462 us, verified
+formal: node min-32-number-boundary pair 4/6 after: 3.424 us, verified; 2/9 measured batches <2 ms (retained)
+formal: node min-32-number-boundary pair 4/6 before: 6.237 us, verified
+formal: node min-4096-number-stringify pair 4/6 after: 1042.215 us, verified
+formal: node min-4096-number-stringify pair 4/6 before: 1767.361 us, verified
+formal: node min-32768-number-encode pair 4/6 after: 4388.884 us, verified
+formal: node min-32768-number-encode pair 4/6 before: 12678.169 us, verified
+formal: node max-4096-boolean-encode pair 4/6 after: 509.639 us, verified
+formal: node max-4096-boolean-encode pair 4/6 before: 1285.613 us, verified
+formal: node min-4096-number-encode pair 4/6 after: 797.634 us, verified
+formal: node min-4096-number-encode pair 4/6 before: 2429.163 us, verified
+formal: node min-4096-number-encode pair 5/6 before: 2321.797 us, verified
+formal: node min-4096-number-encode pair 5/6 after: 585.536 us, verified
+formal: node max-4096-boolean-encode pair 5/6 before: 769.289 us, verified
+formal: node max-4096-boolean-encode pair 5/6 after: 253.279 us, verified
+formal: node min-32768-number-encode pair 5/6 before: 8251.229 us, verified
+formal: node min-32768-number-encode pair 5/6 after: 4827.847 us, verified
+formal: node min-4096-number-stringify pair 5/6 before: 1351.789 us, verified
+formal: node min-4096-number-stringify pair 5/6 after: 738.272 us, verified
+formal: node min-32-number-boundary pair 5/6 before: 4.576 us, verified
+formal: node min-32-number-boundary pair 5/6 after: 2.038 us, verified; 3/9 measured batches <2 ms (retained)
+formal: node min-8-number-control pair 5/6 before: 1.778 us, verified
+formal: node min-8-number-control pair 5/6 after: 1.326 us, verified
+formal: node min-256-object-control pair 5/6 before: 570.509 us, verified
+formal: node min-256-object-control pair 5/6 after: 597.262 us, verified
+formal: bun min-4096-number-encode pair 5/6 before: 403.067 us, verified
+formal: bun min-4096-number-encode pair 5/6 after: 264.096 us, verified
+formal: bun max-4096-boolean-encode pair 5/6 before: 442.791 us, verified
+formal: bun max-4096-boolean-encode pair 5/6 after: 326.456 us, verified
+formal: bun min-32768-number-encode pair 5/6 before: 2103.929 us, verified
+formal: bun min-32768-number-encode pair 5/6 after: 1889.926 us, verified
+formal: bun min-4096-number-stringify pair 5/6 before: 706.393 us, verified
+formal: bun min-4096-number-stringify pair 5/6 after: 764.900 us, verified
+formal: bun min-32-number-boundary pair 5/6 before: 3.246 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 5/6 after: 2.651 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-8-number-control pair 5/6 before: 2.025 us, verified
+formal: bun min-8-number-control pair 5/6 after: 2.054 us, verified
+formal: bun min-256-object-control pair 5/6 before: 539.405 us, verified
+formal: bun min-256-object-control pair 5/6 after: 523.704 us, verified
+formal: bun min-256-object-control pair 6/6 after: 431.579 us, verified
+formal: bun min-256-object-control pair 6/6 before: 543.942 us, verified
+formal: bun min-8-number-control pair 6/6 after: 1.199 us, verified
+formal: bun min-8-number-control pair 6/6 before: 1.732 us, verified
+formal: bun min-32-number-boundary pair 6/6 after: 2.786 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun min-32-number-boundary pair 6/6 before: 4.089 us, verified
+formal: bun min-4096-number-stringify pair 6/6 after: 589.322 us, verified
+formal: bun min-4096-number-stringify pair 6/6 before: 544.135 us, verified
+formal: bun min-32768-number-encode pair 6/6 after: 1746.677 us, verified
+formal: bun min-32768-number-encode pair 6/6 before: 2478.805 us, verified
+formal: bun max-4096-boolean-encode pair 6/6 after: 316.216 us, verified
+formal: bun max-4096-boolean-encode pair 6/6 before: 436.234 us, verified
+formal: bun min-4096-number-encode pair 6/6 after: 259.573 us, verified
+formal: bun min-4096-number-encode pair 6/6 before: 387.581 us, verified
+formal: node min-256-object-control pair 6/6 after: 618.443 us, verified
+formal: node min-256-object-control pair 6/6 before: 560.940 us, verified
+formal: node min-8-number-control pair 6/6 after: 1.643 us, verified
+formal: node min-8-number-control pair 6/6 before: 1.618 us, verified
+formal: node min-32-number-boundary pair 6/6 after: 2.043 us, verified; 3/9 measured batches <2 ms (retained)
+formal: node min-32-number-boundary pair 6/6 before: 4.663 us, verified
+formal: node min-4096-number-stringify pair 6/6 after: 676.637 us, verified
+formal: node min-4096-number-stringify pair 6/6 before: 1064.216 us, verified
+formal: node min-32768-number-encode pair 6/6 after: 2397.127 us, verified
+formal: node min-32768-number-encode pair 6/6 before: 6643.819 us, verified
+formal: node max-4096-boolean-encode pair 6/6 after: 217.894 us, verified
+formal: node max-4096-boolean-encode pair 6/6 before: 686.995 us, verified
+formal: node min-4096-number-encode pair 6/6 after: 346.438 us, verified
+formal: node min-4096-number-encode pair 6/6 before: 795.028 us, verified
+node min-4096-number-encode: 2023.396 -> 743.186 us, paired ratio 0.388 (0.273-0.551)
+node max-4096-boolean-encode: 1333.595 -> 545.884 us, paired ratio 0.385 (0.308-0.482)
+node min-32768-number-encode: 15503.265 -> 6287.064 us, paired ratio 0.479 (0.357-0.641)
+node min-4096-number-stringify: 1993.787 -> 1172.092 us, paired ratio 0.572 (0.471-0.695)
+node min-32-number-boundary: 6.161 -> 3.100 us, paired ratio 0.460 (0.400-0.530)
+node min-8-number-control: 2.386 -> 2.943 us, paired ratio 1.046 (0.814-1.344)
+node min-256-object-control: 1147.282 -> 963.674 us, paired ratio 0.950 (0.823-1.097)
+bun min-4096-number-encode: 564.503 -> 446.994 us, paired ratio 0.727 (0.530-0.998)
+bun max-4096-boolean-encode: 628.922 -> 452.469 us, paired ratio 0.653 (0.462-0.923)
+bun min-32768-number-encode: 2763.507 -> 1853.572 us, paired ratio 0.673 (0.539-0.841)
+bun min-4096-number-stringify: 877.125 -> 844.693 us, paired ratio 1.018 (0.920-1.126)
+bun min-32-number-boundary: 7.816 -> 6.452 us, paired ratio 0.839 (0.709-0.993)
+bun min-8-number-control: 2.810 -> 3.079 us, paired ratio 1.021 (0.811-1.287)
+bun min-256-object-control: 858.440 -> 1387.385 us, paired ratio 1.248 (0.899-1.733)
