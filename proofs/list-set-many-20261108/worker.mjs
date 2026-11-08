@@ -97,6 +97,9 @@ if (!isMainThread) {
         for (let i = 0; i < 512; i++) oracle[(Math.imul(i, 2654435761) >>> 0) % (count - 32)] = -i - 1;
         assert.deepEqual(expected.after, oracle);
         assert.deepEqual(expected.before, input);
+        const forkOracle = [...input]; forkOracle[count - 33] = -777;
+        assert.deepEqual(expected.fork, forkOracle);
+        assert.deepEqual(expected.compacted, oracle);
       } else {
         assert.deepEqual(expected.after, input.flatMap((value, i) => i % 2 ? [[`key/${i}`, value]] : [])
           .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));

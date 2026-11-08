@@ -19,7 +19,33 @@ const median = xs => {
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const near = (actual, expected) => assert.ok(
   Math.abs(actual - expected) <= Math.max(1e-13, Math.abs(expected) * 1e-12), `${actual} != ${expected}`);
+// Reconstruct inputs from the recorded case, not from either run's digest.
+// All three retained workload versions use the same fixture definition;
+// their differences are preparation strategy and timing repetition counts.
+function reconstructFixture(spec) {
+  const input = [];
+  for (let i = 0; i < spec.count; i++) input.push(spec.type === 'boolean' ? i % 3 === 1
+    : spec.type === 'string' ? `lane/é/界/🙂/${i}` : i + 0.25);
+  let state = 0x42c0ffee;
+  const seen = new Set(), entries = [];
+  for (let i = 0; i < spec.edits; i++) {
+    let index;
+    if (spec.shape === 'clustered') index = Math.min(4090, spec.count - spec.edits) + (i * 73) % spec.edits;
+    else if (spec.shape === 'repeated') index = 4000 + i % 16;
+    else if (spec.shape === 'mixed' && i < 4) index = [0, 31, 32, spec.count - 1][i];
+    else do {
+      state = Number((BigInt(state) * 1664525n + 1013904223n) & 0xffffffffn);
+      index = state % spec.count;
+    } while (seen.has(index));
+    assert.ok(index >= 0 && index < spec.count);
+    seen.add(index);
+    entries.push([index, spec.type === 'boolean' ? !input[index]
+      : spec.type === 'string' ? `replacement/${i}/é/🙂` : -i - 0.125]);
+  }
+  return { digest: digest(JSON.stringify({ input, entries })), distinctEdits: seen.size };
+}
 const { method, runs } = record;
+const fixtures = new Map(method.cases.map(spec => [spec.name, reconstructFixture(spec)]));
 const settings = {
   pilot: { pairs: 2, minimumWarmupMs: 150 },
   formal: { pairs: 6, minimumWarmupMs: 500 },
@@ -57,7 +83,8 @@ for (const run of runs) {
     : spec.mode === 'batch' && run.variant === 'after' && record.mode !== 'aa'
       ? 'one SharedList.setMany call' : 'scalar SharedList.set loop';
   assert.equal(run.strategy, expectedStrategy, 'The new API must be distinguished from scalar controls');
-  assert.match(run.expectedDigest, /^[0-9a-f]{64}$/);
+  assert.equal(run.expectedDigest, fixtures.get(spec.name).digest, 'Recorded fixture must match its case definition');
+  assert.equal(run.fixture.distinctEdits, fixtures.get(spec.name).distinctEdits);
   assert.ok(run.warmupBatchMs.length >= method.minimumWarmupBatches);
   assert.ok(run.warmupBatchMs.reduce((a, b) => a + b, 0) >= method.minimumWarmupMs);
   assert.equal(run.sampleBatchMs.length, method.samples);

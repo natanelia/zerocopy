@@ -1,5 +1,6 @@
 export function equal(actual, expected, label = 'value') {
   if (Object.is(actual, expected)) return;
+  if (Array.isArray(actual) !== Array.isArray(expected)) throw new Error(`${label}: array type mismatch`);
   if (Array.isArray(actual) && Array.isArray(expected)) {
     if (actual.length !== expected.length) throw new Error(`${label}: length mismatch`);
     for (let i = 0; i < actual.length; i++) equal(actual[i], expected[i], `${label}[${i}]`);

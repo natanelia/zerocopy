@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "retimed": false,
+  "checkedAt": "2026-11-08T17:24:45.010Z",
+  "records": [
+    {
+      "name": "pilot",
+      "sha256": "89a874a8e30ce9e82373632603337196edfbd8ab4c654db3db666c84215a8c98",
+      "processes": 32,
+      "passed": true
+    },
+    {
+      "name": "pilot-v2",
+      "sha256": "6d40194b9929e2a0f83b77c1c9a8b395672c470b3dbad393cc2abc5d4e9289d3",
+      "processes": 32,
+      "passed": true
+    },
+    {
+      "name": "formal",
+      "sha256": "9719b80624c8bbbd8dc7743e26dcc23254c894d1fde65eed7d2d9034953e1707",
+      "processes": 240,
+      "passed": true
+    },
+    {
+      "name": "aa",
+      "sha256": "c91eb17cd98307475bb97b40d5745b9ba67d4f15421713fe5ca5cbf4fa2535a9",
+      "processes": 48,
+      "passed": true
+    }
+  ],
+  "rejectsMatchingWrongDigests": true,
+  "browserArrayObjectMismatchesRejected": 4
+}
