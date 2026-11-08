@@ -1,4 +1,4 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, popcount } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, popcount, nativeMapLeaves } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 // Registering a collection must not allocate an unused writer in every reader.
@@ -77,7 +77,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
   }
   forEach(fn: (value: ValueOf<T>, key: string) => void): void {
     const a = this.arena, leaves = a.leaves;
-    if (leaves !== defaultLeaves) {
+    if (leaves !== nativeMapLeaves) {
       for (const leaf of Reflect.apply(leaves, a, [this.root])) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf));
       return;
     }
@@ -123,8 +123,6 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     return new SharedMap(valueType, root, size, source);
   }
 }
-// Keep custom arena traversals observable, including later prototype changes.
-const defaultLeaves = Arena.prototype.leaves;
 structureRegistry.SharedMap = { fromWorkerData: (d, a) => SharedMap.fromWorkerData(d.root, d.valueType, d.size, a) };
 
 /** Compatibility wrapper for internal numeric-key users. */

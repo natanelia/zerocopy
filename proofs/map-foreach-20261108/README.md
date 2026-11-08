@@ -1,5 +1,16 @@
 # SharedMap `forEach` traversal
 
+> **Historical V1/V2 evidence.** These recordings describe the earlier source at
+> PR head `5bf3e68167f15930f273c353cdcdb1e7db31cc7f`. A later public-entry Bun
+> integration check with the optional numeric factory found that a traversal hook
+> installed before Map-module initialization could be mistaken for the native
+> method. The repair captures that identity when Arena initializes. The
+> [corrected-source study](../map-foreach-early-identity-20261108/README.md) contains
+> fresh measurements, the reproduced failure and the regression gate. None of the
+> old timing samples below are pooled with that study. Audit this archive without
+> `CHECK_CONFIRMED_SOURCE`; that extra check is only valid at its historical
+> candidate. Current-source matching is enforced by the new study's verifier.
+
 ## Change
 
 `SharedMap.forEach` now walks the immutable HAMT directly, keeping its stack and overlay reconstruction arrays local to the call. The traversal captures one memory view. This removes the per-leaf generator suspension and per-node view refreshes in `Arena.leaves`.

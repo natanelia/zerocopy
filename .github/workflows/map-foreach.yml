@@ -7,6 +7,7 @@ on:
       - 'arena.ts'
       - 'map-foreach.test.ts'
       - 'proofs/map-foreach-20261108/**'
+      - 'proofs/map-foreach-early-identity-20261108/**'
       - '.github/workflows/map-foreach.yml'
   workflow_dispatch:
 permissions:
@@ -19,6 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with: { node-version: '24' }
@@ -30,18 +32,31 @@ jobs:
         run: node node_modules/vitest/vitest.mjs run map-foreach.test.ts shared-map.test.ts map-values-view.test.ts map-set-index.test.ts map-set-utf8.test.ts --maxWorkers=2
       - name: Check traversal and compatibility on Bun
         run: bun --bun node_modules/vitest/vitest.mjs run map-foreach.test.ts shared-map.test.ts map-values-view.test.ts map-set-index.test.ts map-set-utf8.test.ts --maxWorkers=2
-      - name: Verify all saved samples and source identities without retiming
+      - name: Check numeric-first public Bun imports and preinstalled hooks
+        run: |
+          mkdir -p map-foreach-ci
+          node proofs/map-foreach-early-identity-20261108/integration-check.mjs > map-foreach-ci/public-entry-integration.json
+          cat map-foreach-ci/public-entry-integration.json
+      - name: Verify historical V1 and V2 measurements without retiming
+        env:
+          CHECK_CONFIRMED_SOURCE: '0'
         run: node proofs/map-foreach-20261108/verify.mjs
+      - name: Audit measurements for the corrected traversal identity
+        env:
+          CHECK_CONFIRMED_SOURCE: ${{ github.head_ref == 'perf/map-reads-20261108' && '1' || '0' }}
+        run: |
+          set -o pipefail
+          node proofs/map-foreach-early-identity-20261108/verify.mjs 2>&1 | tee map-foreach-ci/evidence-audit.txt
       - name: Check real shared and copied Node workers during owner growth
         run: |
           mkdir -p map-foreach-ci
-          node proofs/map-foreach-20261108/node-worker.mjs > map-foreach-ci/node-workers.json
+          node proofs/map-foreach-early-identity-20261108/node-worker.mjs > map-foreach-ci/node-workers.json
           cat map-foreach-ci/node-workers.json
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
       - name: Check real shared and copied Chromium workers during owner growth
         run: |
-          node proofs/map-foreach-20261108/browser-check.mjs > map-foreach-ci/chromium-workers.json
+          node proofs/map-foreach-early-identity-20261108/browser-check.mjs > map-foreach-ci/chromium-workers.json
           cat map-foreach-ci/chromium-workers.json
       - uses: actions/upload-artifact@v4
         if: always()

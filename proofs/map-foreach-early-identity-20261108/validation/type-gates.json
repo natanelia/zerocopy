@@ -1,0 +1,83 @@
+[
+  {
+    "gate": "declarations",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--emitDeclarationOnly",
+      "--noEmit",
+      "false",
+      "--declarationMap",
+      "false",
+      "--outDir",
+      "dist/types"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck-redux",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.redux.json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck-values",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.typed-values.json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck-values-nonexact",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.typed-values.json",
+      "--exactOptionalPropertyTypes",
+      "false"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck-geometry",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.geometry.json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "gate": "typecheck-worker",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exitCode": 0
+  }
+]
