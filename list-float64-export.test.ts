@@ -14,7 +14,7 @@ describe('SharedList.toFloat64Array', () => {
     test('copies all numeric values across leaf boundaries, length ' + size, () => {
       const values = Array.from({ length: size }, (_, i) => (i % 97) - 48.5);
       values[0] = -0;
-      values[size - 1] = Number.NaN;
+      if (size > 1) values[size - 1] = Number.NaN;
       if (size > 31) values[31] = Number.POSITIVE_INFINITY;
       if (size > 32) values[32] = Number.NEGATIVE_INFINITY;
       const list = new SharedList('number').pushMany(values);
