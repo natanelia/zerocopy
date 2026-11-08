@@ -160,8 +160,9 @@ independent observations.
 After each batch, every returned collection is checked completely: entries,
 sizes, heap mode, frozen state, copied memory independence, heap topology,
 shared live-node counts and group aliases. Numeric results must allocate exactly
-one 32-byte node for each unique live node. Every source byte and every retained
-source snapshot is checked unchanged. Source, build, WASM, workload and driver
+one 32-byte node for each unique live node. Every used source payload byte and
+every retained source snapshot is checked unchanged; reserved writer scratch and
+unused capacity are excluded from the byte comparison. Source, build, WASM, workload and driver
 identities are recorded and checked again when the study completes.
 
 Local validation of V3 passed:
