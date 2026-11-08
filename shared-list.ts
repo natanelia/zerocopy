@@ -183,6 +183,29 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
     return result;
   }
+  /** Copy numeric values directly from immutable WASM leaves into a typed array.
+   * Unlike toArray(), this never creates boxed intermediary values. The returned
+   * array owns its bytes and is safe to modify without changing the snapshot.
+   */
+  toFloat64Array(this: SharedList<'number'>): Float64Array {
+    if (this.type !== 'number') throw new TypeError('Float64 export requires a number list');
+    const output = new Float64Array(this.size);
+    if (!this.size) return output;
+    const a = this.arena, source = a.buf, dest = new Uint8Array(output.buffer);
+    const last = (this.size - 1) & ~31;
+    // WASM stores IEEE-754 values little-endian. Preserve their exact bits
+    // (including signed zero and noncanonical NaNs) on either host byte order.
+    const littleEndian = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+    for (let first = 0; first < this.size; first += 32) {
+      const leaf = first === last ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
+      const bytes = Math.min(32, this.size - first) * 8, destOffset = first * 8;
+      if (littleEndian) dest.set(source.subarray(leaf, leaf + bytes), destOffset);
+      else for (let i = 0; i < bytes; i += 8) {
+        for (let j = 0; j < 8; j++) dest[destOffset + i + j] = source[leaf + i + 7 - j];
+      }
+    }
+    return output;
+  }
   toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }
   static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = defaultArena()): SharedList<T> {
     return new SharedList(d.type, d.root, d.depth, d.size, source, d.tail);
