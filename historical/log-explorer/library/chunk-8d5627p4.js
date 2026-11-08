@@ -70,13 +70,18 @@ function recordOf(value) {
     throw new TypeError("Shared state cannot have enumerable symbol keys");
   }
   const structures = Object.create(null);
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-    if (!descriptor.enumerable)
+  let accessor = false;
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor || typeof key === "symbol" || !descriptor.enumerable)
       continue;
     if (!("value" in descriptor))
-      throw new TypeError("Shared state cannot have getters or setters");
-    structures[key] = descriptor.value;
+      accessor = true;
+    else
+      structures[key] = descriptor.value;
   }
+  if (accessor)
+    throw new TypeError("Shared state cannot have getters or setters");
   return { single: false, structures };
 }
 function identities(data) {

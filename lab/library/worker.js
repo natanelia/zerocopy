@@ -10,7 +10,7 @@ import {
   connectSharedSession2,
   shareWithWorker2,
   receiveShared2
-} from "./chunk-g9ne2gjq.js";
+} from "./chunk-8d5627p4.js";
 import"./chunk-601qbgtx.js";
 import"./chunk-6xsztezz.js";
 import"./chunk-aysdem6q.js";
