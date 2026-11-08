@@ -34,15 +34,19 @@ jobs:
         run: node proofs/map-foreach-20261108/verify.mjs
       - name: Check real shared and copied Node workers during owner growth
         run: |
-          mkdir -p .map-foreach-ci
-          node proofs/map-foreach-20261108/node-worker.mjs > .map-foreach-ci/node-workers.json
+          mkdir -p map-foreach-ci
+          node proofs/map-foreach-20261108/node-worker.mjs > map-foreach-ci/node-workers.json
+          cat map-foreach-ci/node-workers.json
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
       - name: Check real shared and copied Chromium workers during owner growth
-        run: node proofs/map-foreach-20261108/browser-check.mjs > .map-foreach-ci/chromium-workers.json
+        run: |
+          node proofs/map-foreach-20261108/browser-check.mjs > map-foreach-ci/chromium-workers.json
+          cat map-foreach-ci/chromium-workers.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: map-foreach-proof-${{ github.event.pull_request.head.sha || github.sha }}
-          path: .map-foreach-ci/
+          path: map-foreach-ci/
           retention-days: 30
+          if-no-files-found: error
