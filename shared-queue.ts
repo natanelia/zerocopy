@@ -61,5 +61,6 @@ export const queueReadProtocol = Object.freeze({
   prototype: SharedQueue.prototype, peek: SharedQueue.prototype.peek,
   next: SharedQueue.prototype.dequeue, nextName: 'dequeue',
   empty: Object.getOwnPropertyDescriptor(SharedQueue.prototype, 'isEmpty')!.get,
+  descriptor: SharedQueue.prototype.toWorkerData,
 });
 structureRegistry.SharedQueue = { fromWorkerData: (d, a) => SharedQueue.fromWorkerData(d, a) };

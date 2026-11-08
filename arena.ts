@@ -79,6 +79,7 @@ export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
 export class Arena {
   readonly memory: WebAssembly.Memory;
   readonly wasm: any;
+  readonly #nativeWasm: any;
   readonly id: string;
   readonly readOnly: boolean;
   private dependencyLookup = new Map<string, Arena>();
@@ -163,7 +164,7 @@ export class Arena {
   constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
-    this.wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+    this.wasm = this.#nativeWasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
     if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
     this.readOnly = options.readOnly ?? false;
     if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
@@ -171,6 +172,10 @@ export class Arena {
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
     this.view = new DataView(this.buffer);
+  }
+  /** Internal: specialized readers must not bypass replaced WASM kernels. */
+  static hasNativeWasm(arena: Arena): boolean {
+    return #nativeWasm in arena && Object.getOwnPropertyDescriptor(arena, 'wasm')?.value === arena.#nativeWasm;
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }
@@ -854,5 +859,6 @@ export class Arena {
 /** Internal identities for optional readers that specialize primitive decoding. */
 export const primitiveReadProtocol = Object.freeze({
   decode: Arena.prototype.decode, view: Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get,
+  bytes: Object.getOwnPropertyDescriptor(Arena.prototype, 'buf')!.get, hasNativeWasm: Arena.hasNativeWasm,
   refresh: Arena.prototype.refresh, owner: Object.getOwnPropertyDescriptor(Snapshot.prototype, 'arena')!.get,
 });

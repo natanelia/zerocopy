@@ -1,0 +1,106 @@
+{
+  "schema": "zerocopy-compaction-vector-copy-evidence/v1",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "candidateMeasuredGitHead": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "candidateRuntimeSourceSha256": {
+    "arena.ts": "7d250dc3452ad047b6b2e38cd4dd0983ddc6808d9402077512710eacd331b55d",
+    "compaction.ts": "7007d2a72ea1831dd4ef6f9a2aaa2d298af98ee52ac86210bde4ec8166fef9e5",
+    "shared-list.ts": "81d410b0793ad8107aa448405e0c94d1a6273e23b594734b1df39e12fb6087b4",
+    "shared-queue.ts": "53b37a6df89adcbb883f671ec901a26dc5fba8650530ca6d68052fe0da7e1f38"
+  },
+  "candidateNote": "Measured uncommitted runtime changes atop the frozen main baseline. Exact source text and hashes are embedded in the recording; final PR commits additionally contain tests, documentation and preserved evidence.",
+  "pilotNote": "Preserved separately. Confirmation adds only proxy-guard ordering and coercible-queue-offset guard repairs to production source; small/reset batches change from128 to32 before confirmation. No timings are pooled.",
+  "evidence": {
+    "pilot.json.gz": {
+      "path": "results/pilot.json.gz",
+      "sha256": "ba1c0f31a99c5f86ad1e64b773acb701d19d9a593b9534b28a6b477c4a217044",
+      "uncompressedSha256": "22d1229d919bd957308bac49a2173702e3f26c33ad88a5c298ec1216952d868f",
+      "uncompressedBytes": 274968,
+      "processes": 32,
+      "measuredBatches": 288,
+      "mode": "pilot"
+    },
+    "confirmation.json.gz": {
+      "path": "results/confirmation.json.gz",
+      "sha256": "cca1b3422f0681ee77e68e8a8ff2bd96f14777a2485dbf6e8e39412a747eb62b",
+      "uncompressedSha256": "a8bb63724aaedfbdeed7d3f63097c78f025bfd6382e7c785488f9360e861bc4c",
+      "uncompressedBytes": 867708,
+      "processes": 168,
+      "measuredBatches": 1512,
+      "mode": "formal"
+    },
+    "aa.json.gz": {
+      "path": "results/aa.json.gz",
+      "sha256": "2955ebb13d91e4109f4108af799140e7c4762a03222e19b8a0f6ec75e89dd85d",
+      "uncompressedSha256": "a1c5ba776a6b4b2567bda4db0f33e5f359926dd852afc1683cd6e6421c1f3cff",
+      "uncompressedBytes": 325890,
+      "processes": 32,
+      "measuredBatches": 288,
+      "mode": "aa"
+    }
+  },
+  "supportFiles": {
+    "browser-check.mjs": "eabafc8ebe3a8c1ea0b0e64b237579e98c90e31019bdc5754f9a7d792d572d93",
+    "confirmation-workloads.mjs": "629da2e157209c1ed9738c528f97f6a6464901d68e254a5cba8452f3c7a31a7b",
+    "node-worker.mjs": "12596468cfbcba6146d7c316a2b08e30d8a0dc555e06f68c640f242a9482dc22",
+    "paired-benchmark.mjs": "f77dd2f9476cd00a2db5b2e5f67daa350df586c08150e7fb9218226e662e3cb6",
+    "smoke.mjs": "f74284413b97b2106cdb1db59db84f9bb1394e647f375f18124da9866274cb86",
+    "worker-fixtures.mjs": "3c27f7aa441e5a4cffe589774fc86d02d9fdb4513b55135936ff87314ea63cb1",
+    "workloads.mjs": "fab3ae2dacc7be3e47959f3d693fdf0bb8bc256d13c69e7809fb0b7cf1bcc0fa",
+    "verify.py": "6fb6fffad37d86c65e86fbdd35cc2ac55a9734d0fccfe13e0aa4fa0dbb72b569",
+    "summary.json": "1927e7dbf115967df928854df9d5a47563349cde58b131fcf744f5349420e42e"
+  },
+  "validation": {
+    "finalFocusedTests": {
+      "nodeCandidate": 14,
+      "bunCandidate": 14,
+      "nodeBaseline": 14,
+      "bunBaseline": 14
+    },
+    "finalLog": "archive/validation/final-validation.txt.gz",
+    "source": {
+      "arena.ts": "7d250dc3452ad047b6b2e38cd4dd0983ddc6808d9402077512710eacd331b55d",
+      "compaction.ts": "7007d2a72ea1831dd4ef6f9a2aaa2d298af98ee52ac86210bde4ec8166fef9e5",
+      "shared-list.ts": "81d410b0793ad8107aa448405e0c94d1a6273e23b594734b1df39e12fb6087b4",
+      "shared-queue.ts": "53b37a6df89adcbb883f671ec901a26dc5fba8650530ca6d68052fe0da7e1f38"
+    },
+    "testSha256": "a3c6347ba9300b798a73362b941b7e5d95a17ea9654b96fff7a24f5f0bd8260f",
+    "workerChecks": [
+      "node-worker-result.json",
+      "browser-result.json"
+    ],
+    "files": {
+      "archive/validation/pre-guard-browser-result.json": "20521c164db0f5ad86a066be94bb16dc6bf0fb8bb7d8a05626af7cdcd7de2d10",
+      "archive/validation/pre-guard-node-worker-result.json": "10ab1720058e4eee067d929d6d42f0c67ea02fe90264fb7cc626979e359e5e99",
+      "node-worker-result.json": "10ab1720058e4eee067d929d6d42f0c67ea02fe90264fb7cc626979e359e5e99",
+      "browser-result.json": "20521c164db0f5ad86a066be94bb16dc6bf0fb8bb7d8a05626af7cdcd7de2d10",
+      "archive/validation/final-validation.txt.gz": "206683ed562bd7f682490cba71254d2832e84a8bce8d331b84b169030aa15e1b",
+      "archive/validation/first-test-timeouts.txt.gz": "eaad5b69f9bcb680f87e0adc60f6c0dd7dd21228fdb29e4b2e0067909917c49c",
+      "archive/validation/identity-matcher-fix.txt.gz": "43329fe8f51b1839328143417628617b9036d86526dea12f0f51480b4734699a",
+      "archive/validation/pre-pilot-validation.txt.gz": "2126380299d5f6bc6c46cb82be18d0cc2e2106d4ef1cbc43bf98f5ece8d0c1e5",
+      "archive/validation/second-test-timeouts.txt.gz": "a8c06df66e3c55c9f6c0b678ca18df02b27e98b4ef5f769800d6a9238ef919af"
+    },
+    "rawLogs": {
+      "archive/validation/final-validation.txt.gz": {
+        "uncompressedSha256": "0c8b5fd4d3cef539abbf863b69e2385a2bba033f3a9d20a0c3a7fa46be3ec466",
+        "uncompressedBytes": 1591
+      },
+      "archive/validation/first-test-timeouts.txt.gz": {
+        "uncompressedSha256": "e384764d588410e1d8a1b3786aac82e495104a1e94a30e3e58572838468fa944",
+        "uncompressedBytes": 2161
+      },
+      "archive/validation/identity-matcher-fix.txt.gz": {
+        "uncompressedSha256": "43230ba4914c804229476a84741670715068a3b035bdadbb1acbc5bfb46f1e09",
+        "uncompressedBytes": 234
+      },
+      "archive/validation/pre-pilot-validation.txt.gz": {
+        "uncompressedSha256": "c37e8d69a1c7500f7432c5068f8511814bc19af9779ef9dd803c203121074a21",
+        "uncompressedBytes": 2178
+      },
+      "archive/validation/second-test-timeouts.txt.gz": {
+        "uncompressedSha256": "cb159f4f06c33c79214a407969f72ad8bc29d3c310c1a9ae02e988df63702ff0",
+        "uncompressedBytes": 1450
+      }
+    }
+  }
+}

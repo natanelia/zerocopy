@@ -188,4 +188,8 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     return new SharedList(d.type, d.root, d.depth, d.size, source, d.tail);
   }
 }
+/** Internal identity for compaction; capture before a later optional import. */
+export const listCompactionProtocol = Object.freeze({
+  prototype: SharedList.prototype, descriptor: SharedList.prototype.toWorkerData,
+});
 structureRegistry.SharedList = { fromWorkerData: (d, a) => SharedList.fromWorkerData(d, a) };
