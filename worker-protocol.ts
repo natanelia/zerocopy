@@ -98,11 +98,16 @@ export function recordOf(value: object): { single: boolean; structures: Record<s
     throw new TypeError('Shared state cannot have enumerable symbol keys');
   }
   const structures = Object.create(null);
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-    if (!descriptor.enumerable) continue;
-    if (!('value' in descriptor)) throw new TypeError('Shared state cannot have getters or setters');
-    structures[key] = descriptor.value;
+  let accessor = false;
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor || typeof key === 'symbol' || !descriptor.enumerable) continue;
+    // The previous eager descriptor pass completed before reporting an accessor.
+    // Keep later proxy traps (and their errors) observable in the same order.
+    if (!('value' in descriptor)) accessor = true;
+    else structures[key] = descriptor.value;
   }
+  if (accessor) throw new TypeError('Shared state cannot have getters or setters');
   return { single: false, structures };
 }
 export function identities(data: WorkerData): Readonly<Record<string, string>> {

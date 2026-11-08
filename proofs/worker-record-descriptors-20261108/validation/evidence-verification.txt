@@ -1,0 +1,165 @@
+PASS: saved worker-record descriptor evidence; no benchmarks executed.
+Source check: 63 baseline files against Git and current worker-protocol.ts.
+Local measurement commit 93fcd53609e8b290028fcbe2a00ac754908dce85: checked against Git.
+Hardware: AMD EPYC 9V74 80-Core Processor; linux/x64; all measured children pinned to CPU 2.
+Ratios use paired process medians. Intervals use Student t on paired log ratios; no pilot interval, pooling, or A/A correction.
+Saved checksums and samples are verified here; full output/snapshot assertions ran in the preserved, hashed workload.
+Warm-up values are recorded aggregates. Measured batches may be shorter than the pre-warm-up 20 ms calibration target.
+
+pilot-v1: 8 processes, 576 measured batches, 2 pairs per runtime/case
+Files: pilot-v1.json.gz; original SHA-256 6b4f8874c7ad516cce5e187f5d7cb59817088fa9b21557bbaf8ddeb3bd4fdd91
+Time: 2026-11-08T12:52:44.746Z to 2026-11-08T12:53:25.472Z
+Node 24.22.1 create-distinct-1024: median ms/op 4.5922741 -> 2.4552644; paired ratio 0.5833032; 95% interval not reported (pilot)
+  Pair ratios: 0.36605148, 0.92949393
+  baseline: iterations 1..8; calibration ms 22.168736..32.09191; warm ms 200.07426..217.28329 / batches 7..40; measured batch ms 1.837626..25.880547 (12/18 below 20 ms)
+  candidate: iterations 8..16; calibration ms 23.787255..37.353808; warm ms 210.14857..223.39344 / batches 6..10; measured batch ms 13.324509..59.541286 (5/18 below 20 ms)
+Node 24.22.1 publish-distinct-1024: median ms/op 4.3070011 -> 3.3207822; paired ratio 0.76473416; 95% interval not reported (pilot)
+  Pair ratios: 0.65648087, 0.89083834
+  baseline: iterations 2..4; calibration ms 21.647301..39.877151; warm ms 200.83592..212.76033 / batches 11..19; measured batch ms 2.804327..21.274529 (16/18 below 20 ms)
+  candidate: iterations 4..8; calibration ms 21.877831..28.41838; warm ms 202.75239..214.97811 / batches 8..13; measured batch ms 9.1354..28.715018 (11/18 below 20 ms)
+Node 24.22.1 create-alias-1024: median ms/op 3.4340627 -> 2.2960592; paired ratio 0.68381002; 95% interval not reported (pilot)
+  Pair ratios: 0.57149269, 0.81820145
+  baseline: iterations 8..8; calibration ms 32.088524..46.446556; warm ms 208.95631..230.25153 / batches 6..8; measured batch ms 17.962685..44.19194 (2/18 below 20 ms)
+  candidate: iterations 8..8; calibration ms 22.288881..24.997643; warm ms 207.38332..212.20401 / batches 9..13; measured batch ms 10.856811..28.157842 (11/18 below 20 ms)
+Node 24.22.1 publish-alias-noop-1024: median ms/op 3.2947048 -> 2.9334721; paired ratio 0.89034414; 95% interval not reported (pilot)
+  Pair ratios: 0.81511909, 0.9725115
+  baseline: iterations 2..16; calibration ms 20.789866..48.750124; warm ms 206.05143..261.53203 / batches 5..29; measured batch ms 2.766029..89.057665 (9/18 below 20 ms)
+  candidate: iterations 8..16; calibration ms 37.53925..37.969389; warm ms 203.71899..249.6962 / batches 6..7; measured batch ms 16.41628..50.166424 (2/18 below 20 ms)
+Node 24.22.1 create-distinct-32: median ms/op 0.079444929 -> 0.07413807; paired ratio 0.94104023; 95% interval not reported (pilot)
+  Pair ratios: 0.87173674, 1.0158534
+  baseline: iterations 256..512; calibration ms 20.114937..32.523492; warm ms 209.61137..217.16372 / batches 6..7; measured batch ms 11.68386..46.822875 (3/18 below 20 ms)
+  candidate: iterations 256..256; calibration ms 21.83191..24.898323; warm ms 211.00379..211.53544 / batches 12..12; measured batch ms 10.656869..40.45949 (10/18 below 20 ms)
+Node 24.22.1 publish-distinct-1: median ms/op 0.0069813584 -> 0.0076254097; paired ratio 1.087049; 95% interval not reported (pilot)
+  Pair ratios: 0.98709588, 1.1971234
+  baseline: iterations 4096..4096; calibration ms 36.239336..46.619856; warm ms 207.69865..223.10067 / batches 7..8; measured batch ms 17.986711..47.990426 (1/18 below 20 ms)
+  candidate: iterations 4096..4096; calibration ms 47.799679..71.367622; warm ms 205.30976..237.40833 / batches 5..6; measured batch ms 23.774806..40.122411 (0/18 below 20 ms)
+Node 24.22.1 create-record-1: median ms/op 0.0075366661 -> 0.0071809224; paired ratio 0.94682135; 95% interval not reported (pilot)
+  Pair ratios: 0.78002454, 1.1492852
+  baseline: iterations 4096..4096; calibration ms 20.91843..25.603249; warm ms 213.20667..220.62489 / batches 8..8; measured batch ms 24.517147..45.610313 (0/18 below 20 ms)
+  candidate: iterations 4096..4096; calibration ms 30.079089..39.59181; warm ms 214.04329..217.88242 / batches 6..7; measured batch ms 21.218825..48.683274 (0/18 below 20 ms)
+Node 24.22.1 create-single-snapshot: median ms/op 0.0054071088 -> 0.0049472037; paired ratio 0.9110269; 95% interval not reported (pilot)
+  Pair ratios: 0.75359035, 1.1013543
+  baseline: iterations 4096..4096; calibration ms 20.001155..32.225883; warm ms 206.63544..209.36971 / batches 9..10; measured batch ms 14.023235..31.238846 (6/18 below 20 ms)
+  candidate: iterations 4096..4096; calibration ms 24.089396..36.426417; warm ms 204.73672..222.32761 / batches 8..9; measured batch ms 15.24475..39.984773 (7/18 below 20 ms)
+Bun 1.4.2 create-distinct-1024: median ms/op 1.6833619 -> 0.57216532; paired ratio 0.34182323; 95% interval not reported (pilot)
+  Pair ratios: 0.30338234, 0.38513488
+  baseline: iterations 16..16; calibration ms 22.238915..32.460923; warm ms 204.13514..211.49625 / batches 6..7; measured batch ms 15.015385..58.445961 (5/18 below 20 ms)
+  candidate: iterations 64..64; calibration ms 35.023018..36.052723; warm ms 201.00875..212.39859 / batches 5..6; measured batch ms 32.696534..123.95078 (0/18 below 20 ms)
+Bun 1.4.2 publish-distinct-1024: median ms/op 2.6989118 -> 0.85188866; paired ratio 0.3240003; 95% interval not reported (pilot)
+  Pair ratios: 0.39950531, 0.26276545
+  baseline: iterations 8..16; calibration ms 33.552216..33.933278; warm ms 205.84394..223.39758 / batches 6..10; measured batch ms 16.853039..40.621254 (3/18 below 20 ms)
+  candidate: iterations 32..32; calibration ms 28.090996..28.335866; warm ms 221.72586..229.66916 / batches 7..8; measured batch ms 22.780133..46.275616 (0/18 below 20 ms)
+Bun 1.4.2 create-alias-1024: median ms/op 1.9989688 -> 0.50378033; paired ratio 0.25648387; 95% interval not reported (pilot)
+  Pair ratios: 0.30435536, 0.216142
+  baseline: iterations 16..16; calibration ms 24.827446..25.192147; warm ms 213.5868..223.59361 / batches 6..7; measured batch ms 19.342549..47.373366 (1/18 below 20 ms)
+  candidate: iterations 32..64; calibration ms 31.521989..38.832473; warm ms 205.49692..211.22106 / batches 5..11; measured batch ms 14.617562..53.601564 (9/18 below 20 ms)
+Bun 1.4.2 publish-alias-noop-1024: median ms/op 2.5862175 -> 0.6980747; paired ratio 0.27510661; 95% interval not reported (pilot)
+  Pair ratios: 0.31328162, 0.24158343
+  baseline: iterations 16..16; calibration ms 33.880001..35.622909; warm ms 205.72761..226.67888 / batches 4..6; measured batch ms 22.673171..59.773779 (0/18 below 20 ms)
+  candidate: iterations 32..32; calibration ms 20.088317..20.798841; warm ms 201.72964..212.16565 / batches 9..9; measured batch ms 18.671797..33.16406 (4/18 below 20 ms)
+Bun 1.4.2 create-distinct-32: median ms/op 0.039505515 -> 0.012499676; paired ratio 0.39189802; 95% interval not reported (pilot)
+  Pair ratios: 0.80167266, 0.19157951
+  baseline: iterations 512..1024; calibration ms 36.437955..38.737077; warm ms 201.32167..211.98026 / batches 5..7; measured batch ms 14.146911..57.861109 (5/18 below 20 ms)
+  candidate: iterations 1024..2048; calibration ms 22.735476..28.473043; warm ms 200.73899..201.75885 / batches 7..8; measured batch ms 11.033027..30.154803 (9/18 below 20 ms)
+Bun 1.4.2 publish-distinct-1: median ms/op 0.0042247449 -> 0.0014811432; paired ratio 0.44314877; 95% interval not reported (pilot)
+  Pair ratios: 0.85546899, 0.22955926
+  baseline: iterations 4096..8192; calibration ms 23.635605..36.556331; warm ms 211.90465..212.19178 / batches 7..15; measured batch ms 12.495015..49.621982 (7/18 below 20 ms)
+  candidate: iterations 8192..16384; calibration ms 25.020088..30.904195; warm ms 205.36498..220.62382 / batches 7..15; measured batch ms 11.068601..27.014771 (9/18 below 20 ms)
+Bun 1.4.2 create-record-1: median ms/op 0.0047930618 -> 0.0024163334; paired ratio 0.59248688; 95% interval not reported (pilot)
+  Pair ratios: 0.92256828, 0.38050376
+  baseline: iterations 2048..16384; calibration ms 30.561753..35.737126; warm ms 212.63961..216.79574 / batches 6..14; measured batch ms 9.74251..52.021456 (8/18 below 20 ms)
+  candidate: iterations 16384..16384; calibration ms 33.520668..34.490073; warm ms 211.75865..223.72195 / batches 6..6; measured batch ms 31.926501..56.37888 (0/18 below 20 ms)
+Bun 1.4.2 create-single-snapshot: median ms/op 0.0039889944 -> 0.0019708976; paired ratio 0.58558079; 95% interval not reported (pilot)
+  Pair ratios: 0.99330743, 0.34521524
+  baseline: iterations 4096..16384; calibration ms 30.556226..38.002689; warm ms 226.26108..238.03298 / batches 7..8; measured batch ms 14.327668..37.773712 (2/18 below 20 ms)
+  candidate: iterations 16384..16384; calibration ms 35.080265..42.455937; warm ms 212.34574..219.93995 / batches 4..7; measured batch ms 28.744283..63.088907 (0/18 below 20 ms)
+
+formal-v2: 192 processes, 1728 measured batches, 6 pairs per runtime/case
+Files: formal-v2.json.gz; original SHA-256 fd2ff6a09a0121a6ecfc76f3c896c582e9788c11ac7a69927a724d3607c6a2dd
+Time: 2026-11-08T13:02:51.009Z to 2026-11-08T13:05:49.492Z
+Node 24.22.1 create-distinct-1024: median ms/op 1.6316301 -> 0.97016556; paired ratio 0.6435431; 95% interval 0.53852851..0.76903585
+  Pair ratios: 0.7681182, 0.48867087, 0.71447567, 0.72610465, 0.57948317, 0.62949727
+  baseline: iterations 8..16; calibration ms 21.981096..50.265396; warm ms 507.47088..523.25262 / batches 17..36; measured batch ms 9.536572..43.145499 (12/54 below 20 ms)
+  candidate: iterations 16..16; calibration ms 23.349547..29.055314; warm ms 504.19295..513.28426 / batches 25..28; measured batch ms 12.784484..39.003484 (40/54 below 20 ms)
+Node 24.22.1 publish-distinct-1024: median ms/op 1.5382006 -> 1.0980516; paired ratio 0.6907069; 95% interval 0.60493278..0.78864304
+  Pair ratios: 0.74998109, 0.7026661, 0.80772209, 0.68592069, 0.66909089, 0.55583063
+  baseline: iterations 8..16; calibration ms 21.807428..51.757256; warm ms 503.08642..517.42251 / batches 14..34; measured batch ms 10.786247..45.658087 (18/54 below 20 ms)
+  candidate: iterations 16..16; calibration ms 27.811898..44.644272; warm ms 507.14118..510.18548 / batches 22..28; measured batch ms 15.336007..27.355441 (43/54 below 20 ms)
+Node 24.22.1 create-alias-1024: median ms/op 1.4399641 -> 0.87136341; paired ratio 0.6412989; 95% interval 0.58061218..0.70832871
+  Pair ratios: 0.55739445, 0.61432482, 0.60851318, 0.71711411, 0.67224415, 0.69249551
+  baseline: iterations 8..16; calibration ms 23.199331..38.886527; warm ms 500.5637..524.339 / batches 14..38; measured batch ms 9.837338..34.49311 (28/54 below 20 ms)
+  candidate: iterations 16..16; calibration ms 24.342432..47.488819; warm ms 502.70483..514.25747 / batches 26..34; measured batch ms 12.210765..39.978517 (45/54 below 20 ms)
+Node 24.22.1 publish-alias-noop-1024: median ms/op 1.5254464 -> 1.2031615; paired ratio 0.79300049; 95% interval 0.64503131..0.97491357
+  Pair ratios: 0.85435046, 0.68303369, 0.57461453, 0.97042972, 0.84526594, 0.90412502
+  baseline: iterations 8..16; calibration ms 22.898117..46.393846; warm ms 506.54375..528.44263 / batches 18..40; measured batch ms 10.008408..52.589788 (9/54 below 20 ms)
+  candidate: iterations 16..16; calibration ms 34.515073..47.861139; warm ms 501.02654..522.02143 / batches 23..28; measured batch ms 14.318497..34.707262 (33/54 below 20 ms)
+Node 24.22.1 create-distinct-32: median ms/op 0.031142008 -> 0.026412934; paired ratio 0.80874796; 95% interval 0.52290722..1.25084
+  Pair ratios: 0.8508242, 0.85750136, 0.87388115, 0.40346039, 1.4730405, 0.73847633
+  baseline: iterations 512..512; calibration ms 31.795289..44.907956; warm ms 500.72299..514.2856 / batches 20..29; measured batch ms 14.005066..52.744822 (37/54 below 20 ms)
+  candidate: iterations 512..512; calibration ms 26.947823..35.877019; warm ms 500.61893..512.43566 / batches 23..32; measured batch ms 12.405992..29.331453 (39/54 below 20 ms)
+Node 24.22.1 publish-distinct-1: median ms/op 0.0040808843 -> 0.0029759755; paired ratio 0.78742326; 95% interval 0.58150959..1.0662514
+  Pair ratios: 0.87917686, 0.60131835, 1.1622206, 1.0027215, 0.67021351, 0.5772802
+  baseline: iterations 4096..4096; calibration ms 29.048141..57.175581; warm ms 503.30783..513.73827 / batches 26..36; measured batch ms 11.374316..31.187191 (42/54 below 20 ms)
+  candidate: iterations 4096..8192; calibration ms 21.789606..43.685706; warm ms 505.17566..530.13926 / batches 16..37; measured batch ms 10.37002..28.710664 (42/54 below 20 ms)
+Node 24.22.1 create-record-1: median ms/op 0.0034518894 -> 0.0032255515; paired ratio 0.86605515; 95% interval 0.76242687..0.98376847
+  Pair ratios: 0.93868442, 0.96021371, 0.93816219, 0.9067023, 0.73483641, 0.74894937
+  baseline: iterations 4096..4096; calibration ms 24.277357..36.86679; warm ms 500.46351..516.3673 / batches 23..33; measured batch ms 12.285041..28.253461 (40/54 below 20 ms)
+  candidate: iterations 4096..4096; calibration ms 22.319575..40.061504; warm ms 500.17247..514.02458 / batches 24..32; measured batch ms 11.368249..27.583703 (50/54 below 20 ms)
+Node 24.22.1 create-single-snapshot: median ms/op 0.002472723 -> 0.0025411858; paired ratio 1.02877; 95% interval 0.86528435..1.2231444
+  Pair ratios: 0.95396068, 1.3421436, 0.98362024, 1.0225072, 1.1199089, 0.82206037
+  baseline: iterations 4096..8192; calibration ms 22.207136..37.148464; warm ms 500.07498..506.8647 / batches 24..47; measured batch ms 9.137955..25.895986 (52/54 below 20 ms)
+  candidate: iterations 4096..8192; calibration ms 22.105697..30.400023; warm ms 502.46724..510.24119 / batches 24..42; measured batch ms 9.126348..34.073068 (50/54 below 20 ms)
+Bun 1.4.2 create-distinct-1024: median ms/op 0.7190452 -> 0.53139941; paired ratio 0.74238574; 95% interval 0.6783771..0.81243396
+  Pair ratios: 0.84497132, 0.6960478, 0.7607931, 0.70990508, 0.78543854, 0.67099244
+  baseline: iterations 32..32; calibration ms 20.838824..29.900869; warm ms 502.19603..527.45661 / batches 15..22; measured batch ms 17.639645..34.001972 (17/54 below 20 ms)
+  candidate: iterations 16..64; calibration ms 20.353945..44.210949; warm ms 505.32878..531.93557 / batches 12..53; measured batch ms 7.101986..54.341907 (14/54 below 20 ms)
+Bun 1.4.2 publish-distinct-1024: median ms/op 0.86961748 -> 0.82283058; paired ratio 0.92235781; 95% interval 0.8659079..0.98248778
+  Pair ratios: 0.91614588, 0.83072164, 0.95975245, 0.91146878, 0.93247627, 0.99183084
+  baseline: iterations 8..32; calibration ms 20.309273..32.300541; warm ms 502.42136..531.43367 / batches 15..40; measured batch ms 6.470636..43.620083 (24/54 below 20 ms)
+  candidate: iterations 32..32; calibration ms 27.821198..33.098528; warm ms 505.56032..529.94411 / batches 17..19; measured batch ms 22.26074..40.110668 (0/54 below 20 ms)
+Bun 1.4.2 create-alias-1024: median ms/op 0.61333948 -> 0.51844277; paired ratio 0.81249867; 95% interval 0.71728835..0.92034687
+  Pair ratios: 0.83276831, 0.86729326, 0.76822287, 0.65787475, 0.9180749, 0.85849391
+  baseline: iterations 16..32; calibration ms 20.378298..29.520724; warm ms 502.35358..518.75939 / batches 18..49; measured batch ms 8.397453..35.864404 (30/54 below 20 ms)
+  candidate: iterations 32..64; calibration ms 20.461816..37.428672; warm ms 500.27862..527.22944 / batches 14..28; measured batch ms 14.40512..51.81045 (12/54 below 20 ms)
+Bun 1.4.2 publish-alias-noop-1024: median ms/op 0.79249391 -> 0.69340694; paired ratio 0.85224692; 95% interval 0.77454467..0.93774425
+  Pair ratios: 0.75226174, 0.83824708, 0.88760702, 0.78390678, 0.93115053, 0.93787848
+  baseline: iterations 32..32; calibration ms 23.430856..28.197331; warm ms 506.34909..517.70661 / batches 16..20; measured batch ms 21.333422..40.197089 (0/54 below 20 ms)
+  candidate: iterations 32..32; calibration ms 20.524841..27.817218; warm ms 500.86285..519.53751 / batches 16..23; measured batch ms 18.713104..34.209406 (11/54 below 20 ms)
+Bun 1.4.2 create-distinct-32: median ms/op 0.018930334 -> 0.012568149; paired ratio 0.71587427; 95% interval 0.56953871..0.89980885
+  Pair ratios: 0.58698027, 0.5572437, 0.65948254, 0.84910555, 0.75178261, 0.97745012
+  baseline: iterations 512..2048; calibration ms 20.857768..41.48857; warm ms 504.30316..530.29714 / batches 13..50; measured batch ms 8.270928..49.720669 (25/54 below 20 ms)
+  candidate: iterations 256..2048; calibration ms 20.015667..55.710026; warm ms 501.49101..528.87088 / batches 15..129; measured batch ms 2.770914..40.838416 (18/54 below 20 ms)
+Bun 1.4.2 publish-distinct-1: median ms/op 0.0014508483 -> 0.0014261921; paired ratio 1.0307493; 95% interval 0.67876402..1.5652628
+  Pair ratios: 0.92310458, 1.4840066, 1.0756586, 1.6530822, 0.54557263, 0.90242263
+  baseline: iterations 4096..8192; calibration ms 22.327345..82.289048; warm ms 501.93562..509.62372 / batches 30..66; measured batch ms 5.271456..21.542726 (47/54 below 20 ms)
+  candidate: iterations 4096..16384; calibration ms 22.362267..74.57779; warm ms 500.9232..519.82023 / batches 22..66; measured batch ms 4.831075..42.260577 (40/54 below 20 ms)
+Bun 1.4.2 create-record-1: median ms/op 0.0021565664 -> 0.0021939227; paired ratio 1.0749635; 95% interval 0.77130858..1.4981638
+  Pair ratios: 1.1930143, 1.8493915, 0.73215418, 1.1063188, 0.88736068, 0.97298214
+  baseline: iterations 4096..8192; calibration ms 24.75603..69.217804; warm ms 503.36391..519.69188 / batches 23..47; measured batch ms 7.74945..38.484862 (50/54 below 20 ms)
+  candidate: iterations 4096..8192; calibration ms 31.426041..74.81038; warm ms 501.10361..509.3769 / batches 23..40; measured batch ms 14.624152..35.500239 (42/54 below 20 ms)
+Bun 1.4.2 create-single-snapshot: median ms/op 0.0020483157 -> 0.0019109229; paired ratio 0.93014913; 95% interval 0.75878282..1.1402174
+  Pair ratios: 1.0212718, 1.2743821, 0.96641011, 0.76457918, 0.87788297, 0.76710341
+  baseline: iterations 8192..8192; calibration ms 43.666516..80.364372; warm ms 500.94189..520.65598 / batches 25..32; measured batch ms 12.569467..30.288124 (41/54 below 20 ms)
+  candidate: iterations 4096..8192; calibration ms 24.531346..75.910387; warm ms 501.77575..510.51896 / batches 25..53; measured batch ms 7.345268..31.950024 (45/54 below 20 ms)
+
+aa-v2: 32 processes, 288 measured batches, 4 pairs per runtime/case
+Files: aa-v2.json.gz; original SHA-256 84b575ac842ed93739d3dcc1b271b572ec46df89bb7b198d2d6a8c27ec220755
+Time: 2026-11-08T13:05:49.563Z to 2026-11-08T13:06:17.718Z
+Node 24.22.1 create-distinct-1024: median ms/op 1.3934277 -> 1.54481; paired ratio 1.0976491; 95% interval 0.96045664..1.2544383
+  Pair ratios: 1.1520815, 1.1232664, 0.96933483, 1.1572158
+  baseline: iterations 8..16; calibration ms 20.116442..52.794175; warm ms 501.4636..519.67021 / batches 18..42; measured batch ms 11.287463..25.623384 (9/36 below 20 ms)
+  candidate: iterations 8..16; calibration ms 20.048759..43.617312; warm ms 508.42071..518.30369 / batches 19..40; measured batch ms 11.125257..32.650074 (9/36 below 20 ms)
+Node 24.22.1 create-single-snapshot: median ms/op 0.0025790868 -> 0.0023621097; paired ratio 0.86434011; 95% interval 0.69866168..1.069307
+  Pair ratios: 0.89629166, 0.71357815, 0.8957512, 0.97422746
+  baseline: iterations 4096..4096; calibration ms 23.78814..24.940247; warm ms 500.46176..506.17296 / batches 39..44; measured batch ms 9.557819..16.773015 (36/36 below 20 ms)
+  candidate: iterations 4096..4096; calibration ms 21.512017..28.376401; warm ms 503.81496..509.32243 / batches 40..48; measured batch ms 8.914006..21.424897 (35/36 below 20 ms)
+Bun 1.4.2 create-distinct-1024: median ms/op 0.69833452 -> 0.76378408; paired ratio 1.0649167; 95% interval 0.84489869..1.342229
+  Pair ratios: 1.1791711, 0.85825269, 1.1327568, 1.1218475
+  baseline: iterations 32..32; calibration ms 23.782003..25.376986; warm ms 500.24647..517.41199 / batches 18..23; measured batch ms 17.760975..29.940685 (10/36 below 20 ms)
+  candidate: iterations 32..32; calibration ms 20.412997..29.157378; warm ms 502.02034..514.37456 / batches 17..23; measured batch ms 17.435259..34.089771 (10/36 below 20 ms)
+Bun 1.4.2 create-single-snapshot: median ms/op 0.0020839949 -> 0.0017328645; paired ratio 0.8517735; 95% interval 0.68666722..1.0565789
+  Pair ratios: 0.75491138, 0.89072257, 1.0109482, 0.77433547
+  baseline: iterations 4096..8192; calibration ms 21.692904..57.499192; warm ms 500.87506..512.29261 / batches 29..60; measured batch ms 6.20256..31.673779 (27/36 below 20 ms)
+  candidate: iterations 4096..8192; calibration ms 21.259427..54.023826; warm ms 500.57045..511.6107 / batches 35..59; measured batch ms 6.968216..14.215214 (36/36 below 20 ms)
+
+PASS: 232 processes and 2592 measured batches verified across all three preserved studies.

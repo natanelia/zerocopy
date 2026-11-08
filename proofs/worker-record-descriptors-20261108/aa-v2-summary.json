@@ -1,0 +1,134 @@
+[
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-distinct-1024",
+    "baselineMs": 1.3934277187500008,
+    "candidateMs": 1.5448099687500019,
+    "pairedGeomeanRatio": 1.097649119125823,
+    "interval95": [
+      0.9604566368190572,
+      1.254438297920447
+    ],
+    "pairs": [
+      {
+        "baselineMs": 1.3562413125000035,
+        "candidateMs": 1.5625004999999987,
+        "ratio": 1.152081481074921
+      },
+      {
+        "baselineMs": 1.3595345000000023,
+        "candidateMs": 1.527119437500005,
+        "ratio": 1.1232664103044112
+      },
+      {
+        "baselineMs": 1.539124000000001,
+        "candidateMs": 1.4919265000000053,
+        "ratio": 0.9693348294224534
+      },
+      {
+        "baselineMs": 1.4273209374999993,
+        "candidateMs": 1.6517183125000017,
+        "ratio": 1.157215780350733
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-single-snapshot",
+    "baselineMs": 0.0025790867919921884,
+    "candidateMs": 0.002362109741210941,
+    "pairedGeomeanRatio": 0.8643401075067418,
+    "interval95": [
+      0.698661676222245,
+      1.0693070006134384
+    ],
+    "pairs": [
+      {
+        "baselineMs": 0.0025875200195312476,
+        "candidateMs": 0.002319172607421871,
+        "ratio": 0.8962916576166278
+      },
+      {
+        "baselineMs": 0.003370404296875018,
+        "candidateMs": 0.002405046875000011,
+        "ratio": 0.7135781535852923
+      },
+      {
+        "baselineMs": 0.002570653564453129,
+        "candidateMs": 0.0023026660156249823,
+        "ratio": 0.8957512001874288
+      },
+      {
+        "baselineMs": 0.0025661979980468874,
+        "candidateMs": 0.002500060546874988,
+        "ratio": 0.9742274558618486
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-distinct-1024",
+    "baselineMs": 0.6983345156249996,
+    "candidateMs": 0.7637840781250027,
+    "pairedGeomeanRatio": 1.0649166560192995,
+    "interval95": [
+      0.8448986869659576,
+      1.3422289580537836
+    ],
+    "pairs": [
+      {
+        "baselineMs": 0.6938635937499988,
+        "candidateMs": 0.8181838750000026,
+        "ratio": 1.179171068160692
+      },
+      {
+        "baselineMs": 0.7028054375000004,
+        "candidateMs": 0.6031846562500007,
+        "ratio": 0.8582526885330201
+      },
+      {
+        "baselineMs": 0.762737937499999,
+        "candidateMs": 0.8639965624999988,
+        "ratio": 1.132756770080025
+      },
+      {
+        "baselineMs": 0.6323357499999993,
+        "candidateMs": 0.7093842812500029,
+        "ratio": 1.1218475015053373
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-single-snapshot",
+    "baselineMs": 0.0020839948730468766,
+    "candidateMs": 0.0017328645019531255,
+    "pairedGeomeanRatio": 0.851773504801341,
+    "interval95": [
+      0.6866672202733055,
+      1.0565789105132921
+    ],
+    "pairs": [
+      {
+        "baselineMs": 0.0029437634277343777,
+        "candidateMs": 0.00222228051757814,
+        "ratio": 0.7549113820224624
+      },
+      {
+        "baselineMs": 0.0020475352783203143,
+        "candidateMs": 0.0018237858886718805,
+        "ratio": 0.8907225716608969
+      },
+      {
+        "baselineMs": 0.0016080861816406278,
+        "candidateMs": 0.0016256918945312532,
+        "ratio": 1.0109482396476186
+      },
+      {
+        "baselineMs": 0.002120454467773439,
+        "candidateMs": 0.0016419431152343705,
+        "ratio": 0.7743354739224728
+      }
+    ]
+  }
+]

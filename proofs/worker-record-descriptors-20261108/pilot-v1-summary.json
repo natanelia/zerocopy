@@ -1,0 +1,322 @@
+[
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-distinct-1024",
+    "baselineMs": 4.592274125000017,
+    "candidateMs": 2.4552643749999916,
+    "pairedGeomeanRatio": 0.583303203493113,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 6.436243999999988,
+        "candidateMs": 2.355996625000003,
+        "ratio": 0.36605147738339433
+      },
+      {
+        "baselineMs": 2.7483042500000465,
+        "candidateMs": 2.55453212499998,
+        "ratio": 0.9294939324857999
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "publish-distinct-1024",
+    "baselineMs": 4.307001124999985,
+    "candidateMs": 3.320782187500015,
+    "pairedGeomeanRatio": 0.76473415519694,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 4.4040374999999585,
+        "candidateMs": 2.8911663750000116,
+        "ratio": 0.6564808712459962
+      },
+      {
+        "baselineMs": 4.209964750000012,
+        "candidateMs": 3.7503980000000183,
+        "ratio": 0.8908383377794334
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-alias-1024",
+    "baselineMs": 3.4340626875000027,
+    "candidateMs": 2.296059187499992,
+    "pairedGeomeanRatio": 0.683810019216372,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 4.164390999999995,
+        "candidateMs": 2.379919000000001,
+        "ratio": 0.5714926864456301
+      },
+      {
+        "baselineMs": 2.7037343750000105,
+        "candidateMs": 2.212199374999983,
+        "ratio": 0.818201445916807
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "publish-alias-noop-1024",
+    "baselineMs": 3.294704781249955,
+    "candidateMs": 2.9334720625000017,
+    "pairedGeomeanRatio": 0.8903441426075374,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 3.439380999999912,
+        "candidateMs": 2.8035051249999867,
+        "ratio": 0.8151190941044503
+      },
+      {
+        "baselineMs": 3.1500285624999975,
+        "candidateMs": 3.0634390000000167,
+        "ratio": 0.9725114992508958
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-distinct-32",
+    "baselineMs": 0.079444928710938,
+    "candidateMs": 0.0741380703125003,
+    "pairedGeomeanRatio": 0.9410402297040155,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.09112520312500116,
+        "candidateMs": 0.07943718749999995,
+        "ratio": 0.8717367399558149
+      },
+      {
+        "baselineMs": 0.06776465429687484,
+        "candidateMs": 0.06883895312500066,
+        "ratio": 1.0158533801916756
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "publish-distinct-1",
+    "baselineMs": 0.006981358398437443,
+    "candidateMs": 0.007625409667968763,
+    "pairedGeomeanRatio": 1.0870490348941604,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.006971828613281161,
+        "candidateMs": 0.006881863281249956,
+        "ratio": 0.9870958772767559
+      },
+      {
+        "baselineMs": 0.006990888183593724,
+        "candidateMs": 0.00836895605468757,
+        "ratio": 1.197123431945015
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-record-1",
+    "baselineMs": 0.007536666137695214,
+    "candidateMs": 0.007180922363281217,
+    "pairedGeomeanRatio": 0.9468213467154047,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.008020656738281229,
+        "candidateMs": 0.006256309082031231,
+        "ratio": 0.780024539907179
+      },
+      {
+        "baselineMs": 0.007052675537109199,
+        "candidateMs": 0.008105535644531203,
+        "ratio": 1.1492852041586417
+      }
+    ]
+  },
+  {
+    "runtime": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "name": "create-single-snapshot",
+    "baselineMs": 0.0054071087646484495,
+    "candidateMs": 0.004947203735351513,
+    "pairedGeomeanRatio": 0.9110268985393268,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.005796684082031156,
+        "candidateMs": 0.004368325195312606,
+        "ratio": 0.7535903515690553
+      },
+      {
+        "baselineMs": 0.005017533447265743,
+        "candidateMs": 0.00552608227539042,
+        "ratio": 1.1013543474038636
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-distinct-1024",
+    "baselineMs": 1.6833618749999992,
+    "candidateMs": 0.5721653203124939,
+    "pairedGeomeanRatio": 0.34182322710858687,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 1.8630870000000002,
+        "candidateMs": 0.5652276875000002,
+        "ratio": 0.3033823366810032
+      },
+      {
+        "baselineMs": 1.5036367499999983,
+        "candidateMs": 0.5791029531249876,
+        "ratio": 0.385134875910015
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "publish-distinct-1024",
+    "baselineMs": 2.698911843749997,
+    "candidateMs": 0.8518886562499972,
+    "pairedGeomeanRatio": 0.3240002955832831,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 2.0872900624999886,
+        "candidateMs": 0.8338834687499954,
+        "ratio": 0.3995053125252926
+      },
+      {
+        "baselineMs": 3.310533625000005,
+        "candidateMs": 0.869893843749999,
+        "ratio": 0.26276544578217287
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-alias-1024",
+    "baselineMs": 1.9989688437499922,
+    "candidateMs": 0.5037803281250035,
+    "pairedGeomeanRatio": 0.2564838715288347,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 1.6260394999999903,
+        "candidateMs": 0.4948938437500061,
+        "ratio": 0.3043553639072169
+      },
+      {
+        "baselineMs": 2.371898187499994,
+        "candidateMs": 0.5126668125000009,
+        "ratio": 0.21614199766321218
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "publish-alias-noop-1024",
+    "baselineMs": 2.5862175000000036,
+    "candidateMs": 0.6980747031249983,
+    "pairedGeomeanRatio": 0.27510661320116636,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 2.0443307500000003,
+        "candidateMs": 0.6404512499999981,
+        "ratio": 0.31328162040315544
+      },
+      {
+        "baselineMs": 3.128104250000007,
+        "candidateMs": 0.7556981562499985,
+        "ratio": 0.2415834306832954
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-distinct-32",
+    "baselineMs": 0.03950551513671896,
+    "candidateMs": 0.012499676269531301,
+    "pairedGeomeanRatio": 0.39189802033406557,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.016165495117187678,
+        "candidateMs": 0.012959435546874953,
+        "ratio": 0.8016726647052129
+      },
+      {
+        "baselineMs": 0.06284553515625024,
+        "candidateMs": 0.01203991699218765,
+        "ratio": 0.19157951256606065
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "publish-distinct-1",
+    "baselineMs": 0.004224744873046887,
+    "candidateMs": 0.0014811431579589834,
+    "pairedGeomeanRatio": 0.44314876598559755,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.0016338261718749636,
+        "candidateMs": 0.0013976876220703205,
+        "ratio": 0.8554689881521161
+      },
+      {
+        "baselineMs": 0.006815663574218811,
+        "candidateMs": 0.0015645986938476464,
+        "ratio": 0.2295592610770809
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-record-1",
+    "baselineMs": 0.004793061767578127,
+    "candidateMs": 0.002416333435058593,
+    "pairedGeomeanRatio": 0.5924868804619497,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.002186291015625008,
+        "candidateMs": 0.002017002746582036,
+        "ratio": 0.922568282157727
+      },
+      {
+        "baselineMs": 0.007399832519531246,
+        "candidateMs": 0.00281566412353515,
+        "ratio": 0.3805037635788968
+      }
+    ]
+  },
+  {
+    "runtime": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun",
+    "name": "create-single-snapshot",
+    "baselineMs": 0.00398899435424796,
+    "candidateMs": 0.0019708976135253686,
+    "pairedGeomeanRatio": 0.5855807914419234,
+    "interval95": null,
+    "pairs": [
+      {
+        "baselineMs": 0.0018325663452148366,
+        "candidateMs": 0.001820301757812448,
+        "ratio": 0.993307425166672
+      },
+      {
+        "baselineMs": 0.006145422363281083,
+        "candidateMs": 0.002121493469238289,
+        "ratio": 0.3452152421474265
+      }
+    ]
+  }
+]

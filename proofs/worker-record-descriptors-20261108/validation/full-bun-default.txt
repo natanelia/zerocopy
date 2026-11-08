@@ -1,0 +1,28 @@
+
+ RUN  v4.1.11 /workspace/scratch/c22084f82996/zerocopy-spatial
+
+ ❯ geometry.test.ts (4 tests | 1 failed) 35138ms
+     × preserves attached snapshots after append, fork, and memory growth 35136ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ <anonymous> geometry.test.ts:45:30
+     38|     expect(bboxXY(newer)).toEqual([-5, -4, -2, -1]);
+     39|   });
+     40| });
+       |    ^
+     41|
+ ❯ processTicksAndRejections unknown:7:39
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 60 passed (61)
+      Tests  1 failed | 1192 passed (1193)
+   Start at  20:56:39
+   Duration  70.75s (transform 785ms, setup 0ms, import 1.61s, tests 129.30s, environment 8ms)
+
+[vitest-pool]: Timeout terminating threads worker for test files /workspace/scratch/c22084f82996/zerocopy-spatial/geometry.test.ts.

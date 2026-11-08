@@ -1,0 +1,1 @@
+Worker sessions proof passed: 2 real workers, all 12 types, nested data, memory growth, descriptor-only updates, retained snapshots, compaction, and real Toolkit auto-publication.
