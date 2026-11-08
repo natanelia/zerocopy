@@ -1,0 +1,20 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/home/runner/work/zerocopy/zerocopy[39m
+
+ [32m✓[39m map-miss-cache.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 1428[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps shared attachments read-only without writing bytes [33m 492[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps copied attachments read-only without writing bytes [33m 472[2mms[22m[39m
+ [32m✓[39m performance-revision.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 2562[2mms[22m[39m
+     [33m[2m✓[22m[39m SharedMap: inserts, overwrites and deletes preserve forks [33m 417[2mms[22m[39m
+     [33m[2m✓[22m[39m SharedOrderedMap: inserts, overwrites and deletes preserve forks [33m 472[2mms[22m[39m
+     [33m[2m✓[22m[39m SharedSortedMap: inserts, overwrites and deletes preserve forks [33m 556[2mms[22m[39m
+     [33m[2m✓[22m[39m compaction removes dead history and does not parse primitive JSON payloads [33m 368[2mms[22m[39m
+ [32m✓[39m map-memory.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 382[2mms[22m[39m
+ [32m✓[39m hot-path.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 417[2mms[22m[39m
+     [33m[2m✓[22m[39m falls back correctly beyond the entry and string-value budgets [33m 347[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m76 passed[39m[22m[90m (76)[39m
+[2m   Start at [22m 17:21:46
+[2m   Duration [22m 5.05s[2m (transform 121ms, setup 0ms, import 162ms, tests 4.79s, environment 0ms)[22m
+

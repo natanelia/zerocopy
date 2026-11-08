@@ -1,0 +1,65 @@
+{
+  "root": "/home/runner/work/zerocopy/zerocopy",
+  "runtime": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "timingCollected": false,
+  "scope": "Logical JavaScript negative-cache entries and retained UTF-16 code units; actual JS heap/RSS/capacity are not measured. Reads allocate no WASM bytes.",
+  "cases": [
+    {
+      "name": "entry-budget",
+      "negativeCachePresent": true,
+      "cachedEntries": 256,
+      "retainedKeyCodeUnits": 2450,
+      "wasmBytesAllocatedByReads": 0,
+      "successfulEntriesBefore": 1,
+      "successfulEntriesAfter": 1
+    },
+    {
+      "name": "character-budget",
+      "negativeCachePresent": true,
+      "cachedEntries": 2,
+      "retainedKeyCodeUnits": 16384,
+      "wasmBytesAllocatedByReads": 0,
+      "successfulEntriesBefore": 1,
+      "successfulEntriesAfter": 1
+    },
+    {
+      "name": "over-character-budget",
+      "negativeCachePresent": true,
+      "cachedEntries": 0,
+      "retainedKeyCodeUnits": 0,
+      "wasmBytesAllocatedByReads": 0,
+      "successfulEntriesBefore": 1,
+      "successfulEntriesAfter": 1
+    }
+  ]
+}

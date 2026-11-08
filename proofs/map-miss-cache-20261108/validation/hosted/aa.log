@@ -1,0 +1,252 @@
+aa: node get-repeated-ascii-16 pair 1/4 before: 142.952 us, verified
+aa: node get-repeated-ascii-16 pair 1/4 after: 151.851 us, verified
+aa: node has-repeated-ascii-128 pair 1/4 before: 141.392 us, verified
+aa: node has-repeated-ascii-128 pair 1/4 after: 141.365 us, verified
+aa: node get-repeated-unicode-128 pair 1/4 before: 423.305 us, verified
+aa: node get-repeated-unicode-128 pair 1/4 after: 399.437 us, verified
+aa: node get-short-repeated-misses pair 1/4 before: 43.224 us, verified
+aa: node get-short-repeated-misses pair 1/4 after: 45.174 us, verified
+aa: node get-cold-misses pair 1/4 before: 155.147 us, verified
+aa: node get-cold-misses pair 1/4 after: 154.654 us, verified
+aa: node get-short-cold-misses pair 1/4 before: 54.181 us, verified
+aa: node get-short-cold-misses pair 1/4 after: 54.851 us, verified
+aa: node get-cold-hits pair 1/4 before: 155.463 us, verified
+aa: node get-cold-hits pair 1/4 after: 162.951 us, verified
+aa: node get-streaming-misses pair 1/4 before: 221.428 us, verified
+aa: node get-streaming-misses pair 1/4 after: 218.889 us, verified
+aa: node get-over-budget-misses pair 1/4 before: 149.168 us, verified
+aa: node get-over-budget-misses pair 1/4 after: 147.208 us, verified
+aa: node get-mixed pair 1/4 before: 46.497 us, verified
+aa: node get-mixed pair 1/4 after: 48.271 us, verified
+aa: node get-alternating-roots pair 1/4 before: 158.357 us, verified
+aa: node get-alternating-roots pair 1/4 after: 158.591 us, verified
+aa: node get-warm-hits pair 1/4 before: 18.994 us, verified
+aa: node get-warm-hits pair 1/4 after: 18.917 us, verified
+aa: node get-warm-hits-after-miss pair 1/4 before: 22.209 us, verified
+aa: node get-warm-hits-after-miss pair 1/4 after: 19.308 us, verified
+aa: node has-warm-hits pair 1/4 before: 14.072 us, verified
+aa: node has-warm-hits pair 1/4 after: 13.325 us, verified
+aa: bun get-repeated-ascii-16 pair 1/4 before: 95.503 us, verified
+aa: bun get-repeated-ascii-16 pair 1/4 after: 93.624 us, verified
+aa: bun has-repeated-ascii-128 pair 1/4 before: 85.682 us, verified
+aa: bun has-repeated-ascii-128 pair 1/4 after: 75.008 us, verified
+aa: bun get-repeated-unicode-128 pair 1/4 before: 113.443 us, verified
+aa: bun get-repeated-unicode-128 pair 1/4 after: 112.691 us, verified
+aa: bun get-short-repeated-misses pair 1/4 before: 57.617 us, verified
+aa: bun get-short-repeated-misses pair 1/4 after: 58.412 us, verified
+aa: bun get-cold-misses pair 1/4 before: 110.870 us, verified
+aa: bun get-cold-misses pair 1/4 after: 115.241 us, verified
+aa: bun get-short-cold-misses pair 1/4 before: 82.435 us, verified
+aa: bun get-short-cold-misses pair 1/4 after: 82.884 us, verified
+aa: bun get-cold-hits pair 1/4 before: 147.355 us, verified
+aa: bun get-cold-hits pair 1/4 after: 146.728 us, verified
+aa: bun get-streaming-misses pair 1/4 before: 100.760 us, verified
+aa: bun get-streaming-misses pair 1/4 after: 99.990 us, verified
+aa: bun get-over-budget-misses pair 1/4 before: 76.276 us, verified
+aa: bun get-over-budget-misses pair 1/4 after: 72.025 us, verified
+aa: bun get-mixed pair 1/4 before: 24.911 us, verified
+aa: bun get-mixed pair 1/4 after: 29.920 us, verified
+aa: bun get-alternating-roots pair 1/4 before: 162.455 us, verified
+aa: bun get-alternating-roots pair 1/4 after: 162.383 us, verified
+aa: bun get-warm-hits pair 1/4 before: 13.025 us, verified
+aa: bun get-warm-hits pair 1/4 after: 8.776 us, verified
+aa: bun get-warm-hits-after-miss pair 1/4 before: 12.663 us, verified
+aa: bun get-warm-hits-after-miss pair 1/4 after: 12.624 us, verified
+aa: bun has-warm-hits pair 1/4 before: 7.639 us, verified
+aa: bun has-warm-hits pair 1/4 after: 7.317 us, verified
+aa: bun has-warm-hits pair 2/4 after: 7.092 us, verified
+aa: bun has-warm-hits pair 2/4 before: 8.828 us, verified
+aa: bun get-warm-hits-after-miss pair 2/4 after: 12.667 us, verified
+aa: bun get-warm-hits-after-miss pair 2/4 before: 13.252 us, verified
+aa: bun get-warm-hits pair 2/4 after: 12.211 us, verified
+aa: bun get-warm-hits pair 2/4 before: 12.060 us, verified
+aa: bun get-alternating-roots pair 2/4 after: 165.961 us, verified
+aa: bun get-alternating-roots pair 2/4 before: 169.783 us, verified
+aa: bun get-mixed pair 2/4 after: 26.003 us, verified
+aa: bun get-mixed pair 2/4 before: 29.615 us, verified
+aa: bun get-over-budget-misses pair 2/4 after: 72.285 us, verified
+aa: bun get-over-budget-misses pair 2/4 before: 74.816 us, verified
+aa: bun get-streaming-misses pair 2/4 after: 103.539 us, verified
+aa: bun get-streaming-misses pair 2/4 before: 99.795 us, verified
+aa: bun get-cold-hits pair 2/4 after: 161.943 us, verified
+aa: bun get-cold-hits pair 2/4 before: 145.417 us, verified
+aa: bun get-short-cold-misses pair 2/4 after: 89.686 us, verified
+aa: bun get-short-cold-misses pair 2/4 before: 86.484 us, verified
+aa: bun get-cold-misses pair 2/4 after: 110.094 us, verified
+aa: bun get-cold-misses pair 2/4 before: 108.749 us, verified
+aa: bun get-short-repeated-misses pair 2/4 after: 56.273 us, verified
+aa: bun get-short-repeated-misses pair 2/4 before: 59.256 us, verified
+aa: bun get-repeated-unicode-128 pair 2/4 after: 115.704 us, verified
+aa: bun get-repeated-unicode-128 pair 2/4 before: 110.289 us, verified
+aa: bun has-repeated-ascii-128 pair 2/4 after: 82.944 us, verified
+aa: bun has-repeated-ascii-128 pair 2/4 before: 76.658 us, verified
+aa: bun get-repeated-ascii-16 pair 2/4 after: 93.315 us, verified
+aa: bun get-repeated-ascii-16 pair 2/4 before: 97.330 us, verified
+aa: node has-warm-hits pair 2/4 after: 8.703 us, verified
+aa: node has-warm-hits pair 2/4 before: 7.921 us, verified
+aa: node get-warm-hits-after-miss pair 2/4 after: 19.367 us, verified
+aa: node get-warm-hits-after-miss pair 2/4 before: 19.012 us, verified
+aa: node get-warm-hits pair 2/4 after: 19.358 us, verified
+aa: node get-warm-hits pair 2/4 before: 19.555 us, verified
+aa: node get-alternating-roots pair 2/4 after: 156.914 us, verified
+aa: node get-alternating-roots pair 2/4 before: 165.493 us, verified
+aa: node get-mixed pair 2/4 after: 47.456 us, verified
+aa: node get-mixed pair 2/4 before: 48.595 us, verified
+aa: node get-over-budget-misses pair 2/4 after: 144.597 us, verified
+aa: node get-over-budget-misses pair 2/4 before: 149.703 us, verified
+aa: node get-streaming-misses pair 2/4 after: 229.365 us, verified
+aa: node get-streaming-misses pair 2/4 before: 230.649 us, verified
+aa: node get-cold-hits pair 2/4 after: 164.041 us, verified
+aa: node get-cold-hits pair 2/4 before: 161.813 us, verified
+aa: node get-short-cold-misses pair 2/4 after: 56.994 us, verified
+aa: node get-short-cold-misses pair 2/4 before: 56.292 us, verified
+aa: node get-cold-misses pair 2/4 after: 162.660 us, verified
+aa: node get-cold-misses pair 2/4 before: 163.877 us, verified
+aa: node get-short-repeated-misses pair 2/4 after: 45.841 us, verified
+aa: node get-short-repeated-misses pair 2/4 before: 47.129 us, verified
+aa: node get-repeated-unicode-128 pair 2/4 after: 374.687 us, verified
+aa: node get-repeated-unicode-128 pair 2/4 before: 372.249 us, verified
+aa: node has-repeated-ascii-128 pair 2/4 after: 148.165 us, verified
+aa: node has-repeated-ascii-128 pair 2/4 before: 147.355 us, verified
+aa: node get-repeated-ascii-16 pair 2/4 after: 145.892 us, verified
+aa: node get-repeated-ascii-16 pair 2/4 before: 143.852 us, verified
+aa: node get-repeated-ascii-16 pair 3/4 before: 145.806 us, verified
+aa: node get-repeated-ascii-16 pair 3/4 after: 147.502 us, verified
+aa: node has-repeated-ascii-128 pair 3/4 before: 143.252 us, verified
+aa: node has-repeated-ascii-128 pair 3/4 after: 147.650 us, verified
+aa: node get-repeated-unicode-128 pair 3/4 before: 450.642 us, verified
+aa: node get-repeated-unicode-128 pair 3/4 after: 452.199 us, verified
+aa: node get-short-repeated-misses pair 3/4 before: 43.460 us, verified
+aa: node get-short-repeated-misses pair 3/4 after: 43.233 us, verified
+aa: node get-cold-misses pair 3/4 before: 155.465 us, verified
+aa: node get-cold-misses pair 3/4 after: 155.309 us, verified
+aa: node get-short-cold-misses pair 3/4 before: 54.152 us, verified
+aa: node get-short-cold-misses pair 3/4 after: 53.924 us, verified
+aa: node get-cold-hits pair 3/4 before: 158.558 us, verified
+aa: node get-cold-hits pair 3/4 after: 155.754 us, verified
+aa: node get-streaming-misses pair 3/4 before: 218.487 us, verified
+aa: node get-streaming-misses pair 3/4 after: 218.074 us, verified
+aa: node get-over-budget-misses pair 3/4 before: 148.299 us, verified
+aa: node get-over-budget-misses pair 3/4 after: 141.505 us, verified
+aa: node get-mixed pair 3/4 before: 50.600 us, verified
+aa: node get-mixed pair 3/4 after: 47.767 us, verified
+aa: node get-alternating-roots pair 3/4 before: 164.154 us, verified
+aa: node get-alternating-roots pair 3/4 after: 164.498 us, verified
+aa: node get-warm-hits pair 3/4 before: 19.943 us, verified
+aa: node get-warm-hits pair 3/4 after: 18.873 us, verified
+aa: node get-warm-hits-after-miss pair 3/4 before: 19.790 us, verified
+aa: node get-warm-hits-after-miss pair 3/4 after: 19.059 us, verified
+aa: node has-warm-hits pair 3/4 before: 14.105 us, verified
+aa: node has-warm-hits pair 3/4 after: 7.605 us, verified
+aa: bun get-repeated-ascii-16 pair 3/4 before: 97.656 us, verified
+aa: bun get-repeated-ascii-16 pair 3/4 after: 93.413 us, verified
+aa: bun has-repeated-ascii-128 pair 3/4 before: 77.975 us, verified
+aa: bun has-repeated-ascii-128 pair 3/4 after: 77.618 us, verified
+aa: bun get-repeated-unicode-128 pair 3/4 before: 110.816 us, verified
+aa: bun get-repeated-unicode-128 pair 3/4 after: 108.567 us, verified
+aa: bun get-short-repeated-misses pair 3/4 before: 59.713 us, verified
+aa: bun get-short-repeated-misses pair 3/4 after: 56.527 us, verified
+aa: bun get-cold-misses pair 3/4 before: 116.321 us, verified
+aa: bun get-cold-misses pair 3/4 after: 109.769 us, verified
+aa: bun get-short-cold-misses pair 3/4 before: 84.889 us, verified
+aa: bun get-short-cold-misses pair 3/4 after: 84.821 us, verified
+aa: bun get-cold-hits pair 3/4 before: 141.396 us, verified
+aa: bun get-cold-hits pair 3/4 after: 147.576 us, verified
+aa: bun get-streaming-misses pair 3/4 before: 121.748 us, verified
+aa: bun get-streaming-misses pair 3/4 after: 101.449 us, verified
+aa: bun get-over-budget-misses pair 3/4 before: 74.623 us, verified
+aa: bun get-over-budget-misses pair 3/4 after: 74.526 us, verified
+aa: bun get-mixed pair 3/4 before: 23.908 us, verified
+aa: bun get-mixed pair 3/4 after: 28.756 us, verified
+aa: bun get-alternating-roots pair 3/4 before: 167.602 us, verified
+aa: bun get-alternating-roots pair 3/4 after: 169.784 us, verified
+aa: bun get-warm-hits pair 3/4 before: 8.539 us, verified
+aa: bun get-warm-hits pair 3/4 after: 12.471 us, verified
+aa: bun get-warm-hits-after-miss pair 3/4 before: 12.940 us, verified
+aa: bun get-warm-hits-after-miss pair 3/4 after: 12.368 us, verified
+aa: bun has-warm-hits pair 3/4 before: 9.165 us, verified
+aa: bun has-warm-hits pair 3/4 after: 7.099 us, verified
+aa: bun has-warm-hits pair 4/4 after: 6.875 us, verified
+aa: bun has-warm-hits pair 4/4 before: 8.991 us, verified
+aa: bun get-warm-hits-after-miss pair 4/4 after: 12.403 us, verified
+aa: bun get-warm-hits-after-miss pair 4/4 before: 8.452 us, verified
+aa: bun get-warm-hits pair 4/4 after: 11.948 us, verified
+aa: bun get-warm-hits pair 4/4 before: 13.208 us, verified
+aa: bun get-alternating-roots pair 4/4 after: 177.171 us, verified
+aa: bun get-alternating-roots pair 4/4 before: 163.355 us, verified
+aa: bun get-mixed pair 4/4 after: 24.680 us, verified
+aa: bun get-mixed pair 4/4 before: 26.670 us, verified
+aa: bun get-over-budget-misses pair 4/4 after: 72.470 us, verified
+aa: bun get-over-budget-misses pair 4/4 before: 71.446 us, verified
+aa: bun get-streaming-misses pair 4/4 after: 126.987 us, verified
+aa: bun get-streaming-misses pair 4/4 before: 102.307 us, verified
+aa: bun get-cold-hits pair 4/4 after: 165.098 us, verified
+aa: bun get-cold-hits pair 4/4 before: 156.775 us, verified
+aa: bun get-short-cold-misses pair 4/4 after: 86.111 us, verified
+aa: bun get-short-cold-misses pair 4/4 before: 83.906 us, verified
+aa: bun get-cold-misses pair 4/4 after: 118.050 us, verified
+aa: bun get-cold-misses pair 4/4 before: 118.245 us, verified
+aa: bun get-short-repeated-misses pair 4/4 after: 58.688 us, verified
+aa: bun get-short-repeated-misses pair 4/4 before: 68.150 us, verified
+aa: bun get-repeated-unicode-128 pair 4/4 after: 112.805 us, verified
+aa: bun get-repeated-unicode-128 pair 4/4 before: 112.559 us, verified
+aa: bun has-repeated-ascii-128 pair 4/4 after: 75.255 us, verified
+aa: bun has-repeated-ascii-128 pair 4/4 before: 79.529 us, verified
+aa: bun get-repeated-ascii-16 pair 4/4 after: 94.606 us, verified
+aa: bun get-repeated-ascii-16 pair 4/4 before: 95.937 us, verified
+aa: node has-warm-hits pair 4/4 after: 8.148 us, verified
+aa: node has-warm-hits pair 4/4 before: 7.815 us, verified
+aa: node get-warm-hits-after-miss pair 4/4 after: 19.271 us, verified
+aa: node get-warm-hits-after-miss pair 4/4 before: 20.226 us, verified
+aa: node get-warm-hits pair 4/4 after: 20.277 us, verified
+aa: node get-warm-hits pair 4/4 before: 20.128 us, verified
+aa: node get-alternating-roots pair 4/4 after: 157.690 us, verified
+aa: node get-alternating-roots pair 4/4 before: 159.807 us, verified
+aa: node get-mixed pair 4/4 after: 48.466 us, verified
+aa: node get-mixed pair 4/4 before: 47.637 us, verified
+aa: node get-over-budget-misses pair 4/4 after: 147.828 us, verified
+aa: node get-over-budget-misses pair 4/4 before: 148.917 us, verified
+aa: node get-streaming-misses pair 4/4 after: 227.228 us, verified
+aa: node get-streaming-misses pair 4/4 before: 229.129 us, verified
+aa: node get-cold-hits pair 4/4 after: 161.488 us, verified
+aa: node get-cold-hits pair 4/4 before: 164.462 us, verified
+aa: node get-short-cold-misses pair 4/4 after: 55.774 us, verified
+aa: node get-short-cold-misses pair 4/4 before: 57.055 us, verified
+aa: node get-cold-misses pair 4/4 after: 162.552 us, verified
+aa: node get-cold-misses pair 4/4 before: 158.025 us, verified
+aa: node get-short-repeated-misses pair 4/4 after: 45.520 us, verified
+aa: node get-short-repeated-misses pair 4/4 before: 43.411 us, verified
+aa: node get-repeated-unicode-128 pair 4/4 after: 379.320 us, verified
+aa: node get-repeated-unicode-128 pair 4/4 before: 357.481 us, verified
+aa: node has-repeated-ascii-128 pair 4/4 after: 143.147 us, verified
+aa: node has-repeated-ascii-128 pair 4/4 before: 146.342 us, verified
+aa: node get-repeated-ascii-16 pair 4/4 after: 145.145 us, verified
+aa: node get-repeated-ascii-16 pair 4/4 before: 148.616 us, verified
+node get-repeated-ascii-16: 144.829 -> 146.697 us, paired ratio 1.016 (0.962-1.073)
+node has-repeated-ascii-128: 144.797 -> 145.398 us, paired ratio 1.003 (0.970-1.038)
+node get-repeated-unicode-128: 397.777 -> 389.379 us, paired ratio 1.003 (0.929-1.082)
+node get-short-repeated-misses: 43.436 -> 45.347 us, paired ratio 1.015 (0.957-1.076)
+node get-cold-misses: 156.745 -> 158.930 us, paired ratio 1.004 (0.978-1.031)
+node get-short-cold-misses: 55.236 -> 55.313 us, paired ratio 0.999 (0.973-1.026)
+node get-cold-hits: 160.185 -> 162.219 us, paired ratio 1.006 (0.958-1.057)
+node get-streaming-misses: 225.278 -> 223.058 us, paired ratio 0.993 (0.987-1.000)
+node get-over-budget-misses: 149.043 -> 145.903 us, paired ratio 0.975 (0.947-1.004)
+node get-mixed: 48.116 -> 48.019 us, paired ratio 0.993 (0.928-1.063)
+node get-alternating-roots: 161.980 -> 158.140 us, paired ratio 0.984 (0.944-1.026)
+node get-warm-hits: 19.749 -> 19.137 us, paired ratio 0.985 (0.943-1.029)
+node get-warm-hits-after-miss: 20.008 -> 19.290 us, paired ratio 0.949 (0.855-1.054)
+node has-warm-hits: 10.997 -> 8.425 us, paired ratio 0.874 (0.519-1.474)
+bun get-repeated-ascii-16: 96.633 -> 93.518 us, paired ratio 0.970 (0.947-0.994)
+bun has-repeated-ascii-128: 78.752 -> 76.436 us, paired ratio 0.972 (0.844-1.120)
+bun get-repeated-unicode-128: 111.687 -> 112.748 us, paired ratio 1.006 (0.959-1.054)
+bun get-short-repeated-misses: 59.485 -> 57.469 us, paired ratio 0.941 (0.846-1.047)
+bun get-cold-misses: 113.596 -> 112.667 us, paired ratio 0.998 (0.935-1.065)
+bun get-short-cold-misses: 84.397 -> 85.466 us, paired ratio 1.017 (0.989-1.045)
+bun get-cold-hits: 146.386 -> 154.760 us, paired ratio 1.051 (0.977-1.130)
+bun get-streaming-misses: 101.534 -> 102.494 us, paired ratio 1.016 (0.783-1.318)
+bun get-over-budget-misses: 74.720 -> 72.378 us, paired ratio 0.980 (0.931-1.032)
+bun get-mixed: 25.790 -> 27.379 us, paired ratio 1.041 (0.797-1.359)
+bun get-alternating-roots: 165.479 -> 167.872 us, paired ratio 1.018 (0.948-1.093)
+bun get-warm-hits: 12.543 -> 12.080 us, paired ratio 0.974 (0.586-1.621)
+bun get-warm-hits-after-miss: 12.802 -> 12.514 us, paired ratio 1.075 (0.772-1.498)
+bun has-warm-hits: 8.909 -> 7.096 us, paired ratio 0.822 (0.696-0.970)

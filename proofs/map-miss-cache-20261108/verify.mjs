@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { gunzipSync } from 'node:zlib';
+import { study, makeFixture } from './workloads.mjs';
 
 // Recompute saved statistics and validate provenance without retiming.
 const [input, candidate] = process.argv.slice(2);
@@ -20,6 +21,7 @@ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const near = (actual, expected) => assert.ok(
   Math.abs(actual - expected) <= Math.max(1e-13, Math.abs(expected) * 1e-12), `${actual} != ${expected}`);
 const { method, runs } = record;
+assert.deepEqual(record.study, study, 'The saved case definitions must match the frozen workload');
 const settings = {
   pilot: { pairs: 2, minimumWarmupMs: 500 },
   formal: { pairs: 6, minimumWarmupMs: 500 },
@@ -48,13 +50,25 @@ for (let pair = 0; pair < method.pairs; pair++) {
   }
 }
 assert.deepEqual(runs.map(({ pair, runtime, caseName, variant }) => ({ pair, runtime, caseName, variant })), expectedSchedule);
+const fixtureDigests = new Map(method.cases.map(spec => {
+  const fixture = makeFixture(spec), oracle = new Map(fixture.entries);
+  const streamKeys = spec.state === 'streaming'
+    ? Array.from({ length: spec.repetitions }, (_, batch) => fixture.keys.map(key => `${key}/request-${batch}`)) : null;
+  const expected = fixture.keys.map(key => spec.method === 'has' ? oracle.has(key) : oracle.get(key));
+  return [spec.name, digest(JSON.stringify({ fixture, streamKeys,
+    expected: expected.map(value => value === undefined ? ['undefined'] : value) }))];
+}));
 let timedBatches = 0, outputs = 0, below2ms = 0;
 for (const run of runs) {
   const spec = method.cases.find(row => row.name === run.caseName);
   assert.deepEqual(run.spec, spec);
   assert.equal(run.affinity, record.host.affinity);
-  assert.equal(run.strategy, `unchanged public SharedMap.${spec.method} calls`);
-  assert.match(run.expectedDigest, /^[0-9a-f]{64}$/);
+  // The frozen driver records the fixture, not workload.strategy. Validate the
+  // public method/unit and reconstruct its digest without altering raw records.
+  assert.equal(run.fixture.method, spec.method);
+  assert.equal(run.fixture.requestCount, spec.queries);
+  assert.equal(run.fixture.unit, `${spec.queries} complete scalar ${spec.method} calls plus result-array creation and retention`);
+  assert.equal(run.expectedDigest, fixtureDigests.get(spec.name));
   assert.ok(run.warmupBatchMs.length >= method.minimumWarmupBatches);
   assert.ok(run.warmupBatchMs.reduce((a, b) => a + b, 0) >= method.minimumWarmupMs);
   assert.equal(run.sampleBatchMs.length, method.samples);

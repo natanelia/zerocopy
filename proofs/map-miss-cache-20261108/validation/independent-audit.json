@@ -1,0 +1,1139 @@
+[
+  {
+    "file": "proofs/map-miss-cache-20261108/results/pilot.json.gz",
+    "verified": true,
+    "mode": "pilot",
+    "processes": 112,
+    "timedBatches": 1008,
+    "verifiedOutputs": 1649472,
+    "verifiedScalars": 1689059328,
+    "measuredBatchesBelow2ms": 0,
+    "warmupBatchesBelow2ms": 0,
+    "minimumMeasuredBatchMs": 3.4587060000000065,
+    "fixtureDigestsReconstructed": 14,
+    "rows": [
+      {
+        "runtime": "node",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 155.93118750000002,
+        "afterMicroseconds": 76.05023437500003,
+        "pairedRatio": 0.4876640125258467,
+        "percentChange": -51.23359874741533,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 147.8023066406249,
+        "afterMicroseconds": 67.7180195312499,
+        "pairedRatio": 0.45805306875602425,
+        "percentChange": -54.194693124397574,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 452.90111328124993,
+        "afterMicroseconds": 79.11448828125,
+        "pairedRatio": 0.17436766607500725,
+        "percentChange": -82.56323339249927,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 46.07983593750009,
+        "afterMicroseconds": 66.62909375000004,
+        "pairedRatio": 1.445501692722346,
+        "percentChange": 44.550169272234605,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 160.55135937499986,
+        "afterMicroseconds": 214.23232812500004,
+        "pairedRatio": 1.3344175933619018,
+        "percentChange": 33.44175933619018,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 56.144140624999395,
+        "afterMicroseconds": 103.60078124999994,
+        "pairedRatio": 1.845813444033603,
+        "percentChange": 84.58134440336029,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 159.26097656250082,
+        "afterMicroseconds": 162.27082812499916,
+        "pairedRatio": 1.0189259889764637,
+        "percentChange": 1.8925988976463692,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 228.7495234375001,
+        "afterMicroseconds": 270.5178281249996,
+        "pairedRatio": 1.182584401626336,
+        "percentChange": 18.258440162633605,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 147.27195312499975,
+        "afterMicroseconds": 179.41674609374968,
+        "pairedRatio": 1.2182222988364344,
+        "percentChange": 21.82222988364344,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 47.72427734375007,
+        "afterMicroseconds": 31.409593750000077,
+        "pairedRatio": 0.6578233572307968,
+        "percentChange": -34.217664276920324,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 162.23834375000035,
+        "afterMicroseconds": 231.00798437499924,
+        "pairedRatio": 1.4241939901316563,
+        "percentChange": 42.419399013165624,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 21.029468750000003,
+        "afterMicroseconds": 21.076581054687573,
+        "pairedRatio": 1.0024279590148106,
+        "percentChange": 0.24279590148106323,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 19.76630371093746,
+        "afterMicroseconds": 19.57466699218735,
+        "pairedRatio": 0.9900183852516796,
+        "percentChange": -0.9981614748320378,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 11.233533203125035,
+        "afterMicroseconds": 10.922468750000025,
+        "pairedRatio": 0.9724938136548812,
+        "percentChange": -2.750618634511881,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 98.11935546875006,
+        "afterMicroseconds": 41.263634765625,
+        "pairedRatio": 0.42050324489876556,
+        "percentChange": -57.94967551012344,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 77.3853144531249,
+        "afterMicroseconds": 40.961900390624976,
+        "pairedRatio": 0.5288884996545371,
+        "percentChange": -47.11115003454629,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 112.25535937499997,
+        "afterMicroseconds": 46.8206582031252,
+        "pairedRatio": 0.41442127256390154,
+        "percentChange": -58.55787274360984,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 64.53547656249992,
+        "afterMicroseconds": 41.55474804687498,
+        "pairedRatio": 0.6439223746107522,
+        "percentChange": -35.60776253892478,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 122.4176406249997,
+        "afterMicroseconds": 162.3517578125009,
+        "pairedRatio": 1.3253404950157806,
+        "percentChange": 32.53404950157805,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 85.72433593749994,
+        "afterMicroseconds": 121.43786718749982,
+        "pairedRatio": 1.4156924053089115,
+        "percentChange": 41.56924053089115,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 151.03848437500034,
+        "afterMicroseconds": 153.55728906249942,
+        "pairedRatio": 1.0172478322683545,
+        "percentChange": 1.7247832268354468,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 106.71096093749988,
+        "afterMicroseconds": 126.95625781249919,
+        "pairedRatio": 1.190283061607788,
+        "percentChange": 19.028306160778797,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 77.13030859375003,
+        "afterMicroseconds": 102.57926171874976,
+        "pairedRatio": 1.3288057980961319,
+        "percentChange": 32.88057980961319,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 29.480265624999944,
+        "afterMicroseconds": 17.799337890624933,
+        "pairedRatio": 0.6017765238541437,
+        "percentChange": -39.82234761458563,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 176.69776562499973,
+        "afterMicroseconds": 230.88493749999995,
+        "pairedRatio": 1.306295809529662,
+        "percentChange": 30.629580952966194,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 13.756585937500066,
+        "afterMicroseconds": 11.196268554687583,
+        "pairedRatio": 0.7984351617371913,
+        "percentChange": -20.15648382628087,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 14.068994140625124,
+        "afterMicroseconds": 11.42226855468753,
+        "pairedRatio": 0.7900320459486379,
+        "percentChange": -20.996795405136215,
+        "interval95": null,
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 7.529958007812532,
+        "afterMicroseconds": 8.710692382812635,
+        "pairedRatio": 1.1464262825464817,
+        "percentChange": 14.642628254648171,
+        "interval95": null,
+        "result": "inconclusive"
+      }
+    ]
+  },
+  {
+    "file": "proofs/map-miss-cache-20261108/results/formal.json.gz",
+    "verified": true,
+    "mode": "formal",
+    "processes": 336,
+    "timedBatches": 3024,
+    "verifiedOutputs": 5017344,
+    "verifiedScalars": 5137760256,
+    "measuredBatchesBelow2ms": 0,
+    "warmupBatchesBelow2ms": 0,
+    "minimumMeasuredBatchMs": 3.294247999999925,
+    "fixtureDigestsReconstructed": 14,
+    "rows": [
+      {
+        "runtime": "node",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 150.89371093750015,
+        "afterMicroseconds": 74.47814062499991,
+        "pairedRatio": 0.4845349788581573,
+        "percentChange": -51.54650211418428,
+        "interval95": [
+          0.4518333751425238,
+          0.5196033729536227
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 147.2580546875002,
+        "afterMicroseconds": 67.0205117187499,
+        "pairedRatio": 0.48882903700837826,
+        "percentChange": -51.11709629916217,
+        "interval95": [
+          0.4125297995887112,
+          0.5792401607369296
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 451.9045937500001,
+        "afterMicroseconds": 78.86807812499997,
+        "pairedRatio": 0.16853153986728733,
+        "percentChange": -83.14684601327127,
+        "interval95": [
+          0.15456729030332897,
+          0.18375737760751398
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 45.27749804687487,
+        "afterMicroseconds": 69.7799414062501,
+        "pairedRatio": 1.5476984375017466,
+        "percentChange": 54.769843750174665,
+        "interval95": [
+          1.4315642547807228,
+          1.6732538867507938
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 164.10658593749972,
+        "afterMicroseconds": 224.11846875000128,
+        "pairedRatio": 1.3816731379365155,
+        "percentChange": 38.167313793651545,
+        "interval95": [
+          1.3454119860097067,
+          1.4189115898671387
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 56.7554218750006,
+        "afterMicroseconds": 105.37630468749981,
+        "pairedRatio": 1.851181229796615,
+        "percentChange": 85.1181229796615,
+        "interval95": [
+          1.8103770150502474,
+          1.8929051336062144
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 162.72817968749996,
+        "afterMicroseconds": 162.82426562500075,
+        "pairedRatio": 0.9943425016277331,
+        "percentChange": -0.5657498372266923,
+        "interval95": [
+          0.9793224781457528,
+          1.0095928895815127
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 229.5476953125002,
+        "afterMicroseconds": 268.0683828125003,
+        "pairedRatio": 1.1768087651807013,
+        "percentChange": 17.680876518070132,
+        "interval95": [
+          1.157435706435661,
+          1.1965060885073957
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 151.10103515625008,
+        "afterMicroseconds": 185.79675781249972,
+        "pairedRatio": 1.2298632483017746,
+        "percentChange": 22.986324830177463,
+        "interval95": [
+          1.2101316031946974,
+          1.2499166252086031
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 49.07373046874986,
+        "afterMicroseconds": 32.03570703125003,
+        "pairedRatio": 0.6535272020912888,
+        "percentChange": -34.647279790871124,
+        "interval95": [
+          0.6291298990151177,
+          0.6788706188370253
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 167.58703906250005,
+        "afterMicroseconds": 238.01048437499972,
+        "pairedRatio": 1.4740890466736296,
+        "percentChange": 47.40890466736296,
+        "interval95": [
+          1.32350389941681,
+          1.6418074162687815
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 20.343190429687574,
+        "afterMicroseconds": 20.538128906249952,
+        "pairedRatio": 1.01321807361773,
+        "percentChange": 1.3218073617730086,
+        "interval95": [
+          0.9506256587188799,
+          1.0799317852298942
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 20.171086914062442,
+        "afterMicroseconds": 20.583306640625022,
+        "pairedRatio": 1.0098394979442111,
+        "percentChange": 0.9839497944211129,
+        "interval95": [
+          0.9803492769012236,
+          1.0402168243869323
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 13.80962402343744,
+        "afterMicroseconds": 14.09297265624998,
+        "pairedRatio": 1.1175017981836008,
+        "percentChange": 11.750179818360085,
+        "interval95": [
+          0.8922424446229545,
+          1.399631094070296
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 103.35755273437486,
+        "afterMicroseconds": 42.17415624999998,
+        "pairedRatio": 0.4140315343103731,
+        "percentChange": -58.59684656896269,
+        "interval95": [
+          0.388585303492811,
+          0.44114409336268956
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 83.30437890624975,
+        "afterMicroseconds": 41.604890624999946,
+        "pairedRatio": 0.4997150001207941,
+        "percentChange": -50.02849998792058,
+        "interval95": [
+          0.4858263414151853,
+          0.5140007036636157
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 117.45280859375006,
+        "afterMicroseconds": 43.97190039062515,
+        "pairedRatio": 0.3715069468964697,
+        "percentChange": -62.84930531035303,
+        "interval95": [
+          0.3452311220121905,
+          0.3997826464424687
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 61.729699218750156,
+        "afterMicroseconds": 42.46235742187476,
+        "pairedRatio": 0.695231173121327,
+        "percentChange": -30.476882687867302,
+        "interval95": [
+          0.6553090838985715,
+          0.7375853562171415
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 119.70370312500035,
+        "afterMicroseconds": 168.6307343750002,
+        "pairedRatio": 1.393844788812134,
+        "percentChange": 39.38447888121339,
+        "interval95": [
+          1.2255727034210042,
+          1.5852207624041361
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 92.24985156249943,
+        "afterMicroseconds": 129.92796875000056,
+        "pairedRatio": 1.4633943431681586,
+        "percentChange": 46.33943431681586,
+        "interval95": [
+          1.3097864411689246,
+          1.6350169281836164
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 170.62546874999995,
+        "afterMicroseconds": 159.22274218750056,
+        "pairedRatio": 0.9278694725716551,
+        "percentChange": -7.213052742834492,
+        "interval95": [
+          0.8163715989756253,
+          1.0545954308193748
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 107.85328906250058,
+        "afterMicroseconds": 127.75128125000012,
+        "pairedRatio": 1.170060769479378,
+        "percentChange": 17.00607694793781,
+        "interval95": [
+          1.0385726654669547,
+          1.318195875739842
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 77.48493359374997,
+        "afterMicroseconds": 99.06553906249994,
+        "pairedRatio": 1.2812453900916565,
+        "percentChange": 28.12453900916565,
+        "interval95": [
+          1.2197357302948308,
+          1.3458569006864471
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 28.46234765625022,
+        "afterMicroseconds": 17.013880859375163,
+        "pairedRatio": 0.5925630726710539,
+        "percentChange": -40.74369273289461,
+        "interval95": [
+          0.5398611912523448,
+          0.6504097734434725
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 174.9106562499998,
+        "afterMicroseconds": 231.06940624999962,
+        "pairedRatio": 1.3300273336465314,
+        "percentChange": 33.00273336465314,
+        "interval95": [
+          1.3071006275205364,
+          1.3533561770240286
+        ],
+        "result": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 12.982658203124942,
+        "afterMicroseconds": 12.609249999999905,
+        "pairedRatio": 0.9508853312606196,
+        "percentChange": -4.911466873938042,
+        "interval95": [
+          0.835741862858665,
+          1.081892571605603
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 12.61025976562513,
+        "afterMicroseconds": 12.53886328125009,
+        "pairedRatio": 1.0160874547041887,
+        "percentChange": 1.6087454704188708,
+        "interval95": [
+          0.9813037310743531,
+          1.052104137499717
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 7.217190429687603,
+        "afterMicroseconds": 7.671873046875222,
+        "pairedRatio": 1.0777572490325136,
+        "percentChange": 7.775724903251358,
+        "interval95": [
+          0.9202362870616186,
+          1.2622417787404139
+        ],
+        "result": "inconclusive"
+      }
+    ]
+  },
+  {
+    "file": "proofs/map-miss-cache-20261108/results/aa.json.gz",
+    "verified": true,
+    "mode": "aa",
+    "processes": 224,
+    "timedBatches": 2016,
+    "verifiedOutputs": 3256768,
+    "verifiedScalars": 3334930432,
+    "measuredBatchesBelow2ms": 0,
+    "warmupBatchesBelow2ms": 0,
+    "minimumMeasuredBatchMs": 3.3173229999999876,
+    "fixtureDigestsReconstructed": 14,
+    "rows": [
+      {
+        "runtime": "node",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 144.82870507812518,
+        "afterMicroseconds": 146.69700976562504,
+        "pairedRatio": 1.0157226181187473,
+        "percentChange": 1.5722618118747311,
+        "interval95": [
+          0.9615172110629117,
+          1.0729838479100293
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 144.7967441406248,
+        "afterMicroseconds": 145.398490234375,
+        "pairedRatio": 1.0033697698401425,
+        "percentChange": 0.3369769840142478,
+        "interval95": [
+          0.9696275857950427,
+          1.0382861521040356
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 397.7771503906249,
+        "afterMicroseconds": 389.37860156250025,
+        "pairedRatio": 1.0028133867415305,
+        "percentChange": 0.28133867415305325,
+        "interval95": [
+          0.9290951566736798,
+          1.0823807243042398
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 43.435601562500146,
+        "afterMicroseconds": 45.34673242187503,
+        "pairedRatio": 1.0147526329623822,
+        "percentChange": 1.4752632962382162,
+        "interval95": [
+          0.95655215742342,
+          1.0764942592129638
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 156.74479687500042,
+        "afterMicroseconds": 158.93005468750056,
+        "pairedRatio": 1.0041575052357887,
+        "percentChange": 0.41575052357887277,
+        "interval95": [
+          0.9784702347906352,
+          1.0305191302391714
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 55.23634374999986,
+        "afterMicroseconds": 55.31256250000016,
+        "pairedRatio": 0.999440947087139,
+        "percentChange": -0.05590529128609578,
+        "interval95": [
+          0.9732266590115538,
+          1.0263613285408155
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 160.1854062500001,
+        "afterMicroseconds": 162.2192812500005,
+        "pairedRatio": 1.0061748301260338,
+        "percentChange": 0.6174830126033815,
+        "interval95": [
+          0.9576092580269909,
+          1.0572034264424561
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 225.27814062499908,
+        "afterMicroseconds": 223.0581484374996,
+        "pairedRatio": 0.9931883987837887,
+        "percentChange": -0.6811601216211272,
+        "interval95": [
+          0.9867381704752265,
+          0.9996807917176563
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 149.04276171874997,
+        "afterMicroseconds": 145.90269140625,
+        "pairedRatio": 0.9747822572655671,
+        "percentChange": -2.521774273443289,
+        "interval95": [
+          0.9465617688304664,
+          1.0038441022753155
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 48.115636718750075,
+        "afterMicroseconds": 48.01890234375006,
+        "pairedRatio": 0.9933634350496056,
+        "percentChange": -0.6636564950394441,
+        "interval95": [
+          0.9284942205754294,
+          1.0627647348004017
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 161.98032031249988,
+        "afterMicroseconds": 158.1404687499992,
+        "pairedRatio": 0.9843740885427947,
+        "percentChange": -1.5625911457205266,
+        "interval95": [
+          0.9444952517067317,
+          1.0259367047568098
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 19.74912988281252,
+        "afterMicroseconds": 19.137278320312422,
+        "pairedRatio": 0.9846250178466939,
+        "percentChange": -1.5374982153306127,
+        "interval95": [
+          0.942593973643213,
+          1.0285302610438378
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 20.008283203124975,
+        "afterMicroseconds": 19.289562500000024,
+        "pairedRatio": 0.9494626493044406,
+        "percentChange": -5.053735069555943,
+        "interval95": [
+          0.8552827841675519,
+          1.054013174486633
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 10.996652343750025,
+        "afterMicroseconds": 8.425158203125061,
+        "pairedRatio": 0.8744735654521746,
+        "percentChange": -12.552643454782542,
+        "interval95": [
+          0.5187048224075428,
+          1.4742566169431446
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-ascii-16",
+        "role": "target",
+        "beforeMicroseconds": 96.63318164062495,
+        "afterMicroseconds": 93.51807031250003,
+        "pairedRatio": 0.9703505296307015,
+        "percentChange": -2.9649470369298547,
+        "interval95": [
+          0.9468115400407607,
+          0.9944747296954655
+        ],
+        "result": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-repeated-ascii-128",
+        "role": "target",
+        "beforeMicroseconds": 78.75233398437499,
+        "afterMicroseconds": 76.43645703125013,
+        "pairedRatio": 0.9718826627185915,
+        "percentChange": -2.8117337281408528,
+        "interval95": [
+          0.8436237964424681,
+          1.1196411410822438
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-repeated-unicode-128",
+        "role": "target",
+        "beforeMicroseconds": 111.68712304687523,
+        "afterMicroseconds": 112.7479296874998,
+        "pairedRatio": 1.0057553705637017,
+        "percentChange": 0.5755370563701678,
+        "interval95": [
+          0.9594271770765327,
+          1.0543206296281922
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-repeated-misses",
+        "role": "short-key",
+        "beforeMicroseconds": 59.4845156249999,
+        "afterMicroseconds": 57.469183593750195,
+        "pairedRatio": 0.9412283687379323,
+        "percentChange": -5.877163126206774,
+        "interval95": [
+          0.8458303639512045,
+          1.0473859533472327
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 113.59576562499996,
+        "afterMicroseconds": 112.66746875000067,
+        "pairedRatio": 0.9978326104567853,
+        "percentChange": -0.2167389543214715,
+        "interval95": [
+          0.9351223106410338,
+          1.0647483298826041
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-short-cold-misses",
+        "role": "admission-control",
+        "beforeMicroseconds": 84.397375,
+        "afterMicroseconds": 85.46601562499933,
+        "pairedRatio": 1.0168743145682346,
+        "percentChange": 1.6874314568234627,
+        "interval95": [
+          0.989152351736172,
+          1.045373212542708
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-cold-hits",
+        "role": "first-hit-control",
+        "beforeMicroseconds": 146.38574218750034,
+        "afterMicroseconds": 154.75971875000027,
+        "pairedRatio": 1.0507151899363947,
+        "percentChange": 5.071518993639468,
+        "interval95": [
+          0.9767065809792408,
+          1.1303317002903852
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-streaming-misses",
+        "role": "streaming-control",
+        "beforeMicroseconds": 101.53361718750008,
+        "afterMicroseconds": 102.49425781250032,
+        "pairedRatio": 1.0158421715714416,
+        "percentChange": 1.5842171571441632,
+        "interval95": [
+          0.7828840424689705,
+          1.318120259915609
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-over-budget-misses",
+        "role": "capacity-control",
+        "beforeMicroseconds": 74.71979687499974,
+        "afterMicroseconds": 72.37778124999971,
+        "pairedRatio": 0.9804839318588991,
+        "percentChange": -1.951606814110085,
+        "interval95": [
+          0.9314061351737558,
+          1.0321477434268185
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-mixed",
+        "role": "mixed-control",
+        "beforeMicroseconds": 25.79043750000021,
+        "afterMicroseconds": 27.379218749999936,
+        "pairedRatio": 1.0408591037775343,
+        "percentChange": 4.085910377753432,
+        "interval95": [
+          0.7973443051332574,
+          1.358745107906062
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-alternating-roots",
+        "role": "root-control",
+        "beforeMicroseconds": 165.4785546875006,
+        "afterMicroseconds": 167.87238281249995,
+        "pairedRatio": 1.0178856092933266,
+        "percentChange": 1.788560929332661,
+        "interval95": [
+          0.9478508956007219,
+          1.0930950410188733
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 12.54273242187498,
+        "afterMicroseconds": 12.079681640625006,
+        "pairedRatio": 0.9743613533643678,
+        "percentChange": -2.56386466356322,
+        "interval95": [
+          0.5857324148969046,
+          1.6208425943050184
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-warm-hits-after-miss",
+        "role": "shape-control",
+        "beforeMicroseconds": 12.801738281250085,
+        "afterMicroseconds": 12.513519531250017,
+        "pairedRatio": 1.075190356138583,
+        "percentChange": 7.519035613858294,
+        "interval95": [
+          0.7718852738703964,
+          1.4976763271267137
+        ],
+        "result": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "has-warm-hits",
+        "role": "control",
+        "beforeMicroseconds": 8.909306640625058,
+        "afterMicroseconds": 7.095671874999709,
+        "pairedRatio": 0.8216538873954824,
+        "percentChange": -17.83461126045176,
+        "interval95": [
+          0.6959734567420612,
+          0.9700299690054365
+        ],
+        "result": "faster"
+      }
+    ]
+  }
+]

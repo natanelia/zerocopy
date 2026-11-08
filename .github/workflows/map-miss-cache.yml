@@ -1,4 +1,4 @@
-name: Map miss cache verification
+name: Rejected Map miss cache archive verification
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - 'proofs/map-miss-cache-20261108/**'
       - '.github/workflows/map-miss-cache.yml'
   push:
-    branches: [main, perf/map-miss-cache-20261108]
+    branches: [main]
     paths:
       - 'map-miss-cache.test.ts'
       - 'proofs/map-miss-cache-20261108/**'
@@ -24,7 +24,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,21 +61,46 @@ jobs:
           bun install
           bun run build:wasm
           bun run build:browser
+      - name: Build the recorded candidate for historical evidence
+        shell: bash
+        run: |
+          recorded_commit="$(node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync } from 'node:fs';
+          import { gunzipSync } from 'node:zlib';
+          const plain = 'proofs/map-miss-cache-20261108/results/formal.json';
+          const path = existsSync(plain) ? plain : `${plain}.gz`;
+          const bytes = readFileSync(path);
+          const record = JSON.parse((path.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
+          assert.match(record.source.after.commit, /^[a-f0-9]{40}$/);
+          process.stdout.write(record.source.after.commit);
+          JS
+          )"
+          recorded_checkout="$RUNNER_TEMP/map-miss-cache-recorded"
+          if ! git cat-file -e "$recorded_commit^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$recorded_commit"
+          fi
+          git worktree add --detach "$recorded_checkout" "$recorded_commit"
+          printf 'MAP_MISS_RECORDED=%s\n' "$recorded_checkout" >> "$GITHUB_ENV"
+          cd "$recorded_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
       - name: Run focused Node and Bun regressions
         shell: bash
         run: |
           node node_modules/vitest/vitest.mjs run map-miss-cache.test.ts hot-path.test.ts map-memory.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/node-tests.log
           bun --bun node_modules/vitest/vitest.mjs run map-miss-cache.test.ts hot-path.test.ts map-memory.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/bun-tests.log
           bun run check:package 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/package.log
-      - name: Verify every workload without timing
+      - name: Verify historical workloads and cache bounds without timing
         shell: bash
         run: |
           node proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/node-baseline-smoke.json
-          node proofs/map-miss-cache-20261108/smoke.mjs . > proofs/map-miss-cache-20261108/ci-logs/node-candidate-smoke.json
+          node proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_RECORDED" > proofs/map-miss-cache-20261108/ci-logs/node-candidate-smoke.json
           bun proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/bun-baseline-smoke.json
-          bun proofs/map-miss-cache-20261108/smoke.mjs . > proofs/map-miss-cache-20261108/ci-logs/bun-candidate-smoke.json
+          bun proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_RECORDED" > proofs/map-miss-cache-20261108/ci-logs/bun-candidate-smoke.json
           node proofs/map-miss-cache-20261108/cache-budget.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/cache-budget-before.json
-          node proofs/map-miss-cache-20261108/cache-budget.mjs . > proofs/map-miss-cache-20261108/ci-logs/cache-budget-after.json
+          node proofs/map-miss-cache-20261108/cache-budget.mjs "$MAP_MISS_RECORDED" > proofs/map-miss-cache-20261108/ci-logs/cache-budget-after.json
       - name: Check real workers and older readers
         shell: bash
         run: |
@@ -86,21 +111,11 @@ jobs:
       - name: Check real Chromium workers
         shell: bash
         run: node proofs/map-miss-cache-20261108/browser.mjs . 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/chromium.log
-      - name: Collect the frozen study on this dedicated runner
-        shell: bash
-        run: |
-          proof=proofs/map-miss-cache-20261108
-          mkdir -p "$proof/results"
-          benchmark_cpu="$(awk '/Cpus_allowed_list/ { split($2, ranges, /[,-]/); print ranges[1] }' /proc/self/status)"
-          printf 'Benchmark CPU: %s\n' "$benchmark_cpu" | tee "$proof/ci-logs/affinity.log"
-          for mode in pilot formal aa; do
-            if [[ ! -e "$proof/results/$mode.json" && ! -e "$proof/results/$mode.json.gz" ]]; then
-              taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" "$proof/workloads.mjs" "$MAP_MISS_BASELINE" . "$(command -v bun)" "$proof/results/$mode.json" "$mode" 2>&1 | tee "$proof/ci-logs/$mode.log"
-            fi
-          done
       - name: Audit raw measurements and source hashes
         shell: bash
-        run: node proofs/map-miss-cache-20261108/audit-evidence.mjs . "$MAP_MISS_BASELINE" 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/evidence.log
+        run: |
+          node proofs/map-miss-cache-20261108/audit-evidence.mjs "$MAP_MISS_RECORDED" "$MAP_MISS_BASELINE" 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/evidence.log
+          python proofs/map-miss-cache-20261108/validation/independent-audit.py proofs/map-miss-cache-20261108/results/pilot.json.gz proofs/map-miss-cache-20261108/results/formal.json.gz proofs/map-miss-cache-20261108/results/aa.json.gz > proofs/map-miss-cache-20261108/ci-logs/independent-audit.json
       - name: Retain all evidence, including partial runs
         if: always()
         uses: actions/upload-artifact@v4

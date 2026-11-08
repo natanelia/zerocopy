@@ -1,0 +1,2 @@
+$ node scripts/check-package.mjs
+Package zerocopy@0.2.1: 145 files, 220964 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.

@@ -1,0 +1,1806 @@
+{
+  "passed": true,
+  "decision": "reject-miss-cache-no-pr",
+  "method": "Independent Python recomputation from retained batch samples using SciPy Student-t quantiles; no repository verifier or timing execution.",
+  "baselineCommit": "a4265a0608ec25eec5719496225212db6b251989",
+  "candidateCommit": "2671a2b19725758f749280d9b0dedfde645baf2b",
+  "currentFrozenSourceBuildHashesMatch": true,
+  "identityFileCounts": {
+    "before": {
+      "sources": 70,
+      "wasm": 12,
+      "bundles": 12
+    },
+    "after": {
+      "sources": 70,
+      "wasm": 12,
+      "bundles": 12
+    }
+  },
+  "driverSha256": "caed1d826b8d65e9279c4665d3bf0076b5da7867b308ccbc1937e7f38e3284f4",
+  "workloadSha256": "48e017b7726145da882b1ada8286092d21e840dc19e3e925336b8e8b1d904c03",
+  "allThreeStudiesComplete": true,
+  "aaUsesIdenticalSourceWasmAndBundles": true,
+  "records": {
+    "formal": {
+      "rawSha256": "1f080418fdff3fe3e4851d1eb3ad51ca08c8a73fc6495707f2c9b759846ea952",
+      "processes": 336,
+      "measuredBatches": 3024,
+      "verifiedOutputs": 5017344,
+      "measuredBatchesBelow2ms": 0,
+      "minimumMeasuredBatchMs": 3.294247999999925,
+      "runsWithoutStrategyField": 336,
+      "processesWithOver20PercentLateMovement": 40,
+      "lateMovement": [
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.2078584579034977,
+          "lastThreeSamplesOverFirstThreeSamples": 1.1637751954890518
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1396161333944261,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7608687659261951
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.9719464454844572,
+          "lastThreeSamplesOverFirstThreeSamples": 0.534779126955104
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "get-alternating-roots",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1941133868917226,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6906394841252188
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.1911807196681652,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5707353395960254
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.166312028376336,
+          "lastThreeSamplesOverFirstThreeSamples": 0.703863836441721
+        },
+        {
+          "pair": 0,
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1374153173792212,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7621045325299426
+        },
+        {
+          "pair": 0,
+          "runtime": "bun",
+          "name": "get-short-cold-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.2561092892747472,
+          "lastThreeSamplesOverFirstThreeSamples": 1.3539717448838786
+        },
+        {
+          "pair": 0,
+          "runtime": "bun",
+          "name": "get-mixed",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.9890091908733779,
+          "lastThreeSamplesOverFirstThreeSamples": 1.211728823147066
+        },
+        {
+          "pair": 1,
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0324881830035086,
+          "lastThreeSamplesOverFirstThreeSamples": 1.2765480418018813
+        },
+        {
+          "pair": 1,
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.2130186651423622,
+          "lastThreeSamplesOverFirstThreeSamples": 1.15048631036997
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.196786492337809,
+          "lastThreeSamplesOverFirstThreeSamples": 1.2216708322479912
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.7981696931835001,
+          "lastThreeSamplesOverFirstThreeSamples": 1.0046238078495413
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.031473701831526,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7938158657763865
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0192098473855136,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6904505123849802
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.074613268663269,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7808961880781367
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1351951763611383,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7409295736433767
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.8059701176650518,
+          "lastThreeSamplesOverFirstThreeSamples": 0.4969869558775158
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.2014970104745801,
+          "lastThreeSamplesOverFirstThreeSamples": 1.118236859029317
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.2090953568819616,
+          "lastThreeSamplesOverFirstThreeSamples": 0.993717347473032
+        },
+        {
+          "pair": 3,
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1012893505840642,
+          "lastThreeSamplesOverFirstThreeSamples": 1.308517010408308
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1943028445771706,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5713190095622566
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.2169042876765184,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5947945919660325
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0020690469396163,
+          "lastThreeSamplesOverFirstThreeSamples": 1.4260926373053384
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.1089375053144315,
+          "lastThreeSamplesOverFirstThreeSamples": 1.225187947939022
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.4904099461818923,
+          "lastThreeSamplesOverFirstThreeSamples": 1.4510525632068647
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.073630605310999,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7706368424897628
+        },
+        {
+          "pair": 4,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.011482474769818,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6738903190715442
+        },
+        {
+          "pair": 4,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.095644943821973,
+          "lastThreeSamplesOverFirstThreeSamples": 0.4760840458662956
+        },
+        {
+          "pair": 4,
+          "runtime": "bun",
+          "name": "get-short-repeated-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.2125683888200312,
+          "lastThreeSamplesOverFirstThreeSamples": 0.9643833430153381
+        },
+        {
+          "pair": 4,
+          "runtime": "bun",
+          "name": "get-over-budget-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.9593371716152695,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6285245180417244
+        },
+        {
+          "pair": 5,
+          "runtime": "bun",
+          "name": "get-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.7964667659229456,
+          "lastThreeSamplesOverFirstThreeSamples": 0.9064703766770806
+        },
+        {
+          "pair": 5,
+          "runtime": "bun",
+          "name": "get-cold-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.374391831463503,
+          "lastThreeSamplesOverFirstThreeSamples": 1.7742747881886685
+        },
+        {
+          "pair": 5,
+          "runtime": "bun",
+          "name": "get-short-cold-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.722603522020635,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6562583034892904
+        },
+        {
+          "pair": 5,
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.9727952030554927,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7138531535139127
+        },
+        {
+          "pair": 5,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.092165152560489,
+          "lastThreeSamplesOverFirstThreeSamples": 0.598633903964571
+        },
+        {
+          "pair": 5,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.5884102104950264,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5872334451456137
+        },
+        {
+          "pair": 5,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0450189916343902,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7505698821548185
+        },
+        {
+          "pair": 5,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.008045999680422,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6847158250047696
+        },
+        {
+          "pair": 5,
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.005718523576063,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7006425423820161
+        }
+      ],
+      "rows": [
+        {
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.15089371093750015,
+          "afterMs": 0.07447814062499991,
+          "pairedRatio": 0.4845349788581573,
+          "changePercent": -51.54650211418428,
+          "interval95": [
+            0.4518333751425238,
+            0.5196033729536227
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.1472580546875002,
+          "afterMs": 0.0670205117187499,
+          "pairedRatio": 0.48882903700837826,
+          "changePercent": -51.11709629916217,
+          "interval95": [
+            0.4125297995887113,
+            0.5792401607369296
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.45190459375000014,
+          "afterMs": 0.07886807812499996,
+          "pairedRatio": 0.16853153986728733,
+          "changePercent": -83.14684601327127,
+          "interval95": [
+            0.15456729030332897,
+            0.18375737760751398
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.045277498046874864,
+          "afterMs": 0.0697799414062501,
+          "pairedRatio": 1.5476984375017466,
+          "changePercent": 54.769843750174665,
+          "interval95": [
+            1.431564254780723,
+            1.6732538867507938
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-misses",
+          "beforeMs": 0.16410658593749972,
+          "afterMs": 0.2241184687500013,
+          "pairedRatio": 1.3816731379365155,
+          "changePercent": 38.167313793651545,
+          "interval95": [
+            1.3454119860097067,
+            1.4189115898671387
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.0567554218750006,
+          "afterMs": 0.10537630468749981,
+          "pairedRatio": 1.851181229796615,
+          "changePercent": 85.1181229796615,
+          "interval95": [
+            1.8103770150502474,
+            1.8929051336062144
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "beforeMs": 0.16272817968749997,
+          "afterMs": 0.16282426562500074,
+          "pairedRatio": 0.9943425016277331,
+          "changePercent": -0.5657498372266923,
+          "interval95": [
+            0.9793224781457528,
+            1.0095928895815127
+          ],
+          "fasterPairs": 3,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.2295476953125002,
+          "afterMs": 0.26806838281250034,
+          "pairedRatio": 1.1768087651807013,
+          "changePercent": 17.680876518070132,
+          "interval95": [
+            1.1574357064356613,
+            1.1965060885073955
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.15110103515625006,
+          "afterMs": 0.1857967578124997,
+          "pairedRatio": 1.2298632483017746,
+          "changePercent": 22.986324830177463,
+          "interval95": [
+            1.2101316031946974,
+            1.2499166252086031
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-mixed",
+          "beforeMs": 0.049073730468749854,
+          "afterMs": 0.03203570703125003,
+          "pairedRatio": 0.6535272020912888,
+          "changePercent": -34.647279790871124,
+          "interval95": [
+            0.6291298990151177,
+            0.6788706188370253
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "node",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.16758703906250005,
+          "afterMs": 0.23801048437499972,
+          "pairedRatio": 1.4740890466736296,
+          "changePercent": 47.40890466736296,
+          "interval95": [
+            1.3235038994168102,
+            1.6418074162687812
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits",
+          "beforeMs": 0.020343190429687574,
+          "afterMs": 0.020538128906249953,
+          "pairedRatio": 1.01321807361773,
+          "changePercent": 1.3218073617730086,
+          "interval95": [
+            0.9506256587188799,
+            1.0799317852298942
+          ],
+          "fasterPairs": 1,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.02017108691406244,
+          "afterMs": 0.02058330664062502,
+          "pairedRatio": 1.0098394979442111,
+          "changePercent": 0.9839497944211129,
+          "interval95": [
+            0.9803492769012236,
+            1.0402168243869323
+          ],
+          "fasterPairs": 2,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "beforeMs": 0.013809624023437439,
+          "afterMs": 0.01409297265624998,
+          "pairedRatio": 1.1175017981836008,
+          "changePercent": 11.750179818360085,
+          "interval95": [
+            0.8922424446229545,
+            1.399631094070296
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.10335755273437486,
+          "afterMs": 0.04217415624999998,
+          "pairedRatio": 0.4140315343103731,
+          "changePercent": -58.59684656896269,
+          "interval95": [
+            0.388585303492811,
+            0.44114409336268956
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.08330437890624975,
+          "afterMs": 0.041604890624999946,
+          "pairedRatio": 0.4997150001207941,
+          "changePercent": -50.02849998792058,
+          "interval95": [
+            0.4858263414151853,
+            0.5140007036636157
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.11745280859375007,
+          "afterMs": 0.04397190039062515,
+          "pairedRatio": 0.3715069468964697,
+          "changePercent": -62.84930531035303,
+          "interval95": [
+            0.3452311220121905,
+            0.3997826464424687
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.061729699218750156,
+          "afterMs": 0.042462357421874763,
+          "pairedRatio": 0.695231173121327,
+          "changePercent": -30.476882687867302,
+          "interval95": [
+            0.6553090838985715,
+            0.7375853562171415
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "beforeMs": 0.11970370312500034,
+          "afterMs": 0.1686307343750002,
+          "pairedRatio": 1.393844788812134,
+          "changePercent": 39.38447888121339,
+          "interval95": [
+            1.2255727034210042,
+            1.5852207624041361
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.09224985156249943,
+          "afterMs": 0.12992796875000057,
+          "pairedRatio": 1.4633943431681586,
+          "changePercent": 46.33943431681586,
+          "interval95": [
+            1.3097864411689246,
+            1.6350169281836164
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-hits",
+          "beforeMs": 0.17062546874999995,
+          "afterMs": 0.15922274218750054,
+          "pairedRatio": 0.9278694725716551,
+          "changePercent": -7.213052742834492,
+          "interval95": [
+            0.8163715989756253,
+            1.0545954308193748
+          ],
+          "fasterPairs": 5,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.10785328906250058,
+          "afterMs": 0.12775128125000013,
+          "pairedRatio": 1.170060769479378,
+          "changePercent": 17.00607694793781,
+          "interval95": [
+            1.0385726654669547,
+            1.318195875739842
+          ],
+          "fasterPairs": 1,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.07748493359374997,
+          "afterMs": 0.09906553906249993,
+          "pairedRatio": 1.2812453900916565,
+          "changePercent": 28.12453900916565,
+          "interval95": [
+            1.2197357302948308,
+            1.3458569006864471
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-mixed",
+          "beforeMs": 0.02846234765625022,
+          "afterMs": 0.017013880859375163,
+          "pairedRatio": 0.5925630726710539,
+          "changePercent": -40.74369273289461,
+          "interval95": [
+            0.5398611912523448,
+            0.6504097734434725
+          ],
+          "fasterPairs": 6,
+          "pairs": 6,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.1749106562499998,
+          "afterMs": 0.2310694062499996,
+          "pairedRatio": 1.3300273336465314,
+          "changePercent": 33.00273336465314,
+          "interval95": [
+            1.3071006275205364,
+            1.3533561770240286
+          ],
+          "fasterPairs": 0,
+          "pairs": 6,
+          "classification": "slower"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits",
+          "beforeMs": 0.012982658203124942,
+          "afterMs": 0.012609249999999905,
+          "pairedRatio": 0.9508853312606196,
+          "changePercent": -4.911466873938042,
+          "interval95": [
+            0.8357418628586651,
+            1.081892571605603
+          ],
+          "fasterPairs": 2,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.012610259765625131,
+          "afterMs": 0.01253886328125009,
+          "pairedRatio": 1.0160874547041887,
+          "changePercent": 1.6087454704188708,
+          "interval95": [
+            0.9813037310743531,
+            1.052104137499717
+          ],
+          "fasterPairs": 1,
+          "pairs": 6,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-warm-hits",
+          "beforeMs": 0.007217190429687603,
+          "afterMs": 0.007671873046875222,
+          "pairedRatio": 1.0777572490325136,
+          "changePercent": 7.775724903251358,
+          "interval95": [
+            0.9202362870616188,
+            1.2622417787404137
+          ],
+          "fasterPairs": 1,
+          "pairs": 6,
+          "classification": "inconclusive"
+        }
+      ]
+    },
+    "aa": {
+      "rawSha256": "1f89f26e0ce870b6f2faed36f0f6c4c302723091ff7a1660504f61d298e0a627",
+      "processes": 224,
+      "measuredBatches": 2016,
+      "verifiedOutputs": 3256768,
+      "measuredBatchesBelow2ms": 0,
+      "minimumMeasuredBatchMs": 3.3173229999999876,
+      "runsWithoutStrategyField": 224,
+      "processesWithOver20PercentLateMovement": 15,
+      "lateMovement": [
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "get-warm-hits-after-miss",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.0871692711049714,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7963733043714242
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.1815600864309255,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6115604274714362
+        },
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1380456581458855,
+          "lastThreeSamplesOverFirstThreeSamples": 0.594822897189468
+        },
+        {
+          "pair": 1,
+          "runtime": "bun",
+          "name": "get-warm-hits-after-miss",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.7941121299419133,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7277496712295028
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.7079908686319512,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5764078295294751
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.5772222132082548,
+          "lastThreeSamplesOverFirstThreeSamples": 1.2667859980816114
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.005958841840855,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5111075236127839
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.0560807442888809,
+          "lastThreeSamplesOverFirstThreeSamples": 1.232672152200145
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.198395046711726,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5741988379336901
+        },
+        {
+          "pair": 2,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.6540487986457001,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5638393378552548
+        },
+        {
+          "pair": 3,
+          "runtime": "bun",
+          "name": "get-cold-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0713564150284336,
+          "lastThreeSamplesOverFirstThreeSamples": 1.2417336151060978
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.5937529889460257,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6052982577974748
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.5904921182077773,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5886024615775565
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "get-warm-hits-after-miss",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.0319563418915145,
+          "lastThreeSamplesOverFirstThreeSamples": 1.5416019587473637
+        },
+        {
+          "pair": 3,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 1.0197935795362376,
+          "lastThreeSamplesOverFirstThreeSamples": 1.2420531173502634
+        }
+      ],
+      "rows": [
+        {
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.14482870507812518,
+          "afterMs": 0.14669700976562505,
+          "pairedRatio": 1.0157226181187473,
+          "changePercent": 1.5722618118747311,
+          "interval95": [
+            0.9615172110629209,
+            1.072983847910019
+          ],
+          "fasterPairs": 1,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.14479674414062482,
+          "afterMs": 0.145398490234375,
+          "pairedRatio": 1.0033697698401425,
+          "changePercent": 0.3369769840142478,
+          "interval95": [
+            0.9696275857950485,
+            1.0382861521040294
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.3977771503906249,
+          "afterMs": 0.38937860156250026,
+          "pairedRatio": 1.0028133867415305,
+          "changePercent": 0.28133867415305325,
+          "interval95": [
+            0.9290951566736921,
+            1.0823807243042254
+          ],
+          "fasterPairs": 1,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.04343560156250015,
+          "afterMs": 0.045346732421875036,
+          "pairedRatio": 1.0147526329623822,
+          "changePercent": 1.4752632962382162,
+          "interval95": [
+            0.9565521574234299,
+            1.0764942592129527
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-misses",
+          "beforeMs": 0.15674479687500043,
+          "afterMs": 0.15893005468750054,
+          "pairedRatio": 1.0041575052357887,
+          "changePercent": 0.41575052357887277,
+          "interval95": [
+            0.9784702347906397,
+            1.0305191302391667
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.05523634374999986,
+          "afterMs": 0.05531256250000016,
+          "pairedRatio": 0.999440947087139,
+          "changePercent": -0.05590529128609578,
+          "interval95": [
+            0.9732266590115582,
+            1.0263613285408106
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "beforeMs": 0.1601854062500001,
+          "afterMs": 0.1622192812500005,
+          "pairedRatio": 1.0061748301260338,
+          "changePercent": 0.6174830126033815,
+          "interval95": [
+            0.9576092580269993,
+            1.057203426442447
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.22527814062499907,
+          "afterMs": 0.2230581484374996,
+          "pairedRatio": 0.9931883987837887,
+          "changePercent": -0.6811601216211272,
+          "interval95": [
+            0.9867381704752276,
+            0.9996807917176552
+          ],
+          "fasterPairs": 4,
+          "pairs": 4,
+          "classification": "faster"
+        },
+        {
+          "runtime": "node",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.14904276171874997,
+          "afterMs": 0.14590269140625,
+          "pairedRatio": 0.9747822572655671,
+          "changePercent": -2.521774273443289,
+          "interval95": [
+            0.9465617688304713,
+            1.0038441022753104
+          ],
+          "fasterPairs": 4,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-mixed",
+          "beforeMs": 0.04811563671875008,
+          "afterMs": 0.04801890234375006,
+          "pairedRatio": 0.9933634350496056,
+          "changePercent": -0.6636564950394441,
+          "interval95": [
+            0.9284942205754403,
+            1.062764734800389
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.16198032031249987,
+          "afterMs": 0.1581404687499992,
+          "pairedRatio": 0.9843740885427947,
+          "changePercent": -1.5625911457205266,
+          "interval95": [
+            0.9444952517067384,
+            1.0259367047568024
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits",
+          "beforeMs": 0.01974912988281252,
+          "afterMs": 0.019137278320312423,
+          "pairedRatio": 0.9846250178466939,
+          "changePercent": -1.5374982153306127,
+          "interval95": [
+            0.9425939736432201,
+            1.02853026104383
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.020008283203124977,
+          "afterMs": 0.019289562500000024,
+          "pairedRatio": 0.9494626493044406,
+          "changePercent": -5.053735069555943,
+          "interval95": [
+            0.8552827841675675,
+            1.0540131744866137
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "beforeMs": 0.010996652343750024,
+          "afterMs": 0.00842515820312506,
+          "pairedRatio": 0.8744735654521746,
+          "changePercent": -12.552643454782542,
+          "interval95": [
+            0.5187048224075901,
+            1.4742566169430102
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.09663318164062495,
+          "afterMs": 0.09351807031250003,
+          "pairedRatio": 0.9703505296307015,
+          "changePercent": -2.9649470369298547,
+          "interval95": [
+            0.9468115400407647,
+            0.9944747296954612
+          ],
+          "fasterPairs": 4,
+          "pairs": 4,
+          "classification": "faster"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.07875233398437498,
+          "afterMs": 0.07643645703125013,
+          "pairedRatio": 0.9718826627185915,
+          "changePercent": -2.8117337281408528,
+          "interval95": [
+            0.843623796442489,
+            1.119641141082216
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.11168712304687523,
+          "afterMs": 0.1127479296874998,
+          "pairedRatio": 1.0057553705637017,
+          "changePercent": 0.5755370563701678,
+          "interval95": [
+            0.9594271770765406,
+            1.0543206296281835
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.0594845156249999,
+          "afterMs": 0.057469183593750195,
+          "pairedRatio": 0.9412283687379323,
+          "changePercent": -5.877163126206774,
+          "interval95": [
+            0.8458303639512202,
+            1.0473859533472132
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "beforeMs": 0.11359576562499996,
+          "afterMs": 0.11266746875000067,
+          "pairedRatio": 0.9978326104567853,
+          "changePercent": -0.2167389543214715,
+          "interval95": [
+            0.9351223106410443,
+            1.0647483298825922
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.084397375,
+          "afterMs": 0.08546601562499934,
+          "pairedRatio": 1.0168743145682346,
+          "changePercent": 1.6874314568234627,
+          "interval95": [
+            0.9891523517361768,
+            1.0453732125427029
+          ],
+          "fasterPairs": 1,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-hits",
+          "beforeMs": 0.14638574218750033,
+          "afterMs": 0.15475971875000027,
+          "pairedRatio": 1.0507151899363947,
+          "changePercent": 5.071518993639468,
+          "interval95": [
+            0.9767065809792532,
+            1.1303317002903708
+          ],
+          "fasterPairs": 1,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.10153361718750009,
+          "afterMs": 0.10249425781250032,
+          "pairedRatio": 1.0158421715714416,
+          "changePercent": 1.5842171571441632,
+          "interval95": [
+            0.7828840424690061,
+            1.318120259915549
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.07471979687499974,
+          "afterMs": 0.07237778124999972,
+          "pairedRatio": 0.9804839318588991,
+          "changePercent": -1.951606814110085,
+          "interval95": [
+            0.9314061351737641,
+            1.0321477434268094
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-mixed",
+          "beforeMs": 0.025790437500000207,
+          "afterMs": 0.027379218749999934,
+          "pairedRatio": 1.0408591037775343,
+          "changePercent": 4.085910377753432,
+          "interval95": [
+            0.7973443051332945,
+            1.3587451079059987
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.1654785546875006,
+          "afterMs": 0.16787238281249994,
+          "pairedRatio": 1.0178856092933266,
+          "changePercent": 1.788560929332661,
+          "interval95": [
+            0.9478508956007338,
+            1.0930950410188598
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits",
+          "beforeMs": 0.01254273242187498,
+          "afterMs": 0.012079681640625006,
+          "pairedRatio": 0.9743613533643678,
+          "changePercent": -2.56386466356322,
+          "interval95": [
+            0.5857324148969567,
+            1.6208425943048745
+          ],
+          "fasterPairs": 2,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.012801738281250086,
+          "afterMs": 0.012513519531250017,
+          "pairedRatio": 1.075190356138583,
+          "changePercent": 7.519035613858294,
+          "interval95": [
+            0.7718852738704409,
+            1.4976763271266271
+          ],
+          "fasterPairs": 3,
+          "pairs": 4,
+          "classification": "inconclusive"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-warm-hits",
+          "beforeMs": 0.008909306640625059,
+          "afterMs": 0.007095671874999709,
+          "pairedRatio": 0.8216538873954824,
+          "changePercent": -17.83461126045176,
+          "interval95": [
+            0.6959734567420813,
+            0.9700299690054084
+          ],
+          "fasterPairs": 4,
+          "pairs": 4,
+          "classification": "faster"
+        }
+      ]
+    },
+    "pilot": {
+      "rawSha256": "96fee8667d6b19193831704bb02f8da87f7868e6174ef66371a49bfb23362c97",
+      "processes": 112,
+      "measuredBatches": 1008,
+      "verifiedOutputs": 1649472,
+      "measuredBatchesBelow2ms": 0,
+      "minimumMeasuredBatchMs": 3.4587060000000065,
+      "runsWithoutStrategyField": 112,
+      "processesWithOver20PercentLateMovement": 8,
+      "lateMovement": [
+        {
+          "pair": 0,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.044865500489546,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7950477475422012
+        },
+        {
+          "pair": 0,
+          "runtime": "bun",
+          "name": "get-over-budget-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.9637762351165764,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6565116063065274
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.6030468220128621,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6022366822536772
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "variant": "before",
+          "sampleMedianOverLastNineWarmupMedian": 0.6195598857028904,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5969282116169958
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-short-repeated-misses",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 0.9911186118913415,
+          "lastThreeSamplesOverFirstThreeSamples": 0.5638290157605285
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.1628176990490435,
+          "lastThreeSamplesOverFirstThreeSamples": 0.7626109048251253
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0377362180131993,
+          "lastThreeSamplesOverFirstThreeSamples": 0.6997071526868167
+        },
+        {
+          "pair": 1,
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "variant": "after",
+          "sampleMedianOverLastNineWarmupMedian": 1.0650899097704758,
+          "lastThreeSamplesOverFirstThreeSamples": 0.792418004374019
+        }
+      ],
+      "rows": [
+        {
+          "runtime": "node",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.1559311875,
+          "afterMs": 0.07605023437500003,
+          "pairedRatio": 0.4876640125258467,
+          "changePercent": -51.23359874741533,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.14780230664062488,
+          "afterMs": 0.0677180195312499,
+          "pairedRatio": 0.45805306875602425,
+          "changePercent": -54.194693124397574,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.45290111328124993,
+          "afterMs": 0.07911448828125,
+          "pairedRatio": 0.17436766607500725,
+          "changePercent": -82.56323339249927,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.04607983593750009,
+          "afterMs": 0.06662909375000003,
+          "pairedRatio": 1.445501692722346,
+          "changePercent": 44.550169272234605,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-misses",
+          "beforeMs": 0.16055135937499987,
+          "afterMs": 0.21423232812500004,
+          "pairedRatio": 1.3344175933619018,
+          "changePercent": 33.44175933619018,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.056144140624999395,
+          "afterMs": 0.10360078124999994,
+          "pairedRatio": 1.845813444033603,
+          "changePercent": 84.58134440336029,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-cold-hits",
+          "beforeMs": 0.15926097656250082,
+          "afterMs": 0.16227082812499916,
+          "pairedRatio": 1.0189259889764637,
+          "changePercent": 1.8925988976463692,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.2287495234375001,
+          "afterMs": 0.2705178281249996,
+          "pairedRatio": 1.182584401626336,
+          "changePercent": 18.258440162633605,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.14727195312499974,
+          "afterMs": 0.1794167460937497,
+          "pairedRatio": 1.2182222988364344,
+          "changePercent": 21.82222988364344,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-mixed",
+          "beforeMs": 0.047724277343750066,
+          "afterMs": 0.031409593750000075,
+          "pairedRatio": 0.6578233572307968,
+          "changePercent": -34.217664276920324,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.16223834375000035,
+          "afterMs": 0.23100798437499925,
+          "pairedRatio": 1.4241939901316563,
+          "changePercent": 42.419399013165624,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits",
+          "beforeMs": 0.021029468750000002,
+          "afterMs": 0.02107658105468757,
+          "pairedRatio": 1.0024279590148106,
+          "changePercent": 0.24279590148106323,
+          "interval95": null,
+          "fasterPairs": 1,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.01976630371093746,
+          "afterMs": 0.01957466699218735,
+          "pairedRatio": 0.9900183852516796,
+          "changePercent": -0.9981614748320378,
+          "interval95": null,
+          "fasterPairs": 1,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "node",
+          "name": "has-warm-hits",
+          "beforeMs": 0.011233533203125035,
+          "afterMs": 0.010922468750000025,
+          "pairedRatio": 0.9724938136548812,
+          "changePercent": -2.750618634511881,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-ascii-16",
+          "beforeMs": 0.09811935546875006,
+          "afterMs": 0.041263634765625,
+          "pairedRatio": 0.42050324489876556,
+          "changePercent": -57.94967551012344,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-repeated-ascii-128",
+          "beforeMs": 0.07738531445312491,
+          "afterMs": 0.04096190039062497,
+          "pairedRatio": 0.5288884996545371,
+          "changePercent": -47.11115003454629,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-repeated-unicode-128",
+          "beforeMs": 0.11225535937499997,
+          "afterMs": 0.0468206582031252,
+          "pairedRatio": 0.41442127256390154,
+          "changePercent": -58.55787274360984,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-repeated-misses",
+          "beforeMs": 0.06453547656249992,
+          "afterMs": 0.04155474804687498,
+          "pairedRatio": 0.6439223746107522,
+          "changePercent": -35.60776253892478,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-misses",
+          "beforeMs": 0.12241764062499971,
+          "afterMs": 0.16235175781250089,
+          "pairedRatio": 1.3253404950157806,
+          "changePercent": 32.53404950157805,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-short-cold-misses",
+          "beforeMs": 0.08572433593749995,
+          "afterMs": 0.12143786718749983,
+          "pairedRatio": 1.4156924053089115,
+          "changePercent": 41.56924053089115,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-cold-hits",
+          "beforeMs": 0.15103848437500034,
+          "afterMs": 0.15355728906249944,
+          "pairedRatio": 1.0172478322683545,
+          "changePercent": 1.7247832268354468,
+          "interval95": null,
+          "fasterPairs": 1,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-streaming-misses",
+          "beforeMs": 0.10671096093749988,
+          "afterMs": 0.1269562578124992,
+          "pairedRatio": 1.190283061607788,
+          "changePercent": 19.028306160778797,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-over-budget-misses",
+          "beforeMs": 0.07713030859375003,
+          "afterMs": 0.10257926171874976,
+          "pairedRatio": 1.3288057980961319,
+          "changePercent": 32.88057980961319,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-mixed",
+          "beforeMs": 0.029480265624999946,
+          "afterMs": 0.017799337890624933,
+          "pairedRatio": 0.6017765238541437,
+          "changePercent": -39.82234761458563,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-alternating-roots",
+          "beforeMs": 0.17669776562499973,
+          "afterMs": 0.23088493749999994,
+          "pairedRatio": 1.306295809529662,
+          "changePercent": 30.629580952966194,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits",
+          "beforeMs": 0.013756585937500065,
+          "afterMs": 0.011196268554687583,
+          "pairedRatio": 0.7984351617371913,
+          "changePercent": -20.15648382628087,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "get-warm-hits-after-miss",
+          "beforeMs": 0.014068994140625124,
+          "afterMs": 0.011422268554687531,
+          "pairedRatio": 0.7900320459486379,
+          "changePercent": -20.996795405136215,
+          "interval95": null,
+          "fasterPairs": 2,
+          "pairs": 2,
+          "classification": "pilot-only"
+        },
+        {
+          "runtime": "bun",
+          "name": "has-warm-hits",
+          "beforeMs": 0.007529958007812532,
+          "afterMs": 0.008710692382812635,
+          "pairedRatio": 1.1464262825464817,
+          "changePercent": 14.642628254648171,
+          "interval95": null,
+          "fasterPairs": 0,
+          "pairs": 2,
+          "classification": "pilot-only"
+        }
+      ]
+    }
+  },
+  "aaIntervalsExcludingOne": [
+    {
+      "runtime": "node",
+      "name": "get-streaming-misses",
+      "beforeMs": 0.22527814062499907,
+      "afterMs": 0.2230581484374996,
+      "pairedRatio": 0.9931883987837887,
+      "changePercent": -0.6811601216211272,
+      "interval95": [
+        0.9867381704752276,
+        0.9996807917176552
+      ],
+      "fasterPairs": 4,
+      "pairs": 4,
+      "classification": "faster"
+    },
+    {
+      "runtime": "bun",
+      "name": "get-repeated-ascii-16",
+      "beforeMs": 0.09663318164062495,
+      "afterMs": 0.09351807031250003,
+      "pairedRatio": 0.9703505296307015,
+      "changePercent": -2.9649470369298547,
+      "interval95": [
+        0.9468115400407647,
+        0.9944747296954612
+      ],
+      "fasterPairs": 4,
+      "pairs": 4,
+      "classification": "faster"
+    },
+    {
+      "runtime": "bun",
+      "name": "has-warm-hits",
+      "beforeMs": 0.008909306640625059,
+      "afterMs": 0.007095671874999709,
+      "pairedRatio": 0.8216538873954824,
+      "changePercent": -17.83461126045176,
+      "interval95": [
+        0.6959734567420813,
+        0.9700299690054084
+      ],
+      "fasterPairs": 4,
+      "pairs": 4,
+      "classification": "faster"
+    }
+  ],
+  "lateMovementDefinition": "A process is counted once when abs(median(all9samples)/median(last9warmup)-1)>0.20 OR abs(median(last3samples)/median(first3samples)-1)>0.20. All samples remain in the estimates.",
+  "knownHostedAuditFailure": "The frozen verifier required run.strategy, which the frozen driver never records. All 672 processes finished before that metadata assertion failed. No raw fields were repaired or timing repeated for this audit.",
+  "limitations": [
+    "This spot review checks fixture identity consistency across all processes; the separate primary independent review reconstructs semantic fixtures.",
+    "Successful scalar assertions eagerly construct error-message strings outside the timer. Their allocations may affect later GC or warmup; these records do not establish the direction or cause of such effects.",
+    "A/A has three unadjusted intervals excluding 1, including a large apparent Bun warm-has improvement. It is not a correction factor, and wide controls do not establish zero regression.",
+    "Student-t intervals are unadjusted across workloads; the two-pair pilot is descriptive only.",
+    "Late movement identifies changes in the raw sequences, not a diagnosis of JIT, GC, scheduling, or other causes.",
+    "Fresh-cache setup is outside timing. Query strings are precreated, and streaming strings are reused across separately reset batches."
+  ],
+  "conclusion": "Repeated ASCII/Unicode misses and mixed reads improve, but automatic read paths incur large repeatable cold, short-key, streaming, budget-full, and alternating-root regressions. These broad costs justify rejection without retiming or another candidate."
+}

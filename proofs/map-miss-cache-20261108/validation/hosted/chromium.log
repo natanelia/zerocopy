@@ -1,0 +1,157 @@
+{
+  "passed": true,
+  "crossOriginIsolated": true,
+  "operations": [
+    "getMany",
+    "get",
+    "has"
+  ],
+  "independentInputOracles": true,
+  "results": [
+    {
+      "copy": false,
+      "valueType": "number",
+      "reads": 21120,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 1114112,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "boolean",
+      "reads": 12864,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 983040,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "string",
+      "reads": 48000,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 1245184,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "object",
+      "reads": 25728,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 327680,
+      "finalCapacity": 2228224,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "number",
+      "reads": 12288,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 1114112,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "boolean",
+      "reads": 15168,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 983040,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "string",
+      "reads": 54912,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 196608,
+      "finalCapacity": 1245184,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "object",
+      "reads": 19008,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "initialCapacity": 327680,
+      "finalCapacity": 2228224,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    }
+  ],
+  "browser": "153.0.8010.12"
+}

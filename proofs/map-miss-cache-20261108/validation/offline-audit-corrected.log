@@ -1,0 +1,3 @@
+{"mode":"pilot","processes":112,"timedBatches":1008,"verifiedOutputs":1649472,"measuredBatchesBelow2ms":0,"exactCurrentBuild":true}
+{"mode":"formal","processes":336,"timedBatches":3024,"verifiedOutputs":5017344,"measuredBatchesBelow2ms":0,"exactCurrentBuild":true}
+{"mode":"aa","processes":224,"timedBatches":2016,"verifiedOutputs":3256768,"measuredBatchesBelow2ms":0,"exactCurrentBuild":true}

@@ -1,0 +1,158 @@
+{
+  "passed": true,
+  "writerRoot": "/home/runner/work/zerocopy/zerocopy",
+  "readerRoot": "/home/runner/work/zerocopy/zerocopy",
+  "runtime": "v24.22.1",
+  "operations": [
+    "getMany",
+    "get",
+    "has"
+  ],
+  "independentInputOracles": true,
+  "results": [
+    {
+      "copy": false,
+      "valueType": "number",
+      "reads": 44160,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 1114112,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "boolean",
+      "reads": 56640,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 983040,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "string",
+      "reads": 69312,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 1245184,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": false,
+      "valueType": "object",
+      "reads": 30336,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 327680,
+      "newCapacity": 2228224,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "number",
+      "reads": 22464,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 1114112,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "boolean",
+      "reads": 15360,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 983040,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "string",
+      "reads": 74496,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 196608,
+      "newCapacity": 1245184,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    },
+    {
+      "copy": true,
+      "valueType": "object",
+      "reads": 23616,
+      "sourceCount": 2055,
+      "resultCount": 2056,
+      "oldCapacity": 327680,
+      "newCapacity": 2228224,
+      "retainedBytesUnchanged": true,
+      "readerAllocationsUnchanged": true,
+      "oldMissAndNewPresenceVerified": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted"
+      ]
+    }
+  ]
+}

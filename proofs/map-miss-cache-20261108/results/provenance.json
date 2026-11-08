@@ -1,0 +1,64 @@
+{
+  "status": "rejected",
+  "repository": "natanelia/zerocopy",
+  "workflowRun": 42504549263,
+  "workflowJob": 128804239742,
+  "workflowUrl": "https://github.com/natanelia/zerocopy/actions/runs/42504549263",
+  "measuredCandidateCommit": "2671a2b19725758f749280d9b0dedfde645baf2b",
+  "baselineCommit": "a4265a0608ec25eec5719496225212db6b251989",
+  "artifact": {
+    "id": 13627760234,
+    "zipBytes": 496377,
+    "zipSha256": "51f06cc7303497970fdcb2e85cb7fa381ee905321aa13b250299dce05fb4d72f"
+  },
+  "compression": "gzip, mtime=0; uncompressed bytes verified exactly against downloaded originals; original JSON fields unchanged",
+  "records": [
+    {
+      "mode": "pilot",
+      "path": "pilot.json.gz",
+      "uncompressedBytes": 650627,
+      "uncompressedSha256": "96fee8667d6b19193831704bb02f8da87f7868e6174ef66371a49bfb23362c97",
+      "compressedBytes": 90746,
+      "compressedSha256": "71360f07b920a0414be0f64831aecd599f44a5b35124da47100a9fdecca4f39e",
+      "status": "complete",
+      "startedAt": "2026-11-08T17:22:28.905Z",
+      "completedAt": "2026-11-08T17:24:09.075Z"
+    },
+    {
+      "mode": "formal",
+      "path": "formal.json.gz",
+      "uncompressedBytes": 1691271,
+      "uncompressedSha256": "1f080418fdff3fe3e4851d1eb3ad51ca08c8a73fc6495707f2c9b759846ea952",
+      "compressedBytes": 211011,
+      "compressedSha256": "e738138793d0d93c28913b9c445a028d6b38ccbcc0e550eb6b29895b96039742",
+      "status": "complete",
+      "startedAt": "2026-11-08T17:24:09.336Z",
+      "completedAt": "2026-11-08T17:29:05.161Z"
+    },
+    {
+      "mode": "aa",
+      "path": "aa.json.gz",
+      "uncompressedBytes": 1175915,
+      "uncompressedSha256": "1f89f26e0ce870b6f2faed36f0f6c4c302723091ff7a1660504f61d298e0a627",
+      "compressedBytes": 150162,
+      "compressedSha256": "2dbbab595b3e6c01f5b0b62b8dad146471c61ea16ca35f2b43a00cc2c56d0b03",
+      "status": "complete",
+      "startedAt": "2026-11-08T17:29:05.411Z",
+      "completedAt": "2026-11-08T17:32:23.319Z"
+    }
+  ],
+  "driverSha256": "caed1d826b8d65e9279c4665d3bf0076b5da7867b308ccbc1937e7f38e3284f4",
+  "workloadSha256": "48e017b7726145da882b1ada8286092d21e840dc19e3e925336b8e8b1d904c03",
+  "hostedJobLog": {
+    "path": "../validation/hosted-job.log.gz",
+    "uncompressedBytes": 198052,
+    "uncompressedSha256": "5679b67f454d327f730c5fb8fee18b68a0fcac2d9a56acd33bbcc6d6c8e34972",
+    "compressedSha256": "4ccad56d81449afc75e685fcf6f0425a1f1999aa94fff3c858c600679c44fd09"
+  },
+  "verifierCorrection": {
+    "originalPath": "../archive/verify-before-strategy-fix.mjs",
+    "originalSha256": "38ab89deb3c2ea833e9cea5bba7da274d18f0312f292c562e0ae9ecee4c01606",
+    "failedLog": "../validation/hosted/evidence.log",
+    "failure": "The original verifier asserted run.strategy although the frozen driver does not record it. Only offline verification was corrected; no raw measurement field was added or changed."
+  }
+}
