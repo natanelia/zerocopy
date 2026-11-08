@@ -1,0 +1,32 @@
+
+ RUN  v4.1.11 /workspace/scratch/d81d52bea579/zerocopy-heap
+
+
+ Test Files  10 passed (10)
+      Tests  184 passed (184)
+   Start at  17:48:29
+   Duration  15.42s (transform 224ms, setup 0ms, import 305ms, tests 15.01s, environment 0ms)
+
+
+ RUN  v4.1.11 /workspace/scratch/d81d52bea579/zerocopy-heap
+
+
+ Test Files  2 passed (2)
+      Tests  24 passed (24)
+   Start at  17:48:45
+   Duration  568ms (transform 247ms, setup 0ms, import 313ms, tests 109ms, environment 0ms)
+
+$ tsc --noEmit
+$ tsc --noEmit -p tsconfig.redux.json
+proofs/redux-types.ts(3,27): error TS7016: Could not find a declaration file for module 'zerocopy'. '/workspace/scratch/d81d52bea579/zerocopy-heap/dist/shared.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/zerocopy` if it exists or add a new declaration (.d.ts) file containing `declare module 'zerocopy';`
+proofs/redux-types.ts(11,8): error TS7016: Could not find a declaration file for module 'zerocopy/redux'. '/workspace/scratch/d81d52bea579/zerocopy-heap/dist/redux.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/zerocopy` if it exists or add a new declaration (.d.ts) file containing `declare module 'zerocopy/redux';`
+proofs/redux-types.ts(23,77): error TS7006: Parameter 'state' implicitly has an 'any' type.
+proofs/redux-types.ts(27,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(2,33): error TS2307: Cannot find module '../dist/types/shared' or its corresponding type declarations.
+type-tests/typed-redux.ts(3,92): error TS2307: Cannot find module '../dist/types/redux' or its corresponding type declarations.
+type-tests/typed-redux.ts(13,90): error TS7006: Parameter 'state' implicitly has an 'any' type.
+type-tests/typed-redux.ts(16,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(18,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(20,1): error TS2578: Unused '@ts-expect-error' directive.

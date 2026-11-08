@@ -1,4 +1,4 @@
-import { Arena, arenaOf } from './arena';
+import { Arena, arenaOf, primitiveReadProtocol } from './arena';
 import { SharedPriorityQueue } from './shared-priority-queue';
 
 /** Portable child indexes preserve equal-priority behavior. These are not WASM
@@ -6,6 +6,30 @@ import { SharedPriorityQueue } from './shared-priority-queue';
  */
 export function readReduxHeap(heap: SharedPriorityQueue<any>, encode: (value: unknown) => any): any[] {
   const arena = arenaOf(heap), nodes = heap.root ? [heap.root] : [], rows: any[] = [];
+  // Native primitive decoding and the codec's primitive encoder cannot invoke
+  // user code. Reuse the view for this traversal; all published nodes already
+  // fit it and shared-memory growth never detaches it. Other readers retain
+  // their dynamic lookups, including overrides installed during decoding.
+  if (typeof heap.size === 'number' && typeof heap.root === 'number'
+    && heap.size >= 32 && (heap.valueType === 'number' || heap.valueType === 'boolean')
+    && primitiveReadProtocol.hasNativeWasm(arena)
+    && Object.getPrototypeOf(arena) === Arena.prototype
+    && !Object.hasOwn(arena, 'decode') && !Object.hasOwn(arena, 'dv') && !Object.hasOwn(arena, 'refresh')
+    && Object.getOwnPropertyDescriptor(Arena.prototype, 'decode')?.value === primitiveReadProtocol.decode
+    && Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')?.get === primitiveReadProtocol.view
+    && Object.getOwnPropertyDescriptor(Arena.prototype, 'refresh')?.value === primitiveReadProtocol.refresh) {
+    const view = nodes.length ? arena.dv : undefined;
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes.length > heap.size) throw new TypeError('Invalid heap size');
+      const node = nodes[i], left = view!.getUint32(node + 16, true), right = view!.getUint32(node + 20, true);
+      const leftIndex = left ? nodes.push(left) - 1 : -1;
+      const rightIndex = right ? nodes.push(right) - 1 : -1;
+      rows.push([encode(arena.decode(heap.valueType, view!.getFloat64(node + 8, true))),
+        encode(view!.getFloat64(node, true)), leftIndex, rightIndex]);
+    }
+    if (rows.length !== heap.size) throw new TypeError('Invalid heap size');
+    return rows;
+  }
   for (let i = 0; i < nodes.length; i++) {
     if (nodes.length > heap.size) throw new TypeError('Invalid heap size');
     const node = nodes[i], left = arena.dv.getUint32(node + 16, true), right = arena.dv.getUint32(node + 20, true);

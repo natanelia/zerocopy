@@ -1,0 +1,49 @@
+
+ RUN  v4.1.11 /workspace/scratch/d81d52bea579/zerocopy-heap-original
+
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  18:11:20
+   Duration  469ms (transform 175ms, setup 0ms, import 220ms, tests 183ms, environment 0ms)
+
+Built 12 portable modules: 240816 bytes
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+
+ RUN  v4.1.11 /workspace/scratch/d81d52bea579/zerocopy-heap
+
+
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+   Start at  18:11:22
+   Duration  549ms (transform 185ms, setup 0ms, import 243ms, tests 240ms, environment 0ms)
+
+
+ RUN  v4.1.11 /workspace/scratch/d81d52bea579/zerocopy-heap
+
+
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+   Start at  18:11:23
+   Duration  520ms (transform 200ms, setup 0ms, import 263ms, tests 107ms, environment 0ms)
+
+$ tsc --noEmit
+$ tsc --noEmit -p tsconfig.redux.json
+Real Node worker: shared, numeric/boolean/JSON/nested, retained snapshots after growth: passed
+Real Node worker: copy, numeric/boolean/JSON/nested, retained snapshots after growth: passed
+Late Redux import (portable, decode override): exact fallback reads preserved
+Late Redux import (portable, view override): exact fallback reads preserved
+Late Redux import (portable, decode override): exact fallback reads preserved
+Late Redux import (portable, view override): exact fallback reads preserved
+Late Redux import (source, decode override): exact fallback reads preserved
+Late Redux import (source, view override): exact fallback reads preserved
+{
+  "browser": "153.0.8010.0",
+  "crossOriginIsolated": true,
+  "checks": [
+    "independent full numeric/boolean wire oracle with topology, ties and special values",
+    "shared real worker: read-only old/new heaps after owner edits and growth",
+    "copy real worker: read-only old/new heaps after owner edits and growth"
+  ],
+  "timingMeasurements": false
+}

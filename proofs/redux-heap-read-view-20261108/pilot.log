@@ -1,0 +1,60 @@
+pilot: node min-4096-number-encode pair 1/2 before: 859.144 us, verified
+pilot: node min-4096-number-encode pair 1/2 after: 415.449 us, verified
+pilot: node max-4096-boolean-encode pair 1/2 before: 661.968 us, verified
+pilot: node max-4096-boolean-encode pair 1/2 after: 246.294 us, verified
+pilot: node min-4096-number-stringify pair 1/2 before: 1228.356 us, verified
+pilot: node min-4096-number-stringify pair 1/2 after: 767.634 us, verified
+pilot: node min-32-number-boundary pair 1/2 before: 4.590 us, verified
+pilot: node min-32-number-boundary pair 1/2 after: 3.887 us, verified; 3/9 measured batches <2 ms (retained)
+pilot: node min-8-number-control pair 1/2 before: 2.406 us, verified
+pilot: node min-8-number-control pair 1/2 after: 1.560 us, verified
+pilot: node min-256-object-control pair 1/2 before: 928.010 us, verified
+pilot: node min-256-object-control pair 1/2 after: 783.661 us, verified
+pilot: bun min-4096-number-encode pair 1/2 before: 405.739 us, verified
+pilot: bun min-4096-number-encode pair 1/2 after: 299.686 us, verified
+pilot: bun max-4096-boolean-encode pair 1/2 before: 393.978 us, verified
+pilot: bun max-4096-boolean-encode pair 1/2 after: 259.007 us, verified
+pilot: bun min-4096-number-stringify pair 1/2 before: 985.056 us, verified
+pilot: bun min-4096-number-stringify pair 1/2 after: 739.237 us, verified
+pilot: bun min-32-number-boundary pair 1/2 before: 3.622 us, verified
+pilot: bun min-32-number-boundary pair 1/2 after: 3.039 us, verified; 2/9 measured batches <2 ms (retained)
+pilot: bun min-8-number-control pair 1/2 before: 1.441 us, verified
+pilot: bun min-8-number-control pair 1/2 after: 1.226 us, verified
+pilot: bun min-256-object-control pair 1/2 before: 566.899 us, verified
+pilot: bun min-256-object-control pair 1/2 after: 529.291 us, verified
+pilot: bun min-256-object-control pair 2/2 after: 550.709 us, verified
+pilot: bun min-256-object-control pair 2/2 before: 571.787 us, verified
+pilot: bun min-8-number-control pair 2/2 after: 1.142 us, verified
+pilot: bun min-8-number-control pair 2/2 before: 1.323 us, verified
+pilot: bun min-32-number-boundary pair 2/2 after: 2.532 us, verified; 2/9 measured batches <2 ms (retained)
+pilot: bun min-32-number-boundary pair 2/2 before: 3.198 us, verified; 1/9 measured batches <2 ms (retained)
+pilot: bun min-4096-number-stringify pair 2/2 after: 522.732 us, verified
+pilot: bun min-4096-number-stringify pair 2/2 before: 588.917 us, verified
+pilot: bun max-4096-boolean-encode pair 2/2 after: 266.237 us, verified
+pilot: bun max-4096-boolean-encode pair 2/2 before: 419.920 us, verified
+pilot: bun min-4096-number-encode pair 2/2 after: 308.953 us, verified
+pilot: bun min-4096-number-encode pair 2/2 before: 416.809 us, verified
+pilot: node min-256-object-control pair 2/2 after: 1142.928 us, verified
+pilot: node min-256-object-control pair 2/2 before: 1094.228 us, verified
+pilot: node min-8-number-control pair 2/2 after: 2.008 us, verified
+pilot: node min-8-number-control pair 2/2 before: 2.246 us, verified
+pilot: node min-32-number-boundary pair 2/2 after: 2.856 us, verified; 3/9 measured batches <2 ms (retained)
+pilot: node min-32-number-boundary pair 2/2 before: 5.254 us, verified
+pilot: node min-4096-number-stringify pair 2/2 after: 738.060 us, verified
+pilot: node min-4096-number-stringify pair 2/2 before: 1158.256 us, verified
+pilot: node max-4096-boolean-encode pair 2/2 after: 262.055 us, verified
+pilot: node max-4096-boolean-encode pair 2/2 before: 1385.316 us, verified
+pilot: node min-4096-number-encode pair 2/2 after: 754.008 us, verified
+pilot: node min-4096-number-encode pair 2/2 before: 2215.517 us, verified
+node min-4096-number-encode: 1537.331 -> 584.728 us, paired ratio 0.406
+node max-4096-boolean-encode: 1023.642 -> 254.174 us, paired ratio 0.265
+node min-4096-number-stringify: 1193.306 -> 752.847 us, paired ratio 0.631
+node min-32-number-boundary: 4.922 -> 3.371 us, paired ratio 0.678
+node min-8-number-control: 2.326 -> 1.784 us, paired ratio 0.762
+node min-256-object-control: 1011.119 -> 963.295 us, paired ratio 0.939
+bun min-4096-number-encode: 411.274 -> 304.319 us, paired ratio 0.740
+bun max-4096-boolean-encode: 406.949 -> 262.622 us, paired ratio 0.646
+bun min-4096-number-stringify: 786.987 -> 630.985 us, paired ratio 0.816
+bun min-32-number-boundary: 3.410 -> 2.785 us, paired ratio 0.815
+bun min-8-number-control: 1.382 -> 1.184 us, paired ratio 0.857
+bun min-256-object-control: 569.343 -> 540.000 us, paired ratio 0.948

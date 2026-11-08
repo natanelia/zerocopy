@@ -1,0 +1,107 @@
+name: Redux heap read verification
+
+on:
+  pull_request:
+    paths:
+      - 'arena.ts'
+      - 'shared-priority-queue.ts'
+      - 'shared.ts'
+      - 'redux*.ts'
+      - '*.as.ts'
+      - 'proofs/redux-heap-read-view-20261108/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/redux-heap-read-view.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'arena.ts'
+      - 'shared-priority-queue.ts'
+      - 'shared.ts'
+      - 'redux*.ts'
+      - '*.as.ts'
+      - 'proofs/redux-heap-read-view-20261108/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/redux-heap-read-view.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: redux-heap-read-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build native and portable modules
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:redux
+      - name: Run focused regressions in Node and Bun
+        shell: bash
+        run: |
+          mkdir -p proofs/redux-heap-read-view-20261108/ci-logs
+          node node_modules/vitest/vitest.mjs run redux-heap-read-view.test.ts redux-regression.test.ts --maxWorkers=1 2>&1 | tee proofs/redux-heap-read-view-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run redux-heap-read-view.test.ts redux-regression.test.ts --maxWorkers=1 2>&1 | tee proofs/redux-heap-read-view-20261108/ci-logs/bun-tests.log
+      - name: Verify real workers and late optional imports
+        shell: bash
+        run: |
+          node proofs/redux-heap-read-view-20261108/node-workers.mjs 2>&1 | tee proofs/redux-heap-read-view-20261108/ci-logs/workers.log
+          node proofs/redux-heap-read-view-20261108/late-import.mjs
+          node proofs/redux-heap-read-view-20261108/late-import.mjs --view
+          bun proofs/redux-heap-read-view-20261108/late-import.mjs
+          bun proofs/redux-heap-read-view-20261108/late-import.mjs --view
+          bun proofs/redux-heap-read-view-20261108/late-import.mjs --source
+          bun proofs/redux-heap-read-view-20261108/late-import.mjs --source --view
+      - name: Verify all final workload outputs without timing
+        run: |
+          node proofs/redux-heap-read-view-20261108/smoke-v3.mjs
+          bun proofs/redux-heap-read-view-20261108/smoke-v3.mjs
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Verify Chromium page and worker behavior
+        shell: bash
+        run: node proofs/redux-heap-read-view-20261108/browser-check.mjs . 2>&1 | tee proofs/redux-heap-read-view-20261108/ci-logs/chromium.log
+      - name: Independently verify saved evidence without collecting timings
+        shell: bash
+        run: |
+          python3 proofs/redux-heap-read-view-20261108/verify.py \
+            proofs/redux-heap-read-view-20261108/pilot.json.gz \
+            proofs/redux-heap-read-view-20261108/formal-v2.json.gz \
+            proofs/redux-heap-read-view-20261108/aa-v2.json.gz \
+            proofs/redux-heap-read-view-20261108/formal-v3.json.gz \
+            proofs/redux-heap-read-view-20261108/aa-v3.json.gz \
+            2>&1 | tee proofs/redux-heap-read-view-20261108/ci-logs/evidence.log
+      - name: Retain correctness logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: redux-heap-read-verification-${{ github.sha }}
+          path: proofs/redux-heap-read-view-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

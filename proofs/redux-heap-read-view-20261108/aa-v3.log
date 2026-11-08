@@ -1,0 +1,54 @@
+aa: node min-4096-number-encode pair 1/4 before: 868.459 us, verified
+aa: node min-4096-number-encode pair 1/4 after: 609.509 us, verified
+aa: node min-256-object-control pair 1/4 before: 641.758 us, verified
+aa: node min-256-object-control pair 1/4 after: 689.831 us, verified
+aa: node reset-empty-list-control pair 1/4 before: 58.074 us, verified; 7/9 measured batches <2 ms (retained)
+aa: node reset-empty-list-control pair 1/4 after: 37.186 us, verified; 9/9 measured batches <2 ms (retained)
+aa: bun min-4096-number-encode pair 1/4 before: 507.824 us, verified
+aa: bun min-4096-number-encode pair 1/4 after: 333.305 us, verified
+aa: bun min-256-object-control pair 1/4 before: 592.016 us, verified
+aa: bun min-256-object-control pair 1/4 after: 523.101 us, verified
+aa: bun reset-empty-list-control pair 1/4 before: 1222.751 us, verified
+aa: bun reset-empty-list-control pair 1/4 after: 1162.427 us, verified
+aa: bun reset-empty-list-control pair 2/4 after: 1171.941 us, verified
+aa: bun reset-empty-list-control pair 2/4 before: 1085.620 us, verified
+aa: bun min-256-object-control pair 2/4 after: 531.335 us, verified
+aa: bun min-256-object-control pair 2/4 before: 548.547 us, verified
+aa: bun min-4096-number-encode pair 2/4 after: 415.146 us, verified
+aa: bun min-4096-number-encode pair 2/4 before: 422.439 us, verified
+aa: node reset-empty-list-control pair 2/4 after: 40.548 us, verified; 8/9 measured batches <2 ms (retained)
+aa: node reset-empty-list-control pair 2/4 before: 54.401 us, verified; 7/9 measured batches <2 ms (retained)
+aa: node min-256-object-control pair 2/4 after: 565.310 us, verified
+aa: node min-256-object-control pair 2/4 before: 894.252 us, verified
+aa: node min-4096-number-encode pair 2/4 after: 1027.870 us, verified
+aa: node min-4096-number-encode pair 2/4 before: 701.041 us, verified
+aa: node min-4096-number-encode pair 3/4 before: 803.747 us, verified
+aa: node min-4096-number-encode pair 3/4 after: 870.812 us, verified
+aa: node min-256-object-control pair 3/4 before: 576.610 us, verified
+aa: node min-256-object-control pair 3/4 after: 597.697 us, verified
+aa: node reset-empty-list-control pair 3/4 before: 36.969 us, verified; 9/9 measured batches <2 ms (retained)
+aa: node reset-empty-list-control pair 3/4 after: 33.471 us, verified; 9/9 measured batches <2 ms (retained)
+aa: bun min-4096-number-encode pair 3/4 before: 373.697 us, verified
+aa: bun min-4096-number-encode pair 3/4 after: 365.826 us, verified
+aa: bun min-256-object-control pair 3/4 before: 532.821 us, verified
+aa: bun min-256-object-control pair 3/4 after: 486.171 us, verified
+aa: bun reset-empty-list-control pair 3/4 before: 1097.556 us, verified
+aa: bun reset-empty-list-control pair 3/4 after: 1131.943 us, verified
+aa: bun reset-empty-list-control pair 4/4 after: 1253.182 us, verified
+aa: bun reset-empty-list-control pair 4/4 before: 1152.264 us, verified
+aa: bun min-256-object-control pair 4/4 after: 523.210 us, verified
+aa: bun min-256-object-control pair 4/4 before: 451.352 us, verified
+aa: bun min-4096-number-encode pair 4/4 after: 377.013 us, verified
+aa: bun min-4096-number-encode pair 4/4 before: 365.081 us, verified
+aa: node reset-empty-list-control pair 4/4 after: 35.641 us, verified; 8/9 measured batches <2 ms (retained)
+aa: node reset-empty-list-control pair 4/4 before: 33.353 us, verified; 8/9 measured batches <2 ms (retained)
+aa: node min-256-object-control pair 4/4 after: 584.802 us, verified
+aa: node min-256-object-control pair 4/4 before: 807.503 us, verified
+aa: node min-4096-number-encode pair 4/4 after: 649.401 us, verified
+aa: node min-4096-number-encode pair 4/4 before: 702.131 us, verified
+node min-4096-number-encode: 752.939 -> 760.106 us, paired ratio 1.008 (0.618-1.644)
+node min-256-object-control: 724.630 -> 591.250 us, paired ratio 0.845 (0.556-1.285)
+node reset-empty-list-control: 45.685 -> 36.413 us, paired ratio 0.824 (0.577-1.177)
+bun min-4096-number-encode: 398.068 -> 371.419 us, paired ratio 0.899 (0.642-1.257)
+bun min-256-object-control: 540.684 -> 523.156 us, paired ratio 0.975 (0.804-1.183)
+bun reset-empty-list-control: 1124.910 -> 1167.184 us, paired ratio 1.036 (0.939-1.143)

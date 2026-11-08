@@ -1,0 +1,66 @@
+{
+  "schema": "zerocopy-redux-heap-view-evidence/v1",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "evidence": {
+    "pilot.json.gz": {
+      "sha256": "130550303c57c36d572e00220297cf1b80ae5fca5121461a1007ef914eb422bd",
+      "uncompressedSha256": "7f8123dcf1c5a1ed8f42e36cdf0cb6b8ffcb8e05ef8d9589ccfe749dc121b728",
+      "uncompressedBytes": 184582,
+      "processes": 48,
+      "measuredBatches": 432
+    },
+    "formal-v2.json.gz": {
+      "sha256": "c5bfb94786ea2b52487e9f74c80a017697ca0a979ead3806537fa12829173505",
+      "uncompressedSha256": "8ccacc57570dea2c908f9e7b5fd254c6814a8f03e2161edc061ca5970758e4df",
+      "uncompressedBytes": 648736,
+      "processes": 168,
+      "measuredBatches": 1512
+    },
+    "aa-v2.json.gz": {
+      "sha256": "0033b46c95015130c43bf828e7c53d66b54a81f8bbfedd3e691206654de675ab",
+      "uncompressedSha256": "38c9c0c599273e3d1b7fa441d4739add1c61da0a05967f01b4c28aebb7f9a4da",
+      "uncompressedBytes": 147269,
+      "processes": 32,
+      "measuredBatches": 288
+    },
+    "formal-v3.json.gz": {
+      "sha256": "0730022f06f7ad8f0bf543ab9c0c3e28386476c3d39f7e34bfb4971e64a0d5cc",
+      "uncompressedSha256": "f9986439c1b227560818472c0ddcd115c74db637a4e14405849ebbb9a777114e",
+      "uncompressedBytes": 964040,
+      "processes": 192,
+      "measuredBatches": 1728
+    },
+    "aa-v3.json.gz": {
+      "sha256": "2ad879a7f126b238549311b1989232068cb9e0a816f568fd3a171fd624474845",
+      "uncompressedSha256": "336ccdd025658806c64ae0b0c9aea5891cf4a4fa0ce1b2e993f198f0c9a50296",
+      "uncompressedBytes": 335362,
+      "processes": 48,
+      "measuredBatches": 432
+    }
+  },
+  "productionSources": {
+    "arena.ts": "7d250dc3452ad047b6b2e38cd4dd0983ddc6808d9402077512710eacd331b55d",
+    "redux-heap-codec.ts": "56684a4f521b876ccfda10c4f042196ef0f40a7674b4c6c2cbe2e3209b5baa9c"
+  },
+  "archiveSources": {
+    "candidate-v1/redux-heap-codec.ts.txt": "76e0045dd2aa99615928e2e15ef056fa91360a76e97b7b5b9728dab739604a81",
+    "candidate-v2/redux-heap-codec.ts.txt": "c77a2bc1ff5b68cfe3a5af66e6d85d862f452c51ce21be7636ebe17d479d64ea"
+  },
+  "validationArchives": {
+    "validation/final-preflight.txt.gz": {
+      "sha256": "937f79c1a39661dada023967cc0320b74f71a89541899680d41a1b9dd294cb3d",
+      "uncompressedSha256": "fd3d683d4b0fa83ee86301f4e7d606745563998bd1f7f6f4d135f878bd966e34",
+      "uncompressedBytes": 1891
+    },
+    "validation/v1-coercion-regression.txt.gz": {
+      "sha256": "ca0ac58a40a421bc7d7b303026120e1add98dfd6521d5e9b3e4f6ba37ecbd4a8",
+      "uncompressedSha256": "cea4723526d6bd8010e5b3b63ef1b8224969f8aea457f429731ef11f22839bed",
+      "uncompressedBytes": 1070
+    },
+    "validation/v2-proxy-regression.txt.gz": {
+      "sha256": "448c243e0599e2fe526a67647cdd56c43be32530024008b13ceca486a74d8f5d",
+      "uncompressedSha256": "415299be029c30df40099a27a8f590ce33f9f3d1b9141eb044fe698baadf687d",
+      "uncompressedBytes": 1189
+    }
+  }
+}

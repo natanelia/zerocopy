@@ -1,0 +1,36 @@
+aa: node min-4096-number-encode pair 1/4 before: 722.296 us, verified
+aa: node min-4096-number-encode pair 1/4 after: 644.994 us, verified
+aa: node min-256-object-control pair 1/4 before: 884.259 us, verified
+aa: node min-256-object-control pair 1/4 after: 687.321 us, verified
+aa: bun min-4096-number-encode pair 1/4 before: 414.660 us, verified
+aa: bun min-4096-number-encode pair 1/4 after: 385.753 us, verified
+aa: bun min-256-object-control pair 1/4 before: 496.827 us, verified
+aa: bun min-256-object-control pair 1/4 after: 467.362 us, verified
+aa: bun min-256-object-control pair 2/4 after: 629.159 us, verified
+aa: bun min-256-object-control pair 2/4 before: 427.336 us, verified
+aa: bun min-4096-number-encode pair 2/4 after: 350.988 us, verified
+aa: bun min-4096-number-encode pair 2/4 before: 377.027 us, verified
+aa: node min-256-object-control pair 2/4 after: 521.017 us, verified
+aa: node min-256-object-control pair 2/4 before: 619.063 us, verified
+aa: node min-4096-number-encode pair 2/4 after: 868.310 us, verified
+aa: node min-4096-number-encode pair 2/4 before: 845.997 us, verified
+aa: node min-4096-number-encode pair 3/4 before: 858.625 us, verified
+aa: node min-4096-number-encode pair 3/4 after: 649.227 us, verified
+aa: node min-256-object-control pair 3/4 before: 508.403 us, verified
+aa: node min-256-object-control pair 3/4 after: 582.824 us, verified
+aa: bun min-4096-number-encode pair 3/4 before: 394.898 us, verified
+aa: bun min-4096-number-encode pair 3/4 after: 384.680 us, verified
+aa: bun min-256-object-control pair 3/4 before: 490.662 us, verified
+aa: bun min-256-object-control pair 3/4 after: 428.276 us, verified
+aa: bun min-256-object-control pair 4/4 after: 508.898 us, verified
+aa: bun min-256-object-control pair 4/4 before: 586.022 us, verified
+aa: bun min-4096-number-encode pair 4/4 after: 502.774 us, verified
+aa: bun min-4096-number-encode pair 4/4 before: 402.226 us, verified
+aa: node min-256-object-control pair 4/4 after: 512.497 us, verified
+aa: node min-256-object-control pair 4/4 before: 588.634 us, verified
+aa: node min-4096-number-encode pair 4/4 after: 665.892 us, verified
+aa: node min-4096-number-encode pair 4/4 before: 770.714 us, verified
+node min-4096-number-encode: 808.355 -> 657.559 us, paired ratio 0.880 (0.720-1.074)
+node min-256-object-control: 603.849 -> 551.920 us, paired ratio 0.899 (0.687-1.176)
+bun min-4096-number-encode: 398.562 -> 385.216 us, paired ratio 1.013 (0.809-1.269)
+bun min-256-object-control: 493.744 -> 488.130 us, paired ratio 1.012 (0.677-1.513)
