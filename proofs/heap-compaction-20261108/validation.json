@@ -1,0 +1,40 @@
+{
+  "runtimeSourceSha256": "4b5beaecac677a2e551e9ce148183435232062e08304286a0baaf33cb6efe294",
+  "portableBuild": "passed with Bun 1.4.2",
+  "typecheck": "node node_modules/typescript/bin/tsc --noEmit: passed",
+  "focusedSuites": {
+    "node": {
+      "files": 2,
+      "tests": 29,
+      "status": "passed"
+    },
+    "bun": {
+      "files": 2,
+      "tests": 29,
+      "status": "passed"
+    },
+    "files": [
+      "heap-compaction.test.ts",
+      "performance-revision.test.ts"
+    ]
+  },
+  "publicWorkloadOracles": {
+    "node": 7,
+    "bun": 7,
+    "status": "passed"
+  },
+  "actualNodeWorkers": {
+    "transports": [
+      "shared",
+      "copied"
+    ],
+    "status": "passed"
+  },
+  "emittedCompactorFields": [
+    "target",
+    "snapshots",
+    "pointers"
+  ],
+  "heapPointersEmission": "Absent from field initializers; assigned only inside heap() after the nonempty-root guard.",
+  "hostedFullSuite": "Pending main CI on the final PR head; not claimed as a local result."
+}
