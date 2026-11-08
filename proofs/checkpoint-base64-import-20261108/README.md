@@ -113,6 +113,16 @@ All earlier measurements remain separate from the final confirmation. No favorab
 
 The [manifest](manifest.json) records compressed and uncompressed recording hashes, source-version hashes, and frozen tool/workload identities. Gzip compression preserves the exact original JSON bytes. The six recordings are not pooled.
 
+## Hosted CI and test assertion repair
+
+At the initial published head `62975a8a2e8e5b4169ff19680dcc695147fa8d7d`, [main CI](https://github.com/natanelia/zerocopy/actions/runs/42471144393/job/128701919813) passed 1,161 tests and failed only the new large nested-payload test: it exceeded Vitest's default 5,000 ms timeout, reporting 18,886 ms under the full parallel Bun suite. There was no value-mismatch failure. The complete [failed job log](checks/ci-main-62975a8a-timeout.txt) is preserved.
+
+The follow-up changes only the two complete arena-byte comparisons from Vitest's `toEqual` to `deepEqual` from `node:assert/strict`. Both assertions still compare every byte and the exact lengths; the large fixture and 5,000 ms timeout remain unchanged. All 15 tests then passed locally on Node and Bun, with test-body totals of 286 ms and 486 ms respectively. See the [Node output](checks/ci-assertion-fix-node.txt) and [Bun output](checks/ci-assertion-fix-bun.txt). These test-run durations are not performance measurements of the library.
+
+The [dedicated hosted workflow](https://github.com/natanelia/zerocopy/actions/runs/42471144522/job/128701920431) passed on that initial head, including the focused tests, all compatibility modes, workload smoke checks, archived-evidence verification, and Chromium **153.0.8010.12**. Chromium exercised seven real native API calls, plus the missing and noncallable API fallbacks with zero native calls; all three modes passed shared/copied workers, growth, retained snapshots, and read-only checks. The [captured browser result](checks/ci-chromium-62975a8a.json) identifies that exact head and job.
+
+That hosted result predates the test-only assertion repair. The production source and browser proof remain identical, with `redux-checkpoint.ts` SHA-256 `55e8aa4be4db3e0644bfb3d7fc8a04031975a49c995874bb54274e5ca71e6ef1`. No benchmark input, recording, estimate, or timing claim changed. Current-head CI status remains visible on the PR.
+
 ## Reproduction
 
 Use two independent checkouts, with the before checkout at `0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e` and the after checkout at this PR. Use Node 24.22.1, Bun 1.4.2, and the pinned dependencies. In each checkout, run `bun install`, `bun run build:wasm`, and `bun run build:browser`.

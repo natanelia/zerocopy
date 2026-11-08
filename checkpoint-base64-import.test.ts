@@ -1,3 +1,4 @@
+import { deepEqual } from 'node:assert/strict';
 import { describe, expect, it } from 'vitest';
 import { SharedList, SharedMap, getWorkerData, initWorker } from './shared';
 import { arenaOf } from './arena';
@@ -106,7 +107,7 @@ describe('byte-oriented checkpoint imports', () => {
     const attached = await initWorker<{ changed: typeof source }>(getWorkerData({ changed }, { copy: true }));
     expect(attached.changed.get('child')!.toArray()).toEqual([...values, 'later']);
     expect(() => attached.changed.set('other', child)).toThrow(/read-only/);
-    expect(arenaOf(source).copy()).toEqual(before); expect(arenaOf(child).copy()).toEqual(childBefore);
+    deepEqual(arenaOf(source).copy(), before); deepEqual(arenaOf(child).copy(), childBefore);
     expect(JSON.stringify(packet)).toBe(text);
   });
 });

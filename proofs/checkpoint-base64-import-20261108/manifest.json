@@ -95,7 +95,11 @@
     "browser.mjs": "71703eeb7a8cfe0ceb8535c0b1b72cc95f106ef8db19807f21d2b7b506a6a8e7",
     "combined-check.mjs": "1e1511e8a61ece3bc1e8090cde1b5c30754aaeec6b7cff50751b36935277d08a",
     "combined-validation.json": "67a233d8c0134bd7d8726f2070f2b304a1b7ea98da593f4e109cd8c85bc67a65",
-    "combined-validation.txt": "1964ad4b2d4b0d5d3943689f03b3f7ab759cffc82475ac3b9dad73c047c83c67"
+    "combined-validation.txt": "1964ad4b2d4b0d5d3943689f03b3f7ab759cffc82475ac3b9dad73c047c83c67",
+    "checks/ci-main-62975a8a-timeout.txt": "ae0302cdd9993f5699b55f0568fefd2d6cad64547906c18f790cf08128a65add",
+    "checks/ci-chromium-62975a8a.json": "e2c7da005fba13bff6130c78433dbf5344414b9656e1df9a89ac646045122194",
+    "checks/ci-assertion-fix-node.txt": "b92bbe9be4f3fcd742c5b61ed830d0a4bad11d36057a047a125cfbf98ef34929",
+    "checks/ci-assertion-fix-bun.txt": "92e08f59eee0e1c87cb491fa5e43de046cdccb729a8c0d1e5a1af727d4175aeb"
   },
   "validation": {
     "v3RegressionTests": {
@@ -143,6 +147,32 @@
       },
       "interactionNodePassed": true,
       "interactionBunPassed": true
+    },
+    "ciFollowup": {
+      "initialHead": "62975a8a2e8e5b4169ff19680dcc695147fa8d7d",
+      "mainCi": {
+        "runId": 42471144393,
+        "jobId": 128701919813,
+        "status": "failure",
+        "passedTests": 1161,
+        "failedTests": 1,
+        "failure": "Large nested-payload test exceeded the unchanged 5000 ms timeout; no value mismatch reported."
+      },
+      "dedicatedCi": {
+        "runId": 42471144522,
+        "jobId": 128701920431,
+        "status": "success",
+        "browser": "153.0.8010.12",
+        "scope": "Initial head, before test-only assertion repair; runtime and browser proof unchanged."
+      },
+      "testOnlyRepair": "Replace the two complete arena-byte Vitest toEqual assertions with node:assert/strict deepEqual; same bytes, fixture and 5000 ms timeout.",
+      "repairedFocusedTests": {
+        "node": 15,
+        "bun": 15,
+        "status": "passed"
+      },
+      "productionSourceSha256": "55e8aa4be4db3e0644bfb3d7fc8a04031975a49c995874bb54274e5ca71e6ef1",
+      "benchmarkRecordingsUnchanged": true
     }
   }
 }
