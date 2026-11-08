@@ -68,6 +68,14 @@ lanes.forEach(value => {
 lanes.setMany([['bad', { ...input, speedLimit: false }]]);
 
 const laneList = new SharedList(LaneValue).push(input).pushMany([input]).set(0, input);
+const editedLanes = laneList.setMany([[0, input], [1, input]] as const);
+type ListBatch = Assert<Equal<typeof editedLanes, typeof laneList>>;
+// @ts-expect-error Indexed bulk updates keep the descriptor's object shape.
+laneList.setMany([[0, { ...input, speedLimit: 'fast' }]]);
+// @ts-expect-error List indexes must be numbers.
+laneList.setMany([['0', input]]);
+// @ts-expect-error Primitive list values retain their type in batch edits.
+new SharedList('number').push(1).setMany([[0, 'wrong']]);
 const tiles = new SharedMap(list(LaneValue)).set('tile', laneList);
 const regions = new SharedMap(map(list(LaneValue))).set('region', tiles);
 const nestedLane = regions.get('region')?.get('tile')?.get(0);

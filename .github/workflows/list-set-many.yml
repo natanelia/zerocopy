@@ -1,0 +1,123 @@
+name: List batch edit verification
+
+on:
+  pull_request:
+    paths:
+      - 'list-set-many.test.ts'
+      - 'proofs/list-set-many-20261108/**'
+      - '.github/workflows/list-set-many.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'list-set-many.test.ts'
+      - 'proofs/list-set-many-20261108/**'
+      - '.github/workflows/list-set-many.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: list-set-many-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build modules and declarations
+        run: |
+          mkdir -p proofs/list-set-many-20261108/ci-logs
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:values
+      - name: Build the pinned reader baseline
+        shell: bash
+        run: |
+          baseline_checkout="$RUNNER_TEMP/list-set-many-baseline"
+          git worktree add --detach "$baseline_checkout" a4265a0608ec25eec5719496225212db6b251989
+          printf 'LIST_BATCH_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
+          cd "$baseline_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Build the recorded candidate for the historical timing audit
+        shell: bash
+        run: |
+          recorded_commit="$(node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync } from 'node:fs';
+          import { gunzipSync } from 'node:zlib';
+          const plain = 'proofs/list-set-many-20261108/results/formal.json';
+          const path = existsSync(plain) ? plain : `${plain}.gz`;
+          const bytes = readFileSync(path);
+          const record = JSON.parse((path.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
+          assert.match(record.source.after.commit, /^[a-f0-9]{40}$/);
+          process.stdout.write(record.source.after.commit);
+          JS
+          )"
+          recorded_checkout="$RUNNER_TEMP/list-set-many-recorded"
+          if ! git cat-file -e "$recorded_commit^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$recorded_commit"
+          fi
+          git worktree add --detach "$recorded_checkout" "$recorded_commit"
+          printf 'LIST_BATCH_RECORDED=%s\n' "$recorded_checkout" >> "$GITHUB_ENV"
+          cd "$recorded_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Run regression tests in Node and Bun
+        shell: bash
+        run: |
+          node node_modules/vitest/vitest.mjs run list-set-many.test.ts shared-list.test.ts allocation-failure.test.ts immutable-proof.test.ts --maxWorkers=1 2>&1 | tee proofs/list-set-many-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run list-set-many.test.ts shared-list.test.ts allocation-failure.test.ts immutable-proof.test.ts --maxWorkers=1 2>&1 | tee proofs/list-set-many-20261108/ci-logs/bun-tests.log
+      - name: Check the packed Node, Bun, and TypeScript API
+        shell: bash
+        run: |
+          bun run check:package 2>&1 | tee proofs/list-set-many-20261108/ci-logs/package-all-exports.log
+          node proofs/list-set-many-20261108/package.mjs . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/package-set-many.log
+      - name: Check the WASM surface and real worker compatibility
+        shell: bash
+        run: |
+          node proofs/list-set-many-20261108/abi.mjs "$LIST_BATCH_BASELINE" . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/wasm-surface.log
+          node proofs/list-set-many-20261108/worker.mjs list . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/workers-current-reader.log
+          node proofs/list-set-many-20261108/worker.mjs list . "$LIST_BATCH_BASELINE" 2>&1 | tee proofs/list-set-many-20261108/ci-logs/workers-old-reader.log
+      - name: Check complete outputs and exact writer allocation
+        shell: bash
+        run: |
+          node proofs/list-set-many-20261108/allocation.mjs "$LIST_BATCH_BASELINE" proofs/list-set-many-20261108/ci-logs/allocation-before.json
+          node proofs/list-set-many-20261108/allocation.mjs . proofs/list-set-many-20261108/ci-logs/allocation-after.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check the new API in Chromium and real browser workers
+        shell: bash
+        run: node proofs/list-set-many-20261108/browser.mjs . proofs/list-set-many-20261108/ci-logs/chromium.json 2>&1 | tee proofs/list-set-many-20261108/ci-logs/chromium.log
+      - name: Audit saved measurements without collecting timings
+        shell: bash
+        run: node proofs/list-set-many-20261108/audit-evidence.mjs "$LIST_BATCH_RECORDED" 2>&1 | tee proofs/list-set-many-20261108/ci-logs/evidence.log
+      - name: Retain correctness and evidence logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: list-set-many-verification-${{ github.sha }}
+          path: |
+            proofs/list-set-many-20261108/results/
+            proofs/list-set-many-20261108/validation/
+            proofs/list-set-many-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

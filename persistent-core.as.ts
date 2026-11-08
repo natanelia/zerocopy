@@ -486,6 +486,44 @@ function vecSetAt(root: u32, depth: u32, index: u32, value: f64): u32 {
   return p;
 }
 export function vecSet(root: u32, depth: u32, index: u32, value: f64): u32 { return vecSetAt(root, depth, index, value); }
+
+// Sorted, distinct edits are staged as [index:u32,value:f64] records. Group
+// them by child so each affected immutable branch and leaf is copied once.
+function vecSetRange(root: u32, depth: u32, input: u32, first: u32, end: u32): u32 {
+  const bytes: u32 = depth ? 128 : 256, p = alloc(bytes);
+  if (root) memory.copy(p, root, bytes); else memory.fill(p, 0, bytes);
+  if (!depth) {
+    for (let i = first; i < end; i++) {
+      const entry = input + i * 12;
+      store<f64>(p + (load<u32>(entry) & 31) * 8, load<f64>(entry + 4));
+    }
+  } else {
+    const shift = depth * 5;
+    let firstChild = first;
+    while (firstChild < end) {
+      const slot = (load<u32>(input + firstChild * 12) >> shift) & 31;
+      let lastChild = firstChild + 1;
+      while (lastChild < end && ((load<u32>(input + lastChild * 12) >> shift) & 31) == slot) lastChild++;
+      const child = root ? load<u32>(root + slot * 4) : 0;
+      store<u32>(p + slot * 4, vecSetRange(child, depth - 1, input, firstChild, lastChild));
+      firstChild = lastChild;
+    }
+  }
+  return p;
+}
+export function vecSetMany(root: u32, depth: u32, input: u32, count: u32): u32 {
+  return count ? vecSetRange(root, depth, input, 0, count) : root;
+}
+export function tailSetMany(tail: u32, length: u32, input: u32, count: u32): u32 {
+  if (!count) return tail;
+  const p = alloc(length * 8);
+  memory.copy(p, tail, length * 8);
+  for (let i: u32 = 0; i < count; i++) {
+    const entry = input + i * 12;
+    store<f64>(p + (load<u32>(entry) & 31) * 8, load<f64>(entry + 4));
+  }
+  return p;
+}
 // Shared accessors for the immutable block sequence tree.
 @inline function sl(p: u32): u32 { return p ? load<u32>(p) : 0; }
 @inline function sr(p: u32): u32 { return p ? load<u32>(p + 4) : 0; }

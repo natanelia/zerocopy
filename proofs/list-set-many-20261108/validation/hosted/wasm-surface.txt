@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "scope": "WASM import/export names and kinds, plus identical legacy aliases; raw-format compatibility is checked by the old-reader worker proof",
+  "beforeSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+  "afterSha256": "dbda0cfd0b3b71489dfb11e66aa059274f661b9f43354cbc03d0349fcddbc3ff",
+  "preservedExports": 55,
+  "imports": [
+    {
+      "module": "env",
+      "name": "memory",
+      "kind": "memory"
+    }
+  ],
+  "added": [
+    {
+      "name": "tailSetMany",
+      "kind": "function"
+    },
+    {
+      "name": "vecSetMany",
+      "kind": "function"
+    }
+  ],
+  "aliases": [
+    "shared-map",
+    "shared-list",
+    "linked-list",
+    "singly-linked-list",
+    "doubly-linked-list",
+    "ordered-map",
+    "sorted-tree",
+    "priority-queue"
+  ]
+}

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/106b5ee34aad/zerocopy-list-batch
+
+
+ Test Files  62 passed (62)
+      Tests  1216 passed (1216)
+   Start at  23:21:26
+   Duration  36.66s (transform 1.58s, setup 0ms, import 3.20s, tests 140.78s, environment 12ms)
+

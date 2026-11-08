@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "crossOriginIsolated": true,
+  "results": [
+    {
+      "copy": false,
+      "reads": 54652,
+      "snapshots": 12,
+      "sourceCount": 32801,
+      "initialCapacity": 393216,
+      "finalCapacity": 2162688,
+      "sourceBytesUnchanged": true
+    },
+    {
+      "copy": true,
+      "reads": 38318,
+      "snapshots": 12,
+      "sourceCount": 32801,
+      "initialCapacity": 393216,
+      "finalCapacity": 2162688,
+      "sourceBytesUnchanged": true
+    }
+  ]
+}

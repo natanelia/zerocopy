@@ -1,0 +1,25 @@
+{
+  "run_id": 42495746269,
+  "run_url": "https://github.com/natanelia/zerocopy/actions/runs/42495746269",
+  "artifact_id": 13624380641,
+  "artifact_sha256": "68ae9cb67b2ca4299626d2d1b257416f7c9096eff793c50487c98cc0f5ce483e",
+  "measured_commit": "dd07070298c3ce8fd9e0a665446a5ed46c8a1af2",
+  "baseline": "a4265a0608ec25eec5719496225212db6b251989",
+  "records": {
+    "formal.json": {
+      "sha256": "9719b80624c8bbbd8dc7743e26dcc23254c894d1fde65eed7d2d9034953e1707",
+      "bytes": 1189082,
+      "gzipBytes": 159029
+    },
+    "aa.json": {
+      "sha256": "c91eb17cd98307475bb97b40d5745b9ba67d4f15421713fe5ca5cbf4fa2535a9",
+      "bytes": 349546,
+      "gzipBytes": 56798
+    },
+    "reference-comparison.json": {
+      "sha256": "c2ed5e639cafcb2548e0de3e36f46a6e8b28a58af851e71604961d968fa87476",
+      "bytes": 387599,
+      "gzipBytes": 56205
+    }
+  }
+}

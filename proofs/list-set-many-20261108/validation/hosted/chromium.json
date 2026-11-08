@@ -1,0 +1,53 @@
+{
+  "schema": "zerocopy-list-set-many-browser/v1",
+  "startedAt": "2026-11-08T15:39:03.879Z",
+  "root": "/home/runner/work/zerocopy/zerocopy",
+  "node": "v24.22.1",
+  "hashes": {
+    "dist/chunk-14v0h3h6.js": "c57ee42023300ba69624c7c9934684f289cc531439ba322d1742315aae7589c6",
+    "dist/chunk-4whxrcn1.js": "8d0de41c1dadf0ad1839ee592ddf9fd4511c6dacf03d89b518b2260e984d780a",
+    "dist/chunk-bfjwjaen.js": "98d8fa17befda97efe56eba913854c88ce669e8ceb742c44fad6493be6faebb1",
+    "dist/chunk-mzkdyhf1.js": "9e3ac2f9f94faca95da6c8eacff84273e9c0475650c07a41ddd9fa41d843a206",
+    "dist/chunk-rq23njtf.js": "6fa040a33c36470e60016db9677c817097146e0a1102fb84623cfd56db9ac089",
+    "dist/geometry.js": "ffa617d8961fb57cbcc37c2a2541b50a18e03b437fc4923520c6de7b2e906882",
+    "dist/numeric.js": "95313561b74de4f79b4b6aa9fa1e1a988aa4b1bce74cb521502ce5922f1af6e0",
+    "dist/redux.js": "ec437e23414c7778a94d7684bad884dd7da84c9850b009c175305cd44b1193c5",
+    "dist/shared.js": "f64ed079b6c2a30ac60983715cc1b951aeafa04995a88cf0c0096ce2dbfbeb96",
+    "dist/state.js": "39f294f7620caa1861154ec518815de85aa99677d59f396a69bbaca64f373754",
+    "dist/tanstack-db-collection.js": "bf27c4487c692027c9e975e9fb575bd9cbf29404ebad41060504a55ad6d7dd50",
+    "dist/worker.js": "9cc5fa499d27e1dba3c339e4cec814456a212a6696e96aa3b5953e6a213d4bc1",
+    "browser-values.mjs": "b80363542a431f06b8f8189aa40bf180398168f415b7bfe189948515bfad84ad",
+    "browser-worker.mjs": "e9cf3862ebd600ebaf9cbee92a9614061a3145c23cb678631261fd537ab22827",
+    "browser-case.mjs": "2188b286f732aee934784dab710af73b93a3e4aef507909d24340ce71d05aa3b",
+    "persistent-core.as.ts": "eb2811552372c708090dd0d7ffcb42f5fb6a6d918ab5d78ea80c71377be8e063",
+    "shared-list.ts": "9f84e03ae8135438d9c387c771ed867ae6d5a8455d078a9e87c098d333beb348"
+  },
+  "driverSha256": "2a9f85ed6e3a09b119484fae74f6223948892283270e273a33de8cce4a7b5aba",
+  "status": "passed",
+  "browser": "153.0.8010.12",
+  "checks": {
+    "passed": true,
+    "crossOriginIsolated": true,
+    "results": [
+      {
+        "copy": false,
+        "reads": 54652,
+        "snapshots": 12,
+        "sourceCount": 32801,
+        "initialCapacity": 393216,
+        "finalCapacity": 2162688,
+        "sourceBytesUnchanged": true
+      },
+      {
+        "copy": true,
+        "reads": 38318,
+        "snapshots": 12,
+        "sourceCount": 32801,
+        "initialCapacity": 393216,
+        "finalCapacity": 2162688,
+        "sourceBytesUnchanged": true
+      }
+    ]
+  },
+  "completedAt": "2026-11-08T15:39:04.801Z"
+}

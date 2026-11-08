@@ -1,0 +1,4 @@
+{"record":"/home/runner/work/zerocopy/zerocopy/proofs/list-set-many-20261108/results/aa.json","mode":"aa","processes":48,"timedBatches":432,"verifiedOutputs":248320,"measuredBatchesBelow2ms":0,"exactCurrentBuild":false}
+{"record":"/home/runner/work/zerocopy/zerocopy/proofs/list-set-many-20261108/results/formal.json","mode":"formal","processes":240,"timedBatches":2160,"verifiedOutputs":10078944,"measuredBatchesBelow2ms":0,"exactCurrentBuild":true}
+{"record":"/home/runner/work/zerocopy/zerocopy/proofs/list-set-many-20261108/results/pilot-v2.json","mode":"pilot","processes":32,"timedBatches":288,"verifiedOutputs":238336,"measuredBatchesBelow2ms":0,"exactCurrentBuild":false}
+{"record":"/home/runner/work/zerocopy/zerocopy/proofs/list-set-many-20261108/results/pilot.json","mode":"pilot","processes":32,"timedBatches":288,"verifiedOutputs":146752,"measuredBatchesBelow2ms":39,"exactCurrentBuild":false}
