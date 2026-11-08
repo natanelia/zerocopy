@@ -1,0 +1,70 @@
+{
+  "runtime": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "date": "2026-11-08T16:12:40.289Z",
+  "source": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "bundle": "7d340d274699dfde34472f3c2b5983846725ff38e6ee563aff37f14f9a11cbd6",
+  "driver": "d2d16eb4c50e369770f8b67b99fd1e00551bcf8ae097b71f2bf9e56b9074497f",
+  "checks": [
+    {
+      "scenario": "allocator-mutation",
+      "status": "passed",
+      "calls": 1,
+      "writes": 0,
+      "size": 65,
+      "inputDetached": false,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    },
+    {
+      "scenario": "allocator-detachment",
+      "status": "passed",
+      "calls": 1,
+      "writes": 0,
+      "size": 65,
+      "inputDetached": true,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    },
+    {
+      "scenario": "view-mutation",
+      "status": "passed",
+      "calls": 1,
+      "writes": 130,
+      "size": 65,
+      "inputDetached": false,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    }
+  ],
+  "timingMeasurements": false
+}

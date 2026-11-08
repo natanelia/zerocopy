@@ -1,0 +1,86 @@
+{
+  "runtime": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "date": "2026-11-08T16:01:32.962Z",
+  "source": "36bcb5f12e5b9f398f3510641d90315e9cd77a0ebaf429a6d6743105cf445ce9",
+  "bundle": "c79cbdc738ce12184b019c1a0ad03f9a1b71536b88f302a02b7dd0a775191103",
+  "driver": "0f7fce51b4c7940ac3565ec7f483f21bbcff9b38e729112ba124e31d97b68542",
+  "order": [
+    "import shared",
+    "customize prototype allocator",
+    "import numeric",
+    "fromFloat64"
+  ],
+  "calls": 1,
+  "expected": [
+    1.25,
+    0,
+    17.5
+  ],
+  "actual": [
+    99,
+    99,
+    99
+  ],
+  "inputAfter": [
+    99,
+    99,
+    99
+  ],
+  "timingMeasurements": false
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Private input snapshot must precede a custom allocator
++ actual - expected
+
+  [
++   99,
++   99,
++   99
+-   1.25,
+-   -0,
+-   17.5
+  ]
+
+    at file:///workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/review-late-import.mjs:30:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [ 99, 99, 99 ],
+  expected: [ 1.25, -0, 17.5 ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.1

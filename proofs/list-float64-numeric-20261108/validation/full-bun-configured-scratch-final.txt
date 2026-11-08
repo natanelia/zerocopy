@@ -1,0 +1,12 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["bun", "--bun", "node_modules/vitest/vitest.mjs", "run"]
+Outer subprocess deadline: 180 seconds; per-test timeouts unchanged
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric
+
+
+ Test Files  62 passed (62)
+      Tests  1221 passed (1221)
+   Start at  00:19:52
+   Duration  40.85s (transform 1.62s, setup 0ms, import 3.11s, tests 149.60s, environment 14ms)
+

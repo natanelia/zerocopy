@@ -1,0 +1,20 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["node", "scripts/check-doc-examples.mjs"]
+Outer subprocess deadline: 180 seconds; per-test timeouts unchanged
+Type-checked 19 Markdown examples against built package declarations.
+Passed: map-snapshots
+Passed: log-columns
+Passed: catalog-snapshots
+Passed: typed-json
+Passed: ordered-map
+Passed: sorted-map
+Passed: sets
+Passed: sequences
+Passed: list-float64
+Passed: linked-lists
+Passed: priority-queues
+Passed: nested-collections
+Passed: compaction
+Passed: shared-collection
+Passed: redux-store
+Passed: documented Node owner/worker pair.

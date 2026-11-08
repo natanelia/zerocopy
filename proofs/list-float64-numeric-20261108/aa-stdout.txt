@@ -1,0 +1,108 @@
+aa: node float64-65536 pair 1/4 before: 916.574 us, verified
+aa: node float64-65536 pair 1/4 after: 920.367 us, verified
+aa: node float64-only-65536 pair 1/4 before: 232.923 us, verified
+aa: node float64-only-65536 pair 1/4 after: 232.233 us, verified
+aa: node array-build-control-32 pair 1/4 before: 0.386 us, verified
+aa: node array-build-control-32 pair 1/4 after: 0.406 us, verified
+aa: node scalar-append-control-2048 pair 1/4 before: 22.466 us, verified
+aa: node scalar-append-control-2048 pair 1/4 after: 22.416 us, verified
+aa: node numeric-range-control-65569 pair 1/4 before: 25.948 us, verified
+aa: node numeric-range-control-65569 pair 1/4 after: 27.221 us, verified
+aa: node numeric-box-control-65538 pair 1/4 before: 57.302 us, verified
+aa: node numeric-box-control-65538 pair 1/4 after: 56.748 us, verified
+aa: bun float64-65536 pair 1/4 before: 499.788 us, verified
+aa: bun float64-65536 pair 1/4 after: 458.447 us, verified
+aa: bun float64-only-65536 pair 1/4 before: 325.109 us, verified
+aa: bun float64-only-65536 pair 1/4 after: 325.576 us, verified
+aa: bun array-build-control-32 pair 1/4 before: 0.716 us, verified
+aa: bun array-build-control-32 pair 1/4 after: 0.660 us, verified
+aa: bun scalar-append-control-2048 pair 1/4 before: 14.143 us, verified
+aa: bun scalar-append-control-2048 pair 1/4 after: 20.657 us, verified
+aa: bun numeric-range-control-65569 pair 1/4 before: 28.338 us, verified
+aa: bun numeric-range-control-65569 pair 1/4 after: 27.488 us, verified
+aa: bun numeric-box-control-65538 pair 1/4 before: 63.465 us, verified
+aa: bun numeric-box-control-65538 pair 1/4 after: 63.002 us, verified
+aa: bun numeric-box-control-65538 pair 2/4 after: 105.341 us, verified
+aa: bun numeric-box-control-65538 pair 2/4 before: 71.032 us, verified
+aa: bun numeric-range-control-65569 pair 2/4 after: 50.532 us, verified
+aa: bun numeric-range-control-65569 pair 2/4 before: 39.462 us, verified
+aa: bun scalar-append-control-2048 pair 2/4 after: 20.836 us, verified
+aa: bun scalar-append-control-2048 pair 2/4 before: 26.726 us, verified
+aa: bun array-build-control-32 pair 2/4 after: 0.604 us, verified
+aa: bun array-build-control-32 pair 2/4 before: 0.571 us, verified
+aa: bun float64-only-65536 pair 2/4 after: 398.805 us, verified
+aa: bun float64-only-65536 pair 2/4 before: 342.692 us, verified
+aa: bun float64-65536 pair 2/4 after: 438.170 us, verified
+aa: bun float64-65536 pair 2/4 before: 357.504 us, verified
+aa: node numeric-box-control-65538 pair 2/4 after: 66.187 us, verified
+aa: node numeric-box-control-65538 pair 2/4 before: 65.746 us, verified
+aa: node numeric-range-control-65569 pair 2/4 after: 46.035 us, verified
+aa: node numeric-range-control-65569 pair 2/4 before: 46.121 us, verified
+aa: node scalar-append-control-2048 pair 2/4 after: 24.281 us, verified
+aa: node scalar-append-control-2048 pair 2/4 before: 24.889 us, verified
+aa: node array-build-control-32 pair 2/4 after: 0.645 us, verified
+aa: node array-build-control-32 pair 2/4 before: 0.435 us, verified
+aa: node float64-only-65536 pair 2/4 after: 330.756 us, verified
+aa: node float64-only-65536 pair 2/4 before: 312.091 us, verified
+aa: node float64-65536 pair 2/4 after: 911.659 us, verified
+aa: node float64-65536 pair 2/4 before: 932.729 us, verified
+aa: node float64-65536 pair 3/4 before: 1008.302 us, verified
+aa: node float64-65536 pair 3/4 after: 904.963 us, verified
+aa: node float64-only-65536 pair 3/4 before: 234.085 us, verified
+aa: node float64-only-65536 pair 3/4 after: 222.628 us, verified
+aa: node array-build-control-32 pair 3/4 before: 0.455 us, verified
+aa: node array-build-control-32 pair 3/4 after: 0.416 us, verified
+aa: node scalar-append-control-2048 pair 3/4 before: 20.478 us, verified
+aa: node scalar-append-control-2048 pair 3/4 after: 23.554 us, verified
+aa: node numeric-range-control-65569 pair 3/4 before: 45.851 us, verified
+aa: node numeric-range-control-65569 pair 3/4 after: 28.265 us, verified
+aa: node numeric-box-control-65538 pair 3/4 before: 59.741 us, verified
+aa: node numeric-box-control-65538 pair 3/4 after: 62.158 us, verified
+aa: bun float64-65536 pair 3/4 before: 484.733 us, verified
+aa: bun float64-65536 pair 3/4 after: 470.674 us, verified
+aa: bun float64-only-65536 pair 3/4 before: 300.331 us, verified
+aa: bun float64-only-65536 pair 3/4 after: 395.581 us, verified
+aa: bun array-build-control-32 pair 3/4 before: 0.747 us, verified
+aa: bun array-build-control-32 pair 3/4 after: 0.736 us, verified
+aa: bun scalar-append-control-2048 pair 3/4 before: 15.145 us, verified
+aa: bun scalar-append-control-2048 pair 3/4 after: 26.522 us, verified
+aa: bun numeric-range-control-65569 pair 3/4 before: 28.491 us, verified
+aa: bun numeric-range-control-65569 pair 3/4 after: 30.419 us, verified
+aa: bun numeric-box-control-65538 pair 3/4 before: 62.088 us, verified
+aa: bun numeric-box-control-65538 pair 3/4 after: 65.636 us, verified
+aa: bun numeric-box-control-65538 pair 4/4 after: 66.502 us, verified
+aa: bun numeric-box-control-65538 pair 4/4 before: 67.381 us, verified
+aa: bun numeric-range-control-65569 pair 4/4 after: 31.649 us, verified
+aa: bun numeric-range-control-65569 pair 4/4 before: 32.818 us, verified
+aa: bun scalar-append-control-2048 pair 4/4 after: 28.490 us, verified
+aa: bun scalar-append-control-2048 pair 4/4 before: 26.398 us, verified
+aa: bun array-build-control-32 pair 4/4 after: 0.849 us, verified
+aa: bun array-build-control-32 pair 4/4 before: 0.732 us, verified
+aa: bun float64-only-65536 pair 4/4 after: 404.446 us, verified
+aa: bun float64-only-65536 pair 4/4 before: 399.275 us, verified
+aa: bun float64-65536 pair 4/4 after: 506.963 us, verified
+aa: bun float64-65536 pair 4/4 before: 424.323 us, verified
+aa: node numeric-box-control-65538 pair 4/4 after: 61.175 us, verified
+aa: node numeric-box-control-65538 pair 4/4 before: 81.259 us, verified
+aa: node numeric-range-control-65569 pair 4/4 after: 45.962 us, verified
+aa: node numeric-range-control-65569 pair 4/4 before: 27.913 us, verified
+aa: node scalar-append-control-2048 pair 4/4 after: 34.138 us, verified
+aa: node scalar-append-control-2048 pair 4/4 before: 34.797 us, verified
+aa: node array-build-control-32 pair 4/4 after: 0.561 us, verified
+aa: node array-build-control-32 pair 4/4 before: 0.430 us, verified
+aa: node float64-only-65536 pair 4/4 after: 305.526 us, verified
+aa: node float64-only-65536 pair 4/4 before: 313.160 us, verified
+aa: node float64-65536 pair 4/4 after: 1038.924 us, verified
+aa: node float64-65536 pair 4/4 before: 1167.787 us, verified
+node float64-65536: 970.515 -> 916.013 us, paired ratio 0.941 (0.854-1.036)
+node float64-only-65536: 273.088 -> 268.879 us, paired ratio 0.995 (0.924-1.071)
+node array-build-control-32: 0.432 -> 0.489 us, paired ratio 1.168 (0.829-1.648)
+node scalar-append-control-2048: 23.677 -> 23.918 us, paired ratio 1.024 (0.904-1.159)
+node numeric-range-control-65569: 36.882 -> 37.113 us, paired ratio 1.015 (0.536-1.924)
+node numeric-box-control-65538: 62.743 -> 61.666 us, paired ratio 0.940 (0.741-1.192)
+bun float64-65536: 454.528 -> 464.561 us, paired ratio 1.069 (0.847-1.348)
+bun float64-only-65536: 333.901 -> 397.193 us, paired ratio 1.117 (0.909-1.372)
+bun array-build-control-32: 0.724 -> 0.698 us, paired ratio 1.027 (0.877-1.202)
+bun scalar-append-control-2048: 20.771 -> 23.679 us, paired ratio 1.211 (0.688-2.131)
+bun numeric-range-control-65569: 30.655 -> 31.034 us, paired ratio 1.063 (0.861-1.313)
+bun numeric-box-control-65538: 65.423 -> 66.069 us, paired ratio 1.113 (0.818-1.515)

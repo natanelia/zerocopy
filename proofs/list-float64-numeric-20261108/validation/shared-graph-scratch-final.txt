@@ -1,0 +1,15 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["node", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/check-shared-graph.mjs", "/workspace/scratch/8d514edd7494/zerocopy", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/shared-graph-comparison-scratch-final.json"]
+Outer subprocess deadline: 180 seconds; per-test timeouts unchanged
+{
+  "status": "PASSED",
+  "reachableBefore": 5,
+  "reachableAfter": 5,
+  "changes": [],
+  "changedRootSources": [
+    "numeric.ts"
+  ],
+  "wasmIdentical": true,
+  "external": [],
+  "unresolved": []
+}

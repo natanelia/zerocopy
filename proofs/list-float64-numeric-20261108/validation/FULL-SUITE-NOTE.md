@@ -1,0 +1,9 @@
+# Full-suite validation and the preserved two-worker failure
+
+All runs below used numeric source SHA-256 `b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d`. Production source and per-test timeouts were unchanged between them.
+
+1. The first full Bun run explicitly used `--maxWorkers=2`, overriding the repository's configured maximum of four workers. `geometry.test.ts` reported failure in its attached-snapshot/growth test after 38,133 ms, followed by a worker-termination timeout for `tanstack-db-collection.test.ts`. The stalled run was interrupted with exit 130 before a final assertion diagnostic or full-suite summary appeared. Its exact log is `full-bun-scratch-final.txt`; the interrupted validation summary lists the later checks that had not run.
+2. The two named files were then compared on baseline and candidate using the identical `--maxWorkers=2` flags and a 60-second outer process limit. Both passed all 15 tests: 1.93 seconds of Vitest duration on baseline and 2.10 seconds on candidate. See `isolation-pair-{baseline,candidate}.txt` and `isolation-pair-results.json`.
+3. One full candidate run used the unchanged repository configuration, including its configured four workers, with a 180-second outer process limit. It passed 1,221 tests in 62 files in 40.85 seconds. See `full-bun-configured-scratch-final.txt`. Focused Node, package, documentation, and graph checks then completed successfully in the serial sequence recorded by `implementation-validation-configured-scratch-final-results.json`.
+
+The two-worker full-run issue remains unresolved. The geometry test compares the complete current arena buffer, and the suite uses `isolate: false`; neither observation establishes the cause. The passing bounded comparisons and configured full run do not erase the failed attempt or identify a production regression. No timeout was raised, no assertion weakened, and no repeated full-suite retries were used to select a passing result.

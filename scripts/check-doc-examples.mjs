@@ -19,6 +19,7 @@ const cases = [
   ['docs/api.md', 'sorted-map', "assert.deepEqual([...reverse.keys()], ['c', 'b', 'a']);"],
   ['docs/api.md', 'sets', "assert.equal(tags.has('admin'), true); assert.deepEqual([...insertionOrder.values()], ['z', 'a', 'm']); assert.deepEqual([...sorted.values()], ['a', 'm', 'z']);"],
   ['docs/api.md', 'sequences', "assert.equal(list.get(0), 1); assert.equal(stack.peek(), 2); assert.equal(queue.peek(), 'first'); assert.equal(remaining.peek(), 'second');"],
+  ['docs/numeric.md', 'list-float64', "assert.equal(snapshot.get(0), 1.25); assert(Object.is(snapshot.get(1), -0)); assert.deepEqual(extended.toArray(), [1.25, -0, 3.5, 4.75]);"],
   ['docs/api.md', 'linked-lists', "assert.deepEqual(numbers.toArray(), [0, 1, 2]); assert.deepEqual(letters.toArrayReverse(), ['c', 'b', 'a']);"],
   ['docs/api.md', 'priority-queues', "assert.equal(pending.peek(), 'high'); assert.equal(pending.peekPriority(), 1); assert.equal(largest.peek(), 30);"],
   ['docs/api.md', 'nested-collections', "assert.equal(users.get('user-1').has('admin'), true); assert.equal(records.get(0).get('x'), 10); assert.equal(nested.size, 0); assert.equal(stack.size, 0); assert.equal(queue.size, 0);"],

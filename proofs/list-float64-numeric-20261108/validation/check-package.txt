@@ -1,0 +1,4 @@
+Command: ["node", "scripts/check-package.mjs"]
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Package zerocopy@0.2.1: 145 files, 222870 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.
