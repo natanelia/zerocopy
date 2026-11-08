@@ -1,4 +1,4 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, primitiveReadProtocol } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 import { compileStringSearch, type TextSearchOptions } from './text-search';
@@ -154,12 +154,25 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
   }
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
-    const a = this.arena, start = this.size ? (this.size - 1) & ~31 : 0;
+    const a = this.arena, type = this.type, start = this.size ? (this.size - 1) & ~31 : 0;
+    const isNumber = type === 'number', isBoolean = type === 'boolean';
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
       const stop = Math.min(this.size, first + 32), view = a.dv;
-      // Shared views remain valid if the callback grows memory or creates forks.
-      for (let i = first; i < stop; i++) fn(a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true)), i);
+      // Published bytes remain valid if a callback grows shared memory.
+      // Inspect the decoder before each callback: a callback can replace it,
+      // and custom decoders must still receive every subsequent raw value.
+      if (isNumber || isBoolean) {
+        for (let i = first; i < stop; i++) {
+          const raw = view.getFloat64(leaf + (i - first) * 8, true);
+          const decoder = a.decode;
+          fn(decoder === primitiveReadProtocol.decode
+            ? (isNumber ? raw : raw !== 0) as ValueOf<T>
+            : decoder.call(a, type, raw), i);
+        }
+      } else {
+        for (let i = first; i < stop; i++) fn(a.decode(type, view.getFloat64(leaf + (i - first) * 8, true)), i);
+      }
     }
   }
   toArray(): ValueOf<T>[] {
