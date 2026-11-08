@@ -5,6 +5,7 @@ The [README](../README.md#performance) compares zerocopy with Immutable.js and n
 | Report | Comparison |
 | --- | --- |
 | [Redux heap encoding](redux-heap-read-view-20261108/README.md) | Reuse native memory views; paired Node/Bun gains and a measured fresh-Arena constructor cost, November 8, 2026 |
+| [Shared-state record capture](worker-record-descriptors-20261108/README.md) | Paired Node/Bun creation and publication measurements, small-record controls, raw evidence and reproduction, November 8, 2026 |
 | [Heap insertion allocation](heap-insert-allocation.md) | Avoid one discarded node on priority promotion; x64 Node/Bun results with five uncertain controls, October 9, 2026 |
 | [UTF-8 value writes](utf8-write-performance.md) | Reuse a portable encoding buffer; matched Node and Bun rounds, October 7, 2026 |
 | [Scalar map writes](map-set-performance.md) | Three libraries and a paired writer-index experiment, September 14, 2026 |
