@@ -32,7 +32,7 @@ describe('SharedList primitive forEach fast path', () => {
 
   for (const type of ['number', 'boolean'] as const) {
     test(`honors decoder replaced before and during ${type} iteration`, () => {
-      const input = Array.from({ length: 69 }, (_, i) => type === 'number' ? i : i % 2 === 0);
+      const input = Array.from({ length: 1067 }, (_, i) => type === 'number' ? i : i % 2 === 0);
       const list = new SharedList(type).pushMany(input as any);
       const a = arenaOf(list);
       const original = a.decode;
@@ -50,13 +50,15 @@ describe('SharedList primitive forEach fast path', () => {
           if (i === 4) a.decode = original;
           if (i === 31) a.decode = custom;
           if (i === 39) a.decode = original;
+          if (i === 1023) a.decode = custom;
+          if (i === 1030) a.decode = original;
         });
       } finally {
         a.decode = original;
       }
-      expect(calls).toBe(5 + 8);
+      expect(calls).toBe(5 + 8 + 7);
       for (let i = 0; i < input.length; i++) {
-        const hooked = i <= 4 || (i >= 32 && i <= 39);
+        const hooked = i <= 4 || (i >= 32 && i <= 39) || (i >= 1024 && i <= 1030);
         const expected = hooked ? type === 'number' ? (input[i] as number) + 1000 : !input[i] : input[i];
         expect(Object.is(actual[i], expected)).toBe(true);
       }
