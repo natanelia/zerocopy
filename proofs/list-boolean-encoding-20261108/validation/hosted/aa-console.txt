@@ -1,0 +1,72 @@
+aa: node boolean-1024-control pair 1/4 before: 12.835 us, verified
+aa: node boolean-1024-control pair 1/4 after: 13.577 us, verified
+aa: node boolean-32768 pair 1/4 before: 713.114 us, verified
+aa: node boolean-32768 pair 1/4 after: 734.034 us, verified
+aa: node number-control-1024 pair 1/4 before: 7.724 us, verified
+aa: node number-control-1024 pair 1/4 after: 7.665 us, verified
+aa: node scalar-boolean-push-control pair 1/4 before: 0.236 us, verified
+aa: node scalar-boolean-push-control pair 1/4 after: 0.215 us, verified
+aa: bun boolean-1024-control pair 1/4 before: 22.054 us, verified
+aa: bun boolean-1024-control pair 1/4 after: 22.001 us, verified
+aa: bun boolean-32768 pair 1/4 before: 541.333 us, verified
+aa: bun boolean-32768 pair 1/4 after: 510.493 us, verified
+aa: bun number-control-1024 pair 1/4 before: 17.810 us, verified
+aa: bun number-control-1024 pair 1/4 after: 17.505 us, verified
+aa: bun scalar-boolean-push-control pair 1/4 before: 0.134 us, verified
+aa: bun scalar-boolean-push-control pair 1/4 after: 0.132 us, verified
+aa: bun scalar-boolean-push-control pair 2/4 after: 0.120 us, verified
+aa: bun scalar-boolean-push-control pair 2/4 before: 0.119 us, verified
+aa: bun number-control-1024 pair 2/4 after: 16.694 us, verified
+aa: bun number-control-1024 pair 2/4 before: 15.809 us, verified
+aa: bun boolean-32768 pair 2/4 after: 506.315 us, verified
+aa: bun boolean-32768 pair 2/4 before: 524.196 us, verified
+aa: bun boolean-1024-control pair 2/4 after: 23.692 us, verified
+aa: bun boolean-1024-control pair 2/4 before: 22.287 us, verified
+aa: node scalar-boolean-push-control pair 2/4 after: 0.233 us, verified
+aa: node scalar-boolean-push-control pair 2/4 before: 0.220 us, verified
+aa: node number-control-1024 pair 2/4 after: 7.743 us, verified
+aa: node number-control-1024 pair 2/4 before: 7.731 us, verified
+aa: node boolean-32768 pair 2/4 after: 508.816 us, verified
+aa: node boolean-32768 pair 2/4 before: 512.357 us, verified
+aa: node boolean-1024-control pair 2/4 after: 12.740 us, verified
+aa: node boolean-1024-control pair 2/4 before: 13.166 us, verified
+aa: node boolean-1024-control pair 3/4 before: 13.108 us, verified
+aa: node boolean-1024-control pair 3/4 after: 13.371 us, verified
+aa: node boolean-32768 pair 3/4 before: 708.684 us, verified
+aa: node boolean-32768 pair 3/4 after: 717.179 us, verified
+aa: node number-control-1024 pair 3/4 before: 7.893 us, verified
+aa: node number-control-1024 pair 3/4 after: 7.786 us, verified
+aa: node scalar-boolean-push-control pair 3/4 before: 0.213 us, verified
+aa: node scalar-boolean-push-control pair 3/4 after: 0.237 us, verified
+aa: bun boolean-1024-control pair 3/4 before: 23.518 us, verified
+aa: bun boolean-1024-control pair 3/4 after: 22.056 us, verified
+aa: bun boolean-32768 pair 3/4 before: 510.651 us, verified
+aa: bun boolean-32768 pair 3/4 after: 529.250 us, verified
+aa: bun number-control-1024 pair 3/4 before: 17.070 us, verified
+aa: bun number-control-1024 pair 3/4 after: 15.578 us, verified
+aa: bun scalar-boolean-push-control pair 3/4 before: 0.120 us, verified
+aa: bun scalar-boolean-push-control pair 3/4 after: 0.118 us, verified
+aa: bun scalar-boolean-push-control pair 4/4 after: 0.121 us, verified
+aa: bun scalar-boolean-push-control pair 4/4 before: 0.118 us, verified
+aa: bun number-control-1024 pair 4/4 after: 16.822 us, verified
+aa: bun number-control-1024 pair 4/4 before: 16.680 us, verified
+aa: bun boolean-32768 pair 4/4 after: 515.686 us, verified
+aa: bun boolean-32768 pair 4/4 before: 511.266 us, verified
+aa: bun boolean-1024-control pair 4/4 after: 22.239 us, verified
+aa: bun boolean-1024-control pair 4/4 before: 21.635 us, verified
+aa: node scalar-boolean-push-control pair 4/4 after: 0.233 us, verified
+aa: node scalar-boolean-push-control pair 4/4 before: 0.216 us, verified
+aa: node number-control-1024 pair 4/4 after: 7.907 us, verified
+aa: node number-control-1024 pair 4/4 before: 7.647 us, verified
+aa: node boolean-32768 pair 4/4 after: 502.969 us, verified
+aa: node boolean-32768 pair 4/4 before: 709.878 us, verified
+aa: node boolean-1024-control pair 4/4 after: 13.214 us, verified
+aa: node boolean-1024-control pair 4/4 before: 13.878 us, verified
+node boolean-1024-control: 13.137 -> 13.293 us, paired ratio 0.999 (0.925-1.078)
+node boolean-32768: 709.281 -> 612.998 us, paired ratio 0.925 (0.696-1.229)
+node number-control-1024: 7.728 -> 7.765 us, paired ratio 1.003 (0.970-1.037)
+node scalar-boolean-push-control: 0.218 -> 0.233 us, paired ratio 1.038 (0.903-1.193)
+bun boolean-1024-control: 22.171 -> 22.147 us, paired ratio 1.006 (0.924-1.094)
+bun boolean-32768: 517.731 -> 513.090 us, paired ratio 0.988 (0.923-1.057)
+bun number-control-1024: 16.875 -> 16.758 us, paired ratio 0.989 (0.897-1.089)
+bun scalar-boolean-push-control: 0.120 -> 0.121 us, paired ratio 1.002 (0.968-1.037)

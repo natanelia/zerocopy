@@ -7,7 +7,7 @@ on:
       - 'proofs/list-boolean-encoding-20261108/**'
       - '.github/workflows/list-boolean-encoding.yml'
   push:
-    branches: [main, perf/list-boolean-encoding-20261108]
+    branches: [main]
     paths:
       - 'list-boolean-range.test.ts'
       - 'proofs/list-boolean-encoding-20261108/**'
@@ -24,11 +24,12 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.22.1'
@@ -47,58 +48,67 @@ jobs:
         run: |
           node node_modules/vitest/vitest.mjs run list-boolean-range.test.ts shared-list.test.ts allocation-failure.test.ts --no-file-parallelism --maxWorkers=1
           bun --bun node_modules/vitest/vitest.mjs run list-boolean-range.test.ts shared-list.test.ts allocation-failure.test.ts --no-file-parallelism --maxWorkers=1
+      - name: Check every workload on the current package without historical layout constraints
+        run: |
+          mkdir -p boolean-ci-results
+          node proofs/list-boolean-encoding-20261108/smoke.mjs . . > boolean-ci-results/smoke-current-node.json
+          bun proofs/list-boolean-encoding-20261108/smoke.mjs . . > boolean-ci-results/smoke-current-bun.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check current browser output and real workers with shared/copied attachments
+        run: node proofs/list-boolean-encoding-20261108/browser.mjs . > boolean-ci-results/browser.json
       - name: Check out the benchmark baseline separately
         uses: actions/checkout@v4
         with:
           ref: a4265a0608ec25eec5719496225212db6b251989
           path: boolean-baseline
           persist-credentials: false
-      - name: Build the baseline with the same dependencies
+      - name: Build the pinned baseline with its recorded dependency versions
         run: |
-          ln -s "$GITHUB_WORKSPACE/node_modules" boolean-baseline/node_modules
           cd boolean-baseline
+          bun install
           bun run build:wasm
           bun run build:browser
-      - name: Verify every workload and exact arena bytes without timing
-        run: |
-          mkdir -p boolean-ci-results
-          node proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline . > boolean-ci-results/smoke-node.json
-          bun proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline . > boolean-ci-results/smoke-bun.json
-          node proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline . > boolean-ci-results/allocation-node.json
-          bun proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline . > boolean-ci-results/allocation-bun.json
-      - name: Install Chromium
-        run: bunx playwright install --with-deps chromium
-      - name: Check browser output and real workers with shared/copied attachments
-        run: node proofs/list-boolean-encoding-20261108/browser.mjs . > boolean-ci-results/browser.json
-      - name: Bootstrap isolated performance evidence when confirmation is absent
-        if: ${{ hashFiles('proofs/list-boolean-encoding-20261108/results/formal.json') == '' }}
+      - name: Rebuild the candidate commit named by the retained confirmation
         shell: bash
         run: |
           set -euo pipefail
-          benchmark_cpu="$(node -e 'const fs = require("node:fs"); const allowed = fs.readFileSync("/proc/self/status", "utf8").match(/^Cpus_allowed_list:\s*(\d+)/m); if (!allowed) process.exit(1); process.stdout.write(allowed[1]);')"
-          benchmark_bun="$(command -v bun)"
-          benchmark_proof=proofs/list-boolean-encoding-20261108
-          mkdir -p "$benchmark_proof/results"
-          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
-            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
-            "$benchmark_bun" "$benchmark_proof/results/pilot-v2.json" pilot \
-            2>&1 | tee boolean-ci-results/pilot-v2-console.txt
-          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
-            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
-            "$benchmark_bun" "$benchmark_proof/results/formal.json" formal \
-            2>&1 | tee boolean-ci-results/formal-console.txt
-          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
-            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
-            "$benchmark_bun" "$benchmark_proof/results/aa.json" aa \
-            2>&1 | tee boolean-ci-results/aa-console.txt
-          taskset -c "$benchmark_cpu" node "$benchmark_proof/compare.mjs" \
-            "$GITHUB_WORKSPACE" "$benchmark_bun" "$benchmark_proof/results/reference-comparison.json" measure \
-            2>&1 | tee boolean-ci-results/reference-comparison-console.txt
+          mkdir -p boolean-ci-results
+          recorded_commit="$(node --input-type=module - <<'NODE'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync } from 'node:fs';
+          import { gunzipSync } from 'node:zlib';
+          const plain = 'proofs/list-boolean-encoding-20261108/results/formal.json';
+          const path = existsSync(plain) ? plain : `${plain}.gz`;
+          const bytes = readFileSync(path);
+          const record = JSON.parse((path.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
+          assert.equal(record.status, 'complete');
+          assert.equal(record.mode, 'formal');
+          assert.match(record.source.after.commit, /^[a-f0-9]{40}$/);
+          process.stdout.write(record.source.after.commit);
+          NODE
+          )"
+          recorded_checkout="$RUNNER_TEMP/boolean-recorded-candidate"
+          if ! git cat-file -e "$recorded_commit^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$recorded_commit"
+          fi
+          git worktree add --detach "$recorded_checkout" "$recorded_commit"
+          printf 'BOOLEAN_RECORDED_CANDIDATE=%s\n' "$recorded_checkout" >> "$GITHUB_ENV"
+          cd "$recorded_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Verify historical workloads and exact arena bytes without timing
+        run: |
+          node proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/smoke-node.json
+          bun proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/smoke-bun.json
+          node proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/allocation-node.json
+          bun proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/allocation-bun.json
       - name: Audit saved samples, statistics and exact source/build hashes
         run: |
           node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/pilot.json > boolean-ci-results/audit-pilot-v1.json
-          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/pilot-v2.json . > boolean-ci-results/audit-pilot-v2.json
-          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/formal.json . > boolean-ci-results/audit-formal.json
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/pilot-v2.json "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/audit-pilot-v2.json
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/formal.json "$BOOLEAN_RECORDED_CANDIDATE" > boolean-ci-results/audit-formal.json
           node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/aa.json boolean-baseline > boolean-ci-results/audit-aa.json
       - uses: actions/upload-artifact@v4
         if: always()

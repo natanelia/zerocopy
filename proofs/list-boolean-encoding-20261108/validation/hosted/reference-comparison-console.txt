@@ -1,0 +1,295 @@
+{
+  "output": "/home/runner/work/zerocopy/zerocopy/proofs/list-boolean-encoding-20261108/results/reference-comparison.json",
+  "status": "complete",
+  "subjects": 72,
+  "summary": [
+    {
+      "runtime": "node",
+      "caseName": "boolean-1024-control",
+      "library": "shared",
+      "medianMs": 0.011354177734375082,
+      "processEstimates": [
+        0.011354177734375082,
+        0.011247978515624979,
+        0.011487683593750075
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-1024-control",
+      "library": "immutable",
+      "medianMs": 0.04542718164062487,
+      "processEstimates": [
+        0.04565788281250005,
+        0.04542718164062487,
+        0.040664382812499955
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-1024-control",
+      "library": "native",
+      "medianMs": 0.0007339121093750123,
+      "processEstimates": [
+        0.0007421171874999466,
+        0.0007339121093750123,
+        0.000730099609375312
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-32768",
+      "library": "shared",
+      "medianMs": 0.45784490625000274,
+      "processEstimates": [
+        0.47014459374999973,
+        0.45784490625000274,
+        0.4556250625000011
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-32768",
+      "library": "immutable",
+      "medianMs": 1.755400625,
+      "processEstimates": [
+        1.7736488437500029,
+        1.74760646875,
+        1.755400625
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-32768",
+      "library": "native",
+      "medianMs": 0.11858550000000179,
+      "processEstimates": [
+        0.11643818750000179,
+        0.11959262500000278,
+        0.11858550000000179
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-262144",
+      "library": "shared",
+      "medianMs": 3.6953709999999944,
+      "processEstimates": [
+        3.6953709999999944,
+        3.7160017500000038,
+        3.610961500000002
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-262144",
+      "library": "immutable",
+      "medianMs": 16.70314725000003,
+      "processEstimates": [
+        16.846452499999998,
+        16.645651249999958,
+        16.70314725000003
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-262144",
+      "library": "native",
+      "medianMs": 0.9013194999999996,
+      "processEstimates": [
+        0.92805125000001,
+        0.9013194999999996,
+        0.9002479999999764
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-prefix-65",
+      "library": "shared",
+      "medianMs": 0.4608704374999988,
+      "processEstimates": [
+        0.4608704374999988,
+        0.4663507499999966,
+        0.458193781250003
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-prefix-65",
+      "library": "immutable",
+      "medianMs": 2.616040562500004,
+      "processEstimates": [
+        2.652375062499999,
+        2.5421741250000025,
+        2.616040562500004
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "node",
+      "caseName": "boolean-prefix-65",
+      "library": "native",
+      "medianMs": 0.12393603124999686,
+      "processEstimates": [
+        0.12393603124999686,
+        0.12220024999999879,
+        0.12488609374999982
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-1024-control",
+      "library": "shared",
+      "medianMs": 0.021847544921874906,
+      "processEstimates": [
+        0.021847544921874906,
+        0.02238470312499996,
+        0.021641230468750106
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-1024-control",
+      "library": "immutable",
+      "medianMs": 0.045526300781250084,
+      "processEstimates": [
+        0.041818562500000045,
+        0.04858885351562514,
+        0.045526300781250084
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-1024-control",
+      "library": "native",
+      "medianMs": 0.0013918300781252668,
+      "processEstimates": [
+        0.0015214101562497362,
+        0.0013858554687500302,
+        0.0013918300781252668
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-32768",
+      "library": "shared",
+      "medianMs": 0.49551487500000135,
+      "processEstimates": [
+        0.49551487500000135,
+        0.5197230625000024,
+        0.3658906562499986
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-32768",
+      "library": "immutable",
+      "medianMs": 1.5507319374999966,
+      "processEstimates": [
+        1.5741865624999996,
+        1.5409047812500063,
+        1.5507319374999966
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-32768",
+      "library": "native",
+      "medianMs": 0.0321795312499944,
+      "processEstimates": [
+        0.0321795312499944,
+        0.028254250000003367,
+        0.033065343750010356
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-262144",
+      "library": "shared",
+      "medianMs": 2.903365750000006,
+      "processEstimates": [
+        2.963592250000005,
+        2.903365750000006,
+        2.4551189999999963
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-262144",
+      "library": "immutable",
+      "medianMs": 15.106798249999997,
+      "processEstimates": [
+        15.586011750000011,
+        14.546635250000008,
+        15.106798249999997
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-262144",
+      "library": "native",
+      "medianMs": 2.7137124999999855,
+      "processEstimates": [
+        2.2304417500000113,
+        2.7137124999999855,
+        2.747546749999998
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-prefix-65",
+      "library": "shared",
+      "medianMs": 0.3675241562499991,
+      "processEstimates": [
+        0.3675241562499991,
+        0.3663991562499973,
+        0.3739218437500007
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-prefix-65",
+      "library": "immutable",
+      "medianMs": 2.554697187499997,
+      "processEstimates": [
+        2.627829499999997,
+        2.554697187499997,
+        2.5038575000000023
+      ],
+      "processes": 3
+    },
+    {
+      "runtime": "bun",
+      "caseName": "boolean-prefix-65",
+      "library": "native",
+      "medianMs": 0.03512621875000832,
+      "processEstimates": [
+        0.0282920312500039,
+        0.06638300000000186,
+        0.03512621875000832
+      ],
+      "processes": 3
+    }
+  ]
+}
