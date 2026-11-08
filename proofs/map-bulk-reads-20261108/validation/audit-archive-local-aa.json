@@ -1,0 +1,48 @@
+{
+  "verified": true,
+  "record": "/tmp/tmp.86McjVdE1D/aa-diagnostic-v1.json",
+  "mode": "aa",
+  "processes": 32,
+  "timedBatches": 288,
+  "verifiedOutputs": 6031360,
+  "measuredBatchesBelow2ms": 2,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "number-hit-128",
+      "pairedRatio": 1.249671969006485,
+      "interval95": [
+        0.8291253393851591,
+        1.883527080813396
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-number-control",
+      "pairedRatio": 0.9919589809249356,
+      "interval95": [
+        0.9082730402136082,
+        1.083355528868525
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-128",
+      "pairedRatio": 0.8976538116050445,
+      "interval95": [
+        0.5841463664968878,
+        1.3794186041442367
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.1691273219837381,
+      "interval95": [
+        0.6859953210995648,
+        1.9925189763947129
+      ]
+    }
+  ]
+}

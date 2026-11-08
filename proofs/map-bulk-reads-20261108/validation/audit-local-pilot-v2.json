@@ -1,0 +1,120 @@
+{
+  "verified": true,
+  "record": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads/proofs/map-bulk-reads-20261108/results/pilot-v2-hosted.json.gz",
+  "mode": "pilot",
+  "processes": 72,
+  "timedBatches": 648,
+  "verifiedOutputs": 8031808,
+  "measuredBatchesBelow2ms": 0,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "number-hit-128",
+      "pairedRatio": 0.8920574320368173,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-hit-1024",
+      "pairedRatio": 0.6832212309718563,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-mixed-1024",
+      "pairedRatio": 0.9782288231730796,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-miss-128",
+      "pairedRatio": 0.9915146356254383,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "string-hit-128",
+      "pairedRatio": 0.86284468823373,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "object-hit-128",
+      "pairedRatio": 0.889221319106566,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-number-control",
+      "pairedRatio": 0.982359370215368,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "cold-number-1024",
+      "pairedRatio": 0.8239425015321638,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "changing-root-1024",
+      "pairedRatio": 0.7437765430259784,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-128",
+      "pairedRatio": 2.673001386483194,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-1024",
+      "pairedRatio": 2.498819632997489,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-mixed-1024",
+      "pairedRatio": 1.3077589103512943,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-miss-128",
+      "pairedRatio": 1.2730492050220734,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "string-hit-128",
+      "pairedRatio": 3.4726201814808126,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "object-hit-128",
+      "pairedRatio": 0.9324643955033011,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.0037458186641002,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "cold-number-1024",
+      "pairedRatio": 1.1430899815802538,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "changing-root-1024",
+      "pairedRatio": 3.0968208140096767,
+      "interval95": null
+    }
+  ]
+}

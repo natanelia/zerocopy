@@ -1,0 +1,174 @@
+{
+  "verified": true,
+  "record": "/home/runner/work/zerocopy/zerocopy/proofs/map-bulk-reads-20261108/results/formal.json",
+  "mode": "formal",
+  "processes": 216,
+  "timedBatches": 1944,
+  "verifiedOutputs": 23736320,
+  "measuredBatchesBelow2ms": 0,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "number-hit-128",
+      "pairedRatio": 0.8691874057941286,
+      "interval95": [
+        0.8439672564032558,
+        0.8951612051998238
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "number-hit-1024",
+      "pairedRatio": 0.6749815628193073,
+      "interval95": [
+        0.6123779181283271,
+        0.7439852036769901
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "number-mixed-1024",
+      "pairedRatio": 0.9526647372540914,
+      "interval95": [
+        0.867170596891876,
+        1.0465877243305197
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "number-miss-128",
+      "pairedRatio": 0.9884030925173364,
+      "interval95": [
+        0.927339019550728,
+        1.0534881555734998
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "string-hit-128",
+      "pairedRatio": 0.9656299507117408,
+      "interval95": [
+        0.8806228822618762,
+        1.0588428037624775
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "object-hit-128",
+      "pairedRatio": 1.023544108372539,
+      "interval95": [
+        0.9562552465788862,
+        1.0955678889419938
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.0174282407946384,
+      "interval95": [
+        0.9420774190591782,
+        1.0988058987766136
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "cold-number-1024",
+      "pairedRatio": 1.0251671393713722,
+      "interval95": [
+        0.8634265388332609,
+        1.2172056525701003
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "changing-root-1024",
+      "pairedRatio": 0.6867023718744976,
+      "interval95": [
+        0.642667386068974,
+        0.7337545949273531
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-128",
+      "pairedRatio": 2.846519962567914,
+      "interval95": [
+        2.413004972457948,
+        3.3579192706942695
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-1024",
+      "pairedRatio": 2.04179542410728,
+      "interval95": [
+        1.656747364845515,
+        2.5163332939987284
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-mixed-1024",
+      "pairedRatio": 1.3086333658827929,
+      "interval95": [
+        1.1977486872344705,
+        1.4297834800853224
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-miss-128",
+      "pairedRatio": 1.2065594323761237,
+      "interval95": [
+        1.1681753659689331,
+        1.2462047277022528
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "string-hit-128",
+      "pairedRatio": 3.4938009598519253,
+      "interval95": [
+        2.9920767694358834,
+        4.079656401785318
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "object-hit-128",
+      "pairedRatio": 0.9653541508443044,
+      "interval95": [
+        0.8365275553788746,
+        1.114020250211906
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-number-control",
+      "pairedRatio": 0.9323600945570134,
+      "interval95": [
+        0.5965352396135217,
+        1.4572405588068105
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "cold-number-1024",
+      "pairedRatio": 1.0691446444752661,
+      "interval95": [
+        0.9653373430377142,
+        1.1841148372165327
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "changing-root-1024",
+      "pairedRatio": 2.5581154087585922,
+      "interval95": [
+        2.2113163516089496,
+        2.959302697584075
+      ]
+    }
+  ]
+}

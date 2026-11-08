@@ -1,0 +1,312 @@
+{
+  "runtime": "bun",
+  "status": "passed",
+  "records": [
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "number-hit-128",
+      "expectedDigest": "d2b736e51715adab8385259400886adbb8a53bd0fe77d21145f173ffd37cf6c2",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "number-hit-1024",
+      "expectedDigest": "c85cc8d4392d5c369b7594a0875923505e5b6955d0b31ce4ef9f4a5170c08de2",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "number-mixed-1024",
+      "expectedDigest": "1c025fa2b3a76bb0882f37fdc5e2f09ff6540731bb9d83dda1c7f3b3762db018",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "mixed",
+        "hitCount": 512,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "number-miss-128",
+      "expectedDigest": "5c403432713cccf8eed855898faefac513b05aebbbd062933ae1e9d23d93e3bf",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "miss",
+        "hitCount": 0,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "string-hit-128",
+      "expectedDigest": "c13ac0b48573359c6a2218cf59eb0ab2d936f9e6d415f979b5ca50a64ecab9c5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "string",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 236844,
+        "sourceBytesHash": "6ec8d41abd369e8a7d6ddc80b6f051d39a121213f53581ae11bc5106999e7999",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "object-hit-128",
+      "expectedDigest": "92ea120296d330a19207c4cbb15d6a3fa01509266641cd442ffd543c00a235e5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "object",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 298340,
+        "sourceBytesHash": "1ff5868f718812e13ef4c04addf6db1fbf2872d3265982a0f66e75da82ffc32b",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "scalar-number-control",
+      "expectedDigest": "11da62ffc6a16e385d7feaf219d287fcb0a57ba4352c0f6f876846b7ab94af1d",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "scalar",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "all scalar get calls and result-array creation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "cold-number-1024",
+      "expectedDigest": "04b80af959eb6f784d32599b4b3b53899770f6498827d0f20e232774ce85920a",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "cold",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "new public shared read-only attachment for each operation, prepared outside timing; first getMany fills that reader cache",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/_temp/map-bulk-baseline",
+      "name": "changing-root-1024",
+      "expectedDigest": "aa3e2ae6baa9a19502019a260641349872ffea3add7f3a6987ae5336c824ebb1",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "root-change",
+        "hitCount": 1024,
+        "sourceBytes": 188180,
+        "sourceBytesHash": "a461579a4da4b384f177f010bc5eaf6279483a0cdb6f0983d34aa647f93201e7",
+        "readState": "alternate two retained roots sharing one read-only arena; second root changes the first requested value",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "number-hit-128",
+      "expectedDigest": "d2b736e51715adab8385259400886adbb8a53bd0fe77d21145f173ffd37cf6c2",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "number-hit-1024",
+      "expectedDigest": "c85cc8d4392d5c369b7594a0875923505e5b6955d0b31ce4ef9f4a5170c08de2",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "number-mixed-1024",
+      "expectedDigest": "1c025fa2b3a76bb0882f37fdc5e2f09ff6540731bb9d83dda1c7f3b3762db018",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "mixed",
+        "hitCount": 512,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "number-miss-128",
+      "expectedDigest": "5c403432713cccf8eed855898faefac513b05aebbbd062933ae1e9d23d93e3bf",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "miss",
+        "hitCount": 0,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "string-hit-128",
+      "expectedDigest": "c13ac0b48573359c6a2218cf59eb0ab2d936f9e6d415f979b5ca50a64ecab9c5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "string",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 236844,
+        "sourceBytesHash": "6ec8d41abd369e8a7d6ddc80b6f051d39a121213f53581ae11bc5106999e7999",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "object-hit-128",
+      "expectedDigest": "92ea120296d330a19207c4cbb15d6a3fa01509266641cd442ffd543c00a235e5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "object",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 298340,
+        "sourceBytesHash": "1ff5868f718812e13ef4c04addf6db1fbf2872d3265982a0f66e75da82ffc32b",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "scalar-number-control",
+      "expectedDigest": "11da62ffc6a16e385d7feaf219d287fcb0a57ba4352c0f6f876846b7ab94af1d",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "scalar",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "all scalar get calls and result-array creation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "cold-number-1024",
+      "expectedDigest": "04b80af959eb6f784d32599b4b3b53899770f6498827d0f20e232774ce85920a",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "cold",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "new public shared read-only attachment for each operation, prepared outside timing; first getMany fills that reader cache",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    },
+    {
+      "directory": "/home/runner/work/zerocopy/zerocopy",
+      "name": "changing-root-1024",
+      "expectedDigest": "aa3e2ae6baa9a19502019a260641349872ffea3add7f3a6987ae5336c824ebb1",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "root-change",
+        "hitCount": 1024,
+        "sourceBytes": 188180,
+        "sourceBytesHash": "a461579a4da4b384f177f010bc5eaf6279483a0cdb6f0983d34aa647f93201e7",
+        "readState": "alternate two retained roots sharing one read-only arena; second root changes the first requested value",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every output position checked against independent native-Map values or fully verified frozen JSON identities; root alternation checked by operation ordinal; source bytes checked once per batch"
+      }
+    }
+  ]
+}

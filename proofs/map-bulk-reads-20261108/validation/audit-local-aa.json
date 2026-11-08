@@ -1,0 +1,84 @@
+{
+  "verified": true,
+  "record": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads/proofs/map-bulk-reads-20261108/results/aa.json.gz",
+  "mode": "aa",
+  "processes": 64,
+  "timedBatches": 576,
+  "verifiedOutputs": 9076608,
+  "measuredBatchesBelow2ms": 0,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "number-hit-128",
+      "pairedRatio": 1.0444749112437712,
+      "interval95": [
+        0.8827512469085949,
+        1.2358270169972863
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "number-mixed-1024",
+      "pairedRatio": 0.972661327454143,
+      "interval95": [
+        0.865710401832824,
+        1.0928251016990203
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.00098326825608,
+      "interval95": [
+        0.9385351748020598,
+        1.0675865223058278
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "cold-number-1024",
+      "pairedRatio": 1.1024876486440152,
+      "interval95": [
+        0.9846400650666733,
+        1.2344399324542064
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-128",
+      "pairedRatio": 1.0862746904492975,
+      "interval95": [
+        0.8938865290867649,
+        1.3200699022908995
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-mixed-1024",
+      "pairedRatio": 1.05494157412979,
+      "interval95": [
+        0.9087926381564708,
+        1.2245936840828877
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-number-control",
+      "pairedRatio": 0.9739966954361514,
+      "interval95": [
+        0.7879287813732816,
+        1.2040042008201632
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "cold-number-1024",
+      "pairedRatio": 1.0430689028256046,
+      "interval95": [
+        0.8774734275015833,
+        1.239915309047746
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+aa: node number-hit-128 pair 1/4 before: 2.102 us, verified
+aa: node number-hit-128 pair 1/4 after: 2.344 us, verified
+aa: node number-mixed-1024 pair 1/4 before: 60.297 us, verified
+aa: node number-mixed-1024 pair 1/4 after: 62.091 us, verified
+aa: node scalar-number-control pair 1/4 before: 1.983 us, verified
+aa: node scalar-number-control pair 1/4 after: 1.912 us, verified
+aa: node cold-number-1024 pair 1/4 before: 210.843 us, verified
+aa: node cold-number-1024 pair 1/4 after: 209.329 us, verified
+aa: bun number-hit-128 pair 1/4 before: 2.082 us, verified
+aa: bun number-hit-128 pair 1/4 after: 1.975 us, verified
+aa: bun number-mixed-1024 pair 1/4 before: 46.072 us, verified
+aa: bun number-mixed-1024 pair 1/4 after: 44.867 us, verified
+aa: bun scalar-number-control pair 1/4 before: 1.561 us, verified
+aa: bun scalar-number-control pair 1/4 after: 1.785 us, verified
+aa: bun cold-number-1024 pair 1/4 before: 171.651 us, verified
+aa: bun cold-number-1024 pair 1/4 after: 198.583 us, verified
+aa: bun cold-number-1024 pair 2/4 after: 182.374 us, verified
+aa: bun cold-number-1024 pair 2/4 before: 198.493 us, verified
+aa: bun scalar-number-control pair 2/4 after: 1.530 us, verified
+aa: bun scalar-number-control pair 2/4 before: 1.497 us, verified
+aa: bun number-mixed-1024 pair 2/4 after: 46.777 us, verified
+aa: bun number-mixed-1024 pair 2/4 before: 46.025 us, verified
+aa: bun number-hit-128 pair 2/4 after: 2.259 us, verified
+aa: bun number-hit-128 pair 2/4 before: 2.065 us, verified
+aa: node cold-number-1024 pair 2/4 after: 242.430 us, verified
+aa: node cold-number-1024 pair 2/4 before: 212.836 us, verified
+aa: node scalar-number-control pair 2/4 after: 2.013 us, verified
+aa: node scalar-number-control pair 2/4 before: 1.975 us, verified
+aa: node number-mixed-1024 pair 2/4 after: 60.283 us, verified
+aa: node number-mixed-1024 pair 2/4 before: 68.989 us, verified
+aa: node number-hit-128 pair 2/4 after: 2.159 us, verified
+aa: node number-hit-128 pair 2/4 before: 2.357 us, verified
+aa: node number-hit-128 pair 3/4 before: 2.212 us, verified
+aa: node number-hit-128 pair 3/4 after: 2.561 us, verified
+aa: node number-mixed-1024 pair 3/4 before: 60.659 us, verified
+aa: node number-mixed-1024 pair 3/4 after: 60.126 us, verified
+aa: node scalar-number-control pair 3/4 before: 1.900 us, verified
+aa: node scalar-number-control pair 3/4 after: 1.996 us, verified
+aa: node cold-number-1024 pair 3/4 before: 177.939 us, verified
+aa: node cold-number-1024 pair 3/4 after: 206.613 us, verified
+aa: bun number-hit-128 pair 3/4 before: 2.011 us, verified
+aa: bun number-hit-128 pair 3/4 after: 2.117 us, verified
+aa: bun number-mixed-1024 pair 3/4 before: 42.518 us, verified
+aa: bun number-mixed-1024 pair 3/4 after: 51.340 us, verified
+aa: bun scalar-number-control pair 3/4 before: 1.779 us, verified
+aa: bun scalar-number-control pair 3/4 after: 1.498 us, verified
+aa: bun cold-number-1024 pair 3/4 before: 185.715 us, verified
+aa: bun cold-number-1024 pair 3/4 after: 209.037 us, verified
+aa: bun cold-number-1024 pair 4/4 after: 219.702 us, verified
+aa: bun cold-number-1024 pair 4/4 before: 222.059 us, verified
+aa: bun scalar-number-control pair 4/4 after: 1.553 us, verified
+aa: bun scalar-number-control pair 4/4 before: 1.699 us, verified
+aa: bun number-mixed-1024 pair 4/4 after: 48.519 us, verified
+aa: bun number-mixed-1024 pair 4/4 before: 46.819 us, verified
+aa: bun number-hit-128 pair 4/4 after: 1.973 us, verified
+aa: bun number-hit-128 pair 4/4 before: 1.547 us, verified
+aa: node cold-number-1024 pair 4/4 after: 207.583 us, verified
+aa: node cold-number-1024 pair 4/4 before: 184.499 us, verified
+aa: node scalar-number-control pair 4/4 after: 1.956 us, verified
+aa: node scalar-number-control pair 4/4 before: 2.011 us, verified
+aa: node number-mixed-1024 pair 4/4 after: 61.402 us, verified
+aa: node number-mixed-1024 pair 4/4 before: 61.185 us, verified
+aa: node number-hit-128 pair 4/4 after: 2.326 us, verified
+aa: node number-hit-128 pair 4/4 before: 2.311 us, verified
+node number-hit-128: 2.262 -> 2.335 us, paired ratio 1.044 (0.883-1.236)
+node number-mixed-1024: 60.922 -> 60.842 us, paired ratio 0.973 (0.866-1.093)
+node scalar-number-control: 1.979 -> 1.976 us, paired ratio 1.001 (0.939-1.068)
+node cold-number-1024: 197.671 -> 208.456 us, paired ratio 1.102 (0.985-1.234)
+bun number-hit-128: 2.038 -> 2.046 us, paired ratio 1.086 (0.894-1.320)
+bun number-mixed-1024: 46.048 -> 47.648 us, paired ratio 1.055 (0.909-1.225)
+bun scalar-number-control: 1.630 -> 1.542 us, paired ratio 0.974 (0.788-1.204)
+bun cold-number-1024: 192.104 -> 203.810 us, paired ratio 1.043 (0.877-1.240)
