@@ -379,6 +379,121 @@ export function mapDeleteLeaf(root: u32, leaf: u32): u32 {
   return leaf ? deleteLeafAt(materializeJournal(root, 0), leaf, load<u32>(leaf + 4), 0) : root;
 }
 
+// Batch request records are [hash, length, UTF-8 bytes] in writer-only scratch.
+// Prefix partitioning shares the walk and branch copies across requested keys.
+// Resolve complete keys at the leaves; misses and duplicate requests remove
+// nothing, so callers need neither a preliminary lookup nor a deduplication set.
+let batchRemoved: u32 = 0;
+@inline function requestedLeaf(leaf: u32, input: u32, count: u32): bool {
+  const hash = load<u32>(leaf + 4), length = load<u32>(leaf + 8);
+  for (let i: u32 = 0; i < count; i++) {
+    const key = load<u32>(input + i * 4);
+    if (load<u32>(key) == hash && load<u32>(key + 4) == length
+      && equalKeyBytes(leaf + 16, key + 8, length)) return true;
+  }
+  return false;
+}
+function deleteKeysAt(root: u32, input: u32, count: u32, shift: u32): u32 {
+  batchRemoved = 0;
+  if (!root || !count) return root;
+  if (tag(root) == 0) {
+    if (!requestedLeaf(root, input, count)) return root;
+    batchRemoved = 1; return 0;
+  }
+  if (count <= 4) {
+    let removed: u32 = 0;
+    for (let i: u32 = 0; i < count; i++) {
+      const key = load<u32>(input + i * 4);
+      const next = deleteAt(root, key + 8, load<u32>(key + 4), load<u32>(key), shift);
+      if (next != root) removed++;
+      root = next;
+    }
+    batchRemoved = removed; return root;
+  }
+  if (tag(root) == 2) {
+    const size = load<u32>(root + 8); let removed: u32 = 0;
+    for (let i: u32 = 0; i < size; i++) if (requestedLeaf(load<u32>(root + 16 + i * 4), input, count)) removed++;
+    batchRemoved = removed;
+    if (!removed) return root;
+    const remaining = size - removed;
+    if (!remaining) return 0;
+    const p = remaining > 1 ? bucket(load<u32>(root + 4), remaining) : 0;
+    let position: u32 = 0, survivor: u32 = 0;
+    for (let i: u32 = 0; i < size; i++) {
+      const leaf = load<u32>(root + 16 + i * 4);
+      if (!requestedLeaf(leaf, input, count)) {
+        survivor = leaf;
+        if (p) store<u32>(p + 16 + position++ * 4, leaf);
+      }
+    }
+    return p ? p : survivor;
+  }
+  const frame: u32 = 8192 + (shift / 4) * 256;
+  memory.fill(frame, 0, 64);
+  for (let i: u32 = 0; i < count; i++) {
+    const digit = (load<u32>(load<u32>(input + i * 4)) >> shift) & 15;
+    store<u32>(frame + digit * 4, load<u32>(frame + digit * 4) + 1);
+  }
+  let offset: u32 = 0;
+  for (let digit: u32 = 0; digit < 16; digit++) {
+    store<u32>(frame + 64 + digit * 4, offset);
+    offset += load<u32>(frame + digit * 4);
+  }
+  let start: u32 = 0;
+  for (let digit: u32 = 0; digit < 16; digit++) {
+    const end = start + load<u32>(frame + digit * 4), cursor = frame + 64 + digit * 4;
+    while (load<u32>(cursor) < end) {
+      const pos = load<u32>(cursor), key = load<u32>(input + pos * 4);
+      const target = (load<u32>(key) >> shift) & 15;
+      if (target == digit) store<u32>(cursor, pos + 1);
+      else {
+        const targetCursor = frame + 64 + target * 4, destination = load<u32>(targetCursor);
+        store<u32>(input + pos * 4, load<u32>(input + destination * 4));
+        store<u32>(input + destination * 4, key); store<u32>(targetCursor, destination + 1);
+      }
+    }
+    start = end;
+  }
+  const original = branchBitmap(root);
+  let bitmap: u32 = 0, children: u32 = 0, survivor: u32 = 0, removed: u32 = 0;
+  start = 0;
+  for (let digit: u32 = 0; digit < 16; digit++) {
+    const n = load<u32>(frame + digit * 4), bit: u32 = 1 << digit;
+    if (original & bit) {
+      const child = deleteKeysAt(branchChild(root, digit), input + start * 4, n, shift + 4);
+      removed += batchRemoved;
+      if (child) {
+        bitmap |= bit; survivor = child;
+        store<u32>(frame + 128 + children++ * 4, child);
+      }
+    }
+    start += n;
+  }
+  batchRemoved = removed;
+  if (!removed) return root;
+  if (!children) return 0;
+  if (children == 1 && !isBranch(survivor)) return survivor;
+  const p = branch(bitmap, mapSize(root) - removed);
+  copyWords(p + 8, frame + 128, children * 4); return p;
+}
+export function mapDeleteKeys(root: u32, input: u32, count: u32): u32 {
+  if (!root || !count) return root;
+  for (let i: u32 = 0; i < count; i++) {
+    const key = load<u32>(input + i * 4);
+    store<u32>(key, hashAt(key + 8, load<u32>(key + 4)));
+  }
+  if (tag(root) == JOURNAL) {
+    let found = false;
+    for (let i: u32 = 0; i < count; i++) {
+      const key = load<u32>(input + i * 4);
+      if (mapFind(root, key + 8, load<u32>(key + 4), load<u32>(key))) { found = true; break; }
+    }
+    if (!found) return root;
+    root = materializeJournal(root, 0);
+  }
+  return deleteKeysAt(root, input, count, 0);
+}
+
 
 // Prefix-fused batch update. Partition the private input array by the next
 // 4-bit digit with an in-place American-flag pass, then merge directly into the

@@ -1,0 +1,216 @@
+diff --git a/arena.ts b/arena.ts
+index 14e746d..a567b94 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -708,6 +708,60 @@ export class Arena {
+     return leaf ? this.wasm.mapDeleteLeaf(root, leaf) >>> 0 : root;
+   }
+ 
++  deleteMany(root: number, keys: readonly string[]): number {
++    this.assertWritable();
++    if (!root || !Array.isArray(keys) || keys.length < 32
++      || Object.getPrototypeOf(keys) !== Array.prototype || Object.hasOwn(keys, Symbol.iterator)
++      || Array.prototype[Symbol.iterator] !== mapKeyIterator
++      || Object.getPrototypeOf(this) !== Arena.prototype || this.delete !== mapDeleteOne || this.find !== mapFindOne
++      || !Arena.hasNativeWasm(this)) {
++      for (const key of keys) root = this.delete(root, key);
++      return root;
++    }
++    // Finish every input getter before touching writer scratch. ASCII keys need
++    // no encoding buffer; retain UTF-8 bytes only for keys that require them.
++    const names: string[] = [], ends: number[] = [];
++    let encoded: Uint8Array[] | undefined, total = 0, first = 0;
++    for (const key of keys) {
++      if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
++      const index = names.length; let length = key.length;
++      for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) {
++        const bytes = encoder.encode(key); (encoded ??= [])[index] = bytes; length = bytes.length; break;
++      }
++      names.push(key);
++      // Each request uses a pointer plus [hash, byte length, UTF-8 bytes].
++      const bytes = 12 + Math.ceil(length / 4) * 4;
++      if (bytes > 49152) {
++        if (first < index) ends.push(index);
++        ends.push(index + 1); first = index + 1; total = 0;
++      } else if (total + bytes > 49152) {
++        ends.push(index); first = index; total = bytes;
++      } else total += bytes;
++    }
++    if (first < names.length) ends.push(names.length);
++    first = 0;
++    // Every chunk fits the permanent writer stage. No temporary key record or
++    // pointer array is retained in the append-only arena, even for all misses.
++    const view = this.view, bytes = this.bytes;
++    for (const end of ends) {
++      const count = end - first, oneLength = encoded?.[first]?.length ?? names[first].length;
++      if (count === 1 && 12 + Math.ceil(oneLength / 4) * 4 > 49152) {
++        root = this.delete(root, names[first]); first = end; continue;
++      }
++      let record = 16384 + count * 4, slot = 16384;
++      for (let i = first; i < end; i++) {
++        const key = names[i], utf8 = encoded?.[i], length = utf8?.length ?? key.length;
++        view.setUint32(slot, record, true); view.setUint32(record + 4, length, true);
++        if (utf8) bytes.set(utf8, record + 8);
++        else for (let j = 0; j < length; j++) bytes[record + 8 + j] = key.charCodeAt(j);
++        record += 8 + Math.ceil(length / 4) * 4; slot += 4;
++      }
++      root = this.wasm.mapDeleteKeys(root, 16384, count) >>> 0;
++      first = end;
++    }
++    return root;
++  }
++
+   *leaves(root: number): Generator<number> {
+     // Each iterator owns its continuation. No shared stack or scratch survives yield.
+     if (root && this.dv.getUint32(root, true) === 0xffffffff) {
+@@ -856,6 +910,10 @@ export class Arena {
+   }
+ }
+ 
++const mapDeleteOne = Arena.prototype.delete;
++const mapFindOne = Arena.prototype.find;
++const mapKeyIterator = Array.prototype[Symbol.iterator];
++
+ /** Internal identities for optional readers that specialize primitive decoding. */
+ export const primitiveReadProtocol = Object.freeze({
+   decode: Arena.prototype.decode, view: Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get,
+diff --git a/persistent-core.as.ts b/persistent-core.as.ts
+index 6fff801..73dc3b9 100644
+--- a/persistent-core.as.ts
++++ b/persistent-core.as.ts
+@@ -379,6 +379,121 @@ export function mapDeleteLeaf(root: u32, leaf: u32): u32 {
+   return leaf ? deleteLeafAt(materializeJournal(root, 0), leaf, load<u32>(leaf + 4), 0) : root;
+ }
+ 
++// Batch request records are [hash, length, UTF-8 bytes] in writer-only scratch.
++// Prefix partitioning shares the walk and branch copies across requested keys.
++// Resolve complete keys at the leaves; misses and duplicate requests remove
++// nothing, so callers need neither a preliminary lookup nor a deduplication set.
++let batchRemoved: u32 = 0;
++@inline function requestedLeaf(leaf: u32, input: u32, count: u32): bool {
++  const hash = load<u32>(leaf + 4), length = load<u32>(leaf + 8);
++  for (let i: u32 = 0; i < count; i++) {
++    const key = load<u32>(input + i * 4);
++    if (load<u32>(key) == hash && load<u32>(key + 4) == length
++      && equalKeyBytes(leaf + 16, key + 8, length)) return true;
++  }
++  return false;
++}
++function deleteKeysAt(root: u32, input: u32, count: u32, shift: u32): u32 {
++  batchRemoved = 0;
++  if (!root || !count) return root;
++  if (tag(root) == 0) {
++    if (!requestedLeaf(root, input, count)) return root;
++    batchRemoved = 1; return 0;
++  }
++  if (count <= 4) {
++    let removed: u32 = 0;
++    for (let i: u32 = 0; i < count; i++) {
++      const key = load<u32>(input + i * 4);
++      const next = deleteAt(root, key + 8, load<u32>(key + 4), load<u32>(key), shift);
++      if (next != root) removed++;
++      root = next;
++    }
++    batchRemoved = removed; return root;
++  }
++  if (tag(root) == 2) {
++    const size = load<u32>(root + 8); let removed: u32 = 0;
++    for (let i: u32 = 0; i < size; i++) if (requestedLeaf(load<u32>(root + 16 + i * 4), input, count)) removed++;
++    batchRemoved = removed;
++    if (!removed) return root;
++    const remaining = size - removed;
++    if (!remaining) return 0;
++    const p = remaining > 1 ? bucket(load<u32>(root + 4), remaining) : 0;
++    let position: u32 = 0, survivor: u32 = 0;
++    for (let i: u32 = 0; i < size; i++) {
++      const leaf = load<u32>(root + 16 + i * 4);
++      if (!requestedLeaf(leaf, input, count)) {
++        survivor = leaf;
++        if (p) store<u32>(p + 16 + position++ * 4, leaf);
++      }
++    }
++    return p ? p : survivor;
++  }
++  const frame: u32 = 8192 + (shift / 4) * 256;
++  memory.fill(frame, 0, 64);
++  for (let i: u32 = 0; i < count; i++) {
++    const digit = (load<u32>(load<u32>(input + i * 4)) >> shift) & 15;
++    store<u32>(frame + digit * 4, load<u32>(frame + digit * 4) + 1);
++  }
++  let offset: u32 = 0;
++  for (let digit: u32 = 0; digit < 16; digit++) {
++    store<u32>(frame + 64 + digit * 4, offset);
++    offset += load<u32>(frame + digit * 4);
++  }
++  let start: u32 = 0;
++  for (let digit: u32 = 0; digit < 16; digit++) {
++    const end = start + load<u32>(frame + digit * 4), cursor = frame + 64 + digit * 4;
++    while (load<u32>(cursor) < end) {
++      const pos = load<u32>(cursor), key = load<u32>(input + pos * 4);
++      const target = (load<u32>(key) >> shift) & 15;
++      if (target == digit) store<u32>(cursor, pos + 1);
++      else {
++        const targetCursor = frame + 64 + target * 4, destination = load<u32>(targetCursor);
++        store<u32>(input + pos * 4, load<u32>(input + destination * 4));
++        store<u32>(input + destination * 4, key); store<u32>(targetCursor, destination + 1);
++      }
++    }
++    start = end;
++  }
++  const original = branchBitmap(root);
++  let bitmap: u32 = 0, children: u32 = 0, survivor: u32 = 0, removed: u32 = 0;
++  start = 0;
++  for (let digit: u32 = 0; digit < 16; digit++) {
++    const n = load<u32>(frame + digit * 4), bit: u32 = 1 << digit;
++    if (original & bit) {
++      const child = deleteKeysAt(branchChild(root, digit), input + start * 4, n, shift + 4);
++      removed += batchRemoved;
++      if (child) {
++        bitmap |= bit; survivor = child;
++        store<u32>(frame + 128 + children++ * 4, child);
++      }
++    }
++    start += n;
++  }
++  batchRemoved = removed;
++  if (!removed) return root;
++  if (!children) return 0;
++  if (children == 1 && !isBranch(survivor)) return survivor;
++  const p = branch(bitmap, mapSize(root) - removed);
++  copyWords(p + 8, frame + 128, children * 4); return p;
++}
++export function mapDeleteKeys(root: u32, input: u32, count: u32): u32 {
++  if (!root || !count) return root;
++  for (let i: u32 = 0; i < count; i++) {
++    const key = load<u32>(input + i * 4);
++    store<u32>(key, hashAt(key + 8, load<u32>(key + 4)));
++  }
++  if (tag(root) == JOURNAL) {
++    let found = false;
++    for (let i: u32 = 0; i < count; i++) {
++      const key = load<u32>(input + i * 4);
++      if (mapFind(root, key + 8, load<u32>(key + 4), load<u32>(key))) { found = true; break; }
++    }
++    if (!found) return root;
++    root = materializeJournal(root, 0);
++  }
++  return deleteKeysAt(root, input, count, 0);
++}
++
+ 
+ // Prefix-fused batch update. Partition the private input array by the next
+ // 4-bit digit with an in-place American-flag pass, then merge directly into the
+diff --git a/shared-map.ts b/shared-map.ts
+index 72a8a7a..5bae715 100644
+--- a/shared-map.ts
++++ b/shared-map.ts
+@@ -60,7 +60,8 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
+   getMany(keys: readonly string[]): (ValueOf<T> | undefined)[] { return keys.map(k => this.get(k)); }
+   deleteMany(keys: readonly string[]): SharedMap<T> {
+     const a = this.arena; a.assertWritable(); let root = this.root;
+-    for (const key of keys) root = a.delete(root, key);
++    if (Array.isArray(keys) && keys.length >= 32) root = a.deleteMany(root, keys);
++    else for (const key of keys) root = a.delete(root, key);
+     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
+   }
+   *entries(): Generator<[string, ValueOf<T>]> {

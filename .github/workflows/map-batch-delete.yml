@@ -1,0 +1,115 @@
+name: Map batch deletion verification
+
+on:
+  pull_request:
+    paths:
+      - 'map-batch-delete.test.ts'
+      - 'proofs/map-batch-delete-direct-20261108/**'
+      - '.github/workflows/map-batch-delete.yml'
+  push:
+    # Temporary bootstrap trigger: remove after the hosted evidence is retained.
+    branches: [main, perf/map-batch-delete-direct-20261108]
+    paths:
+      - 'map-batch-delete.test.ts'
+      - 'proofs/map-batch-delete-direct-20261108/**'
+      - '.github/workflows/map-batch-delete.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: map-batch-delete-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build modules and declarations
+        run: |
+          mkdir -p proofs/map-batch-delete-direct-20261108/ci-logs
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:values
+      - name: Build the pinned reader baseline
+        shell: bash
+        run: |
+          baseline_checkout="$RUNNER_TEMP/map-batch-delete-baseline"
+          git worktree add --detach "$baseline_checkout" a4265a0608ec25eec5719496225212db6b251989
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$baseline_checkout/node_modules"
+          printf 'MAP_DELETE_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
+          cd "$baseline_checkout"
+          bun run build:wasm
+          bun run build:browser
+      - name: Run focused regression tests in Node and Bun
+        shell: bash
+        run: |
+          node node_modules/vitest/vitest.mjs run map-batch-delete.test.ts shared-map.test.ts map-set-path.test.ts map-set-utf8.test.ts heap-compaction.test.ts worker-attachment.test.ts --maxWorkers=1 --fileParallelism=false 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run map-batch-delete.test.ts shared-map.test.ts map-set-path.test.ts map-set-utf8.test.ts heap-compaction.test.ts worker-attachment.test.ts --maxWorkers=1 --fileParallelism=false 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/bun-tests.log
+      - name: Check current and baseline readers in real workers
+        shell: bash
+        run: |
+          node proofs/map-batch-delete-direct-20261108/worker.mjs map . 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/workers-current-reader.json
+          node proofs/map-batch-delete-direct-20261108/worker.mjs map . "$MAP_DELETE_BASELINE" 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/workers-old-reader.json
+      - name: Check complete outputs and exact writer allocation
+        shell: bash
+        run: |
+          node proofs/map-batch-delete-direct-20261108/allocation.mjs "$MAP_DELETE_BASELINE" proofs/map-batch-delete-direct-20261108/ci-logs/allocation-before.json
+          node proofs/map-batch-delete-direct-20261108/allocation.mjs . proofs/map-batch-delete-direct-20261108/ci-logs/allocation-after.json
+      - name: Check the installed package
+        run: bun run check:package
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check Chromium and real browser workers
+        shell: bash
+        run: node proofs/map-batch-delete-direct-20261108/browser.mjs map . 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/chromium.json
+      - name: Bootstrap the initial isolated performance evidence
+        if: ${{ hashFiles('proofs/map-batch-delete-direct-20261108/results/formal.json') == '' }}
+        shell: bash
+        run: |
+          proof=proofs/map-batch-delete-direct-20261108
+          mkdir -p "$proof/results"
+          benchmark_cpu="$(node -e 'const fs = require("node:fs"); const match = fs.readFileSync("/proc/self/status", "utf8").match(/^Cpus_allowed_list:\s*(\d+)/m); if (!match) process.exit(1); process.stdout.write(match[1]);')"
+          benchmark_bun="$(command -v bun)"
+          printf 'Using allowed CPU %s for serial fresh-process studies\n' "$benchmark_cpu"
+          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
+            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
+            "$proof/results/pilot-v3.json" pilot 2>&1 | tee "$proof/ci-logs/pilot-v3.log"
+          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
+            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
+            "$proof/results/formal.json" formal 2>&1 | tee "$proof/ci-logs/formal.log"
+          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
+            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
+            "$proof/results/aa.json" aa 2>&1 | tee "$proof/ci-logs/aa.log"
+          taskset -c "$benchmark_cpu" node "$proof/compare.mjs" \
+            . "$benchmark_bun" "$proof/results/reference-comparison.json" measure \
+            2>&1 | tee "$proof/ci-logs/reference-comparison.log"
+      - name: Audit saved measurements without collecting timings
+        shell: bash
+        run: node proofs/map-batch-delete-direct-20261108/audit-evidence.mjs . 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/evidence.log
+      - name: Retain all raw measurements and correctness logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-batch-delete-verification-${{ github.sha }}
+          path: |
+            proofs/map-batch-delete-direct-20261108/results/
+            proofs/map-batch-delete-direct-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

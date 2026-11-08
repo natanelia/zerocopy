@@ -708,6 +708,74 @@ export class Arena {
     return leaf ? this.wasm.mapDeleteLeaf(root, leaf) >>> 0 : root;
   }
 
+  deleteMany(root: number, keys: readonly string[]): number {
+    this.assertWritable();
+    if (!root || !Array.isArray(keys) || keys.length < 512
+      || Object.getPrototypeOf(keys) !== Array.prototype || Object.hasOwn(keys, Symbol.iterator)
+      || Array.prototype[Symbol.iterator] !== mapKeyIterator
+      || Object.getPrototypeOf(this) !== Arena.prototype || this.delete !== mapDeleteOne || this.find !== mapFindOne
+      || !Arena.hasNativeWasm(this)) {
+      for (const key of keys) root = this.delete(root, key);
+      return root;
+    }
+    const wasm = this.wasm, deleteKeys = wasm.mapDeleteKeys, deleteLeaf = wasm.mapDeleteLeaf, deleteBytes = wasm.mapDeleteBytes;
+    const native = () => this.delete === mapDeleteOne && this.find === mapFindOne && this.wasm === wasm
+      && wasm.mapDeleteKeys === deleteKeys && wasm.mapDeleteLeaf === deleteLeaf && wasm.mapDeleteBytes === deleteBytes;
+    let names: string[] | undefined, encoded: Uint8Array[] | undefined, total = 0;
+    let probed = 0, hits = 0, batching = false;
+    const flush = () => {
+      if (!names?.length) return;
+      // Input getters may grow or reenter the arena. No shared request bytes
+      // survive a getter: refresh, stage, and finish this whole chunk now.
+      primitiveReadProtocol.refresh.call(this);
+      const view = this.view, bytes = this.bytes, count = names.length;
+      let record = 16384 + count * 4, slot = 16384;
+      for (let i = 0; i < count; i++) {
+        const key = names[i], utf8 = encoded?.[i], length = utf8?.length ?? key.length;
+        view.setUint32(slot, record, true); view.setUint32(record + 4, length, true);
+        if (utf8) bytes.set(utf8, record + 8);
+        else for (let j = 0; j < length; j++) bytes[record + 8 + j] = key.charCodeAt(j);
+        record += 8 + Math.ceil(length / 4) * 4; slot += 4;
+      }
+      // Captured native code finishes earlier buffered keys even if the next
+      // input getter has just replaced a hook. Later keys use the new hook.
+      root = deleteKeys(root, 16384, count) >>> 0;
+      names.length = 0; encoded = undefined; total = 0;
+    };
+    // Use one iterator throughout. Small/sparse requests keep scalar deletion;
+    // the first 32 real deletions are useful work, not duplicate lookups.
+    for (const key of keys) {
+      if (!batching) {
+        const before = root;
+        root = this.delete(root, key);
+        if (probed < 32) {
+          if (root !== before) hits++;
+          if (++probed === 32 && hits >= 16 && root && native()) { batching = true; names = []; }
+        }
+        continue;
+      }
+      if (!native()) {
+        flush();
+        root = this.delete(root, key); batching = false;
+        continue;
+      }
+      this.assertWritable();
+      if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+      let utf8: Uint8Array | undefined, length = key.length;
+      for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) {
+        utf8 = encoder.encode(key); length = utf8.length; break;
+      }
+      const size = 12 + Math.ceil(length / 4) * 4;
+      if (size > 49152) { flush(); root = this.delete(root, key); continue; }
+      if (total + size > 49152) flush();
+      const index = names!.length;
+      names!.push(key); if (utf8) (encoded ??= [])[index] = utf8;
+      total += size;
+    }
+    flush();
+    return root;
+  }
+
   *leaves(root: number): Generator<number> {
     // Each iterator owns its continuation. No shared stack or scratch survives yield.
     if (root && this.dv.getUint32(root, true) === 0xffffffff) {
@@ -855,6 +923,10 @@ export class Arena {
     }
   }
 }
+
+const mapDeleteOne = Arena.prototype.delete;
+const mapFindOne = Arena.prototype.find;
+const mapKeyIterator = Array.prototype[Symbol.iterator];
 
 /** Internal identities for optional readers that specialize primitive decoding. */
 export const primitiveReadProtocol = Object.freeze({
