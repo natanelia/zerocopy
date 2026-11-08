@@ -189,6 +189,22 @@ History rows keep 32 snapshots of a 10,000-key map while changing one key. Share
 
 Compaction is explicit, not automatic reclamation. Old snapshots, workers, payloads, nested values, or default references can keep the source arena alive. An arena reserves at least 128 KiB. The tables do not imply that every Shared collection is smaller than every alternative. Only directly corresponding Map, OrderedMap, List/Array, and Stack/Array representations are measured here. Missing Immutable.js types are not substituted with unrelated types.
 
+### Batched List writer allocation
+
+The additive `SharedList.setMany(entries)` API copies each affected branch and leaf once per batch. The diagnostic below compares **append-only WASM writer allocation** for one complete numeric batch against a loop of scalar `set` calls at baseline `a4265a0608ec25eec5719496225212db6b251989`. Both versions retain the original List and return the same final values; intermediate scalar snapshots are not retained. This measures newly allocated writer bytes, including intermediate paths left in the scalar arena. It excludes JavaScript objects, garbage collection, backing-buffer capacity, and process RSS, so it does not use the total retained-memory metric of the tables above.
+
+| Complete numeric edit batch | Scalar `set` loop | One `setMany` call | Fewer writer bytes |
+| --- | ---: | ---: | ---: |
+| 256 clustered edits in a 32,768-item List | 131,072 B | 2,688 B | 97.95% |
+| 256 submitted edits at 16 indexes in a 32,768-item List | 131,072 B | 512 B | 99.61% |
+| 256 scattered edits in a 32,768-item List | 131,072 B | 62,848 B | 52.05% |
+| 1,024 scattered edits in a 65,536-item List | 654,976 B | 216,448 B | 66.95% |
+| 4 scattered edits in a 32,768-item List | 2,048 B | 1,664 B | 18.75% |
+
+More than 4,096 distinct edits also allocate staging records in the append-only arena. The 4,096-edit boundary case allocates 33,792 B; the 4,097-edit case allocates 82,960 B, including 49,168 B of staging. These are measured allocation totals with full source/result checks and an independent node-count model. Fewer allocated bytes alone do not establish faster calls, especially for small or scattered batches.
+
+The [before record](../proofs/list-set-many-20261108/results/allocation-before.json), [after record](../proofs/list-set-many-20261108/results/allocation-after.json), and [batch proof report](../proofs/list-set-many-20261108/README.md) contain every case, the exact scope, and reproduction instructions. The existing cross-library memory tables remain separate measurements.
+
 ### Reproduce the timing and memory comparisons
 
 From the project directory:
