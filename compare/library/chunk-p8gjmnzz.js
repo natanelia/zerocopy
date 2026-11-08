@@ -931,23 +931,31 @@ class Compactor {
   heap(a, type, root) {
     if (!root)
       return 0;
-    const todo = [[root, false]];
+    const identity = this.key(a, `heap/${type}`, 0), groups = this.heapPointers ??= new Map;
+    let pointers = groups.get(identity);
+    if (!pointers)
+      groups.set(identity, pointers = new Map);
+    const todo = [root, 0];
     while (todo.length) {
-      const [old, ready] = todo.pop(), key = this.key(a, `heap/${type}`, old);
-      if (!old || this.pointers.has(key))
+      const ready = todo.pop(), old = todo.pop();
+      if (pointers.has(old))
         continue;
       const left = a.dv.getUint32(old + 16, true), right = a.dv.getUint32(old + 20, true);
       if (!ready) {
-        todo.push([old, true], [right, false], [left, false]);
+        todo.push(old, 1);
+        if (right)
+          todo.push(right, 0);
+        if (left)
+          todo.push(left, 0);
         continue;
       }
       const value = this.raw(a, type, a.dv.getFloat64(old + 8, true)), p = this.bytes(a, old, 32);
       this.target.dv.setFloat64(p + 8, value, true);
-      this.target.dv.setUint32(p + 16, left ? this.pointers.get(this.key(a, `heap/${type}`, left)) : 0, true);
-      this.target.dv.setUint32(p + 20, right ? this.pointers.get(this.key(a, `heap/${type}`, right)) : 0, true);
-      this.pointers.set(key, p);
+      this.target.dv.setUint32(p + 16, left ? pointers.get(left) : 0, true);
+      this.target.dv.setUint32(p + 20, right ? pointers.get(right) : 0, true);
+      pointers.set(old, p);
     }
-    return this.pointers.get(this.key(a, `heap/${type}`, root));
+    return pointers.get(root);
   }
   snapshot(source) {
     if (!(source instanceof Snapshot))

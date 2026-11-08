@@ -4,7 +4,7 @@ import {
 import {
   getWorkerData2,
   initWorker2
-} from "./chunk-gar6as5k.js";
+} from "./chunk-p8gjmnzz.js";
 
 // worker-protocol.ts
 var PROTOCOL = "zerocopy/session";
