@@ -118,6 +118,18 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
       }
     }
   }
+  /** Eagerly materialize entries without suspending the entries generator per key.
+   * Useful when consumers need all keys/values as a JavaScript array.
+   * Like forEach, this reads the immutable snapshot and honors custom traversal.
+   */
+  toEntriesArray(): [string, ValueOf<T>][] {
+    const result = new Array<[string, ValueOf<T>]>(this.size);
+    let count = 0;
+    this.forEach((value, key) => { result[count++] = [key, value]; });
+    // Historical journal descriptors can report a larger reserved size.
+    if (result.length !== count) result.length = count;
+    return result;
+  }
   toWorkerData() { return Object.freeze({ root: this.root, valueType: this.valueType, size: this.size }); }
   static fromWorkerData<T extends string>(root: number, valueType: T, size?: number, source: Arena = defaultArena()): SharedMap<T> {
     return new SharedMap(valueType, root, size, source);

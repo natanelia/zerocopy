@@ -1,0 +1,58 @@
+name: Eager Map entries array proof
+
+on:
+  push:
+    branches: [perf/map-entries-array-20261109]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build candidate and verify TypeScript
+        run: |
+          bun install
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+      - name: Run full Bun regression suite
+        run: bun run test 2>&1 | tee /tmp/map-entries-tests.log
+      - name: Validate installed Node package and worker behavior
+        run: |
+          bun run check:package
+          node proofs/node-worker.mjs
+      - name: Build pinned Map forEach baseline
+        env:
+          BASELINE: 1f6d5bdd114217e8405f0518abfa7612d7db0cd9
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/map-before" "$BASELINE"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/map-before/node_modules"
+          (cd "$RUNNER_TEMP/map-before" && bun run build:wasm && bun run build:browser)
+      - name: Paired fresh-process Node/Bun comparison
+        run: |
+          node proofs/map-entries-array-20261109/compare.mjs "$RUNNER_TEMP/map-before" "$GITHUB_WORKSPACE" 2>&1 | tee /tmp/map-entries-benchmark.log
+      - name: Save correctness and timing evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-entries-proof-${{ github.sha }}
+          path: |
+            proofs/map-entries-array-20261109/results.json
+            /tmp/map-entries-tests.log
+            /tmp/map-entries-benchmark.log
+          retention-days: 7
+          if-no-files-found: warn
