@@ -11,13 +11,13 @@ import {
   Snapshot,
   Arena,
   primitiveReadProtocol
-} from "./chunk-sbahvxa1.js";
+} from "./chunk-vmm7z6ce.js";
 import {
   SharedMap2
-} from "./chunk-vb9htdwy.js";
+} from "./chunk-6xsztezz.js";
 import {
   SharedList2
-} from "./chunk-eg3tkaph.js";
+} from "./chunk-aysdem6q.js";
 import {
   SharedSet2,
   SharedStack2,
@@ -33,14 +33,33 @@ import {
   SharedPriorityQueue2,
   compactMany2,
   getWorkerData2
-} from "./chunk-p8gjmnzz.js";
+} from "./chunk-601qbgtx.js";
 import {
   createSharedSession2
-} from "./chunk-g3bp4snz.js";
+} from "./chunk-g9ne2gjq.js";
 
 // redux-heap-codec.ts
 function readReduxHeap(heap, encode) {
   const arena = arenaOf(heap), nodes = heap.root ? [heap.root] : [], rows = [];
+  if (typeof heap.size === "number" && typeof heap.root === "number" && heap.size >= 32 && (heap.valueType === "number" || heap.valueType === "boolean") && primitiveReadProtocol.hasNativeWasm(arena) && Object.getPrototypeOf(arena) === Arena.prototype && !Object.hasOwn(arena, "decode") && !Object.hasOwn(arena, "dv") && !Object.hasOwn(arena, "refresh") && Object.getOwnPropertyDescriptor(Arena.prototype, "decode")?.value === primitiveReadProtocol.decode && Object.getOwnPropertyDescriptor(Arena.prototype, "dv")?.get === primitiveReadProtocol.view && Object.getOwnPropertyDescriptor(Arena.prototype, "refresh")?.value === primitiveReadProtocol.refresh) {
+    const view = nodes.length ? arena.dv : undefined;
+    for (let i = 0;i < nodes.length; i++) {
+      if (nodes.length > heap.size)
+        throw new TypeError("Invalid heap size");
+      const node = nodes[i], left = view.getUint32(node + 16, true), right = view.getUint32(node + 20, true);
+      const leftIndex = left ? nodes.push(left) - 1 : -1;
+      const rightIndex = right ? nodes.push(right) - 1 : -1;
+      rows.push([
+        encode(arena.decode(heap.valueType, view.getFloat64(node + 8, true))),
+        encode(view.getFloat64(node, true)),
+        leftIndex,
+        rightIndex
+      ]);
+    }
+    if (rows.length !== heap.size)
+      throw new TypeError("Invalid heap size");
+    return rows;
+  }
   for (let i = 0;i < nodes.length; i++) {
     if (nodes.length > heap.size)
       throw new TypeError("Invalid heap size");
