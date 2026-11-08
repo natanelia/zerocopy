@@ -1,0 +1,81 @@
+name: Heap compaction verification
+
+on:
+  pull_request:
+    paths:
+      - 'compaction.ts'
+      - 'heap-compaction.test.ts'
+      - 'shared-priority-queue.ts'
+      - 'arena.ts'
+      - '*.as.ts'
+      - 'proofs/heap-compaction-20261108/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - '.github/workflows/heap-compaction.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'compaction.ts'
+      - 'heap-compaction.test.ts'
+      - 'shared-priority-queue.ts'
+      - 'arena.ts'
+      - '*.as.ts'
+      - 'proofs/heap-compaction-20261108/**'
+      - 'scripts/build-browser.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'package.json'
+      - '.github/workflows/heap-compaction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: heap-compaction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install pinned project dependencies and build
+        run: |
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Run compaction regressions in Node and Bun
+        shell: bash
+        run: |
+          mkdir -p proofs/heap-compaction-20261108/ci-logs
+          node node_modules/vitest/vitest.mjs run heap-compaction.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run heap-compaction.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/bun-tests.log
+      - name: Verify public workloads without timing
+        shell: bash
+        run: |
+          node proofs/heap-compaction-20261108/smoke.mjs 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/node-workloads.log
+          bun proofs/heap-compaction-20261108/smoke.mjs 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/bun-workloads.log
+      - name: Verify real shared and copied Node workers
+        shell: bash
+        run: node proofs/heap-compaction-20261108/worker.mjs 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/node-workers.log
+      - name: Independently verify saved evidence without collecting new timings
+        shell: bash
+        run: python3 proofs/heap-compaction-20261108/verify.py proofs/heap-compaction-20261108/results/*.json.gz 2>&1 | tee proofs/heap-compaction-20261108/ci-logs/evidence.log
+      - name: Retain verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heap-compaction-${{ github.sha }}
+          path: proofs/heap-compaction-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
