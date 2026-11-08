@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "archive": {
+    "name": "zerocopy",
+    "version": "0.2.1",
+    "integrity": "sha512-f81cu0qzSoALAtD3j6syrgF05h55kghPEU31uBD1HCwQ1xJxLpwRFxzW9YgQHKRskgG513nxCHBGN1xAF2L7Dw=="
+  },
+  "checks": [
+    {
+      "runtime": "node",
+      "passed": true,
+      "values": 32801
+    },
+    {
+      "runtime": "bun",
+      "passed": true,
+      "values": 32801
+    }
+  ],
+  "types": "new method and invalid-input errors verified against packed declarations"
+}

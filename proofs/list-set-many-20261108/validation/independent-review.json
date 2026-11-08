@@ -1,0 +1,382 @@
+{
+  "schema": "zerocopy-list-batch-independent-review/v1",
+  "reviewedAt": "2026-11-08T16:00:28.962576+00:00",
+  "passed": true,
+  "retimed": false,
+  "method": "Independent Python reconstruction of fixtures, SHA-256 identities, schedule, medians, ratios, sample counts and Student-t intervals; no use of the repository verifier.",
+  "reviewerScriptSha256": "33fb11c3722cec56915aea4f39a987c196a6c43fb3e9ead8b3fc0a20bc41c96e",
+  "scipyVersion": "1.17.0",
+  "rawRecordSha256": {
+    "formal.json": "9719b80624c8bbbd8dc7743e26dcc23254c894d1fde65eed7d2d9034953e1707",
+    "aa.json": "c91eb17cd98307475bb97b40d5745b9ba67d4f15421713fe5ca5cbf4fa2535a9",
+    "reference-comparison.json": "c2ed5e639cafcb2548e0de3e36f46a6e8b28a58af851e71604961d968fa87476"
+  },
+  "primary": {
+    "processes": 240,
+    "measuredBatches": 2160,
+    "warmupBatches": 10441,
+    "verifiedOutputs": 10078944,
+    "measuredBatchesBelow2ms": 0,
+    "minimumMeasuredBatchMs": 4.188439000000017,
+    "warmupBatchesBelow2ms": 0,
+    "rows": [
+      {
+        "runtime": "node",
+        "name": "batch-number-clustered-256",
+        "role": "target",
+        "pairedRatio": 0.2073825223319759,
+        "interval95": [
+          0.2013611252471701,
+          0.21358398010530041
+        ],
+        "changePercent": -79.26174776680242,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-scattered-256",
+        "role": "target",
+        "pairedRatio": 0.6415488961748274,
+        "interval95": [
+          0.6006891766061961,
+          0.6851879511272917
+        ],
+        "changePercent": -35.84511038251726,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-scattered-1024",
+        "role": "target",
+        "pairedRatio": 0.5540906647460598,
+        "interval95": [
+          0.5407301279339781,
+          0.5677813180704008
+        ],
+        "changePercent": -44.590933525394014,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-repeated-256",
+        "role": "target",
+        "pairedRatio": 0.06116401525240215,
+        "interval95": [
+          0.05992625957169794,
+          0.06242733633859079
+        ],
+        "changePercent": -93.8835984747598,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-boolean-clustered-256",
+        "role": "type",
+        "pairedRatio": 0.1990500311017357,
+        "interval95": [
+          0.19647614970730884,
+          0.20165763091665503
+        ],
+        "changePercent": -80.09499688982643,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-string-clustered-128",
+        "role": "type",
+        "pairedRatio": 0.524778965449296,
+        "interval95": [
+          0.5044205880014528,
+          0.545959005498087
+        ],
+        "changePercent": -47.52210345507039,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-tree-tail-64",
+        "role": "boundary",
+        "pairedRatio": 0.4693655438394026,
+        "interval95": [
+          0.44338474665311844,
+          0.49686872497671364
+        ],
+        "changePercent": -53.06344561605974,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-small-4",
+        "role": "small-batch",
+        "pairedRatio": 0.8741941245820073,
+        "interval95": [
+          0.8415095161039502,
+          0.9081482179689336
+        ],
+        "changePercent": -12.580587541799272,
+        "classification": "faster"
+      },
+      {
+        "runtime": "node",
+        "name": "scalar-set-control",
+        "role": "control",
+        "pairedRatio": 1.0184566726890276,
+        "interval95": [
+          0.9817383693329804,
+          1.0565482887763098
+        ],
+        "changePercent": 1.845667268902762,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "get-number-control",
+        "role": "control",
+        "pairedRatio": 1.01185687183145,
+        "interval95": [
+          0.9928237586796489,
+          1.0312548628309883
+        ],
+        "changePercent": 1.185687183145001,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-clustered-256",
+        "role": "target",
+        "pairedRatio": 0.2378098876416732,
+        "interval95": [
+          0.19259093331855723,
+          0.29364592447663257
+        ],
+        "changePercent": -76.21901123583268,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-scattered-256",
+        "role": "target",
+        "pairedRatio": 1.0974393569574468,
+        "interval95": [
+          1.018882215892627,
+          1.1820533555432031
+        ],
+        "changePercent": 9.743935695744677,
+        "classification": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-scattered-1024",
+        "role": "target",
+        "pairedRatio": 0.6102858224611561,
+        "interval95": [
+          0.5802308359627445,
+          0.641897606974139
+        ],
+        "changePercent": -38.97141775388439,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-repeated-256",
+        "role": "target",
+        "pairedRatio": 0.05463255705973938,
+        "interval95": [
+          0.04383362117612526,
+          0.06809193972117814
+        ],
+        "changePercent": -94.53674429402606,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-boolean-clustered-256",
+        "role": "type",
+        "pairedRatio": 0.26830042318983105,
+        "interval95": [
+          0.2571462070027892,
+          0.27993847516895953
+        ],
+        "changePercent": -73.1699576810169,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-string-clustered-128",
+        "role": "type",
+        "pairedRatio": 0.29389878785480156,
+        "interval95": [
+          0.2841346058297822,
+          0.3039985124313495
+        ],
+        "changePercent": -70.61012121451984,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-tree-tail-64",
+        "role": "boundary",
+        "pairedRatio": 0.5908684157622739,
+        "interval95": [
+          0.5390163546342635,
+          0.6477085189415265
+        ],
+        "changePercent": -40.913158423772614,
+        "classification": "faster"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-small-4",
+        "role": "small-batch",
+        "pairedRatio": 1.9402327502786227,
+        "interval95": [
+          1.7849461676351392,
+          2.109028940767053
+        ],
+        "changePercent": 94.02327502786227,
+        "classification": "slower"
+      },
+      {
+        "runtime": "bun",
+        "name": "scalar-set-control",
+        "role": "control",
+        "pairedRatio": 1.0529293196506782,
+        "interval95": [
+          0.9599015186832301,
+          1.1549728077322698
+        ],
+        "changePercent": 5.292931965067815,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "get-number-control",
+        "role": "control",
+        "pairedRatio": 1.0037440554067754,
+        "interval95": [
+          0.9792715813693242,
+          1.0288281084963586
+        ],
+        "changePercent": 0.37440554067753595,
+        "classification": "inconclusive"
+      }
+    ]
+  },
+  "sameBuild": {
+    "processes": 48,
+    "measuredBatches": 432,
+    "warmupBatches": 2197,
+    "verifiedOutputs": 248320,
+    "measuredBatchesBelow2ms": 0,
+    "minimumMeasuredBatchMs": 6.9271960000000945,
+    "warmupBatchesBelow2ms": 0,
+    "rows": [
+      {
+        "runtime": "node",
+        "name": "batch-number-clustered-256",
+        "role": "target",
+        "pairedRatio": 1.006599204896316,
+        "interval95": [
+          0.9560703159559657,
+          1.0597985758869257
+        ],
+        "changePercent": 0.6599204896315936,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "batch-number-scattered-256",
+        "role": "target",
+        "pairedRatio": 0.9643380258301688,
+        "interval95": [
+          0.9089957183767021,
+          1.0230497341865832
+        ],
+        "changePercent": -3.566197416983119,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "node",
+        "name": "scalar-set-control",
+        "role": "control",
+        "pairedRatio": 0.9830397585806795,
+        "interval95": [
+          0.8964351471360942,
+          1.0780112426846307
+        ],
+        "changePercent": -1.696024141932051,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-clustered-256",
+        "role": "target",
+        "pairedRatio": 0.9715442804709168,
+        "interval95": [
+          0.8150995741003739,
+          1.1580159270203678
+        ],
+        "changePercent": -2.845571952908321,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "batch-number-scattered-256",
+        "role": "target",
+        "pairedRatio": 0.982957468479582,
+        "interval95": [
+          0.9013887573189674,
+          1.071907517144553
+        ],
+        "changePercent": -1.7042531520418014,
+        "classification": "inconclusive"
+      },
+      {
+        "runtime": "bun",
+        "name": "scalar-set-control",
+        "role": "control",
+        "pairedRatio": 1.0252048539549332,
+        "interval95": [
+          0.8559953786913297,
+          1.227862928628918
+        ],
+        "changePercent": 2.5204853954933215,
+        "classification": "inconclusive"
+      }
+    ]
+  },
+  "referenceComparison": {
+    "processes": 96,
+    "measuredBatches": 864,
+    "verifiedFinalSnapshots": 676800,
+    "measuredBatchesBelow2ms": 150,
+    "shortBatchesByImplementation": {
+      "zerocopy-before": 0,
+      "zerocopy-after": 54,
+      "immutable": 96,
+      "native": 0
+    },
+    "minimumMeasuredBatchMs": 0.5633260000013252,
+    "equalFixtureDigestsAndRepetitions": true,
+    "independentlyReconstructedFixtureDigests": true,
+    "fullResultAndRetainedSourceAssertionsReviewed": true,
+    "nativeCopyStrategy": "One Array.slice per complete logical batch; all private assignments included.",
+    "immutableStrategy": "One List.withMutations session per complete logical batch.",
+    "noIntermediateScalarSnapshotsRetained": true,
+    "sourceAndBuildHashesMatchPrimary": true,
+    "immutableIdentity": {
+      "version": "5.1.9",
+      "moduleSha256": "357518ba2cab55c9990e60550dadddb8c39108bfe44ace61809af254a34d5d54",
+      "packageSha256": "662ad133db0b86e4a4f780f01dcd04d850e6ca54780f96b37b518316fc682abf"
+    }
+  },
+  "conclusions": [
+    "Formal statistics, schedules, source/build provenance, warmups, output accounting and independently reconstructed fixtures all agree with the raw records.",
+    "Bun four-edit batches are 94.0% slower: paired ratio 1.9402, unadjusted 95% interval 1.7849 to 2.1090.",
+    "Bun 256-scattered-edit batches are 9.7% slower: paired ratio 1.0974, unadjusted 95% interval 1.0189 to 1.1821.",
+    "All four unchanged formal control intervals include 1; their effects are inconclusive, not proof of zero regression.",
+    "Benefits are scoped to the opt-in batch API and workload shapes. No blanket speedup over scalar set or competing libraries is established.",
+    "The supplementary comparison uses fair whole-batch strategies and identical fixtures. It reports three-round medians, not paired confidence intervals; primary paired evidence carries the optimization claim.",
+    "Verification accounting and assertion coverage were audited. Recorded outputs themselves are not stored for independent replay; no benchmark was rerun."
+  ]
+}

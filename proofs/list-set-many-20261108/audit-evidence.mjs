@@ -3,13 +3,15 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 
 const folder = dirname(fileURLToPath(import.meta.url));
 const root = resolve(process.argv[2] ?? join(folder, '../..'));
 const resultDirectory = join(folder, 'results');
-const records = readdirSync(resultDirectory).filter(name => name.endsWith('.json')).map(name => ({
-  path: join(resultDirectory, name), data: JSON.parse(readFileSync(join(resultDirectory, name), 'utf8')),
-})).filter(({ data }) => data.schema === 'zerocopy-paired-public-operation/v1' && data.status === 'complete');
+const records = readdirSync(resultDirectory).filter(name => /\.json(?:\.gz)?$/.test(name)).map(name => {
+  const path = join(resultDirectory, name), bytes = readFileSync(path);
+  return { path, data: JSON.parse((name.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8')) };
+}).filter(({ data }) => data.schema === 'zerocopy-paired-public-operation/v1' && data.status === 'complete');
 const formal = records.filter(({ data }) => data.mode === 'formal').sort((a, b) => a.data.startedAt.localeCompare(b.data.startedAt));
 assert.ok(formal.length, 'Commit the complete formal record before claiming the batch improvement');
 assert.ok(records.some(({ data }) => data.mode === 'aa'), 'Commit the same-build control record');

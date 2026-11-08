@@ -177,7 +177,7 @@ queue.peek();     // 'first'
 remaining.peek(); // 'second'
 ```
 
-Use `SharedList.setMany(entries)` when several indexed edits should produce one
+`SharedList.setMany(entries)` applies several indexed edits to produce one
 new snapshot. It copies each affected tree node once, keeps the list's size,
 and preserves the original snapshot. It ignores out-of-range and non-integer
 indexes, as `set` does. An empty batch or one with no valid indexes returns the
@@ -200,6 +200,12 @@ overwritten value `11` is never encoded. This matters when JSON `toJSON` methods
 have side effects. Use individual `set` calls when you need each intermediate
 snapshot or each overwritten value's serialization. If serialization or
 allocation fails, existing snapshots remain unchanged; no result is published.
+
+This is an opt-in batch API. The [recorded performance study](../proofs/list-set-many-20261108/README.md#formal-results)
+found strong gains for clustered edits and repeated indexes. Preparing a batch
+also costs time: four scattered edits were slower than scalar `set` calls in
+Bun, and some larger scattered batches were slower too. Measure your edit
+pattern and runtime before replacing existing scalar loops.
 
 ## Linked-list interfaces
 

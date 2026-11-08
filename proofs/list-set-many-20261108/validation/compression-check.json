@@ -1,0 +1,25 @@
+{
+  "schema": "zerocopy-evidence-lossless-compression/v1",
+  "records": [
+    {
+      "source": "pilot.json",
+      "archive": "pilot.json.gz",
+      "originalBytes": 300730,
+      "compressedBytes": 54015,
+      "originalSha256": "89a874a8e30ce9e82373632603337196edfbd8ab4c654db3db666c84215a8c98",
+      "compressedSha256": "b6adccc3dc2ae72a2fc88daaee903d385b180520d4344b1290d3f50d04e140a3",
+      "gzipMtime": 0,
+      "roundTripExactBytes": true
+    },
+    {
+      "source": "pilot-v2.json",
+      "archive": "pilot-v2.json.gz",
+      "originalBytes": 259948,
+      "compressedBytes": 43955,
+      "originalSha256": "6d40194b9929e2a0f83b77c1c9a8b395672c470b3dbad393cc2abc5d4e9289d3",
+      "compressedSha256": "8846f9bfa6119229d81bc61e07ff2899436f6b847367ca7f926f9317287b8abc",
+      "gzipMtime": 0,
+      "roundTripExactBytes": true
+    }
+  ]
+}

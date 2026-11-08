@@ -1,0 +1,54 @@
+aa: node batch-number-clustered-256 pair 1/4 before: 104.450 us, verified
+aa: node batch-number-clustered-256 pair 1/4 after: 104.951 us, verified
+aa: node batch-number-scattered-256 pair 1/4 before: 145.624 us, verified
+aa: node batch-number-scattered-256 pair 1/4 after: 133.808 us, verified
+aa: node scalar-set-control pair 1/4 before: 134.781 us, verified
+aa: node scalar-set-control pair 1/4 after: 131.444 us, verified
+aa: bun batch-number-clustered-256 pair 1/4 before: 119.722 us, verified
+aa: bun batch-number-clustered-256 pair 1/4 after: 109.688 us, verified
+aa: bun batch-number-scattered-256 pair 1/4 before: 120.662 us, verified
+aa: bun batch-number-scattered-256 pair 1/4 after: 123.185 us, verified
+aa: bun scalar-set-control pair 1/4 before: 118.532 us, verified
+aa: bun scalar-set-control pair 1/4 after: 122.401 us, verified
+aa: bun scalar-set-control pair 2/4 after: 129.424 us, verified
+aa: bun scalar-set-control pair 2/4 before: 139.972 us, verified
+aa: bun batch-number-scattered-256 pair 2/4 after: 121.060 us, verified
+aa: bun batch-number-scattered-256 pair 2/4 before: 118.557 us, verified
+aa: bun batch-number-clustered-256 pair 2/4 after: 113.435 us, verified
+aa: bun batch-number-clustered-256 pair 2/4 before: 130.634 us, verified
+aa: node scalar-set-control pair 2/4 after: 141.405 us, verified
+aa: node scalar-set-control pair 2/4 before: 142.902 us, verified
+aa: node batch-number-scattered-256 pair 2/4 after: 139.662 us, verified
+aa: node batch-number-scattered-256 pair 2/4 before: 142.284 us, verified
+aa: node batch-number-clustered-256 pair 2/4 after: 102.670 us, verified
+aa: node batch-number-clustered-256 pair 2/4 before: 106.268 us, verified
+aa: node batch-number-clustered-256 pair 3/4 before: 104.105 us, verified
+aa: node batch-number-clustered-256 pair 3/4 after: 108.834 us, verified
+aa: node batch-number-scattered-256 pair 3/4 before: 137.325 us, verified
+aa: node batch-number-scattered-256 pair 3/4 after: 131.463 us, verified
+aa: node scalar-set-control pair 3/4 before: 145.296 us, verified
+aa: node scalar-set-control pair 3/4 after: 133.188 us, verified
+aa: bun batch-number-clustered-256 pair 3/4 before: 110.209 us, verified
+aa: bun batch-number-clustered-256 pair 3/4 after: 110.482 us, verified
+aa: bun batch-number-scattered-256 pair 3/4 before: 123.956 us, verified
+aa: bun batch-number-scattered-256 pair 3/4 after: 122.029 us, verified
+aa: bun scalar-set-control pair 3/4 before: 139.168 us, verified
+aa: bun scalar-set-control pair 3/4 after: 134.397 us, verified
+aa: bun scalar-set-control pair 4/4 after: 140.119 us, verified
+aa: bun scalar-set-control pair 4/4 before: 116.958 us, verified
+aa: bun batch-number-scattered-256 pair 4/4 after: 125.549 us, verified
+aa: bun batch-number-scattered-256 pair 4/4 before: 138.016 us, verified
+aa: bun batch-number-clustered-256 pair 4/4 after: 126.916 us, verified
+aa: bun batch-number-clustered-256 pair 4/4 before: 113.612 us, verified
+aa: node scalar-set-control pair 4/4 after: 140.788 us, verified
+aa: node scalar-set-control pair 4/4 before: 133.361 us, verified
+aa: node batch-number-scattered-256 pair 4/4 after: 134.839 us, verified
+aa: node batch-number-scattered-256 pair 4/4 before: 134.624 us, verified
+aa: node batch-number-clustered-256 pair 4/4 after: 108.947 us, verified
+aa: node batch-number-clustered-256 pair 4/4 before: 107.698 us, verified
+node batch-number-clustered-256: 105.359 -> 106.893 us, paired ratio 1.007 (0.956-1.060)
+node batch-number-scattered-256: 139.804 -> 134.324 us, paired ratio 0.964 (0.909-1.023)
+node scalar-set-control: 138.842 -> 136.988 us, paired ratio 0.983 (0.896-1.078)
+bun batch-number-clustered-256: 116.667 -> 111.959 us, paired ratio 0.972 (0.815-1.158)
+bun batch-number-scattered-256: 122.309 -> 122.607 us, paired ratio 0.983 (0.901-1.072)
+bun scalar-set-control: 128.850 -> 131.910 us, paired ratio 1.025 (0.856-1.228)

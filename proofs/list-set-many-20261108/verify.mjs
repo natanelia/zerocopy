@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 
 // Recompute saved statistics and validate provenance without retiming.
 const [input, candidate] = process.argv.slice(2);
-assert.ok(input, 'Usage: node verify.mjs RECORD.json [CANDIDATE_ROOT]');
-const record = JSON.parse(readFileSync(input, 'utf8'));
+assert.ok(input, 'Usage: node verify.mjs RECORD.json[.gz] [CANDIDATE_ROOT]');
+const recordPath = !existsSync(input) && input.endsWith('.json') ? `${input}.gz` : input;
+const bytes = readFileSync(recordPath);
+const record = JSON.parse((recordPath.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
 assert.equal(record.status, 'complete');
 assert.equal(record.schema, 'zerocopy-paired-public-operation/v1');
 const median = xs => {
@@ -109,6 +112,6 @@ if (candidate) {
   assert.equal(digest(readFileSync(join(folder, basename(record.driver.name)))), record.driver.sha256);
   assert.equal(digest(readFileSync(join(folder, basename(record.workload.name)))), record.workload.sha256);
 }
-console.log(JSON.stringify({ verified: true, record: resolve(input), mode: record.mode,
+console.log(JSON.stringify({ verified: true, record: resolve(recordPath), mode: record.mode,
   processes: runs.length, timedBatches, verifiedOutputs: outputs, measuredBatchesBelow2ms: below2ms,
   exactCurrentBuild: Boolean(candidate), rows: record.summary.map(({ runtime, name, pairedRatio, interval95 }) => ({ runtime, name, pairedRatio, interval95 })) }, null, 2));

@@ -1,0 +1,33 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/home/runner/work/zerocopy/zerocopy[39m
+
+ [32m✓[39m allocation-failure.test.ts [2m([22m[2m32 tests[22m[2m)[22m[33m 19886[2mms[22m[39m
+     [33m[2m✓[22m[39m map: insert [33m 958[2mms[22m[39m
+     [33m[2m✓[22m[39m map: replace [33m 863[2mms[22m[39m
+     [33m[2m✓[22m[39m map: delete [33m 772[2mms[22m[39m
+     [33m[2m✓[22m[39m ordered map: insert [33m 881[2mms[22m[39m
+     [33m[2m✓[22m[39m ordered map: replace [33m 860[2mms[22m[39m
+     [33m[2m✓[22m[39m ordered map: delete [33m 811[2mms[22m[39m
+     [33m[2m✓[22m[39m sorted map: insert [33m 1115[2mms[22m[39m
+     [33m[2m✓[22m[39m sorted map: replace [33m 1103[2mms[22m[39m
+     [33m[2m✓[22m[39m sorted map: delete [33m 1082[2mms[22m[39m
+     [33m[2m✓[22m[39m map: bulk insert, overwrite, duplicate and exact hash collision [33m 633[2mms[22m[39m
+     [33m[2m✓[22m[39m set: insert [33m 642[2mms[22m[39m
+     [33m[2m✓[22m[39m ordered set: insert [33m 779[2mms[22m[39m
+     [33m[2m✓[22m[39m sorted set: insert [33m 1025[2mms[22m[39m
+     [33m[2m✓[22m[39m list: replace a tail value [33m 353[2mms[22m[39m
+     [33m[2m✓[22m[39m list: bulk append across leaves [33m 353[2mms[22m[39m
+     [33m[2m✓[22m[39m linked list: append [33m 305[2mms[22m[39m
+     [33m[2m✓[22m[39m priority queue: min enqueue [33m 1272[2mms[22m[39m
+     [33m[2m✓[22m[39m priority queue: min dequeue [33m 1289[2mms[22m[39m
+     [33m[2m✓[22m[39m priority queue: max enqueue [33m 890[2mms[22m[39m
+     [33m[2m✓[22m[39m priority queue: max dequeue [33m 864[2mms[22m[39m
+ [32m✓[39m immutable-proof.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 1943[2mms[22m[39m
+ [32m✓[39m list-set-many.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 461[2mms[22m[39m
+ [32m✓[39m shared-list.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m112 passed[39m[22m[90m (112)[39m
+[2m   Start at [22m 15:38:14
+[2m   Duration [22m 22.73s[2m (transform 190ms, setup 0ms, import 244ms, tests 22.39s, environment 0ms)[22m
+

@@ -7,7 +7,7 @@ on:
       - 'proofs/list-set-many-20261108/**'
       - '.github/workflows/list-set-many.yml'
   push:
-    branches: [main, perf/list-batched-edits-20261108]
+    branches: [main]
     paths:
       - 'list-set-many.test.ts'
       - 'proofs/list-set-many-20261108/**'
@@ -24,7 +24,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,9 +51,34 @@ jobs:
         run: |
           baseline_checkout="$RUNNER_TEMP/list-set-many-baseline"
           git worktree add --detach "$baseline_checkout" a4265a0608ec25eec5719496225212db6b251989
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$baseline_checkout/node_modules"
           printf 'LIST_BATCH_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
           cd "$baseline_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Build the recorded candidate for the historical timing audit
+        shell: bash
+        run: |
+          recorded_commit="$(node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync } from 'node:fs';
+          import { gunzipSync } from 'node:zlib';
+          const plain = 'proofs/list-set-many-20261108/results/formal.json';
+          const path = existsSync(plain) ? plain : `${plain}.gz`;
+          const bytes = readFileSync(path);
+          const record = JSON.parse((path.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
+          assert.match(record.source.after.commit, /^[a-f0-9]{40}$/);
+          process.stdout.write(record.source.after.commit);
+          JS
+          )"
+          recorded_checkout="$RUNNER_TEMP/list-set-many-recorded"
+          if ! git cat-file -e "$recorded_commit^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$recorded_commit"
+          fi
+          git worktree add --detach "$recorded_checkout" "$recorded_commit"
+          printf 'LIST_BATCH_RECORDED=%s\n' "$recorded_checkout" >> "$GITHUB_ENV"
+          cd "$recorded_checkout"
+          bun install
           bun run build:wasm
           bun run build:browser
       - name: Run regression tests in Node and Bun
@@ -82,32 +107,9 @@ jobs:
       - name: Check the new API in Chromium and real browser workers
         shell: bash
         run: node proofs/list-set-many-20261108/browser.mjs . proofs/list-set-many-20261108/ci-logs/chromium.json 2>&1 | tee proofs/list-set-many-20261108/ci-logs/chromium.log
-      - name: Bootstrap missing formal evidence on this runner
-        if: ${{ hashFiles('proofs/list-set-many-20261108/results/formal.json') == '' }}
-        shell: bash
-        run: |
-          proof=proofs/list-set-many-20261108
-          list_batch_cpu=
-          while read -r status_key status_value; do
-            if [[ "$status_key" == "Cpus_allowed_list:" ]]; then
-              list_batch_cpu="${status_value%%[-,]*}"
-              break
-            fi
-          done < /proc/self/status
-          [[ "$list_batch_cpu" =~ ^[0-9]+$ ]]
-          printf 'First allowed benchmark CPU: %s\n' "$list_batch_cpu" | tee "$proof/ci-logs/benchmark-cpu.log"
-          taskset -c "$list_batch_cpu" node "$proof/paired-benchmark.mjs" \
-            "$proof/workloads.mjs" "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
-            "$proof/results/formal.json" formal 2>&1 | tee "$proof/ci-logs/formal-console.log"
-          taskset -c "$list_batch_cpu" node "$proof/paired-benchmark.mjs" \
-            "$proof/workloads.mjs" "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
-            "$proof/results/aa.json" aa 2>&1 | tee "$proof/ci-logs/aa-console.log"
-          taskset -c "$list_batch_cpu" node "$proof/reference-comparison.mjs" \
-            "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
-            "$proof/results/reference-comparison.json" 2>&1 | tee "$proof/ci-logs/reference-console.log"
       - name: Audit saved measurements without collecting timings
         shell: bash
-        run: node proofs/list-set-many-20261108/audit-evidence.mjs . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/evidence.log
+        run: node proofs/list-set-many-20261108/audit-evidence.mjs "$LIST_BATCH_RECORDED" 2>&1 | tee proofs/list-set-many-20261108/ci-logs/evidence.log
       - name: Retain correctness and evidence logs
         if: always()
         uses: actions/upload-artifact@v4

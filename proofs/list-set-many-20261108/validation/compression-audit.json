@@ -1,0 +1,29 @@
+{
+  "schema": "zerocopy-evidence-compression-audit/v1",
+  "passed": true,
+  "scope": "All verifier fields except the resolved record filename are identical before and after lossless compression. Both direct .json.gz and requested .json fallback paths passed; plain JSON was also rechecked.",
+  "records": [
+    {
+      "name": "pilot.json.gz",
+      "directGzip": true,
+      "jsonFallback": true,
+      "plainJson": true,
+      "allAuditFieldsUnchanged": true,
+      "processes": 32,
+      "timedBatches": 288,
+      "verifiedOutputs": 146752,
+      "measuredBatchesBelow2ms": 39
+    },
+    {
+      "name": "pilot-v2.json.gz",
+      "directGzip": true,
+      "jsonFallback": true,
+      "plainJson": true,
+      "allAuditFieldsUnchanged": true,
+      "processes": 32,
+      "timedBatches": 288,
+      "verifiedOutputs": 238336,
+      "measuredBatchesBelow2ms": 0
+    }
+  ]
+}

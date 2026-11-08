@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "kind": "list",
+  "writerRoot": "/home/runner/work/zerocopy/zerocopy",
+  "readerRoot": "/home/runner/work/_temp/list-set-many-baseline",
+  "runtime": "v24.22.1",
+  "results": [
+    {
+      "copy": false,
+      "reads": 14878,
+      "sourceCount": 32801,
+      "resultCount": 32801,
+      "oldCapacity": 393216,
+      "newCapacity": 2097152,
+      "retainedBytesUnchanged": true
+    },
+    {
+      "copy": true,
+      "reads": 12600,
+      "sourceCount": 32801,
+      "resultCount": 32801,
+      "oldCapacity": 393216,
+      "newCapacity": 2097152,
+      "retainedBytesUnchanged": true
+    }
+  ]
+}
