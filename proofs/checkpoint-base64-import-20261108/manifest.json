@@ -1,0 +1,148 @@
+{
+  "schema": "zerocopy-checkpoint-byte-import-evidence/v1",
+  "baseline": "0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e",
+  "finalVersion": "v3",
+  "sourceVersions": {
+    "v1": {
+      "recording": "pilot-v1.json.gz",
+      "path": "source-snapshots/redux-checkpoint-v1.ts",
+      "sha256": "82dd341f16692cd23cd5e2629e8f3b863e77969dc3a487c1983b92ed3cf7a750"
+    },
+    "v2": {
+      "recording": "formal-v2.json.gz",
+      "path": "source-snapshots/redux-checkpoint-v2.ts",
+      "sha256": "7fdd472255c90d308373bf8d246f2b0f4c66264f4d989ca98711d46182517b94"
+    },
+    "v3": {
+      "recording": "formal-v3.json.gz",
+      "path": "source-snapshots/redux-checkpoint-v3.ts",
+      "sha256": "55e8aa4be4db3e0644bfb3d7fc8a04031975a49c995874bb54274e5ca71e6ef1"
+    }
+  },
+  "evidence": {
+    "pilot-v1.json.gz": {
+      "sha256": "63758d6f208dadf9db5375078f538bb2fe2506919fa0cceea75fa10a6054e632",
+      "uncompressedSha256": "d8fa310b27bad125bfcfa3b51f2062a14b8e8b89b2e2f4fe470a2ec1ac338620",
+      "uncompressedBytes": 153676,
+      "sourceRecordingName": "pilot.json",
+      "mode": "pilot",
+      "processes": 32,
+      "measuredBatches": 288,
+      "workload": "workloads.mjs"
+    },
+    "formal-v2.json.gz": {
+      "sha256": "0dc40e08249c60ea6237209366955d95a3e539f82c5f108dff8cb89585780eff",
+      "uncompressedSha256": "8e864ef8d4132a3d2b3a5a254dd61b7928645a41257fbcc1652910eb75609f4d",
+      "uncompressedBytes": 433905,
+      "sourceRecordingName": "formal-v2.json",
+      "mode": "formal",
+      "processes": 120,
+      "measuredBatches": 1080,
+      "workload": "workloads.mjs"
+    },
+    "aa-v2.json.gz": {
+      "sha256": "8335b7a38c45f618e526c9b00aefe38cfa76f10e9d63fc69ae73c977c56ea92e",
+      "uncompressedSha256": "5199b0682c748e3457889b1ef8a055abdf10829bdcfa54552a461c1c181c92c7",
+      "uncompressedBytes": 160080,
+      "sourceRecordingName": "aa-v2.json",
+      "mode": "aa",
+      "processes": 32,
+      "measuredBatches": 288,
+      "workload": "workloads.mjs"
+    },
+    "pilot-v3.json.gz": {
+      "sha256": "c0c9427eabe5fb85b73c6dabe22369710ab91efe5282eef0f33abba9e733b3a0",
+      "uncompressedSha256": "2dfb4d2a0acad28f9872b063fb3244c354adde9ae2dd5454af706d317c16da41",
+      "uncompressedBytes": 180541,
+      "sourceRecordingName": "pilot-v3.json",
+      "mode": "pilot",
+      "processes": 40,
+      "measuredBatches": 360,
+      "workload": "workloads-v3.mjs"
+    },
+    "formal-v3.json.gz": {
+      "sha256": "e0ae382c15e08af1574ff99cac6e4adc057140b5f2f5c235b482690fb9ebefff",
+      "uncompressedSha256": "0ff82cd12d2dc3c04e562132710ef2766d440461c0b01a0ac483ed7a01a9f7a4",
+      "uncompressedBytes": 508523,
+      "sourceRecordingName": "formal-v3.json",
+      "mode": "formal",
+      "processes": 144,
+      "measuredBatches": 1296,
+      "workload": "workloads-v3.mjs"
+    },
+    "aa-v3.json.gz": {
+      "sha256": "ef53eeb08ee74263fa47fb034d7a023c4e33c433c7ec1ba1ff129c28ba9a89c6",
+      "uncompressedSha256": "6b6d1e52f8ab8e975c9c59382044abab86685c7f9aca022880bc42fdba39407d",
+      "uncompressedBytes": 207993,
+      "sourceRecordingName": "aa-v3.json",
+      "mode": "aa",
+      "processes": 48,
+      "measuredBatches": 432,
+      "workload": "workloads-v3.mjs"
+    }
+  },
+  "processes": 416,
+  "measuredBatches": 3744,
+  "artifacts": {
+    "paired-benchmark.mjs": "f3d5f78f11b75f35f0565999676bc1be56a6771be074bfe32e6a8a331eb47b89",
+    "verify.py": "d1259790aad7b1a88a002083f0b6e712786f5bf9d7bc07f4edfcf604c5da9b0d",
+    "workloads.mjs": "c1a5b945e9fa2d7475a19ee2d2fa5fcce429a2b6c8eaf7a19ea9804fc2a0ef4b",
+    "workloads-v3.mjs": "3620e6dc5ec34258f80a96ea54cfeb8c99d482ed3a43310c6e65e92d5d01e6a3",
+    "compatibility.mjs": "4bf52094b7720e022f3ad76626da433c2f5398c2811fb4752d290d01035eaa1a",
+    "compatibility-v3.mjs": "edb461c7378b1b75efa19388a1d101a78ed84d95a666893dcf569958429f5788",
+    "smoke.mjs": "e2140a126995aea41eace96c0297efe66976363dc9d51db413256eab26c2e480",
+    "smoke-v3.mjs": "048c2968fb49adf2cea0deacd37577c94cab69bcaa6f3b30010fd73ef4f6da7c",
+    "browser.mjs": "71703eeb7a8cfe0ceb8535c0b1b72cc95f106ef8db19807f21d2b7b506a6a8e7",
+    "combined-check.mjs": "1e1511e8a61ece3bc1e8090cde1b5c30754aaeec6b7cff50751b36935277d08a",
+    "combined-validation.json": "67a233d8c0134bd7d8726f2070f2b304a1b7ea98da593f4e109cd8c85bc67a65",
+    "combined-validation.txt": "1964ad4b2d4b0d5d3943689f03b3f7ab759cffc82475ac3b9dad73c047c83c67"
+  },
+  "validation": {
+    "v3RegressionTests": {
+      "node": 15,
+      "bun": 15
+    },
+    "v3CompatibilityModes": [
+      "auto",
+      "buffer",
+      "buffer-offset",
+      "portable-missing",
+      "portable-noncallable"
+    ],
+    "v3CompatibilityRuntimes": [
+      "node",
+      "bun"
+    ],
+    "v3Declarations": "passed",
+    "v3ReduxTypes": "passed",
+    "browserLocal": "launch blocked; see checks/browser-launch-failure.json",
+    "timingClaim": "Node full decode targets only; Bun and deserialize effects remain inconclusive; no browser timing measured",
+    "combined": {
+      "scope": "Correctness only: heap-compaction and checkpoint-byte-decoder changes together. Performance studies test each change separately against main.",
+      "sourceSha256": {
+        "compaction.ts": "4b5beaecac677a2e551e9ce148183435232062e08304286a0baaf33cb6efe294",
+        "redux-checkpoint.ts": "55e8aa4be4db3e0644bfb3d7fc8a04031975a49c995874bb54274e5ca71e6ef1",
+        "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9"
+      },
+      "focusedSuites": {
+        "node": {
+          "files": 6,
+          "tests": 201,
+          "status": "passed"
+        },
+        "bun": {
+          "files": 6,
+          "tests": 201,
+          "status": "passed"
+        }
+      },
+      "realNodeWorkers": {
+        "shared": true,
+        "copied": true,
+        "status": "passed"
+      },
+      "interactionNodePassed": true,
+      "interactionBunPassed": true
+    }
+  }
+}

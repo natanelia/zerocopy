@@ -1,0 +1,6 @@
+decode-text-512k: full output and input invariants passed
+deserialize-text-512k: full output and input invariants passed
+decode-text-2m: full output and input invariants passed
+small-snapshot: full output and input invariants passed
+plain-state-control: full output and input invariants passed
+portable-decode-text-512k: full output and input invariants passed
