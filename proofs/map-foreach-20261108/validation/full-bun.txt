@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-map
+
+
+ Test Files  61 passed (61)
+      Tests  1199 passed (1199)
+   Start at  21:16:13
+   Duration  35.27s (transform 1.24s, setup 0ms, import 2.42s, tests 136.43s, environment 12ms)

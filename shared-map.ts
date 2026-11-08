@@ -1,4 +1,4 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize, popcount } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 // Registering a collection must not allocate an unused writer in every reader.
@@ -75,12 +75,56 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     // even when a consumer pauses iteration to create another snapshot.
     for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf, 0, view);
   }
-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { const a = this.arena; for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf)); }
+  forEach(fn: (value: ValueOf<T>, key: string) => void): void {
+    const a = this.arena, leaves = a.leaves;
+    if (leaves !== defaultLeaves) {
+      for (const leaf of Reflect.apply(leaves, a, [this.root])) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf));
+      return;
+    }
+    if (!this.root) return;
+    const view = a.dv;
+    // Retain legacy journal ordering and duplicate suppression. Ordinary HAMT
+    // traversal keeps its entire continuation local, without generator yields.
+    if (view.getUint32(this.root, true) === 0xffffffff) {
+      for (const leaf of leaves.call(a, this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf));
+      return;
+    }
+    const stack = [this.root], lanes = new Uint32Array(16), patches: number[] = [];
+    while (stack.length) {
+      const p = stack.pop()!, tag = view.getUint32(p, true);
+      if (!tag) {
+        // Published leaves remain inside this view when a callback grows the
+        // shared arena, reenters the traversal, or creates a fork.
+        fn(a.leafValue(this.valueType, p), a.leafKey(p));
+        continue;
+      }
+      if (tag & 0x80000000) {
+        const bitmap = view.getUint32(p + 8, true) >>> 16;
+        patches.length = 0; let base = p;
+        while (view.getUint32(base, true) & 0x80000000) {
+          patches.push(base); base -= (view.getUint32(base, true) & 16383) * 4;
+        }
+        const bits = view.getUint32(base + 4, true); let offset = 0;
+        for (let digit = 0; digit < 16; digit++) if (bits & (1 << digit)) lanes[digit] = view.getUint32(base + 8 + offset++ * 4, true);
+        for (let i = patches.length - 1; i >= 0; i--) {
+          const patch = patches[i], distance = (view.getUint32(patch, true) >>> 14) & 127;
+          lanes[view.getUint32(patch + 4, true) & 15] = distance ? patch - distance * 4 : 0;
+        }
+        for (let digit = 15; digit >= 0; digit--) if (bitmap & (1 << digit)) stack.push(lanes[digit]);
+      } else {
+        const dense = (tag & 3) === 1;
+        const count = dense ? popcount(view.getUint32(p + 4, true)) : view.getUint32(p + 8, true);
+        for (let i = count - 1; i >= 0; i--) stack.push(view.getUint32(p + (dense ? 8 : 16) + i * 4, true));
+      }
+    }
+  }
   toWorkerData() { return Object.freeze({ root: this.root, valueType: this.valueType, size: this.size }); }
   static fromWorkerData<T extends string>(root: number, valueType: T, size?: number, source: Arena = defaultArena()): SharedMap<T> {
     return new SharedMap(valueType, root, size, source);
   }
 }
+// Keep custom arena traversals observable, including later prototype changes.
+const defaultLeaves = Arena.prototype.leaves;
 structureRegistry.SharedMap = { fromWorkerData: (d, a) => SharedMap.fromWorkerData(d.root, d.valueType, d.size, a) };
 
 /** Compatibility wrapper for internal numeric-key users. */
