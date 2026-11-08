@@ -121,6 +121,10 @@ export class Arena {
   private valueMap: Map<string, string | number | boolean | typeof PRESENT> | undefined;
   private valueMapChars = 0;
   private valueMapBytes = 0;
+  // Add this field only after a miss, preserving the existing read-cache layout.
+  // Missing keys have their own small budget and cannot evict successful reads.
+  // null retires this optional cache after custom readers were observed.
+  declare private missingReads: { roots: Map<string, number>; chars: number } | null | undefined;
   private cacheRead(key: string, value: string | number | boolean | typeof PRESENT, present: boolean): void {
     const map = this.valueMap!;
     if (!present && (map.size >= 16384 || this.valueMapChars + key.length > 131072)) return;
@@ -639,6 +643,12 @@ export class Arena {
     this.reads.remember(key, root, leaf); return leaf;
   }
   private findUncached(root: number, key: string): number {
+    let checkedView!: DataView, checked = false;
+    if (this.missingReads?.roots.get(key) === root) {
+      checkedView = this.dv; checked = true;
+      if (checkedView === this.view && Arena.hasNativeWasm(this)) return 0;
+    }
+    const publishedRoot = root;
     let hash = 2166136261, encoded: Uint8Array | undefined;
     for (let i = 0; i < key.length; i++) {
       const code = key.charCodeAt(i);
@@ -646,7 +656,8 @@ export class Arena {
       hash = Math.imul(hash ^ code, 16777619);
     }
     this.lastReadAscii = !encoded;
-    const length = encoded?.length ?? key.length, view = this.dv, bytes = this.bytes;
+    const length = encoded?.length ?? key.length, view = checked ? checkedView : this.dv, bytes = this.bytes;
+    if (view !== this.view) this.missingReads = null;
     // The generic journal path is retained for low-level imported descriptors.
     if (root && view.getUint32(root, true) === 0xffffffff) {
       for (let j = 0; j < view.getUint32(root + 12, true); j++) {
@@ -662,7 +673,9 @@ export class Arena {
     // The exact-root check below invalidates the directory before any reuse.
     if (root) {
       if (this.prefixRoot !== root) {
-        const bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
+        const wasm = this.wasm;
+        if (wasm !== this.#nativeWasm) this.missingReads = null;
+        const bits = wasm.mapSize(root) > 16384 ? 12 : 8;
         if (!this.prefixChildren || bits !== this.prefixBits) {
           this.prefixChildren = new Uint32Array(1 << bits); this.prefixValid = new Uint32Array((1 << bits) >>> 5);
         } else this.prefixValid!.fill(0);
@@ -670,12 +683,20 @@ export class Arena {
       }
       const prefix = hash & ((1 << this.prefixBits) - 1), word = prefix >>> 5, bit = 1 << (prefix & 31);
       if (!(this.prefixValid[word] & bit)) {
-        this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        const wasm = this.wasm;
+        if (wasm !== this.#nativeWasm) this.missingReads = null;
+        this.prefixChildren[prefix] = wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
         this.prefixValid[word] |= bit;
       }
-      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
-    } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
-    if (!candidate) return 0;
+      const wasm = this.wasm;
+      if (wasm !== this.#nativeWasm) this.missingReads = null;
+      candidate = wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
+    } else {
+      const wasm = this.wasm;
+      if (wasm !== this.#nativeWasm) this.missingReads = null;
+      candidate = wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+    }
+    if (!candidate) return this.rememberMissing(publishedRoot, key);
     const bucket = view.getUint32(candidate, true) === 2;
     const count = bucket ? view.getUint32(candidate + 8, true) : 1;
     for (let j = 0; j < count; j++) {
@@ -684,6 +705,17 @@ export class Arena {
       let i = 0; for (; i < length; i++) if (bytes[leaf + 16 + i] !== (encoded ? encoded[i] : key.charCodeAt(i))) break;
       if (i === length) return leaf;
     }
+    return this.rememberMissing(publishedRoot, key);
+  }
+  private rememberMissing(root: number, key: string): number {
+    const previous = this.missingReads;
+    if (previous === null || key.length > 16384) return 0;
+    const known = previous?.roots.has(key) ?? false;
+    if (!known && previous && (previous.roots.size >= 256 || previous.chars + key.length > 16384)) return 0;
+    if (!Arena.hasNativeWasm(this)) return 0;
+    const cache = previous ?? (this.missingReads = { roots: new Map(), chars: 0 });
+    cache.roots.set(key, root);
+    if (!known) cache.chars += key.length;
     return 0;
   }
 

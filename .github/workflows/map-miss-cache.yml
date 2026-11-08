@@ -1,0 +1,114 @@
+name: Map miss cache verification
+
+on:
+  pull_request:
+    paths:
+      - 'map-miss-cache.test.ts'
+      - 'proofs/map-miss-cache-20261108/**'
+      - '.github/workflows/map-miss-cache.yml'
+  push:
+    branches: [main, perf/map-miss-cache-20261108]
+    paths:
+      - 'map-miss-cache.test.ts'
+      - 'proofs/map-miss-cache-20261108/**'
+      - '.github/workflows/map-miss-cache.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: map-miss-cache-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install project dependencies
+        run: bun install
+      - name: Build current modules and declarations
+        shell: bash
+        run: |
+          mkdir -p proofs/map-miss-cache-20261108/ci-logs
+          bun run build:wasm 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/build-wasm.log
+          bun run build:browser 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/build-browser.log
+          bun run build:types 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/build-types.log
+          bun run typecheck 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/typecheck.log
+          bun run typecheck:values 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/typecheck-values.log
+      - name: Build the pinned baseline with its own dependencies
+        shell: bash
+        run: |
+          baseline_checkout="$RUNNER_TEMP/map-miss-cache-baseline"
+          baseline_commit=a4265a0608ec25eec5719496225212db6b251989
+          if ! git cat-file -e "$baseline_commit^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$baseline_commit"
+          fi
+          git worktree add --detach "$baseline_checkout" "$baseline_commit"
+          printf 'MAP_MISS_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
+          cd "$baseline_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Run focused Node and Bun regressions
+        shell: bash
+        run: |
+          node node_modules/vitest/vitest.mjs run map-miss-cache.test.ts hot-path.test.ts map-memory.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run map-miss-cache.test.ts hot-path.test.ts map-memory.test.ts performance-revision.test.ts --maxWorkers=1 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/bun-tests.log
+          bun run check:package 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/package.log
+      - name: Verify every workload without timing
+        shell: bash
+        run: |
+          node proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/node-baseline-smoke.json
+          node proofs/map-miss-cache-20261108/smoke.mjs . > proofs/map-miss-cache-20261108/ci-logs/node-candidate-smoke.json
+          bun proofs/map-miss-cache-20261108/smoke.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/bun-baseline-smoke.json
+          bun proofs/map-miss-cache-20261108/smoke.mjs . > proofs/map-miss-cache-20261108/ci-logs/bun-candidate-smoke.json
+          node proofs/map-miss-cache-20261108/cache-budget.mjs "$MAP_MISS_BASELINE" > proofs/map-miss-cache-20261108/ci-logs/cache-budget-before.json
+          node proofs/map-miss-cache-20261108/cache-budget.mjs . > proofs/map-miss-cache-20261108/ci-logs/cache-budget-after.json
+      - name: Check real workers and older readers
+        shell: bash
+        run: |
+          node proofs/map-miss-cache-20261108/worker.mjs . 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/workers-current.log
+          node proofs/map-miss-cache-20261108/worker.mjs . "$MAP_MISS_BASELINE" 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/workers-baseline.log
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check real Chromium workers
+        shell: bash
+        run: node proofs/map-miss-cache-20261108/browser.mjs . 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/chromium.log
+      - name: Collect the frozen study on this dedicated runner
+        shell: bash
+        run: |
+          proof=proofs/map-miss-cache-20261108
+          mkdir -p "$proof/results"
+          benchmark_cpu="$(awk '/Cpus_allowed_list/ { split($2, ranges, /[,-]/); print ranges[1] }' /proc/self/status)"
+          printf 'Benchmark CPU: %s\n' "$benchmark_cpu" | tee "$proof/ci-logs/affinity.log"
+          for mode in pilot formal aa; do
+            if [[ ! -e "$proof/results/$mode.json" && ! -e "$proof/results/$mode.json.gz" ]]; then
+              taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" "$proof/workloads.mjs" "$MAP_MISS_BASELINE" . "$(command -v bun)" "$proof/results/$mode.json" "$mode" 2>&1 | tee "$proof/ci-logs/$mode.log"
+            fi
+          done
+      - name: Audit raw measurements and source hashes
+        shell: bash
+        run: node proofs/map-miss-cache-20261108/audit-evidence.mjs . "$MAP_MISS_BASELINE" 2>&1 | tee proofs/map-miss-cache-20261108/ci-logs/evidence.log
+      - name: Retain all evidence, including partial runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-miss-cache-verification-${{ github.sha }}
+          path: |
+            proofs/map-miss-cache-20261108/results/
+            proofs/map-miss-cache-20261108/validation/
+            proofs/map-miss-cache-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

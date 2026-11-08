@@ -1,0 +1,35 @@
+{
+  "passedNodeWorkerChecks": true,
+  "browserExecutedLocally": false,
+  "browserStatus": "JavaScript and embedded-worker syntax checked; real Chromium execution required in GitHub Actions",
+  "collectedPerformanceTimings": false,
+  "helperHashes": {
+    "worker.mjs": "e6530ef53df9ca480ff37f03a02a00f9979bb7521c56c75683f93e2fa527235f",
+    "browser.mjs": "479a6777e61e2c37c767413835408012897fee992db6199a89740187130f1252",
+    "read-fixtures.mjs": "a699c8e814677c68c9dc5d3611dff697bbec87281234cb803868775cc471ee7f"
+  },
+  "checkoutSourceHashesAtValidation": {
+    "arena.ts": "4a3e2cd601d866013ea82f7afa07a5884cccab01deefd07a6149d707288720bb",
+    "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9"
+  },
+  "builtBundleSha256AtValidation": "16128d32f813666a5bbc286ec5f83fcb85c6c1f012aec71fd38dd0343e7ce46a",
+  "baselineReaderBundleSha256": "fe05b36e1a0aa60ac71da9c084f52c910bdd644ba6e62486f47fd2afa0e271e8",
+  "sourceBuildCorrespondence": "Source hashes identify the local checkout; the hosted workflow rebuilds and validates the frozen measured commit before timing. These helper checks alone do not assert reproducible build identity.",
+  "runtime": "v24.22.1",
+  "checks": [
+    {
+      "reader": "current",
+      "cases": 8,
+      "checkedReadOperations": 426816,
+      "path": "validation/node-workers-current-reader.json",
+      "sha256": "c2b46981e9cff645bf877b7cfaf04afd2506f31edf60369640af077ad24915d7"
+    },
+    {
+      "reader": "baseline",
+      "cases": 8,
+      "checkedReadOperations": 340800,
+      "path": "validation/node-workers-baseline-reader.json",
+      "sha256": "6aa66bbb152f9fc8cf92f3940cb8d72636eb05371033023418403e31c3a56422"
+    }
+  ]
+}
