@@ -156,13 +156,15 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   forEach(fn: (value: ValueOf<T>, index: number) => void): void {
     const a = this.arena, type = this.type, start = this.size ? (this.size - 1) & ~31 : 0;
     const isNumber = type === 'number', isBoolean = type === 'boolean';
+    // Tiny scans are dominated by branch and dispatch overhead in Node.
+    const usePrimitiveFastPath = this.size >= 1024 && (isNumber || isBoolean);
     for (let first = 0; first < this.size; first += 32) {
       const leaf = first === start ? this.tail : a.wasm.vecLeaf(this.root, this.depth, first) >>> 0;
       const stop = Math.min(this.size, first + 32), view = a.dv;
       // Published bytes remain valid if a callback grows shared memory.
       // Inspect the decoder before each callback: a callback can replace it,
       // and custom decoders must still receive every subsequent raw value.
-      if (isNumber || isBoolean) {
+      if (usePrimitiveFastPath) {
         for (let i = first; i < stop; i++) {
           const raw = view.getFloat64(leaf + (i - first) * 8, true);
           const decoder = a.decode;
