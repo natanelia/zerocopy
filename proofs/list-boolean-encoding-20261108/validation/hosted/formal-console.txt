@@ -1,0 +1,338 @@
+formal: node boolean-256-control pair 1/6 before: 3.316 us, verified
+formal: node boolean-256-control pair 1/6 after: 3.349 us, verified
+formal: node boolean-1024-control pair 1/6 before: 13.615 us, verified
+formal: node boolean-1024-control pair 1/6 after: 12.970 us, verified
+formal: node boolean-32767-control pair 1/6 before: 727.249 us, verified
+formal: node boolean-32767-control pair 1/6 after: 721.043 us, verified
+formal: node boolean-32768 pair 1/6 before: 517.593 us, verified
+formal: node boolean-32768 pair 1/6 after: 463.752 us, verified
+formal: node boolean-32769 pair 1/6 before: 721.917 us, verified
+formal: node boolean-32769 pair 1/6 after: 465.801 us, verified
+formal: node boolean-262144 pair 1/6 before: 4988.427 us, verified
+formal: node boolean-262144 pair 1/6 after: 3846.679 us, verified
+formal: node boolean-prefix-31 pair 1/6 before: 740.415 us, verified
+formal: node boolean-prefix-31 pair 1/6 after: 463.193 us, verified
+formal: node boolean-prefix-32 pair 1/6 before: 527.285 us, verified
+formal: node boolean-prefix-32 pair 1/6 after: 462.604 us, verified
+formal: node boolean-prefix-65 pair 1/6 before: 635.421 us, verified
+formal: node boolean-prefix-65 pair 1/6 after: 465.989 us, verified
+formal: node number-control-1024 pair 1/6 before: 7.842 us, verified
+formal: node number-control-1024 pair 1/6 after: 7.813 us, verified
+formal: node string-control-256 pair 1/6 before: 8.198 us, verified
+formal: node string-control-256 pair 1/6 after: 8.289 us, verified
+formal: node object-control-128 pair 1/6 before: 92.044 us, verified
+formal: node object-control-128 pair 1/6 after: 103.385 us, verified
+formal: node scalar-boolean-push-control pair 1/6 before: 0.234 us, verified
+formal: node scalar-boolean-push-control pair 1/6 after: 0.217 us, verified
+formal: bun boolean-256-control pair 1/6 before: 6.122 us, verified
+formal: bun boolean-256-control pair 1/6 after: 6.161 us, verified
+formal: bun boolean-1024-control pair 1/6 before: 22.701 us, verified
+formal: bun boolean-1024-control pair 1/6 after: 22.638 us, verified
+formal: bun boolean-32767-control pair 1/6 before: 513.922 us, verified
+formal: bun boolean-32767-control pair 1/6 after: 519.255 us, verified
+formal: bun boolean-32768 pair 1/6 before: 522.692 us, verified
+formal: bun boolean-32768 pair 1/6 after: 368.194 us, verified
+formal: bun boolean-32769 pair 1/6 before: 543.981 us, verified
+formal: bun boolean-32769 pair 1/6 after: 515.531 us, verified
+formal: bun boolean-262144 pair 1/6 before: 4302.589 us, verified
+formal: bun boolean-262144 pair 1/6 after: 2107.476 us, verified
+formal: bun boolean-prefix-31 pair 1/6 before: 547.079 us, verified
+formal: bun boolean-prefix-31 pair 1/6 after: 378.676 us, verified
+formal: bun boolean-prefix-32 pair 1/6 before: 519.055 us, verified
+formal: bun boolean-prefix-32 pair 1/6 after: 513.806 us, verified
+formal: bun boolean-prefix-65 pair 1/6 before: 518.972 us, verified
+formal: bun boolean-prefix-65 pair 1/6 after: 361.130 us, verified
+formal: bun number-control-1024 pair 1/6 before: 17.697 us, verified
+formal: bun number-control-1024 pair 1/6 after: 15.665 us, verified
+formal: bun string-control-256 pair 1/6 before: 7.512 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 1/6 after: 11.928 us, verified; 4/9 measured batches <2 ms (retained)
+formal: bun object-control-128 pair 1/6 before: 56.155 us, verified
+formal: bun object-control-128 pair 1/6 after: 56.711 us, verified
+formal: bun scalar-boolean-push-control pair 1/6 before: 0.118 us, verified
+formal: bun scalar-boolean-push-control pair 1/6 after: 0.120 us, verified
+formal: bun scalar-boolean-push-control pair 2/6 after: 0.122 us, verified
+formal: bun scalar-boolean-push-control pair 2/6 before: 0.124 us, verified
+formal: bun object-control-128 pair 2/6 after: 55.099 us, verified
+formal: bun object-control-128 pair 2/6 before: 63.611 us, verified
+formal: bun string-control-256 pair 2/6 after: 7.061 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 2/6 before: 6.998 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun number-control-1024 pair 2/6 after: 16.031 us, verified
+formal: bun number-control-1024 pair 2/6 before: 16.470 us, verified
+formal: bun boolean-prefix-65 pair 2/6 after: 525.110 us, verified
+formal: bun boolean-prefix-65 pair 2/6 before: 498.911 us, verified
+formal: bun boolean-prefix-32 pair 2/6 after: 527.132 us, verified
+formal: bun boolean-prefix-32 pair 2/6 before: 513.120 us, verified
+formal: bun boolean-prefix-31 pair 2/6 after: 525.378 us, verified
+formal: bun boolean-prefix-31 pair 2/6 before: 516.442 us, verified
+formal: bun boolean-262144 pair 2/6 after: 3016.484 us, verified
+formal: bun boolean-262144 pair 2/6 before: 4002.653 us, verified
+formal: bun boolean-32769 pair 2/6 after: 523.966 us, verified
+formal: bun boolean-32769 pair 2/6 before: 528.941 us, verified
+formal: bun boolean-32768 pair 2/6 after: 527.249 us, verified
+formal: bun boolean-32768 pair 2/6 before: 538.728 us, verified
+formal: bun boolean-32767-control pair 2/6 after: 535.265 us, verified
+formal: bun boolean-32767-control pair 2/6 before: 523.502 us, verified
+formal: bun boolean-1024-control pair 2/6 after: 22.232 us, verified
+formal: bun boolean-1024-control pair 2/6 before: 23.071 us, verified
+formal: bun boolean-256-control pair 2/6 after: 6.527 us, verified
+formal: bun boolean-256-control pair 2/6 before: 6.240 us, verified
+formal: node scalar-boolean-push-control pair 2/6 after: 0.234 us, verified
+formal: node scalar-boolean-push-control pair 2/6 before: 0.235 us, verified
+formal: node object-control-128 pair 2/6 after: 88.448 us, verified
+formal: node object-control-128 pair 2/6 before: 91.166 us, verified
+formal: node string-control-256 pair 2/6 after: 8.253 us, verified
+formal: node string-control-256 pair 2/6 before: 8.263 us, verified
+formal: node number-control-1024 pair 2/6 after: 9.524 us, verified
+formal: node number-control-1024 pair 2/6 before: 7.855 us, verified
+formal: node boolean-prefix-65 pair 2/6 after: 465.625 us, verified
+formal: node boolean-prefix-65 pair 2/6 before: 640.488 us, verified
+formal: node boolean-prefix-32 pair 2/6 after: 461.985 us, verified
+formal: node boolean-prefix-32 pair 2/6 before: 500.099 us, verified
+formal: node boolean-prefix-31 pair 2/6 after: 467.392 us, verified
+formal: node boolean-prefix-31 pair 2/6 before: 504.063 us, verified
+formal: node boolean-262144 pair 2/6 after: 3853.194 us, verified
+formal: node boolean-262144 pair 2/6 before: 4815.930 us, verified
+formal: node boolean-32769 pair 2/6 after: 464.225 us, verified
+formal: node boolean-32769 pair 2/6 before: 710.637 us, verified
+formal: node boolean-32768 pair 2/6 after: 467.716 us, verified
+formal: node boolean-32768 pair 2/6 before: 714.614 us, verified
+formal: node boolean-32767-control pair 2/6 after: 761.724 us, verified
+formal: node boolean-32767-control pair 2/6 before: 706.434 us, verified
+formal: node boolean-1024-control pair 2/6 after: 13.157 us, verified
+formal: node boolean-1024-control pair 2/6 before: 13.099 us, verified
+formal: node boolean-256-control pair 2/6 after: 3.301 us, verified
+formal: node boolean-256-control pair 2/6 before: 3.347 us, verified
+formal: node boolean-256-control pair 3/6 before: 3.603 us, verified
+formal: node boolean-256-control pair 3/6 after: 3.618 us, verified
+formal: node boolean-1024-control pair 3/6 before: 12.605 us, verified
+formal: node boolean-1024-control pair 3/6 after: 13.162 us, verified
+formal: node boolean-32767-control pair 3/6 before: 708.160 us, verified
+formal: node boolean-32767-control pair 3/6 after: 515.589 us, verified
+formal: node boolean-32768 pair 3/6 before: 505.879 us, verified
+formal: node boolean-32768 pair 3/6 after: 462.807 us, verified
+formal: node boolean-32769 pair 3/6 before: 503.378 us, verified
+formal: node boolean-32769 pair 3/6 after: 460.156 us, verified
+formal: node boolean-262144 pair 3/6 before: 5606.629 us, verified
+formal: node boolean-262144 pair 3/6 after: 3774.689 us, verified
+formal: node boolean-prefix-31 pair 3/6 before: 508.698 us, verified
+formal: node boolean-prefix-31 pair 3/6 after: 473.050 us, verified
+formal: node boolean-prefix-32 pair 3/6 before: 513.661 us, verified
+formal: node boolean-prefix-32 pair 3/6 after: 465.951 us, verified
+formal: node boolean-prefix-65 pair 3/6 before: 645.971 us, verified
+formal: node boolean-prefix-65 pair 3/6 after: 458.827 us, verified
+formal: node number-control-1024 pair 3/6 before: 7.565 us, verified
+formal: node number-control-1024 pair 3/6 after: 9.333 us, verified
+formal: node string-control-256 pair 3/6 before: 8.670 us, verified
+formal: node string-control-256 pair 3/6 after: 8.802 us, verified
+formal: node object-control-128 pair 3/6 before: 103.495 us, verified
+formal: node object-control-128 pair 3/6 after: 88.100 us, verified
+formal: node scalar-boolean-push-control pair 3/6 before: 0.221 us, verified
+formal: node scalar-boolean-push-control pair 3/6 after: 0.214 us, verified
+formal: bun boolean-256-control pair 3/6 before: 6.230 us, verified
+formal: bun boolean-256-control pair 3/6 after: 6.423 us, verified
+formal: bun boolean-1024-control pair 3/6 before: 23.099 us, verified
+formal: bun boolean-1024-control pair 3/6 after: 22.770 us, verified
+formal: bun boolean-32767-control pair 3/6 before: 522.463 us, verified
+formal: bun boolean-32767-control pair 3/6 after: 531.619 us, verified
+formal: bun boolean-32768 pair 3/6 before: 505.590 us, verified
+formal: bun boolean-32768 pair 3/6 after: 533.021 us, verified
+formal: bun boolean-32769 pair 3/6 before: 520.371 us, verified
+formal: bun boolean-32769 pair 3/6 after: 513.735 us, verified
+formal: bun boolean-262144 pair 3/6 before: 4272.282 us, verified
+formal: bun boolean-262144 pair 3/6 after: 2831.817 us, verified
+formal: bun boolean-prefix-31 pair 3/6 before: 521.012 us, verified
+formal: bun boolean-prefix-31 pair 3/6 after: 502.743 us, verified
+formal: bun boolean-prefix-32 pair 3/6 before: 510.744 us, verified
+formal: bun boolean-prefix-32 pair 3/6 after: 355.010 us, verified
+formal: bun boolean-prefix-65 pair 3/6 before: 521.477 us, verified
+formal: bun boolean-prefix-65 pair 3/6 after: 506.323 us, verified
+formal: bun number-control-1024 pair 3/6 before: 18.134 us, verified
+formal: bun number-control-1024 pair 3/6 after: 18.367 us, verified
+formal: bun string-control-256 pair 3/6 before: 9.990 us, verified; 1/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 3/6 after: 7.475 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun object-control-128 pair 3/6 before: 55.933 us, verified
+formal: bun object-control-128 pair 3/6 after: 56.178 us, verified
+formal: bun scalar-boolean-push-control pair 3/6 before: 0.123 us, verified
+formal: bun scalar-boolean-push-control pair 3/6 after: 0.133 us, verified
+formal: bun scalar-boolean-push-control pair 4/6 after: 0.122 us, verified
+formal: bun scalar-boolean-push-control pair 4/6 before: 0.133 us, verified
+formal: bun object-control-128 pair 4/6 after: 57.506 us, verified
+formal: bun object-control-128 pair 4/6 before: 55.654 us, verified
+formal: bun string-control-256 pair 4/6 after: 7.261 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 4/6 before: 7.324 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun number-control-1024 pair 4/6 after: 17.116 us, verified
+formal: bun number-control-1024 pair 4/6 before: 17.139 us, verified
+formal: bun boolean-prefix-65 pair 4/6 after: 514.860 us, verified
+formal: bun boolean-prefix-65 pair 4/6 before: 544.493 us, verified
+formal: bun boolean-prefix-32 pair 4/6 after: 382.111 us, verified
+formal: bun boolean-prefix-32 pair 4/6 before: 551.501 us, verified
+formal: bun boolean-prefix-31 pair 4/6 after: 506.276 us, verified
+formal: bun boolean-prefix-31 pair 4/6 before: 520.488 us, verified
+formal: bun boolean-262144 pair 4/6 after: 2927.793 us, verified
+formal: bun boolean-262144 pair 4/6 before: 4479.648 us, verified
+formal: bun boolean-32769 pair 4/6 after: 373.494 us, verified
+formal: bun boolean-32769 pair 4/6 before: 541.234 us, verified
+formal: bun boolean-32768 pair 4/6 after: 536.468 us, verified
+formal: bun boolean-32768 pair 4/6 before: 556.830 us, verified
+formal: bun boolean-32767-control pair 4/6 after: 527.994 us, verified
+formal: bun boolean-32767-control pair 4/6 before: 516.441 us, verified
+formal: bun boolean-1024-control pair 4/6 after: 22.063 us, verified
+formal: bun boolean-1024-control pair 4/6 before: 22.020 us, verified
+formal: bun boolean-256-control pair 4/6 after: 6.245 us, verified
+formal: bun boolean-256-control pair 4/6 before: 6.203 us, verified
+formal: node scalar-boolean-push-control pair 4/6 after: 0.230 us, verified
+formal: node scalar-boolean-push-control pair 4/6 before: 0.236 us, verified
+formal: node object-control-128 pair 4/6 after: 90.057 us, verified
+formal: node object-control-128 pair 4/6 before: 101.881 us, verified
+formal: node string-control-256 pair 4/6 after: 8.219 us, verified
+formal: node string-control-256 pair 4/6 before: 8.340 us, verified
+formal: node number-control-1024 pair 4/6 after: 9.526 us, verified
+formal: node number-control-1024 pair 4/6 before: 9.444 us, verified
+formal: node boolean-prefix-65 pair 4/6 after: 460.142 us, verified
+formal: node boolean-prefix-65 pair 4/6 before: 631.840 us, verified
+formal: node boolean-prefix-32 pair 4/6 after: 464.697 us, verified
+formal: node boolean-prefix-32 pair 4/6 before: 527.645 us, verified
+formal: node boolean-prefix-31 pair 4/6 after: 465.204 us, verified
+formal: node boolean-prefix-31 pair 4/6 before: 499.852 us, verified
+formal: node boolean-262144 pair 4/6 after: 3671.225 us, verified
+formal: node boolean-262144 pair 4/6 before: 4782.226 us, verified
+formal: node boolean-32769 pair 4/6 after: 464.186 us, verified
+formal: node boolean-32769 pair 4/6 before: 709.858 us, verified
+formal: node boolean-32768 pair 4/6 after: 461.267 us, verified
+formal: node boolean-32768 pair 4/6 before: 500.535 us, verified
+formal: node boolean-32767-control pair 4/6 after: 714.342 us, verified
+formal: node boolean-32767-control pair 4/6 before: 500.211 us, verified
+formal: node boolean-1024-control pair 4/6 after: 12.899 us, verified
+formal: node boolean-1024-control pair 4/6 before: 13.323 us, verified
+formal: node boolean-256-control pair 4/6 after: 3.377 us, verified
+formal: node boolean-256-control pair 4/6 before: 3.356 us, verified
+formal: node boolean-256-control pair 5/6 before: 3.324 us, verified
+formal: node boolean-256-control pair 5/6 after: 3.324 us, verified
+formal: node boolean-1024-control pair 5/6 before: 13.644 us, verified
+formal: node boolean-1024-control pair 5/6 after: 13.122 us, verified
+formal: node boolean-32767-control pair 5/6 before: 499.534 us, verified
+formal: node boolean-32767-control pair 5/6 after: 523.113 us, verified
+formal: node boolean-32768 pair 5/6 before: 706.160 us, verified
+formal: node boolean-32768 pair 5/6 after: 467.028 us, verified
+formal: node boolean-32769 pair 5/6 before: 706.244 us, verified
+formal: node boolean-32769 pair 5/6 after: 462.149 us, verified
+formal: node boolean-262144 pair 5/6 before: 4739.210 us, verified
+formal: node boolean-262144 pair 5/6 after: 3897.003 us, verified
+formal: node boolean-prefix-31 pair 5/6 before: 720.271 us, verified
+formal: node boolean-prefix-31 pair 5/6 after: 477.316 us, verified
+formal: node boolean-prefix-32 pair 5/6 before: 512.803 us, verified
+formal: node boolean-prefix-32 pair 5/6 after: 471.349 us, verified
+formal: node boolean-prefix-65 pair 5/6 before: 632.684 us, verified
+formal: node boolean-prefix-65 pair 5/6 after: 460.684 us, verified
+formal: node number-control-1024 pair 5/6 before: 7.559 us, verified
+formal: node number-control-1024 pair 5/6 after: 9.458 us, verified
+formal: node string-control-256 pair 5/6 before: 8.229 us, verified
+formal: node string-control-256 pair 5/6 after: 8.382 us, verified
+formal: node object-control-128 pair 5/6 before: 98.266 us, verified
+formal: node object-control-128 pair 5/6 after: 103.376 us, verified
+formal: node scalar-boolean-push-control pair 5/6 before: 0.234 us, verified
+formal: node scalar-boolean-push-control pair 5/6 after: 0.215 us, verified
+formal: bun boolean-256-control pair 5/6 before: 6.119 us, verified
+formal: bun boolean-256-control pair 5/6 after: 6.232 us, verified
+formal: bun boolean-1024-control pair 5/6 before: 21.718 us, verified
+formal: bun boolean-1024-control pair 5/6 after: 23.314 us, verified
+formal: bun boolean-32767-control pair 5/6 before: 521.029 us, verified
+formal: bun boolean-32767-control pair 5/6 after: 678.970 us, verified
+formal: bun boolean-32768 pair 5/6 before: 540.438 us, verified
+formal: bun boolean-32768 pair 5/6 after: 384.860 us, verified
+formal: bun boolean-32769 pair 5/6 before: 517.008 us, verified
+formal: bun boolean-32769 pair 5/6 after: 506.509 us, verified
+formal: bun boolean-262144 pair 5/6 before: 4268.783 us, verified
+formal: bun boolean-262144 pair 5/6 after: 3056.204 us, verified
+formal: bun boolean-prefix-31 pair 5/6 before: 544.702 us, verified
+formal: bun boolean-prefix-31 pair 5/6 after: 361.754 us, verified
+formal: bun boolean-prefix-32 pair 5/6 before: 513.205 us, verified
+formal: bun boolean-prefix-32 pair 5/6 after: 365.526 us, verified
+formal: bun boolean-prefix-65 pair 5/6 before: 527.690 us, verified
+formal: bun boolean-prefix-65 pair 5/6 after: 363.219 us, verified
+formal: bun number-control-1024 pair 5/6 before: 17.708 us, verified
+formal: bun number-control-1024 pair 5/6 after: 17.995 us, verified
+formal: bun string-control-256 pair 5/6 before: 7.445 us, verified; 6/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 5/6 after: 7.441 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun object-control-128 pair 5/6 before: 54.624 us, verified
+formal: bun object-control-128 pair 5/6 after: 55.374 us, verified
+formal: bun scalar-boolean-push-control pair 5/6 before: 0.122 us, verified
+formal: bun scalar-boolean-push-control pair 5/6 after: 0.134 us, verified
+formal: bun scalar-boolean-push-control pair 6/6 after: 0.133 us, verified
+formal: bun scalar-boolean-push-control pair 6/6 before: 0.124 us, verified
+formal: bun object-control-128 pair 6/6 after: 64.704 us, verified
+formal: bun object-control-128 pair 6/6 before: 60.373 us, verified
+formal: bun string-control-256 pair 6/6 after: 6.948 us, verified; 7/9 measured batches <2 ms (retained)
+formal: bun string-control-256 pair 6/6 before: 7.683 us, verified; 5/9 measured batches <2 ms (retained)
+formal: bun number-control-1024 pair 6/6 after: 16.910 us, verified
+formal: bun number-control-1024 pair 6/6 before: 16.604 us, verified
+formal: bun boolean-prefix-65 pair 6/6 after: 372.400 us, verified
+formal: bun boolean-prefix-65 pair 6/6 before: 523.649 us, verified
+formal: bun boolean-prefix-32 pair 6/6 after: 381.097 us, verified
+formal: bun boolean-prefix-32 pair 6/6 before: 520.552 us, verified
+formal: bun boolean-prefix-31 pair 6/6 after: 360.903 us, verified
+formal: bun boolean-prefix-31 pair 6/6 before: 511.799 us, verified
+formal: bun boolean-262144 pair 6/6 after: 2115.715 us, verified
+formal: bun boolean-262144 pair 6/6 before: 4715.572 us, verified
+formal: bun boolean-32769 pair 6/6 after: 362.018 us, verified
+formal: bun boolean-32769 pair 6/6 before: 515.493 us, verified
+formal: bun boolean-32768 pair 6/6 after: 386.218 us, verified
+formal: bun boolean-32768 pair 6/6 before: 497.840 us, verified
+formal: bun boolean-32767-control pair 6/6 after: 510.668 us, verified
+formal: bun boolean-32767-control pair 6/6 before: 503.871 us, verified
+formal: bun boolean-1024-control pair 6/6 after: 22.823 us, verified
+formal: bun boolean-1024-control pair 6/6 before: 23.477 us, verified
+formal: bun boolean-256-control pair 6/6 after: 5.729 us, verified
+formal: bun boolean-256-control pair 6/6 before: 6.264 us, verified
+formal: node scalar-boolean-push-control pair 6/6 after: 0.216 us, verified
+formal: node scalar-boolean-push-control pair 6/6 before: 0.234 us, verified
+formal: node object-control-128 pair 6/6 after: 103.094 us, verified
+formal: node object-control-128 pair 6/6 before: 91.006 us, verified
+formal: node string-control-256 pair 6/6 after: 8.196 us, verified
+formal: node string-control-256 pair 6/6 before: 8.406 us, verified
+formal: node number-control-1024 pair 6/6 after: 7.838 us, verified
+formal: node number-control-1024 pair 6/6 before: 7.764 us, verified
+formal: node boolean-prefix-65 pair 6/6 after: 461.376 us, verified
+formal: node boolean-prefix-65 pair 6/6 before: 638.088 us, verified
+formal: node boolean-prefix-32 pair 6/6 after: 463.171 us, verified
+formal: node boolean-prefix-32 pair 6/6 before: 501.030 us, verified
+formal: node boolean-prefix-31 pair 6/6 after: 464.636 us, verified
+formal: node boolean-prefix-31 pair 6/6 before: 509.896 us, verified
+formal: node boolean-262144 pair 6/6 after: 3797.212 us, verified
+formal: node boolean-262144 pair 6/6 before: 4733.772 us, verified
+formal: node boolean-32769 pair 6/6 after: 460.361 us, verified
+formal: node boolean-32769 pair 6/6 before: 504.417 us, verified
+formal: node boolean-32768 pair 6/6 after: 465.812 us, verified
+formal: node boolean-32768 pair 6/6 before: 714.457 us, verified
+formal: node boolean-32767-control pair 6/6 after: 713.658 us, verified
+formal: node boolean-32767-control pair 6/6 before: 724.592 us, verified
+formal: node boolean-1024-control pair 6/6 after: 13.329 us, verified
+formal: node boolean-1024-control pair 6/6 before: 13.686 us, verified
+formal: node boolean-256-control pair 6/6 after: 3.533 us, verified
+formal: node boolean-256-control pair 6/6 before: 3.279 us, verified
+node boolean-256-control: 3.336 -> 3.363 us, paired ratio 1.014 (0.981-1.047)
+node boolean-1024-control: 13.469 -> 13.140 us, paired ratio 0.984 (0.949-1.020)
+node boolean-32767-control: 707.297 -> 714.000 us, paired ratio 1.023 (0.816-1.283)
+node boolean-32768: 611.876 -> 464.782 us, paired ratio 0.773 (0.640-0.934)
+node boolean-32769: 708.051 -> 463.168 us, paired ratio 0.729 (0.607-0.876)
+node boolean-262144: 4799.078 -> 3821.946 us, paired ratio 0.771 (0.716-0.831)
+node boolean-prefix-31: 509.297 -> 466.298 us, paired ratio 0.820 (0.673-0.998)
+node boolean-prefix-32: 513.232 -> 463.934 us, paired ratio 0.905 (0.883-0.928)
+node boolean-prefix-65: 636.755 -> 461.030 us, paired ratio 0.725 (0.717-0.733)
+node number-control-1024: 7.803 -> 9.395 us, paired ratio 1.113 (0.989-1.252)
+node string-control-256: 8.301 -> 8.271 us, paired ratio 1.001 (0.982-1.019)
+node object-control-128: 95.155 -> 96.575 us, paired ratio 0.996 (0.877-1.131)
+node scalar-boolean-push-control: 0.234 -> 0.216 us, paired ratio 0.951 (0.917-0.986)
+bun boolean-256-control: 6.216 -> 6.239 us, paired ratio 1.003 (0.954-1.054)
+bun boolean-1024-control: 22.886 -> 22.704 us, paired ratio 0.998 (0.959-1.040)
+bun boolean-32767-control: 518.735 -> 529.807 us, paired ratio 1.060 (0.953-1.179)
+bun boolean-32768: 530.710 -> 456.733 us, paired ratio 0.854 (0.709-1.028)
+bun boolean-32769: 524.656 -> 510.122 us, paired ratio 0.872 (0.726-1.048)
+bun boolean-262144: 4287.436 -> 2879.805 us, paired ratio 0.610 (0.488-0.762)
+bun boolean-prefix-31: 520.750 -> 440.710 us, paired ratio 0.822 (0.667-1.013)
+bun boolean-prefix-32: 516.130 -> 381.604 us, paired ratio 0.797 (0.657-0.966)
+bun boolean-prefix-65: 522.563 -> 439.361 us, paired ratio 0.831 (0.678-1.018)
+bun number-control-1024: 17.418 -> 17.013 us, paired ratio 0.983 (0.929-1.040)
+bun string-control-256: 7.479 -> 7.351 us, paired ratio 1.012 (0.780-1.313)
+bun object-control-128: 56.044 -> 56.445 us, paired ratio 0.998 (0.924-1.077)
+bun scalar-boolean-push-control: 0.123 -> 0.127 us, paired ratio 1.026 (0.956-1.101)

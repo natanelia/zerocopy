@@ -10,6 +10,10 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const littleEndian = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+const arrayMap = Array.prototype.map;
+const arrayForEach = Array.prototype.forEach;
+const arraySpecies = Object.getOwnPropertyDescriptor(Array, Symbol.species)?.get;
 let nextId = 0;
 const PRESENT = Symbol("present; primitive value not decoded");
 interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
@@ -820,6 +824,12 @@ export class Arena {
 
   encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {
     this.assertWritable();
+    // Large boolean batches can validate into one-byte flags, then let the
+    // native typed-array conversion fill their final f64 slots in one pass.
+    // Keep small batches and customized encoders on the original path.
+    if (type === 'boolean' && values.length >= 32768 && this.canEncodeBooleanRange(values)) {
+      return this.encodeBooleanRange(values, prefix, length);
+    }
     const raw = type === 'number' ? values : values.map(value => this.encode(type, value));
     const input = this.alloc((length + raw.length) * 8), dv = this.dv;
     if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
@@ -827,6 +837,50 @@ export class Arena {
       if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
       dv.setFloat64(input + (length + i) * 8, raw[i], true);
     }
+    return input;
+  }
+  private canEncodeBooleanRange(values: readonly boolean[]): boolean {
+    return littleEndian && Array.isArray(values) && Object.getPrototypeOf(values) === Array.prototype
+      && !Object.hasOwn(values, 'map') && !Object.hasOwn(values, 'constructor')
+      && Array.prototype.map === arrayMap && Array.prototype.constructor === Array
+      && Object.getOwnPropertyDescriptor(Array, Symbol.species)?.get === arraySpecies
+      && Object.getPrototypeOf(this) === Arena.prototype
+      && this.encode === rangeEncode && this.alloc === rangeAlloc && Arena.hasNativeWasm(this)
+      && !Object.hasOwn(this, 'dv') && !Object.hasOwn(this, 'refresh')
+      && Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')?.get === primitiveReadProtocol.view
+      && Arena.prototype.refresh === primitiveReadProtocol.refresh;
+  }
+  private encodeBooleanRange(values: readonly boolean[], prefix: number, length: number): number {
+    const count = values.length, flags = new Uint8Array(count);
+    let present = 0, raw: any[] | undefined;
+    // Complete every input getter before allocating or writing arena bytes.
+    // Native forEach preserves map's ascending visitation and skips holes.
+    arrayForEach.call(values, (value: boolean, index: number) => {
+      const encode = this.encode;
+      if (!raw && encode === rangeEncode) {
+        if (typeof value !== 'boolean') throw new TypeError('Expected a boolean');
+        flags[index] = value ? 1 : 0;
+      } else {
+        // A getter can replace encode partway through map's iteration. Keep
+        // its arbitrary raw results without reading any input getter twice.
+        if (!raw) {
+          raw = new Array(count);
+          for (let i = 0; i < index; i++) raw[i] = flags[i];
+        }
+        raw[index] = encode.call(this, 'boolean', value);
+      }
+      present++;
+    });
+    // The original map leaves holes, which the numeric-slot writer rejects.
+    if (present !== count) throw new TypeError('Expected a number');
+    const input = this.alloc((length + count) * 8), view = this.dv;
+    if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
+    if (raw) {
+      for (let i = 0; i < count; i++) {
+        if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
+        view.setFloat64(input + (length + i) * 8, raw[i], true);
+      }
+    } else new Float64Array(view.buffer, input + length * 8, count).set(flags);
     return input;
   }
   *blocks(root: number, reverse = false): Generator<number> {
@@ -855,6 +909,9 @@ export class Arena {
     }
   }
 }
+
+const rangeEncode = Arena.prototype.encode;
+const rangeAlloc = Arena.prototype.alloc;
 
 /** Internal identities for optional readers that specialize primitive decoding. */
 export const primitiveReadProtocol = Object.freeze({

@@ -1,0 +1,9 @@
+{
+  "passed": false,
+  "phase": "Chromium process launch",
+  "timingMeasurements": false,
+  "testsExecuted": false,
+  "executable": "/usr/bin/chromium",
+  "error": "socket() failed: Operation not permitted (1)",
+  "nextValidation": "Hosted CI runs the dedicated real Chromium worker/output proof."
+}

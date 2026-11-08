@@ -1,0 +1,1709 @@
+{
+  "passed": true,
+  "timingMeasurements": false,
+  "runtime": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "scope": "Exact shared-arena allocation, descriptors and byte identity. JavaScript temporary heap is not measured.",
+  "sources": [
+    {
+      "root": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "arenaSha256": "7d250dc3452ad047b6b2e38cd4dd0983ddc6808d9402077512710eacd331b55d",
+      "coreWasmSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "bundleSha256": "fe05b36e1a0aa60ac71da9c084f52c910bdd644ba6e62486f47fd2afa0e271e8"
+    },
+    {
+      "root": "/workspace/scratch/106b5ee34aad/zerocopy-list-booleans",
+      "arenaSha256": "6f21a542109703cbeaaf0ef95f32bbc5a347ea6d54369731c6de6ffeb286674f",
+      "coreWasmSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "bundleSha256": "65aafe83e350a51dbad30d33440880a56718e49e733264bd07aadaf77857d73f"
+    }
+  ],
+  "pairs": 36,
+  "rows": [
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 256,
+      "allocatedBytes": 2176,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 67584,
+        "depth": 1,
+        "size": 256,
+        "type": "boolean",
+        "tail": 67328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ba75f241c51a8cd8ec6127ef506aacbf276be6f04efb4523bd6dfe5341e4b570"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 1024,
+      "allocatedBytes": 8320,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 73728,
+        "depth": 1,
+        "size": 1024,
+        "type": "boolean",
+        "tail": 73472
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "80a051fb1288ec602c3af9f952aa3614aec1c333bfb4a7d59f7334cddf21ebc7"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 32767,
+      "allocatedBytes": 266360,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327672,
+        "depth": 2,
+        "size": 32767,
+        "type": "boolean",
+        "tail": 327424
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "71c5743532a8872413b53a130bd266ce4c320c6fe2f04755c90e3c67c569a6d8"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 32768,
+      "allocatedBytes": 266368,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327680,
+        "depth": 2,
+        "size": 32768,
+        "type": "boolean",
+        "tail": 327424
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "50dc473577c4d7bf16a8925907d909939e079f56cd9fb20d6e1c2ae5d1ee584a"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 32769,
+      "allocatedBytes": 266376,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327688,
+        "depth": 2,
+        "size": 32769,
+        "type": "boolean",
+        "tail": 327680
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "b8545914adb406b26fadc0253b614912d626f8ceba0273280c5d05809d67d626"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 0,
+      "count": 262144,
+      "allocatedBytes": 2131072,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 2162688,
+        "depth": 3,
+        "size": 262144,
+        "type": "boolean",
+        "tail": 2162432
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "f6c0e7bfb117fbb946b5a12e7db9fc86281a60f4629908e427be0a82e45f1950"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 256,
+      "allocatedBytes": 2184,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 67600,
+        "depth": 1,
+        "size": 257,
+        "type": "boolean",
+        "tail": 67592
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "e1a9da711b5ebfdaba8381cbdbe3632a896adfee3c25d337dd59c2eae98cc439"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 1024,
+      "allocatedBytes": 8328,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 73744,
+        "depth": 1,
+        "size": 1025,
+        "type": "boolean",
+        "tail": 73736
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "6bf27c7bbdc7680fd0e6aee33652e29a5ddb6da6aefa0b6313aa67ad483ebe45"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 32767,
+      "allocatedBytes": 266368,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327688,
+        "depth": 2,
+        "size": 32768,
+        "type": "boolean",
+        "tail": 327432
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "563d591c7a6c9aa5c0b8d5a80689acfbc8597f2947194c7ebc9a1b781545a832"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 32768,
+      "allocatedBytes": 266376,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327696,
+        "depth": 2,
+        "size": 32769,
+        "type": "boolean",
+        "tail": 327688
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "9428a46b7418fa696682d13a65946cebb2581c7d144c9e9c18c0c67e3a1af406"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 32769,
+      "allocatedBytes": 266384,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327704,
+        "depth": 2,
+        "size": 32770,
+        "type": "boolean",
+        "tail": 327688
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "a2e159c281537ae36ec05c3a3b9b110e80ab844949c2d9d748e417a1f54bfd82"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1,
+      "count": 262144,
+      "allocatedBytes": 2131080,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2162704,
+        "depth": 3,
+        "size": 262145,
+        "type": "boolean",
+        "tail": 2162696
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "91e23f155cc604a7555037ebf62c723b28a30dbc7299fa1eb9dde87107975121"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 256,
+      "allocatedBytes": 2424,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 68080,
+        "depth": 1,
+        "size": 287,
+        "type": "boolean",
+        "tail": 67832
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "1258a12c6adb4c2e93ea5a73a40c33ece9c93aec275c3e78dfbfa3d2e563b4aa"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 1024,
+      "allocatedBytes": 8568,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 74224,
+        "depth": 1,
+        "size": 1055,
+        "type": "boolean",
+        "tail": 73976
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ae5eb476445359d9ac252148c9e923e539352b014f99955bceb012e2efb883f2"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 32767,
+      "allocatedBytes": 266608,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328168,
+        "depth": 2,
+        "size": 32798,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "3cadf60aed10cde2c73e8c2b70d47e01e489debdc3bcdd47f6ec95b12e0bc3e1"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 32768,
+      "allocatedBytes": 266616,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328176,
+        "depth": 2,
+        "size": 32799,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ef12b933fe6a523f6662eed42efadf592d934a504229be93d7eac6c5bb6c499d"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 32769,
+      "allocatedBytes": 266624,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328184,
+        "depth": 2,
+        "size": 32800,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "0f3b4f402adb71c68f7c25fa65f99f1ea84ac71cac37e2ac4cf56efe6c318c91"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 31,
+      "count": 262144,
+      "allocatedBytes": 2131320,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2163184,
+        "depth": 3,
+        "size": 262175,
+        "type": "boolean",
+        "tail": 2162936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "301955bf965f20f5e6888d2f7ef704f60342a6b10a6923d873ba4a7a38fd04b7"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 256,
+      "allocatedBytes": 2432,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 68096,
+        "depth": 1,
+        "size": 288,
+        "type": "boolean",
+        "tail": 67840
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "89922ad45cb8e4aeb611fe10ea0381c9de89dbdec1f7cc9cef3b82aa0b5366c5"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 1024,
+      "allocatedBytes": 8576,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 74240,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73984
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "f7b304ba800204df0f04df425de343eee0f40710ef3540fda6ec9b09444aed5f"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 32767,
+      "allocatedBytes": 266616,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328184,
+        "depth": 2,
+        "size": 32799,
+        "type": "boolean",
+        "tail": 327936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ffd8879e5cc90171351bfa2bb6946775294bd2ab9c9e79186c954f886c22693f"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 32768,
+      "allocatedBytes": 266624,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328192,
+        "depth": 2,
+        "size": 32800,
+        "type": "boolean",
+        "tail": 327936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "638af06a2156c6ff3829b3093747319ea79d409cd5455b8af29efe30130f69ca"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 32769,
+      "allocatedBytes": 267016,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328200,
+        "depth": 3,
+        "size": 32801,
+        "type": "boolean",
+        "tail": 328192
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "327c7276e0b8dfaec1258847edecfe9ecac293a70642b64b9fba87633325278d"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 32,
+      "count": 262144,
+      "allocatedBytes": 2131328,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2163200,
+        "depth": 3,
+        "size": 262176,
+        "type": "boolean",
+        "tail": 2162944
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ec1d99dabde06b761bf7ed8b793350853f5c7fd7ecd346837af3b3bfc3f104d3"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 256,
+      "allocatedBytes": 2184,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 68240,
+        "depth": 1,
+        "size": 321,
+        "type": "boolean",
+        "tail": 68232
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "d6a3855907be1e8fad887c10f3da414d3b420c297d205e77c8bc9731d3f13a0b"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 1024,
+      "allocatedBytes": 8712,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 74512,
+        "depth": 2,
+        "size": 1089,
+        "type": "boolean",
+        "tail": 74376
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "943396920f8748ee0081e1c0a96e19b337922554671f8bb0fdf61f18ab0c795b"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 32767,
+      "allocatedBytes": 267008,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328584,
+        "depth": 3,
+        "size": 32832,
+        "type": "boolean",
+        "tail": 328072
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "2b67e29d871c19636139993ae3ff815fc605bb2939023b27661d925cb9c1962c"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 32768,
+      "allocatedBytes": 267016,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328592,
+        "depth": 3,
+        "size": 32833,
+        "type": "boolean",
+        "tail": 328328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "43ddbc7d4b7c168e6cf6114c73e602e061d1fe566ece3f1848957c435072fc8d"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 32769,
+      "allocatedBytes": 267024,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328600,
+        "depth": 3,
+        "size": 32834,
+        "type": "boolean",
+        "tail": 328328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "2d8dbc3d0655c0c3a00cfa2c30702e5fa5066b7bf75372e576a61859b856d318"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 65,
+      "count": 262144,
+      "allocatedBytes": 2131592,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 2163600,
+        "depth": 3,
+        "size": 262209,
+        "type": "boolean",
+        "tail": 2163336
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "eb7c8d9f696fd03d6cddd589c14e4e68eee5be4c2f7d8d9f95808595bf49a23a"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 256,
+      "allocatedBytes": 2688,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 76544,
+        "depth": 2,
+        "size": 1312,
+        "type": "boolean",
+        "tail": 76160
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "5df3cb14c06bbddbbc42e7c45eace82af9a91b514488652e201b741de09cf4c6"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 1024,
+      "allocatedBytes": 8832,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 82688,
+        "depth": 2,
+        "size": 2080,
+        "type": "boolean",
+        "tail": 82304
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "073616e4e7a91a92a91dbddfce40226ecd2f8096c7f631714456a7863016402f"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 32767,
+      "allocatedBytes": 267128,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336760,
+        "depth": 3,
+        "size": 33823,
+        "type": "boolean",
+        "tail": 336256
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "0e2a878aad24a8f38c1ffd0ad291dc2a8bc501c823ea2e3cfd75dc24723eb908"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 32768,
+      "allocatedBytes": 267136,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336768,
+        "depth": 3,
+        "size": 33824,
+        "type": "boolean",
+        "tail": 336256
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "513e8dd781ce6c5906ddb523ea8a0ad3249b94bb11003065c8991e6ef57d788e"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 32769,
+      "allocatedBytes": 267272,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336776,
+        "depth": 3,
+        "size": 33825,
+        "type": "boolean",
+        "tail": 336512
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "7db04fae7310a6d28cc2b363719a34e2504e19734b18c4b9e406be53168d513c"
+    },
+    {
+      "variant": "before",
+      "prefixCount": 1056,
+      "count": 262144,
+      "allocatedBytes": 2131712,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 2171776,
+        "depth": 3,
+        "size": 263200,
+        "type": "boolean",
+        "tail": 2171264
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "35131394d7c3bdcd5b9be3eb2b5330dc7529b58e044c076e99e5866f9cdce5de"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 256,
+      "allocatedBytes": 2176,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 67584,
+        "depth": 1,
+        "size": 256,
+        "type": "boolean",
+        "tail": 67328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ba75f241c51a8cd8ec6127ef506aacbf276be6f04efb4523bd6dfe5341e4b570"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 1024,
+      "allocatedBytes": 8320,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 73728,
+        "depth": 1,
+        "size": 1024,
+        "type": "boolean",
+        "tail": 73472
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "80a051fb1288ec602c3af9f952aa3614aec1c333bfb4a7d59f7334cddf21ebc7"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 32767,
+      "allocatedBytes": 266360,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327672,
+        "depth": 2,
+        "size": 32767,
+        "type": "boolean",
+        "tail": 327424
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "71c5743532a8872413b53a130bd266ce4c320c6fe2f04755c90e3c67c569a6d8"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 32768,
+      "allocatedBytes": 266368,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327680,
+        "depth": 2,
+        "size": 32768,
+        "type": "boolean",
+        "tail": 327424
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "50dc473577c4d7bf16a8925907d909939e079f56cd9fb20d6e1c2ae5d1ee584a"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 32769,
+      "allocatedBytes": 266376,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 327688,
+        "depth": 2,
+        "size": 32769,
+        "type": "boolean",
+        "tail": 327680
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "b8545914adb406b26fadc0253b614912d626f8ceba0273280c5d05809d67d626"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 0,
+      "count": 262144,
+      "allocatedBytes": 2131072,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 0,
+        "type": "boolean",
+        "tail": 0
+      },
+      "descriptor": {
+        "root": 2162688,
+        "depth": 3,
+        "size": 262144,
+        "type": "boolean",
+        "tail": 2162432
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "f6c0e7bfb117fbb946b5a12e7db9fc86281a60f4629908e427be0a82e45f1950"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 256,
+      "allocatedBytes": 2184,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 67600,
+        "depth": 1,
+        "size": 257,
+        "type": "boolean",
+        "tail": 67592
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "e1a9da711b5ebfdaba8381cbdbe3632a896adfee3c25d337dd59c2eae98cc439"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 1024,
+      "allocatedBytes": 8328,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 73744,
+        "depth": 1,
+        "size": 1025,
+        "type": "boolean",
+        "tail": 73736
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "6bf27c7bbdc7680fd0e6aee33652e29a5ddb6da6aefa0b6313aa67ad483ebe45"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 32767,
+      "allocatedBytes": 266368,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327688,
+        "depth": 2,
+        "size": 32768,
+        "type": "boolean",
+        "tail": 327432
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "563d591c7a6c9aa5c0b8d5a80689acfbc8597f2947194c7ebc9a1b781545a832"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 32768,
+      "allocatedBytes": 266376,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327696,
+        "depth": 2,
+        "size": 32769,
+        "type": "boolean",
+        "tail": 327688
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "9428a46b7418fa696682d13a65946cebb2581c7d144c9e9c18c0c67e3a1af406"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 32769,
+      "allocatedBytes": 266384,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 327704,
+        "depth": 2,
+        "size": 32770,
+        "type": "boolean",
+        "tail": 327688
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "a2e159c281537ae36ec05c3a3b9b110e80ab844949c2d9d748e417a1f54bfd82"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1,
+      "count": 262144,
+      "allocatedBytes": 2131080,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 1,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2162704,
+        "depth": 3,
+        "size": 262145,
+        "type": "boolean",
+        "tail": 2162696
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "91e23f155cc604a7555037ebf62c723b28a30dbc7299fa1eb9dde87107975121"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 256,
+      "allocatedBytes": 2424,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 68080,
+        "depth": 1,
+        "size": 287,
+        "type": "boolean",
+        "tail": 67832
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "1258a12c6adb4c2e93ea5a73a40c33ece9c93aec275c3e78dfbfa3d2e563b4aa"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 1024,
+      "allocatedBytes": 8568,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 74224,
+        "depth": 1,
+        "size": 1055,
+        "type": "boolean",
+        "tail": 73976
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ae5eb476445359d9ac252148c9e923e539352b014f99955bceb012e2efb883f2"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 32767,
+      "allocatedBytes": 266608,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328168,
+        "depth": 2,
+        "size": 32798,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "3cadf60aed10cde2c73e8c2b70d47e01e489debdc3bcdd47f6ec95b12e0bc3e1"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 32768,
+      "allocatedBytes": 266616,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328176,
+        "depth": 2,
+        "size": 32799,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ef12b933fe6a523f6662eed42efadf592d934a504229be93d7eac6c5bb6c499d"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 32769,
+      "allocatedBytes": 266624,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328184,
+        "depth": 2,
+        "size": 32800,
+        "type": "boolean",
+        "tail": 327928
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "0f3b4f402adb71c68f7c25fa65f99f1ea84ac71cac37e2ac4cf56efe6c318c91"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 31,
+      "count": 262144,
+      "allocatedBytes": 2131320,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 31,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2163184,
+        "depth": 3,
+        "size": 262175,
+        "type": "boolean",
+        "tail": 2162936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "301955bf965f20f5e6888d2f7ef704f60342a6b10a6923d873ba4a7a38fd04b7"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 256,
+      "allocatedBytes": 2432,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 68096,
+        "depth": 1,
+        "size": 288,
+        "type": "boolean",
+        "tail": 67840
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "89922ad45cb8e4aeb611fe10ea0381c9de89dbdec1f7cc9cef3b82aa0b5366c5"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 1024,
+      "allocatedBytes": 8576,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 74240,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73984
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "f7b304ba800204df0f04df425de343eee0f40710ef3540fda6ec9b09444aed5f"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 32767,
+      "allocatedBytes": 266616,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328184,
+        "depth": 2,
+        "size": 32799,
+        "type": "boolean",
+        "tail": 327936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ffd8879e5cc90171351bfa2bb6946775294bd2ab9c9e79186c954f886c22693f"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 32768,
+      "allocatedBytes": 266624,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328192,
+        "depth": 2,
+        "size": 32800,
+        "type": "boolean",
+        "tail": 327936
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "638af06a2156c6ff3829b3093747319ea79d409cd5455b8af29efe30130f69ca"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 32769,
+      "allocatedBytes": 267016,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 328200,
+        "depth": 3,
+        "size": 32801,
+        "type": "boolean",
+        "tail": 328192
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "327c7276e0b8dfaec1258847edecfe9ecac293a70642b64b9fba87633325278d"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 32,
+      "count": 262144,
+      "allocatedBytes": 2131328,
+      "sourceDescriptor": {
+        "root": 0,
+        "depth": 0,
+        "size": 32,
+        "type": "boolean",
+        "tail": 65536
+      },
+      "descriptor": {
+        "root": 2163200,
+        "depth": 3,
+        "size": 262176,
+        "type": "boolean",
+        "tail": 2162944
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "ec1d99dabde06b761bf7ed8b793350853f5c7fd7ecd346837af3b3bfc3f104d3"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 256,
+      "allocatedBytes": 2184,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 68240,
+        "depth": 1,
+        "size": 321,
+        "type": "boolean",
+        "tail": 68232
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "d6a3855907be1e8fad887c10f3da414d3b420c297d205e77c8bc9731d3f13a0b"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 1024,
+      "allocatedBytes": 8712,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 74512,
+        "depth": 2,
+        "size": 1089,
+        "type": "boolean",
+        "tail": 74376
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "943396920f8748ee0081e1c0a96e19b337922554671f8bb0fdf61f18ab0c795b"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 32767,
+      "allocatedBytes": 267008,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328584,
+        "depth": 3,
+        "size": 32832,
+        "type": "boolean",
+        "tail": 328072
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "2b67e29d871c19636139993ae3ff815fc605bb2939023b27661d925cb9c1962c"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 32768,
+      "allocatedBytes": 267016,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328592,
+        "depth": 3,
+        "size": 32833,
+        "type": "boolean",
+        "tail": 328328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "43ddbc7d4b7c168e6cf6114c73e602e061d1fe566ece3f1848957c435072fc8d"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 32769,
+      "allocatedBytes": 267024,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 328600,
+        "depth": 3,
+        "size": 32834,
+        "type": "boolean",
+        "tail": 328328
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "2d8dbc3d0655c0c3a00cfa2c30702e5fa5066b7bf75372e576a61859b856d318"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 65,
+      "count": 262144,
+      "allocatedBytes": 2131592,
+      "sourceDescriptor": {
+        "root": 66056,
+        "depth": 1,
+        "size": 65,
+        "type": "boolean",
+        "tail": 66048
+      },
+      "descriptor": {
+        "root": 2163600,
+        "depth": 3,
+        "size": 262209,
+        "type": "boolean",
+        "tail": 2163336
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "eb7c8d9f696fd03d6cddd589c14e4e68eee5be4c2f7d8d9f95808595bf49a23a"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 256,
+      "allocatedBytes": 2688,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 76544,
+        "depth": 2,
+        "size": 1312,
+        "type": "boolean",
+        "tail": 76160
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "5df3cb14c06bbddbbc42e7c45eace82af9a91b514488652e201b741de09cf4c6"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 1024,
+      "allocatedBytes": 8832,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 82688,
+        "depth": 2,
+        "size": 2080,
+        "type": "boolean",
+        "tail": 82304
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "073616e4e7a91a92a91dbddfce40226ecd2f8096c7f631714456a7863016402f"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 32767,
+      "allocatedBytes": 267128,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336760,
+        "depth": 3,
+        "size": 33823,
+        "type": "boolean",
+        "tail": 336256
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "0e2a878aad24a8f38c1ffd0ad291dc2a8bc501c823ea2e3cfd75dc24723eb908"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 32768,
+      "allocatedBytes": 267136,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336768,
+        "depth": 3,
+        "size": 33824,
+        "type": "boolean",
+        "tail": 336256
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "513e8dd781ce6c5906ddb523ea8a0ad3249b94bb11003065c8991e6ef57d788e"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 32769,
+      "allocatedBytes": 267272,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 336776,
+        "depth": 3,
+        "size": 33825,
+        "type": "boolean",
+        "tail": 336512
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "7db04fae7310a6d28cc2b363719a34e2504e19734b18c4b9e406be53168d513c"
+    },
+    {
+      "variant": "after",
+      "prefixCount": 1056,
+      "count": 262144,
+      "allocatedBytes": 2131712,
+      "sourceDescriptor": {
+        "root": 73984,
+        "depth": 1,
+        "size": 1056,
+        "type": "boolean",
+        "tail": 73728
+      },
+      "descriptor": {
+        "root": 2171776,
+        "depth": 3,
+        "size": 263200,
+        "type": "boolean",
+        "tail": 2171264
+      },
+      "publishedBytesPreserved": true,
+      "completeValuesChecked": true,
+      "wholeArenaSha256": "35131394d7c3bdcd5b9be3eb2b5330dc7529b58e044c076e99e5866f9cdce5de"
+    }
+  ]
+}
