@@ -1,0 +1,41 @@
+{
+  "browser": "153.0.8010.0",
+  "crossOriginIsolated": true,
+  "checks": [
+    {
+      "transport": "shared",
+      "first": {
+        "id": 1,
+        "ok": true,
+        "numberValues": 8194,
+        "booleanValues": 4097,
+        "compactedArenaCount": 1
+      },
+      "second": {
+        "id": 2,
+        "ok": true,
+        "numberValues": 8195,
+        "booleanValues": 4096,
+        "compactedArenaCount": 1
+      }
+    },
+    {
+      "transport": "copy",
+      "first": {
+        "id": 3,
+        "ok": true,
+        "numberValues": 8194,
+        "booleanValues": 4097,
+        "compactedArenaCount": 1
+      },
+      "second": {
+        "id": 4,
+        "ok": true,
+        "numberValues": 8195,
+        "booleanValues": 4096,
+        "compactedArenaCount": 1
+      }
+    }
+  ],
+  "timingMeasurements": false
+}

@@ -1,0 +1,31 @@
+name: Compaction vector copy evidence
+
+on:
+  pull_request:
+    paths:
+      - 'proofs/compaction-vector-copy-20261108/**'
+      - '.github/workflows/compaction-vector-copy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'proofs/compaction-vector-copy-20261108/**'
+      - '.github/workflows/compaction-vector-copy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify saved samples, source hashes and paired statistics
+        run: |
+          python3 proofs/compaction-vector-copy-20261108/verify.py \
+            proofs/compaction-vector-copy-20261108/results/pilot.json.gz \
+            proofs/compaction-vector-copy-20261108/results/confirmation.json.gz \
+            proofs/compaction-vector-copy-20261108/results/aa.json.gz

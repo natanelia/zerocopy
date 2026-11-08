@@ -1,11 +1,11 @@
-import { Arena, Snapshot, arenaOf, vectorDepth } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, primitiveReadProtocol } from './arena';
 import { parseNestedType } from './types';
 import { structureRegistry } from './codec';
 import { SharedMap } from './shared-map';
-import { SharedList } from './shared-list';
+import { SharedList, listCompactionProtocol } from './shared-list';
 import { SharedSet } from './shared-set';
 import { SharedStack } from './shared-stack';
-import { SharedQueue } from './shared-queue';
+import { SharedQueue, queueReadProtocol } from './shared-queue';
 import { SharedLinkedList } from './shared-linked-list';
 import { SharedDoublyLinkedList } from './shared-doubly-linked-list';
 import { SharedOrderedMap } from './shared-ordered-map';
@@ -76,8 +76,52 @@ class Compactor {
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return (sorted ? this.target.wasm.radixBuild(input, leaves.length) : this.target.wasm.mapBatch(0, input, leaves.length)) >>> 0;
   }
-  private vector(a: Arena, d: any, type: string, sequence: boolean, queue: boolean): { input: number; size: number } {
+  private primitiveVector(a: Arena, d: any, queue: boolean): number | undefined {
+    // Native descriptors contain data properties. Keep customized descriptors,
+    // views and kernels on the existing per-value path, without calling getters.
+    if (!primitiveReadProtocol.hasNativeWasm(a)
+      || Object.getPrototypeOf(a) !== Arena.prototype
+      || Object.hasOwn(a, 'buf') || Object.hasOwn(a, 'dv') || Object.hasOwn(a, 'refresh')
+      || Object.getOwnPropertyDescriptor(Arena.prototype, 'buf')?.get !== primitiveReadProtocol.bytes
+      || Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')?.get !== primitiveReadProtocol.view
+      || Object.getOwnPropertyDescriptor(Arena.prototype, 'refresh')?.value !== primitiveReadProtocol.refresh) return undefined;
+    const start = queue ? d.tail : 0;
+    // A public queue constructor can retain a coercible offset object. Reject
+    // it before arithmetic so the original loop remains its only coercion.
+    if (!Number.isSafeInteger(start)) return undefined;
+    const end = start + d.size;
+    const root = queue ? d.head : d.root, tail = queue ? d.block : d.tail;
+    if (![end, root, tail, d.depth].every(Number.isSafeInteger)
+      || start < 0 || end > 0x3fffffff || root < 0 || tail < 0 || d.depth < 0 || d.depth > 6
+      || d.size * 8 > 0x7ffe0000) return undefined;
+    const prefix = end - (((end - 1) & 31) + 1);
+    const bytes = a.buf;
+    // Validate every copied span before allocating. subarray clips invalid
+    // bounds, and malformed descriptors must keep the original read errors.
+    for (let i = start; i < end;) {
+      const leaf = i >= prefix ? tail : a.wasm.vecLeaf(root, d.depth, i) >>> 0;
+      const count = Math.min(32 - (i & 31), end - i);
+      if (leaf + (i & 31) * 8 + count * 8 > bytes.length) return undefined;
+      i += count;
+    }
+    const input = this.target.alloc(d.size * 8), output = this.target.buf;
+    let destination = input;
+    // The source and destination have separate arenas. Copy the existing little-
+    // endian bytes, including NaN and signed zero, without a temporary JS array.
+    for (let i = start; i < end;) {
+      const leaf = i >= prefix ? tail : a.wasm.vecLeaf(root, d.depth, i) >>> 0;
+      const offset = leaf + (i & 31) * 8, count = Math.min(32 - (i & 31), end - i), length = count * 8;
+      output.set(bytes.subarray(offset, offset + length), destination);
+      destination += length; i += count;
+    }
+    return input;
+  }
+  private vector(a: Arena, d: any, type: string, sequence: boolean, queue: boolean, nativeDescriptor: boolean): { input: number; size: number } {
     const size = d.size;
+    if (nativeDescriptor && size >= 32 && (type === 'number' || type === 'boolean')) {
+      const input = this.primitiveVector(a, d, queue);
+      if (input !== undefined) return { input, size };
+    }
     // Place blobs before the final contiguous values. Nested compaction may grow
     // memory, so reacquire the view after it returns.
     const values: number[] = [];
@@ -156,7 +200,10 @@ class Compactor {
     } else if (kind === 'SharedPriorityQueue') next = { ...d, root: this.heap(a, type, d.root) };
     else {
       const sequence = kind === 'SharedLinkedList' || kind === 'SharedDoublyLinkedList', queue = kind === 'SharedQueue';
-      const { input, size } = this.vector(a, d, type, sequence, queue), tailSize = size ? ((size - 1) & 31) + 1 : 0;
+      const protocol = sequence ? undefined : queue ? queueReadProtocol : listCompactionProtocol;
+      const nativeDescriptor = !!protocol && Object.getPrototypeOf(source) === protocol.prototype
+        && Object.getOwnPropertyDescriptor(protocol.prototype, 'toWorkerData')?.value === protocol.descriptor;
+      const { input, size } = this.vector(a, d, type, sequence, queue, nativeDescriptor), tailSize = size ? ((size - 1) & 31) + 1 : 0;
       const prefix = size - tailSize, tail = size ? input + prefix * 8 : 0;
       if (sequence) next = { ...d, head: this.target.wasm.blockBuild(input, prefix / 32) >>> 0, tail, tailSize };
       else {
