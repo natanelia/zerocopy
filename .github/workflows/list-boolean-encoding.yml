@@ -1,0 +1,110 @@
+name: Boolean List append evidence
+
+on:
+  pull_request:
+    paths:
+      - 'list-boolean-range.test.ts'
+      - 'proofs/list-boolean-encoding-20261108/**'
+      - '.github/workflows/list-boolean-encoding.yml'
+  push:
+    branches: [main, perf/list-boolean-encoding-20261108]
+    paths:
+      - 'list-boolean-range.test.ts'
+      - 'proofs/list-boolean-encoding-20261108/**'
+      - '.github/workflows/list-boolean-encoding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: list-boolean-encoding-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Build the portable package and check source/value types
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run typecheck
+          bun run typecheck:values
+      - name: Check retained Lists and allocation failures in Node and Bun
+        run: |
+          node node_modules/vitest/vitest.mjs run list-boolean-range.test.ts shared-list.test.ts allocation-failure.test.ts --no-file-parallelism --maxWorkers=1
+          bun --bun node_modules/vitest/vitest.mjs run list-boolean-range.test.ts shared-list.test.ts allocation-failure.test.ts --no-file-parallelism --maxWorkers=1
+      - name: Check out the benchmark baseline separately
+        uses: actions/checkout@v4
+        with:
+          ref: a4265a0608ec25eec5719496225212db6b251989
+          path: boolean-baseline
+          persist-credentials: false
+      - name: Build the baseline with the same dependencies
+        run: |
+          ln -s "$GITHUB_WORKSPACE/node_modules" boolean-baseline/node_modules
+          cd boolean-baseline
+          bun run build:wasm
+          bun run build:browser
+      - name: Verify every workload and exact arena bytes without timing
+        run: |
+          mkdir -p boolean-ci-results
+          node proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline . > boolean-ci-results/smoke-node.json
+          bun proofs/list-boolean-encoding-20261108/smoke.mjs boolean-baseline . > boolean-ci-results/smoke-bun.json
+          node proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline . > boolean-ci-results/allocation-node.json
+          bun proofs/list-boolean-encoding-20261108/allocation.mjs boolean-baseline . > boolean-ci-results/allocation-bun.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check browser output and real workers with shared/copied attachments
+        run: node proofs/list-boolean-encoding-20261108/browser.mjs . > boolean-ci-results/browser.json
+      - name: Bootstrap isolated performance evidence when confirmation is absent
+        if: ${{ hashFiles('proofs/list-boolean-encoding-20261108/results/formal.json') == '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          benchmark_cpu="$(node -e 'const fs = require("node:fs"); const allowed = fs.readFileSync("/proc/self/status", "utf8").match(/^Cpus_allowed_list:\s*(\d+)/m); if (!allowed) process.exit(1); process.stdout.write(allowed[1]);')"
+          benchmark_bun="$(command -v bun)"
+          benchmark_proof=proofs/list-boolean-encoding-20261108
+          mkdir -p "$benchmark_proof/results"
+          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
+            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
+            "$benchmark_bun" "$benchmark_proof/results/pilot-v2.json" pilot \
+            2>&1 | tee boolean-ci-results/pilot-v2-console.txt
+          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
+            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
+            "$benchmark_bun" "$benchmark_proof/results/formal.json" formal \
+            2>&1 | tee boolean-ci-results/formal-console.txt
+          taskset -c "$benchmark_cpu" node "$benchmark_proof/paired-benchmark.mjs" \
+            "$benchmark_proof/workloads.mjs" "$GITHUB_WORKSPACE/boolean-baseline" "$GITHUB_WORKSPACE" \
+            "$benchmark_bun" "$benchmark_proof/results/aa.json" aa \
+            2>&1 | tee boolean-ci-results/aa-console.txt
+          taskset -c "$benchmark_cpu" node "$benchmark_proof/compare.mjs" \
+            "$GITHUB_WORKSPACE" "$benchmark_bun" "$benchmark_proof/results/reference-comparison.json" measure \
+            2>&1 | tee boolean-ci-results/reference-comparison-console.txt
+      - name: Audit saved samples, statistics and exact source/build hashes
+        run: |
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/pilot.json > boolean-ci-results/audit-pilot-v1.json
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/pilot-v2.json . > boolean-ci-results/audit-pilot-v2.json
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/formal.json . > boolean-ci-results/audit-formal.json
+          node proofs/list-boolean-encoding-20261108/verify.mjs proofs/list-boolean-encoding-20261108/results/aa.json boolean-baseline > boolean-ci-results/audit-aa.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boolean-list-validation-${{ github.sha }}
+          path: |
+            proofs/list-boolean-encoding-20261108/results/
+            boolean-ci-results/
+          if-no-files-found: warn
+          retention-days: 14

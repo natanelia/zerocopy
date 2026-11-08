@@ -1,0 +1,490 @@
+{
+  "passed": true,
+  "timingMeasurements": false,
+  "runtime": {
+    "node": "26.3.0",
+    "bun": "1.4.2",
+    "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+    "openssl": "1.1.0",
+    "llhttp": "9.3.0",
+    "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+    "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+    "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+    "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+    "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+    "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+    "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+    "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+    "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+    "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+    "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+    "v8": "14.6.202.34-node.20",
+    "uv": "1.48.0",
+    "napi": "10",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "sqlite": "3.53.2",
+    "modules": "147"
+  },
+  "sources": [
+    {
+      "root": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "sourceSha256": "7d250dc3452ad047b6b2e38cd4dd0983ddc6808d9402077512710eacd331b55d",
+      "bundleSha256": "fe05b36e1a0aa60ac71da9c084f52c910bdd644ba6e62486f47fd2afa0e271e8",
+      "coreWasmSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    {
+      "root": "/workspace/scratch/106b5ee34aad/zerocopy-list-booleans",
+      "sourceSha256": "6f21a542109703cbeaaf0ef95f32bbc5a347ea6d54369731c6de6ffeb286674f",
+      "bundleSha256": "65aafe83e350a51dbad30d33440880a56718e49e733264bd07aadaf77857d73f",
+      "coreWasmSha256": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    }
+  ],
+  "rows": [
+    {
+      "variant": "before",
+      "name": "boolean-256-control",
+      "expectedDigest": "daab87ab3441637ac1f6c1775a1d606bfca00dd03627f7d1d3bd0611bb851e3b",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 256,
+        "resultCount": 256,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-1024-control",
+      "expectedDigest": "8b6c688723de3c68c5769ecb270554c78b17daadc81e544bf64f29199528ef0a",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 1024,
+        "resultCount": 1024,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-32767-control",
+      "expectedDigest": "a467a7711575aaf1a79b256fb8334c6fcca3846da7662c7dc713b35597246421",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32767,
+        "resultCount": 32767,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-32768",
+      "expectedDigest": "bff3c6d6e5ec18e705e0c83e9555de9dcc719881022d6558bc0e3d76ef4b83b8",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32768,
+        "resultCount": 32768,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-32769",
+      "expectedDigest": "41de4485cde7927c94eb35fbc2a797ff775e5f991712aba3e28ec422c63d266f",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32769,
+        "resultCount": 32769,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-262144",
+      "expectedDigest": "042f2f24f8cd8d8f78d6a9cdbe4ee34be00066e9a75d30322d4ad53ae14783cd",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 262144,
+        "resultCount": 262144,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-prefix-31",
+      "expectedDigest": "3cd12833c46b9b24800a072cb3be0b570c9f22fe5baaf81de5e9a50e4b8b20a1",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 31,
+        "appendCount": 32768,
+        "resultCount": 32799,
+        "sourceHash": "c845b1e456c4468202c6d4250404fca51ab6572332a771d102f51ee55ee69f91",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-prefix-32",
+      "expectedDigest": "d7789da2e886d5398113d33f87c60f2d305686c4bb71332cb1f8379b7e8c190e",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 32,
+        "appendCount": 32768,
+        "resultCount": 32800,
+        "sourceHash": "08560d04b74b7e044b26caf2dd081b83794b8e7336c39ef15c10df54a5d0b303",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "boolean-prefix-65",
+      "expectedDigest": "115d4458dd52ed396d565a96f4ffad279d0b75d8632f7dd3da7629a26f2237b1",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 65,
+        "appendCount": 32768,
+        "resultCount": 32833,
+        "sourceHash": "0d0e022b25050e244aa315d728f2fc5b41be011cc5709f913552c564a098379c",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "number-control-1024",
+      "expectedDigest": "aa8bfda7126bbeba137d05e48e0c7c25845ec097c45b94378bc5c1948b1415d1",
+      "fixture": {
+        "type": "number",
+        "sourceCount": 65,
+        "appendCount": 1024,
+        "resultCount": 1089,
+        "sourceHash": "b54b5ae7e6cfa1003b68781c2927eb7b97127c152093cd1f9f1084050a715a2d",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "string-control-256",
+      "expectedDigest": "767d5b161769cb510f1623ecfccf62432931570eb7efc36f6a94037b2e6eee0f",
+      "fixture": {
+        "type": "string",
+        "sourceCount": 31,
+        "appendCount": 256,
+        "resultCount": 287,
+        "sourceHash": "1987798bd5ca134999913b4c9589061a1f4eaeb3341278b7209c7b08ce3448ea",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "object-control-128",
+      "expectedDigest": "d2f6c7aaac7678e7e378025d584229a3f8ba8e8a020f4cfe90e85edc18d23477",
+      "fixture": {
+        "type": "object",
+        "sourceCount": 31,
+        "appendCount": 128,
+        "resultCount": 159,
+        "sourceHash": "66fee4fd9c03107e18ab5ec55e59aec20378b0e06b770f28f930ef27b116c2d4",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "before",
+      "name": "scalar-boolean-push-control",
+      "expectedDigest": "2f96e3eeb39e1b2721f38f060188377a89ea8e574cb554c3ad00d768b1a869d8",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 17,
+        "appendCount": 1,
+        "resultCount": 18,
+        "sourceHash": "71e4c739c3eabe0a7859e729387e1b7d7dd33fbe3c60978c579dc6438644137b",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.push(input[0]), retaining the returned snapshot",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-256-control",
+      "expectedDigest": "daab87ab3441637ac1f6c1775a1d606bfca00dd03627f7d1d3bd0611bb851e3b",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 256,
+        "resultCount": 256,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-1024-control",
+      "expectedDigest": "8b6c688723de3c68c5769ecb270554c78b17daadc81e544bf64f29199528ef0a",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 1024,
+        "resultCount": 1024,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-32767-control",
+      "expectedDigest": "a467a7711575aaf1a79b256fb8334c6fcca3846da7662c7dc713b35597246421",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32767,
+        "resultCount": 32767,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-32768",
+      "expectedDigest": "bff3c6d6e5ec18e705e0c83e9555de9dcc719881022d6558bc0e3d76ef4b83b8",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32768,
+        "resultCount": 32768,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-32769",
+      "expectedDigest": "41de4485cde7927c94eb35fbc2a797ff775e5f991712aba3e28ec422c63d266f",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 32769,
+        "resultCount": 32769,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-262144",
+      "expectedDigest": "042f2f24f8cd8d8f78d6a9cdbe4ee34be00066e9a75d30322d4ad53ae14783cd",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 0,
+        "appendCount": 262144,
+        "resultCount": 262144,
+        "sourceHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-prefix-31",
+      "expectedDigest": "3cd12833c46b9b24800a072cb3be0b570c9f22fe5baaf81de5e9a50e4b8b20a1",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 31,
+        "appendCount": 32768,
+        "resultCount": 32799,
+        "sourceHash": "c845b1e456c4468202c6d4250404fca51ab6572332a771d102f51ee55ee69f91",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-prefix-32",
+      "expectedDigest": "d7789da2e886d5398113d33f87c60f2d305686c4bb71332cb1f8379b7e8c190e",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 32,
+        "appendCount": 32768,
+        "resultCount": 32800,
+        "sourceHash": "08560d04b74b7e044b26caf2dd081b83794b8e7336c39ef15c10df54a5d0b303",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "boolean-prefix-65",
+      "expectedDigest": "115d4458dd52ed396d565a96f4ffad279d0b75d8632f7dd3da7629a26f2237b1",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 65,
+        "appendCount": 32768,
+        "resultCount": 32833,
+        "sourceHash": "0d0e022b25050e244aa315d728f2fc5b41be011cc5709f913552c564a098379c",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "number-control-1024",
+      "expectedDigest": "aa8bfda7126bbeba137d05e48e0c7c25845ec097c45b94378bc5c1948b1415d1",
+      "fixture": {
+        "type": "number",
+        "sourceCount": 65,
+        "appendCount": 1024,
+        "resultCount": 1089,
+        "sourceHash": "b54b5ae7e6cfa1003b68781c2927eb7b97127c152093cd1f9f1084050a715a2d",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "string-control-256",
+      "expectedDigest": "767d5b161769cb510f1623ecfccf62432931570eb7efc36f6a94037b2e6eee0f",
+      "fixture": {
+        "type": "string",
+        "sourceCount": 31,
+        "appendCount": 256,
+        "resultCount": 287,
+        "sourceHash": "1987798bd5ca134999913b4c9589061a1f4eaeb3341278b7209c7b08ce3448ea",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "object-control-128",
+      "expectedDigest": "d2f6c7aaac7678e7e378025d584229a3f8ba8e8a020f4cfe90e85edc18d23477",
+      "fixture": {
+        "type": "object",
+        "sourceCount": 31,
+        "appendCount": 128,
+        "resultCount": 159,
+        "sourceHash": "66fee4fd9c03107e18ab5ec55e59aec20378b0e06b770f28f930ef27b116c2d4",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.pushMany(input), including validation, temporary storage, final value storage, tree linking and snapshot construction",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    },
+    {
+      "variant": "after",
+      "name": "scalar-boolean-push-control",
+      "expectedDigest": "2f96e3eeb39e1b2721f38f060188377a89ea8e574cb554c3ad00d768b1a869d8",
+      "fixture": {
+        "type": "boolean",
+        "sourceCount": 17,
+        "appendCount": 1,
+        "resultCount": 18,
+        "sourceHash": "71e4c739c3eabe0a7859e729387e1b7d7dd33fbe3c60978c579dc6438644137b",
+        "sourceConstruction": "fresh private List arena and original prefix before every batch, outside timing",
+        "timedOperation": "source.push(input[0]), retaining the returned snapshot",
+        "oracle": "every result value via unchanged public toArray, size, type, frozen handles, complete original prefix and all original published bytes",
+        "inputShape": "ordinary dense Array; reused input values and independently retained forks from one immutable source per batch"
+      },
+      "verifiedResults": 4
+    }
+  ]
+}
