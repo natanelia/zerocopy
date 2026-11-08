@@ -1,0 +1,108 @@
+name: Map bulk read evidence
+
+on:
+  pull_request:
+    paths:
+      - 'arena.ts'
+      - 'shared-map.ts'
+      - 'map-get-many.test.ts'
+      - 'proofs/map-bulk-reads-20261108/**'
+      - '.github/workflows/map-bulk-reads.yml'
+  push:
+    branches: [main, perf/map-bulk-reads-20261108]
+    paths:
+      - 'arena.ts'
+      - 'shared-map.ts'
+      - 'map-get-many.test.ts'
+      - 'proofs/map-bulk-reads-20261108/**'
+      - '.github/workflows/map-bulk-reads.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: map-bulk-reads-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - run: bun install
+      - name: Build the package and check source/value types
+        run: |
+          mkdir -p map-bulk-ci-results
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:values
+      - name: Check scalar and bulk Map reads in Node and Bun
+        run: |
+          set -euo pipefail
+          node node_modules/vitest/vitest.mjs run map-get-many.test.ts shared-map.test.ts typed-values.test.ts --no-file-parallelism --maxWorkers=1 | tee map-bulk-ci-results/tests-node.txt
+          bun --bun node_modules/vitest/vitest.mjs run map-get-many.test.ts shared-map.test.ts typed-values.test.ts --no-file-parallelism --maxWorkers=1 | tee map-bulk-ci-results/tests-bun.txt
+      - name: Build the pinned baseline in an isolated worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          map_bulk_baseline="$RUNNER_TEMP/map-bulk-baseline"
+          git worktree add --detach "$map_bulk_baseline" a4265a0608ec25eec5719496225212db6b251989
+          printf 'MAP_BULK_BASELINE=%s\n' "$map_bulk_baseline" >> "$GITHUB_ENV"
+          cd "$map_bulk_baseline"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Check every output and source bytes in both builds
+        run: |
+          node proofs/map-bulk-reads-20261108/smoke.mjs "$MAP_BULK_BASELINE" . > map-bulk-ci-results/smoke-node.json
+          bun proofs/map-bulk-reads-20261108/smoke.mjs "$MAP_BULK_BASELINE" . > map-bulk-ci-results/smoke-bun.json
+      - name: Check real Node readers and cross-version shared/copied attachments
+        run: |
+          node proofs/map-bulk-reads-20261108/worker.mjs . > map-bulk-ci-results/worker-current.json
+          node proofs/map-bulk-reads-20261108/worker.mjs . "$MAP_BULK_BASELINE" > map-bulk-ci-results/worker-baseline.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check Chromium output and real worker readers
+        run: node proofs/map-bulk-reads-20261108/browser.mjs . > map-bulk-ci-results/browser.json
+      - name: Collect isolated paired pilot, confirmation and same-build controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          proof=proofs/map-bulk-reads-20261108
+          if [ ! -f "$proof/results/formal.json" ] && [ ! -f "$proof/results/formal.json.gz" ]; then
+            map_bulk_cpu="$(awk '/Cpus_allowed_list/ { split($2, ranges, ","); split(ranges[1], first, "-"); print first[1] }' /proc/self/status)"
+            taskset -c "$map_bulk_cpu" node "$proof/paired-benchmark.mjs" "$proof/workloads.mjs" "$MAP_BULK_BASELINE" . "$(command -v bun)" "$proof/results/pilot-v2-hosted.json" pilot | tee map-bulk-ci-results/pilot-v2-hosted.txt
+            taskset -c "$map_bulk_cpu" node "$proof/paired-benchmark.mjs" "$proof/workloads.mjs" "$MAP_BULK_BASELINE" . "$(command -v bun)" "$proof/results/formal.json" formal | tee map-bulk-ci-results/formal.txt
+            taskset -c "$map_bulk_cpu" node "$proof/paired-benchmark.mjs" "$proof/workloads.mjs" "$MAP_BULK_BASELINE" . "$(command -v bun)" "$proof/results/aa.json" aa | tee map-bulk-ci-results/aa.txt
+          fi
+      - name: Audit all raw samples and exact current source/build hashes
+        run: |
+          proof=proofs/map-bulk-reads-20261108
+          node "$proof/exploration/v1/verify.mjs" "$proof/results/pilot-v1.json" > map-bulk-ci-results/audit-pilot-v1.json
+          node "$proof/exploration/v1/verify.mjs" "$proof/results/aa-diagnostic-v1.json" "$MAP_BULK_BASELINE" > map-bulk-ci-results/audit-local-aa.json
+          node "$proof/verify.mjs" "$proof/results/pilot-v2-hosted.json" . > map-bulk-ci-results/audit-pilot-v2-hosted.json
+          node "$proof/verify.mjs" "$proof/results/formal.json" . > map-bulk-ci-results/audit-formal.json
+          node "$proof/verify.mjs" "$proof/results/aa.json" "$MAP_BULK_BASELINE" > map-bulk-ci-results/audit-aa.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-bulk-read-evidence-${{ github.sha }}
+          path: |
+            proofs/map-bulk-reads-20261108/results/
+            proofs/map-bulk-reads-20261108/validation/
+            map-bulk-ci-results/
+          if-no-files-found: warn
+          retention-days: 14

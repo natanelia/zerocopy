@@ -1,0 +1,70 @@
+pilot: node number-hit-128 pair 1/2 before: 4.240 us, verified
+pilot: node number-hit-128 pair 1/2 after: 6.377 us, verified
+pilot: node number-hit-1024 pair 1/2 before: 49.411 us, verified
+pilot: node number-hit-1024 pair 1/2 after: 35.291 us, verified
+pilot: node number-mixed-1024 pair 1/2 before: 94.019 us, verified
+pilot: node number-mixed-1024 pair 1/2 after: 98.538 us, verified
+pilot: node number-miss-128 pair 1/2 before: 13.934 us, verified
+pilot: node number-miss-128 pair 1/2 after: 14.330 us, verified
+pilot: node string-hit-128 pair 1/2 before: 3.347 us, verified
+pilot: node string-hit-128 pair 1/2 after: 3.227 us, verified
+pilot: node object-hit-128 pair 1/2 before: 11.206 us, verified
+pilot: node object-hit-128 pair 1/2 after: 16.509 us, verified
+pilot: node scalar-number-control pair 1/2 before: 2.708 us, verified
+pilot: node scalar-number-control pair 1/2 after: 4.785 us, verified
+pilot: bun number-hit-128 pair 1/2 before: 3.523 us, verified
+pilot: bun number-hit-128 pair 1/2 after: 3.028 us, verified
+pilot: bun number-hit-1024 pair 1/2 before: 32.741 us, verified
+pilot: bun number-hit-1024 pair 1/2 after: 42.745 us, verified
+pilot: bun number-mixed-1024 pair 1/2 before: 74.314 us, verified
+pilot: bun number-mixed-1024 pair 1/2 after: 78.897 us, verified
+pilot: bun number-miss-128 pair 1/2 before: 9.772 us, verified
+pilot: bun number-miss-128 pair 1/2 after: 9.132 us, verified
+pilot: bun string-hit-128 pair 1/2 before: 2.309 us, verified
+pilot: bun string-hit-128 pair 1/2 after: 1.494 us, verified; 6/9 measured batches <2 ms (retained)
+pilot: bun object-hit-128 pair 1/2 before: 10.028 us, verified; 3/9 measured batches <2 ms (retained)
+pilot: bun object-hit-128 pair 1/2 after: 5.044 us, verified; 8/9 measured batches <2 ms (retained)
+pilot: bun scalar-number-control pair 1/2 before: 1.565 us, verified; 4/9 measured batches <2 ms (retained)
+pilot: bun scalar-number-control pair 1/2 after: 2.609 us, verified
+pilot: bun scalar-number-control pair 2/2 after: 3.215 us, verified
+pilot: bun scalar-number-control pair 2/2 before: 1.897 us, verified
+pilot: bun object-hit-128 pair 2/2 after: 5.404 us, verified; 7/9 measured batches <2 ms (retained)
+pilot: bun object-hit-128 pair 2/2 before: 6.083 us, verified; 7/9 measured batches <2 ms (retained)
+pilot: bun string-hit-128 pair 2/2 after: 2.250 us, verified
+pilot: bun string-hit-128 pair 2/2 before: 2.222 us, verified; 4/9 measured batches <2 ms (retained)
+pilot: bun number-miss-128 pair 2/2 after: 13.822 us, verified
+pilot: bun number-miss-128 pair 2/2 before: 16.361 us, verified
+pilot: bun number-mixed-1024 pair 2/2 after: 62.718 us, verified
+pilot: bun number-mixed-1024 pair 2/2 before: 76.783 us, verified
+pilot: bun number-hit-1024 pair 2/2 after: 30.732 us, verified
+pilot: bun number-hit-1024 pair 2/2 before: 26.770 us, verified
+pilot: bun number-hit-128 pair 2/2 after: 3.494 us, verified
+pilot: bun number-hit-128 pair 2/2 before: 3.941 us, verified
+pilot: node scalar-number-control pair 2/2 after: 4.527 us, verified
+pilot: node scalar-number-control pair 2/2 before: 3.805 us, verified
+pilot: node object-hit-128 pair 2/2 after: 9.608 us, verified
+pilot: node object-hit-128 pair 2/2 before: 12.720 us, verified
+pilot: node string-hit-128 pair 2/2 after: 5.607 us, verified
+pilot: node string-hit-128 pair 2/2 before: 5.433 us, verified
+pilot: node number-miss-128 pair 2/2 after: 15.116 us, verified
+pilot: node number-miss-128 pair 2/2 before: 20.536 us, verified
+pilot: node number-mixed-1024 pair 2/2 after: 127.743 us, verified
+pilot: node number-mixed-1024 pair 2/2 before: 125.396 us, verified
+pilot: node number-hit-1024 pair 2/2 after: 55.546 us, verified
+pilot: node number-hit-1024 pair 2/2 before: 46.131 us, verified
+pilot: node number-hit-128 pair 2/2 after: 6.636 us, verified
+pilot: node number-hit-128 pair 2/2 before: 4.387 us, verified
+node number-hit-128: 4.313 -> 6.507 us, paired ratio 1.508
+node number-hit-1024: 47.771 -> 45.418 us, paired ratio 0.927
+node number-mixed-1024: 109.707 -> 113.140 us, paired ratio 1.033
+node number-miss-128: 17.235 -> 14.723 us, paired ratio 0.870
+node string-hit-128: 4.390 -> 4.417 us, paired ratio 0.998
+node object-hit-128: 11.963 -> 13.058 us, paired ratio 1.055
+node scalar-number-control: 3.257 -> 4.656 us, paired ratio 1.450
+bun number-hit-128: 3.732 -> 3.261 us, paired ratio 0.873
+bun number-hit-1024: 29.756 -> 36.739 us, paired ratio 1.224
+bun number-mixed-1024: 75.548 -> 70.807 us, paired ratio 0.931
+bun number-miss-128: 13.067 -> 11.477 us, paired ratio 0.889
+bun string-hit-128: 2.266 -> 1.872 us, paired ratio 0.809
+bun object-hit-128: 8.056 -> 5.224 us, paired ratio 0.668
+bun scalar-number-control: 1.731 -> 2.912 us, paired ratio 1.681

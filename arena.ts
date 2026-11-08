@@ -512,6 +512,15 @@ export class Arena {
     const leaf = this.reads.leaf(slot);
     return leaf !== 0 && Object.is(this.value(root, key, type, prefix, sorted), value);
   }
+  /** Internal batch-read shortcut; callers verify the original value method. */
+  cachedMapValue(root: number, key: string, type: string, code: number): any {
+    if (typeof key === 'string' && root && root === this.valueRoot && code === this.valueCode) {
+      const hit = this.valueMap?.get(key);
+      if (hit !== undefined && hit !== PRESENT) return hit;
+      return this.readPrimitive(root, key, type, 0, code, hit === PRESENT);
+    }
+    return primitiveMapValue(this, root, key, type);
+  }
   value(root: number, key: string, type: string, prefix = 0, sorted = false): any {
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     if (!root) return undefined;
@@ -855,6 +864,8 @@ export class Arena {
     }
   }
 }
+
+const primitiveMapValue = Function.prototype.call.bind(Arena.prototype.value);
 
 /** Internal identities for optional readers that specialize primitive decoding. */
 export const primitiveReadProtocol = Object.freeze({

@@ -57,7 +57,20 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     const a = this.arena, root = a.bulk(this.valueType, this.root, entries);
     return new SharedMap(this.valueType, root, undefined, a);
   }
-  getMany(keys: readonly string[]): (ValueOf<T> | undefined)[] { return keys.map(k => this.get(k)); }
+  getMany(keys: readonly string[]): (ValueOf<T> | undefined)[] {
+    if (this == null || Object.getPrototypeOf(this) !== SharedMap.prototype) return keys.map(k => this.get(k));
+    const root = this.root, type = this.valueType;
+    const code = type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0;
+    if (!code) return keys.map(k => this.get(k));
+    // Keep Array.map's holes, species and key-access order. A key accessor may
+    // replace get, so resolve the method separately for every visited key.
+    return keys.map(k => {
+      const get = this.get;
+      if (get !== mapGet) return Reflect.apply(get, this, [k]);
+      const a = this.arena, value = a.value;
+      return value === arenaValue ? cachedMapValue(a, root, k, type, code) : Reflect.apply(value, a, [root, k, type]);
+    });
+  }
   deleteMany(keys: readonly string[]): SharedMap<T> {
     const a = this.arena; a.assertWritable(); let root = this.root;
     for (const key of keys) root = a.delete(root, key);
@@ -81,6 +94,9 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     return new SharedMap(valueType, root, size, source);
   }
 }
+const mapGet = SharedMap.prototype.get;
+const arenaValue = Arena.prototype.value;
+const cachedMapValue = Function.prototype.call.bind(Arena.prototype.cachedMapValue);
 structureRegistry.SharedMap = { fromWorkerData: (d, a) => SharedMap.fromWorkerData(d.root, d.valueType, d.size, a) };
 
 /** Compatibility wrapper for internal numeric-key users. */

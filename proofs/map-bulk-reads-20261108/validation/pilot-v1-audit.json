@@ -1,0 +1,96 @@
+{
+  "verified": true,
+  "record": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads/proofs/map-bulk-reads-20261108/results/pilot-v1.json",
+  "mode": "pilot",
+  "processes": 56,
+  "timedBatches": 504,
+  "verifiedOutputs": 1689984,
+  "measuredBatchesBelow2ms": 39,
+  "exactCurrentBuild": false,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "number-hit-128",
+      "pairedRatio": 1.5084041668510322,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-hit-1024",
+      "pairedRatio": 0.927353900279675,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-mixed-1024",
+      "pairedRatio": 1.0332895495906977,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-miss-128",
+      "pairedRatio": 0.870044173352173,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "string-hit-128",
+      "pairedRatio": 0.9976381558532209,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "object-hit-128",
+      "pairedRatio": 1.0548700364356878,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.4498092740861048,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-128",
+      "pairedRatio": 0.8729292043920067,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-hit-1024",
+      "pairedRatio": 1.2242465820064352,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-mixed-1024",
+      "pairedRatio": 0.9312354861957278,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-miss-128",
+      "pairedRatio": 0.8885443743886797,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "string-hit-128",
+      "pairedRatio": 0.8094658857292558,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "object-hit-128",
+      "pairedRatio": 0.6684409569916288,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-number-control",
+      "pairedRatio": 1.6811616584972557,
+      "interval95": null
+    }
+  ]
+}

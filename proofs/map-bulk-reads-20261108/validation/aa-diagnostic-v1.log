@@ -1,0 +1,36 @@
+aa: node number-hit-128 pair 1/4 before: 2.626 us, verified
+aa: node number-hit-128 pair 1/4 after: 4.793 us, verified
+aa: node scalar-number-control pair 1/4 before: 4.559 us, verified
+aa: node scalar-number-control pair 1/4 after: 4.392 us, verified
+aa: bun number-hit-128 pair 1/4 before: 3.133 us, verified
+aa: bun number-hit-128 pair 1/4 after: 2.317 us, verified
+aa: bun scalar-number-control pair 1/4 before: 3.466 us, verified
+aa: bun scalar-number-control pair 1/4 after: 3.328 us, verified
+aa: bun scalar-number-control pair 2/4 after: 3.101 us, verified
+aa: bun scalar-number-control pair 2/4 before: 1.607 us, verified
+aa: bun number-hit-128 pair 2/4 after: 1.814 us, verified
+aa: bun number-hit-128 pair 2/4 before: 2.648 us, verified
+aa: node scalar-number-control pair 2/4 after: 2.596 us, verified
+aa: node scalar-number-control pair 2/4 before: 2.502 us, verified
+aa: node number-hit-128 pair 2/4 after: 3.131 us, verified
+aa: node number-hit-128 pair 2/4 before: 2.820 us, verified
+aa: node number-hit-128 pair 3/4 before: 2.757 us, verified
+aa: node number-hit-128 pair 3/4 after: 3.223 us, verified
+aa: node scalar-number-control pair 3/4 before: 2.558 us, verified
+aa: node scalar-number-control pair 3/4 after: 2.381 us, verified
+aa: bun number-hit-128 pair 3/4 before: 3.291 us, verified
+aa: bun number-hit-128 pair 3/4 after: 3.661 us, verified
+aa: bun scalar-number-control pair 3/4 before: 3.342 us, verified
+aa: bun scalar-number-control pair 3/4 after: 3.429 us, verified
+aa: bun scalar-number-control pair 4/4 after: 1.714 us, verified
+aa: bun scalar-number-control pair 4/4 before: 1.744 us, verified; 2/9 measured batches <2 ms (retained)
+aa: bun number-hit-128 pair 4/4 after: 1.891 us, verified
+aa: bun number-hit-128 pair 4/4 before: 1.642 us, verified
+aa: node scalar-number-control pair 4/4 after: 2.377 us, verified
+aa: node scalar-number-control pair 4/4 before: 2.284 us, verified
+aa: node number-hit-128 pair 4/4 after: 2.677 us, verified
+aa: node number-hit-128 pair 4/4 before: 2.601 us, verified
+node number-hit-128: 2.692 -> 3.177 us, paired ratio 1.250 (0.829-1.884)
+node scalar-number-control: 2.530 -> 2.489 us, paired ratio 0.992 (0.908-1.083)
+bun number-hit-128: 2.890 -> 2.104 us, paired ratio 0.898 (0.584-1.379)
+bun scalar-number-control: 2.543 -> 3.215 us, paired ratio 1.169 (0.686-1.993)

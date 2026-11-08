@@ -1,0 +1,244 @@
+{
+  "runtime": "node",
+  "status": "passed",
+  "records": [
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "number-hit-128",
+      "expectedDigest": "547bffb9a7becd163d4179aba422d4ee355dce5e6bf30da0f9a1870909e76ec9",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "number-hit-1024",
+      "expectedDigest": "0f9e1746760b53d74963c56ca1ced5a0f2923a0519ef2971cfbf02a0665d2202",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "number-mixed-1024",
+      "expectedDigest": "e36fe22d1c7d297acb9d928aeedbf03909b15a4b851963d27df2943033173464",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "mixed",
+        "hitCount": 512,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "number-miss-128",
+      "expectedDigest": "a34046bcd4fb9ac4551524892befe2cd20127ebfaaa9a2460f7d0f4b61d46cd5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "miss",
+        "hitCount": 0,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "string-hit-128",
+      "expectedDigest": "e2f6b964980f9c0ae6a55949b6f281bc024298a7750fc94d2074cdf1a4310d52",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "string",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 236844,
+        "sourceBytesHash": "6ec8d41abd369e8a7d6ddc80b6f051d39a121213f53581ae11bc5106999e7999",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "object-hit-128",
+      "expectedDigest": "7ab59007da150b8bb92c18b84cfa21a4ebcbefcb6a6985c58c148c9ef5b3a146",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "object",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 298340,
+        "sourceBytesHash": "1ff5868f718812e13ef4c04addf6db1fbf2872d3265982a0f66e75da82ffc32b",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy",
+      "name": "scalar-number-control",
+      "expectedDigest": "cfa461525620fb2230f6a2ce59aaceaa097942d7445178b82204a9c944a1b035",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "scalar",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "all scalar get calls and result-array creation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "number-hit-128",
+      "expectedDigest": "547bffb9a7becd163d4179aba422d4ee355dce5e6bf30da0f9a1870909e76ec9",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "number-hit-1024",
+      "expectedDigest": "0f9e1746760b53d74963c56ca1ced5a0f2923a0519ef2971cfbf02a0665d2202",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "hit",
+        "hitCount": 1024,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "number-mixed-1024",
+      "expectedDigest": "e36fe22d1c7d297acb9d928aeedbf03909b15a4b851963d27df2943033173464",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 1024,
+        "type": "number",
+        "mode": "mixed",
+        "hitCount": 512,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "number-miss-128",
+      "expectedDigest": "a34046bcd4fb9ac4551524892befe2cd20127ebfaaa9a2460f7d0f4b61d46cd5",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "miss",
+        "hitCount": 0,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "string-hit-128",
+      "expectedDigest": "e2f6b964980f9c0ae6a55949b6f281bc024298a7750fc94d2074cdf1a4310d52",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "string",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 236844,
+        "sourceBytesHash": "6ec8d41abd369e8a7d6ddc80b6f051d39a121213f53581ae11bc5106999e7999",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "object-hit-128",
+      "expectedDigest": "7ab59007da150b8bb92c18b84cfa21a4ebcbefcb6a6985c58c148c9ef5b3a146",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "object",
+        "mode": "hit",
+        "hitCount": 128,
+        "sourceBytes": 298340,
+        "sourceBytesHash": "1ff5868f718812e13ef4c04addf6db1fbf2872d3265982a0f66e75da82ffc32b",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "complete public getMany including result-array allocation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    },
+    {
+      "directory": "/workspace/scratch/106b5ee34aad/zerocopy-map-reads",
+      "name": "scalar-number-control",
+      "expectedDigest": "cfa461525620fb2230f6a2ce59aaceaa097942d7445178b82204a9c944a1b035",
+      "fixture": {
+        "sourceCount": 4096,
+        "requestCount": 128,
+        "type": "number",
+        "mode": "scalar",
+        "hitCount": 128,
+        "sourceBytes": 188092,
+        "sourceBytesHash": "228083b5ff451bcc03c51d4e25c470aee50dddbcc34327559f1db92c484bc00f",
+        "readState": "one read-only shared attachment per fresh process; requested keys warmed before timing",
+        "timedOperation": "all scalar get calls and result-array creation",
+        "oracle": "every requested output against a separate native Map, plus frozen JSON and unchanged source bytes; no whole-map traversal per output"
+      }
+    }
+  ]
+}
