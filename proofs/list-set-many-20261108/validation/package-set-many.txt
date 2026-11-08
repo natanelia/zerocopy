@@ -1,0 +1,22 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+{
+  "passed": true,
+  "archive": {
+    "name": "zerocopy",
+    "version": "0.2.1",
+    "integrity": "sha512-dzrxfE5A2+dJ3TVuEXnjtS9sdsLZFc3Pj19VbNsvuCH4KdWDXzM+MSGi+hif4ZZs+pBVCUBURnjTUF2RK5vGQw=="
+  },
+  "checks": [
+    {
+      "runtime": "node",
+      "passed": true,
+      "values": 32801
+    },
+    {
+      "runtime": "bun",
+      "passed": true,
+      "values": 32801
+    }
+  ],
+  "types": "new method and invalid-input errors verified against packed declarations"
+}

@@ -156,7 +156,7 @@ tags.has('admin');           // true
 
 | Class | Update methods | Read methods and properties |
 | --- | --- | --- |
-| `SharedList<T>` | `push(value)`, `pushMany(values)`, `pop()`, `set(index, value)` | `get(index)`, `values()`, `forEach(fn)`, `toArray()`, `size` |
+| `SharedList<T>` | `push(value)`, `pushMany(values)`, `pop()`, `set(index, value)`, `setMany(entries)` | `get(index)`, `values()`, `forEach(fn)`, `toArray()`, `size` |
 | `SharedStack<T>` | `push(value)`, `pop()` | `peek()`, `size`, `isEmpty` |
 | `SharedQueue<T>` | `enqueue(value)`, `dequeue()` | `peek()`, `size`, `isEmpty` |
 
@@ -176,6 +176,30 @@ stack.peek();     // 2
 queue.peek();     // 'first'
 remaining.peek(); // 'second'
 ```
+
+Use `SharedList.setMany(entries)` when several indexed edits should produce one
+new snapshot. It copies each affected tree node once, keeps the list's size,
+and preserves the original snapshot. It ignores out-of-range and non-integer
+indexes, as `set` does. An empty batch or one with no valid indexes returns the
+original list. A valid edit on an attached read-only list throws.
+
+```ts
+import { SharedList } from 'zerocopy';
+
+const original = new SharedList('number').pushMany([10, 20, 30]);
+const edited = original.setMany([[0, 11], [2, 31], [0, 12]]);
+
+edited.toArray();   // [12, 20, 31]
+original.toArray(); // [10, 20, 30]
+```
+
+For duplicate indexes, the last value wins. Only the final value for each valid
+index is validated and serialized, in the order those indexes first appeared.
+For example, in the batch above index `0` is encoded before index `2`, and the
+overwritten value `11` is never encoded. This matters when JSON `toJSON` methods
+have side effects. Use individual `set` calls when you need each intermediate
+snapshot or each overwritten value's serialization. If serialization or
+allocation fails, existing snapshots remain unchanged; no result is published.
 
 ## Linked-list interfaces
 

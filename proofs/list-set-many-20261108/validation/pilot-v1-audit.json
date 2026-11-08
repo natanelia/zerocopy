@@ -1,0 +1,60 @@
+{
+  "verified": true,
+  "record": "/workspace/scratch/106b5ee34aad/zerocopy-list-batch/proofs/list-set-many-20261108/results/pilot.json",
+  "mode": "pilot",
+  "processes": 32,
+  "timedBatches": 288,
+  "verifiedOutputs": 146752,
+  "measuredBatchesBelow2ms": 39,
+  "exactCurrentBuild": false,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "batch-number-clustered-256",
+      "pairedRatio": 0.49021506042142027,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "batch-number-scattered-256",
+      "pairedRatio": 0.914249601515901,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "batch-number-repeated-256",
+      "pairedRatio": 0.06520318033074532,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-set-control",
+      "pairedRatio": 0.807213135545064,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "batch-number-clustered-256",
+      "pairedRatio": 0.4773312121505655,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "batch-number-scattered-256",
+      "pairedRatio": 1.523860742945686,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "batch-number-repeated-256",
+      "pairedRatio": 0.0567925458373309,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-set-control",
+      "pairedRatio": 0.9416707041035646,
+      "interval95": null
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+pilot: node batch-number-clustered-256 pair 1/2 before: 81.289 us, verified
+pilot: node batch-number-clustered-256 pair 1/2 after: 39.561 us, verified
+pilot: node batch-number-scattered-256 pair 1/2 before: 87.886 us, verified
+pilot: node batch-number-scattered-256 pair 1/2 after: 83.760 us, verified
+pilot: node batch-number-repeated-256 pair 1/2 before: 78.224 us, verified
+pilot: node batch-number-repeated-256 pair 1/2 after: 5.377 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: node scalar-set-control pair 1/2 before: 87.777 us, verified
+pilot: node scalar-set-control pair 1/2 after: 82.344 us, verified
+pilot: bun batch-number-clustered-256 pair 1/2 before: 72.253 us, verified
+pilot: bun batch-number-clustered-256 pair 1/2 after: 32.838 us, verified; 3/9 measured batches <2 ms (retained)
+pilot: bun batch-number-scattered-256 pair 1/2 before: 79.218 us, verified
+pilot: bun batch-number-scattered-256 pair 1/2 after: 121.998 us, verified
+pilot: bun batch-number-repeated-256 pair 1/2 before: 73.049 us, verified
+pilot: bun batch-number-repeated-256 pair 1/2 after: 6.277 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun scalar-set-control pair 1/2 before: 89.822 us, verified
+pilot: bun scalar-set-control pair 1/2 after: 76.968 us, verified
+pilot: bun scalar-set-control pair 2/2 after: 81.234 us, verified
+pilot: bun scalar-set-control pair 2/2 before: 78.500 us, verified
+pilot: bun batch-number-repeated-256 pair 2/2 after: 3.357 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: bun batch-number-repeated-256 pair 2/2 before: 89.429 us, verified
+pilot: bun batch-number-scattered-256 pair 2/2 after: 130.208 us, verified
+pilot: bun batch-number-scattered-256 pair 2/2 before: 86.353 us, verified
+pilot: bun batch-number-clustered-256 pair 2/2 after: 55.145 us, verified
+pilot: bun batch-number-clustered-256 pair 2/2 before: 109.999 us, verified
+pilot: node scalar-set-control pair 2/2 after: 81.370 us, verified
+pilot: node scalar-set-control pair 2/2 before: 117.149 us, verified
+pilot: node batch-number-repeated-256 pair 2/2 after: 5.382 us, verified; 9/9 measured batches <2 ms (retained)
+pilot: node batch-number-repeated-256 pair 2/2 before: 87.004 us, verified
+pilot: node batch-number-scattered-256 pair 2/2 after: 72.665 us, verified
+pilot: node batch-number-scattered-256 pair 2/2 before: 82.855 us, verified
+pilot: node batch-number-clustered-256 pair 2/2 after: 39.134 us, verified
+pilot: node batch-number-clustered-256 pair 2/2 before: 79.252 us, verified
+node batch-number-clustered-256: 80.270 -> 39.347 us, paired ratio 0.490
+node batch-number-scattered-256: 85.370 -> 78.213 us, paired ratio 0.914
+node batch-number-repeated-256: 82.614 -> 5.379 us, paired ratio 0.065
+node scalar-set-control: 102.463 -> 81.857 us, paired ratio 0.807
+bun batch-number-clustered-256: 91.126 -> 43.992 us, paired ratio 0.477
+bun batch-number-scattered-256: 82.786 -> 126.103 us, paired ratio 1.524
+bun batch-number-repeated-256: 81.239 -> 4.817 us, paired ratio 0.057
+bun scalar-set-control: 84.161 -> 79.101 us, paired ratio 0.942

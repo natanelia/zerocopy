@@ -1,0 +1,121 @@
+name: List batch edit verification
+
+on:
+  pull_request:
+    paths:
+      - 'list-set-many.test.ts'
+      - 'proofs/list-set-many-20261108/**'
+      - '.github/workflows/list-set-many.yml'
+  push:
+    branches: [main, perf/list-batched-edits-20261108]
+    paths:
+      - 'list-set-many.test.ts'
+      - 'proofs/list-set-many-20261108/**'
+      - '.github/workflows/list-set-many.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: list-set-many-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build modules and declarations
+        run: |
+          mkdir -p proofs/list-set-many-20261108/ci-logs
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:values
+      - name: Build the pinned reader baseline
+        shell: bash
+        run: |
+          baseline_checkout="$RUNNER_TEMP/list-set-many-baseline"
+          git worktree add --detach "$baseline_checkout" a4265a0608ec25eec5719496225212db6b251989
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$baseline_checkout/node_modules"
+          printf 'LIST_BATCH_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
+          cd "$baseline_checkout"
+          bun run build:wasm
+          bun run build:browser
+      - name: Run regression tests in Node and Bun
+        shell: bash
+        run: |
+          node node_modules/vitest/vitest.mjs run list-set-many.test.ts shared-list.test.ts allocation-failure.test.ts immutable-proof.test.ts --maxWorkers=1 2>&1 | tee proofs/list-set-many-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run list-set-many.test.ts shared-list.test.ts allocation-failure.test.ts immutable-proof.test.ts --maxWorkers=1 2>&1 | tee proofs/list-set-many-20261108/ci-logs/bun-tests.log
+      - name: Check the packed Node, Bun, and TypeScript API
+        shell: bash
+        run: |
+          bun run check:package 2>&1 | tee proofs/list-set-many-20261108/ci-logs/package-all-exports.log
+          node proofs/list-set-many-20261108/package.mjs . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/package-set-many.log
+      - name: Check the WASM surface and real worker compatibility
+        shell: bash
+        run: |
+          node proofs/list-set-many-20261108/abi.mjs "$LIST_BATCH_BASELINE" . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/wasm-surface.log
+          node proofs/list-set-many-20261108/worker.mjs list . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/workers-current-reader.log
+          node proofs/list-set-many-20261108/worker.mjs list . "$LIST_BATCH_BASELINE" 2>&1 | tee proofs/list-set-many-20261108/ci-logs/workers-old-reader.log
+      - name: Check complete outputs and exact writer allocation
+        shell: bash
+        run: |
+          node proofs/list-set-many-20261108/allocation.mjs "$LIST_BATCH_BASELINE" proofs/list-set-many-20261108/ci-logs/allocation-before.json
+          node proofs/list-set-many-20261108/allocation.mjs . proofs/list-set-many-20261108/ci-logs/allocation-after.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check the new API in Chromium and real browser workers
+        shell: bash
+        run: node proofs/list-set-many-20261108/browser.mjs . proofs/list-set-many-20261108/ci-logs/chromium.json 2>&1 | tee proofs/list-set-many-20261108/ci-logs/chromium.log
+      - name: Bootstrap missing formal evidence on this runner
+        if: ${{ hashFiles('proofs/list-set-many-20261108/results/formal.json') == '' }}
+        shell: bash
+        run: |
+          proof=proofs/list-set-many-20261108
+          list_batch_cpu=
+          while read -r status_key status_value; do
+            if [[ "$status_key" == "Cpus_allowed_list:" ]]; then
+              list_batch_cpu="${status_value%%[-,]*}"
+              break
+            fi
+          done < /proc/self/status
+          [[ "$list_batch_cpu" =~ ^[0-9]+$ ]]
+          printf 'First allowed benchmark CPU: %s\n' "$list_batch_cpu" | tee "$proof/ci-logs/benchmark-cpu.log"
+          taskset -c "$list_batch_cpu" node "$proof/paired-benchmark.mjs" \
+            "$proof/workloads.mjs" "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
+            "$proof/results/formal.json" formal 2>&1 | tee "$proof/ci-logs/formal-console.log"
+          taskset -c "$list_batch_cpu" node "$proof/paired-benchmark.mjs" \
+            "$proof/workloads.mjs" "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
+            "$proof/results/aa.json" aa 2>&1 | tee "$proof/ci-logs/aa-console.log"
+          taskset -c "$list_batch_cpu" node "$proof/reference-comparison.mjs" \
+            "$LIST_BATCH_BASELINE" . "$(command -v bun)" \
+            "$proof/results/reference-comparison.json" 2>&1 | tee "$proof/ci-logs/reference-console.log"
+      - name: Audit saved measurements without collecting timings
+        shell: bash
+        run: node proofs/list-set-many-20261108/audit-evidence.mjs . 2>&1 | tee proofs/list-set-many-20261108/ci-logs/evidence.log
+      - name: Retain correctness and evidence logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: list-set-many-verification-${{ github.sha }}
+          path: |
+            proofs/list-set-many-20261108/results/
+            proofs/list-set-many-20261108/validation/
+            proofs/list-set-many-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn

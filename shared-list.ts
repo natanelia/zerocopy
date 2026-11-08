@@ -123,6 +123,45 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     if (index >= start) return new SharedList(this.type, this.root, this.depth, this.size, a, a.wasm.tailSet(this.tail, this.size - start, index - start, raw) >>> 0);
     return new SharedList(this.type, a.wasm.vecSet(this.root, this.depth, index, raw) >>> 0, this.depth, this.size, a, this.tail);
   }
+  /** Apply a batch without publishing intermediate versions. Invalid indexes
+   * are ignored. The last value for each index wins; only those final values
+   * are encoded, in the order their indexes first appeared in the input.
+   */
+  setMany(entries: readonly (readonly [number, ValueOf<T>])[]): SharedList<T> {
+    if (!entries.length) return this;
+    // This private map holds submitted values first, then their encoded
+    // numbers. Replacing an existing key preserves its first-occurrence order.
+    const edits = new Map<number, ValueOf<T> | number>();
+    for (const entry of entries) {
+      const index = entry[0];
+      if (validIndex(index, this.size)) edits.set(index, entry[1]);
+    }
+    if (!edits.size) return this;
+    const a = this.arena; a.assertWritable();
+    // User serialization can reenter this arena. Finish it in input order
+    // before sorting or touching shared writer scratch.
+    const indexes = new Uint32Array(edits.size);
+    let position = 0;
+    edits.forEach((value, index) => {
+      indexes[position++] = index;
+      edits.set(index, a.encode(this.type, value));
+    });
+    indexes.sort();
+    const input = indexes.length <= 4096 ? 16384 : a.alloc(indexes.length * 12), view = a.dv;
+    const tailStart = (this.size - 1) & ~31;
+    let treeCount = 0;
+    for (let i = 0; i < indexes.length; i++) {
+      const index = indexes[i];
+      // Every surviving value was replaced by encode's numeric result above.
+      const raw = edits.get(index) as number;
+      view.setUint32(input + i * 12, index, true);
+      view.setFloat64(input + i * 12 + 4, raw, true);
+      if (index < tailStart) treeCount++;
+    }
+    const root = a.wasm.vecSetMany(this.root, this.depth, input, treeCount) >>> 0;
+    const tail = a.wasm.tailSetMany(this.tail, this.size - tailStart, input + treeCount * 12, indexes.length - treeCount) >>> 0;
+    return new SharedList(this.type, root, this.depth, this.size, a, tail);
+  }
   pop(): SharedList<T> {
     if (!this.size) return this;
     const a = this.arena, size = this.size - 1;
