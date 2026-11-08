@@ -1,0 +1,181 @@
+{
+  "outcome": "cancelled at configured 60-minute job limit; incomplete evidence; no acceptance decision",
+  "runId": 42495937874,
+  "jobId": 128778192941,
+  "artifactId": 13625657254,
+  "artifactZipSha256": "c37be353f9a48f2044bf4b925df2e93a26c7839fa0c3cb08eff6c30584f9630d",
+  "headSha": "1d6cadc134fdad3e9c80a448715af239491a91c5",
+  "rawDownloadDirectory": "/workspace/scratch/106b5ee34aad/ci-downloads/map-final-hosted",
+  "retainedFiles": [
+    {
+      "downloaded": "ci-logs/allocation-after.json",
+      "retained": "ci-logs/allocation-after.json",
+      "originalBytes": 10041,
+      "originalSha256": "55f2e5cd7c08c0517e334cee3ab63f64e4775f8fabcddbd23057212b64fe0c0c",
+      "retainedBytes": 10041,
+      "retainedSha256": "55f2e5cd7c08c0517e334cee3ab63f64e4775f8fabcddbd23057212b64fe0c0c",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/allocation-before.json",
+      "retained": "ci-logs/allocation-before.json",
+      "originalBytes": 10060,
+      "originalSha256": "4732b3c348bbc84efa88047c58b5542fd253c44b8cbe5551752c4c813609d6ec",
+      "retainedBytes": 10060,
+      "retainedSha256": "4732b3c348bbc84efa88047c58b5542fd253c44b8cbe5551752c4c813609d6ec",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/bun-tests.log",
+      "retained": "ci-logs/bun-tests.log",
+      "originalBytes": 1424,
+      "originalSha256": "971a3c734477310999f0b7cb6185fd82150c51f56c664e22ceb1e93d19bb0715",
+      "retainedBytes": 1424,
+      "retainedSha256": "971a3c734477310999f0b7cb6185fd82150c51f56c664e22ceb1e93d19bb0715",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/chromium.json",
+      "retained": "ci-logs/chromium.json",
+      "originalBytes": 809,
+      "originalSha256": "9a470707747fce844f846ff9fdd21cfc9c3a7e2245ae3d707b779712745a313f",
+      "retainedBytes": 809,
+      "retainedSha256": "9a470707747fce844f846ff9fdd21cfc9c3a7e2245ae3d707b779712745a313f",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/formal.log",
+      "retained": "ci-logs/formal.log",
+      "originalBytes": 25306,
+      "originalSha256": "b34f85bb703cfdd4ea64f82acb37ce50f6bc831eda4b0858f567f69d8b968f87",
+      "retainedBytes": 25306,
+      "retainedSha256": "b34f85bb703cfdd4ea64f82acb37ce50f6bc831eda4b0858f567f69d8b968f87",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/node-tests.log",
+      "retained": "ci-logs/node-tests.log",
+      "originalBytes": 1421,
+      "originalSha256": "db393b8696e67dddeaa6a08d86840f77bd3ecc8aeb81189cdb6510276cc1661d",
+      "retainedBytes": 1421,
+      "retainedSha256": "db393b8696e67dddeaa6a08d86840f77bd3ecc8aeb81189cdb6510276cc1661d",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/pilot-v3.log",
+      "retained": "ci-logs/pilot-v3.log",
+      "originalBytes": 5678,
+      "originalSha256": "5b68dd5d9670067fc77bb484ca5722785bf114a77ee46c87d4bfc8c1feb640dc",
+      "retainedBytes": 5678,
+      "retainedSha256": "5b68dd5d9670067fc77bb484ca5722785bf114a77ee46c87d4bfc8c1feb640dc",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/workers-current-reader.json",
+      "retained": "ci-logs/workers-current-reader.json",
+      "originalBytes": 1054,
+      "originalSha256": "94229b2f006ba7760b2cab4245a6e218f705c7265bfed2e1d682adea9e66285c",
+      "retainedBytes": 1054,
+      "retainedSha256": "94229b2f006ba7760b2cab4245a6e218f705c7265bfed2e1d682adea9e66285c",
+      "compression": "none"
+    },
+    {
+      "downloaded": "ci-logs/workers-old-reader.json",
+      "retained": "ci-logs/workers-old-reader.json",
+      "originalBytes": 1068,
+      "originalSha256": "65e916bb40b41c1b285ee009e938ec38acc9cebea1dc7ccaeefaa71ba32805f7",
+      "retainedBytes": 1068,
+      "retainedSha256": "65e916bb40b41c1b285ee009e938ec38acc9cebea1dc7ccaeefaa71ba32805f7",
+      "compression": "none"
+    },
+    {
+      "downloaded": "download-provenance.json",
+      "retained": "download-provenance.json",
+      "originalBytes": 2203,
+      "originalSha256": "67de86de2177a7b4565104a7a1d4f21339777c21b06586a3c0696feeff478da3",
+      "retainedBytes": 2203,
+      "retainedSha256": "67de86de2177a7b4565104a7a1d4f21339777c21b06586a3c0696feeff478da3",
+      "compression": "none"
+    },
+    {
+      "downloaded": "github-job.log",
+      "retained": "github-job.log.gz",
+      "originalBytes": 174109,
+      "originalSha256": "7b992d22e592c25590743e3e841a74ce0a4bdf72218c560a6d421b7ebbbbb9fb",
+      "retainedBytes": 31260,
+      "retainedSha256": "be34366f5fb6eb3ef0d4d6744b1d40bdd03d738eb099dfb945cc1d237c5cacc8",
+      "compression": "gzip-mtime0"
+    },
+    {
+      "downloaded": "github-metadata.json",
+      "retained": "github-metadata.json",
+      "originalBytes": 5220,
+      "originalSha256": "9920221cd8813c2094240ecb3b79914fee5a19fb53ecd1670d29e22f735c249a",
+      "retainedBytes": 5220,
+      "retainedSha256": "9920221cd8813c2094240ecb3b79914fee5a19fb53ecd1670d29e22f735c249a",
+      "compression": "none"
+    },
+    {
+      "downloaded": "results/formal.json",
+      "retained": "results/formal.json.gz",
+      "originalBytes": 2826942,
+      "originalSha256": "337a07389e001266f01f261a67a9456e4e89457e91604b4e7fc9439dd7625eaf",
+      "retainedBytes": 538069,
+      "retainedSha256": "452f0e3270dea99acbe74614c3f89bc6a4709dd478e2b8c36d5446e5e4d838de",
+      "compression": "gzip-mtime0"
+    },
+    {
+      "downloaded": "results/pilot-console.txt",
+      "retained": "results/pilot-console.txt",
+      "originalBytes": 4208,
+      "originalSha256": "c4b493823553fccab38d72f2aef234623b6c5fa236f55299b30c94d1cbd6a318",
+      "retainedBytes": 4208,
+      "retainedSha256": "c4b493823553fccab38d72f2aef234623b6c5fa236f55299b30c94d1cbd6a318",
+      "compression": "none"
+    },
+    {
+      "downloaded": "results/pilot-v3.json",
+      "retained": "results/pilot-v3.json.gz",
+      "originalBytes": 474287,
+      "originalSha256": "0f7d2b295e5e7a5a491bc65a66e8b8cb0ef267663913b4c30ebf3775d57ba88e",
+      "retainedBytes": 80575,
+      "retainedSha256": "22b9db805741b39da3f4afa34c51520029988bf8bd97f0d31e26426c0bfc9353",
+      "compression": "gzip-mtime0"
+    },
+    {
+      "downloaded": "results/pilot.json",
+      "retained": "results/pilot.json.gz",
+      "originalBytes": 410647,
+      "originalSha256": "242f649b003747fe3529ddfc464e162f41f272e81091000a7cd2e605e73f1bd2",
+      "retainedBytes": 74593,
+      "retainedSha256": "4ef9292ce6104a6c814fd3020e803df3ae659d1046239a11491d1cd7ba0b79da",
+      "compression": "gzip-mtime0"
+    }
+  ],
+  "studyStatus": {
+    "pilot-v3": {
+      "status": "complete",
+      "processes": 64,
+      "expectedProcesses": 64,
+      "startedAt": "2026-11-08T15:40:49.342Z",
+      "completedAt": "2026-11-08T15:44:27.791Z"
+    },
+    "formal": {
+      "status": "running",
+      "processes": 331,
+      "expectedProcesses": 432,
+      "startedAt": "2026-11-08T15:44:27.999Z",
+      "lastCompletedAt": "2026-11-08T16:39:40.692Z"
+    },
+    "aa": {
+      "status": "not started",
+      "processes": 0,
+      "expectedProcesses": 32
+    },
+    "reference-comparison": {
+      "status": "not started",
+      "processes": 0,
+      "expectedProcesses": 54
+    }
+  }
+}

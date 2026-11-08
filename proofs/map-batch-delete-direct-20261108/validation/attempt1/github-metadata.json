@@ -1,0 +1,170 @@
+{
+  "run": {
+    "id": 42495937874,
+    "head_sha": "1d6cadc134fdad3e9c80a448715af239491a91c5",
+    "head_branch": "perf/map-batch-delete-direct-20261108",
+    "html_url": "https://github.com/natanelia/zerocopy/actions/runs/42495937874",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "run_started_at": "2026-11-08T15:39:48Z",
+    "created_at": "2026-11-08T15:39:48Z",
+    "updated_at": "2026-11-08T16:40:08Z"
+  },
+  "jobs": {
+    "jobs": [
+      {
+        "id": 128778192941,
+        "name": "verify",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "run_id": 42495937874,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run oven-sh/setup-bun@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Install existing project dependencies",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Build modules and declarations",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Build the pinned reader baseline",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Run focused regression tests in Node and Bun",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Check current and baseline readers in real workers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Check complete outputs and exact writer allocation",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Check the installed package",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Install Chromium",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Check Chromium and real browser workers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          },
+          {
+            "name": "Bootstrap the initial isolated performance evidence",
+            "status": "completed",
+            "conclusion": "cancelled",
+            "number": 14
+          },
+          {
+            "name": "Audit saved measurements without collecting timings",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 15
+          },
+          {
+            "name": "Retain all raw measurements and correctness logs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16
+          },
+          {
+            "name": "Post Run oven-sh/setup-bun@v2",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 30
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 31
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 33
+          }
+        ]
+      }
+    ]
+  },
+  "artifacts": {
+    "artifacts": [
+      {
+        "id": 13625657254,
+        "name": "map-batch-delete-verification-1d6cadc134fdad3e9c80a448715af239491a91c5",
+        "size_in_bytes": 706890,
+        "url": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/13625657254",
+        "archive_download_url": "https://api.github.com/repos/natanelia/zerocopy/actions/artifacts/13625657254/zip",
+        "expired": false,
+        "created_at": "2026-11-08T16:40:04Z",
+        "expires_at": "2026-11-22T16:40:03Z",
+        "updated_at": "2026-11-08T16:40:04Z",
+        "digest": "sha256:c37be353f9a48f2044bf4b925df2e93a26c7839fa0c3cb08eff6c30584f9630d",
+        "workflow_run": {
+          "id": 42495937874,
+          "repository_id": 1121397035,
+          "head_repository_id": 1121397035,
+          "head_branch": "perf/map-batch-delete-direct-20261108",
+          "head_sha": "1d6cadc134fdad3e9c80a448715af239491a91c5"
+        }
+      }
+    ]
+  }
+}

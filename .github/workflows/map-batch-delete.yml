@@ -1,4 +1,4 @@
-name: Map batch deletion verification
+name: Rejected Map deletion experiment verification
 
 on:
   pull_request:
@@ -7,8 +7,7 @@ on:
       - 'proofs/map-batch-delete-direct-20261108/**'
       - '.github/workflows/map-batch-delete.yml'
   push:
-    # Temporary bootstrap trigger: remove after the hosted evidence is retained.
-    branches: [main, perf/map-batch-delete-direct-20261108]
+    branches: [main]
     paths:
       - 'map-batch-delete.test.ts'
       - 'proofs/map-batch-delete-direct-20261108/**'
@@ -25,7 +24,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,9 +51,9 @@ jobs:
         run: |
           baseline_checkout="$RUNNER_TEMP/map-batch-delete-baseline"
           git worktree add --detach "$baseline_checkout" a4265a0608ec25eec5719496225212db6b251989
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$baseline_checkout/node_modules"
           printf 'MAP_DELETE_BASELINE=%s\n' "$baseline_checkout" >> "$GITHUB_ENV"
           cd "$baseline_checkout"
+          bun install
           bun run build:wasm
           bun run build:browser
       - name: Run focused regression tests in Node and Bun
@@ -79,37 +78,46 @@ jobs:
       - name: Check Chromium and real browser workers
         shell: bash
         run: node proofs/map-batch-delete-direct-20261108/browser.mjs map . 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/chromium.json
-      - name: Bootstrap the initial isolated performance evidence
-        if: ${{ hashFiles('proofs/map-batch-delete-direct-20261108/results/formal.json') == '' }}
+      - name: Rebuild the recorded rejected candidate for archive verification
         shell: bash
         run: |
-          proof=proofs/map-batch-delete-direct-20261108
-          mkdir -p "$proof/results"
-          benchmark_cpu="$(node -e 'const fs = require("node:fs"); const match = fs.readFileSync("/proc/self/status", "utf8").match(/^Cpus_allowed_list:\s*(\d+)/m); if (!match) process.exit(1); process.stdout.write(match[1]);')"
-          benchmark_bun="$(command -v bun)"
-          printf 'Using allowed CPU %s for serial fresh-process studies\n' "$benchmark_cpu"
-          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
-            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
-            "$proof/results/pilot-v3.json" pilot 2>&1 | tee "$proof/ci-logs/pilot-v3.log"
-          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
-            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
-            "$proof/results/formal.json" formal 2>&1 | tee "$proof/ci-logs/formal.log"
-          taskset -c "$benchmark_cpu" node "$proof/paired-benchmark.mjs" \
-            "$proof/workloads.mjs" "$MAP_DELETE_BASELINE" . "$benchmark_bun" \
-            "$proof/results/aa.json" aa 2>&1 | tee "$proof/ci-logs/aa.log"
-          taskset -c "$benchmark_cpu" node "$proof/compare.mjs" \
-            . "$benchmark_bun" "$proof/results/reference-comparison.json" measure \
-            2>&1 | tee "$proof/ci-logs/reference-comparison.log"
-      - name: Audit saved measurements without collecting timings
+          recorded_commit="$(
+            node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { existsSync, readFileSync } from 'node:fs';
+          import { gunzipSync } from 'node:zlib';
+          const plain = 'proofs/map-batch-delete-direct-20261108/validation/attempt1/results/pilot-v3.json';
+          const path = existsSync(plain) ? plain : `${plain}.gz`;
+          const bytes = readFileSync(path);
+          const record = JSON.parse((path.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
+          assert.equal(record.schema, 'zerocopy-paired-public-operation/v1');
+          assert.equal(record.mode, 'pilot'); assert.equal(record.status, 'complete');
+          assert.equal(record.runs.length, 64);
+          assert.match(record.source.after.commit, /^[0-9a-f]{40}$/);
+          process.stdout.write(record.source.after.commit);
+          JS
+          )"
+          recorded_checkout="$RUNNER_TEMP/map-batch-delete-recorded"
+          if ! git cat-file -e "$recorded_commit^{commit}"; then
+            git fetch --no-tags origin "$recorded_commit"
+          fi
+          git worktree add --detach "$recorded_checkout" "$recorded_commit"
+          printf 'MAP_DELETE_RECORDED_CHECKOUT=%s\n' "$recorded_checkout" >> "$GITHUB_ENV"
+          cd "$recorded_checkout"
+          bun install
+          bun run build:wasm
+          bun run build:browser
+      - name: Verify the rejected archive without collecting timings
         shell: bash
-        run: node proofs/map-batch-delete-direct-20261108/audit-evidence.mjs . 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/evidence.log
-      - name: Retain all raw measurements and correctness logs
+        run: node proofs/map-batch-delete-direct-20261108/audit-rejected.mjs "$MAP_DELETE_RECORDED_CHECKOUT" "$MAP_DELETE_BASELINE" 2>&1 | tee proofs/map-batch-delete-direct-20261108/ci-logs/archive-audit.json
+      - name: Retain archived measurements and current correctness logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: map-batch-delete-verification-${{ github.sha }}
           path: |
             proofs/map-batch-delete-direct-20261108/results/
+            proofs/map-batch-delete-direct-20261108/validation/
             proofs/map-batch-delete-direct-20261108/ci-logs/
           retention-days: 14
           if-no-files-found: warn

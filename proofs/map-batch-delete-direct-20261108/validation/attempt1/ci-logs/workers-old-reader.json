@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "kind": "map",
+  "writerRoot": "/home/runner/work/zerocopy/zerocopy",
+  "readerRoot": "/home/runner/work/_temp/map-batch-delete-baseline",
+  "runtime": "v24.22.1",
+  "results": [
+    {
+      "copy": false,
+      "reads": 220502,
+      "sourceCount": 8192,
+      "resultCount": 4096,
+      "oldCapacity": 458752,
+      "newCapacity": 2097152,
+      "retainedBytesUnchanged": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted",
+        "boundary511",
+        "boundary512",
+        "lateHits",
+        "sparseHits",
+        "densePrefixMisses"
+      ]
+    },
+    {
+      "copy": true,
+      "reads": 86079,
+      "sourceCount": 8192,
+      "resultCount": 4096,
+      "oldCapacity": 458752,
+      "newCapacity": 2097152,
+      "retainedBytesUnchanged": true,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted",
+        "boundary511",
+        "boundary512",
+        "lateHits",
+        "sparseHits",
+        "densePrefixMisses"
+      ]
+    }
+  ]
+}

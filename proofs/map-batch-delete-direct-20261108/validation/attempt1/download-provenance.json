@@ -1,0 +1,71 @@
+{
+  "zip_sha256": "c37be353f9a48f2044bf4b925df2e93a26c7839fa0c3cb08eff6c30584f9630d",
+  "zip_bytes": 706890,
+  "members": [
+    {
+      "name": "results/formal.json",
+      "bytes": 2826942,
+      "sha256": "337a07389e001266f01f261a67a9456e4e89457e91604b4e7fc9439dd7625eaf"
+    },
+    {
+      "name": "results/pilot-v3.json",
+      "bytes": 474287,
+      "sha256": "0f7d2b295e5e7a5a491bc65a66e8b8cb0ef267663913b4c30ebf3775d57ba88e"
+    },
+    {
+      "name": "results/pilot-console.txt",
+      "bytes": 4208,
+      "sha256": "c4b493823553fccab38d72f2aef234623b6c5fa236f55299b30c94d1cbd6a318"
+    },
+    {
+      "name": "results/pilot.json",
+      "bytes": 410647,
+      "sha256": "242f649b003747fe3529ddfc464e162f41f272e81091000a7cd2e605e73f1bd2"
+    },
+    {
+      "name": "ci-logs/allocation-after.json",
+      "bytes": 10041,
+      "sha256": "55f2e5cd7c08c0517e334cee3ab63f64e4775f8fabcddbd23057212b64fe0c0c"
+    },
+    {
+      "name": "ci-logs/bun-tests.log",
+      "bytes": 1424,
+      "sha256": "971a3c734477310999f0b7cb6185fd82150c51f56c664e22ceb1e93d19bb0715"
+    },
+    {
+      "name": "ci-logs/allocation-before.json",
+      "bytes": 10060,
+      "sha256": "4732b3c348bbc84efa88047c58b5542fd253c44b8cbe5551752c4c813609d6ec"
+    },
+    {
+      "name": "ci-logs/chromium.json",
+      "bytes": 809,
+      "sha256": "9a470707747fce844f846ff9fdd21cfc9c3a7e2245ae3d707b779712745a313f"
+    },
+    {
+      "name": "ci-logs/formal.log",
+      "bytes": 25306,
+      "sha256": "b34f85bb703cfdd4ea64f82acb37ce50f6bc831eda4b0858f567f69d8b968f87"
+    },
+    {
+      "name": "ci-logs/node-tests.log",
+      "bytes": 1421,
+      "sha256": "db393b8696e67dddeaa6a08d86840f77bd3ecc8aeb81189cdb6510276cc1661d"
+    },
+    {
+      "name": "ci-logs/pilot-v3.log",
+      "bytes": 5678,
+      "sha256": "5b68dd5d9670067fc77bb484ca5722785bf114a77ee46c87d4bfc8c1feb640dc"
+    },
+    {
+      "name": "ci-logs/workers-current-reader.json",
+      "bytes": 1054,
+      "sha256": "94229b2f006ba7760b2cab4245a6e218f705c7265bfed2e1d682adea9e66285c"
+    },
+    {
+      "name": "ci-logs/workers-old-reader.json",
+      "bytes": 1068,
+      "sha256": "65e916bb40b41c1b285ee009e938ec38acc9cebea1dc7ccaeefaa71ba32805f7"
+    }
+  ]
+}

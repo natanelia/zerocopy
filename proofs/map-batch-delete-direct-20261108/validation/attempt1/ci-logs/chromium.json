@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "crossOriginIsolated": true,
+  "kind": "map",
+  "results": [
+    {
+      "copy": false,
+      "reads": 243413,
+      "initialCapacity": 458752,
+      "finalCapacity": 2097152,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted",
+        "boundary511",
+        "boundary512",
+        "lateHits",
+        "sparseHits",
+        "densePrefixMisses"
+      ]
+    },
+    {
+      "copy": true,
+      "reads": 121154,
+      "initialCapacity": 458752,
+      "finalCapacity": 2097152,
+      "checkedSnapshots": [
+        "before",
+        "after",
+        "fork",
+        "compacted",
+        "boundary511",
+        "boundary512",
+        "lateHits",
+        "sparseHits",
+        "densePrefixMisses"
+      ]
+    }
+  ],
+  "browser": "153.0.8010.12"
+}

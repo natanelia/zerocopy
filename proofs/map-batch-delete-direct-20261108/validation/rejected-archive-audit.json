@@ -1,0 +1,23 @@
+{
+  "verifiedArchive": true,
+  "experiment": "rejected",
+  "completeFormalStudy": false,
+  "collectedNewTimings": false,
+  "historicalCandidate": "1d6cadc134fdad3e9c80a448715af239491a91c5",
+  "exactCandidateBuild": true,
+  "exactBaselineBuild": true,
+  "preservedV2PilotProcesses": 48,
+  "completeV3PilotProcesses": 64,
+  "partialFormalProcesses": 331,
+  "plannedFormalProcesses": 432,
+  "partialMeasuredBatches": 2979,
+  "partialMeasuredBatchesBelow2ms": 423,
+  "partialVerifiedOutputs": 3304908080,
+  "missingStages": [
+    "101 formal processes",
+    "all 32 A/A processes",
+    "all 54 reference comparison processes"
+  ],
+  "allocationCases": 20,
+  "conclusion": "Archive integrity and completed correctness checks passed; performance candidate remains rejected."
+}
