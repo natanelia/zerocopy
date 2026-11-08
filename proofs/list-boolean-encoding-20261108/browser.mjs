@@ -31,7 +31,7 @@ self.onmessage=async({data:m})=>{try{
   before=(await S.initWorker(m.packet)).before;expected=m.expected;check(before,expected);
   arena=S.getWorkerData({before},{copy:false}).arenas[0];
   bytes=new Uint8Array(arena.memory.buffer,65536,arena.used-65536).slice();
-  iterator=before[Symbol.iterator]();first=iterator.next().value;postMessage({type:'ready'});
+  iterator=before.values();first=iterator.next().value;postMessage({type:'ready'});
  }
  if(m.type==='concurrent'){
   const control=new Int32Array(m.control),deadline=performance.now()+20000;let reads=0;
