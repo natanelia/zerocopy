@@ -31,6 +31,8 @@ jobs:
       - run: bun run typecheck:geometry
       - name: Check public worker task declarations
         run: bunx tsc --noEmit -p tsconfig.worker.json
+      - name: Verify recorded worker dispatch evidence
+        run: python3 proofs/worker-constructor-dispatch-20261105/verify-package.py
       - name: Run unit and integration tests
         shell: bash
         run: bun run test 2>&1 | tee vitest.log
