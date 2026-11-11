@@ -1,0 +1,31 @@
+{
+  "archives": [
+    {
+      "file": "pilot-01.json.gz",
+      "originalFile": "pilot-01.json",
+      "originalBytes": 299391,
+      "originalSha256": "b98f0c9a79bf093980fb93df86d6adb30529204f4704da78f533f1efbcc97058",
+      "compressedBytes": 66651,
+      "compressedSha256": "7e2f200b1a384f9da6172840506a731a99b6e8af4d829a4f798cdbde7bffd5ec",
+      "roundTripVerified": true
+    },
+    {
+      "file": "formal-01.json.gz",
+      "originalFile": "formal-01.json",
+      "originalBytes": 835219,
+      "originalSha256": "fbaefb5cb47da19aff98900c41d4bca081e440c3fbac1cd89d955b78bfd92d81",
+      "compressedBytes": 184133,
+      "compressedSha256": "23cf1a908c2e004a2bf2814be16be6aebd9cb9c6878763697bf779174391f4d2",
+      "roundTripVerified": true
+    },
+    {
+      "file": "isolated-01.json.gz",
+      "originalFile": "isolated-01.json",
+      "originalBytes": 996511,
+      "originalSha256": "73500b7ac06ee967f83bcc2e601df2f88dd479b4e69ba007d3bc3dcee00284b2",
+      "compressedBytes": 173032,
+      "compressedSha256": "14d67da7f502f0a30f2ab9e1aa147c573936faf63d2b50bead5fd1587a3bd8fe",
+      "roundTripVerified": true
+    }
+  ]
+}
