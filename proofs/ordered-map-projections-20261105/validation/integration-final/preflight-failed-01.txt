@@ -1,0 +1,7 @@
+Session 16120, exit 1. The final-discovery runner stopped before any test command because untracked old archive test paths were still present after their tracked rename. Captured output:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/83f1d4baba1f/results/round3/integration-followup.py", line 17, in <module>
+    assert not list((root/'proofs/ordered-map-projections-20261105/rejected-v1').rglob('*.test.ts'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
