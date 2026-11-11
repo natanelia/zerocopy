@@ -1,0 +1,129 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/736c0a2657a3/zerocopy-numeric
+
+ ❯ redux-checkpoint.test.ts (34 tests | 1 failed) 32429ms
+     × restores a writable priority queue with its original semantics 6928ms
+ ❯ workers.test.ts (24 tests | 14 failed) 1530ms
+     × concurrent reads from multiple workers 68ms
+     × workers see updated map after set operations 36ms
+     × workers see map after delete operations 476ms
+     × workers handle missing keys 137ms
+     × stress test - 2 workers, 100 keys 62ms
+     × empty SharedMap 54ms
+     × 3 workers same key simultaneously 26ms
+     × unicode keys and values 32ms
+     × SharedSet shared across workers 34ms
+     × SharedSet after delete operation 27ms
+     × SharedMap<string> zero-copy 36ms
+     × SharedMap<number> zero-copy 56ms
+     × SharedMap<boolean> zero-copy 48ms
+     × SharedMap<object> zero-copy 40ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  redux-checkpoint.test.ts > complete checkpoint round trips > restores a writable priority queue with its original semantics
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ forEach unknown:1:11
+ ❯ <anonymous> redux-checkpoint.test.ts:92:41
+     90|     const map = new SharedMap<'SharedList<number>'>('SharedList<number…
+     91|     const restored = deserializeZerocopyState<typeof map>(serializeZer…
+     92|     expect(restored.get('child')!.toArray()).toEqual([1, 2]);
+       |                                         ^
+     93|     const worker = await initWorker<any>(getWorkerData({ restored }, {…
+     94|     expect(worker.restored.get('child').toArray()).toEqual([1, 2]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > concurrent reads from multiple workers
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:b0bfcc57-a9f3-41e0-ab89-2ae6072f39ac:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > workers see updated map after set operations
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:3ffcac7e-f92b-4576-ae70-8994d377974c:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > workers see map after delete operations
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:001b70e3-3998-4ec8-8cc9-beaa265f95da:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > workers handle missing keys
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:1ec72885-a59b-4302-add9-c815c7696e0e:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > stress test - 2 workers, 100 keys
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:e4ab37e7-b1f5-4bee-b41c-f9a8f7b58740:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > empty SharedMap
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:993516e6-bc9f-43bd-9873-8c9e2988691a:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > 3 workers same key simultaneously
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:ddff7c71-07c3-4729-924b-10a74dd18e2c:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  workers.test.ts > SharedMap Multi-Worker Tests > unicode keys and values
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:3433a260-315e-41a2-ad81-c6c64086998c:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  workers.test.ts > SharedSet Multi-Worker Tests > SharedSet shared across workers
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:ab4dfdea-9c69-4d95-9562-1900553c1a6b:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  workers.test.ts > SharedSet Multi-Worker Tests > SharedSet after delete operation
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:e3080c2d-3ecc-484e-b7a8-a7ed940ad31e:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  workers.test.ts > Zero-Copy Data Type Tests > SharedMap<string> zero-copy
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:5905878b-e235-4434-9294-841b73f08710:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  workers.test.ts > Zero-Copy Data Type Tests > SharedMap<number> zero-copy
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:ee62a5b8-363f-4886-a54c-1e86d39c9561:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  workers.test.ts > Zero-Copy Data Type Tests > SharedMap<boolean> zero-copy
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:e69eaeeb-a31e-4e4d-b747-5e8eab547e1d:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  workers.test.ts > Zero-Copy Data Type Tests > SharedMap<object> zero-copy
+Error: ENOENT: no such file or directory, open './shared-map.wasm'
+ ❯ <anonymous> blob:bc43891d-66c4-4a0f-973e-22b19ff2b1fd:6:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+
+ Test Files  2 failed | 48 passed (50)
+      Tests  15 failed | 1047 passed (1062)
+   Start at  10:31:43
+   Duration  42.48s (transform 1.66s, setup 0ms, import 3.17s, tests 164.62s, environment 10ms)
+
+error: script "test" exited with code 1

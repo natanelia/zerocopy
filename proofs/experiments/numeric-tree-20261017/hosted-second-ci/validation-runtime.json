@@ -1,0 +1,12 @@
+{
+  "node": {
+    "binary": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/node",
+    "version": "v22.23.2",
+    "sha256": "3517c2df0b2f8cd7f422b4b8450ef81c6889f08eb03e281d6de9079b15e6a327"
+  },
+  "bun": {
+    "binary": "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "version": "1.4.2",
+    "sha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c"
+  }
+}

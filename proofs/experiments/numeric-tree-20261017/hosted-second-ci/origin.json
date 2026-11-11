@@ -1,0 +1,67 @@
+{
+  "repository": "natanelia/zerocopy",
+  "pr": 39,
+  "headCommit": "85eee3354b85f8d7d6121a72579ddc8e06a57112",
+  "distinction": "These logs are from Worker sessions run 38998487324 and Numeric performance proof run 38998487320. They are not from Numeric tree comparison run 38998487385.",
+  "logs": [
+    {
+      "runId": 38998487324,
+      "jobId": 117296191012,
+      "name": "worker-sessions",
+      "conclusion": "failure",
+      "file": "job-117296191012.log",
+      "failedTest": "geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth",
+      "durationMs": 5727,
+      "testLimitMs": 5000,
+      "passed": 1061,
+      "total": 1062,
+      "bytes": 38523,
+      "sha256": "51a5c0d2f8281303a6407ea90181d0f99c31edd590be9e2e1b89e43423fabe47",
+      "checkedCommitLine": "2026-10-17T03:21:56.3561105Z 2ac1950417e6a9151eaa6b5fb48afc3cc4998399"
+    },
+    {
+      "runId": 38998487320,
+      "jobId": 117296191057,
+      "name": "verify (ubuntu-latest)",
+      "conclusion": "failure",
+      "file": "job-117296191057.log",
+      "failedTest": "geometry.test.ts > bboxXY > preserves attached snapshots after append, fork, and memory growth",
+      "durationMs": 5735,
+      "testLimitMs": 5000,
+      "passed": 1061,
+      "total": 1062,
+      "secondaryFailure": "Artifact upload found no numeric result file. Worker and timing steps were skipped.",
+      "bytes": 39911,
+      "sha256": "f77f917117febc6e67336fae0a6b5454edc1c7bbab6f4cb52291fde660de2722",
+      "checkedCommitLine": "2026-10-17T03:21:55.9364840Z 2ac1950417e6a9151eaa6b5fb48afc3cc4998399"
+    },
+    {
+      "runId": 38998487320,
+      "jobId": 117296190799,
+      "name": "verify (ubuntu-24.04-arm)",
+      "conclusion": "success",
+      "file": "job-117296190799.log",
+      "geometryTestDurationMs": 1399,
+      "passed": 1062,
+      "total": 1062,
+      "nodeNumericGate": "success",
+      "bunNumericGate": "success",
+      "bytes": 38996,
+      "sha256": "b6275f4782ff1ced2889ecf68477b2aa0352b88b8c66e6a48221910f297c512d",
+      "checkedCommitLine": "2026-10-17T03:21:58.0885377Z 2ac1950417e6a9151eaa6b5fb48afc3cc4998399"
+    }
+  ],
+  "source": "GitHub fetch_workflow_job_logs returns decoded log text. The retained files contain this exact decoded text, including terminal control characters.",
+  "inference": "The timeout cause is not proved. The private-Arena change in the new numeric test did not resolve the failure on these two x64 jobs.",
+  "geometryAssertionRepair": {
+    "beforeTestSource": "geometry-before-buffer-equality.test.ts.source",
+    "afterTestSource": "geometry-buffer-equality.test.ts.source",
+    "fullByteLengthChecked": true,
+    "allBytesCompared": true,
+    "savedCopyIndependent": true,
+    "timeoutMs": 5000,
+    "timeoutCauseEstablished": false,
+    "beforeTestSourceSha256": "d3d42533a45bee3a9086e33c1d58e8033ca8bbbbc042f47ddc182b0edaa511a4",
+    "afterTestSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+  }
+}

@@ -1,0 +1,63 @@
+NUMERIC-TREE {"name":"range-simd","size":1,"iterations":1000000,"ms":{"baseline":24.239450000000033,"candidate":22.730809000000136},"speedup":1.0663698771125958,"pairedMedian":1.0663602987447491}
+NUMERIC-TREE {"name":"range-scalar","size":1,"iterations":1000000,"ms":{"baseline":30.512404999999944,"candidate":31.18496600000026},"speedup":0.9784331655195548,"pairedMedian":0.9645239537328587}
+NUMERIC-TREE {"name":"range-public","size":1,"iterations":1000000,"ms":{"baseline":20.688043000000107,"candidate":20.629173000000264},"speedup":1.0028537256437688,"pairedMedian":1.0103126169158325}
+NUMERIC-TREE {"name":"range-simd","size":2,"iterations":1000000,"ms":{"baseline":38.83841399999983,"candidate":35.114003000000594},"speedup":1.1060662608019705,"pairedMedian":1.0826349214691977}
+NUMERIC-TREE {"name":"range-scalar","size":2,"iterations":1000000,"ms":{"baseline":33.013380000000325,"candidate":35.217766000000665},"speedup":0.9374069894155042,"pairedMedian":0.945925484841158}
+NUMERIC-TREE {"name":"range-public","size":2,"iterations":1000000,"ms":{"baseline":27.06543999999849,"candidate":26.543493999999555},"speedup":1.0196638016079926,"pairedMedian":1.0218521791865056}
+NUMERIC-TREE {"name":"point-scalar-control","size":2,"iterations":1000000,"ms":{"baseline":22.742886999998518,"candidate":23.173327000000427},"speedup":0.9814251963042725,"pairedMedian":0.9733937211519509}
+NUMERIC-TREE {"name":"point-simd-control","size":2,"iterations":1000000,"ms":{"baseline":32.44452700000147,"candidate":30.90038800000002},"speedup":1.0499715084484198,"pairedMedian":1.0549588871562179}
+NUMERIC-TREE {"name":"point-public-control","size":2,"iterations":1000000,"ms":{"baseline":22.271346999999878,"candidate":22.661283999999796},"speedup":0.9827928108574995,"pairedMedian":0.9770253971487038}
+NUMERIC-TREE {"name":"range-simd","size":31,"iterations":258065,"ms":{"baseline":11.92519700000048,"candidate":11.823656000000483},"speedup":1.0085879528294797,"pairedMedian":1.0109539209233125}
+NUMERIC-TREE {"name":"range-scalar","size":31,"iterations":258065,"ms":{"baseline":20.196281999998973,"candidate":20.001963999999134},"speedup":1.0097149459922958,"pairedMedian":1.0131157760289216}
+NUMERIC-TREE {"name":"range-public","size":31,"iterations":258065,"ms":{"baseline":9.355507000000216,"candidate":9.142253999998502},"speedup":1.0233260856679052,"pairedMedian":1.0183715578088421}
+NUMERIC-TREE {"name":"range-simd","size":32,"iterations":250000,"ms":{"baseline":11.170642000000953,"candidate":11.058118000000832},"speedup":1.0101756917406843,"pairedMedian":1.0108141852969985}
+NUMERIC-TREE {"name":"range-scalar","size":32,"iterations":250000,"ms":{"baseline":19.72747999999774,"candidate":19.794208999999682},"speedup":0.9966288625121649,"pairedMedian":0.9969147856161672}
+NUMERIC-TREE {"name":"range-public","size":32,"iterations":250000,"ms":{"baseline":9.288587999999436,"candidate":8.89737100000275},"speedup":1.0439699547199466,"pairedMedian":1.0509452605878156}
+NUMERIC-TREE {"name":"point-scalar-control","size":32,"iterations":250000,"ms":{"baseline":18.703314999998838,"candidate":18.838650000001508},"speedup":0.9928160988179802,"pairedMedian":0.9986806651739207}
+NUMERIC-TREE {"name":"point-simd-control","size":32,"iterations":250000,"ms":{"baseline":18.71607700000095,"candidate":18.517092000001867},"speedup":1.0107460177871916,"pairedMedian":1.0120173061885382}
+NUMERIC-TREE {"name":"point-public-control","size":32,"iterations":250000,"ms":{"baseline":14.598700000002282,"candidate":14.312324999998964},"speedup":1.0200089782759503,"pairedMedian":1.0295155967112688}
+NUMERIC-TREE {"name":"range-simd","size":33,"iterations":242425,"ms":{"baseline":12.389077999996516,"candidate":11.686894999998913},"speedup":1.0600829390524744,"pairedMedian":1.069609323854629}
+NUMERIC-TREE {"name":"range-scalar","size":33,"iterations":242425,"ms":{"baseline":20.667574000002787,"candidate":20.487945000000764},"speedup":1.0087675459887273,"pairedMedian":0.9960643925559023}
+NUMERIC-TREE {"name":"range-public","size":33,"iterations":242425,"ms":{"baseline":10.708201000001281,"candidate":10.942552000000433},"speedup":0.9785835150704203,"pairedMedian":0.9954171686830747}
+NUMERIC-TREE {"name":"range-simd","size":1024,"iterations":7813,"ms":{"baseline":4.5511440000009316,"candidate":3.214201000002504},"speedup":1.4159487847827146,"pairedMedian":1.4301104526275907}
+NUMERIC-TREE {"name":"range-scalar","size":1024,"iterations":7813,"ms":{"baseline":10.311838000001444,"candidate":10.382335999998759},"speedup":0.993209813283126,"pairedMedian":0.9691595402161346}
+NUMERIC-TREE {"name":"range-public","size":1024,"iterations":7813,"ms":{"baseline":4.413795000000391,"candidate":3.133187999999791},"speedup":1.408723319507379,"pairedMedian":1.406868863602065}
+NUMERIC-TREE {"name":"point-scalar-control","size":1024,"iterations":7813,"ms":{"baseline":9.37096499999825,"candidate":9.506804000000557},"speedup":0.9857113915462759,"pairedMedian":0.988109090478869}
+NUMERIC-TREE {"name":"point-simd-control","size":1024,"iterations":7813,"ms":{"baseline":9.274809999998979,"candidate":9.32050000000163},"speedup":0.9950979024727598,"pairedMedian":0.9983958746451645}
+NUMERIC-TREE {"name":"point-public-control","size":1024,"iterations":7813,"ms":{"baseline":9.233942999999272,"candidate":9.083791000000929},"speedup":1.0165296625603042,"pairedMedian":1.0237457136778052}
+NUMERIC-TREE {"name":"range-simd","size":1057,"iterations":7569,"ms":{"baseline":4.9707369999996445,"candidate":3.4180689999993774},"speedup":1.4542529714878634,"pairedMedian":1.465355303058489}
+NUMERIC-TREE {"name":"range-scalar","size":1057,"iterations":7569,"ms":{"baseline":10.605641000001924,"candidate":10.464146000002074},"speedup":1.0135218870225837,"pairedMedian":1.030181382929769}
+NUMERIC-TREE {"name":"range-public","size":1057,"iterations":7569,"ms":{"baseline":4.974900999997772,"candidate":3.2189149999976507},"speedup":1.5455210839681701,"pairedMedian":1.5577988388720487}
+NUMERIC-TREE {"name":"range-simd","size":32768,"iterations":245,"ms":{"baseline":4.367893000002368,"candidate":3.121831000000384},"speedup":1.3991446045611793,"pairedMedian":1.4077075797535668}
+NUMERIC-TREE {"name":"range-scalar","size":32768,"iterations":245,"ms":{"baseline":10.179575999998633,"candidate":10.346883999998681},"speedup":0.9838301076923188,"pairedMedian":0.9937737745212791}
+NUMERIC-TREE {"name":"range-public","size":32768,"iterations":245,"ms":{"baseline":4.3979809999982535,"candidate":3.0790540000016335},"speedup":1.4283546180079727,"pairedMedian":1.4080495878195254}
+NUMERIC-TREE {"name":"point-scalar-control","size":32768,"iterations":245,"ms":{"baseline":9.448835999999574,"candidate":9.255121999998664},"speedup":1.0209304642338521,"pairedMedian":0.9982245559514819}
+NUMERIC-TREE {"name":"point-simd-control","size":32768,"iterations":245,"ms":{"baseline":9.416551000002073,"candidate":9.002142000001186},"speedup":1.0460344882363368,"pairedMedian":1.0368859648043696}
+NUMERIC-TREE {"name":"point-public-control","size":32768,"iterations":245,"ms":{"baseline":9.567048000000796,"candidate":9.275225000001228},"speedup":1.0314626329818983,"pairedMedian":1.0279072699530498}
+NUMERIC-TREE {"name":"range-simd","size":32801,"iterations":244,"ms":{"baseline":4.436119000001781,"candidate":3.025673000000097},"speedup":1.4661594296547047,"pairedMedian":1.4346662950741256}
+NUMERIC-TREE {"name":"range-scalar","size":32801,"iterations":244,"ms":{"baseline":10.135579000001599,"candidate":9.786611999999877},"speedup":1.0356575901856255,"pairedMedian":1.013392311696409}
+NUMERIC-TREE {"name":"range-public","size":32801,"iterations":244,"ms":{"baseline":4.385502999997698,"candidate":3.137125000001106},"speedup":1.3979369645762127,"pairedMedian":1.4181521810314466}
+NUMERIC-TREE {"name":"range-simd","size":262144,"iterations":31,"ms":{"baseline":4.388840999999957,"candidate":3.201404999999795},"speedup":1.370910896934389,"pairedMedian":1.362864787524524}
+NUMERIC-TREE {"name":"range-scalar","size":262144,"iterations":31,"ms":{"baseline":10.401314999999158,"candidate":10.341766000001371},"speedup":1.0057581074642163,"pairedMedian":1.0058851072519523}
+NUMERIC-TREE {"name":"range-public","size":262144,"iterations":31,"ms":{"baseline":4.558316999995441,"candidate":3.29000200000155},"speedup":1.3855058446752595,"pairedMedian":1.3791596322623059}
+NUMERIC-TREE {"name":"point-scalar-control","size":262144,"iterations":31,"ms":{"baseline":9.821067999997467,"candidate":9.686028000003716},"speedup":1.0139417313261638,"pairedMedian":1.0216686756208642}
+NUMERIC-TREE {"name":"point-simd-control","size":262144,"iterations":31,"ms":{"baseline":9.561884000002465,"candidate":9.208482000001823},"speedup":1.0383778781345907,"pairedMedian":1.02313345901164}
+NUMERIC-TREE {"name":"point-public-control","size":262144,"iterations":31,"ms":{"baseline":9.418515000004845,"candidate":9.239459999997052},"speedup":1.019379379315225,"pairedMedian":1.0109801024319442}
+NUMERIC-TREE {"name":"range-simd","size":1048609,"iterations":8,"ms":{"baseline":5.081432000006316,"candidate":3.71963500000129},"speedup":1.3661103844878741,"pairedMedian":1.3436652411163488}
+NUMERIC-TREE {"name":"range-scalar","size":1048609,"iterations":8,"ms":{"baseline":10.967233000003034,"candidate":11.057165999998688},"speedup":0.9918665415717134,"pairedMedian":0.9765041310052057}
+NUMERIC-TREE {"name":"range-public","size":1048609,"iterations":8,"ms":{"baseline":5.142767999997886,"candidate":3.9486679999972694},"speedup":1.3024057732889782,"pairedMedian":1.3038267161696784}
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: range-scalar/2 regressed by more than 5%
+    at file:///workspace/scratch/736c0a2657a3/zerocopy-numeric/proofs/numeric-tree-benchmark.mjs:130:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v22.23.2

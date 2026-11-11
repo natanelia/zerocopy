@@ -1,0 +1,183 @@
+{
+  "baseline": {
+    "sha256": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "bytes": 782,
+    "sections": [
+      {
+        "id": 1,
+        "bytes": 51,
+        "sha256": "415aaa4f0345b6c26166984cc7869fd47817173123a246ca0de9e3f723ff1e7a"
+      },
+      {
+        "id": 2,
+        "bytes": 18,
+        "sha256": "a0a0bbadeda75675d8b61322759a07f4f3d03722ba09f55fe639fe852894d74a"
+      },
+      {
+        "id": 3,
+        "bytes": 6,
+        "sha256": "acc80a36036a3ded1a9442615e43a99bfe34d4feee3d60268ff3d7f1000c3957"
+      },
+      {
+        "id": 7,
+        "bytes": 44,
+        "sha256": "245e391dea7c045b04f70286c82d3e82ae9076a771be5158d3d5b5d062c1bc2a"
+      },
+      {
+        "id": 10,
+        "bytes": 644,
+        "sha256": "9d06bdac19b204d7f948e889e26c761a1c0ff48a5909b5acbb81fee8d573ff50"
+      }
+    ],
+    "functions": [
+      {
+        "index": 0,
+        "bytes": 160,
+        "sha256": "6fcaed16c0af29eec3f60ee66c97ca5aca83477848a05e2bc6def36258a35ff3"
+      },
+      {
+        "index": 1,
+        "bytes": 96,
+        "sha256": "47515eee3c71f913066c46ad9f344ded0b96d7318e001abd3acc3c6311705caa"
+      },
+      {
+        "index": 2,
+        "bytes": 140,
+        "sha256": "7d2c94d4791f37dd0a8e750fc62731951e4cfc26b9cb6888e72b618064b6361e"
+      },
+      {
+        "index": 3,
+        "bytes": 168,
+        "sha256": "f72602cfa7a2617bc8505586c70a8d4abfcfb34a66743d13bd5251a216762e7f"
+      },
+      {
+        "index": 4,
+        "bytes": 71,
+        "sha256": "9b656bcea4ee546fe94bb68d2fef33cfaff71747f23c3f34b44323702ce3dda1"
+      }
+    ]
+  },
+  "stage3": {
+    "sha256": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c",
+    "bytes": 916,
+    "sections": [
+      {
+        "id": 1,
+        "bytes": 51,
+        "sha256": "415aaa4f0345b6c26166984cc7869fd47817173123a246ca0de9e3f723ff1e7a"
+      },
+      {
+        "id": 2,
+        "bytes": 18,
+        "sha256": "a0a0bbadeda75675d8b61322759a07f4f3d03722ba09f55fe639fe852894d74a"
+      },
+      {
+        "id": 3,
+        "bytes": 6,
+        "sha256": "acc80a36036a3ded1a9442615e43a99bfe34d4feee3d60268ff3d7f1000c3957"
+      },
+      {
+        "id": 7,
+        "bytes": 44,
+        "sha256": "245e391dea7c045b04f70286c82d3e82ae9076a771be5158d3d5b5d062c1bc2a"
+      },
+      {
+        "id": 10,
+        "bytes": 778,
+        "sha256": "b2d46671918caf9d1eb74ee983053dafce2699b47c4709266c70b987b3e297c9"
+      }
+    ],
+    "functions": [
+      {
+        "index": 0,
+        "bytes": 160,
+        "sha256": "6fcaed16c0af29eec3f60ee66c97ca5aca83477848a05e2bc6def36258a35ff3"
+      },
+      {
+        "index": 1,
+        "bytes": 229,
+        "sha256": "1a2c37ce3fcb004fba6109018f2bb9b1e5d42a2383450a663dd00e4ce6bb5a35"
+      },
+      {
+        "index": 2,
+        "bytes": 140,
+        "sha256": "7d2c94d4791f37dd0a8e750fc62731951e4cfc26b9cb6888e72b618064b6361e"
+      },
+      {
+        "index": 3,
+        "bytes": 168,
+        "sha256": "f72602cfa7a2617bc8505586c70a8d4abfcfb34a66743d13bd5251a216762e7f"
+      },
+      {
+        "index": 4,
+        "bytes": 71,
+        "sha256": "9b656bcea4ee546fe94bb68d2fef33cfaff71747f23c3f34b44323702ce3dda1"
+      }
+    ]
+  },
+  "same_body_indices": [
+    0,
+    2,
+    3,
+    4
+  ],
+  "control_bodies": {
+    "treeBox": 0,
+    "spanCount": 2,
+    "countPointsInBox": 3,
+    "countInRange": 4
+  },
+  "changed_body_index": 1,
+  "source": {
+    "baseline": {
+      "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+      "files": {
+        "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7"
+      },
+      "dist": {
+        "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "numeric.js": "dc34d0d1a8862e899eba2c2afcdc7b3a4b79365feabbfeb7ec0ba1547130db1b",
+        "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+        "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+      }
+    },
+    "candidate": {
+      "commit": "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+      "files": {
+        "numeric-kernels.as.ts": "09b2ef17f68c395c54c9378c50d21ba8276110b47626d3c60ecf7403070204c3",
+        "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+        "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+        "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+        "numeric-kernels-simd.wasm": "6c598b7f0cb3504197d97b2a51b7927bfb36a938f2eba6f6f9d53d08616b047c"
+      },
+      "dist": {
+        "chunk-4w7mq2zb.js": "ab51d737e4fb6723f41e59b15c43d058af5e136fca46501c71040aa8885c2222",
+        "chunk-enwn105b.js": "7ad810302b30a0fee877e168f1f72d243572a16eb63c13b6b97449640aef0f5a",
+        "chunk-jyz2w9p4.js": "038d655ea40230ff0a6c665b25c7a29ed6294c8033fbf9d77b202c0133f63cfc",
+        "chunk-n1amv1q3.js": "bafb7c92768b5b367bc64eeb41780c4dd9410aaa2a327a73b52af8bc62eb8bef",
+        "chunk-t2acd52e.js": "4f9ea5585d0233a9a9c01d67c4d22c3258f64e8d0b8f6b45f7b4cb82548cbfaa",
+        "geometry.js": "21934608073dc29c190b9b3c71155a83e1b69205a6dd9aa881cffb52ba54afc8",
+        "numeric.js": "603400b6ae670cdfaf888d131617ebf9df37b505c7a12a2f182e5028c5d9a5a3",
+        "redux.js": "1a8687c65192049682f42e1686b9f9cea71ed7a1d5555e67221463f3a582cc31",
+        "shared.js": "ee40cdca73bfbd526b774de2b86b0dfa617b363a6b583c4c70e65a6c0c3fd476",
+        "state.js": "d896fb63f9d2829437fbc69154f5c622794a287b55c4ebd9800a3454e442ae5e",
+        "tanstack-db-collection.js": "c967a00866079e59bde2667efe6f13c4ac7d13ca5c79cef49c231ac4b51ed9e4",
+        "worker.js": "ff999f68dde5a450721417c81d309bf645db8440498e30fc959821ce46899b66"
+      }
+    },
+    "driver": "a40edcec42faa5f9c09cc66e514c7f8d2b6a864227297824bb2ddd7d85de169a"
+  },
+  "method": "Hash each code-section function body, including local declarations. Function names follow the checked stage3.wat function order. Sections 1, 2, 3 and 7 (types, imports, function signatures, exports) are identical. Only treeCount has different body bytes; this does not imply identical compiled native placement."
+}

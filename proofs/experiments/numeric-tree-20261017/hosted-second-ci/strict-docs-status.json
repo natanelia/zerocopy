@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/workspace/scratch/844bacd0f270/zerocopy-tools/node_modules/.bin/bun",
+    "scripts/check-docs.mjs",
+    "--base",
+    "afdffdcfcbd61013f120de82411c0c4a6b2d1e0e",
+    "--preserve"
+  ],
+  "cwd": "/workspace/scratch/736c0a2657a3/zerocopy-numeric",
+  "startedAt": "2026-10-17T03:36:47.758441+00:00",
+  "completedAt": "2026-10-17T03:36:47.804036+00:00",
+  "elapsedSeconds": 0.04559391099974164,
+  "exitCode": 0,
+  "log": "strict-docs.txt",
+  "logSha256": "588fe4a626b1e08ab875c7167d77a08dd09db6ba399ddb4be83e97e842f7fc1a",
+  "testSourceSha256": "c7d3c72f685cd94b8e611ebb6f1c29cc79d7126f5e88a339bc80a6138a746b62"
+}

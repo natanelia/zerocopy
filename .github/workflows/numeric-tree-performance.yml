@@ -1,0 +1,160 @@
+name: Numeric tree comparison
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'numeric-kernels.as.ts'
+      - 'numeric.test.ts'
+      - 'numeric.ts'
+      - 'numeric-spatial.as.ts'
+      - 'numeric-wasm.ts'
+      - 'geometry.test.ts'
+      - 'scripts/build-wasm.mjs'
+      - 'scripts/build-browser.ts'
+      - 'package.json'
+      - 'proofs/numeric-tree-*'
+      - 'proofs/experiments/numeric-tree-20261017/**'
+      - '.github/workflows/numeric-tree-performance.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: numeric-tree-comparison-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+    env:
+      BASE_DIR: ${{ github.workspace }}/.numeric-tree-base
+      CANDIDATE_DIR: ${{ github.workspace }}
+      EVIDENCE_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install pinned dependencies
+        run: bun install
+      - name: Build candidate and retain its exact input
+        run: |
+          mkdir -p "$EVIDENCE_DIR"
+          git archive HEAD > "$EVIDENCE_DIR/candidate-source.tar"
+          git rev-parse HEAD > "$EVIDENCE_DIR/candidate-commit.txt"
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          mkdir "$EVIDENCE_DIR/candidate-build"
+          cp -R dist "$EVIDENCE_DIR/candidate-build/"
+          cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/candidate-build/"
+      - name: Retain the installed pinned compiler and licenses
+        env:
+          TOOLKIT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/compiler-toolkit
+        run: node proofs/numeric-tree-toolkit.mjs 2>&1 | tee "$EVIDENCE_DIR/compiler-toolkit.txt"
+      - name: Test the fail-closed measurement harness
+        run: node --test proofs/numeric-tree-process.node.mjs proofs/numeric-tree-manifest.node.mjs proofs/numeric-tree-gate.node.mjs 2>&1 | tee "$EVIDENCE_DIR/harness-tests.txt"
+      - name: Check types and test suite
+        run: |
+          bun run typecheck
+          bun run typecheck:redux
+          bun run typecheck:values
+          bun run typecheck:geometry
+          bunx tsc --noEmit -p tsconfig.numeric.json
+          bun run test 2>&1 | tee "$EVIDENCE_DIR/tests.txt"
+      - name: Check real workers on both runtimes
+        run: |
+          node proofs/numeric-tree-worker.mjs 2>&1 | tee "$EVIDENCE_DIR/node-worker.txt"
+          bun proofs/numeric-tree-worker.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-worker.txt"
+      - name: Check out exact comparison base after candidate tests
+        uses: actions/checkout@v4
+        with:
+          ref: afdffdcfcbd61013f120de82411c0c4a6b2d1e0e
+          path: .numeric-tree-base
+          persist-credentials: false
+      - name: Verify the complete source inventory
+        run: node proofs/numeric-tree-manifest.mjs 2>&1 | tee "$EVIDENCE_DIR/source-inventory.txt"
+      - name: Build comparison base and check scalar bytes
+        run: |
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
+          cd "$BASE_DIR"
+          git archive HEAD > "$EVIDENCE_DIR/baseline-source.tar"
+          git rev-parse HEAD > "$EVIDENCE_DIR/baseline-commit.txt"
+          bun run build:wasm
+          bun run build:browser
+          cmp numeric-kernels.wasm "$CANDIDATE_DIR/numeric-kernels.wasm"
+          mkdir "$EVIDENCE_DIR/baseline-build"
+          cp -R dist "$EVIDENCE_DIR/baseline-build/"
+          cp package.json numeric-kernels.wasm numeric-kernels-simd.wasm "$EVIDENCE_DIR/baseline-build/"
+      - name: Check Node identical-build size-isolated cohort
+        id: node_aa
+        continue-on-error: true
+        env:
+          RUNTIME_BIN: node
+          KIND: aa
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/node-aa
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/node-aa.txt"
+      - name: Compare Node base and candidate in fresh processes
+        id: node_ab
+        continue-on-error: true
+        env:
+          RUNTIME_BIN: node
+          KIND: ab
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/node-ab
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/node-ab.txt"
+      - name: Check Bun identical-build size-isolated cohort
+        id: bun_aa
+        continue-on-error: true
+        env:
+          RUNTIME_BIN: bun
+          KIND: aa
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/bun-aa
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-aa.txt"
+      - name: Compare Bun base and candidate in fresh processes
+        id: bun_ab
+        continue-on-error: true
+        env:
+          RUNTIME_BIN: bun
+          KIND: ab
+          OUT_DIR: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/bun-ab
+        run: node proofs/numeric-tree-size-process.mjs 2>&1 | tee "$EVIDENCE_DIR/bun-ab.txt"
+      - name: Install browser engines
+        if: runner.arch == 'X64'
+        run: bunx playwright install --with-deps chromium firefox webkit
+      - name: Compare browser correctness and scalar fallback
+        if: runner.arch == 'X64'
+        env:
+          OUT_FILE: ${{ github.workspace }}/proofs/results/numeric-tree-hosted/browsers.json
+        run: node proofs/numeric-tree-browsers.mjs 2>&1 | tee "$EVIDENCE_DIR/browsers.txt"
+      - name: Enforce every performance gate
+        if: always()
+        env:
+          NODE_AA_RESULT: ${{ steps.node_aa.outcome }}
+          NODE_AB_RESULT: ${{ steps.node_ab.outcome }}
+          BUN_AA_RESULT: ${{ steps.bun_aa.outcome }}
+          BUN_AB_RESULT: ${{ steps.bun_ab.outcome }}
+        run: node proofs/numeric-tree-gate.mjs
+      - name: Save all evidence, including failed gates
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: numeric-tree-${{ runner.arch }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: proofs/results/numeric-tree-hosted/
+          if-no-files-found: error
+          retention-days: 30
