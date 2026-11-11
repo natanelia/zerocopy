@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r2-search
+
+
+ Test Files  54 passed (54)
+      Tests  1079 passed (1079)
+   Start at  13:16:06
+   Duration  46.69s (transform 1.69s, setup 0ms, import 2.97s, tests 161.47s, environment 11ms)
+
