@@ -162,6 +162,8 @@ tags.has('admin');           // true
 
 Construct these with a value type, for example `new SharedList('number')`. List indexes start at zero. Stack and queue `peek()` return `undefined` when empty.
 
+For typed numeric buffers, the optional [`fromFloat64` factory](numeric.md#import-a-float64array) in `zerocopy/numeric` creates a numeric list while preserving the input's stored 64-bit patterns.
+
 <!-- example: sequences -->
 ```ts
 import { SharedList, SharedStack, SharedQueue } from 'zerocopy';

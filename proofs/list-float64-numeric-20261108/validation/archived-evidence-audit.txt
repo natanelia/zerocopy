@@ -1,0 +1,4 @@
+pilot: 72 fresh processes; 648 measured batches; raw hashes, source, loaded module graph, schedule, outputs, worker evidence and paired estimates verified
+formal: 288 fresh processes; 2592 measured batches; raw hashes, source, loaded module graph, schedule, outputs, worker evidence and paired estimates verified
+aa: 96 fresh processes; 864 measured batches; raw hashes, source, loaded module graph, schedule, outputs, worker evidence and paired estimates verified
+Verified 3 studies, 456 processes, 4104 measured batches and 66462120 warmup-plus-measured outputs. No samples removed, adjusted or retimed.

@@ -1,0 +1,8 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["bun", "--bun", "node_modules/vitest/vitest.mjs", "run", "--maxWorkers=2"]
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric
+
+ ❯ geometry.test.ts (4 tests | 1 failed) 38147ms
+     × preserves attached snapshots after append, fork, and memory growth 38133ms
+[vitest-pool]: Timeout terminating threads worker for test files /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/tanstack-db-collection.test.ts.

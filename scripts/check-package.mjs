@@ -27,11 +27,17 @@ try {
   const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
 import { SharedList } from 'zerocopy';
+import { fromFloat64 } from 'zerocopy/numeric';
 ${imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; assert.ok(Object.keys(entry${index}).length > 0);`).join('\n')}
 const before = new SharedList('number').pushMany([1, 2]);
 const after = before.push(3);
 assert.deepEqual(before.toArray(), [1, 2]);
 assert.deepEqual(after.toArray(), [1, 2, 3]);
+const input = new Float64Array([1.25, -0, 3.5]);
+const imported = fromFloat64(input);
+input[0] = 99;
+assert.deepEqual(imported.toArray(), [1.25, -0, 3.5]);
+assert.equal(typeof SharedList.fromFloat64, 'undefined');
 `;
   writeFileSync(join(temporary, 'smoke.mjs'), smoke);
   run(process.execPath, ['smoke.mjs']);
@@ -43,7 +49,7 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
   run(process.execPath, ['worker.mjs']);
 
   const consumer = join(temporary, 'consumer.ts');
-  writeFileSync(consumer, imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; void entry${index};`).join('\n') + "\nimport { SharedList } from 'zerocopy';\nconst list: SharedList<'number'> = new SharedList('number');\nconst value: number | undefined = list.get(0);\n");
+  writeFileSync(consumer, imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; void entry${index};`).join('\n') + "\nimport { SharedList } from 'zerocopy';\nimport { fromFloat64 } from 'zerocopy/numeric';\nconst list: SharedList<'number'> = fromFloat64(new Float64Array([1, 2]));\nconst value: number | undefined = list.get(0);\n");
   const program = ts.createProgram([consumer], {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
     strict: true, noEmit: true, skipLibCheck: false, types: [], lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],

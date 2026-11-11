@@ -1,0 +1,12 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["node", "node_modules/vitest/vitest.mjs", "run", "shared-list-float64.test.ts", "shared-list-float64-contract.test.ts", "shared-list.test.ts", "shared-list-to-array.test.ts", "allocation-failure.test.ts", "immutable-proof.test.ts", "numeric.test.ts", "numeric-spatial.test.ts", "--maxWorkers=2"]
+Outer subprocess deadline: 180 seconds; per-test timeouts unchanged
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric
+
+
+ Test Files  8 passed (8)
+      Tests  171 passed (171)
+   Start at  00:20:33
+   Duration  6.96s (transform 319ms, setup 0ms, import 429ms, tests 10.86s, environment 1ms)
+

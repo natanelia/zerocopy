@@ -1,0 +1,69 @@
+name: Optional Float64 list import proof
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'numeric.ts'
+      - 'shared-list.ts'
+      - 'arena.ts'
+      - 'shared-list-float64*.test.ts'
+      - 'type-tests/list-float64.ts'
+      - 'tsconfig.numeric.json'
+      - 'proofs/list-float64-numeric-20261108/**'
+      - '.github/workflows/list-float64-numeric.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '24' }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: '1.4.2' }
+      - run: bun install
+      - run: bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck
+      - name: Check numeric public types
+        run: |
+          bunx tsc --noEmit -p tsconfig.numeric.json
+          bunx tsc --noEmit -p tsconfig.numeric.json --exactOptionalPropertyTypes false
+      - name: Check imports and existing List and numeric behavior on Node
+        run: node node_modules/vitest/vitest.mjs run shared-list-float64*.test.ts shared-list.test.ts shared-list-to-array.test.ts allocation-failure.test.ts immutable-proof.test.ts numeric*.test.ts --maxWorkers=2
+      - name: Check imports and existing List and numeric behavior on Bun
+        run: bun --bun node_modules/vitest/vitest.mjs run shared-list-float64*.test.ts shared-list.test.ts shared-list-to-array.test.ts allocation-failure.test.ts immutable-proof.test.ts numeric*.test.ts --maxWorkers=2
+      - name: Check storage hooks installed before the optional import
+        run: |
+          mkdir -p list-float64-numeric-ci
+          node proofs/list-float64-numeric-20261108/late-import-contract.mjs > list-float64-numeric-ci/late-import-node.json
+          bun proofs/list-float64-numeric-20261108/late-import-contract.mjs > list-float64-numeric-ci/late-import-bun.json
+      - name: Audit saved measurements without retiming
+        env:
+          CHECK_CONFIRMED_SOURCE: ${{ github.head_ref == 'perf/list-float64-numeric-20261108' && '1' || '0' }}
+        run: |
+          set -o pipefail
+          mkdir -p list-float64-numeric-ci
+          node proofs/list-float64-numeric-20261108/verify.mjs 2>&1 | tee list-float64-numeric-ci/evidence-audit.txt
+      - name: Check real shared and copied Node workers during owner growth
+        run: |
+          node proofs/list-float64-numeric-20261108/node-worker.mjs > list-float64-numeric-ci/node-workers.json
+          cat list-float64-numeric-ci/node-workers.json
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check real shared and copied Chromium workers during owner growth
+        run: |
+          node proofs/list-float64-numeric-20261108/browser-check.mjs > list-float64-numeric-ci/chromium-workers.json
+          cat list-float64-numeric-ci/chromium-workers.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: list-float64-numeric-proof-${{ github.event.pull_request.head.sha || github.sha }}
+          path: list-float64-numeric-ci/
+          retention-days: 30
+          if-no-files-found: error

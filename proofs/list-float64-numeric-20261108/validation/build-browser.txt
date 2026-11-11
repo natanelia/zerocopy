@@ -1,0 +1,2 @@
+Command: ["bun", "scripts/build-browser.ts"]
+Built 12 portable modules: 247481 bytes
