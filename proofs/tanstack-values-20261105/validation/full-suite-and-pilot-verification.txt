@@ -1,0 +1,26 @@
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types
+$ tsc --noEmit
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-query
+
+
+ Test Files  54 passed (54)
+      Tests  1079 passed (1079)
+   Start at  18:29:47
+   Duration  39.59s (transform 1.48s, setup 0ms, import 2.88s, tests 141.96s, environment 11ms)
+
+{
+  "ok": true,
+  "mode": "pilot",
+  "pairs": 40,
+  "subjects": 80,
+  "measuredBatches": 720,
+  "shortestMeasuredBatchMs": 0.7342049999999745,
+  "warmupTimedMsRange": [
+    100.08428499999998,
+    242.10240199999996
+  ],
+  "rawSha256": "095c25855cff054a9799995b3dc4d8071372b93f2af96ece31fbe91467814b53",
+  "checkedSourceBuilds": true
+}

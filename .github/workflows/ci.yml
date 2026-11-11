@@ -59,6 +59,11 @@ jobs:
         run: bunx playwright install --with-deps chromium
       - name: Check documented browser workers and isolation guards
         run: node scripts/check-doc-browser.mjs
+      - name: Check TanStack value materialization and recorded evidence
+        run: |
+          node proofs/tanstack-values-20261105/worker.mjs
+          node proofs/tanstack-values-20261105/verify.mjs proofs/tanstack-values-20261105/results/formal-01.json.gz
+          node proofs/tanstack-values-20261105/verify.mjs proofs/tanstack-values-20261105/results/pilot-02.json.gz
       - name: Check typed task examples from Markdown
         shell: bash
         run: node scripts/check-worker-docs.mjs 2>&1 | tee worker-docs.log

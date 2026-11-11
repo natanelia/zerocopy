@@ -1,0 +1,14 @@
+$ node scripts/build-wasm.mjs
+$ bun scripts/build-browser.ts
+Built 12 portable modules: 233067 bytes
+$ bun --bun node_modules/vitest/vitest.mjs run tanstack-db-collection.test.ts tanstack-values.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-query
+
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  18:22:39
+   Duration  988ms (transform 263ms, setup 0ms, import 331ms, tests 713ms, environment 0ms)
+
+$ tsc --noEmit
