@@ -12,6 +12,7 @@ import { injectMemoryCharts, writeMemoryChartAssets } from './memory-charts.mjs'
 import { explorer } from './explorer-template.mjs';
 import { investigationBenchmark } from './explorer-benchmark-template.mjs';
 import { shell, home, docsLayout, lab, playground, useCaseCards } from './templates.mjs';
+import { benchmarks } from './benchmarks-template.mjs';
 
 const here = fileURLToPath(new URL('.', import.meta.url)), root = resolve(here, '..');
 const out = join(here, '_site'), base = basePath(process.env.SITE_BASE ?? '/');
@@ -73,6 +74,8 @@ function writePage(route, title, description, body, script) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
   }
   if (['compare/', 'explorer/', 'investigation-benchmark/'].includes(route) || route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
+  if (route === 'benchmarks/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/benchmarks.css"></head>`);
+  if (route === 'playground/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/studio.css"></head>`);
   if (route === 'historical/log-compare/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
   if (preview) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
@@ -86,6 +89,7 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base), 'home.mjs');
+writePage('benchmarks/', 'Find the right benchmark', 'Explore measured collection operations, worker publication, fan-out and retained snapshot memory with explicit methodology and raw evidence.', benchmarks(base));
 writePage('compare/', 'Compare the shared product catalog', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same product records, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
 writePage('investigation-benchmark/', 'Product catalog worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse product edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
 function historical(body) {
@@ -105,7 +109,7 @@ writePage('historical/log-compare/', 'Historical SharedList comparison', 'Histor
 writePage('historical/log-explorer/', 'Historical SharedList log explorer', 'The original log-column use case, retained as a historical reference.', historical(explorer(base)), 'explorer.mjs');
 writePage('historical/log-benchmark/', 'Historical SharedList investigation benchmark', 'The original log-column timing workload, retained as a historical reference.', historical(investigationBenchmark(base)), 'explorer-benchmark.mjs');
 writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
-writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
+writePage('playground/', 'Snapshot studio', 'Edit products, publish revisions, and pin earlier snapshots in real reader workers. Explore immutable shared data in your browser.', playground(base), 'playground.mjs');
 writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Product records, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');

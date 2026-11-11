@@ -1,6 +1,10 @@
-# zerocopy documentation website
+# zerocopy developer website
 
-A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
+A static developer product experience: understand the shared-memory model on the homepage, try actual workers in Snapshot Studio, choose an appropriate benchmark, then follow source-backed adoption guides. Built with HTML, CSS, and small JavaScript modules; no runtime UI framework or new dependencies.
+
+The dark design system lives in `assets/site.css`. `home-template.mjs` keeps the product story separate from the shared shell and documentation layout in `templates.mjs`. The homepage storage diagram is explicitly conceptual: it loads no library, allocates no shared arena, and starts no workers. Reduced-motion preferences disable visual transitions. Search, raw Markdown, existing routes, GitHub Pages isolation, and source metadata remain available.
+
+At `/benchmarks/`, the benchmark explorer distinguishes live browser suites from recorded Node/Bun evidence, explains the questions each answers, and links to methodology and raw exports. It does not create synthetic scores or change the measurement engines. `/docs/choose-zerocopy/` starts the docs with fit, alternatives, isolation, ownership, delivery, and lifetime constraints.
 
 ## Local development
 
@@ -42,11 +46,15 @@ Measure initial sharing, a query on attached data, and append + publish + query 
 
 Two warm-ups precede seven samples per case. Order rotates, all 42 measured samples are exported with schema `zerocopy-investigation-benchmark/v3`, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
-## Playground
+## Snapshot Studio
 
-At `/playground/`, start a real dedicated worker and update the owner state. The worker's latest snapshot changes; its retained initial snapshot does not. All collection reads use the actual library, with shared transport explicitly selected. Small worker reports exist only to display the result.
+At `/playground/`, connect one real reader worker to a shared product catalog. Edit one of three products, then explicitly publish a revision. Add up to two more workers and pin different revisions in each reader while its latest view follows the writer. Product values come from the actual `SharedMap` library with shared transport explicitly selected; small worker reports supply the display.
 
-The demo is opt-in. Disconnect and page navigation remove the session and terminate the owned worker. It does not run on the marketing page.
+The timeline displays the latest eight publications. Each worker retains its initial snapshot, its current pin, and its latest eight revisions. A session is limited to 40 edits. Removing history references does not reclaim individual arena allocations; this is a teaching app, not a compaction or memory benchmark. JSON object reads decode and can allocate. No fabricated timings or allocation claims appear in the studio.
+
+The demo is opt-in. Disconnect, startup cancellation, failure, and page navigation terminate owned workers and release the session. Reconnecting starts with a fresh arena. Each reader that joins late starts its history at the current revision. Input validation prevents invalid stock and prices; busy states prevent overlapping mutations.
+
+`node website/tests/studio-browser.mjs` checks Chromium and WebKit worker behavior, independent pins, late joins, bounded history, editing, restart, navigation cleanup, and mobile layout. Use `STUDIO_BROWSERS=chromium` for a local Chromium-only run when WebKit is unavailable. `CHROMIUM_EXECUTABLE` can point to a locally installed headless browser.
 
 ## Benchmark lab
 
@@ -91,6 +99,7 @@ node --test website/tests/*.test.mjs
 node website/tests/docs-browser.mjs
 node website/tests/isolation-browser.mjs
 node website/tests/browser.mjs
+node website/tests/studio-browser.mjs
 node website/tests/explorer-browser.mjs
 node website/tests/comparison-browser.mjs
 node website/tests/memory-browser.mjs

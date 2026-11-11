@@ -23,7 +23,9 @@ test('comparison exposes all four real implementations and isolates their script
   assert.ok(existsSync(new URL('historical/log-compare/vendor/immer.mjs', out)));
   assert.ok(existsSync(new URL('historical/log-compare/vendor/immer-LICENSE.txt', out)));
   assert.ok(existsSync(new URL('historical/log-compare/assets/immer-storage.mjs', out)));
-  assert.match(readFileSync(new URL('index.html', out), 'utf8'), /Compare it live/);
+  const homepage = readFileSync(new URL('index.html', out), 'utf8');
+  assert.match(homepage, /Compare the full product catalog/);
+  assert.ok(homepage.includes(`href="${meta.base}compare/"`));
   if (meta.preview) {
     assert.match(html, /noindex,nofollow/); assert.match(html, /Return to PR/);
     assert.ok(meta.base.includes(meta.preview.headCommit));

@@ -1,5 +1,6 @@
 /** One route registry for navigation, search, Markdown links, and the sitemap. */
 export const pages = [
+  { source: 'website/content/choose-zerocopy.md', slug: 'choose-zerocopy', title: 'Should I use ZeroCopy?', group: 'Start here', description: 'Choose a shared-memory design with clear trade-offs: local worker reads, single-writer ownership, browser isolation, snapshot delivery, and compaction.' },
   { source: 'docs/getting-started.md', slug: 'getting-started', title: 'Get started with shared state and Web Workers', group: 'Start here', description: 'Set up zerocopy in JavaScript or TypeScript. Share immutable state with a Web Worker using SharedArrayBuffer and read locally on both threads.' },
   { source: 'website/content/mental-model.md', slug: 'mental-model', title: 'How sharing works', group: 'Start here', description: 'One writer, immutable snapshots, and local reads. A model you can reason about.' },
   { source: 'docs/api.md', slug: 'collections', title: 'Immutable collections API & types', group: 'Build with it', description: 'zerocopy API reference for shared immutable maps, lists, sets, typed JSON, and nested collections in JavaScript and TypeScript.' },

@@ -11,6 +11,13 @@ const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await onc
 const origin = `http://127.0.0.1:${server.address().port}`;
 const errors = [];
 let activePage;
+async function capture(page, filename) {
+  // Keyboard checks scroll into later sections. Reset before visual evidence
+  // so sticky navigation is captured at the beginning of the full-page image.
+  await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
+  await page.waitForFunction(() => window.scrollY === 0);
+  await page.screenshot({ path: screenshots + '/' + filename, fullPage: true });
+}
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1024 }, reducedMotion: 'reduce' });
   const page = activePage = await context.newPage(); page.setDefaultTimeout(20000); page.on('pageerror', error => errors.push(error.message));
@@ -18,28 +25,47 @@ try {
   await page.goto(origin + base); await page.locator('.reader-node').first().waitFor();
   assert.equal(await page.locator('.reader-node').count(), 3);
   assert.match(await page.locator('.owner-node').innerText(), /Writer\s+Main thread or worker/);
-  assert.deepEqual(await page.locator('#worker-architecture li strong').allTextContents(), ['UI · main thread', 'Writer worker', 'Reader workers']);
+  assert.match(await page.locator('#how-it-works').innerText(), /captured snapshot stays exactly as it was/);
+  assert.match(await page.locator('.diagram-caption').first().innerText(), /Not a measured benchmark/);
+  assert.equal(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), 0, 'The homepage must not register a service worker');
   await page.getByRole('button', { name: 'Cloned', exact: true }).click(); assert.equal(await page.locator('#storage-count').innerText(), '4 separate stores');
   await page.getByRole('button', { name: 'Shared', exact: true }).click();
   await page.locator('#worker-count').focus(); await page.keyboard.press('ArrowRight'); assert.equal(await page.locator('.reader-node').count(), 4);
-  await page.getByRole('tab', { name: 'worker.ts' }).click(); await page.locator('#panel-reader').waitFor({ state: 'visible' });
+  const previousRevision = await page.locator('#arena-revision').innerText();
+  await page.locator('#publish-concept').focus(); await page.keyboard.press('Enter');
+  await page.waitForFunction(previous => document.querySelector('#arena-revision').textContent !== previous, previousRevision);
+  assert.equal(await page.locator('#storage-count').innerText(), '1 backing store');
+  const tabs = page.getByRole('tab');
+  await page.getByRole('tab', { name: 'main.ts' }).focus(); await page.keyboard.press('ArrowRight');
+  await page.locator('#panel-reader').waitFor({ state: 'visible' });
+  assert.equal(await page.getByRole('tab', { name: 'worker.ts' }).getAttribute('aria-selected'), 'true');
+  assert.equal(await tabs.filter({ hasText: 'main.ts' }).getAttribute('tabindex'), '-1');
+  await page.keyboard.press('Home'); await page.locator('#panel-owner').waitFor({ state: 'visible' });
+  assert.equal(await page.getByRole('tab', { name: 'main.ts' }).evaluate(node => node === document.activeElement), true);
+  await page.keyboard.press('End'); await page.locator('#panel-reader').waitFor({ state: 'visible' });
+  assert.equal(await page.getByRole('tab', { name: 'worker.ts' }).evaluate(node => node === document.activeElement), true);
+  await page.keyboard.press('ArrowLeft'); await page.locator('#panel-owner').waitFor({ state: 'visible' });
   assert.ok(requested.every(url => !url.includes('/library/')), 'Product page must not load the WASM runtime');
   await page.keyboard.press('Control+k'); await page.locator('#search-input').fill('compaction');
   await page.locator('.search-result').first().waitFor(); assert.ok(await page.locator('.search-result').count() > 0);
   await page.locator('#search-input').fill('<script>alert(1)</script>'); assert.equal(await page.locator('.search-result').count(), 0);
   await page.keyboard.press('Escape'); assert.equal(await page.locator('dialog').evaluate(node => node.open), false);
-  await page.screenshot({ path: screenshots + '/home-desktop.png', fullPage: true });
+  await capture(page, 'home-desktop.png');
   await page.goto(origin + base + 'docs/getting-started/'); assert.ok(await page.locator('article').innerText().then(text => text.includes('connectSharedSession')));
-  await page.screenshot({ path: screenshots + '/docs-desktop.png', fullPage: true });
+  await capture(page, 'docs-desktop.png');
+  await page.goto(origin + base + 'benchmarks/');
+  assert.equal(await page.locator('main a[href="' + base + 'investigation-benchmark/"]').count() > 0, true);
+  assert.equal(await page.locator('main a[href="' + base + 'lab/"]').count() > 0, true);
+  await capture(page, 'benchmarks-desktop.png');
   await page.goto(origin + base + 'playground/'); await page.getByRole('button', { name: 'Connect a worker' }).click();
   await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '12');
-  await page.locator('#stock').fill('0'); await page.getByRole('button', { name: 'Apply edit' }).click();
+  await page.locator('#stock').fill('0'); await page.getByRole('button', { name: 'Publish revision' }).click();
   await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '0');
   assert.match(await page.locator('#owner-value').innerText(), /^0\s*units$/); assert.match(await page.locator('#retained-value').innerText(), /^12\s*units$/);
   assert.equal(await page.locator('#owner-availability').innerText(), 'Sold out');
   assert.equal(await page.locator('#reader-availability').innerText(), 'Sold out');
   assert.equal(await page.locator('#retained-availability').innerText(), 'In stock');
-  await page.screenshot({ path: screenshots + '/playground-desktop.png', fullPage: true });
+  await capture(page, 'playground-desktop.png');
   await page.locator('#stock').fill('-1'); await page.locator('#apply-edit').click();
   assert.match(await page.locator('#owner-value').innerText(), /^0\s*units$/);
   await page.locator('#stock').fill('1.5'); await page.locator('#apply-edit').click();
@@ -62,18 +88,18 @@ try {
   assert.ok(raw.dependencies.immutable); assert.ok(raw.dependencies.immer); assert.equal(raw.raw.length, 21);
   for (const sample of raw.raw) for (const reader of sample.readers) assert.equal(reader.checksum, 499500);
   writeFileSync(screenshots + '/benchmark-samples.json', JSON.stringify(raw, null, 2));
-  await page.screenshot({ path: screenshots + '/lab-desktop.png', fullPage: true });
+  await capture(page, 'lab-desktop.png');
   await page.locator('#entries').selectOption('50000'); await page.getByRole('button', { name: 'Run benchmark' }).click(); await page.getByRole('button', { name: 'Stop run' }).click();
   assert.match(await page.locator('#benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#export-results').isDisabled(), true);
   const mobile = await context.newPage(); await mobile.setViewportSize({ width: 390, height: 844 });
-  for (const route of ['', 'docs/collections/', 'lab/', 'playground/', 'use-cases/']) {
+  for (const route of ['', 'docs/collections/', 'docs/choose-zerocopy/', 'benchmarks/', 'lab/', 'playground/', 'use-cases/']) {
     await mobile.goto(origin + base + route);
     assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, 'Horizontal overflow at ' + route);
   }
-  await mobile.goto(origin + base); await mobile.screenshot({ path: screenshots + '/home-mobile.png', fullPage: true });
+  await mobile.goto(origin + base); await capture(mobile, 'home-mobile.png');
   await mobile.setViewportSize({ width: 320, height: 844 });
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Homepage architecture at 320px');
-  assert.deepEqual(await mobile.locator('#worker-architecture li strong').allTextContents(), ['UI · main thread', 'Writer worker', 'Reader workers']);
+  assert.equal(await mobile.locator('#how-it-works').isVisible(), true);
   await mobile.setViewportSize({ width: 390, height: 844 });
   await mobile.getByRole('button', { name: 'Menu', exact: true }).click(); assert.equal(await mobile.locator('#mobile-nav').isVisible(), true);
   await mobile.setViewportSize({ width: 1200, height: 900 });
@@ -84,11 +110,12 @@ try {
   const noJs = await browser.newContext({ javaScriptEnabled: false }); const plain = await noJs.newPage();
   await plain.goto(origin + base);
   assert.match(await plain.title(), /^natanelia\/zerocopy:/);
-  assert.equal(await plain.locator('.hero a[href="https://github.com/natanelia/zerocopy"]').innerText(), 'natanelia/zerocopy');
-  assert.match(await plain.locator('.hero-description').innerText(), /JavaScript and TypeScript/);
-  assert.match(await plain.locator('.hero-description').innerText(), /One writer on the main thread or in a worker/);
-  assert.equal(await plain.locator('#worker-architecture').isVisible(), true);
-  assert.match(await plain.locator('#worker-architecture').innerText(), /one allocating writer/);
+  assert.match(await plain.locator('.hero a[href="https://github.com/natanelia/zerocopy"]').innerText(), /natanelia\/zerocopy/);
+  assert.match(await plain.locator('.hero-detail').innerText(), /JavaScript and TypeScript/);
+  assert.match(await plain.locator('.owner-node').innerText(), /Main thread or worker/);
+  assert.equal(await plain.locator('#how-it-works').isVisible(), true);
+  assert.match(await plain.locator('.code-facts').innerText(), /One allocating writer per arena/);
+  assert.equal(await plain.locator('.reader-node').count(), 3, 'The conceptual explanation remains legible without JavaScript');
   assert.equal(await plain.locator('a[href="https://www.npmjs.com/package/zerocopy"]').isVisible(), true);
   await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap')); await noJs.close();
   await context.close();

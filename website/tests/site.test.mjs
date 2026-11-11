@@ -76,13 +76,17 @@ test('docs are prerendered and search points to generated pages', () => {
   }
   assert.ok(readFileSync(join(out, 'docs/collections/index.html'), 'utf8').includes('SharedMap'));
 });
-test('the first screen sells direct reads, not mandatory tasks or invented results', () => {
+test('the product story separates its conceptual model, real playground, and measurements', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
   assert.ok(home.includes('Share your data.')); assert.ok(home.includes('Tasks optional.'));
-  assert.ok(home.includes('Conceptual storage model. Not a memory measurement.'));
-  for (const text of ['One writer on the main thread or in a worker', 'Main thread or worker', 'one allocating writer', 'Writer worker', 'Reader workers', 'snapshot delivery runs from the writer worker to reader workers', 'Example: main-thread writer']) assert.ok(home.includes(text), text);
-  assert.ok(home.includes('id="worker-architecture"'));
-  assert.ok(home.includes(`href="${meta.base}compare/"`));
+  assert.ok(home.includes('Interactive explanation. Not a measured benchmark.'));
+  for (const text of ['Main thread or worker', 'One allocating writer per arena', 'synchronous local read', 'deliver new snapshots asynchronously', 'zero allocations', 'cross-origin isolation', 'Explicit compaction']) assert.ok(home.includes(text), text);
+  assert.ok(home.includes('id="how-it-works"'));
+  assert.ok(home.includes('id="publish-concept"'));
+  assert.ok(home.includes('id="arena-revision"'));
+  for (const route of ['playground/', 'compare/', 'benchmarks/', 'docs/getting-started/', 'docs/choose-zerocopy/']) assert.ok(home.includes(`href="${meta.base}${route}"`), route);
+  assert.match(home, /No preselected winner\. Live timings appear only after you run a benchmark\./);
+  assert.doesNotMatch(home, /(?:src|href)="[^\"]*\/library\//);
   const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
   assert.match(lab, /Immutable\.js Map/); assert.match(lab, /Immer Map/);
