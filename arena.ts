@@ -846,6 +846,22 @@ export class Arena {
       node = next;
     }
   }
+  visitBlocks(root: number, fn: (data: number, length: number, view: DataView) => void, reverse = false): void {
+    if (!root) return;
+    // The callback consumes a whole immutable block without a per-value yield.
+    // Each traversal owns its stack; reentry and shared growth cannot disturb it.
+    const view = this.dv, stack: number[] = [];
+    const first = reverse ? 4 : 0, second = reverse ? 0 : 4;
+    let node = root;
+    while (node || stack.length) {
+      while (node) { stack.push(node); node = view.getUint32(node + first, true); }
+      node = stack.pop()!;
+      const data = view.getUint32(node + 16, true), length = view.getUint32(node + 20, true);
+      const next = view.getUint32(node + second, true);
+      fn(data, length, view);
+      node = next;
+    }
+  }
   *vector(root: number, depth: number, start: number, count: number): Generator<number> {
     let i = start, end = start + count;
     while (i < end) {

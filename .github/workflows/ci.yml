@@ -37,6 +37,10 @@ jobs:
       - name: Verify task lifecycle with real Node workers
         shell: bash
         run: node --test --test-concurrency=1 --test-timeout=15000 proofs/worker-tasks.mjs proofs/worker-task-lifecycle.node.mjs 2>&1 | tee worker-tasks.log
+      - name: Verify linked callbacks across worker growth
+        run: |
+          node proofs/block-traversal-worker-check.mjs
+          node proofs/block-callback-20261105/verify.mjs
       - name: Verify list queries and bounded string reuse
         run: node --test proofs/list-query.mjs
       - name: Verify additional list pipeline regressions

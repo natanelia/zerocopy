@@ -1,0 +1,10 @@
+Built 12 portable modules: 234003 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-list
+
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  18:26:14
+   Duration  966ms (transform 427ms, setup 0ms, import 571ms, tests 1.51s, environment 0ms)
+
