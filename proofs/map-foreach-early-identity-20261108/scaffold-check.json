@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "checks": [
+    "unchanged-ten-case-specs-and-repetitions",
+    "unchanged-four-aa-cases",
+    "no-pilot-selection",
+    "unchanged-createWorkload-function",
+    "unchanged-old-proof-modules",
+    "unchanged-worker-fixture",
+    "exact-latest-generic-driver",
+    "five-syntax-checks"
+  ],
+  "study": "map-foreach-early-identity-20261108",
+  "formalCases": 10,
+  "aaCases": 4,
+  "timingMeasurements": false
+}

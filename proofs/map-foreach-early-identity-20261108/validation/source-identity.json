@@ -1,0 +1,47 @@
+{
+  "status": "passed",
+  "baselineCommit": "0ac8a005268335a6116f025e75f670b5cee6843e",
+  "mapParentCommit": "97d09254b2c096c5a40fee8776bafb592b811a30",
+  "changedRuntimeSources": [
+    "arena.ts",
+    "shared-map.ts"
+  ],
+  "sources": {
+    "arena.ts": "15fc0a16a8db39c2178ef6655d90b95f20e5635fa411a60d0bc04a4f5e1e3403",
+    "shared-map.ts": "729c51f57919d410fff877db750a368c15755f23047c26cbbb13015d99818380"
+  },
+  "wasm": {
+    "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+    "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+    "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+    "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+  },
+  "wasmIdenticalToBaseline": true,
+  "bundles": {
+    "chunk-598s0b7f.js": "2332279867842d3e2cbf23e186496dd8347f8668ed1c114d80b90c0e2a04847f",
+    "chunk-cahk7myr.js": "e0cbc63b16a12aabe32ad471208c214aa3b03caaa0e1c3639c278857fbbe1172",
+    "chunk-gmt99257.js": "27f7d561477bdde8a22fa7729443a09729a20d0a754499a066fc1817155f4c86",
+    "chunk-kgdgpjzb.js": "3a1d5416edb50a99b71ce2c16322e3e94afed1c764ea23faba1632bdb30c418c",
+    "chunk-vcefd4dp.js": "8c0ba4dee43ea155a645ff67f756e7661fb60419b89deaaeb491f6d65ad376ee",
+    "geometry.js": "8b2a9df12ccb785ef2582fd198a132031833b0cc3b47a12883161c2456269be2",
+    "numeric.js": "f27b693c9a3a340d206fd953296da47ad42728fed9e04bbecd8f2f7038bb25df",
+    "redux.js": "651e92be864c1c4dd1b75a76f0d529aab4129f305008a775f6ef15c00dd3648a",
+    "shared.js": "3bb6a0a178ca33d89aec3706a8cb42d9e2ed53b6606c1c4b7c90f0ca435484e2",
+    "state.js": "2fe21bce4f329ef6995dc31e7a528ed2b4e861d8aa014fbdec659b5b741fb8c0",
+    "tanstack-db-collection.js": "f4459126df30abce4000ca70468248d6fe017187507e672f2c4fa244b6336b37",
+    "worker.js": "6c693ddbfe8c550c763ee22f3caa322a5c69753c1b675c7e6318ec17f6abdeb7"
+  },
+  "integrationRunner": "7a104c770f35fe6087948a41953761a4103ab6457241ab7ab594552e08532565",
+  "integrationSubject": "023d0fea451f57e9318d7be739e9c1626b8d2414e2202af4f984e82707f5ca37",
+  "numericFixture": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "originalRegressionEvidenceUnchanged": true,
+  "timingMeasurements": false
+}

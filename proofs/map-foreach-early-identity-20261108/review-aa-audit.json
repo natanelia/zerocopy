@@ -1,0 +1,331 @@
+{
+  "file": "aa.json",
+  "study": "map-foreach-early-identity-20261108",
+  "mode": "aa",
+  "status": "independently verified",
+  "currentSourcesChecked": false,
+  "sourceScope": "Both arena.ts and shared-map.ts snapshots are bound to the measured build; all baseline sources match the pinned Git commit",
+  "comparison": "Baseline repeated against itself; not subtracted from or pooled with A/B",
+  "verificationScope": "Every timed return value and complete key/value/order plus published-byte invariants after every batch",
+  "processes": 64,
+  "measuredBatches": 576,
+  "warmupBatches": 1453,
+  "shortMeasuredBatches": 0,
+  "measuredOutputCount": 55296,
+  "verifiedOutputCount": 219392,
+  "workerProof": null,
+  "summary": [
+    {
+      "runtime": "node",
+      "name": "number-4096",
+      "role": "target",
+      "beforeMs": 0.9541940703125009,
+      "afterMs": 0.8705486796875013,
+      "pairedRatio": 0.9435910269499738,
+      "interval95": [
+        0.7396321917884763,
+        1.203792960914196
+      ],
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 1.1781222656249994,
+          "after": 1.0834615937499983,
+          "ratio": 0.9196512326122762
+        },
+        {
+          "pair": 1,
+          "before": 1.0766778906250014,
+          "after": 0.826414921875001,
+          "ratio": 0.7675600372877304
+        },
+        {
+          "pair": 2,
+          "before": 0.8113016250000022,
+          "after": 0.8630731093749997,
+          "ratio": 1.0638128690731974
+        },
+        {
+          "pair": 3,
+          "before": 0.8317102500000004,
+          "after": 0.8780242500000028,
+          "ratio": 1.0556852581773548
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "string-1024",
+      "role": "type control",
+      "beforeMs": 0.1551829882812501,
+      "afterMs": 0.17447607812499966,
+      "pairedRatio": 1.039202584407757,
+      "interval95": [
+        0.89583236865165,
+        1.205517962099563
+      ],
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.23929195312499996,
+          "after": 0.22849035156249986,
+          "ratio": 0.9548601554651626
+        },
+        {
+          "pair": 1,
+          "before": 0.16614853906250016,
+          "after": 0.19400929687499957,
+          "ratio": 1.1676858428590757
+        },
+        {
+          "pair": 2,
+          "before": 0.14421743750000005,
+          "after": 0.15494285937499974,
+          "ratio": 1.0743697992484418
+        },
+        {
+          "pair": 3,
+          "before": 0.1376156484375004,
+          "after": 0.1339828203125002,
+          "ratio": 0.9736016349430632
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "entries-4096",
+      "role": "unchanged-method control",
+      "beforeMs": 1.1386037265625006,
+      "afterMs": 0.9902633359375006,
+      "pairedRatio": 0.8560260104001596,
+      "interval95": [
+        0.6453852478039347,
+        1.1354156807504683
+      ],
+      "fasterPairs": 3,
+      "points": [
+        {
+          "pair": 0,
+          "before": 1.4245659531250006,
+          "after": 0.9571557343750001,
+          "ratio": 0.6718928893922633
+        },
+        {
+          "pair": 1,
+          "before": 1.186514625000001,
+          "after": 1.0593229218749993,
+          "ratio": 0.8928022458003824
+        },
+        {
+          "pair": 2,
+          "before": 0.9946344062499985,
+          "after": 1.023370937500001,
+          "ratio": 1.0288915515785804
+        },
+        {
+          "pair": 3,
+          "before": 1.0906928281250003,
+          "after": 0.9489107812499995,
+          "ratio": 0.8700073538406436
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "get-4096",
+      "role": "unchanged-method control",
+      "beforeMs": 0.1337305742187498,
+      "afterMs": 0.15723644531249992,
+      "pairedRatio": 1.0670038701805102,
+      "interval95": [
+        0.8045614313159934,
+        1.4150532385301968
+      ],
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.1492597421874997,
+          "after": 0.1550026406249998,
+          "ratio": 1.038475870005764
+        },
+        {
+          "pair": 1,
+          "before": 0.11540875000000028,
+          "after": 0.15947025000000004,
+          "ratio": 1.3817864763286982
+        },
+        {
+          "pair": 2,
+          "before": 0.23672893749999968,
+          "after": 0.22646733593749957,
+          "ratio": 0.9566525255810768
+        },
+        {
+          "pair": 3,
+          "before": 0.11820140624999986,
+          "after": 0.11160792968750055,
+          "ratio": 0.9442182900214072
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-4096",
+      "role": "target",
+      "beforeMs": 0.37615717187500053,
+      "afterMs": 0.47396339843749935,
+      "pairedRatio": 1.2097638866296236,
+      "interval95": [
+        0.8466592504150487,
+        1.7285923004747925
+      ],
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.3808261875000003,
+          "after": 0.395741390625,
+          "ratio": 1.0391653820419051
+        },
+        {
+          "pair": 1,
+          "before": 0.36209695312500045,
+          "after": 0.5521854062499987,
+          "ratio": 1.5249656244949878
+        },
+        {
+          "pair": 2,
+          "before": 0.4041595625000003,
+          "after": 0.5673128125000009,
+          "ratio": 1.403685240034375
+        },
+        {
+          "pair": 3,
+          "before": 0.37148815625000076,
+          "after": 0.3577115624999987,
+          "ratio": 0.9629151198545054
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "string-1024",
+      "role": "type control",
+      "beforeMs": 0.061971996093749926,
+      "afterMs": 0.06315901953125014,
+      "pairedRatio": 1.0268071483163996,
+      "interval95": [
+        0.6164725893532212,
+        1.7102673144637648
+      ],
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.09239749999999969,
+          "after": 0.06356987499999978,
+          "ratio": 0.6880042750074405
+        },
+        {
+          "pair": 1,
+          "before": 0.06038577343749996,
+          "after": 0.0627481640625005,
+          "ratio": 1.0391216422431957
+        },
+        {
+          "pair": 2,
+          "before": 0.0635582187499999,
+          "after": 0.09587250781250045,
+          "ratio": 1.5084203065791646
+        },
+        {
+          "pair": 3,
+          "before": 0.051427007812500314,
+          "after": 0.05301110937500031,
+          "ratio": 1.030802911347196
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "entries-4096",
+      "role": "unchanged-method control",
+      "beforeMs": 0.6553923515625,
+      "afterMs": 0.5544780859374994,
+      "pairedRatio": 0.8767786368491193,
+      "interval95": [
+        0.6697696081314929,
+        1.1477689771257527
+      ],
+      "fasterPairs": 4,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.6640159375000003,
+          "after": 0.6585539374999989,
+          "ratio": 0.9917742938210705
+        },
+        {
+          "pair": 1,
+          "before": 0.681829109375002,
+          "after": 0.6814011250000007,
+          "ratio": 0.9993722996435375
+        },
+        {
+          "pair": 2,
+          "before": 0.6467687656249996,
+          "after": 0.4504022343749998,
+          "ratio": 0.6963883513140239
+        },
+        {
+          "pair": 3,
+          "before": 0.4984314531249989,
+          "after": 0.42675009374999995,
+          "ratio": 0.8561861236373011
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "get-4096",
+      "role": "unchanged-method control",
+      "beforeMs": 0.06426013671874964,
+      "afterMs": 0.07898539843749974,
+      "pairedRatio": 1.1372741790539107,
+      "interval95": [
+        0.4981218456463043,
+        2.5965385169256985
+      ],
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.07237435156249994,
+          "after": 0.1251384453125004,
+          "ratio": 1.729044096573843
+        },
+        {
+          "pair": 1,
+          "before": 0.12535314843750012,
+          "after": 0.07568192968749976,
+          "ratio": 0.6037497313059835
+        },
+        {
+          "pair": 2,
+          "before": 0.05614592187499934,
+          "after": 0.05148074999999963,
+          "ratio": 0.916909871292415
+        },
+        {
+          "pair": 3,
+          "before": 0.04708364062499992,
+          "after": 0.08228886718749973,
+          "ratio": 1.747716746096455
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+aa: node number-4096 pair 1/4 before: 1178.122 us, verified
+aa: node number-4096 pair 1/4 after: 1083.462 us, verified
+aa: node string-1024 pair 1/4 before: 239.292 us, verified
+aa: node string-1024 pair 1/4 after: 228.490 us, verified
+aa: node entries-4096 pair 1/4 before: 1424.566 us, verified
+aa: node entries-4096 pair 1/4 after: 957.156 us, verified
+aa: node get-4096 pair 1/4 before: 149.260 us, verified
+aa: node get-4096 pair 1/4 after: 155.003 us, verified
+aa: bun number-4096 pair 1/4 before: 380.826 us, verified
+aa: bun number-4096 pair 1/4 after: 395.741 us, verified
+aa: bun string-1024 pair 1/4 before: 92.397 us, verified
+aa: bun string-1024 pair 1/4 after: 63.570 us, verified
+aa: bun entries-4096 pair 1/4 before: 664.016 us, verified
+aa: bun entries-4096 pair 1/4 after: 658.554 us, verified
+aa: bun get-4096 pair 1/4 before: 72.374 us, verified
+aa: bun get-4096 pair 1/4 after: 125.138 us, verified
+aa: bun get-4096 pair 2/4 after: 75.682 us, verified
+aa: bun get-4096 pair 2/4 before: 125.353 us, verified
+aa: bun entries-4096 pair 2/4 after: 681.401 us, verified
+aa: bun entries-4096 pair 2/4 before: 681.829 us, verified
+aa: bun string-1024 pair 2/4 after: 62.748 us, verified
+aa: bun string-1024 pair 2/4 before: 60.386 us, verified
+aa: bun number-4096 pair 2/4 after: 552.185 us, verified
+aa: bun number-4096 pair 2/4 before: 362.097 us, verified
+aa: node get-4096 pair 2/4 after: 159.470 us, verified
+aa: node get-4096 pair 2/4 before: 115.409 us, verified
+aa: node entries-4096 pair 2/4 after: 1059.323 us, verified
+aa: node entries-4096 pair 2/4 before: 1186.515 us, verified
+aa: node string-1024 pair 2/4 after: 194.009 us, verified
+aa: node string-1024 pair 2/4 before: 166.149 us, verified
+aa: node number-4096 pair 2/4 after: 826.415 us, verified
+aa: node number-4096 pair 2/4 before: 1076.678 us, verified
+aa: node number-4096 pair 3/4 before: 811.302 us, verified
+aa: node number-4096 pair 3/4 after: 863.073 us, verified
+aa: node string-1024 pair 3/4 before: 144.217 us, verified
+aa: node string-1024 pair 3/4 after: 154.943 us, verified
+aa: node entries-4096 pair 3/4 before: 994.634 us, verified
+aa: node entries-4096 pair 3/4 after: 1023.371 us, verified
+aa: node get-4096 pair 3/4 before: 236.729 us, verified
+aa: node get-4096 pair 3/4 after: 226.467 us, verified
+aa: bun number-4096 pair 3/4 before: 404.160 us, verified
+aa: bun number-4096 pair 3/4 after: 567.313 us, verified
+aa: bun string-1024 pair 3/4 before: 63.558 us, verified
+aa: bun string-1024 pair 3/4 after: 95.873 us, verified
+aa: bun entries-4096 pair 3/4 before: 646.769 us, verified
+aa: bun entries-4096 pair 3/4 after: 450.402 us, verified
+aa: bun get-4096 pair 3/4 before: 56.146 us, verified
+aa: bun get-4096 pair 3/4 after: 51.481 us, verified
+aa: bun get-4096 pair 4/4 after: 82.289 us, verified
+aa: bun get-4096 pair 4/4 before: 47.084 us, verified
+aa: bun entries-4096 pair 4/4 after: 426.750 us, verified
+aa: bun entries-4096 pair 4/4 before: 498.431 us, verified
+aa: bun string-1024 pair 4/4 after: 53.011 us, verified
+aa: bun string-1024 pair 4/4 before: 51.427 us, verified
+aa: bun number-4096 pair 4/4 after: 357.712 us, verified
+aa: bun number-4096 pair 4/4 before: 371.488 us, verified
+aa: node get-4096 pair 4/4 after: 111.608 us, verified
+aa: node get-4096 pair 4/4 before: 118.201 us, verified
+aa: node entries-4096 pair 4/4 after: 948.911 us, verified
+aa: node entries-4096 pair 4/4 before: 1090.693 us, verified
+aa: node string-1024 pair 4/4 after: 133.983 us, verified
+aa: node string-1024 pair 4/4 before: 137.616 us, verified
+aa: node number-4096 pair 4/4 after: 878.024 us, verified
+aa: node number-4096 pair 4/4 before: 831.710 us, verified
+node number-4096: 954.194 -> 870.549 us, paired ratio 0.944 (0.740-1.204)
+node string-1024: 155.183 -> 174.476 us, paired ratio 1.039 (0.896-1.206)
+node entries-4096: 1138.604 -> 990.263 us, paired ratio 0.856 (0.645-1.135)
+node get-4096: 133.731 -> 157.236 us, paired ratio 1.067 (0.805-1.415)
+bun number-4096: 376.157 -> 473.963 us, paired ratio 1.210 (0.847-1.729)
+bun string-1024: 61.972 -> 63.159 us, paired ratio 1.027 (0.616-1.710)
+bun entries-4096: 655.392 -> 554.478 us, paired ratio 0.877 (0.670-1.148)
+bun get-4096: 64.260 -> 78.985 us, paired ratio 1.137 (0.498-2.597)

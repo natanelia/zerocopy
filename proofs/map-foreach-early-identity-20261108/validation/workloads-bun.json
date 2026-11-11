@@ -1,0 +1,89 @@
+{
+  "runtime": {
+    "node": "26.3.0",
+    "bun": "1.4.2",
+    "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+    "openssl": "1.1.0",
+    "llhttp": "9.3.0",
+    "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+    "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+    "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+    "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+    "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+    "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+    "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+    "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+    "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+    "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+    "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+    "v8": "14.6.202.34-node.20",
+    "uv": "1.48.0",
+    "napi": "10",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "sqlite": "3.53.2",
+    "modules": "147"
+  },
+  "timingMeasurements": false,
+  "sources": {
+    "arena.ts": "15fc0a16a8db39c2178ef6655d90b95f20e5635fa411a60d0bc04a4f5e1e3403",
+    "shared-map.ts": "729c51f57919d410fff877db750a368c15755f23047c26cbbb13015d99818380"
+  },
+  "workload": "7be5a9137ca87fca55bc83c740de16097b6f4ab4f68e12ff1ab579d00dd36de3",
+  "driver": "dc624a7766a273091917c959e011deca5308750a8ce0d1873190f2b4520c2cfa",
+  "checks": [
+    {
+      "case": "number-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-65536",
+      "expectedDigest": "0c5f542433692f1fdccd420d36d2009fa4b292b42bb1d8d65a89826dd0e18a97",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-overlay-4096",
+      "expectedDigest": "611b3af1a6ea40c319e19778faf56bfe218ff7639d41fca70976592533b9c10c",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-64",
+      "expectedDigest": "3089b5ad40d2eaea60063f0a2ce6b9ad59ee2b8bdab5c64c3b5c447c0b181aa7",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "boolean-4096",
+      "expectedDigest": "3b9a7ba6e3cc2ee0fea0a8ec1a6b53cee7923ff7499bfa652d637f683d32fd24",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "string-1024",
+      "expectedDigest": "fd243a3f2a73e89a5be759a2a39064bb46bf598eb35f103ed177b2ed6ad559ad",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "json-256",
+      "expectedDigest": "be8e1966c650913efa38575c538e42055c6a2e4e58a8d44a50cc19bd2eac8e64",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "unicode-4096",
+      "expectedDigest": "538aca009eceba90db9bb5c6406c02cd0eab05f05575b4b4354f063c728cfbb5",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "entries-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "get-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "pilot-v1.json.gz": {
+    "sha256": "e97b3c34acf1900a25637183bc9a885bc241b0e836ccba43e95c8085b6858229",
+    "uncompressedSha256": "9f5ec955c7dbe12b37bc20f1e91a2051c07295123535873f80c4343d0a246788",
+    "uncompressedBytes": 174642
+  },
+  "pilot-v2.json.gz": {
+    "sha256": "9d158318413e1061fac13b6602a0647bde1c4cd31a043c2704082f7ea8062df4",
+    "uncompressedSha256": "b53d4bd05e89c6560ac3d5fabaf34f91d4cac807b75a9732428385717e3e98ff",
+    "uncompressedBytes": 173154
+  },
+  "confirmation-v2.json.gz": {
+    "sha256": "917105eab9e886ce6022d38d0b082e71ff9490a5d0aac626d2b5d5703f04eb09",
+    "uncompressedSha256": "6719147ab7144189e52960a8387e84c4c4926a9a5970ede9ea5e4c5d3112f6a7",
+    "uncompressedBytes": 835630
+  },
+  "aa-v2.json.gz": {
+    "sha256": "3989cd457c53d414fe2295ec577e5ebfbac99bcd234ed8bc53b578c56858e925",
+    "uncompressedSha256": "d256e0064019304d658c15142230abd9f68cee29aae2a6c78c5602244e6e72d2",
+    "uncompressedBytes": 235981
+  }
+}

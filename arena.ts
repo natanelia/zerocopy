@@ -856,6 +856,10 @@ export class Arena {
   }
 }
 
+// Optional entries can expose an owner before SharedMap is imported. Capture
+// this identity here so a preinstalled traversal hook remains observable.
+export const nativeMapLeaves = Arena.prototype.leaves;
+
 /** Internal identities for optional readers that specialize primitive decoding. */
 export const primitiveReadProtocol = Object.freeze({
   decode: Arena.prototype.decode, view: Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get,
