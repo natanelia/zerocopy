@@ -29,6 +29,14 @@ export const zerocopyImmutableCheck = Object.freeze({
 });
 export const zerocopyMiddlewareOptions = Object.freeze({ serializableCheck: zerocopySerializableCheck, immutableCheck: zerocopyImmutableCheck });
 
+/** Selectors only accept exact SharedMaps. Return the validated owner rather
+ * than looking up every collection kind and reading the private brand twice. */
+function selectorArena(map: unknown): Arena {
+  if (map && typeof map === 'object' && Object.isFrozen(map) && Object.getPrototypeOf(map) === SharedMap.prototype) {
+    try { return arenaOf(map); } catch { /* A matching prototype alone is not a snapshot. */ }
+  }
+  throw new TypeError('Expected a frozen SharedMap');
+}
 /** One-entry cache per component/key stream. Arena identity prevents address reuse errors. */
 export function createSharedMapEntrySelector<State, Args extends unknown[], T extends string>(
   selectMap: (state: State, ...args: { [K in keyof Args]: NoInfer<Args[K]> }) => SharedMap<T>,
@@ -38,8 +46,7 @@ export function createSharedMapEntrySelector<State, Args extends unknown[], T ex
   let lastValue: ValueOf<T> | undefined;
   return (state, ...args) => {
     const map = selectMap(state, ...args), key = selectKey(state, ...args);
-    if (sharedCollectionKind(map) !== 'SharedMap') throw new TypeError('Expected a frozen SharedMap');
-    const arena = arenaOf(map), leaf = arena.find(map.root, key);
+    const arena = selectorArena(map), leaf = arena.find(map.root, key);
     if (arena !== lastArena || leaf !== lastLeaf || map.valueType !== lastType) {
       lastValue = leaf ? arena.leafValue(map.valueType, leaf) : undefined;
       lastArena = arena; lastLeaf = leaf; lastType = map.valueType;

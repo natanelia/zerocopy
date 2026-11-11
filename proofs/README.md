@@ -4,6 +4,7 @@ The [README](../README.md#performance) compares zerocopy with Immutable.js and n
 
 | Report | Comparison |
 | --- | --- |
+| [Redux entry selector validation](redux-selector-validation-20261108/README.md) | Bun-scoped draft measurements, unresolved Node results, rejected cache experiments and full reproduction evidence, November 8, 2026 |
 | [Redux heap encoding](redux-heap-read-view-20261108/README.md) | Reuse native memory views; paired Node/Bun gains and a measured fresh-Arena constructor cost, November 8, 2026 |
 | [Shared-state record capture](worker-record-descriptors-20261108/README.md) | Paired Node/Bun creation and publication measurements, small-record controls, raw evidence and reproduction, November 8, 2026 |
 | [Heap insertion allocation](heap-insert-allocation.md) | Avoid one discarded node on priority promotion; x64 Node/Bun results with five uncertain controls, October 9, 2026 |
