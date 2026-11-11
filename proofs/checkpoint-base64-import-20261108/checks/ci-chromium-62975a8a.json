@@ -1,0 +1,53 @@
+{
+  "schema": "zerocopy-hosted-browser-correctness/v1",
+  "pr": 63,
+  "head": "62975a8a2e8e5b4169ff19680dcc695147fa8d7d",
+  "testedMerge": "3fc4a5debf338f152b4e442f2028a1442a91a03b",
+  "runId": 42471144522,
+  "jobId": 128701920431,
+  "url": "https://github.com/natanelia/zerocopy/actions/runs/42471144522/job/128701920431",
+  "status": "success",
+  "productionSourceSha256": "55e8aa4be4db3e0644bfb3d7fc8a04031975a49c995874bb54274e5ca71e6ef1",
+  "note": "Captured from the completed hosted job log. This run precedes the test-only assertion repair; production source and browser proof are unchanged. Correctness only; no browser timing measured.",
+  "result": {
+    "browser": "153.0.8010.12",
+    "cases": [
+      {
+        "mode": "native",
+        "nativeSupported": true,
+        "nativeCalls": 7,
+        "paddingCases": 3,
+        "decodedBytes": 722472,
+        "sharedWorker": true,
+        "copiedWorker": true,
+        "memoryGrowth": true,
+        "retainedSnapshots": true,
+        "readOnlyAttachments": true
+      },
+      {
+        "mode": "missing",
+        "nativeSupported": true,
+        "nativeCalls": 0,
+        "paddingCases": 3,
+        "decodedBytes": 722472,
+        "sharedWorker": true,
+        "copiedWorker": true,
+        "memoryGrowth": true,
+        "retainedSnapshots": true,
+        "readOnlyAttachments": true
+      },
+      {
+        "mode": "noncallable",
+        "nativeSupported": true,
+        "nativeCalls": 0,
+        "paddingCases": 3,
+        "decodedBytes": 722472,
+        "sharedWorker": true,
+        "copiedWorker": true,
+        "memoryGrowth": true,
+        "retainedSnapshots": true,
+        "readOnlyAttachments": true
+      }
+    ]
+  }
+}

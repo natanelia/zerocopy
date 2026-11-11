@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/d3b3ec32e60a/zerocopy-serialization
+
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  18:02:50
+   Duration  3.73s (transform 254ms, setup 0ms, import 339ms, tests 3.30s, environment 0ms)
+
