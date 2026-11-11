@@ -46,6 +46,8 @@ Measure initial sharing, a query on attached data, and append + publish + query 
 
 Two warm-ups precede seven samples per case. Order rotates, all 42 measured samples are exported with schema `zerocopy-investigation-benchmark/v3`, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
+<a id="playground"></a>
+
 ## Snapshot Studio
 
 At `/playground/`, connect one real reader worker to a shared product catalog. Edit one of three products, then explicitly publish a revision. Add up to two more workers and pin different revisions in each reader while its latest view follows the writer. Product values come from the actual `SharedMap` library with shared transport explicitly selected; small worker reports supply the display.
