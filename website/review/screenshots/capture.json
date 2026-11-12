@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "e6eeececc3fedf485b34d98e47c9c6f1803e4cba",
+  "sourceCommit": "e9ae75712fcd883821c0b6ff4fe88b3c79b58cce",
   "base": "/zerocopy/",
   "browser": "153.0.8010.0",
   "reducedMotion": true,
@@ -33,6 +33,14 @@
       "viewport": {
         "width": 390,
         "height": 844
+      },
+      "fullPage": true
+    },
+    {
+      "file": "benchmarks-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
       },
       "fullPage": true
     },
