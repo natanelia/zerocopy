@@ -1,10 +1,12 @@
 # zerocopy developer website
 
-A static developer product experience: understand the shared-memory model on the homepage, try actual workers in Snapshot Studio, choose an appropriate benchmark, then follow source-backed adoption guides. Built with HTML, CSS, and small JavaScript modules; no runtime UI framework or new dependencies.
+A static developer product experience: understand the shared-memory model on the homepage, try actual workers in Snapshot Studio, compare memory and performance, then follow source-backed adoption guides. Built with HTML, CSS, and small JavaScript modules; no runtime UI framework or new dependencies.
 
 The dark design system lives in `assets/site.css`. `home-template.mjs` keeps the product story separate from the shared shell and documentation layout in `templates.mjs`. The homepage storage diagram is explicitly conceptual: it loads no library, allocates no shared arena, and starts no workers. Reduced-motion preferences disable visual transitions. Search, raw Markdown, existing routes, GitHub Pages isolation, and source metadata remain available.
 
-At `/benchmarks/`, the benchmark explorer distinguishes live browser suites from recorded Node/Bun evidence, explains the questions each answers, and links to methodology and raw exports. It does not create synthetic scores or change the measurement engines. `/docs/choose-zerocopy/` starts the docs with fit, alternatives, isolation, ownership, delivery, and lifetime constraints.
+At `/benchmarks/`, verified memory recordings appear first as simple bars. The performance section starts with an explicitly labelled recorded browser run; **Run on my device** runs the same checked catalog workload directly on the page. Completed live results replace the recorded sample. Methodology and further phases are disclosed on demand; the detailed benchmark keeps its dataset options. The full recordings remain downloadable, and the measurement logic is unchanged. `/docs/choose-zerocopy/` starts the docs with fit, alternatives, isolation, ownership, delivery, and lifetime constraints.
+
+The memory bars reuse the verified, original Node recording, with its workload and runtime clearly labelled. `assets/catalog-benchmark-recording.json` is a complete browser export captured on source `ab1eae5c2ecc8497ed1b5a4c422febc0e5e4f492`: 10,000 products, two readers, 100 replacements, two warm-ups and seven measured samples per case. The build checks displayed medians against the raw samples. This JSON is downloadable but is not fetched to render the page; the charts are present in the initial HTML. A run uses the existing catalog harness, checks current and retained answers, and replaces the charts only after every case completes. Stopping or failing keeps the previous completed result and its original label.
 
 ## Local development
 
@@ -102,12 +104,15 @@ node website/tests/docs-browser.mjs
 node website/tests/isolation-browser.mjs
 node website/tests/browser.mjs
 node website/tests/studio-browser.mjs
+node website/tests/benchmark-dashboard-browser.mjs
 node website/tests/explorer-browser.mjs
 node website/tests/comparison-browser.mjs
 node website/tests/memory-browser.mjs
 ```
 
 Build first. Browser tests use the root Playwright dependency with Chromium and WebKit. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
+
+The benchmark dashboard suite supports `DASHBOARD_BROWSERS=chromium` for local runs. It checks prefilled charts without JavaScript, one-click execution, exports, cancellation/failure, and mobile layout. `node website/tests/capture-benchmarks.mjs` captures the initial desktop and mobile benchmark page for review.
 
 CI uploads the static output, test logs, and desktop/mobile screenshots. Existing library and Markdown checks remain separate and unchanged.
 

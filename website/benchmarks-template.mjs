@@ -1,61 +1,43 @@
-/** Benchmark discovery only. Measurements stay in the existing checked harnesses. */
-export function benchmarks(base) {
+import { featureMemoryData, featureChartModel } from './feature-memory-charts.mjs';
+
+const MIB = 1048576;
+const labels = { shared: 'ZeroCopy', native: 'Native Map', immutable: 'Immutable.js', immer: 'Immer' };
+const mib = bytes => (bytes / MIB).toFixed(2);
+
+/** The same verified recording used by the full memory report, without extra navigation. */
+export function benchmarkMemory(base) {
+  const model = featureChartModel('rss');
+  const data = featureMemoryData;
+  const controls = data.summary.filter(row => row.readers === 0 && row.stage === 'edited-retained');
+  const control = kind => mib(controls.find(row => row.kind === kind).medians.rssBytes);
+  return `<section class="benchmark-memory" aria-labelledby="memory-heading">
+    <div class="benchmark-section-heading"><div><span class="eyebrow">01 / MEMORY</span><h2 id="memory-heading">Whole-process memory</h2></div><span class="benchmark-unit">MiB · lower is better</span></div>
+    <p class="benchmark-workload">100,000 synthetic records <span>·</span> 100 replacements <span>·</span> initial + current revision retained</p>
+    <div class="benchmark-memory-grid">${model.groups.map(group => `<figure class="benchmark-chart" data-memory-readers="${group.points[0].readers}" data-memory-maximum="${model.maximum * MIB}">
+      <figcaption><h3>${group.label}</h3><p><strong>${group.percentLower.toFixed(1)}%</strong> less RAM vs native Map</p></figcaption>
+      <div class="benchmark-bars">${group.points.map(point => `<div class="benchmark-bar" data-memory-kind="${point.kind}" data-memory-bytes="${point.bytes}">
+        <div class="benchmark-bar-label"><span>${labels[point.kind]}</span><strong>${mib(point.bytes)} <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:${point.bytes / (model.maximum * MIB) * 100}%"></span></div>
+      </div>`).join('')}</div>
+      <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>${model.maximum / 2}</span><span>${model.maximum} MiB</span></div>
+    </figure>`).join('')}</div>
+    <div class="benchmark-source"><p><span class="benchmark-recorded">Recorded</span> ${data.measuredAt.slice(0, 10)} · Node ${data.runtime.slice(1)} · ${data.cpu.replace(/ \d+-Core Processor$/, '')} · median of 3 trials</p><a href="${base}assets/feature-memory-data.json" download>Raw data ↓</a></div>
+    <p class="benchmark-caveat">Earlier synthetic fixture with incremental copies. Post-GC process RAM, not browser or peak memory. The owner-only control uses more RAM with ZeroCopy.</p>
+    <details class="benchmark-method"><summary>Memory method &amp; controls</summary><div>
+      <p>Absolute process RSS includes the owner, all readers, and the Node runtime. The charts use the same zero-based scale and compare matched reader counts after the first edit. All implementations retain revision 0 and revision 1. Native Map, Immutable.js, and Immer send only the 100 changed records on updates.</p>
+      <p>The owner-only control uses ${control('shared')} MiB for ZeroCopy SharedMap and ${control('native')} MiB for native Map. These historical measurements use runtime <a href="https://github.com/natanelia/zerocopy/commit/${data.runtimeSourceCommit}">${data.runtimeSourceCommit.slice(0, 7)}</a>, before later optimizations. They do not measure the current product catalog or this browser.</p>
+      <p>Each bar is the median of three fresh processes. Raw data contains every sample, observed ranges, source hashes, and environment. The separate eight-reader recording uses a different host and remains in the full report.</p>
+      <a href="${base}docs/memory-comparison/">Full memory report →</a>
+    </div></details>
+  </section>`;
+}
+
+/** Performance is supplied by the checked catalog benchmark presentation. */
+export function benchmarks(base, performancePanel = '') {
   return `<main id="main" class="wrap evidence-page">
-    <header class="evidence-intro">
-      <span class="eyebrow">THE BENCHMARK EXPLORER</span>
-      <div class="evidence-heading"><h1>Find the cost<br>that <span>matters.</span></h1><p>Building a collection, publishing an edit, and keeping history are different jobs. Choose the question that matches your application. Then inspect the work behind the number.</p></div>
-      <div class="evidence-legend"><span><i aria-hidden="true"></i> Live · runs on your device</span><span><i aria-hidden="true"></i> Recorded · includes its original environment</span></div>
-    </header>
-
-    <section class="evidence-suites" aria-label="Choose a benchmark">
-      <article class="evidence-suite evidence-suite-featured" aria-labelledby="suite-publish">
-        <div class="evidence-suite-top"><span class="evidence-number">01 / PUBLISHING</span><span class="evidence-kind evidence-kind-live">LIVE IN YOUR BROWSER</span></div>
-        <h2 id="suite-publish">What does an<br>update really cost?</h2>
-        <p>Replace 100 products. Compare shared snapshots, incremental copies, and full copies while two workers keep reading.</p>
-        <dl><div><dt>Dataset</dt><dd>1,000–100,000 product records</dd></div><div><dt>Answers</dt><dd>Build, publish, query, and edit timings</dd></div><div><dt>Evidence</dt><dd>Checked results + raw JSON export</dd></div></dl>
-        <a class="button primary" href="${base}investigation-benchmark/">Run the catalog benchmark <span aria-hidden="true">→</span></a>
-        <a class="evidence-method-link" href="${base}docs/catalog/#read-the-measurements">Read the catalog method →</a>
-      </article>
-
-      <article class="evidence-suite" aria-labelledby="suite-fanout">
-        <div class="evidence-suite-top"><span class="evidence-number">02 / WORKER FAN-OUT</span><span class="evidence-kind evidence-kind-live">LIVE IN YOUR BROWSER</span></div>
-        <h2 id="suite-fanout">What changes with<br>more readers?</h2>
-        <p>Publish the same numeric Map to one, two, or four workers. Each worker attaches and reads every key.</p>
-        <dl><div><dt>Dataset</dt><dd>1,000–50,000 string-keyed numbers</dd></div><div><dt>Answers</dt><dd>Full publication + local reads</dd></div><div><dt>Evidence</dt><dd>Checked checksums + raw JSON export</dd></div></dl>
-        <a class="button secondary" href="${base}lab/">Run the worker fan-out control <span aria-hidden="true">→</span></a>
-        <p class="evidence-suite-note">This separate control uses full-copy Immutable.js and Immer replicas on every publication.</p>
-      </article>
-
-      <article class="evidence-suite" aria-labelledby="suite-collections">
-        <div class="evidence-suite-top"><span class="evidence-number">03 / COLLECTION OPERATIONS</span><span class="evidence-kind">RECORDED · BUN</span></div>
-        <h2 id="suite-collections">How much does<br>a local operation cost?</h2>
-        <p>Compare construction, reads, edits, and scans. See both warmed operations and first-use setup, including slower workloads.</p>
-        <dl><div><dt>Dataset</dt><dd>Maps, lists, queues, and other collections</dd></div><div><dt>Answers</dt><dd>Local operations; no worker transport</dd></div><div><dt>Evidence</dt><dd>Historical results + reproduction commands</dd></div></dl>
-        <a class="button secondary" href="${base}docs/benchmarks/">Explore the collection results <span aria-hidden="true">→</span></a>
-        <a class="evidence-method-link" href="${base}docs/benchmarks/#evidence">Inspect recorded evidence →</a>
-      </article>
-
-      <article class="evidence-suite" aria-labelledby="suite-memory">
-        <div class="evidence-suite-top"><span class="evidence-number">04 / RETAINED MEMORY</span><span class="evidence-kind">RECORDED · NODE.JS</span></div>
-        <h2 id="suite-memory">What stays in memory<br>when history stays open?</h2>
-        <p>Inspect retained backing storage and whole-process RAM with multiple readers and earlier snapshots still available.</p>
-        <dl><div><dt>Dataset</dt><dd>100,000 synthetic records</dd></div><div><dt>Answers</dt><dd>Retained data and endpoint process RSS</dd></div><div><dt>Evidence</dt><dd>Original cohorts, raw data, and accounting</dd></div></dl>
-        <a class="button secondary" href="${base}docs/memory-comparison/">Explore the memory report <span aria-hidden="true">→</span></a>
-        <p class="evidence-suite-note">An earlier synthetic fixture with incremental copies. These are not current product-catalog or browser measurements.</p>
-      </article>
-    </section>
-
-    <section class="evidence-reading" aria-labelledby="evidence-reading-title">
-      <div><span class="eyebrow">BEFORE COMPARING THE BARS</span><h2 id="evidence-reading-title">Same question.<br>Same work.</h2><p>A useful result tells you what ran, where it ran, and what the timer included.</p></div>
-      <ol class="evidence-checks">
-        <li><span>01</span><div><h3>Match the workload</h3><p>Use the same dataset, reader count, update size, and retained history. Compare native collections and incremental copies too.</p></div></li>
-        <li><span>02</span><div><h3>Keep the environment attached</h3><p>Browser exports include your browser identity, hardware concurrency, source commit, and dependency versions. Recorded reports retain their original runtime and host.</p></div></li>
-        <li><span>03</span><div><h3>Open the method and raw samples</h3><p>The live suites rotate case order, warm up, and check results. Export the JSON after the run. Startup and module loading are outside the timers; memory has a separate method.</p></div></li>
-      </ol>
-    </section>
-
-    <aside class="evidence-copy-note" aria-labelledby="copy-note-title"><span class="evidence-note-icon" aria-hidden="true">↳</span><div><h2 id="copy-note-title">Full-copy bars have a specific job.</h2><p>In the catalog benchmark, only <strong>Publish the edited revision</strong> and <strong>Replace and publish 100 products</strong> add full-copy native Map, Immutable.js, and Immer results. Other phases show the four baseline cases. There are no invented full-copy construction or query results.</p></div><a href="${base}investigation-benchmark/">Open the benchmark →</a></aside>
-
-    <footer class="evidence-next"><div><h2>Decide with your application.</h2><p>ZeroCopy avoids copying shared collection storage between readers. Encoding, local reads, decoding, and keeping arenas alive still have costs.</p></div><a class="text-link" href="${base}docs/choose-zerocopy/">Is ZeroCopy a fit? <span aria-hidden="true">→</span></a></footer>
+    <header class="benchmark-intro"><span class="eyebrow">BENCHMARKS</span><h1>Memory, <span>measured.</span></h1><p>See the recorded results. Run the performance test on your device.</p></header>
+    ${benchmarkMemory(base)}
+    ${performancePanel}
+    <nav class="benchmark-more" aria-label="More benchmarks"><span>Explore more</span><a href="${base}lab/">Worker fan-out →</a><a href="${base}docs/benchmarks/">Collection operations →</a><a href="${base}docs/choose-zerocopy/">Is ZeroCopy a fit? →</a></nav>
   </main>`;
 }

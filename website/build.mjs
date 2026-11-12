@@ -13,6 +13,7 @@ import { explorer } from './explorer-template.mjs';
 import { investigationBenchmark } from './explorer-benchmark-template.mjs';
 import { shell, home, docsLayout, lab, playground, useCaseCards } from './templates.mjs';
 import { benchmarks } from './benchmarks-template.mjs';
+import { benchmarkPerformancePanel } from './benchmark-performance.mjs';
 
 const here = fileURLToPath(new URL('.', import.meta.url)), root = resolve(here, '..');
 const out = join(here, '_site'), base = basePath(process.env.SITE_BASE ?? '/');
@@ -58,7 +59,8 @@ const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('co
 const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'catalog-timings.mjs', 'catalog-benchmark-core.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
 demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
 demoScripts.delete('explorer/');
-demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);
+demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs', 'benchmark-bars.mjs']);
+demoScripts.set('benchmarks/', [...featureScripts, 'feature-benchmark.mjs', 'benchmark-bars.mjs']);
 for (const [route, scripts] of historicalDemos) demoScripts.set(route, scripts);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
@@ -89,7 +91,7 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base), 'home.mjs');
-writePage('benchmarks/', 'Find the right benchmark', 'Explore measured collection operations, worker publication, fan-out and retained snapshot memory with explicit methodology and raw evidence.', benchmarks(base));
+writePage('benchmarks/', 'Memory and performance benchmarks', 'Compare recorded memory use, see measured performance results, and run the checked product-catalog benchmark on your device in one click.', benchmarks(base, benchmarkPerformancePanel(base)), 'feature-benchmark.mjs');
 writePage('compare/', 'Compare the shared product catalog', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same product records, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
 writePage('investigation-benchmark/', 'Product catalog worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse product edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
 function historical(body) {

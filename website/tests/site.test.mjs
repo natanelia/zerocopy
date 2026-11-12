@@ -97,7 +97,7 @@ test('the product story separates its conceptual model, real playground, and mea
 });
 
 test('demo workers and all runtime modules stay inside the automatic isolation scope', () => {
-  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['compare', 'feature.mjs', 'feature-owner.mjs'], ['investigation-benchmark', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['historical/log-explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['historical/log-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
+  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['compare', 'feature.mjs', 'feature-owner.mjs'], ['benchmarks', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['investigation-benchmark', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['historical/log-explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['historical/log-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
     assert.ok(html.includes(`src="${meta.base}${route}/assets/main.mjs"`));

@@ -12,6 +12,7 @@ mkdirSync(artifacts, { recursive: true });
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const demos = [
   ['compare/', 'feature-load'],
+  ['benchmarks/', 'feature-run'],
   ['investigation-benchmark/', 'feature-run'],
   ['lab/', 'run-benchmark'], ['playground/', 'start-playground'],
 ];
