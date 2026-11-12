@@ -1,13 +1,23 @@
 import { checkCapability } from './capability.mjs';
 import { BENCHMARK_CASES, EDIT_PUBLICATION_PHASES, casesForPhase } from './catalog-benchmark-core.mjs';
+import { benchmarkBars, benchmarkOrigin, benchmarkRecordingDetails } from './benchmark-bars.mjs';
 import { Peer } from './catalog-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
 const $ = id => document.getElementById(id);
 const WARMUPS = 2, SAMPLES = 7;
 const PHASES = { generationMs: 'Generate the catalog', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 product objects', editPublicationMs: 'Publish the edited revision', updatePublicationMs: 'Replace and publish 100 products', updatedQueryMs: 'Query the edited revision' };
+const compact = $('feature-benchmark-form').dataset.benchmarkView === 'compact';
+const recorded = compact ? { bars: $('feature-benchmark-results').innerHTML, origin: $('feature-result-origin').innerHTML, details: $('feature-recording-details').innerHTML } : undefined;
 let current, generation = 0, result, ready = false, running = false;
 checkCapability(() => { ready = true; controls(); });
-function controls() { $('feature-run').disabled = !ready || running; $('feature-count').disabled = running; $('feature-cancel').hidden = !running; $('feature-export').disabled = !result || running; }
+function controls() {
+  $('feature-run').disabled = !ready || running; $('feature-count').disabled = running; $('feature-cancel').hidden = !running; $('feature-export').disabled = !result || running;
+  if (compact) {
+    $('feature-benchmark-form').setAttribute('aria-busy', String(running));
+    $('feature-export').hidden = !result;
+    $('feature-recorded-export').hidden = !!result;
+  }
+}
 function summarize(values) {
   if (values.length !== SAMPLES || values.some(value => !Number.isFinite(value) || value < 0)) {
     throw new Error('Incomplete benchmark samples for a measured phase');
@@ -16,6 +26,13 @@ function summarize(values) {
   return { median: sorted[3], min: sorted[0], max: sorted[6], p25: (sorted[1] + sorted[2]) / 2, p75: (sorted[4] + sorted[5]) / 2 };
 }
 function render(value) {
+  if (compact) {
+    $('feature-benchmark-results').innerHTML = benchmarkBars(value);
+    $('feature-result-origin').innerHTML = benchmarkOrigin(value, false);
+    $('feature-result-origin').dataset.resultOrigin = 'device';
+    $('feature-recording-details').innerHTML = benchmarkRecordingDetails(value);
+    return;
+  }
   const fragment = document.createDocumentFragment();
   for (const [phase, label] of Object.entries(PHASES)) {
     const section = document.createElement('section'); section.className = 'feature-timing-group'; section.dataset.phase = phase;
@@ -64,7 +81,8 @@ async function sample({ id, kind, updateMode }, count, token) {
 $('feature-benchmark-form').addEventListener('submit', async event => {
   event.preventDefault(); if (running || !ready) return;
   const token = ++generation, count = Number($('feature-count').value), raw = [];
-  result = undefined; running = true; controls(); $('feature-benchmark-results').replaceChildren();
+  if (!compact) { result = undefined; $('feature-benchmark-results').replaceChildren(); }
+  running = true; controls();
   try {
     for (let round = 0; round < WARMUPS + SAMPLES; round++) {
       for (let offset = 0; offset < BENCHMARK_CASES.length; offset++) {
@@ -88,12 +106,12 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
       method: 'Synthetic product catalog with product/ IDs, names, categories, metadata, availability, revisions, prices in cents, stock, and currency. Fresh owner and two reader workers per sample. Worker/module startup excluded. The four baseline cases (shared snapshots and three incremental-copy implementations) measure all nine phases; three additional full-copy cases measure ONLY editPublicationMs and updatePublicationMs. All full-copy cases must still build and load the same catalog, update the same 100 objects and verify current and retained answers, but do not record redundant construction or query phases. Initial replica publication always clones the full catalog. Incremental edits clone only the 100 changed pairs, whereas full edits clone the entire updated dataset to each reader including encoding, reconstruction/freezing and both acknowledgements. SharedMap publishes shared descriptors. Owner updates are identical between copy modes; Native copies its index once to retain the initial revision. Publication counts are logical product deliveries, not bytes or local copy counts. Timers end before full-field fingerprints, visible records, and validation outputs are checked against the independent catalog reference. Cases rotate; all warmups and samples retained. No DOM paint or memory measurement.',
       summary: Object.fromEntries(cases.map(({ id, measuredPhases }) => [id, Object.fromEntries(measuredPhases.map(phase => [phase, summarize(measured.filter(record => record.caseId === id).map(record => record[phase]))]))])), raw };
     render(result); $('feature-benchmark-status').textContent = `Complete. All ${SAMPLES * BENCHMARK_CASES.length} measured samples and ${WARMUPS * BENCHMARK_CASES.length} warm-ups passed current and retained-revision checks.`;
-  } catch (error) { if (token === generation) { $('feature-benchmark-status').textContent = `Run failed: ${error.message}`; } }
+  } catch (error) { if (token === generation) { $('feature-benchmark-status').textContent = `Run failed: ${error.message}${compact ? ' The previous completed result is still shown.' : ''}`; } }
   finally { if (token === generation) { running = false; controls(); } }
 });
 $('feature-cancel').addEventListener('click', () => {
-  generation++; current?.close(); current = undefined; running = false; result = undefined; controls();
-  $('feature-benchmark-status').textContent = 'Stopped. No partial run is shown as a completed benchmark.';
+  generation++; current?.close(); current = undefined; running = false; if (!compact) result = undefined; controls();
+  $('feature-benchmark-status').textContent = compact ? 'Stopped. The previous completed result is still shown.' : 'Stopped. No partial run is shown as a completed benchmark.';
 });
 $('feature-export').addEventListener('click', () => {
   if (!result) return;
@@ -104,5 +122,10 @@ $('feature-export').addEventListener('click', () => {
 window.addEventListener('pagehide', () => {
   generation++; current?.close(); current = undefined; running = false; result = undefined; controls();
   $('feature-benchmark-status').textContent = 'Session released after navigation. Run a new benchmark to continue.';
-  $('feature-benchmark-results').replaceChildren();
+  if (compact) {
+    $('feature-benchmark-results').innerHTML = recorded.bars;
+    $('feature-result-origin').innerHTML = recorded.origin;
+    $('feature-result-origin').dataset.resultOrigin = 'recorded';
+    $('feature-recording-details').innerHTML = recorded.details;
+  } else $('feature-benchmark-results').replaceChildren();
 });

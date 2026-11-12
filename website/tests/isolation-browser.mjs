@@ -11,12 +11,11 @@ const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('..
 mkdirSync(artifacts, { recursive: true });
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const demos = [
-  ['compare/', 'feature-load'],
-  ['investigation-benchmark/', 'feature-run'],
-  ['lab/', 'run-benchmark'], ['playground/', 'start-playground'],
+  ['benchmarks/', 'feature-run'],
+  ['playground/', 'start-playground'],
 ];
 async function ready(page, id) {
-  await page.locator('#capability[data-state="ready"], #capability[data-state="blocked"]').waitFor();
+  await page.locator('#capability[data-state="ready"], #capability[data-state="blocked"]').waitFor({ state: 'attached' });
   const state = await page.evaluate(async () => {
     const worker = value => value && ({ url: value.scriptURL, state: value.state });
     return {
@@ -64,7 +63,7 @@ async function navigations(page) {
 }
 for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'webkit']) {
   assert.ok(['chromium', 'webkit'].includes(name));
-  const browser = await ({ chromium, webkit })[name].launch({ headless: true });
+  const browser = await ({ chromium, webkit })[name].launch({ headless: true, ...(name === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
   const errors = [];
   try {
     for (const isolated of [true, false]) {
@@ -112,7 +111,7 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         });
         const p = await storage.newPage(); p.setDefaultTimeout(25000); p.on('pageerror', error => errors.push(error.message));
         const storageVisits = await navigations(p);
-        await p.goto(origin + base + 'compare/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'feature-load');
+        await p.goto(origin + base + 'benchmarks/?filter=errors#main', { waitUntil: 'commit' }); await ready(p, 'feature-run');
         assert.equal(storageVisits.length, 2); await storage.close();
 
         // Keep register()/getRegistration() views empty after a real install.
@@ -135,8 +134,8 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         const staleHistories = await Promise.all(stalePair.map(navigations));
         for (const tab of stalePair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         await Promise.all(stalePair.map(async tab => {
-          await tab.goto(origin + base + 'compare/?stale-registration=1#main', { waitUntil: 'commit' });
-          await ready(tab, 'feature-load');
+          await tab.goto(origin + base + 'benchmarks/?stale-registration=1#main', { waitUntil: 'commit' });
+          await ready(tab, 'feature-run');
           assert.equal(new URL(tab.url()).searchParams.get('stale-registration'), '1');
           assert.equal(new URL(tab.url()).hash, '#main');
         }));
@@ -151,7 +150,7 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         const pair = [await tabs.newPage(), await tabs.newPage()];
         const histories = await Promise.all(pair.map(navigations));
         for (const tab of pair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
-        const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'compare/', { waitUntil: 'commit' }); await ready(tab, 'feature-load'); }));
+        const starts = await Promise.allSettled(pair.map(async tab => { await tab.goto(origin + base + 'benchmarks/', { waitUntil: 'commit' }); await ready(tab, 'feature-run'); }));
         for (let index = 0; index < starts.length; index++) {
           if (starts[index].status === 'rejected') {
             console.error(`Concurrent tab ${index}:`, JSON.stringify(histories[index].trace));
@@ -164,7 +163,7 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
               const value = await navigator.serviceWorker.getRegistration(scope);
               const worker = item => item && ({ url: item.scriptURL, state: item.state });
               return value && { scope: value.scope, active: worker(value.active), waiting: worker(value.waiting), installing: worker(value.installing) };
-            }, origin + base + 'compare/')));
+            }, origin + base + 'benchmarks/')));
             throw starts[index].reason;
           }
         }
@@ -180,10 +179,10 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         const cachedHistories = await Promise.all(cachedPair.map(navigations));
         for (const tab of cachedPair) { tab.setDefaultTimeout(25000); tab.on('pageerror', error => errors.push(error.message)); }
         await Promise.all(cachedPair.map(async tab => {
-          const url = origin + base + 'compare/?cached-registration=1#main';
-          await tab.goto(url, { waitUntil: 'commit' }); await ready(tab, 'feature-load');
+          const url = origin + base + 'benchmarks/?cached-registration=1#main';
+          await tab.goto(url, { waitUntil: 'commit' }); await ready(tab, 'feature-run');
           assert.equal(tab.url(), url);
-          assert.equal(await tab.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + 'compare/isolation-sw.js');
+          assert.equal(await tab.evaluate(() => navigator.serviceWorker.controller.scriptURL), origin + base + 'benchmarks/isolation-sw.js');
         }));
         assert.ok(cachedHistories.every(history => history.length >= 1 && history.length <= 2));
         await cached.close();
@@ -200,11 +199,11 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         });
         const f = await failure.newPage(); f.setDefaultTimeout(25000); const failedVisits = await navigations(f);
         f.on('pageerror', error => errors.push(error.message));
-        await f.goto(origin + base + 'compare/'); await f.locator('#capability[data-state="blocked"]').waitFor();
+        await f.goto(origin + base + 'benchmarks/'); await f.locator('#capability[data-state="blocked"]').waitFor();
         await f.evaluate(() => globalThis.__zcDocumentReported);
-        assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#feature-load').isDisabled(), true);
+        assert.equal(failedVisits.length, 1); assert.equal(await f.locator('#feature-run').isDisabled(), true);
         assert.match(await f.locator('#capability-text').innerText(), /Registration blocked by test/);
-        await f.getByRole('button', { name: 'Retry setup', exact: true }).click(); await ready(f, 'feature-load');
+        await f.getByRole('button', { name: 'Retry setup', exact: true }).click(); await ready(f, 'feature-run');
         assert.equal(failedVisits.length, 2); await failure.close();
 
         // Some embedded browsers throw on access, rather than hide the API.
@@ -216,11 +215,11 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         const r = await restricted.newPage(); r.setDefaultTimeout(25000);
         r.on('pageerror', error => errors.push(error.message));
         const restrictedVisits = await navigations(r);
-        await r.goto(origin + base + 'compare/');
+        await r.goto(origin + base + 'benchmarks/');
         await r.locator('#capability[data-state="blocked"]').waitFor();
         await r.evaluate(() => globalThis.__zcDocumentReported);
         assert.match(await r.locator('#capability-text').innerText(), /blocked by policy/);
-        assert.equal(await r.locator('#feature-load').isDisabled(), true);
+        assert.equal(await r.locator('#feature-run').isDisabled(), true);
         assert.equal(await r.locator('#enable-isolation').isHidden(), true);
         assert.equal(await r.locator('#capability-help').isVisible(), true);
         assert.equal(restrictedVisits.length, 1); await restricted.close();
@@ -231,11 +230,11 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         await denied.addInitScript(() => Object.defineProperty(globalThis, 'crossOriginIsolated', { get: () => false }));
         const d = await denied.newPage(); d.setDefaultTimeout(25000); const deniedVisits = await navigations(d);
         d.on('pageerror', error => errors.push(error.message));
-        await d.goto(origin + base + 'compare/', { waitUntil: 'commit' });
+        await d.goto(origin + base + 'benchmarks/', { waitUntil: 'commit' });
         await d.locator('#capability[data-state="blocked"]').waitFor();
         await d.evaluate(() => globalThis.__zcDocumentReported);
         assert.match(await d.locator('#capability-text').innerText(), /Automatic reloads have stopped/);
-        assert.equal(await d.locator('#feature-load').isDisabled(), true);
+        assert.equal(await d.locator('#feature-run').isDisabled(), true);
         await d.waitForTimeout(300); assert.equal(deniedVisits.length, 2, 'A failed setup must not loop');
         await d.reload(); await d.locator('#capability[data-state="blocked"]').waitFor();
         await d.evaluate(() => globalThis.__zcDocumentReported);

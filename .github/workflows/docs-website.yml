@@ -48,8 +48,10 @@ jobs:
           node website/build.mjs
           node --test website/tests/*.test.mjs
           node website/tests/docs-browser.mjs
+          node website/tests/studio-browser.mjs
           node website/tests/memory-charts-browser.mjs
           node website/tests/feature-browser.mjs
+          node website/tests/benchmark-dashboard-browser.mjs
           node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
@@ -63,6 +65,7 @@ jobs:
           node website/build.mjs
           node --test website/tests/*.test.mjs
           node website/tests/docs-browser.mjs
+          node website/tests/studio-browser.mjs
           node website/tests/memory-charts-browser.mjs
           node website/tests/feature-browser.mjs
           node website/tests/isolation-browser.mjs
@@ -91,6 +94,7 @@ jobs:
           node website/build.mjs
           node --test website/tests/*.test.mjs
           node website/tests/docs-browser.mjs
+          node website/tests/studio-browser.mjs
           node website/tests/memory-charts-browser.mjs
           node website/tests/feature-browser.mjs
           node website/tests/isolation-browser.mjs

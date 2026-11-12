@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { recordedMemory } from '../memory-template.mjs';
-import { pages } from '../config.mjs';
+import { evidencePages } from '../config.mjs';
 test('memory tables disclose Node, units, fixed workload, and shared backing accounting',()=>{
   const html=recordedMemory('/zerocopy/');
   for(const text of ['Node.js','MiB','100,000','counted once','not measurements of this device','One native owner','RSS'])assert.ok(html.includes(text),text);
@@ -17,7 +17,7 @@ test('both comparison pages include the recorded table and its documentation rou
     assert.ok(source.includes("import { recordedMemory } from './memory-template.mjs'"));
     assert.ok(source.includes('${recordedMemory(base)}'));
   }
-  assert.ok(pages.some(page=>page.source==='docs/memory-comparison.md'&&page.slug==='historical-sharedlist-memory'));
+  assert.ok(evidencePages.some(page=>page.source==='docs/memory-comparison.md'&&page.slug==='historical-sharedlist-memory'));
 });
 test('recorded figures retain identity and all four architecture values',()=>{
   const data=JSON.parse(readFileSync(new URL('../recorded-memory.json',import.meta.url),'utf8'));

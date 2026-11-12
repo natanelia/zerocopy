@@ -1,5 +1,6 @@
 /** One route registry for navigation, search, Markdown links, and the sitemap. */
 export const pages = [
+  { source: 'website/content/choose-zerocopy.md', slug: 'choose-zerocopy', title: 'Should I use ZeroCopy?', group: 'Start here', description: 'Choose a shared-memory design with clear trade-offs: local worker reads, single-writer ownership, browser isolation, snapshot delivery, and compaction.' },
   { source: 'docs/getting-started.md', slug: 'getting-started', title: 'Get started with shared state and Web Workers', group: 'Start here', description: 'Set up zerocopy in JavaScript or TypeScript. Share immutable state with a Web Worker using SharedArrayBuffer and read locally on both threads.' },
   { source: 'website/content/mental-model.md', slug: 'mental-model', title: 'How sharing works', group: 'Start here', description: 'One writer, immutable snapshots, and local reads. A model you can reason about.' },
   { source: 'docs/api.md', slug: 'collections', title: 'Immutable collections API & types', group: 'Build with it', description: 'zerocopy API reference for shared immutable maps, lists, sets, typed JSON, and nested collections in JavaScript and TypeScript.' },
@@ -11,18 +12,32 @@ export const pages = [
   { source: 'docs/redux.md', slug: 'redux', title: 'Redux & Redux Toolkit integration', group: 'Integrations', description: 'Keep your Redux store and share selected immutable collections with workers. Connect zerocopy to Redux Toolkit, selectors, and DevTools.' },
   { source: 'docs/tanstack.md', slug: 'tanstack', title: 'TanStack DB integration', group: 'Integrations', description: 'Use zerocopy collection wrappers and sync-cache helpers with TanStack DB. Examples, adapter behavior, and current limits.' },
   { source: 'docs/architecture.md', slug: 'memory', title: 'Memory & ownership', group: 'Go deeper', description: 'Understand storage, retained snapshots, and explicit compaction.' },
-  { source: 'docs/feature-map-memory.md', slug: 'memory-comparison', title: 'SharedMap memory comparison', group: 'Go deeper', description: 'Measured worker memory, shared buffer accounting, reader scaling, retained snapshots and process RAM.' },
-  { source: 'docs/memory-comparison.md', slug: 'historical-sharedlist-memory', title: 'Historical SharedList memory', group: 'Go deeper', description: 'Original log-column memory measurements, preserved as a distinct historical workload.' },
-  { source: 'docs/benchmarks.md', slug: 'benchmarks', title: 'Recorded benchmarks', group: 'Go deeper', description: 'All recorded results, slower workloads, and methods. No selected-only results.' },
   { source: 'docs/migration.md', slug: 'migration', title: 'Migration', group: 'Go deeper', description: 'Format and lifetime changes for existing users.' },
   { source: 'docs/use-cases.md', slug: 'use-cases', title: 'Choose a use case', group: 'Use cases', description: 'Where sharing helps, where it does not, and which alternatives to consider.' },
-  { source: 'website/content/log-explorer.md', slug: 'log-explorer', title: 'Historical SharedList log explorer', group: 'Use cases', description: 'One working example: search, summarize, and inspect a large shared stream.' },
   { source: 'website/content/data-tables.md', slug: 'data-tables', title: 'Large tables & dashboards', group: 'Use cases', description: 'Multiple independent views of the same large, changing table.' },
   { source: 'website/content/graphs.md', slug: 'graphs', title: 'Graphs & developer tools', group: 'Use cases', description: 'Stable versions for traversal, layout, and diagnostics.' },
   { source: 'website/content/simulations.md', slug: 'simulations', title: 'Simulation & world state', group: 'Use cases', description: 'Separate simulation ownership from analysis and rendering.' },
   { source: 'website/content/analytics.md', slug: 'analytics', title: 'Product catalogs & filtering', group: 'Use cases', description: 'Read stock directly and filter a large catalog in workers.' },
   { source: 'website/content/catalog.md', slug: 'catalog', title: 'Shared product catalog', group: 'Use cases', description: 'Look up products, validate prices and stock, and retain earlier catalog revisions across workers.' },
   { source: 'website/content/editors.md', slug: 'editors', title: 'Editors & history', group: 'Use cases', description: 'Read an earlier version without stopping new edits.' },
+];
+/** Preserved source reports, downloadable from Benchmarks without separate site pages. */
+export const evidencePages = [
+  { source: 'docs/feature-map-memory.md', slug: 'memory-comparison', title: 'Original SharedMap memory report', target: 'benchmarks/#memory' },
+  { source: 'docs/memory-comparison.md', slug: 'historical-sharedlist-memory', title: 'Historical SharedList memory report', target: 'benchmarks/#sources' },
+  { source: 'docs/benchmarks.md', slug: 'benchmarks', title: 'Recorded collection operations', target: 'benchmarks/#sources' },
+  { source: 'website/content/log-explorer.md', slug: 'log-explorer', title: 'Historical SharedList example', target: 'benchmarks/#sources' },
+];
+/** One public destination for benchmark and comparison links, including bookmarks. */
+export const benchmarkRedirects = [
+  { route: 'compare/', target: 'benchmarks/#performance' },
+  { route: 'investigation-benchmark/', target: 'benchmarks/#performance' },
+  { route: 'lab/', target: 'benchmarks/#performance' },
+  { route: 'explorer/', target: 'benchmarks/#performance' },
+  { route: 'historical/log-compare/', target: 'benchmarks/#sources' },
+  { route: 'historical/log-explorer/', target: 'benchmarks/#sources' },
+  { route: 'historical/log-benchmark/', target: 'benchmarks/#sources' },
+  ...evidencePages.map(page => ({ route: `docs/${page.slug}/`, target: page.target })),
 ];
 export const projectName = 'natanelia/zerocopy';
 export const repository = `https://github.com/${projectName}`;

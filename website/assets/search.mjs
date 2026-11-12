@@ -1,7 +1,7 @@
 export function validateSearchIndex(value) {
   if (!Array.isArray(value) || !value.every(entry => entry &&
     ['title', 'heading', 'context', 'description', 'route', 'text'].every(key => typeof entry[key] === 'string') &&
-    /^docs\/[a-z0-9-]+\/(?:#[\p{L}\p{N}\p{M}_-]*)?$/u.test(entry.route))) {
+    /^(?:docs\/[a-z0-9-]+\/(?:#[\p{L}\p{N}\p{M}_-]*)?|benchmarks\/#(?:memory|performance|sources))$/u.test(entry.route))) {
     throw new Error('Search index has an unsupported format');
   }
   return value;

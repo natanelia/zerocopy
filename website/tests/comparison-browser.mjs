@@ -3,7 +3,7 @@ import { once } from 'node:events';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
-import { createPreview } from '../serve.mjs';
+import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 import { generateColumns } from '../assets/explorer-core.mjs';
 import { reference } from '../assets/explorer-reference.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));

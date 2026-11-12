@@ -1,6 +1,14 @@
-# zerocopy documentation website
+# zerocopy developer website
 
-A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
+A static developer product experience: understand the shared-memory model on the homepage, try actual workers in Snapshot Studio, compare memory and performance, then follow source-backed adoption guides. Built with HTML, CSS, and small JavaScript modules; no runtime UI framework or new dependencies.
+
+The dark design system lives in `assets/site.css`. `home-template.mjs` keeps the product story separate from the shared shell and documentation layout in `templates.mjs`. The homepage storage diagram is explicitly conceptual: it loads no library, allocates no shared arena, and starts no workers. Reduced-motion preferences disable visual transitions. Search, raw Markdown, existing routes, GitHub Pages isolation, and source metadata remain available.
+
+At `/benchmarks/`, verified memory recordings appear first as simple bars. The performance section starts with an explicitly labelled recorded browser run; **Run on my device** runs the same checked catalog workload directly on the page. Completed live results replace the recorded sample. Methodology, dataset options, and further phases are disclosed on demand on the same page. The full recordings remain downloadable, and the measurement logic is unchanged. `/docs/choose-zerocopy/` starts the docs with fit, alternatives, isolation, ownership, delivery, and lifetime constraints.
+
+**Benchmarks is the only public comparison page.** The homepage, desktop/mobile menus, docs sidebar, search, and PR preview all point there. Dataset sizes are available under **Run options** on the same page. Old comparison, lab, detailed benchmark, and historical URLs redirect to the relevant section; their reports remain available under **Method, environment & source data**. Redirects are excluded from search and the sitemap. Playground is the separate teaching app.
+
+The memory bars reuse the verified, original Node recording, with its workload and runtime clearly labelled. `assets/catalog-benchmark-recording.json` is a complete browser export captured on source `ab1eae5c2ecc8497ed1b5a4c422febc0e5e4f492`: 10,000 products, two readers, 100 replacements, two warm-ups and seven measured samples per case. The build checks displayed medians against the raw samples. This JSON is downloadable but is not fetched to render the page; the charts are present in the initial HTML. A run uses the existing catalog harness, checks current and retained answers, and replaces the charts only after every case completes. Stopping or failing keeps the previous completed result and its original label.
 
 ## Local development
 
@@ -26,31 +34,37 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
 
-> The current primary demos use the product-catalog workload described under [Product catalog comparison](#product-catalog-comparison). The log-column sections below describe the preserved historical routes.
+> The sections below document preserved measurement implementations. Their original comparison interfaces are test fixtures served only by `tests/regression-preview.mjs`; they are not built or deployed as public pages. The public site has one benchmark page and Snapshot Studio. All existing worker, history, copy-mode, memory, and browser regressions remain in CI.
 
 ## Log explorer
 
-At `/historical/log-explorer/`, the flagship application loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
+The historical log-explorer test fixture loads up to 100,000 generated events in a dedicated owning worker. The UI receives read-only shared columns. A search worker and a summary worker read the same captured snapshot. The UI reads visible records directly. New events arrive in 2,000-event batches; freeze retains the current investigation without stopping ingestion.
 
 The application caps a session at 200,000 events. Stop and navigation terminate owned workers and drop snapshots. It does not claim per-node reclamation. No user data is imported or uploaded. The homepage remains about shared collections across domains; the use-case index includes editors, tables, catalogs, graphs and simulations.
 
 ## Investigation benchmark
 
-At `/historical/log-benchmark/`, compare six cases: shared snapshots; Immutable.js List replicas with incremental copy and full copy; native-array replicas with incremental copy and full copy; and one native-data-owning worker. Each replica case has two readers. Incremental copy sends only the 2,000 appended events after initial load; full copy sends the complete updated dataset to each reader on every append. These modes describe worker data transfer, separate from local collection updates.
+The historical investigation test fixture compares six cases: shared snapshots; Immutable.js List replicas with incremental copy and full copy; native-array replicas with incremental copy and full copy; and one native-data-owning worker. Each replica case has two readers. Incremental copy sends only the 2,000 appended events after initial load; full copy sends the complete updated dataset to each reader on every append. These modes describe worker data transfer, separate from local collection updates.
 
 Measure initial sharing, a query on attached data, and append + publish + query separately. Queries do not resend the dataset. Each case uses identical data and operations. A separate array implementation validates rows, counts, timeline buckets, service totals, errors, and latency sums outside timing.
 
 Two warm-ups precede seven samples per case. Order rotates, all 42 measured samples are exported with schema `zerocopy-investigation-benchmark/v3`, and no winner is assumed. Dataset construction is reported separately. Timings use a coordinator in place of the UI and exclude DOM paint, worker startup, and module loading. This is not a memory benchmark. The separate Map transport lab compares zerocopy, Immutable.js Map, and Immer Map. For append-only arrays, native designs can also retain an earlier view by length.
 
-## Playground
+<a id="playground"></a>
 
-At `/playground/`, start a real dedicated worker and update the owner state. The worker's latest snapshot changes; its retained initial snapshot does not. All collection reads use the actual library, with shared transport explicitly selected. Small worker reports exist only to display the result.
+## Snapshot Studio
 
-The demo is opt-in. Disconnect and page navigation remove the session and terminate the owned worker. It does not run on the marketing page.
+At `/playground/`, connect one real reader worker to a shared product catalog. Edit one of three products, then explicitly publish a revision. Add up to two more workers and pin different revisions in each reader while its latest view follows the writer. Product values come from the actual `SharedMap` library with shared transport explicitly selected; small worker reports supply the display.
+
+The timeline displays the latest eight publications. Each worker retains its initial snapshot, its current pin, and its latest eight revisions. A session is limited to 40 edits. Removing history references does not reclaim individual arena allocations; this is a teaching app, not a compaction or memory benchmark. JSON object reads decode and can allocate. No fabricated timings or allocation claims appear in the studio.
+
+The demo is opt-in. Disconnect, startup cancellation, failure, and page navigation terminate owned workers and release the session. Reconnecting starts with a fresh arena. Each reader that joins late starts its history at the current revision. Input validation prevents invalid stock and prices; busy states prevent overlapping mutations.
+
+`node website/tests/studio-browser.mjs` checks Chromium and WebKit worker behavior, independent pins, late joins, bounded history, editing, restart, navigation cleanup, and mobile layout. Use `STUDIO_BROWSERS=chromium` for a local Chromium-only run when WebKit is unavailable. `CHROMIUM_EXECUTABLE` can point to a locally installed headless browser.
 
 ## Benchmark lab
 
-At `/lab/`, a dedicated coordinator builds deterministic string-keyed numeric maps, starts one to four reader workers, and measures full-snapshot fan-out plus a lookup for every key. The three paths use real zerocopy `SharedMap`, Immutable.js `Map`, and Immer-managed `Map` implementations. **Immutable.js and Immer use full copy on every publication**; zerocopy publishes shared descriptors. This control does not send incremental updates.
+The scalar Map test fixture uses a dedicated coordinator to build deterministic string-keyed numeric maps, start one to four reader workers, and measure full-snapshot fan-out plus a lookup for every key. The three paths use real zerocopy `SharedMap`, Immutable.js `Map`, and Immer-managed `Map` implementations. **Immutable.js and Immer use full copy on every publication**; zerocopy publishes shared descriptors. This control does not send incremental updates. The old `/lab/` URL redirects to Benchmarks.
 
 Each path gets two warm-ups and seven samples, in rotating order. Every reader checksum is verified. Bars show the median; text shows the interquartile range. Worker creation and library loading are outside timing. Every publication includes zerocopy descriptor creation and shared attachment, Immutable.js entry encoding plus structured cloning and Map reconstruction, or Immer Map structured cloning and replica freezing.
 
@@ -66,7 +80,7 @@ For a host with response-header configuration, deploy `_site/` and apply its `_h
 
 Shared memory requires HTTPS (or localhost) and cross-origin isolation. This is a browser security rule, not a permission prompt. A host that sends COOP/COEP headers makes a demo ready on the first response: no service worker and no reload are needed. The generated `_headers` file is suitable for hosts that support that format; GitHub Pages does not apply it.
 
-On GitHub Pages, each demo prepares itself automatically. It registers a network-only service worker scoped to that demo path and waits until that worker is active. Setup also observes `navigator.serviceWorker.ready`, checking the exact scope and script, to recover when registration views or lifecycle events are stale. A new navigation uses the active registration even when another tab installed it and the current page was not claimed. The worker adds isolation headers to same-origin responses without caching data. A first visit then refreshes once. Return visits normally need no setup refresh. The comparison still waits for **Load all four paths**; setup does not allocate datasets or start benchmarks.
+On GitHub Pages, each demo prepares itself automatically. It registers a network-only service worker scoped to that demo path and waits until that worker is active. Setup also observes `navigator.serviceWorker.ready`, checking the exact scope and script, to recover when registration views or lifecycle events are stale. A new navigation uses the active registration even when another tab installed it and the current page was not claimed. The worker adds isolation headers to same-origin responses without caching data. A first visit then refreshes once. Return visits normally need no setup refresh. The benchmark waits for **Run on my device**, and Snapshot Studio waits for **Connect a worker**; setup does not allocate datasets or start benchmarks.
 
 A temporary `__zerocopy_isolation` query marker limits setup to one automatic navigation, even when cookies or browser storage are blocked. The marker is removed after success; other query parameters and the fragment are retained. A failed attempt does not reload repeatedly. **Retry setup** appears only after failure when another attempt could help. Registration and activation share a 12-second deadline. The next document must report actual cross-origin isolation before the demo is enabled. Late completion after a timeout cannot trigger a reload. Unknown or unrelated service workers are not removed.
 
@@ -91,12 +105,16 @@ node --test website/tests/*.test.mjs
 node website/tests/docs-browser.mjs
 node website/tests/isolation-browser.mjs
 node website/tests/browser.mjs
+node website/tests/studio-browser.mjs
+node website/tests/benchmark-dashboard-browser.mjs
 node website/tests/explorer-browser.mjs
 node website/tests/comparison-browser.mjs
 node website/tests/memory-browser.mjs
 ```
 
 Build first. Browser tests use the root Playwright dependency with Chromium and WebKit. `CHROMIUM_EXECUTABLE` can select a local executable. Tests cover live snapshot updates, retained history, checksum-checked benchmarks and export, cancellation, keyboard search, no-JS docs, mobile overflow, and the scoped service-worker fallback. Build and run these checks with both `/` and `/zerocopy/` prefixes.
+
+The benchmark dashboard suite supports `DASHBOARD_BROWSERS=chromium` for local runs. It checks prefilled charts without JavaScript, one-click execution, exports, cancellation/failure, and mobile layout. `node website/tests/capture-benchmarks.mjs` captures the initial desktop and mobile benchmark page for review.
 
 CI uploads the static output, test logs, and desktop/mobile screenshots. Existing library and Markdown checks remain separate and unchanged.
 
@@ -112,7 +130,7 @@ The `Documentation website` workflow now publishes tested **same-repository PRs*
 /zerocopy/previews/pr-<number>/<head-commit>/
 ```
 
-The workflow creates or updates one bot comment with links to the homepage, live comparison, explorer, and benchmark. The comment names both the PR head and the tested merge commit. It says **Preview ready** only after the public `build.json` matches the tested build. Failed or stale builds do not claim a working link. Closing a PR removes its preview files; reopening it builds a new preview.
+The workflow creates or updates one bot comment with **Open Benchmarks** as its primary link, followed by Home, Playground, and Documentation. The comment names both the PR head and the tested merge commit. It says **Preview ready** only after the public `build.json` matches the tested build. Failed or stale builds do not claim a working link. Closing a PR removes its preview files; reopening it builds a new preview.
 
 The `gh-pages` branch stores static output only. It is separate from source branches. Updates preserve other previews and the production site. Git updates are non-forced and retry conflicts. Commit-specific URLs prevent old service workers or cached scripts from running under a new preview. Previews have a visible banner and `noindex` metadata.
 
@@ -144,7 +162,7 @@ Google controls crawl timing, indexing, and ranking. Metadata and a sitemap do n
 
 ## Side-by-side comparison
 
-The `/historical/log-compare/` route runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
+The historical comparison test fixture runs **zerocopy, Immutable.js, Immer, and native arrays** over identical deterministic events. Each implementation has two real reader workers. One control surface applies the same search, service, severity, time filter, pagination, append, and freeze operation to all four views.
 
 Native arrays, Immutable.js Lists and Immer arrays use **incremental copy** by default: full initial data, then only appended events. The **full copy** option sends the entire updated dataset to each reader on every append. Both modes read attached data during queries. All four can retain this append-only stream: zerocopy, Immutable.js, and Immer keep immutable roots; native arrays keep a prefix length. There are no artificial delays or precomputed results. All result pages and aggregates are checked against the independent array reference after timing.
 
@@ -196,13 +214,13 @@ the same. See `proofs/query-performance.mjs` and the Query performance workflow.
 
 ## Product catalog comparison
 
-The current `/compare/` is the direct live comparison. A writer worker owns a product catalog keyed by string IDs; lookup and validation workers read its snapshots. All four implementations receive the same products, sparse replacements and retained initial revision. Product records include a name, category, SKU, price, stock and availability. The UI displays bounded record/issue replies. `/explorer/` forwards directly to this comparison for old links.
+The retained product-catalog comparison fixture exercises a writer worker with a catalog keyed by string IDs; lookup and validation workers read its snapshots. All four implementations receive the same products, sparse replacements and retained initial revision. Product records include a name, category, SKU, price, stock and availability. The test UI displays bounded record/issue replies. The public `/compare/` and `/explorer/` URLs both redirect directly to Benchmarks.
 
 SharedMap, native Map, Immutable.js Map and Immer Map use equivalent operations. **The live comparison uses incremental copy:** native, Immutable.js and Immer readers receive a full initial dataset once and only the 100 changed ID/object pairs on later edits. SharedMap publishes shared descriptors. Native Map makes a shallow local index copy when retaining its initial version; that is separate from copying records between workers. Records remain immutable in every path. Use the catalog benchmark below to compare both incremental and full-copy publication.
 
 ## Catalog benchmark
 
-The current `/investigation-benchmark/` runs **four baseline cases across all phases**: SharedMap with shared snapshots, plus incremental-copy native Map, Immutable.js Map and Immer Map. Only **Publish the edited revision** and **Replace and publish 100 products** include three additional **full-copy** cases (seven results for these two phases). The order is SharedMap, the three full-copy paths, then the incremental-copy paths. Incremental copy publishes only the 100 changed ID/object pairs after the initial full catalog; full copy publishes the entire updated catalog, including unchanged records, to both readers on the edit.
+The performance section at `/benchmarks/` runs **four baseline cases across all phases**: SharedMap with shared snapshots, plus incremental-copy native Map, Immutable.js Map and Immer Map. Only **Publish the edited revision** and **Replace and publish 100 products** include three additional **full-copy** cases (seven results for these two phases). The order is SharedMap, the three full-copy paths, then the incremental-copy paths. Incremental copy publishes only the 100 changed ID/object pairs after the initial full catalog; full copy publishes the entire updated catalog, including unchanged records, to both readers on the edit.
 
 Every sample creates fresh owner/reader workers. Two warm-ups and seven measured samples per case rotate case order. Startup and imports finish before timing. The four baseline cases measure generation, construction, initial publication, first/repeated queries and edits; full-copy cases measure only edited publication and combined replace + publish. Full-copy cases still construct/load the full catalog and verify the current and retained results, but skip redundant query timings. Full-copy publication includes encoding, structured cloning, reader reconstruction/freezing and acknowledgement. Each reader retains the initial revision even when a full replacement arrives. The owner uses the same update mechanism in both strategies; worker data copying is separate from local structural sharing or shallow index copying.
 
@@ -210,4 +228,4 @@ The export uses `zerocopy-product-catalog-browser/v3`; it includes all 63 record
 
 The displayed historical memory charts use the earlier synthetic-record fixture and runtime with **incremental copy only** for native, Immutable.js and Immer replicas. They do not measure this product catalog or full-copy updates. Original data, source hashes, proof drivers and fixture modules remain unchanged. The separate catalog model prevents changing the old proof workload when the live example evolves. See [the catalog guide](content/catalog.md) and [recorded memory method](../docs/feature-map-memory.md).
 
-The original log implementations remain at `/historical/log-explorer/`, `/historical/log-compare/` and `/historical/log-benchmark/`. The earlier sections describe those historical routes. Run `node website/tests/feature-browser.mjs` after building to check real product workers, replacements, retained reads, Stop/restart/navigation, export and mobile layout.
+The original log implementations remain in source and run through the internal regression fixture server. Their former public URLs redirect to Benchmarks. Run `node website/tests/feature-browser.mjs` after building to check real product workers, replacements, retained reads, Stop/restart/navigation, export and mobile layout; `benchmark-dashboard-browser.mjs` checks the actual public page.

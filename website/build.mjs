@@ -3,15 +3,13 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { pages, projectName, repository, basePath } from './config.mjs';
+import { pages, evidencePages, benchmarkRedirects, projectName, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
-import { comparison } from './comparison-template.mjs';
-import { featureExplorer, featureBenchmark } from './feature-template.mjs';
-import { writeFeatureMemoryAssets, injectFeatureMemoryCharts } from './feature-memory-charts.mjs';
-import { injectMemoryCharts, writeMemoryChartAssets } from './memory-charts.mjs';
-import { explorer } from './explorer-template.mjs';
-import { investigationBenchmark } from './explorer-benchmark-template.mjs';
-import { shell, home, docsLayout, lab, playground, useCaseCards } from './templates.mjs';
+import { writeFeatureMemoryAssets } from './feature-memory-charts.mjs';
+import { writeMemoryChartAssets } from './memory-charts.mjs';
+import { shell, home, docsLayout, playground, useCaseCards } from './templates.mjs';
+import { benchmarks } from './benchmarks-template.mjs';
+import { benchmarkPerformancePanel } from './benchmark-performance.mjs';
 
 const here = fileURLToPath(new URL('.', import.meta.url)), root = resolve(here, '..');
 const out = join(here, '_site'), base = basePath(process.env.SITE_BASE ?? '/');
@@ -41,24 +39,16 @@ if (immerPackage.version !== JSON.parse(readFileSync(join(root, 'package.json'),
 cpSync(join(root, 'node_modules/immer/dist/immer.production.mjs'), join(out, 'vendor/immer.mjs'));
 cpSync(join(root, 'node_modules/immer/LICENSE'), join(out, 'vendor/immer-LICENSE.txt'));
 writeFileSync(join(out, 'vendor/version.mjs'), `export const immutableVersion = ${JSON.stringify(immutablePackage.version)};\nexport const immerVersion = ${JSON.stringify(immerPackage.version)};\n`);
-const routes = new Map(pages.map(page => [page.source, `docs/${page.slug}/`]));
+const routes = new Map([...pages.map(page => [page.source, `docs/${page.slug}/`]), ...evidencePages.map(page => [page.source, page.target])]);
 routes.set('README.md', ''); routes.set('docs/README.md', 'docs/getting-started/');
-routes.set('playground/', 'playground/'); routes.set('lab/', 'lab/');
+routes.set('playground/', 'playground/'); routes.set('lab/', 'benchmarks/#performance');
 // A controlled page is not sufficient: dedicated worker entry URLs and their
 // dependencies must also be inside the service worker's demo scope.
 const demoScripts = new Map([
-  ['compare/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'comparison.mjs', 'comparison-core.mjs', 'comparison-runner.mjs', 'comparison-reader.mjs', 'immutable-storage.mjs', 'immer-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reference.mjs']],
-  ['lab/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'lab.mjs', 'bench-core.mjs', 'bench-runner.mjs', 'bench-reader.mjs', 'bench-maps.mjs']],
-  ['explorer/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-owner.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'immutable-storage.mjs']],
-  ['investigation-benchmark/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs', 'explorer-benchmark-cases.mjs', 'immutable-storage.mjs', 'explorer-core.mjs', 'explorer-peer.mjs', 'explorer-storage.mjs', 'explorer-reader.mjs', 'explorer-reference.mjs', 'bench-core.mjs']],
   ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
-const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('compare/')], ['historical/log-explorer/', demoScripts.get('explorer/')], ['historical/log-benchmark/', demoScripts.get('investigation-benchmark/')]]);
 const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'catalog-timings.mjs', 'catalog-benchmark-core.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
-demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
-demoScripts.delete('explorer/');
-demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);
-for (const [route, scripts] of historicalDemos) demoScripts.set(route, scripts);
+demoScripts.set('benchmarks/', [...featureScripts, 'feature-benchmark.mjs', 'benchmark-bars.mjs']);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
   for (const file of [...scripts, 'search.mjs']) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
@@ -69,11 +59,8 @@ const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
   let html = shell({ title, description, body, script, base, route, version, sha, origin, noindex: !!preview });
-  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
-    html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
-  }
-  if (['compare/', 'explorer/', 'investigation-benchmark/'].includes(route) || route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
-  if (route === 'historical/log-compare/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
+  if (route === 'benchmarks/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/benchmarks.css"></head>`);
+  if (route === 'playground/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/studio.css"></head>`);
   if (preview) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
     html = html.replace('<header class="site-header">', `<aside class="preview-banner">PR #${preview.number} preview · ${preview.headCommit.slice(0, 7)} · Not a release · <a href="${repository}/pull/${preview.number}">Return to PR</a></aside><header class="site-header">`);
@@ -86,37 +73,40 @@ function writePage(route, title, description, body, script) {
   siteRoutes.push(route);
 }
 writePage('', `${projectName}: Immutable collections for JavaScript and TypeScript`, `${projectName} shares immutable maps, lists, and sets across workers with SharedArrayBuffer and WebAssembly. Read locally without cloning the dataset.`, home(base), 'home.mjs');
-writePage('compare/', 'Compare the shared product catalog', 'Compare SharedMap, native Map, Immutable.js Map and Immer Map with the same product records, sparse replacements, retained revisions and real workers.', featureExplorer(base, true), 'feature.mjs');
-writePage('investigation-benchmark/', 'Product catalog worker benchmark', 'Measure construction, publication, first and repeated keyed reads, and sparse product edits with checked results.', featureBenchmark(base), 'feature-benchmark.mjs');
-function historical(body) {
-  for (const [current, old] of [['compare/', 'historical/log-compare/'], ['explorer/', 'historical/log-explorer/'], ['investigation-benchmark/', 'historical/log-benchmark/'], ['docs/memory-comparison/', 'docs/historical-sharedlist-memory/']]) body = body.replaceAll(`href="${base}${current}"`, `href="${base}${old}"`);
-  return `<aside class="historical-notice">Historical SharedList log workload. These results do not measure the current product catalog. <a href="${base}compare/">Open the live product comparison →</a></aside>` + body;
-}
-function writeRedirect(route, target, title) {
+writePage('benchmarks/', 'Memory and performance benchmarks', 'Compare recorded memory use, see measured performance results, and run the checked product-catalog benchmark on your device in one click.', benchmarks(base, benchmarkPerformancePanel(base)), 'feature-benchmark.mjs');
+function writeRedirect(route, target, title, preserveHash = false) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
-  const href = base + target;
-  let html = shell({ title, description: title, body: `<main id="main" class="wrap"><h1>${title}</h1><p><a href="${href}">Continue directly →</a></p></main>`, base, route: target, version, sha, origin, noindex: true });
-  html = html.replace('</head>', `<meta http-equiv="refresh" content="0;url=${href}"><script>location.replace(${JSON.stringify(href)} + location.search + location.hash)</script></head>`);
+  const [path, anchor] = target.split('#'), href = base + target;
+  let html = shell({ title, description: title, body: `<main id="main" class="wrap"><h1>${title}</h1><p><a href="${href}">Continue directly →</a></p></main>`, base, route: path, version, sha, origin, noindex: true });
+  // Queries belong before the destination fragment. Retired UI anchors do not
+  // exist on the consolidated page, so each old route gets its relevant section.
+  const hash = preserveHash ? 'location.hash' : JSON.stringify(anchor ? '#' + anchor : '');
+  html = html.replace('</head>', `<meta http-equiv="refresh" content="0;url=${href}"><script>location.replace(${JSON.stringify(base + path)} + location.search + ${hash})</script></head>`);
   writeFileSync(join(destination, 'index.html'), html);
 }
-writeRedirect('explorer/', 'compare/', 'Live product comparison');
-writeRedirect('docs/maps/', 'docs/catalog/', 'Product catalog guide');
-writePage('historical/log-compare/', 'Historical SharedList comparison', 'Historical log-column workload and its unchanged recorded measurements.', historical(comparison(base)), 'comparison.mjs');
-writePage('historical/log-explorer/', 'Historical SharedList log explorer', 'The original log-column use case, retained as a historical reference.', historical(explorer(base)), 'explorer.mjs');
-writePage('historical/log-benchmark/', 'Historical SharedList investigation benchmark', 'The original log-column timing workload, retained as a historical reference.', historical(investigationBenchmark(base)), 'explorer-benchmark.mjs');
-writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
-writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
+for (const { route, target } of benchmarkRedirects) writeRedirect(route, target, 'Benchmarks have moved');
+writeRedirect('docs/maps/', 'docs/catalog/', 'Product catalog guide', true);
+writePage('playground/', 'Snapshot studio', 'Edit products, publish revisions, and pin earlier snapshots in real reader workers. Explore immutable shared data in your browser.', playground(base), 'playground.mjs');
 writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Product records, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const rendered = renderMarkdown(source, page.source, routes, base);
-  const html = page.slug === 'historical-sharedlist-memory' ? injectMemoryCharts(rendered.html, base) : page.slug === 'memory-comparison' ? injectFeatureMemoryCharts(rendered.html, base) : rendered.html;
+  const html = rendered.html;
   const { toc } = rendered;
   writePage(`docs/${page.slug}/`, page.title, page.description, docsLayout(page, html, toc, pages, base, sha));
   mkdirSync(join(out, 'markdown'), { recursive: true }); writeFileSync(join(out, 'markdown', `${page.slug}.md`), source);
   for (const section of rendered.sections) search.push({ title: page.title, description: page.description,
     heading: section.title, context: section.context, route: `docs/${page.slug}/${section.id ? '#' + section.id : ''}`, text: section.text });
 }
+for (const page of evidencePages) {
+  mkdirSync(join(out, 'markdown'), { recursive: true });
+  cpSync(join(root, page.source), join(out, 'markdown', `${page.slug}.md`));
+}
+for (const [heading, anchor, text] of [
+  ['Memory', 'memory', 'Compare recorded whole-process memory use for ZeroCopy, native Map, Immutable.js and Immer, with two and four reader workers.'],
+  ['Performance', 'performance', 'Run the product catalog benchmark in your browser. Compare shared snapshots, incremental copies and full copies.'],
+  ['Method and source data', 'sources', 'Download recorded memory and performance measurements, original reports, samples, methodology and environment.'],
+]) search.push({ title: 'Benchmarks', description: 'Memory and performance in one place.', heading, context: '', route: `benchmarks/#${anchor}`, text });
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
 writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', route: '404.html', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
@@ -127,5 +117,5 @@ writeFileSync(join(out, '_headers'), '/*\n  Cross-Origin-Opener-Policy: same-ori
 // A project-site robots.txt is not host-root crawl control on GitHub Pages.
 writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\n${origin && !preview ? `Sitemap: ${origin}${base}sitemap.xml\n` : ''}`);
 if (origin && !preview) writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${siteRoutes.map(route => `<url><loc>${escape(origin + base + route)}</loc></url>`).join('')}</urlset>`);
-writeFileSync(join(out, 'llms.txt'), `# zerocopy\n\nShared immutable collections. Reads are local; tasks are optional.\n\nSource: ${repository}/commit/${sha}\n\n${pages.map(page => `- [${page.title}](${origin}${base}markdown/${page.slug}.md): ${page.description}`).join('\n')}\n`);
+writeFileSync(join(out, 'llms.txt'), `# zerocopy\n\nShared immutable collections. Reads are local; tasks are optional.\n\nSource: ${repository}/commit/${sha}\nBenchmarks: ${origin}${base}benchmarks/\n\n${pages.map(page => `- [${page.title}](${origin}${base}markdown/${page.slug}.md): ${page.description}`).join('\n')}\n\n## Recorded evidence\n\n${evidencePages.map(page => `- [${page.title}](${origin}${base}markdown/${page.slug}.md)`).join('\n')}\n`);
 console.log(`Built ${siteRoutes.length} static pages at ${base}. Source ${sha.slice(0, 7)}. No client-side Markdown or UI framework.`);

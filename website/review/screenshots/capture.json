@@ -1,0 +1,66 @@
+{
+  "sourceCommit": "e9ae75712fcd883821c0b6ff4fe88b3c79b58cce",
+  "base": "/zerocopy/",
+  "browser": "153.0.8010.0",
+  "reducedMotion": true,
+  "captures": [
+    {
+      "file": "home-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "fullPage": false
+    },
+    {
+      "file": "home-mobile.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true
+    },
+    {
+      "file": "studio-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "fullPage": true
+    },
+    {
+      "file": "studio-mobile.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true
+    },
+    {
+      "file": "benchmarks-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "fullPage": true
+    },
+    {
+      "file": "adoption-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "fullPage": false
+    }
+  ],
+  "studio": {
+    "workers": 3,
+    "currentRevision": 2,
+    "currentStock": 4,
+    "pinnedStock": [
+      12,
+      7,
+      12
+    ]
+  }
+}

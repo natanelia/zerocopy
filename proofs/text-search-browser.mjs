@@ -7,12 +7,13 @@ const server=createPreview();server.listen(0,'127.0.0.1');await once(server,'lis
 const origin=`http://127.0.0.1:${server.address().port}/`;
 
 try {
-  for(const [engine,type]of Object.entries({chromium,webkit})) {
-    const browser=await type.launch({headless:true});
+  for(const engine of process.env.TEXT_BROWSER_ENGINES?.split(',')??['chromium','webkit']) {
+    assert.ok(['chromium','webkit'].includes(engine));
+    const browser=await ({chromium,webkit})[engine].launch({headless:true,...(engine==='chromium'&&process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE,args:['--no-sandbox']}: {})});
     try {
-      const page=await browser.newPage();await page.goto(origin+'compare/');
+      const page=await browser.newPage();await page.goto(origin);
       const result=await page.evaluate(async()=>{
-        const {SharedList,getWorkerData,initWorker,resetSharedList}=await import('./library/shared.js');
+        const {SharedList,getWorkerData,initWorker,resetSharedList}=await import('/library/shared.js');
         const strings=['KELVIN','İSTANBUL','ΟΣ','ΟΣΑ','ẞ','CAFÉ','e\u0301','日本語 request','request 日本語','😀','\ud800','\udfff','\uFEFFhello','\0HELLO'];
         const terms=['','k','i','σ','ς','ß','é','e\u0301','request','REQUEST','😀','\ud83d','\ude00','\ud800','\uFFFD','\uFEFF','\0','absent'];
         const original=new SharedList('string').pushMany(strings);

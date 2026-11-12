@@ -19,10 +19,12 @@ const types = { '.mjs':'text/javascript', '.js':'text/javascript', '.html':'text
 function server(folder) {
   return createServer((req,res)=>{
     try {
-      let p=resolve(folder,'.'+new URL(req.url,'http://localhost').pathname);
+      const pathname=new URL(req.url,'http://localhost').pathname;
+      res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');res.setHeader('Cache-Control','no-store');
+      if(pathname==='/__proof__/') {res.setHeader('Content-Type','text/html; charset=utf-8');res.end('<!doctype html><title>Text search proof</title>');return;}
+      let p=resolve(folder,'.'+pathname);
       if(p!==folder&&!p.startsWith(folder+sep)) {res.writeHead(403).end();return;}
       if(statSync(p).isDirectory())p=resolve(p,'index.html');
-      res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');
       res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type',types[extname(p)]??'application/octet-stream');res.end(readFileSync(p));
     }catch{res.writeHead(404).end();}
   });
@@ -53,20 +55,21 @@ for(const kind of ['repeated','unique','unique-miss','unicode'])for(const [varia
 }
 const runs=[];
 try {
-  for(const [engine,browserType]of Object.entries({chromium,webkit})) {
-    const browser=await browserType.launch({headless:true});
+  for(const engine of process.env.TEXT_PERF_BROWSERS?.split(',')??['chromium','webkit']) {
+    assert.ok(['chromium','webkit'].includes(engine));
+    const browser=await ({chromium,webkit})[engine].launch({headless:true,...(engine==='chromium'&&process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE,args:['--no-sandbox']}: {})});
     try {
       for(let repeat=0;repeat<repetitions;repeat++)for(const kind of ['repeated','unique','unique-miss','unicode']) {
         const order=variants.filter(x=>x.kind===kind);if(repeat%2)order.reverse();
         for(const v of order) {
           const context=await browser.newContext();const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
           try {
-            // Keep the same log workload at its historical route in the current site.
-            await page.goto(v.origin + (v.variant === 'before' ? '/investigation-benchmark/' : '/historical/log-benchmark/'));
+            // Use the same inert driver for both revisions, independent of website routes.
+            await page.goto(v.origin + '/__proof__/');
             const result=await page.evaluate(async()=>{
               if(!crossOriginIsolated)throw Error('Not isolated');
-              const {Peer}=await import('./assets/explorer-peer.mjs');
-              const peer=new Peer(new URL('./assets/explorer-bench-runner.mjs',location.href));
+              const {Peer}=await import('/assets/explorer-peer.mjs');
+              const peer=new Peer(new URL('/assets/explorer-bench-runner.mjs',location.href));
               try{return await peer.request('run',{entries:100000},180000);}finally{peer.close();}
             });
             const paths = v.variant === 'before'
