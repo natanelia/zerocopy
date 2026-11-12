@@ -35,7 +35,7 @@ test('packed JSON preserves arbitrary JSON, normalized duplicates, Unicode and h
   expect(old.get('primitive-null')).toBeUndefined();
 });
 
-test.each([255, 256, 257])('object batch boundary %i preserves inherited toJSON and duplicate-key order', count => {
+test.each([63, 64, 65])('object batch boundary %i preserves inherited toJSON and duplicate-key order', count => {
   const events: string[] = [];
   const prototype = { toJSON(key: string) { events.push(`${(this as any).index}:${key}`); return { index: (this as any).index }; } };
   const input: any[] = Array.from({ length: count }, (_, index) => [`key-${index}`, Object.assign(Object.create(prototype), { index })]);
@@ -44,6 +44,20 @@ test.each([255, 256, 257])('object batch boundary %i preserves inherited toJSON 
   expect(map.size).toBe(count);
   expect(events).toEqual([`${count}:`, ...Array.from({ length: count - 1 }, (_, i) => `${i + 1}:`)]);
   expect(map.get('key-0')).toEqual({ index: count });
+});
+
+test('100-object edits preserve old snapshots, retained values and shared/copy readers', async () => {
+  const initial = entries(1000), old = fresh().setMany(initial), keep = old.get('key-999');
+  const edits = Array.from({ length: 100 }, (_, i) => [`key-${i * 7}`, { i: -i - 1, changed: true, text: `edit ${i} · 界🙂` }] as const);
+  const next = old.setMany(edits);
+  expect(next.size).toBe(old.size);
+  expect(next.get('key-999')).toBe(keep);
+  for (const copy of [false, true]) {
+    const reader = await initWorker(getWorkerData({ old, next }, { copy }));
+    for (const [key, value] of initial) expect(reader.old.get(key)).toEqual(value);
+    for (const [key, value] of edits) expect(reader.next.get(key)).toEqual(value);
+    expect(reader.next.get('key-999')).toEqual(initial[999]![1]);
+  }
 });
 
 test('packed JSON serializes once in surviving-key order while callbacks grow and reenter the arena', () => {

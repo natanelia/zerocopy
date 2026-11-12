@@ -842,49 +842,53 @@ export class Arena {
       }
       return this.wasm.mapBatch(root, input, latest.size) >>> 0;
     }
-    const leaves: number[] = [];
-    if (latest.size >= 256) {
-      // Keep one bounded byte stage, not all serialized values. Each invocation
-      // owns its stage so a toJSON/getter can recursively build another map.
-      const stage = new Uint8Array(1048576), view = new DataView(stage.buffer);
-      let length = 0, first = 0;
-      const flush = () => {
-        if (!length) return;
-        // mapLeaf preserves the existing four-byte record alignment.
-        const base = this.wasm.mapLeaf(0, length - 16) >>> 0;
-        this.refresh(); this.bytes.set(stage.subarray(0, length), base);
-        for (let i = first; i < leaves.length; i++) leaves[i] += base;
-        first = leaves.length; length = 0;
-      };
-      for (const [key, value] of latest) {
-        const text = this.text(type, value);
-        let valueBytes = encodeUtf8ForWrite(encoder, text), keyBytes: Uint8Array | undefined;
-        let keyLength = key.length;
-        for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { keyBytes = encoder.encode(key); keyLength = keyBytes.length; break; }
-        const recordLength = Math.ceil((16 + keyLength + valueBytes.length) / 4) * 4;
-        if (recordLength > stage.length) {
-          flush();
-          leaves.push(this.leaf(type, key, value, undefined, encodeUtf8ForWrite(encoder, text)));
-          first = leaves.length; continue;
-        }
-        if (length + recordLength > stage.length) {
-          flush();
-          // Allocation hooks may reenter and reuse the UTF-8 encoding buffer.
-          valueBytes = encodeUtf8ForWrite(encoder, text);
-        }
-        let hash = 2166136261;
-        for (let i = 0; i < keyLength; i++) { const c = keyBytes ? keyBytes[i] : key.charCodeAt(i); stage[length + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
-        view.setUint32(length, 0, true); view.setUint32(length + 4, hash >>> 0, true);
-        view.setUint32(length + 8, keyLength, true); view.setUint32(length + 12, valueBytes.length, true);
-        stage.set(valueBytes, length + 16 + keyLength);
-        leaves.push(length); length += recordLength;
-      }
-      flush();
-    } else for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
+    const leaves: number[] = latest.size >= 64 ? this.packedLeaves(type, latest) : [];
+    if (latest.size < 64) for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
     // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
     const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
+  }
+
+  private packedLeaves(type: string, latest: ReadonlyMap<string, any>): number[] {
+    const leaves: number[] = [];
+    // Keep one bounded byte stage, not all serialized values. Each invocation
+    // owns its stage so a toJSON/getter can recursively build another map.
+    const stage = new Uint8Array(Math.min(1048576, Math.max(65536, latest.size * 256))), view = new DataView(stage.buffer);
+    let length = 0, first = 0;
+    const flush = () => {
+      if (!length) return;
+      // mapLeaf preserves the existing four-byte record alignment.
+      const base = this.wasm.mapLeaf(0, length - 16) >>> 0;
+      this.refresh(); this.bytes.set(stage.subarray(0, length), base);
+      for (let i = first; i < leaves.length; i++) leaves[i] += base;
+      first = leaves.length; length = 0;
+    };
+    for (const [key, value] of latest) {
+      const text = this.text(type, value);
+      let valueBytes = encodeUtf8ForWrite(encoder, text), keyBytes: Uint8Array | undefined;
+      let keyLength = key.length;
+      for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { keyBytes = encoder.encode(key); keyLength = keyBytes.length; break; }
+      const recordLength = Math.ceil((16 + keyLength + valueBytes.length) / 4) * 4;
+      if (recordLength > stage.length) {
+        flush();
+        leaves.push(this.leaf(type, key, value, undefined, encodeUtf8ForWrite(encoder, text)));
+        first = leaves.length; continue;
+      }
+      if (length + recordLength > stage.length) {
+        flush();
+        // Allocation hooks may reenter and reuse the UTF-8 encoding buffer.
+        valueBytes = encodeUtf8ForWrite(encoder, text);
+      }
+      let hash = 2166136261;
+      for (let i = 0; i < keyLength; i++) { const c = keyBytes ? keyBytes[i] : key.charCodeAt(i); stage[length + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+      view.setUint32(length, 0, true); view.setUint32(length + 4, hash >>> 0, true);
+      view.setUint32(length + 8, keyLength, true); view.setUint32(length + 12, valueBytes.length, true);
+      stage.set(valueBytes, length + 16 + keyLength);
+      leaves.push(length); length += recordLength;
+    }
+    flush();
+    return leaves;
   }
 
   private vectorRoot = -1;
