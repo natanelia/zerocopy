@@ -58,10 +58,12 @@ const contentTypes = { '.mjs': 'text/javascript', '.js': 'text/javascript', '.ht
 function serve(folder) {
   return createServer((req, res) => {
     try {
-      let path = resolve(folder, '.' + new URL(req.url, 'http://localhost').pathname);
+      const pathname = new URL(req.url, 'http://localhost').pathname;
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin'); res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); res.setHeader('Cache-Control', 'no-store');
+      if (pathname === '/__proof__/') { res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end('<!doctype html><title>Query proof</title>'); return; }
+      let path = resolve(folder, '.' + pathname);
       if (path !== folder && !path.startsWith(folder + sep)) { res.writeHead(403).end(); return; }
       if (statSync(path).isDirectory()) path = resolve(path, 'index.html');
-      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin'); res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
       res.setHeader('Content-Type', contentTypes[extname(path)] ?? 'application/octet-stream');
       res.setHeader('Cache-Control', 'no-store'); res.end(readFileSync(path));
     } catch { res.writeHead(404).end(); }
@@ -79,8 +81,9 @@ const runs = [], rounds = Number(process.env.PERF_REPEATS ?? 3);
 assert.ok(Number.isSafeInteger(rounds) && rounds >= 1 && rounds <= 10);
 const median = values => { const a = [...values].sort((a, b) => a - b); const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
 try {
-  for (const [engine, browserType] of Object.entries({ chromium, webkit })) {
-    const browser = await browserType.launch({ headless: true });
+  for (const engine of process.env.QUERY_PERF_BROWSERS?.split(',') ?? ['chromium', 'webkit']) {
+    assert.ok(['chromium', 'webkit'].includes(engine));
+    const browser = await ({ chromium, webkit })[engine].launch({ headless: true, ...(engine === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
     try {
       // Three independent repeats for the target workload; one clearly labelled
       // seven-sample run per control for unique text, not a universal speed gate.
@@ -91,11 +94,12 @@ try {
           const errors = []; page.on('pageerror', error => errors.push(error.message));
           try {
             const meta = JSON.parse(readFileSync(resolve(variant.folder, 'build.json'), 'utf8'));
-            await page.goto(variant.origin + '/investigation-benchmark/');
+            // Website redirects and navigation must not select the measured engine.
+            await page.goto(variant.origin + '/__proof__/');
             const result = await page.evaluate(async source => {
               if (!crossOriginIsolated) throw new Error('Not isolated');
-              const { Peer } = await import('./assets/explorer-peer.mjs');
-              const peer = new Peer(new URL('./assets/explorer-bench-runner.mjs', location.href));
+              const { Peer } = await import('/assets/explorer-peer.mjs');
+              const peer = new Peer(new URL('/assets/explorer-bench-runner.mjs', location.href));
               try { return await peer.request('run', { entries: 100000, source }, 180000); }
               finally { peer.close(); }
             }, meta.sourceCommit ?? meta.commit ?? 'unknown');

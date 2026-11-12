@@ -42,6 +42,7 @@ jobs:
       - name: Build the candidate
         run: node website/build.mjs
       - name: Measure original, equal-scheduler baseline, and candidate
+        shell: bash
         run: |
           node --check proofs/query-performance.mjs
           node proofs/query-performance.mjs 2>&1 | tee query-performance.log
