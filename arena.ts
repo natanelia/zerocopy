@@ -119,10 +119,10 @@ export class Arena {
   private lastReadAscii = true;
   private valueRoot = 0;
   private valueCode = 0;
-  private valueMap: Map<string, unknown> | undefined;
+  private valueMap: Map<string, string | number | boolean | typeof PRESENT> | undefined;
   private valueMapChars = 0;
   private valueMapBytes = 0;
-  private cacheRead(key: string, value: unknown, present: boolean): void {
+  private cacheRead(key: string, value: string | number | boolean | typeof PRESENT, present: boolean): void {
     const map = this.valueMap!;
     if (!present && (map.size >= 16384 || this.valueMapChars + key.length > 131072)) return;
     const bytes = typeof value === 'string' ? value.length * 2 : 8;
@@ -131,7 +131,7 @@ export class Arena {
     map.set(key, value); this.valueMapBytes += delta;
     if (!present) this.valueMapChars += key.length;
   }
-  private cachePrimitive(previous: number, next: number, key: string, value: unknown, code: number): void {
+  private cachePrimitive(previous: number, next: number, key: string, value: string | number | boolean | typeof PRESENT, code: number): void {
     if (previous !== this.valueRoot || code !== this.valueCode) {
       this.valueMap = undefined; this.valueMapChars = 0; this.valueMapBytes = 0;
     }
@@ -150,6 +150,10 @@ export class Arena {
     }
   }
   private readonly objects = new Map<number, unknown>();
+  private objectRoot = 0;
+  private objectCode = 0;
+  private objectKeys: Map<string, unknown> | undefined;
+  private objectKeyChars = 0;
   private readonly keys = new Map<string, KeyToken>();
   private keyBytes = 0;
   private objectBytes = 0;
@@ -517,21 +521,26 @@ export class Arena {
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     if (!root) return undefined;
     const code = (type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0) + (prefix ? 4 : 0);
-    const primitive = code !== 0 && code !== 4, cacheCode = primitive ? code : code + 8;
-    if (!sorted && (root === this.valueRoot || !this.valueRoot)) {
-      if (!this.valueRoot) { this.valueRoot = root; this.valueCode = cacheCode; }
-      else if (!this.valueCode) this.valueCode = cacheCode;
-      if (cacheCode === this.valueCode) {
-        const hit = this.valueMap?.get(key);
-        if (hit !== undefined && hit !== PRESENT) return hit;
-        return primitive ? this.readPrimitive(root, key, type, prefix, code, hit === PRESENT)
-          : this.readObject(root, key, type, prefix, cacheCode, hit === PRESENT);
+    if (code === 0 || code === 4) {
+      if (!sorted && (root === this.objectRoot || !this.objectRoot)) {
+        if (!this.objectRoot) { this.objectRoot = root; this.objectCode = code; }
+        if (code === this.objectCode) {
+          const hit = this.objectKeys?.get(key);
+          if (hit !== undefined) return hit;
+          return this.readObject(root, key, type, prefix, code);
+        }
       }
-    }
-    // Historical roots and sorted maps retain address-based object decoding.
-    if (!primitive) {
       const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
       return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    }
+    if (!sorted && (root === this.valueRoot || !this.valueRoot)) {
+      if (!this.valueRoot) { this.valueRoot = root; this.valueCode = code; }
+      else if (!this.valueCode) this.valueCode = code;
+      if (code === this.valueCode) {
+        const hit = this.valueMap?.get(key);
+        if (hit !== undefined && hit !== PRESENT) return hit;
+        return this.readPrimitive(root, key, type, prefix, code, hit === PRESENT);
+      }
     }
     let slot = this.reads?.slot(key);
     if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
@@ -543,8 +552,8 @@ export class Arena {
     if (slot !== undefined) this.reads.cacheValue(slot, code, result);
     return result;
   }
-  private readObject(root: number, key: string, type: string, prefix: number, code: number, present: boolean): any {
-    const map = this.valueMap ??= new Map();
+  private readObject(root: number, key: string, type: string, prefix: number, code: number): any {
+    const map = this.objectKeys ??= new Map();
     const leaf = this.findUncached(root, key);
     if (!leaf) return undefined;
     const ascii = this.lastReadAscii, view = this.dv;
@@ -552,11 +561,18 @@ export class Arena {
     const value = this.leafValue(type, leaf, prefix, view);
     // The address cache owns decoded values and its existing memory limits.
     // A key only adds a reference to an accepted value, never another retained
-    // object graph. Nested factories may reenter and replace the active cache.
-    if (value !== undefined && this.valueRoot === root && this.valueCode === code && this.valueMap === map
-      && this.objects.get(ptr) === value && (present || map.size < 16384)) {
-      if (ascii) this.cacheRead(key, value, present);
-      else this.cachePrimitive(root, root, key, value, code);
+    // object graph. Its separate root leaves the primitive read cache intact.
+    if (value !== undefined && this.objects.get(ptr) === value) {
+      const cacheKey = ascii ? key : normalizeKey(key);
+      if (this.objectRoot === root && this.objectCode === code && this.objectKeys === map) {
+        // A nested factory may reenter this arena while decoding. Account for
+        // the current entry instead of relying on its state before the call.
+        const present = map.has(cacheKey);
+        if (present || map.size < 2048 && this.objectKeyChars + cacheKey.length <= 131072) {
+          map.set(cacheKey, value);
+          if (!present) this.objectKeyChars += cacheKey.length;
+        }
+      }
     }
     return value;
   }

@@ -46,8 +46,11 @@ describe('bounded object key reads', () => {
     for (let i = 0; i < 2050; i++) expect(map.get(`key${i}`)).toEqual({ i });
     expect(reader.objects.size).toBe(2048); expect(reader.objectBytes).toBeLessThanOrEqual(2097152);
     expect(reader.valueMap.size).toBe(2050); expect(reader.valueMapBytes).toBe(2050 * 8);
+    expect(reader.objectKeys.size).toBe(2048);
+    expect(reader.objectKeyChars).toBe(Array.from({ length: 2048 }, (_, i) => `key${i}`.length).reduce((a, b) => a + b, 0));
     expect(reader.reads).toBeUndefined();
-    expect([...reader.valueMap.values()].filter(value => value !== null && typeof value === 'object')).toHaveLength(2048);
+    expect([...reader.objectKeys.values()].every(value => value !== null && typeof value === 'object')).toBe(true);
+    expect([...reader.valueMap.values()].some(value => value !== null && typeof value === 'object')).toBe(false);
     expect(map.get('key2047')).toBe(map.get('key2047'));
     expect(map.get('key2048')).not.toBe(map.get('key2048'));
 
@@ -58,7 +61,22 @@ describe('bounded object key reads', () => {
     expect(first).not.toBe(bytes.get('large'));
     const byteReader: any = arenaOf(bytes);
     expect(byteReader.objects.size).toBe(0); expect(byteReader.objectBytes).toBe(0);
-    expect([...byteReader.valueMap.values()].some(value => value === first)).toBe(false);
+    expect(byteReader.objectKeys.size).toBe(0); expect(byteReader.objectKeyChars).toBe(0);
+  });
+
+  test('object reads do not claim the primitive fast path in a shared arena', async () => {
+    const owner = new Arena();
+    const metadata = new SharedMap('object', 0, 0, owner).set('item', { title: 'metadata' });
+    const prices = new SharedMap('number', 0, 0, owner).set('item', 42);
+    const { a, b } = await initWorker(getWorkerData({ a: metadata, b: prices }, { copy: false }));
+    const reader: any = arenaOf(a);
+    expect(reader.valueRoot).toBe(0);
+    const object = a.get('item'); expect(object).toEqual({ title: 'metadata' });
+    expect(reader.valueRoot).toBe(0); expect(reader.valueMap).toBeUndefined();
+    expect(b.get('item')).toBe(42);
+    expect(reader.valueRoot).toBe(b.root); expect(reader.valueMap.get('item')).toBe(42);
+    expect(a.get('item')).toBe(object); expect(b.get('item')).toBe(42);
+    expect(reader.reads).toBeUndefined();
   });
 
   test('keeps object and primitive views of the same root separate', async () => {
@@ -89,6 +107,24 @@ describe('bounded object key reads', () => {
       expect(decoded.get(0)).toBe(42); expect(source.get('child')).toBe(decoded);
       expect(changed!.get('number')).toBe(7); expect(calls).toBe(1);
       expect(source.has('number')).toBe(false);
+    } finally { factory.fromWorkerData = original; }
+  });
+
+  test('reentrant presence checks do not duplicate object key accounting', () => {
+    const owner = new Arena(), child = new SharedList('number').push(42);
+    const source = new SharedMap('SharedList<number>', 0, 0, owner).set('child', child);
+    const factory = structureRegistry.SharedList, original = factory.fromWorkerData;
+    factory.fromWorkerData = (data, arena) => {
+      expect(source.has('child')).toBe(true);
+      return original(data, arena);
+    };
+    try {
+      const decoded = source.get('child')!;
+      expect(decoded.get(0)).toBe(42); expect(source.get('child')).toBe(decoded);
+      const cache: any = owner;
+      expect(cache.objectKeys.size).toBe(1); expect(cache.objectKeyChars).toBe('child'.length);
+      expect(cache.valueMap.size).toBe(1); expect(cache.valueMapBytes).toBe(8);
+      expect(cache.valueMapChars).toBe('child'.length);
     } finally { factory.fromWorkerData = original; }
   });
 });
