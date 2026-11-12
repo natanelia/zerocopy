@@ -1,0 +1,283 @@
+{
+  "status": "pass",
+  "codecSamples": 210,
+  "readerSamples": 14,
+  "groups": [
+    {
+      "kind": "catalog",
+      "before": "codec-native",
+      "after": "codec-direct",
+      "field": "category",
+      "beforeMs": 85.83290000000125,
+      "afterMs": 249.99822200000017,
+      "ratio": 2.651462743191101,
+      "ci95": [
+        2.1586501109321468,
+        3.2567828583830476
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "catalog",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "category",
+      "beforeMs": 79.93813100000261,
+      "afterMs": 12.903317000000243,
+      "ratio": 0.16613121177837015,
+      "ci95": [
+        0.1338113395655826,
+        0.20625740401786188
+      ],
+      "fasterPairs": 7,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "before": "codec-native",
+      "after": "codec-direct",
+      "field": "category",
+      "beforeMs": 65.75810600000113,
+      "afterMs": 344.15901000000304,
+      "ratio": 5.408457513542009,
+      "ci95": [
+        4.183068434281811,
+        6.9928123661718615
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "category",
+      "beforeMs": 61.65006999999969,
+      "afterMs": 9.583394000001135,
+      "ratio": 0.155278461308987,
+      "ci95": [
+        0.11761208831951138,
+        0.20500784307973718
+      ],
+      "fasterPairs": 7,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "before": "codec-native",
+      "after": "codec-direct",
+      "field": "category",
+      "beforeMs": 42.26090699999986,
+      "afterMs": 331.37448200000654,
+      "ratio": 9.05909528844849,
+      "ci95": [
+        6.991336958801758,
+        11.738413972719616
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "category",
+      "beforeMs": 33.489809999999125,
+      "afterMs": 2.879601000000548,
+      "ratio": 0.09465113241750436,
+      "ci95": [
+        0.05439075187562804,
+        0.16471250275049631
+      ],
+      "fasterPairs": 7,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "before": "codec-native",
+      "after": "codec-direct",
+      "field": "category",
+      "beforeMs": 115.65230399999564,
+      "afterMs": 232.80776400000468,
+      "ratio": 1.804218270966236,
+      "ci95": [
+        1.177498581551772,
+        2.7645074230140545
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "category",
+      "beforeMs": 67.48997499999678,
+      "afterMs": 5.824940999998944,
+      "ratio": 0.09809185284053494,
+      "ci95": [
+        0.060772063606718316,
+        0.15832951890456218
+      ],
+      "fasterPairs": 7,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "before": "codec-native",
+      "after": "codec-direct",
+      "field": "category",
+      "beforeMs": 133.0144450000007,
+      "afterMs": 244.6478070000012,
+      "ratio": 2.0198007771006874,
+      "ci95": [
+        1.7686416399826155,
+        2.30662621921343
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "category",
+      "beforeMs": 84.10800100000051,
+      "afterMs": 96.2153460000045,
+      "ratio": 1.1700862278639286,
+      "ci95": [
+        0.9632428367969379,
+        1.4213464438412007
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "before": "query-native",
+      "after": "query-bytes",
+      "field": "absent",
+      "beforeMs": 141.29448200001207,
+      "afterMs": 141.70690099999774,
+      "ratio": 1.0309762311985615,
+      "ci95": [
+        0.9026903696491934,
+        1.177493440756948
+      ],
+      "fasterPairs": 2,
+      "pairs": 7
+    }
+  ],
+  "phases": [
+    {
+      "phase": "constructionMs",
+      "beforeMs": 110.21159699999998,
+      "afterMs": 94.06228500000003,
+      "ratio": 0.9141297291333221,
+      "ci95": [
+        0.7450806494339877,
+        1.1215338397530024
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "publicationMs",
+      "beforeMs": 9.888270999999975,
+      "afterMs": 7.688490000000002,
+      "ratio": 0.8146228658937943,
+      "ci95": [
+        0.5871746667447635,
+        1.1301754847769696
+      ],
+      "fasterPairs": 5,
+      "pairs": 7
+    },
+    {
+      "phase": "firstQueryMs",
+      "beforeMs": 68.165955,
+      "afterMs": 112.70008800000005,
+      "ratio": 1.5337842515342044,
+      "ci95": [
+        0.9417653969687562,
+        2.497961952972865
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "phase": "repeatQueryMs",
+      "beforeMs": 6.210820000000012,
+      "afterMs": 8.09021000000007,
+      "ratio": 1.2370742089654012,
+      "ci95": [
+        0.7163486336190361,
+        2.1363237488929663
+      ],
+      "fasterPairs": 2,
+      "pairs": 7
+    },
+    {
+      "phase": "readyMs",
+      "beforeMs": 192.380047,
+      "afterMs": 212.28172100000006,
+      "ratio": 1.1343609782671322,
+      "ci95": [
+        0.8576994896188488,
+        1.5002630228764533
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "phase": "updateMs",
+      "beforeMs": 0.8746869999999944,
+      "afterMs": 0.6601040000000467,
+      "ratio": 0.57343543260089,
+      "ci95": [
+        0.18617430315360975,
+        1.7662383572391218
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "editPublicationMs",
+      "beforeMs": 1.072622000000024,
+      "afterMs": 1.5881989999999178,
+      "ratio": 1.2105883393998802,
+      "ci95": [
+        0.5255124790716965,
+        2.788752286301113
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "updatedQueryMs",
+      "beforeMs": 28.708683000000065,
+      "afterMs": 50.32699400000001,
+      "ratio": 1.450353372206585,
+      "ci95": [
+        1.0853214021504436,
+        1.9381585031891126
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "phase": "retainedQueryMs",
+      "beforeMs": 4.809801999999991,
+      "afterMs": 3.849148000000014,
+      "ratio": 0.840208698865255,
+      "ci95": [
+        0.6804223770181876,
+        1.0375182849548976
+      ],
+      "fasterPairs": 5,
+      "pairs": 7
+    }
+  ],
+  "note": "Exploratory unadjusted paired log-ratio intervals; lower is faster. Same-build scheduling noise is not estimated in this experiment. No outliers removed."
+}
