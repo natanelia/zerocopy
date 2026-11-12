@@ -10,6 +10,7 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const nonAsciiText = /[^\x00-\x7f]/;
 let nextId = 0;
 const PRESENT = Symbol("present; primitive value not decoded");
 interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
@@ -118,10 +119,10 @@ export class Arena {
   private lastReadAscii = true;
   private valueRoot = 0;
   private valueCode = 0;
-  private valueMap: Map<string, string | number | boolean | typeof PRESENT> | undefined;
+  private valueMap: Map<string, unknown> | undefined;
   private valueMapChars = 0;
   private valueMapBytes = 0;
-  private cacheRead(key: string, value: string | number | boolean | typeof PRESENT, present: boolean): void {
+  private cacheRead(key: string, value: unknown, present: boolean): void {
     const map = this.valueMap!;
     if (!present && (map.size >= 16384 || this.valueMapChars + key.length > 131072)) return;
     const bytes = typeof value === 'string' ? value.length * 2 : 8;
@@ -130,7 +131,7 @@ export class Arena {
     map.set(key, value); this.valueMapBytes += delta;
     if (!present) this.valueMapChars += key.length;
   }
-  private cachePrimitive(previous: number, next: number, key: string, value: string | number | boolean | typeof PRESENT, code: number): void {
+  private cachePrimitive(previous: number, next: number, key: string, value: unknown, code: number): void {
     if (previous !== this.valueRoot || code !== this.valueCode) {
       this.valueMap = undefined; this.valueMapChars = 0; this.valueMapBytes = 0;
     }
@@ -516,24 +517,48 @@ export class Arena {
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     if (!root) return undefined;
     const code = (type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0) + (prefix ? 4 : 0);
-    if (!sorted && code !== 0 && code !== 4 && (root === this.valueRoot || !this.valueRoot)) {
-      if (!this.valueRoot) { this.valueRoot = root; this.valueCode = code; }
-      else if (!this.valueCode) this.valueCode = code;
-      if (code === this.valueCode) {
+    const primitive = code !== 0 && code !== 4, cacheCode = primitive ? code : code + 8;
+    if (!sorted && (root === this.valueRoot || !this.valueRoot)) {
+      if (!this.valueRoot) { this.valueRoot = root; this.valueCode = cacheCode; }
+      else if (!this.valueCode) this.valueCode = cacheCode;
+      if (cacheCode === this.valueCode) {
         const hit = this.valueMap?.get(key);
         if (hit !== undefined && hit !== PRESENT) return hit;
-        return this.readPrimitive(root, key, type, prefix, code, hit === PRESENT);
+        return primitive ? this.readPrimitive(root, key, type, prefix, code, hit === PRESENT)
+          : this.readObject(root, key, type, prefix, cacheCode, hit === PRESENT);
       }
     }
+    // Historical roots and sorted maps retain address-based object decoding.
+    if (!primitive) {
+      const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
+      return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    }
     let slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
     // A root change can still resolve to the exact same immutable leaf.
     slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const result = leaf ? this.leafValue(type, leaf, prefix) : undefined;
-    if (code !== 0 && code !== 4 && slot !== undefined) this.reads.cacheValue(slot, code, result);
+    if (slot !== undefined) this.reads.cacheValue(slot, code, result);
     return result;
+  }
+  private readObject(root: number, key: string, type: string, prefix: number, code: number, present: boolean): any {
+    const map = this.valueMap ??= new Map();
+    const leaf = this.findUncached(root, key);
+    if (!leaf) return undefined;
+    const ascii = this.lastReadAscii, view = this.dv;
+    const ptr = leaf + 16 + view.getUint32(leaf + 8, true) + prefix;
+    const value = this.leafValue(type, leaf, prefix, view);
+    // The address cache owns decoded values and its existing memory limits.
+    // A key only adds a reference to an accepted value, never another retained
+    // object graph. Nested factories may reenter and replace the active cache.
+    if (value !== undefined && this.valueRoot === root && this.valueCode === code && this.valueMap === map
+      && this.objects.get(ptr) === value && (present || map.size < 16384)) {
+      if (ascii) this.cacheRead(key, value, present);
+      else this.cachePrimitive(root, root, key, value, code);
+    }
+    return value;
   }
   private readPrimitive(root: number, key: string, type: string, prefix: number, code: number, present: boolean): any {
     this.valueMap ??= new Map();
@@ -670,10 +695,18 @@ export class Arena {
       }
       const prefix = hash & ((1 << this.prefixBits) - 1), word = prefix >>> 5, bit = 1 << (prefix & 31);
       if (!(this.prefixValid[word] & bit)) {
-        this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        // A one-off prefix needs only the direct lookup. Materialize its
+        // reusable directory entry after another key actually needs it.
+        // Allocated addresses are below 0x7fff0000, so this is not a pointer.
+        this.prefixChildren[prefix] = 0xffffffff;
         this.prefixValid[word] |= bit;
+        candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+      } else {
+        if (this.prefixChildren[prefix] === 0xffffffff) {
+          this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        }
+        candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
       }
-      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
     } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
     if (!candidate) return 0;
     const bucket = view.getUint32(candidate, true) === 2;
@@ -748,26 +781,36 @@ export class Arena {
     if (!entries.length) return root;
     const latest = new Map<string, any>();
     for (const [key, value] of entries) latest.set(normalizeKey(key), value);
-    if (type === 'string') {
-      // Prepare UTF-8 only when it is needed. ASCII records go directly into
-      // one fresh allocation. No per-record WASM calls or encoding buffers.
+    // A large JSON batch can use the same packed UTF-8 leaves as strings.
+    // Serialize each surviving value once, in input order, before allocating:
+    // toJSON/getters can reenter this arena and reuse its writer scratch.
+    const packedJSON = type !== 'string' && type !== 'number' && type !== 'boolean' && latest.size >= 256;
+    if (packedJSON) for (const [key, value] of latest) latest.set(key, this.text(type, value));
+    if (type === 'string' || packedJSON) {
+      // JSON records use native UTF-8 conversion. Short ASCII string values
+      // keep their direct writer; neither path needs per-record WASM calls.
       const encodedKeys = new Map<string, Uint8Array>(), encodedValues = new Map<string, Uint8Array>();
-      let total = (latest.size * 4 + 7) & ~7;
+      const staged = packedJSON && latest.size <= 12288;
+      const tableBytes = staged ? 0 : (latest.size * 4 + 7) & ~7;
+      let total = tableBytes;
       for (const [key, value] of latest) {
         if (typeof value !== 'string') throw new TypeError('Expected a string');
         let keyLength = key.length, valueLength = value.length;
         for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { const b = encoder.encode(key); encodedKeys.set(key, b); keyLength = b.length; break; }
-        for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
+        if (packedJSON) {
+          if (nonAsciiText.test(value)) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; }
+        } else for (let i = 0; i < value.length; i++) if (value.charCodeAt(i) > 127) { const b = encoder.encode(value); encodedValues.set(key, b); valueLength = b.length; break; }
         total += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
       }
-      const input = this.alloc(total), dv = this.dv, bytes = this.bytes;
-      let p = input + ((latest.size * 4 + 7) & ~7), slot = input;
+      const allocation = this.alloc(total), input = staged ? 16384 : allocation, dv = this.dv, bytes = this.bytes;
+      let p = allocation + tableBytes, slot = input;
       for (const [key, value] of latest) {
         const k = encodedKeys.get(key), v = encodedValues.get(key);
         const keyLength = k?.length ?? key.length, valueLength = v?.length ?? value.length;
         let hash = 2166136261;
         for (let i = 0; i < keyLength; i++) { const c = k ? k[i] : key.charCodeAt(i); bytes[p + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
         if (v) bytes.set(v, p + 16 + keyLength);
+        else if (packedJSON) bytes.set(encodeUtf8ForWrite(encoder, value), p + 16 + keyLength);
         else for (let i = 0; i < valueLength; i++) bytes[p + 16 + keyLength + i] = value.charCodeAt(i);
         dv.setUint32(p, 0, true); dv.setUint32(p + 4, hash >>> 0, true); dv.setUint32(p + 8, keyLength, true); dv.setUint32(p + 12, valueLength, true);
         dv.setUint32(slot, p, true); slot += 4; p += Math.ceil((16 + keyLength + valueLength) / 4) * 4;
