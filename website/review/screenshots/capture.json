@@ -37,14 +37,6 @@
       "fullPage": true
     },
     {
-      "file": "benchmarks-desktop.png",
-      "viewport": {
-        "width": 1440,
-        "height": 1000
-      },
-      "fullPage": true
-    },
-    {
       "file": "adoption-desktop.png",
       "viewport": {
         "width": 1440,

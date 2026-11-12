@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "aafe7cd5138c96b1da379442a074bf5e08f38a2d",
+  "base": "/zerocopy/",
+  "browser": "153.0.8010.0",
+  "reducedMotion": true,
+  "captures": [
+    {
+      "file": "benchmarks-desktop.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "fullPage": true
+    },
+    {
+      "file": "benchmarks-mobile.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true
+    }
+  ],
+  "performance": {
+    "display": "recorded",
+    "sourceCommit": "ab1eae5c2ecc8497ed1b5a4c422febc0e5e4f492",
+    "measuredAt": "2026-11-11T23:59:12.980Z",
+    "entries": 10000,
+    "readers": 2,
+    "samplesPerCase": 7
+  }
+}
