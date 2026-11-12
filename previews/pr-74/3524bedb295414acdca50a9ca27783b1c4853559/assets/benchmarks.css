@@ -1,0 +1,79 @@
+.evidence-page{padding-bottom:64px}
+.benchmark-intro{padding:52px 0 35px}
+.benchmark-intro h1{font-size:clamp(42px,5.4vw,68px);line-height:1.05;letter-spacing:-.06em;margin:14px 0 16px}
+.benchmark-intro h1 span{color:var(--lime)}
+.benchmark-intro>p{font-size:16px;margin:0;line-height:1.7}
+.benchmark-memory{border-top:1px solid var(--line);padding-top:27px}
+.benchmark-section-heading{display:flex;justify-content:space-between;align-items:end;gap:18px}
+.benchmark-section-heading h2{font-size:27px;line-height:1.2;letter-spacing:-.035em;margin:7px 0 0}
+.benchmark-unit{font:11px/1.8 var(--mono);color:var(--muted);white-space:nowrap}
+.benchmark-workload{font-size:13px;line-height:1.7;margin:12px 0 24px}
+.benchmark-workload>span{padding-inline:6px;color:#717968}
+.benchmark-memory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.benchmark-chart{min-width:0;margin:0;padding:24px 26px 19px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.benchmark-chart>figcaption{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:26px}
+.benchmark-chart h3{font-size:19px;line-height:1.3;letter-spacing:-.03em;margin:0}
+.benchmark-chart>figcaption p{font-size:11px;line-height:1.6;text-align:right;margin:0}
+.benchmark-chart>figcaption p strong{color:var(--lime);font-size:17px;font-weight:550;display:block;letter-spacing:-.02em}
+.benchmark-bars{display:grid;gap:20px}
+.benchmark-bar-label{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:8px;font-size:14px;line-height:1.4}
+.benchmark-bar-label>span{color:#d4d7cc}
+.benchmark-bar-label strong{font:14px/1.4 var(--mono);font-weight:500;white-space:nowrap}
+.benchmark-bar-label>span{min-width:0}
+.benchmark-bar-label strong{flex:none}
+.benchmark-bar-label small{font-size:11px;color:var(--muted)}
+.benchmark-bar-track,.benchmark-track{height:10px;border-radius:2px;background:#262a22;overflow:hidden}
+.benchmark-bar-track>span,.benchmark-fill{display:block;height:100%;background:#88917c;border-radius:2px}
+.benchmark-bar[data-memory-kind=shared] .benchmark-bar-track>span,.benchmark-bar[data-kind=shared] .benchmark-bar-track>span,.benchmark-bar[data-kind=shared] .benchmark-fill{background:var(--lime)}
+.benchmark-bar[data-memory-kind=shared] .benchmark-bar-label>span,.benchmark-bar[data-kind=shared] .benchmark-bar-label>span{color:var(--lime)}
+.benchmark-scale{display:flex;justify-content:space-between;font:10px/1.5 var(--mono);color:#919887;border-top:1px solid #3a4033;margin-top:21px;padding-top:7px}
+.benchmark-source{display:flex;align-items:baseline;justify-content:space-between;gap:18px;margin-top:17px;font-size:11px;line-height:1.8}
+.benchmark-source p{font-size:11px;line-height:1.8;margin:0}
+.benchmark-recorded{font-size:10px;color:#d1d9bf;border:1px solid #4c583b;border-radius:4px;padding:3px 6px;margin-right:6px;white-space:nowrap}
+.benchmark-source a,.benchmark-method a{color:#d4dfbc;text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
+.benchmark-caveat{font-size:12px;line-height:1.7;margin:8px 0 13px}
+.benchmark-method{border-top:1px solid var(--line);font-size:12px;line-height:1.8}
+.benchmark-method>summary{padding:13px 0;min-height:44px;color:#c4ccba}
+.benchmark-method>div{max-width:920px;padding:0 0 18px}
+.benchmark-method p{font-size:12px;line-height:1.85;margin:0 0 12px}
+.benchmark-method a{white-space:normal;overflow-wrap:anywhere}
+.benchmark-performance{margin-top:38px;border-top:1px solid var(--line);padding-top:28px}
+.benchmark-performance .benchmark-chart>figcaption{display:block;margin-bottom:24px}
+.benchmark-performance .benchmark-chart>figcaption>.benchmark-unit{display:block;margin-top:8px;white-space:normal}
+.benchmark-performance #feature-result-origin{display:block;white-space:normal;border:0;padding:0;margin:0 0 20px;font-size:12px;line-height:1.8;color:var(--muted)}
+.benchmark-performance #feature-result-origin strong{font-weight:500;color:var(--ink)}
+.benchmark-performance #feature-recording-details{overflow-wrap:anywhere}
+.benchmark-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:21px 0 14px}
+.benchmark-controls .button{font-size:12px;gap:15px}
+.benchmark-controls>a{font-size:12px;line-height:1.7;padding:8px 4px;color:#d4dfbc;text-decoration:underline;text-underline-offset:4px}
+.benchmark-controls label{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.benchmark-controls select{font-size:12px;min-height:48px;padding:10px 27px 10px 12px}
+.benchmark-controls input[type=hidden]{display:none}
+.benchmark-run-options{flex-basis:100%;font-size:12px;line-height:1.8;color:var(--muted)}
+.benchmark-run-options>summary{min-height:44px;padding:12px 0;color:#c4ccba}
+.benchmark-run-options>label{justify-content:flex-start;padding:0 0 8px;max-width:320px}
+.benchmark-run-options select{min-width:160px}
+.benchmark-source-files{display:grid;gap:7px;padding-left:18px;margin:0 0 12px}
+.benchmark-source-files a{white-space:normal}
+#memory,#performance,#sources{scroll-margin-top:100px}
+.benchmark-status{font-size:12px;line-height:1.7;color:var(--muted);margin:0 0 18px;min-height:21px}
+.benchmark-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.benchmark-performance .feature-timing-group{padding:24px 26px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.benchmark-performance .feature-timing-group h2{font-size:19px;line-height:1.3;letter-spacing:-.025em;margin:0 0 23px}
+.benchmark-performance .feature-timing-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:7px 12px;margin-top:17px;font-size:13px}
+.benchmark-performance .feature-timing-row>span{color:#d4d7cc}
+.benchmark-performance .feature-timing-value{grid-column:2;grid-row:1;font:14px/1.5 var(--mono);white-space:nowrap}
+.benchmark-performance .feature-timing-track{grid-column:1/-1;grid-row:2;height:10px;background:#262a22;border-radius:2px;overflow:hidden}
+.benchmark-performance .feature-timing-fill{height:100%;background:#88917c;border-radius:2px}
+.benchmark-performance .feature-timing-row[data-case=shared]>span{color:var(--lime)}
+.benchmark-performance .feature-timing-row[data-case=shared] .feature-timing-fill{background:var(--lime)}
+.benchmark-performance .feature-timing-group>.lab-small{font-size:11px;line-height:1.6;margin:5px 0 0}
+.benchmark-performance .capability-notice{margin:0 0 12px;padding:0;border:0;background:none;font-size:11px;color:var(--muted)}
+.benchmark-performance .capability-help{font-size:12px;margin-bottom:16px}
+.benchmark-performance .capability-notice[data-state=ready]{display:none}
+.benchmark-more{display:flex;align-items:center;flex-wrap:wrap;gap:12px 26px;border-top:1px solid var(--line);margin-top:34px;padding-top:22px;font-size:12px}
+.benchmark-more>span{color:var(--muted);margin-right:auto}
+.benchmark-more>a:hover{color:var(--lime)}
+@media(max-width:900px){.benchmark-chart{padding:21px}.benchmark-chart>figcaption{gap:10px}.benchmark-chart h3{font-size:18px}.benchmark-source{align-items:start}.benchmark-results{grid-template-columns:1fr}.benchmark-controls .button{padding-inline:15px}}
+@media(max-width:650px){.benchmark-intro{padding:36px 0 26px}.benchmark-intro h1{font-size:45px}.benchmark-intro>p{font-size:14px;max-width:330px}.benchmark-section-heading{align-items:start;flex-direction:column;gap:8px}.benchmark-section-heading h2{font-size:25px}.benchmark-unit{font-size:10px}.benchmark-workload{font-size:12px;margin-bottom:18px}.benchmark-workload>span{padding-inline:2px}.benchmark-memory-grid{grid-template-columns:1fr;gap:16px}.benchmark-chart{padding:23px 21px 18px}.benchmark-chart>figcaption{margin-bottom:24px}.benchmark-chart h3{font-size:19px}.benchmark-source{display:block;margin-top:15px}.benchmark-source a{display:inline-block;padding-block:8px;font-size:12px}.benchmark-caveat{margin-top:0}.benchmark-performance{margin-top:28px;padding-top:23px}.benchmark-controls{gap:10px;margin-top:18px}.benchmark-controls>.primary{width:100%;justify-content:space-between}.benchmark-controls label{width:100%;justify-content:space-between}.benchmark-controls select{flex:1;max-width:200px}.benchmark-performance .feature-timing-group{padding:22px 20px}.benchmark-more{gap:13px 20px;align-items:start;flex-direction:column;margin-top:26px}.benchmark-more>span{font-size:11px}.evidence-page{padding-bottom:42px}}
+@media(max-width:360px){.benchmark-intro h1{font-size:39px}.benchmark-chart{padding-inline:17px}.benchmark-chart>figcaption{align-items:start;gap:8px}.benchmark-chart h3{font-size:17px}.benchmark-bar-label{font-size:14px;gap:6px}.benchmark-bar-label strong{font-size:14px}.benchmark-chart>figcaption p{font-size:10px}.benchmark-chart>figcaption p strong{font-size:16px}}
