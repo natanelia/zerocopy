@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { basePath, pages } from '../config.mjs';
+import { regressionHTML } from './regression-preview.mjs';
+import { basePath, pages, evidencePages, benchmarkRedirects } from '../config.mjs';
 import { highlight, renderMarkdown } from '../render.mjs';
 import { expectedChecksum, orderFor, summarize, validateConfig, verifyChecksums } from '../assets/bench-core.mjs';
 const out = fileURLToPath(new URL('../_site/', import.meta.url));
@@ -84,20 +85,21 @@ test('the product story separates its conceptual model, real playground, and mea
   assert.ok(home.includes('id="how-it-works"'));
   assert.ok(home.includes('id="publish-concept"'));
   assert.ok(home.includes('id="arena-revision"'));
-  for (const route of ['playground/', 'compare/', 'benchmarks/', 'docs/getting-started/', 'docs/choose-zerocopy/']) assert.ok(home.includes(`href="${meta.base}${route}"`), route);
-  assert.match(home, /No preselected winner\. Live timings appear only after you run a benchmark\./);
+  for (const route of ['playground/', 'benchmarks/', 'docs/getting-started/', 'docs/choose-zerocopy/']) assert.ok(home.includes(`href="${meta.base}${route}"`), route);
+  assert.ok(home.includes('benchmarks/'));
+  assert.doesNotMatch(home, /Choose a benchmark|Compare the full product catalog/);
   assert.doesNotMatch(home, /(?:src|href)="[^\"]*\/library\//);
-  const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
+  const lab = regressionHTML('lab/');
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
   assert.match(lab, /Immutable\.js Map/); assert.match(lab, /Immer Map/);
   assert.doesNotMatch(lab, /Structured-cloned Map|Native Map can win/);
-  for (const file of ['immutable.mjs', 'immer.mjs', 'immutable-LICENSE.txt', 'immer-LICENSE.txt']) assert.ok(existsSync(join(out, 'lab/vendor', file)), file);
+  for (const file of ['immutable.mjs', 'immer.mjs', 'immutable-LICENSE.txt', 'immer-LICENSE.txt']) assert.ok(existsSync(join(out, 'vendor', file)), file);
   assert.equal(meta.dependencies.immer, JSON.parse(readFileSync(new URL('../../package.json', import.meta.url))).devDependencies.immer);
   assert.ok(!home.includes('<script src="https://'));
 });
 
 test('demo workers and all runtime modules stay inside the automatic isolation scope', () => {
-  for (const [route, entry, worker] of [['lab', 'lab.mjs', 'bench-runner.mjs'], ['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['compare', 'feature.mjs', 'feature-owner.mjs'], ['benchmarks', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['investigation-benchmark', 'feature-benchmark.mjs', 'feature-owner.mjs'], ['historical/log-explorer', 'explorer.mjs', 'explorer-owner.mjs'], ['historical/log-benchmark', 'explorer-benchmark.mjs', 'explorer-bench-runner.mjs']]) {
+  for (const [route, entry, worker] of [['playground', 'playground.mjs', 'snapshot-worker.mjs'], ['benchmarks', 'feature-benchmark.mjs', 'feature-owner.mjs']]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.ok(html.includes(`src="${meta.base}${route}/assets/${entry}"`));
     assert.ok(html.includes(`src="${meta.base}${route}/assets/main.mjs"`));
@@ -115,7 +117,7 @@ test('demo workers and all runtime modules stay inside the automatic isolation s
 
 test('product catalog and small snapshot tutorial have clear scopes', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.match(home, /product catalog/i); assert.doesNotMatch(home, /headphones/);
+  assert.match(home, /Edit a product/); assert.doesNotMatch(home, /headphones/);
   assert.doesNotMatch(home, /100,000 generated events|immutable columns|LOG EXPLORER/);
   const guide = readFileSync(join(out, 'docs/catalog/index.html'), 'utf8');
   assert.match(guide, /prices, stock and availability/);
@@ -123,56 +125,77 @@ test('product catalog and small snapshot tutorial have clear scopes', () => {
   assert.match(playground, /Headphones in stock/);
 });
 
-test('the catalog is the sole live comparison and old workloads stay historical', () => {
+test('retained comparison fixtures keep their workload boundaries', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
   for (const slug of ['catalog', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) assert.ok(home.includes(`docs/${slug}/`));
   for (const route of ['compare']) {
-    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    const html = regressionHTML(route + '/');
     assert.match(html, /Replace 100 products/); assert.match(html, /Initial · retained/);
     assert.doesNotMatch(html, /Freeze investigation|live events|Five immutable columns/);
   }
   for (const route of ['historical/log-explorer', 'historical/log-compare', 'historical/log-benchmark']) {
-    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    const html = regressionHTML(route + '/');
     assert.match(html, /Historical SharedList log workload/);
-    assert.ok(existsSync(join(out, route, 'isolation-sw.js')));
-    assert.ok(existsSync(join(out, route, 'library/shared.js')));
+    assert.ok(!existsSync(join(out, route, 'isolation-sw.js')));
+    assert.ok(!existsSync(join(out, route, 'library/shared.js')));
   }
 });
 
-test('benchmark pages disclose copy strategies while preserving the original catalog layout', () => {
-  const catalog = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
+test('retained benchmark fixtures preserve copy strategies and the original layout', () => {
+  const catalog = regressionHTML('investigation-benchmark/');
   for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
   assert.match(catalog, /<h1>One product catalog\.<br>Four implementations\.<\/h1>/);
   assert.doesNotMatch(catalog, /feature-benchmark-preview|data-preview-case|feature-preview-status/);
   assert.ok(catalog.includes('<div id="feature-benchmark-results" aria-live="polite"></div>'));
   const css = readFileSync(join(out, 'assets/feature.css'), 'utf8');
   assert.doesNotMatch(css, /feature-benchmark-preview|feature-preview-status/);
-  const historical = readFileSync(join(out, 'historical/log-benchmark/index.html'), 'utf8');
+  const historical = regressionHTML('historical/log-benchmark/');
   for (const text of ['incremental copy', 'full copy', '42 measured samples', 'Queries use data already attached']) assert.ok(historical.includes(text), text);
-  const live = readFileSync(join(out, 'compare/index.html'), 'utf8');
+  const live = regressionHTML('compare/');
   assert.equal((live.match(/LOCAL REPLICAS/g) ?? []).length, 3);
   assert.equal((live.match(/Edits clone only 100 changed ID\/object pairs\./g) ?? []).length, 3);
   assert.doesNotMatch(live, /Incremental copy baseline/);
-  const logLive = readFileSync(join(out, 'historical/log-compare/index.html'), 'utf8');
+  const logLive = regressionHTML('historical/log-compare/');
   assert.match(logLive, /Incremental copy is the default/);
   assert.match(logLive, /Full copy · all events every update/);
-  const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
+  const lab = regressionHTML('lab/');
   assert.match(lab, /Full copy on every publication/);
 });
 
-test('old demo and guide routes redirect directly without allocating demo workers', () => {
-  for (const [route, target] of [['explorer/', 'compare/'], ['docs/maps/', 'docs/catalog/']]) {
+test('retired routes go directly to one benchmark page without allocating workers', () => {
+  for (const { route, target } of [...benchmarkRedirects, { route: 'docs/maps/', target: 'docs/catalog/' }]) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
-    assert.ok(html.includes(`http-equiv="refresh" content="0;url=${meta.base}${target}"`));
-    assert.ok(html.includes(`href="${meta.base}${target}">Continue directly`));
-    assert.ok(html.includes('location.replace('));
-    assert.ok(html.includes('location.search + location.hash'));
-    assert.doesNotMatch(html, /feature-load|feature\.mjs|capability\.mjs/);
+    assert.ok(html.includes(`http-equiv="refresh" content="0;url=${meta.base}${target}"`), route);
+    assert.ok(html.includes(`href="${meta.base}${target}"`), route);
+    assert.ok(html.includes('location.replace('), route);
+    assert.match(html, /noindex,nofollow/);
+    assert.doesNotMatch(html, /feature-load|feature\.mjs|feature-benchmark\.mjs|capability\.mjs/);
+    assert.ok(!meta.pages.includes(route), 'Redirects do not compete in the sitemap');
   }
-  const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.ok(!home.includes(`href="${meta.base}explorer/"`));
-  for (const route of ['', 'compare/', 'investigation-benchmark/', 'docs/catalog/']) {
+  for (const route of ['', 'benchmarks/', 'playground/', 'docs/catalog/']) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    for (const retired of benchmarkRedirects) assert.ok(!html.includes(`href="${meta.base}${retired.route}`), `${route} links to retired ${retired.route}`);
     assert.doesNotMatch(html, /road\/|road attributes|road features|\blanes\b|geospatial|cartograph|spatial index/i);
+  }
+});
+
+test('navigation, search and recorded sources all resolve to one benchmark destination', () => {
+  const search = JSON.parse(readFileSync(join(out, 'search.json'), 'utf8'));
+  assert.deepEqual(search.filter(entry => entry.title === 'Benchmarks').map(entry => entry.route),
+    ['benchmarks/#memory', 'benchmarks/#performance', 'benchmarks/#sources']);
+  for (const { route } of benchmarkRedirects) assert.ok(search.every(entry => !entry.route.startsWith(route)), route);
+  for (const route of meta.pages) {
+    const html = readFileSync(join(out, route, 'index.html'), 'utf8');
+    for (const name of ['desktop-nav', 'mobile-nav']) {
+      const nav = html.match(new RegExp(`<nav[^>]*class="${name}"[^>]*>([\\s\\S]*?)<\\/nav>`))[1];
+      assert.equal((nav.match(/>Benchmarks<\/a>/g) || []).length, 1);
+      assert.ok(nav.includes(`href="${meta.base}benchmarks/"`));
+      assert.doesNotMatch(nav, /Live catalog comparison|Benchmark explorer/);
+    }
+    for (const retired of benchmarkRedirects) assert.ok(!html.includes(`href="${meta.base}${retired.route}`), `${route} links to retired ${retired.route}`);
+  }
+  for (const page of evidencePages) {
+    assert.equal(readFileSync(join(out, 'markdown', `${page.slug}.md`), 'utf8'),
+      readFileSync(new URL('../../' + page.source, import.meta.url), 'utf8'), page.source);
   }
 });

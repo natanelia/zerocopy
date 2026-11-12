@@ -4,11 +4,15 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createPreview } from '../serve.mjs';
+import { createRegressionPreview } from './regression-preview.mjs';
+import { benchmarkRedirects } from '../config.mjs';
 const base = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url))).base;
 const screenshots = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(screenshots, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox'] });
 const server = createPreview({ base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
+const regressionServer = createRegressionPreview({ base }); regressionServer.listen(0, '127.0.0.1'); await once(regressionServer, 'listening');
+const regressionOrigin = `http://127.0.0.1:${regressionServer.address().port}`;
 const errors = [];
 let activePage;
 async function capture(page, filename) {
@@ -54,8 +58,15 @@ try {
   await page.goto(origin + base + 'docs/getting-started/'); assert.ok(await page.locator('article').innerText().then(text => text.includes('connectSharedSession')));
   await capture(page, 'docs-desktop.png');
   await page.goto(origin + base + 'benchmarks/');
-  assert.equal(await page.locator('main a[href="' + base + 'investigation-benchmark/"]').count() > 0, true);
-  assert.equal(await page.locator('main a[href="' + base + 'lab/"]').count() > 0, true);
+  assert.equal(await page.locator('h1').innerText(), 'Benchmarks.');
+  assert.equal(await page.locator('#feature-run').count(), 1);
+  for (const { route, target } of benchmarkRedirects) {
+    await page.goto(origin + base + route + '?source=legacy#old-section');
+    await page.waitForURL(url => url.pathname === base + 'benchmarks/');
+    assert.equal(new URL(page.url()).hash, new URL(origin + base + target).hash);
+    assert.equal(new URL(page.url()).search, '?source=legacy');
+  }
+  await page.goto(origin + base + 'benchmarks/');
   await capture(page, 'benchmarks-desktop.png');
   await page.goto(origin + base + 'playground/'); await page.getByRole('button', { name: 'Connect a worker' }).click();
   await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '12');
@@ -75,7 +86,8 @@ try {
   assert.equal(await page.locator('#reader-availability').innerText(), 'In stock');
   assert.match(await page.locator('#retained-value').innerText(), /^12\s*units$/);
   await page.getByRole('button', { name: 'Disconnect', exact: true }).click();
-  await page.goto(origin + base + 'lab/'); await page.locator('#entries').selectOption('1000');
+  // Keep the scalar-map engine regression without publishing a second benchmark page.
+  await page.goto(regressionOrigin + base + 'lab/'); await page.locator('#entries').selectOption('1000');
   await page.getByRole('button', { name: 'Run benchmark' }).click(); await page.waitForFunction(() => document.querySelector('#benchmark-status').textContent.startsWith('Complete.'));
   assert.equal(await page.locator('.result-row').count(), 3); assert.match(await page.locator('#benchmark-detail').innerText(), /checksums passed/);
   assert.match(await page.locator('#benchmark-chart').innerText(), /Immutable\.js Map/);
@@ -92,7 +104,7 @@ try {
   await page.locator('#entries').selectOption('50000'); await page.getByRole('button', { name: 'Run benchmark' }).click(); await page.getByRole('button', { name: 'Stop run' }).click();
   assert.match(await page.locator('#benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#export-results').isDisabled(), true);
   const mobile = await context.newPage(); await mobile.setViewportSize({ width: 390, height: 844 });
-  for (const route of ['', 'docs/collections/', 'docs/choose-zerocopy/', 'benchmarks/', 'lab/', 'playground/', 'use-cases/']) {
+  for (const route of ['', 'docs/collections/', 'docs/choose-zerocopy/', 'benchmarks/', 'playground/', 'use-cases/']) {
     await mobile.goto(origin + base + route);
     assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, 'Horizontal overflow at ' + route);
   }
@@ -117,7 +129,14 @@ try {
   assert.match(await plain.locator('.code-facts').innerText(), /One allocating writer per arena/);
   assert.equal(await plain.locator('.reader-node').count(), 3, 'The conceptual explanation remains legible without JavaScript');
   assert.equal(await plain.locator('a[href="https://www.npmjs.com/package/zerocopy"]').isVisible(), true);
-  await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap')); await noJs.close();
+  await plain.goto(origin + base + 'docs/collections/'); assert.ok((await plain.locator('article').innerText()).includes('SharedMap'));
+  for (const { route, target } of benchmarkRedirects) {
+    await plain.goto(origin + base + route);
+    await plain.waitForURL(origin + base + target);
+    assert.equal(await plain.locator('h1').innerText(), 'Benchmarks.');
+    assert.equal(await plain.locator('#feature-result-origin').getAttribute('data-result-origin'), 'recorded');
+  }
+  await noJs.close();
   await context.close();
   console.log('Passed: desktop/mobile layout, lazy runtime, navigation, safe search, no-JS docs, actual worker snapshots, live benchmark checksums/export, and cancellation.');
   const staticServer = createPreview({ base, isolated: false }); staticServer.listen(0, '127.0.0.1'); await once(staticServer, 'listening');
@@ -126,10 +145,12 @@ try {
     const staticOrigin = `http://127.0.0.1:${staticServer.address().port}`;
     p.on('pageerror', error => errors.push(error.message));
     p.on('requestfailed', request => console.error('Static-host request failed:', request.url(), request.failure()?.errorText));
-    await p.goto(staticOrigin + base + 'lab/');
-    await p.waitForFunction(() => crossOriginIsolated && !document.querySelector('#run-benchmark').disabled);
-    await p.locator('#entries').selectOption('1000'); await p.locator('#readers').selectOption('1'); await p.locator('#run-benchmark').click();
-    await p.waitForFunction(() => document.querySelector('#benchmark-status').textContent.startsWith('Complete.'));
+    await p.goto(staticOrigin + base + 'benchmarks/');
+    await p.waitForFunction(() => crossOriginIsolated && !document.querySelector('#feature-run').disabled);
+    await p.locator('details:has(#feature-count) > summary').click();
+    await p.locator('#feature-count').selectOption('1000'); await p.locator('#feature-run').click();
+    await p.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'));
+    assert.equal(await p.locator('#feature-result-origin').getAttribute('data-result-origin'), 'device');
     await p.goto(staticOrigin + base + 'playground/');
     await p.waitForFunction(() => crossOriginIsolated && !document.querySelector('#start-playground').disabled);
     await p.locator('#start-playground').click();
@@ -150,4 +171,4 @@ try {
     await activePage.screenshot({ path: screenshots + '/failure.png', fullPage: true }).catch(() => {});
   }
   throw error;
-} finally { await browser.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+} finally { await browser.close(); server.closeAllConnections(); regressionServer.closeAllConnections(); await Promise.all([new Promise(resolve => server.close(resolve)), new Promise(resolve => regressionServer.close(resolve))]); }

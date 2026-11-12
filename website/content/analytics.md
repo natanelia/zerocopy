@@ -48,7 +48,7 @@ Do not send huge result arrays back for every query without measuring that cost.
 
 Measure input construction, data movement, attachment, calculation, and the result. A faster warm lookup does not prove a faster first query.
 
-The [live benchmark](../README.md#benchmark-lab) measures one end-to-end scenario: sending a numeric map to dedicated readers, attaching it, and looking up every key. It includes per-publication attachment cost. Native Map can win. The [recorded report](../../docs/benchmarks.md) measures other collection workloads separately.
+[Benchmarks](../README.md#catalog-benchmark) puts recorded memory charts and a product-catalog performance run on one page. The browser run measures construction, publication, reads, and 100 product replacements with two readers. Native Map can win. Original collection measurements remain available under **Method, environment & source data**.
 
 ## Know when columnar data is a better fit
 

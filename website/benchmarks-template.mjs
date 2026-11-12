@@ -10,7 +10,7 @@ export function benchmarkMemory(base) {
   const data = featureMemoryData;
   const controls = data.summary.filter(row => row.readers === 0 && row.stage === 'edited-retained');
   const control = kind => mib(controls.find(row => row.kind === kind).medians.rssBytes);
-  return `<section class="benchmark-memory" aria-labelledby="memory-heading">
+  return `<section id="memory" class="benchmark-memory" aria-labelledby="memory-heading">
     <div class="benchmark-section-heading"><div><span class="eyebrow">01 / MEMORY</span><h2 id="memory-heading">Whole-process memory</h2></div><span class="benchmark-unit">MiB · lower is better</span></div>
     <p class="benchmark-workload">100,000 synthetic records <span>·</span> 100 replacements <span>·</span> initial + current revision retained</p>
     <div class="benchmark-memory-grid">${model.groups.map(group => `<figure class="benchmark-chart" data-memory-readers="${group.points[0].readers}" data-memory-maximum="${model.maximum * MIB}">
@@ -27,7 +27,7 @@ export function benchmarkMemory(base) {
       <p>Absolute process RSS includes the owner, all readers, and the Node runtime. The charts use the same zero-based scale and compare matched reader counts after the first edit. All implementations retain revision 0 and revision 1. Native Map, Immutable.js, and Immer send only the 100 changed records on updates.</p>
       <p>The owner-only control uses ${control('shared')} MiB for ZeroCopy SharedMap and ${control('native')} MiB for native Map. These historical measurements use runtime <a href="https://github.com/natanelia/zerocopy/commit/${data.runtimeSourceCommit}">${data.runtimeSourceCommit.slice(0, 7)}</a>, before later optimizations. They do not measure the current product catalog or this browser.</p>
       <p>Each bar is the median of three fresh processes. Raw data contains every sample, observed ranges, source hashes, and environment. The separate eight-reader recording uses a different host and remains in the full report.</p>
-      <a href="${base}docs/memory-comparison/">Full memory report →</a>
+      <p>The original reports are available in <a href="#sources">source data</a> below.</p>
     </div></details>
   </section>`;
 }
@@ -35,9 +35,8 @@ export function benchmarkMemory(base) {
 /** Performance is supplied by the checked catalog benchmark presentation. */
 export function benchmarks(base, performancePanel = '') {
   return `<main id="main" class="wrap evidence-page">
-    <header class="benchmark-intro"><span class="eyebrow">BENCHMARKS</span><h1>Memory, <span>measured.</span></h1><p>See the recorded results. Run the performance test on your device.</p></header>
+    <header class="benchmark-intro"><span class="eyebrow">MEMORY &amp; PERFORMANCE</span><h1>Benchmarks<span>.</span></h1><p>Compare memory use. Run the performance test on your device.</p></header>
     ${benchmarkMemory(base)}
     ${performancePanel}
-    <nav class="benchmark-more" aria-label="More benchmarks"><span>Explore more</span><a href="${base}lab/">Worker fan-out →</a><a href="${base}docs/benchmarks/">Collection operations →</a><a href="${base}docs/choose-zerocopy/">Is ZeroCopy a fit? →</a></nav>
   </main>`;
 }

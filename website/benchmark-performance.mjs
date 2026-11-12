@@ -37,26 +37,27 @@ export function validateCatalogRecording(value) {
 validateCatalogRecording(catalogRecording);
 
 export function benchmarkPerformancePanel(base) {
-  return `<section class="benchmark-performance" aria-labelledby="benchmark-performance-title">
+  return `<section id="performance" class="benchmark-performance" aria-labelledby="benchmark-performance-title">
     <div class="benchmark-section-heading"><div><span class="eyebrow">02 / PERFORMANCE</span><h2 id="benchmark-performance-title">Now try your device.</h2></div><span class="benchmark-unit">Real workers · checked results</span></div>
-    <p class="benchmark-workload">10,000 products <span>·</span> 2 readers <span>·</span> 100 edits <span>·</span> 7 samples per case</p>
+    <p class="benchmark-workload">2 readers <span>·</span> 100 edits <span>·</span> 7 samples per case</p>
     <form id="feature-benchmark-form" class="benchmark-controls" data-benchmark-view="compact">
-      <input id="feature-count" type="hidden" value="10000">
       <button id="feature-run" class="button primary" aria-label="Run performance benchmark on my device" disabled>Run on my device <span aria-hidden="true">→</span></button>
       <button id="feature-cancel" type="button" class="button secondary" hidden>Stop run</button>
       <button id="feature-export" type="button" class="button secondary" disabled hidden>Download my results</button>
       <a id="feature-recorded-export" href="${base}assets/catalog-benchmark-recording.json" download>Download recorded JSON ↓</a>
+      <details class="benchmark-run-options"><summary>Run options</summary><label for="feature-count">Products<select id="feature-count"><option value="1000">1,000</option><option value="10000" selected>10,000</option><option value="100000">100,000</option></select></label></details>
     </form>
     ${isolationNotice()}
     <noscript><p class="benchmark-status">Enable JavaScript to run on your device. The recorded charts and downloads stay available.</p></noscript>
     <p id="feature-benchmark-status" class="benchmark-status" role="status">Run once to replace the recorded sample with your result.</p>
     <p id="feature-result-origin" class="benchmark-recorded" data-result-origin="recorded">${benchmarkOrigin(catalogRecording)}</p>
     <div id="feature-benchmark-results">${benchmarkBars(catalogRecording)}</div>
-    <details class="benchmark-method"><summary>Method and environment</summary><div>
+    <details id="sources" class="benchmark-method"><summary>Method, environment &amp; source data</summary><div>
       <p>Median of seven measured samples after two warm-ups. Cases rotate through fresh owner and reader workers. Startup is excluded; current and retained answers are checked after timing. These are timings, not memory measurements.</p>
       <p>Full-copy bars appear only for publishing an edit and replacing + publishing 100 products. Other operations use the four baseline cases. Raw JSON includes every sample and observed range.</p>
       <p id="feature-recording-details">${benchmarkRecordingDetails(catalogRecording)}</p>
-      <p><a href="${base}investigation-benchmark/">Detailed benchmark and dataset options →</a></p>
+      <p>Original reports, including the complete historical tables and reproduction commands:</p>
+      <ul class="benchmark-source-files"><li><a href="${base}markdown/memory-comparison.md" download>SharedMap memory report (.md)</a></li><li><a href="${base}markdown/benchmarks.md" download>Collection operation results (.md)</a></li><li><a href="${base}markdown/historical-sharedlist-memory.md" download>Earlier SharedList memory report (.md)</a></li></ul>
     </div></details>
   </section>`;
 }

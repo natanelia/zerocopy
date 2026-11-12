@@ -60,7 +60,7 @@ Shared memory is for trusted application workers. Code that holds the underlying
 
 1. **See the snapshot behavior.** Open the [snapshot playground](../README.md#playground), publish a change, and compare a reader's new revision with its retained earlier view.
 2. **Build the smallest real integration.** Follow [Get started](../../docs/getting-started.md). It includes both source files, browser setup, and the expected output.
-3. **Measure the boundary you want to improve.** Use the [product-catalog benchmark](../README.md#catalog-benchmark) for sparse edits and publication, the [Map transport control](../README.md#benchmark-lab) for worker fan-out, and the [recorded memory report](../../docs/feature-map-memory.md) to understand memory accounting. Historical results describe their original source and environment.
+3. **Measure the boundary you want to improve.** Open [Benchmarks](../README.md#catalog-benchmark) for recorded memory use and a one-click product-catalog run. Inspect additional operations, methods, and original reports on the same page. Historical results describe their original source and environment.
 4. **Test your actual workload.** Keep the same data, readers, update pattern, and retained history in each design. Include a native owner with small replies and incremental replicas where they are realistic alternatives.
 
 For the API details, continue to [collections and types](../../docs/api.md), [state and subscriptions](../../docs/worker-sessions.md), or [your own transport](../../docs/worker-sharing.md).

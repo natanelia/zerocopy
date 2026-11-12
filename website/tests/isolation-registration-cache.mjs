@@ -5,7 +5,7 @@
 export function cacheEarlyRegistration() {
   // Apply only to the two demo documents under test. A fresh homepage document
   // in the same browser context must retain native APIs for server-state checks.
-  if (!location.pathname.endsWith('/compare/')) return;
+  if (!location.pathname.endsWith('/compare/') && !location.pathname.endsWith('/benchmarks/')) return;
   const container = navigator.serviceWorker;
   const register = container.register.bind(container);
   const getRegistration = container.getRegistration.bind(container);

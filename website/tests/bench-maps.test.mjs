@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { Map as ImmutableMap } from '../_site/lab/vendor/immutable.mjs';
-import { produce } from '../_site/lab/vendor/immer.mjs';
-import { immutableVersion, immerVersion } from '../_site/lab/vendor/version.mjs';
-import { buildReplica, encodeReplica, attachReplica } from '../_site/lab/assets/bench-maps.mjs';
+import { Map as ImmutableMap } from '../_site/vendor/immutable.mjs';
+import { produce } from '../_site/vendor/immer.mjs';
+import { immutableVersion, immerVersion } from '../_site/vendor/version.mjs';
+import { buildReplica, encodeReplica, attachReplica } from '../_site/assets/bench-maps.mjs';
 
 test('lab uses the pinned upstream Map implementations and keeps earlier roots', () => {
   const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url)));
