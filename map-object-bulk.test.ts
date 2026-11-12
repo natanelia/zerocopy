@@ -102,3 +102,27 @@ test('packed JSON retains full-hash collisions and unchanged leaves across updat
     expect(old.get(key)).toEqual({ collision: i }); expect(next.get(key)).toEqual({ replacement: i });
   }
 });
+
+test('bounded packing flushes safely around oversized records and reentrant allocation hooks', async () => {
+  const a = new Arena(), native = a.wasm, side: SharedMap<'object'>[] = [];
+  let inHook = false, calls = 0;
+  Object.defineProperty(a, 'wasm', { value: {
+    ...native,
+    mapLeaf(keyLength: number, valueLength: number) {
+      if (!inHook && keyLength === 0) {
+        inHook = true; calls++;
+        side.push(fresh(a).set('side', { text: `allocation ${calls} ` + 'x'.repeat(300) }));
+        inHook = false;
+      }
+      return native.mapLeaf(keyLength, valueLength);
+    },
+  } });
+  const input: any[] = Array.from({ length: 5000 }, (_, i) => [`record-${i}`, { i, text: `${i} ` + 'y'.repeat(300) }]);
+  input.splice(3500, 0, ['huge', { text: '界🙂'.repeat(220000) }]);
+  const source = fresh(a).setMany(input);
+  const { map } = await initWorker(getWorkerData({ map: source }, { copy: false }));
+  expect(calls).toBeGreaterThanOrEqual(3);
+  expect(map.size).toBe(input.length);
+  for (const [key, expected] of input) expect(map.get(key)).toEqual(expected);
+  for (let i = 0; i < side.length; i++) expect((side[i]!.get('side') as any).text).toBe(`allocation ${i + 1} ` + 'x'.repeat(300));
+});

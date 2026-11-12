@@ -33,7 +33,8 @@ const fixturePaths = ['run.mjs', 'worker.mjs'].map(path => resolve(here, path)).
 const fixtures = Object.fromEntries(fixturePaths.map(path => [relative(repository, path), hash(readFileSync(path))]));
 const data = { schema: 'zerocopy-reader-startup/v1', startedAt: new Date().toISOString(),
   runtime: { executable: process.execPath, node: process.version, bun: process.versions.bun ?? null,
-    platform: platform(), arch: arch(), cpu: cpus()[0]?.model, logicalCpus: cpus().length },
+    platform: platform(), arch: arch(), cpu: cpus()[0]?.model, logicalCpus: cpus().length,
+    affinity: platform() === 'linux' ? readFileSync('/proc/self/status', 'utf8').match(/^Cpus_allowed_list:\s*(.*)$/m)?.[1] : null },
   method: 'Fresh owner process and two fresh reader workers per sample; imports and input generation excluded. No query warmup. Original catalog calculate includes fingerprints. Paired alternating process order, all samples retained. Summary ratios compare after/before within each pair; total is construction+publication+first query per sample. Correctness checks run after each timer.',
   config: { pairs, sizes, workloads, readers: 2, requestedIds: 1000 }, roots, sources, fixtures, raw: [] };
 mkdirSync(dirname(output), { recursive: true });

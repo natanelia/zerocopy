@@ -66,7 +66,8 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
   const environment = await page.evaluate(() => ({ userAgent: navigator.userAgent, crossOriginIsolated, hardwareConcurrency: navigator.hardwareConcurrency }));
   if (!environment.crossOriginIsolated) throw new Error('Shared-memory isolation is required');
-  data.environment = { ...environment, browser: browser.version(), cpu: cpus()[0]?.model }; save();
+  data.environment = { ...environment, browser: browser.version(), cpu: cpus()[0]?.model,
+    affinity: process.platform === 'linux' ? readFileSync('/proc/self/status', 'utf8').match(/^Cpus_allowed_list:\s*(.*)$/m)?.[1] : null }; save();
   async function sample(arm, kind, count, pair, warmup) {
     const result = await page.evaluate(async ({ arm, kind, count }) => {
       const { Peer } = await import(`/${arm}/assets/catalog-peer.mjs`);
