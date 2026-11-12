@@ -1,0 +1,35 @@
+{
+  "baseline": "6ee24d20e6be91e1d757995770654a249b489d0f",
+  "source": "final writer64+ plus bounded shared UTF8 decode; commit to be fixed after correctness",
+  "affinity": "0-3",
+  "aa": {
+    "node_pairs": 6,
+    "bun_pairs": 6,
+    "chromium_pairs": 7,
+    "sizes": [
+      10000,
+      100000
+    ],
+    "separate_only": true
+  },
+  "final": {
+    "node_pairs": 12,
+    "bun_pairs": 12,
+    "chromium_pairs": 14,
+    "sizes": [
+      1000,
+      10000,
+      100000
+    ],
+    "competitors_at": 10000
+  },
+  "rules": [
+    "all timed CPU runs sequential",
+    "no early stopping",
+    "no outlier removal",
+    "all earlier formal variants retained separately",
+    "A/A results do not normalize A/B results",
+    "preserve construction publication first query repeat first edit edited query and ready sum"
+  ],
+  "candidate": "105e6c775021f95594f861a718f23883f650eb2d"
+}
