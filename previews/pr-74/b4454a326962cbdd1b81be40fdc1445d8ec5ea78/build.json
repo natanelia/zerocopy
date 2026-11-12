@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "9168a6a79c059f367ea121c6f4237570c5420f16",
+  "version": "0.2.1",
+  "dependencies": {
+    "immutable": "5.1.9",
+    "immer": "11.1.21"
+  },
+  "base": "/zerocopy/previews/pr-74/b4454a326962cbdd1b81be40fdc1445d8ec5ea78/",
+  "preview": {
+    "number": 74,
+    "headCommit": "b4454a326962cbdd1b81be40fdc1445d8ec5ea78"
+  },
+  "pages": [
+    "",
+    "benchmarks/",
+    "playground/",
+    "use-cases/",
+    "docs/choose-zerocopy/",
+    "docs/getting-started/",
+    "docs/mental-model/",
+    "docs/collections/",
+    "docs/text-search/",
+    "docs/sessions/",
+    "docs/transport/",
+    "docs/tasks/",
+    "docs/workers/",
+    "docs/redux/",
+    "docs/tanstack/",
+    "docs/memory/",
+    "docs/migration/",
+    "docs/use-cases/",
+    "docs/data-tables/",
+    "docs/graphs/",
+    "docs/simulations/",
+    "docs/analytics/",
+    "docs/catalog/",
+    "docs/editors/"
+  ],
+  "librarySHA256": "f64ed079b6c2a30ac60983715cc1b951aeafa04995a88cf0c0096ce2dbfbeb96"
+}
