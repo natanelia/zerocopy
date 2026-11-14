@@ -22,8 +22,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: primitive-scans-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -47,8 +48,9 @@ jobs:
       - run: bun install
       - name: Build candidate and check source types
         run: bun run build:wasm && bun run build:browser && bun run typecheck
+      # Main CI owns PR unit coverage; retain it for manual diagnostic runs.
       - name: Run full unit suite
-        if: matrix.runtime == 'node'
+        if: matrix.runtime == 'node' && (github.event_name != 'pull_request' || github.base_ref != 'main')
         run: bun run test
       - name: Check out actual PR base separately
         uses: actions/checkout@v4

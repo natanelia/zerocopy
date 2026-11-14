@@ -18,6 +18,11 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify:
     if: github.event_name != 'pull_request' || github.head_ref == 'perf/worker-arena-registry-20261008'

@@ -1,9 +1,8 @@
 name: Browser memory regression
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  # CI checks startup allocation; Documentation website checks WebKit memory
+  # behavior at every hosting path. Retain this standalone diagnostic entry point.
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

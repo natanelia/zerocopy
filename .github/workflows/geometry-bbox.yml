@@ -6,6 +6,11 @@ on:
     paths: ['geometry*', 'proofs/geometry*', 'scripts/build-*', 'package.json', 'tsconfig*', 'type-tests/geometry*', '.github/workflows/geometry-bbox.yml']
 permissions:
   contents: read
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify:
     strategy:
@@ -24,7 +29,9 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run typecheck:geometry && bun run typecheck:redux && bun run typecheck:values
+      # Keep ARM portability coverage; main CI already tests x64 on PRs.
       - run: bun run test
+        if: matrix.os != 'ubuntu-latest' || github.event_name != 'pull_request' || github.base_ref != 'main'
       - name: Exact differential tests and Node bulk benchmark
         run: PERF_GATE=1 node proofs/geometry-bbox.mjs
       - name: Exact differential tests and Bun bulk benchmark

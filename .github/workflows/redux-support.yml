@@ -1,7 +1,6 @@
 name: Redux support
 on:
-  pull_request:
-    branches: [main]
+  # CI owns the same full unit/browser suites, Redux proof, and type checks.
   workflow_dispatch:
 permissions:
   contents: read

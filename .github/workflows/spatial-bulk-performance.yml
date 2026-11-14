@@ -6,6 +6,11 @@ on:
     paths: ['numeric-spatial*', 'proofs/spatial*', 'type-tests/numeric-spatial*', '.github/workflows/spatial-bulk-performance.yml']
 permissions:
   contents: read
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify:
     strategy:
@@ -25,7 +30,9 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bunx tsc --noEmit -p tsconfig.numeric.json
+      # Keep ARM portability coverage; main CI already tests x64 on PRs.
       - run: bun run test
+        if: matrix.os != 'ubuntu-latest' || github.event_name != 'pull_request' || github.base_ref != 'main'
       - run: node proofs/spatial-worker.mjs && node proofs/numeric-worker.mjs
       - run: PERF_GATE=1 node proofs/spatial-bulk-benchmark.mjs
       - run: PERF_GATE=1 bun proofs/spatial-bulk-benchmark.mjs

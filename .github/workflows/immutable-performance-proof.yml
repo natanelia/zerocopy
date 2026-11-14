@@ -5,9 +5,29 @@ on:
     branches: [agent/immutable-performance-proof]
   pull_request:
     branches: [main]
+    # Measurements depend on the whole runtime, compiler, and proof harness.
+    paths:
+      - '*.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bun.lockb'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'scripts/**'
+      - 'proofs/**'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/**'
+      - '.github/workflows/immutable-performance-proof.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -25,16 +45,22 @@ jobs:
       - name: Verify the complete historical raw evidence
         run: node proofs/restore-local-evidence.mjs
       - run: bun run build:wasm && bun run build:browser && bun run build:types
-      - run: bun run typecheck
+      # PRs get the full unit/browser suites and public type checks from CI.
+      # Keep manual runs and the historical agent branch self-contained.
+      - if: github.event_name != 'pull_request'
+        run: bun run typecheck
       - name: Unit and snapshot invariant tests
+        if: github.event_name != 'pull_request'
         run: bun run test
       - name: Real Node worker, shared memory, and deterministic allocation
         run: |
           node proofs/node-worker.mjs > proofs/results/ci-node-worker.json
           bun proofs/allocation.ts > proofs/results/ci-allocation.json
           EXPECT_PASS=1 LABEL=candidate bun proofs/snapshot-regressions.ts > proofs/results/ci-candidate-regressions.json
-      - run: bunx playwright install --with-deps chromium
+      - if: github.event_name != 'pull_request'
+        run: bunx playwright install --with-deps chromium
       - name: Real browser worker tests
+        if: github.event_name != 'pull_request'
         run: bun run test:browser
       - uses: actions/checkout@v4
         with:

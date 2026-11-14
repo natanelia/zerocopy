@@ -9,13 +9,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -49,6 +53,8 @@ jobs:
         run: |
           node --test scripts/check-docs.node.mjs
           if [ -n "$DOCS_BASE" ]; then
+            # Preservation compares two trees; it does not need the full history.
+            git fetch --no-tags --depth=1 origin "$DOCS_BASE"
             node scripts/check-docs.mjs --base "$DOCS_BASE" --preserve
           else
             node scripts/check-docs.mjs
@@ -57,6 +63,9 @@ jobs:
         run: node scripts/check-doc-examples.mjs
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
+      - name: Run all real Chromium integration tests
+        shell: bash
+        run: bun run test:browser 2>&1 | tee browser.log
       - name: Check documented browser workers and isolation guards
         run: node scripts/check-doc-browser.mjs
       - name: Check typed task examples from Markdown
@@ -65,6 +74,7 @@ jobs:
       - name: Check built Node entry points
         run: |
           node proofs/node-worker.mjs
+          node proofs/worker-sessions.mjs
           node proofs/redux-node.mjs
           node proofs/typed-json-worker.mjs
           node --test proofs/map-values-view/worker.mjs
@@ -97,6 +107,7 @@ jobs:
           name: test-evidence-${{ github.sha }}
           path: |
             vitest.log
+            browser.log
             worker-tasks.log
             worker-docs.log
             dist/

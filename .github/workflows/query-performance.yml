@@ -3,10 +3,32 @@ name: Query performance
 on:
   pull_request:
     branches: [main]
+    # Keep runtime, compiler, and proof changes covered without rerunning for prose.
+    paths:
+      - '*.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bun.lockb'
+      - 'package-lock.json'
+      - 'bunfig.toml'
+      - 'tsconfig*.json'
+      - 'type-tests/**'
+      - 'scripts/**'
+      - 'proofs/**'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/**'
+      - 'website/**'
+      - '.github/workflows/query-performance.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   proof:

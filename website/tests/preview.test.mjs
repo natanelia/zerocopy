@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { runInNewContext } from 'node:vm';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, symlinkSync, mkdirSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -81,6 +82,109 @@ test('pushes and manual runs share cancellation only for the same production bra
   const manual = { ...push, event_name: 'workflow_dispatch' };
   assert.equal(group(manual), group(push));
   assert.notEqual(group(manual), group({ ...manual, ref: 'refs/heads/other' }));
+});
+
+// Read only the small YAML sections used by these scenarios; no workflow logic
+// is copied into the tests. The expression operators and fromJSON/format calls
+// below have the same results in JS for these strings, numbers, and status values.
+function workflowJob(name) {
+  const match = workflow.match(new RegExp(`^  ${name}:\\n((?:\\n| {4}[^\\n]*\\n)+)`, 'm'));
+  assert.ok(match, `Missing workflow job: ${name}`);
+  return match[1];
+}
+function workflowValue(source, name, indent) {
+  const match = source.match(new RegExp(`^${' '.repeat(indent)}${name}: ([^\\n]+)(?:\\n((?:${' '.repeat(indent + 2)}[^\\n]*\\n)*))?`, 'm'));
+  assert.ok(match, `Missing workflow field: ${name}`);
+  return match[1] === '>-' ? match[2].trim().replace(/\n\s*/g, ' ') : match[1];
+}
+function evaluate(source, context) {
+  const expression = source.replace(/^\$\{\{\s*|\s*\}\}$/g, '');
+  return runInNewContext(expression, {
+    fromJSON: JSON.parse,
+    format: (template, ...values) => template.replace(/\{(\d+)\}/g, (_, index) => values[index]),
+    always: () => true,
+    cancelled: () => false,
+    vars: {},
+    ...context,
+  });
+}
+const siteJob = workflowJob('site'), buildJob = workflowJob('build'), publishJob = workflowJob('publish');
+const publishableStep = siteJob.match(/^      - name: Retain publishable output\n((?:\n| {8}[^\n]*\n)+)/m)[1];
+const repository = 'natanelia/zerocopy';
+function siteEvent(event, fork = false) {
+  return { ...event, repository, event: { ...event.event, ...(event.event_name === 'pull_request' ? {
+    pull_request: { ...event.event.pull_request, head: { sha, repo: { full_name: fork ? 'contributor/zerocopy' : repository } } },
+  } : {}) } };
+}
+function buildResult(github, result, cancelled = false) {
+  const context = { github, needs: { site: { result } }, cancelled: () => cancelled };
+  if (!evaluate(workflowValue(buildJob, 'if', 4), context)) return 'skipped';
+  // Run the actual final gate, so changing it to accept a failed/skipped host
+  // cannot leave the publication tests green.
+  const gate = spawnSync('sh', ['-e', '-c', workflowValue(buildJob, 'run', 8)], {
+    env: { SITE_RESULT: String(evaluate(workflowValue(buildJob, 'SITE_RESULT', 10), context)) },
+    encoding: 'utf8', timeout: 5000,
+  });
+  assert.ifError(gate.error);
+  return gate.status === 0 ? 'success' : 'failure';
+}
+function canPublish(github, result, cancelled = false) {
+  return evaluate(workflowValue(publishJob, 'if', 4), {
+    github, needs: { build: { result } }, cancelled: () => cancelled,
+  });
+}
+const hostingScenarios = [
+  ['main push', siteEvent(push), ['root', 'pages'], 'pages', true],
+  ['manual main build', siteEvent({ ...push, event_name: 'workflow_dispatch' }), ['root', 'pages'], 'pages', true],
+  ['same-repository PR', siteEvent(pullRequest('synchronize')), ['root', 'pages', 'preview'], 'preview', true],
+  ['fork PR', siteEvent(pullRequest('synchronize'), true), ['root', 'pages', 'preview'], 'preview', false],
+];
+for (const [label, github, expectedHosts, producer, publishAllowed] of hostingScenarios) {
+  test(`hosting matrix selects one correct artifact for ${label}`, () => {
+    assert.equal(evaluate(workflowValue(siteJob, 'if', 4), { github }), true);
+    const hosts = evaluate(workflowValue(siteJob, 'host', 8), { github });
+    assert.deepEqual(hosts, expectedHosts);
+    const artifacts = [];
+    for (const host of hosts) {
+      const context = { github, matrix: { host } };
+      const values = Object.fromEntries(['SITE_BASE', 'SITE_ORIGIN', 'SITE_PREVIEW_PR', 'SITE_HEAD_COMMIT']
+        .map(name => [name, evaluate(workflowValue(siteJob, name, 6), context)]));
+      const expectedBase = host === 'root' ? '/' : host === 'pages' ? '/zerocopy/' : `/zerocopy/previews/pr-28/${sha}/`;
+      assert.equal(values.SITE_BASE, expectedBase);
+      assert.equal(values.SITE_ORIGIN, host === 'root' ? '' : 'https://natanelia.github.io');
+      assert.equal(values.SITE_PREVIEW_PR, host === 'preview' ? 28 : '');
+      assert.equal(values.SITE_HEAD_COMMIT, host === 'preview' ? sha : '');
+      if (evaluate(workflowValue(publishableStep, 'if', 8), context)) artifacts.push({ host, base: values.SITE_BASE });
+    }
+    assert.deepEqual(artifacts, [{ host: producer, base: producer === 'pages' ? '/zerocopy/' : `/zerocopy/previews/pr-28/${sha}/` }]);
+    assert.equal(buildResult(github, 'success'), 'success');
+    assert.equal(canPublish(github, 'success'), publishAllowed);
+  });
+}
+
+test('failed, cancelled, or skipped hosting checks cannot pass the build or publication gates', () => {
+  for (const [label, github] of hostingScenarios) {
+    for (const result of ['failure', 'cancelled', 'skipped']) {
+      const gate = buildResult(github, result);
+      assert.equal(gate, 'failure', `${label}: ${result}`);
+      assert.equal(canPublish(github, gate), false, `${label}: ${result}`);
+    }
+    assert.equal(buildResult(github, 'success', true), 'skipped');
+    assert.equal(canPublish(github, 'success', true), false, `${label}: cancelled workflow`);
+  }
+});
+
+test('closed PR cleanup needs no site build and remains unavailable to forks', () => {
+  for (const merged of [false, true]) {
+    for (const fork of [false, true]) {
+      const github = siteEvent(pullRequest('closed', 28, merged), fork);
+      assert.equal(evaluate(workflowValue(siteJob, 'if', 4), { github }), false);
+      const gate = buildResult(github, 'skipped');
+      assert.equal(gate, 'skipped');
+      assert.equal(canPublish(github, gate), !fork);
+      assert.equal(evaluate(workflowValue(publishJob, 'if', 8), { github }), false, 'Cleanup must not download a build artifact');
+    }
+  }
 });
 
 test('a delayed cleanup keeps the preview when its PR has reopened', async () => {

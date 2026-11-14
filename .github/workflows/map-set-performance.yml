@@ -11,9 +11,30 @@ on:
       - '.github/workflows/map-set-performance.yml'
   pull_request:
     branches: [main]
+    # Keep runtime, compiler, and proof changes covered without rerunning for prose.
+    paths:
+      - '*.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bun.lockb'
+      - 'package-lock.json'
+      - 'bunfig.toml'
+      - 'tsconfig*.json'
+      - 'type-tests/**'
+      - 'scripts/**'
+      - 'proofs/**'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/**'
+      - '.github/workflows/map-set-performance.yml'
 
 permissions:
   contents: read
+
+concurrency:
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -30,7 +51,9 @@ jobs:
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run typecheck:redux
+      # Main CI owns the full suite on PRs; standalone evidence runs remain complete.
       - run: bun run test
+        if: github.event_name != 'pull_request'
       - run: node proofs/node-worker.mjs
       - name: Map set and memory comparison
         run: |

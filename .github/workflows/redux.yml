@@ -1,15 +1,19 @@
 name: Redux integration
 
 on:
+  # Main-branch PRs get these suites and proofs from CI. Preserve the legacy
+  # branch target, which does not run that workflow, plus manual diagnostics.
   pull_request:
-    branches: [main, agent/immutable-performance-proof]
+    branches: [agent/immutable-performance-proof]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: redux-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   redux:

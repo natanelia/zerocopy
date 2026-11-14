@@ -18,14 +18,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  site:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
+    strategy:
+      # Each hosting path has its own build, browser processes, and evidence.
+      # Complete the other paths even if one fails.
+      fail-fast: false
+      matrix:
+        host: ${{ fromJSON(github.event_name == 'pull_request' && '["root","pages","preview"]' || '["root","pages"]') }}
+    env:
+      SITE_BASE: ${{ matrix.host == 'root' && '/' || matrix.host == 'preview' && format('/zerocopy/previews/pr-{0}/{1}/', github.event.pull_request.number, github.event.pull_request.head.sha) || '/zerocopy/' }}
+      SITE_ORIGIN: ${{ matrix.host != 'root' && 'https://natanelia.github.io' || '' }}
+      SITE_PREVIEW_PR: ${{ matrix.host == 'preview' && github.event.pull_request.number || '' }}
+      SITE_HEAD_COMMIT: ${{ matrix.host == 'preview' && github.event.pull_request.head.sha || '' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -37,13 +46,16 @@ jobs:
       - run: npm --prefix website install --ignore-scripts --no-package-lock
       - run: bunx playwright install --with-deps chromium webkit
       - name: Check the published-package Vite starter once
+        if: matrix.host == 'root'
         timeout-minutes: 5
         run: node scripts/check-vite-quickstart.mjs
       - name: Check lazy memory allocation
+        if: matrix.host == 'root'
         run: node --test proofs/memory-startup.mjs
       - name: Check deployment safety
+        if: matrix.host == 'root'
         run: node --test website/tests/preview.test.mjs
-      - name: Check root-hosted site
+      - name: Build and check the hosting path
         run: |
           node website/build.mjs
           node --test website/tests/*.test.mjs
@@ -51,53 +63,30 @@ jobs:
           node website/tests/memory-charts-browser.mjs
           node website/tests/feature-browser.mjs
           node website/tests/isolation-browser.mjs
-          node website/tests/browser.mjs
-          node website/tests/explorer-browser.mjs
-          node website/tests/comparison-browser.mjs
-          node website/tests/memory-browser.mjs
-      - name: Build and check GitHub Pages subpath
-        env:
-          SITE_BASE: /zerocopy/
-          SITE_ORIGIN: https://natanelia.github.io
+      - name: Check homepage browser interactions
+        # Preserve the original root/Pages homepage coverage. The preview runs
+        # the same docs, feature, isolation, comparison, explorer, and memory checks.
+        if: matrix.host != 'preview'
+        run: node website/tests/browser.mjs
+      - name: Check comparison, explorer, and memory browsers
         run: |
-          node website/build.mjs
-          node --test website/tests/*.test.mjs
-          node website/tests/docs-browser.mjs
-          node website/tests/memory-charts-browser.mjs
-          node website/tests/feature-browser.mjs
-          node website/tests/isolation-browser.mjs
-          node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
           node website/tests/comparison-browser.mjs
           node website/tests/memory-browser.mjs
-      - name: Retain site and visual evidence
+      - name: Retain site and visual evidence for this hosting path
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: zerocopy-website-${{ github.sha }}
+          name: zerocopy-website-${{ matrix.host }}-${{ github.sha }}
           path: |
             website/_site/
             website/artifacts/
           include-hidden-files: true
           retention-days: 14
-      - name: Build and check commit-specific PR preview
-        if: github.event_name == 'pull_request'
-        env:
-          SITE_BASE: /zerocopy/previews/pr-${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.sha }}/
-          SITE_PREVIEW_PR: ${{ github.event.pull_request.number }}
-          SITE_HEAD_COMMIT: ${{ github.event.pull_request.head.sha }}
-          SITE_ORIGIN: https://natanelia.github.io
-        run: |
-          node website/build.mjs
-          node --test website/tests/*.test.mjs
-          node website/tests/docs-browser.mjs
-          node website/tests/memory-charts-browser.mjs
-          node website/tests/feature-browser.mjs
-          node website/tests/isolation-browser.mjs
-          node website/tests/comparison-browser.mjs
-          node website/tests/explorer-browser.mjs
-          node website/tests/memory-browser.mjs
       - name: Retain publishable output
+        # Exactly one matrix child supplies the artifact consumed by publish.
+        # A PR must publish its commit-specific preview; main uses the Pages path.
+        if: matrix.host == 'preview' || (matrix.host == 'pages' && github.event_name != 'pull_request')
         uses: actions/upload-artifact@v4
         with:
           name: docs-publishable
@@ -105,6 +94,18 @@ jobs:
           include-hidden-files: true
           retention-days: 7
           if-no-files-found: error
+
+  build:
+    # Keep one stable check and require every hosting path before publication.
+    if: ${{ always() && !cancelled() && github.event.action != 'closed' }}
+    needs: site
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require all hosting checks to pass
+        env:
+          SITE_RESULT: ${{ needs.site.result }}
+        run: test "$SITE_RESULT" = success
 
   publish:
     # Never expose a write token to fork code or a PR build job.

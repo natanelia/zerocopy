@@ -5,13 +5,29 @@ on:
     branches: [agent/immutable-performance-proof]
   pull_request:
     branches: [main]
+    # Measurements depend on the whole runtime, compiler, and proof harness.
+    paths:
+      - '*.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - 'bun.lockb'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'scripts/**'
+      - 'proofs/**'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/**'
+      - '.github/workflows/performance-revision.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: performance-revision-${{ github.ref }}
-  cancel-in-progress: true
+  # Only superseded PR revisions cancel each other; keep standalone evidence runs.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name != 'pull_request' && github.run_id || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -27,7 +43,9 @@ jobs:
           bun-version: '1.4.2'
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
-      - run: bun run typecheck && bun run test
+      # PRs get these checks from CI; manual/agent-branch runs stay self-contained.
+      - if: github.event_name != 'pull_request'
+        run: bun run typecheck && bun run test
       - name: Shared worker, live-data compaction, and allocation checks
         run: |
           mkdir -p proofs/results
