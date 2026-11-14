@@ -24,6 +24,13 @@ concurrency:
 
 jobs:
   verify:
+    name: verify (${{ matrix.lane }})
+    strategy:
+      fail-fast: false
+      # Each lane retains all runtimes, engines, and samples it measured before;
+      # separate runners keep concurrent benchmarks from competing for one CPU.
+      matrix:
+        lane: [native, browsers]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -51,16 +58,19 @@ jobs:
       - name: Verify native encoding and snapshot regressions
         run: bun run test -- utf8-write.test.ts
       - name: Measure isolated Node and Bun operation rounds
+        if: matrix.lane == 'native'
         run: node proofs/run-utf8-write.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/utf8-write-ci
       - name: Install browser engines
+        if: matrix.lane == 'browsers'
         run: bunx playwright install --with-deps chromium firefox webkit
       - name: Verify and measure all three browser engines
+        if: matrix.lane == 'browsers'
         run: node proofs/utf8-write-browser.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/results/utf8-write-ci/browsers.json
       - name: Preserve every measurement
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: utf8-write-evidence-${{ github.sha }}
+          name: utf8-write-evidence-${{ matrix.lane }}-${{ github.sha }}
           path: proofs/results/utf8-write-ci/
           retention-days: 30
           if-no-files-found: error

@@ -24,10 +24,19 @@ concurrency:
 
 jobs:
   verify:
+    name: verify (${{ matrix.os }}, ${{ matrix.lane }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm]
+        # Baseline/candidate pairs stay sequential on one runner. Independent
+        # native and browser measurements no longer wait for each other.
+        include:
+          - os: ubuntu-latest
+            lane: native
+          - os: ubuntu-24.04-arm
+            lane: native
+          - os: ubuntu-latest
+            lane: browsers
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -59,16 +68,17 @@ jobs:
           node proofs/json-read-correctness.mjs
           bun test ./proofs/json-read-correctness.mjs
       - name: Measure Node and Bun in isolated processes
+        if: matrix.lane == 'native'
         env:
           JSON_READ_WARMUPS: '10'
           JSON_READ_SAMPLES: '12'
           JSON_READ_ROUNDS: '3'
         run: node proofs/run-json-read.mjs .proof-baseline/dist/shared.js dist/shared.js proofs/json-read-results/ci
       - name: Install browser engines
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.lane == 'browsers'
         run: bunx playwright install --with-deps chromium firefox webkit
       - name: Verify and measure browser reads
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.lane == 'browsers'
         env:
           JSON_READ_WARMUPS: '5'
           JSON_READ_SAMPLES: '7'
@@ -78,7 +88,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: json-read-evidence-${{ runner.arch }}-${{ github.sha }}
+          name: json-read-evidence-${{ runner.arch }}-${{ matrix.lane }}-${{ github.sha }}
           path: proofs/json-read-results/ci/
           retention-days: 30
           if-no-files-found: error
