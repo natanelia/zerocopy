@@ -36,6 +36,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - name: Install existing project dependencies
         run: bun install
       - name: Build modules and declarations

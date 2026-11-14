@@ -43,11 +43,13 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
-      - name: Prepare exact main377 and shared dependencies
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
+      - name: Prepare exact main377 and its dependencies
         run: |
           bun install
           git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
-          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
       - name: Build matching sources and check all public types
         run: |
           bun run build:wasm
@@ -140,11 +142,13 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - name: Build exact source pair and install browser
         run: |
           bun install
           git worktree add --detach .proof-baseline 3773c6e519c7c0958da13727ed1082f449f3ee25
-          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           bun run build:wasm
           bun run build:browser
           cp ./*.wasm .proof-baseline/

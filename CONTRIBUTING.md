@@ -1,12 +1,16 @@
 # Contributing
 
-Use Bun 1.4.2 and Node.js 22 to match the recorded build. Direct development dependencies are pinned in `package.json`.
+Use Bun 1.4.2, Node.js 22 or newer, and the Rust toolchain pinned in `rust-toolchain.toml`. Direct development dependencies, including the Binaryen WASM build tool, are pinned in `package.json`. Applications using the published package do not need Rust.
 
 ## Set up and test
 
+Install Rust through rustup, then run these commands from the checkout. The compiler and WASM target are build dependencies only.
+
 ```sh
+rustup toolchain install 1.100.0 --profile minimal --target wasm32-unknown-unknown
 bun install
 bun run build:wasm
+node --test scripts/rust-wasm.node.mjs
 bun run build:browser
 bun run build:types
 bun run typecheck
@@ -41,7 +45,9 @@ The server prints its address and supplies cross-origin isolation headers. Brows
 
 ## Where changes belong
 
-Collection wrappers and their unit tests are at the repository root. Shared allocation and value handling belong in `arena.ts`; persistent WASM operations belong in `persistent-core.as.ts`. Keep Redux and TanStack integration behind their existing entry points.
+Collection wrappers and their unit tests are at the repository root. Shared allocation and value handling belong in `arena.ts`; persistent WASM operations belong in `rust/src/maps.rs` and `rust/src/collections.rs`. Byte readers, selective JSON access, numeric reductions, and geometry kernels have separate modules under `rust/src/`. Keep Redux and TanStack integration behind their existing entry points.
+
+The Rust crate uses `no_std`, has no Cargo dependencies, and exports scalar arguments and results over the existing arena layout. Build release artifacts through `bun run build:wasm`: its Binaryen pass promotes compiler state placeholders into instance-local WASM globals and audits the generated modules. A raw `cargo build` output is an intermediate artifact, not a distributable kernel. See [the engine contract](docs/architecture.md#rust-wasm-engine) before changing memory access or exported functions.
 
 Use `demo/` for browser integration tests, `proofs/` for benchmark drivers and measurements, `scripts/` for build and documentation checks, and `docs/` for user guides. See the [source map](docs/architecture.md#source-map) before changing module boundaries.
 
@@ -87,7 +93,7 @@ Inspect the package contents and use the local archive in a consumer test. These
 
 ## npm releases
 
-The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 or newer for local checks. `npm publish --access public` runs `prepublishOnly`: WASM, portable JavaScript, declarations, type checks, the test suite, the Redux proof, and the packed-package consumer check. Do not bypass this gate with `--ignore-scripts` when publishing.
+The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 or newer for local checks. `npm publish --access public` runs `prepublishOnly`: WASM, negative build-audit tests, portable JavaScript, declarations, type checks, the test suite, the Redux proof, and the packed-package consumer check. Do not bypass this gate with `--ignore-scripts` when publishing.
 
 The consumer check installs the tarball in a temporary application outside the repository. It checks all public Node and Bun entry points, retained immutable snapshots, the real Node worker proof, and TypeScript imports. It also rejects development files and missing exported declarations.
 

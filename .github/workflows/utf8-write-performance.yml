@@ -12,6 +12,10 @@ on:
       - 'scripts/build-*.mjs'
       - 'package.json'
       - '.github/workflows/utf8-write-performance.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   workflow_dispatch:
 
 permissions:
@@ -31,9 +35,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser
-      - name: Build the PR base with the same compiler and dependencies
+      - name: Build the PR base with its recorded compiler dependencies
         env:
           PR_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -41,7 +47,7 @@ jobs:
           git cat-file -e "$baseline_ref^{commit}"
           mkdir -p .proof-baseline
           git archive "$baseline_ref" | tar -x -C .proof-baseline
-          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           (cd .proof-baseline && bun run build:wasm && bun run build:browser)
       - name: Verify native encoding and snapshot regressions
         run: bun run test -- utf8-write.test.ts

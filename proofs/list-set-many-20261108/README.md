@@ -10,7 +10,7 @@ For 256 clustered numeric edits in a 32,768-item List, the complete-batch median
 
 Repeated scalar edits copy the root-to-leaf path for each edit, including shared paths copied by the previous edit. The new operation groups final edits by index and copies each affected branch and leaf once. It copies a changed tail at its actual length. Unaffected nodes remain shared with the original snapshot.
 
-The JavaScript preparation also removes overwritten edits. Only the final value for each valid index is encoded, in the order those indexes first appeared in the input. User serialization finishes before staging records in writer scratch. A native `Uint32Array` sort then places the encoded edits in tree order. See the [implementation](../../shared-list.ts), [WASM kernels](../../persistent-core.as.ts), and [API contract](../../docs/api.md).
+The JavaScript preparation also removes overwritten edits. Only the final value for each valid index is encoded, in the order those indexes first appeared in the input. User serialization finishes before staging records in writer scratch. A native `Uint32Array` sort then places the encoded edits in tree order. See the [implementation](../../shared-list.ts), [WASM kernels](https://github.com/natanelia/zerocopy/blob/dd07070298c3ce8fd9e0a665446a5ed46c8a1af2/persistent-core.as.ts), and [API contract](../../docs/api.md).
 
 This final-value contract matters for JSON serialization and invalid values. `setMany([[0, badValue], [0, goodValue]])` encodes only `goodValue`; a scalar loop would try to encode both. Use scalar calls when intermediate versions or intermediate serialization effects are required. Empty and entirely invalid batches return the original List. Valid edits require a writable owner.
 

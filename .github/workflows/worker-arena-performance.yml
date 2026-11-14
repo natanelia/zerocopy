@@ -42,6 +42,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - name: Verify attachment, graph traversal, and real workers
@@ -53,13 +55,13 @@ jobs:
           node proofs/node-worker.mjs
           node proofs/worker-sessions.mjs
           node proofs/typed-json-worker.mjs
-      - name: Build the baseline with identical tools
+      - name: Build the baseline with its compiler dependencies
         run: |
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           git cat-file -e "$BASELINE_SHA^{commit}"
           git worktree add --detach .proof-baseline "$BASELINE_SHA"
           test "$(git -C .proof-baseline rev-parse HEAD)" = "$BASELINE_SHA"
-          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           (cd .proof-baseline && bun run build:wasm && bun run build:browser)
       - name: Measure small, representative, and stress payloads
         env:

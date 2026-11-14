@@ -22,9 +22,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm
+      - name: Verify Rust WASM build rejection guards
+        run: node --test scripts/rust-wasm.node.mjs
       - run: bun run build:browser && bun run build:types
+      - name: Verify Rust kernels with real workers
+        run: node proofs/rust-migration-20261115/workers.mjs
       - run: bun run typecheck
       - run: bun run typecheck:redux
       - run: bun run typecheck:values

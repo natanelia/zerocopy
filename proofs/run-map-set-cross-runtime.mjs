@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, copyFileSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { kernelCompiler, withKernelSources } from './kernel-provenance.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = resolve(process.argv[2] ?? join(root, 'proofs/results/map-set-local.json'));
@@ -16,7 +17,7 @@ const executable = { bun: process.env.BUN_BIN ?? 'bun', node: process.execPath }
 const variants = baseline ? ['shared', 'immutable', 'native', 'before'] : ['shared', 'immutable', 'native'];
 const program = join(root, 'proofs/map-set-case.mjs');
 function fingerprint(directory) {
-  const files = readdirSync(directory).filter(file => file.endsWith('.ts') && !file.endsWith('.test.ts') && file !== 'benchmark.ts').sort();
+  const files = withKernelSources(directory, readdirSync(directory).filter(file => file.endsWith('.ts') && !file.endsWith('.test.ts') && file !== 'benchmark.ts'));
   const hash = createHash('sha256');
   for (const file of files) hash.update(file + '\0').update(readFileSync(join(directory, file))).update('\0');
   return { files, sha256: hash.digest('hex'), wasmSHA256: createHash('sha256').update(readFileSync(join(directory, 'persistent-core.wasm'))).digest('hex') };
@@ -71,7 +72,7 @@ assert.equal(fingerprint(root).sha256, sources.shared.sha256, 'Source changed du
 const result = { schema: 1, measuredAt: new Date().toISOString(), method: 'Median of 45 samples across three process rounds per case, library, and runtime. Variant order rotates. Checked complete outputs and retained bases. Native updates copy once inside timing. Arena setup is separate except cold-insert-string. No speed threshold or statistical significance is implied.',
   sources, benchmarkSHA256,
   immutable: JSON.parse(readFileSync(join(root, 'node_modules/immutable/package.json'), 'utf8')).version,
-  compiler: JSON.parse(readFileSync(join(root, 'node_modules/assemblyscript/package.json'), 'utf8')).version,
+  compiler: kernelCompiler(root),
   summary, rows };
 writeFileSync(output, JSON.stringify(result) + '\n');
 rmSync(output + '.partial', { force: true });

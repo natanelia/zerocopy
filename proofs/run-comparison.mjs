@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, copyFileSync, mkdirSync, mkdtempSync, read
 import { resolve, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
+import { kernelCompiler, withKernelSources } from './kernel-provenance.mjs';
 
 // Supply a separate checkout of the pinned base. Never rewrite the candidate.
 const root = resolve(import.meta.dirname, '..');
@@ -26,7 +27,7 @@ for (const file of baselineFiles) baseHash.update(file + '\0').update(readFileSy
 const baselineEngineSHA256 = baseHash.digest('hex');
 if (baselineEngineSHA256 !== '8dfcd6c936b4875ebfcd6e13dd214d5b84d2d6301f1c5f6c68704a2f357352fa') throw Error('Baseline source does not match the pinned commit');
 
-const engineFiles = readdirSync(root).filter(p => (p === 'persistent-core.as.ts' || p === 'shared-hash-reader.as.ts' || p === 'shared-runtime.as.ts') || p === 'compaction.ts' || p === 'arena.ts' || p === 'read-cache.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')).sort();
+const engineFiles = withKernelSources(root, readdirSync(root).filter(p => p === 'compaction.ts' || p === 'arena.ts' || p === 'read-cache.ts' || p === 'utf8.ts' || p === 'codec.ts' || p === 'types.ts' || p === 'wasm-utils.ts' || p === 'set-key.ts' || p === 'shared.ts' || p === 'json-view.ts' || /^shared-.*\.ts$/.test(p) && !p.endsWith('.test.ts') && !p.endsWith('.as.ts')));
 const hash = createHash('sha256');
 for (const file of engineFiles) hash.update(file + '\0').update(readFileSync(join(root, file))).update('\0');
 const candidateEngineSHA256 = hash.digest('hex');
@@ -39,9 +40,9 @@ try {
   copyFileSync(join(root, 'proofs/compare.ts'), join(baseline, 'proofs/compare.ts'));
   console.error('Build the original baseline'); run(bun, ['run', 'build:wasm'], baseline);
   for (const name of entries) copyFileSync(join(baseline, `${name}.wasm`), join(temp, 'original', `${name}.wasm`));
-  console.error('Build the same baseline with the candidate compiler flags');
+  console.error('Build the legacy baseline with optimized AssemblyScript flags');
   for (const name of entries) {
-    run(process.execPath, [join(root, 'node_modules/assemblyscript/bin/asc.js'), `${name}.as.ts`, '-o', `${name}.wasm`, ...flags], baseline);
+    run(process.execPath, [join(baseline, 'node_modules/assemblyscript/bin/asc.js'), `${name}.as.ts`, '-o', `${name}.wasm`, ...flags], baseline);
     copyFileSync(join(baseline, `${name}.wasm`), join(temp, 'optimized', `${name}.wasm`));
   }
   const scenarios = ['list.pushMany', 'list.toArray', 'list.push', 'map.setMany', 'map.get', 'linked.randomGet', 'linked.append', 'doubly.randomGet', 'doubly.append', 'ordered.set', 'sorted.set', 'priority.enqueue', 'queue.build', 'stack.build'];
@@ -69,7 +70,7 @@ try {
     const original = median(times('original')), optimized = median(times('optimized')), candidate = median(times('candidate'));
     return { name: row.name, units: row.units, originalMs: original, optimizedMs: optimized, candidateMs: candidate, originalSpeedup: original / candidate, optimizedSpeedup: optimized / candidate };
   });
-  const result = { baselineCommit: baseSHA, baselineEngineSHA256, measuredAt: new Date().toISOString(), engineFiles, candidateEngineSHA256, candidateWasmSHA256: createHash('sha256').update(readFileSync(join(root, 'persistent-core.wasm'))).digest('hex'), compiler: JSON.parse(readFileSync(join(root, 'node_modules/assemblyscript/package.json'))).version, matchedCompilerFlags: flags, benchmarkSHA256, summary, rounds };
+  const result = { baselineCommit: baseSHA, baselineEngineSHA256, measuredAt: new Date().toISOString(), engineFiles, candidateEngineSHA256, candidateWasmSHA256: createHash('sha256').update(readFileSync(join(root, 'persistent-core.wasm'))).digest('hex'), compilers: { candidate: kernelCompiler(root), baseline: kernelCompiler(baseline) }, baselineOptimizedCompilerFlags: flags, benchmarkSHA256, summary, rounds };
   mkdirSync(resolve(output, '..'), { recursive: true });
   writeFileSync(output, JSON.stringify(result) + '\n');
   rmSync(output + '.partial', { force: true });

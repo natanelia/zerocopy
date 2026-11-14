@@ -1,0 +1,742 @@
+{
+  "persistent-core": {
+    "mapHashCandidate": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapHashCandidateFrom": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapHashPrefix": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "textContains16": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "textContainsBlock16": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "getHeapEnd": {
+      "params": [],
+      "results": [
+        "i32"
+      ]
+    },
+    "setHeapEnd": {
+      "params": [
+        "i32"
+      ],
+      "results": []
+    },
+    "alloc": {
+      "params": [
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapSize": {
+      "params": [
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapLeaf": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapInsert": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapFind": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapDelete": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapDeleteBytes": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapDeleteLeaf": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapChild": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapBatch": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "keyBuf": {
+      "params": [],
+      "results": [
+        "i32"
+      ]
+    },
+    "batchBuf": {
+      "params": [],
+      "results": [
+        "i32"
+      ]
+    },
+    "getInfo": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "vecLeaf": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "vecGet": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "f64"
+      ]
+    },
+    "vecSet": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "vecSetMany": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "tailSetMany": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "cons": {
+      "params": [
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "heapInsert": {
+      "params": [
+        "i32",
+        "f64",
+        "f64",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "heapPop": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "tailAppend": {
+      "params": [
+        "i32",
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "tailSet": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "tailInsert": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "tailRemove": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "vecLink": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "blockAppend": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "blockGet": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "f64"
+      ]
+    },
+    "blockInsert": {
+      "params": [
+        "i32",
+        "i32",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "blockDelete": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapNumber": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "f64"
+      ]
+    },
+    "orderCons": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "radixSize": {
+      "params": [
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "radixFind": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "radixInsert": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "radixDelete": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "stagedWrite": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f64",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "journalFind": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "compareLeaves": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeMapNumber": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeSortedNumber": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeOrderedNumber": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapSetNumber": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "mapSetBytes": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "radixBuild": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "blockBuild": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeMapBytes": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeOrderedBytes": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "writeSortedBytes": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "memory": {
+      "kind": "memory"
+    },
+    "jsonValueEnd": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "jsonStringEnd": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "jsonFieldAscii8": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "jsonFieldCandidate": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "jsonArrayAt": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "jsonInteger": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "f64"
+      ]
+    }
+  },
+  "numeric-kernels": {
+    "countInRange": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f64",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "countPointsInBox": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f64",
+        "f64",
+        "f64",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "memory": {
+      "kind": "memory"
+    }
+  },
+  "numeric-kernels-simd": {
+    "countInRange": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f64",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "countPointsInBox": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f64",
+        "f64",
+        "f64",
+        "f64"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "memory": {
+      "kind": "memory"
+    }
+  },
+  "geometry-kernels": {
+    "bboxMinX": {
+      "params": [],
+      "results": [
+        "f64"
+      ]
+    },
+    "bboxMinY": {
+      "params": [],
+      "results": [
+        "f64"
+      ]
+    },
+    "bboxMaxX": {
+      "params": [],
+      "results": [
+        "f64"
+      ]
+    },
+    "bboxMaxY": {
+      "params": [],
+      "results": [
+        "f64"
+      ]
+    },
+    "xyLeaf": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
+    "bboxXY": {
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": []
+    },
+    "memory": {
+      "kind": "memory"
+    }
+  }
+}

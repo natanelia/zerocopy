@@ -32,6 +32,20 @@ test('discovers the stated source/configuration union without tests or nested ap
     assert.deepEqual(sourcePaths(root), ['arena.ts', 'bunfig.toml', 'core.wasm', 'helper.js', 'kernel.as.ts', 'other.mts', 'package.json', 'scripts/build-browser.ts', 'scripts/build-helper.mjs', 'tsconfig.json']);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+test('includes Rust kernel and build inputs while excluding Cargo output', () => {
+  const root = mkdtempSync(join(tmpdir(), 'zerocopy-rust-sources-'));
+  try {
+    mkdirSync(join(root, 'rust/src'), { recursive: true });
+    mkdirSync(join(root, 'rust/target/release'), { recursive: true });
+    mkdirSync(join(root, 'scripts'), { recursive: true });
+    const inputs = ['package.json', 'rust-toolchain.toml', 'rust/Cargo.toml', 'rust/Cargo.lock',
+      'rust/wasm-abi.json', 'rust/src/lib.rs', 'rust/src/readers.rs', 'scripts/build-wasm.mjs', 'scripts/rust-wasm.mjs'];
+    for (const path of inputs) writeFileSync(join(root, path), path);
+    writeFileSync(join(root, 'rust/target/release/generated.rs'), 'compiler output');
+    assert.deepEqual(sourcePaths(root), inputs.sort());
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('captures actual Git HEAD, per-file hashes, and clean/dirty source state', () => {
   const root = mkdtempSync(join(tmpdir(), 'worker-arena-capture-'));
   const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();

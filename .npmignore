@@ -1,7 +1,9 @@
 # Tests
 *.test.ts
 
-# AssemblyScript source (WASM is published)
+# Kernel sources and compiler configuration (built WASM is published)
+rust/
+rust-toolchain.toml
 *.as.ts
 
 # Development

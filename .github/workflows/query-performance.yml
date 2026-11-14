@@ -22,6 +22,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: npm --prefix website install --ignore-scripts --no-package-lock
@@ -36,7 +38,7 @@ jobs:
           git cat-file -e "$BASE^{commit}"
           mkdir -p .proof-baseline
           git archive "$BASE" | tar -x -C .proof-baseline
-          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           ln -s "$PWD/website/node_modules" .proof-baseline/website/node_modules
           (cd .proof-baseline && bun run build:wasm && bun run build:browser && SITE_COMMIT="$BASE" node website/build.mjs)
       - name: Build the candidate

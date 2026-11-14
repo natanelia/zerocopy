@@ -8,7 +8,6 @@ on:
       - 'redux*.ts'
       - 'compaction.ts'
       - 'checkpoint*.test.ts'
-      - '*.as.ts'
       - 'proofs/checkpoint-validation-20261105/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
@@ -16,6 +15,10 @@ on:
       - 'tsconfig*.json'
       - 'vitest.config.ts'
       - '.github/workflows/checkpoint-validation.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   push:
     branches: [main]
     paths:
@@ -24,7 +27,6 @@ on:
       - 'redux*.ts'
       - 'compaction.ts'
       - 'checkpoint*.test.ts'
-      - '*.as.ts'
       - 'proofs/checkpoint-validation-20261105/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
@@ -32,6 +34,10 @@ on:
       - 'tsconfig*.json'
       - 'vitest.config.ts'
       - '.github/workflows/checkpoint-validation.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   workflow_dispatch:
 
 permissions:
@@ -55,6 +61,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - name: Install existing project dependencies
         run: bun install
       - name: Build native and portable modules

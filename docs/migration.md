@@ -45,6 +45,10 @@ Existing primitive and `'object'` constructors keep their runtime behavior. Use 
 
 Typed values use the existing object codec and wire version 4. Existing object readers can read these snapshots without a format migration. Consumers need the updated package to use the new TypeScript helpers. Validate unknown data before assigning it an application type; a type assertion does not check or transform existing stored values.
 
+The Rust engine migration also preserves this object encoding, the arena record layout, and wire version 4. Installed-package users do not need Rust. Source builds now require the pinned Rust compiler and WASM target; follow [Contributing](../CONTRIBUTING.md#set-up-and-test) and rebuild through `bun run build:wasm`.
+
+For selective reads, object maps and lists now provide [`getView()`](api.md#read-selected-json-fields). It returns a view over stored UTF-8 JSON without decoding and freezing the full object. Existing `get()` retains its cached, deeply frozen results. A view's `toObject()` explicitly creates a fresh mutable copy; request `{ freeze: true }` only when that detached result needs freezing.
+
 An earlier draft of this change used a separate `'json'` descriptor with strict serialization. That draft-only descriptor has been removed. Re-create draft snapshots and worker payloads from the original application data, and re-export draft persistence data with the updated package. Native JSON rules now apply, including omitted `undefined` properties, non-finite numbers becoming `null`, negative zero becoming zero, and calls to getters or `toJSON`.
 
 String-form nested collection types no longer resolve to `any`. Previously unchecked invalid calls can now produce compile errors. Fix those calls or use the typed descriptor helpers. `getWorkerData()` carries its producer's types to `initWorker()`, whose returned record is read-only, as it already was at runtime.

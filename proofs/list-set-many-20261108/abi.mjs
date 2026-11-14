@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
 const [beforeArg, afterArg] = process.argv.slice(2);
@@ -14,9 +14,12 @@ const exportsBefore = WebAssembly.Module.exports(before), exportsAfter = WebAsse
 assert.deepEqual(WebAssembly.Module.imports(after), WebAssembly.Module.imports(before));
 for (const entry of exportsBefore) assert.deepEqual(exportsAfter.find(item => item.name === entry.name), entry);
 const added = exportsAfter.filter(entry => !exportsBefore.some(item => item.name === entry.name));
-assert.deepEqual(added.sort((a, b) => a.name.localeCompare(b.name)), [
-  { name: 'tailSetMany', kind: 'function' }, { name: 'vecSetMany', kind: 'function' },
-]);
+const expectedAdded = ['tailSetMany', 'vecSetMany'];
+if (existsSync(join(afterRoot, 'rust/Cargo.toml'))) {
+  expectedAdded.push('jsonArrayAt', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonInteger', 'jsonStringEnd', 'jsonValueEnd');
+}
+assert.deepEqual(added.sort((a, b) => a.name.localeCompare(b.name)),
+  expectedAdded.sort((a, b) => a.localeCompare(b)).map(name => ({ name, kind: 'function' })));
 const aliases = ['shared-map', 'shared-list', 'linked-list', 'singly-linked-list',
   'doubly-linked-list', 'ordered-map', 'sorted-tree', 'priority-queue'];
 for (const root of [beforeRoot, afterRoot]) {

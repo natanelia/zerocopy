@@ -7,7 +7,6 @@ on:
       - 'shared-priority-queue.ts'
       - 'shared.ts'
       - 'redux*.ts'
-      - '*.as.ts'
       - 'proofs/redux-heap-read-view-20261108/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
@@ -15,6 +14,10 @@ on:
       - 'tsconfig*.json'
       - 'vitest.config.ts'
       - '.github/workflows/redux-heap-read-view.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   push:
     branches: [main]
     paths:
@@ -22,7 +25,6 @@ on:
       - 'shared-priority-queue.ts'
       - 'shared.ts'
       - 'redux*.ts'
-      - '*.as.ts'
       - 'proofs/redux-heap-read-view-20261108/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
@@ -30,6 +32,10 @@ on:
       - 'tsconfig*.json'
       - 'vitest.config.ts'
       - '.github/workflows/redux-heap-read-view.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   workflow_dispatch:
 
 permissions:
@@ -53,6 +59,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - name: Install existing project dependencies
         run: bun install
       - name: Build native and portable modules
