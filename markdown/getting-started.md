@@ -26,7 +26,7 @@ npm install --save-exact zerocopy@0.2.1
 npm install --save-dev --save-exact vite@8.3.4
 ```
 
-Keep the generated lockfile. The package includes JavaScript bundles, embedded WASM, and TypeScript declarations. This application does not need Bun or an AssemblyScript build.
+Keep the generated lockfile. The package includes JavaScript bundles, embedded WASM, and TypeScript declarations. This application does not need Bun or a Rust build.
 
 Already have a TypeScript application? Install zerocopy there, then apply the browser settings below using your bundler's equivalent worker support.
 
@@ -212,6 +212,7 @@ To try unreleased changes, build the current `main` branch instead of installing
 ```sh
 git clone --branch main https://github.com/natanelia/zerocopy.git
 cd zerocopy
+rustup toolchain install 1.100.0 --profile minimal --target wasm32-unknown-unknown
 bun install
 bun run build:wasm
 bun run build:browser
@@ -225,4 +226,4 @@ Install the archive printed by `npm pack` in your application, for example:
 npm install /path/to/zerocopy-0.2.1.tgz
 ```
 
-The repository's CI uses Bun 1.4.2 and Node.js 22. The archive's version follows the source checkout.
+The repository's CI uses Bun 1.4.2, Node.js 22, and the Rust compiler pinned in `rust-toolchain.toml`. Install rustup before running the source-build commands. The archive's version follows the source checkout; applications installing it do not need the Rust toolchain.

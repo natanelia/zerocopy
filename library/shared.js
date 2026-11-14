@@ -20,15 +20,15 @@ import {
   compactMany2,
   getWorkerData2,
   initWorker2
-} from "./chunk-14v0h3h6.js";
+} from "./chunk-799g9jjt.js";
 import {
   resetMap2,
   SharedMap2
-} from "./chunk-rq23njtf.js";
+} from "./chunk-5k0hgf1r.js";
 import {
   resetSharedList2,
   SharedList2
-} from "./chunk-4whxrcn1.js";
+} from "./chunk-nk9phzb0.js";
 import {
   configureMemory2,
   json2,
@@ -43,9 +43,11 @@ import {
   priorityQueue2,
   set2,
   orderedSet2,
-  sortedSet2
-} from "./chunk-mzkdyhf1.js";
+  sortedSet2,
+  JsonView2
+} from "./chunk-vzhwgf41.js";
 export {
+  JsonView2 as JsonView,
   SharedDoublyLinkedList2 as SharedDoublyLinkedList,
   SharedLinkedList2 as SharedLinkedList,
   SharedList2 as SharedList,
