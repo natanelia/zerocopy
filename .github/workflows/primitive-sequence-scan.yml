@@ -7,7 +7,6 @@ on:
       - 'shared-linked-list.ts'
       - 'shared-doubly-linked-list.ts'
       - 'arena.ts'
-      - 'persistent-core.as.ts'
       - 'primitive-sequence-scan.test.ts'
       - 'primitive-scan-portability.test.ts'
       - 'proofs/primitive-scan-*.mjs'
@@ -16,6 +15,10 @@ on:
       - 'scripts/build-*.mjs'
       - 'package.json'
       - '.github/workflows/primitive-sequence-scan.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   workflow_dispatch:
 
 permissions:
@@ -44,6 +47,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - name: Build candidate and check source types
         run: bun run build:wasm && bun run build:browser && bun run typecheck
@@ -58,7 +63,7 @@ jobs:
           persist-credentials: false
       - name: Build base with the same dependencies and flags
         run: |
-          ln -s "$GITHUB_WORKSPACE/node_modules" .primitive-baseline/node_modules
+          (cd ".primitive-baseline" && bun install)
           (cd .primitive-baseline && bun run build:wasm && bun run build:browser)
       - name: Install browser
         if: matrix.runtime != 'node' && matrix.runtime != 'bun'

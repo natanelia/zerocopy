@@ -13,8 +13,11 @@ The runtime is kept in flat, focused modules. Tests sit next to the modules they
 | [`shared.ts`](../shared.ts) | Public collection exports and worker payload encoding/attachment |
 | [`shared-map.ts`](../shared-map.ts) and other `shared-*.ts` wrappers | Collection methods, snapshot descriptors, and per-class default arenas |
 | [`arena.ts`](../arena.ts) | Arena identity, allocation, WASM access, value storage, read caches, and snapshot ownership |
-| [`persistent-core.as.ts`](../persistent-core.as.ts) | Persistent data-structure operations in AssemblyScript |
-| [`shared-runtime.as.ts`](../shared-runtime.as.ts), [`shared-hash-reader.as.ts`](../shared-hash-reader.as.ts) | WASM entry points |
+| [`rust/src/maps.rs`](../rust/src/maps.rs), [`rust/src/collections.rs`](../rust/src/collections.rs) | Persistent map, sequence, and heap operations |
+| [`rust/src/readers.rs`](../rust/src/readers.rs), [`rust/src/json.rs`](../rust/src/json.rs) | Read-only hash, text, and selective JSON kernels |
+| [`rust/src/numeric.rs`](../rust/src/numeric.rs), [`rust/src/geometry.rs`](../rust/src/geometry.rs) | Scalar/SIMD numeric reductions and geometry bounds |
+| [`rust/src/memory.rs`](../rust/src/memory.rs), [`rust/src/lib.rs`](../rust/src/lib.rs) | Raw arena access, allocation, and Rust module selection |
+| [`json-view.ts`](../json-view.ts) | Selective JSON views and explicit materialization into JavaScript values |
 | [`codec.ts`](../codec.ts), [`types.ts`](../types.ts) | Value types and nested-collection reconstruction |
 | [`read-cache.ts`](../read-cache.ts), [`utf8.ts`](../utf8.ts), [`set-key.ts`](../set-key.ts) | Bounded read caching, UTF-8 support, and set-key encoding |
 | [`compaction.ts`](../compaction.ts) | Copy selected live snapshots into fresh storage |
@@ -24,7 +27,15 @@ The runtime is kept in flat, focused modules. Tests sit next to the modules they
 | [`demo/`](../demo) | Browser demo, module workers, and Chromium tests |
 | [`proofs/`](../proofs) | Benchmark drivers, correctness experiments, and recorded results |
 
-The small legacy collection-specific `.as.ts` entry points are not separate current implementations. Read `persistent-core.as.ts` for the engine.
+## Rust WASM engine
+
+The engine is a Rust `no_std` crate: it uses Rust's core library without its standard library or a Rust heap allocator. Its exported functions pass byte offsets, lengths, numeric values, and flags directly. This scalar ABI—the calling convention between JavaScript and WASM—does not pass Rust strings, vectors, or serialized Rust objects across the boundary. The crate has no Cargo dependencies or generated host bindings.
+
+The Rust kernels operate on the existing shared arena records. Persistent updates allocate new path nodes where required and reuse unchanged nodes and value bytes. Read-only operations inspect published spans directly. Moving the implementation to Rust does not change the record layout, JSON encoding, snapshot descriptors, or transport version 4.
+
+`scripts/build-wasm.mjs` builds the collection engine, scalar and SIMD numeric kernels, and geometry kernel with the toolchain pinned in `rust-toolchain.toml`. Its Binaryen pass converts compiler state placeholders into instance-local WASM globals. Build audits reject data segments, start functions, linear-memory stack use, residual state placeholders, and shared-memory writes reachable from designated reader exports. A new reader instance therefore does not initialize or overwrite the writer's shared memory.
+
+The JavaScript API still decides when to decode a value. Ordinary object `get()` returns a cached, deeply frozen JavaScript value. [`getView()`](api.md#read-selected-json-fields) scans the existing UTF-8 JSON bytes and converts only requested scalars; nested objects and arrays remain views. Native JSON serialization is still used for writes, and a requested JavaScript string still needs decoding.
 
 ## Storage choices
 

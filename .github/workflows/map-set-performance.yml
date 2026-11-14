@@ -9,6 +9,9 @@ on:
       - 'scripts/**'
       - 'package.json'
       - '.github/workflows/map-set-performance.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
   pull_request:
     branches: [main]
 
@@ -27,6 +30,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run typecheck:redux

@@ -26,13 +26,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - name: Preserve and build the unchanged runtime
         run: |
           set -euo pipefail
           mkdir -p "$MAP_SET_BASELINE"
           git archive HEAD | tar -x -C "$MAP_SET_BASELINE"
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$MAP_SET_BASELINE/node_modules"
+          (cd "$MAP_SET_BASELINE" && bun install)
           (cd "$MAP_SET_BASELINE" && node scripts/build-wasm.mjs && bun scripts/build-browser.ts)
       - name: Apply the reviewed UTF-8 changes
         run: |

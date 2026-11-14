@@ -19,6 +19,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bunx tsc --noEmit -p tsconfig.text-search.json
@@ -32,7 +34,7 @@ jobs:
           git merge-base --is-ancestor "$BASE" HEAD
           mkdir -p .text-search-baseline
           git archive "$BASE" | tar -x -C .text-search-baseline
-          ln -s "$PWD/node_modules" .text-search-baseline/node_modules
+          (cd ".text-search-baseline" && bun install)
           ln -s "$PWD/website/node_modules" .text-search-baseline/website/node_modules
           (cd .text-search-baseline && bun run build:wasm && bun run build:browser && SITE_COMMIT="$BASE" node website/build.mjs)
       - run: node website/build.mjs

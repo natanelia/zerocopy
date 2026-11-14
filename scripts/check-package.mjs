@@ -18,8 +18,8 @@ try {
     for (const path of Object.values(conditions)) assert.ok(paths.has(path.replace(/^\.\//, '')), `Missing export: ${path}`);
   }
   for (const path of paths) {
-    assert.doesNotMatch(path, /(?:^|\/)(?:node_modules|website|proofs|scripts|\.github)\//, path);
-    assert.doesNotMatch(path, /(?:\.test\.ts|\.as\.ts|\.wat|\.tgz)$|^tsconfig.*\.json$/, path);
+    assert.doesNotMatch(path, /(?:^|\/)(?:node_modules|website|proofs|scripts|rust|\.github)\//, path);
+    assert.doesNotMatch(path, /(?:\.test\.ts|\.as\.ts|\.wat|\.tgz)$|^tsconfig.*\.json$|^rust-toolchain\.toml$/, path);
   }
   writeFileSync(join(temporary, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', join(temporary, archive.filename)]);

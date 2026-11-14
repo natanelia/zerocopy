@@ -1,0 +1,21 @@
+Final source: 105e6c775021f95594f861a718f23883f650eb2d
+
+== reader-unit-verified.log ==
+
+ RUN  v4.1.11 /workspace/scratch/19a1c1ea84dd/zerocopy
+
+
+ Test Files  65 passed (65)
+      Tests  1246 passed (1246)
+   Start at  10:26:48
+   Duration  58.42s (transform 1.21s, setup 0ms, import 4.67s, tests 106.03s, environment 15ms)
+
+
+== reader-typed-json-verified.log ==
+Typed JSON worker tests passed: shared memory, copy transport, nested values, retained snapshots, memory growth, and compaction.
+
+== reader-node-worker-verified.log ==
+{"passed":true,"runtime":"v24.22.1","structures":12,"nested":true,"concurrentReadsAtLeast":10000,"largeRetainedSequences":4,"workerSharesBackingMemory":true,"repeatedAttachment":true,"resetKeepsOldSnapshots":true}
+
+TypeScript, portable build, declarations and git diff --check completed with exit0.
+Actual Chromium153 correctness:37 checks; see utf8-browser.json.

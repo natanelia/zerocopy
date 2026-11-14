@@ -3,7 +3,7 @@ on:
   push:
     branches: [agent/perf-spatial-bulk]
   pull_request:
-    paths: ['numeric-spatial*', 'proofs/spatial*', 'type-tests/numeric-spatial*', '.github/workflows/spatial-bulk-performance.yml']
+    paths: ['numeric-spatial*', 'proofs/spatial*', 'type-tests/numeric-spatial*', '.github/workflows/spatial-bulk-performance.yml', 'rust/**', 'rust-toolchain.toml', '.github/actions/setup-rust/**', 'scripts/build-wasm.mjs', 'package.json', 'scripts/rust-wasm.mjs']
 permissions:
   contents: read
 jobs:
@@ -22,6 +22,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bunx tsc --noEmit -p tsconfig.numeric.json

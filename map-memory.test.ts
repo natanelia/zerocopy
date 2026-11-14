@@ -64,6 +64,58 @@ describe('compact immutable HAMT records', () => {
 });
 
 describe('small root-specific read indexes', () => {
+  test.each([false, true])('cold prefixes need no reusable directory lookup (copy=%s)', async copy => {
+    const encoder = new TextEncoder(), prefix = (key: string) => hashBytes(encoder.encode(key)) & 255;
+    const matching = (first: string) => {
+      const keys = [first], wanted = prefix(first);
+      for (let i = 0; keys.length < 4; i++) {
+        const key = `${first}/${i}`;
+        if (prefix(key) === wanted) keys.push(key);
+      }
+      return keys;
+    };
+    const keys = matching('present'), absent = matching('absent');
+    expect(prefix(keys[0])).not.toBe(prefix(absent[0]));
+    const source = ownerMap().setMany(keys.slice(0, 3).map((key, i) => [key, i] as const));
+    const owner = arenaOf(source), before = owner.buf.slice();
+    const { map } = await initWorker(getWorkerData({ map: source }, { copy }));
+    const reader = arenaOf(map), native = reader.wasm;
+    const calls = { direct: 0, prefix: 0, reused: 0 };
+    Object.defineProperty(reader, 'wasm', { value: {
+      ...native,
+      mapHashCandidate(...args: number[]) { calls.direct++; return native.mapHashCandidate(...args); },
+      mapHashPrefix(...args: number[]) { calls.prefix++; return native.mapHashPrefix(...args); },
+      mapHashCandidateFrom(...args: number[]) { calls.reused++; return native.mapHashCandidateFrom(...args); },
+    } });
+    expect(map.get(keys[0])).toBe(0);
+    expect(calls).toEqual({ direct: 1, prefix: 0, reused: 0 });
+    // A miss sharing a seen prefix must resolve the subtree, not reuse the
+    // first leaf. Later hits still compare their complete keys.
+    expect(map.has(keys[3])).toBe(false);
+    expect(map.get(keys[1])).toBe(1); expect(map.get(keys[2])).toBe(2);
+    expect(calls).toEqual({ direct: 1, prefix: 1, reused: 3 });
+    // A genuinely absent subtree is a valid cached zero, distinct from the
+    // marker for a prefix that has only been visited once.
+    for (const key of absent) expect(map.has(key)).toBe(false);
+    expect(calls).toEqual({ direct: 2, prefix: 2, reused: 6 });
+    expect(reader.used).toBe(owner.used);
+    expect(Buffer.compare(Buffer.from(before), Buffer.from(owner.buf))).toBe(0);
+    expect(() => map.set('forbidden', 1)).toThrow(/read-only/);
+  });
+  test('unresolved prefixes cannot escape their snapshot or directory size', async () => {
+    const owner = new Arena();
+    const small = new SharedMap('number', 0, 0, owner).setMany([['costarring', 1], ['liquid', 2], ['界🙂', 3]]);
+    const large = small.setMany(Array.from({ length: 17000 }, (_, i) => [`key${i}`, i] as const));
+    const fork = large.set('costarring', -1).delete('liquid');
+    const { a, b, c } = await initWorker(getWorkerData({ a: small, b: large, c: fork }, { copy: false }));
+    for (let i = 0; i < 3; i++) {
+      expect(a.get('costarring')).toBe(1);
+      expect(b.get(`key${16999 - i}`)).toBe(16999 - i);
+      expect(c.get('costarring')).toBe(-1); expect(c.has('liquid')).toBe(false);
+      expect(a.get('liquid')).toBe(2); expect(b.get('liquid')).toBe(2);
+      expect(a.get('界🙂')).toBe(3); expect(b.has(`absent/${i}`)).toBe(false);
+    }
+  });
   test('presence checks do not replace boolean values or confuse missing keys', () => {
     const map: any = ownerMap('boolean').set('yes', true).set('no', false);
     const read: any = attached(map);

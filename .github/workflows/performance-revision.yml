@@ -25,6 +25,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: bun run typecheck && bun run test
@@ -44,8 +46,8 @@ jobs:
           path: .revision-previous
       - name: Four-way comparison and complete write-read workloads
         run: |
-          ln -s "$GITHUB_WORKSPACE/node_modules" .revision-baseline/node_modules
-          ln -s "$GITHUB_WORKSPACE/node_modules" .revision-previous/node_modules
+          (cd ".revision-baseline" && bun install)
+          (cd ".revision-previous" && bun install)
           node proofs/run-revision.mjs .revision-baseline .revision-previous proofs/results/revision-ci.json
           node proofs/run-extended.mjs .revision-baseline .revision-previous proofs/results/revision-ci-extended.json
       - uses: actions/upload-artifact@v4
@@ -60,7 +62,7 @@ jobs:
         if: always()
         run: |
           git rev-parse HEAD > source-commit.txt
-          tar --exclude=.git --exclude=node_modules --exclude=dist --exclude=.proof-tools --exclude=.revision-baseline --exclude=.revision-previous -czf /tmp/zerocopy-tested-source.tar.gz .
+          tar --exclude=.git --exclude=node_modules --exclude=dist --exclude=rust/target --exclude=.proof-tools --exclude=.revision-baseline --exclude=.revision-previous -czf /tmp/zerocopy-tested-source.tar.gz .
       - uses: actions/upload-artifact@v4
         if: always()
         with:

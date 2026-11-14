@@ -4,7 +4,7 @@ A static product site, source-backed documentation, and real browser experiments
 
 ## Local development
 
-Use the repository's Bun and Node setup. Build the library first, then the website:
+Use the repository's [Bun, Node, and Rust setup](../CONTRIBUTING.md#set-up-and-test). Build the library first, then the website:
 
 ```sh
 bun install

@@ -7,12 +7,15 @@ on:
       - 'heap-compaction.test.ts'
       - 'shared-priority-queue.ts'
       - 'arena.ts'
-      - '*.as.ts'
       - 'proofs/heap-compaction-20261108/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
       - 'package.json'
       - '.github/workflows/heap-compaction.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   push:
     branches: [main]
     paths:
@@ -20,12 +23,15 @@ on:
       - 'heap-compaction.test.ts'
       - 'shared-priority-queue.ts'
       - 'arena.ts'
-      - '*.as.ts'
       - 'proofs/heap-compaction-20261108/**'
       - 'scripts/build-browser.ts'
       - 'scripts/build-wasm.mjs'
       - 'package.json'
       - '.github/workflows/heap-compaction.yml'
+      - 'rust/**'
+      - 'rust-toolchain.toml'
+      - '.github/actions/setup-rust/**'
+      - 'scripts/rust-wasm.mjs'
   workflow_dispatch:
 
 permissions:
@@ -49,6 +55,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - name: Install pinned project dependencies and build
         run: |
           bun install

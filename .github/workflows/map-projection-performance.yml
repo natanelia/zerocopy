@@ -30,16 +30,18 @@ jobs:
         with: { node-version: '22' }
       - uses: oven-sh/setup-bun@v2
         with: { bun-version: '1.4.2' }
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types && bun run typecheck
       - run: bun run test -- map-projection.test.ts
-      - name: Build exact branch merge-base with identical tools
+      - name: Build exact branch merge-base with its compiler dependencies
         run: |
           base="$(git merge-base HEAD origin/main)"
           git cat-file -e "$base^{commit}"
           mkdir -p .proof-baseline
           git archive "$base" | tar -x -C .proof-baseline
-          ln -s "$PWD/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           (cd .proof-baseline && bun run build:wasm && bun run build:browser)
           mkdir -p proofs/results/map-projection
           printf '%s\n' "$base" > proofs/results/map-projection/base-commit.txt

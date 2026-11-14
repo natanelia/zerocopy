@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 /workspace/scratch/aa13b8fc4d5f/zerocopy-rust
+
+
+ Test Files  66 passed (66)
+      Tests  1260 passed (1260)
+   Start at  06:53:15
+   Duration  79.99s (transform 2.87s, setup 0ms, import 4.51s, tests 153.84s, environment 15ms)

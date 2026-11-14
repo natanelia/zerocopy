@@ -16,6 +16,8 @@ import { structureRegistry } from './codec';
 
 export { SharedMap, SharedList, SharedSet, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedOrderedSet, SharedSortedMap, SharedSortedSet, SharedPriorityQueue };
 export { resetMap } from './shared-map';
+export { JsonView } from './json-view';
+export type { JsonScalar, JsonViewValue, JsonViewType } from './json-view';
 export { resetSharedList } from './shared-list';
 export { resetStack } from './shared-stack';
 export { resetQueue } from './shared-queue';

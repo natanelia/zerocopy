@@ -21,6 +21,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - name: Verify the complete historical raw evidence
         run: node proofs/restore-local-evidence.mjs
@@ -40,9 +42,9 @@ jobs:
         with:
           ref: 7aea44447177d37a303ab5c1b26d7c5e00e1c1f7
           path: .proof-baseline
-      - name: Matched compiler comparison with output validation
+      - name: Cross-version comparison with output validation
         run: |
-          ln -s "$GITHUB_WORKSPACE/node_modules" .proof-baseline/node_modules
+          (cd ".proof-baseline" && bun install)
           node proofs/run-comparison.mjs .proof-baseline proofs/results/ci.json
           cp proofs/snapshot-regressions.ts .proof-baseline/proofs/
           (cd .proof-baseline && LABEL=original bun proofs/snapshot-regressions.ts) > proofs/results/ci-baseline-regressions.json
