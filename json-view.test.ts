@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
+import { Buffer } from 'node:buffer';
 import { Arena, arenaOf } from './arena';
 import { JsonView } from './json-view';
 import { SharedMap } from './shared-map';
@@ -53,7 +54,7 @@ describe('JSON shared-byte views', () => {
     } finally { parse.mockRestore(); freeze.mockRestore(); }
     expect(values!).toEqual([42, true, true, true, true, true, true, false, 2, 'books']);
     expect(parses!).toBe(0); expect(freezes!).toBe(0);
-    expect(arena.buf.slice(0, arena.used)).toEqual(before);
+    expect(Buffer.from(arena.buf.buffer, 0, arena.used).equals(Buffer.from(before.buffer))).toBe(true);
   });
 
   test('matches semantic field names and strings without conflating UTF-8 and UTF-16', () => {
@@ -159,7 +160,7 @@ describe('JSON shared-byte views', () => {
     expect(view.get('text')).toBe('保持🙂');
     expect(nested.get('n')).toBe(7);
     expect(view.toJSON()).toEqual({ category: 'books', nested: { n: 7 }, text: '保持🙂' });
-    expect(new Uint8Array(writer.memory.buffer)).toEqual(before);
+    expect(Buffer.from(writer.memory.buffer).equals(Buffer.from(before.buffer))).toBe(true);
   });
 
   test('skips very deep unrelated values without a recursive parser or linear-memory stack', () => {

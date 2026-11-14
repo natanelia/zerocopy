@@ -28,6 +28,8 @@ jobs:
       - run: bun run build:wasm
       - name: Verify Rust WASM build rejection guards
         run: node --test scripts/rust-wasm.node.mjs
+      - name: Verify aligned and unaligned geometry reads
+        run: node proofs/rust-migration-20261115/geometry-abi.mjs
       - run: bun run build:browser && bun run build:types
       - name: Verify Rust kernels with real workers
         run: node proofs/rust-migration-20261115/workers.mjs

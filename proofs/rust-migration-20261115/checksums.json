@@ -1,0 +1,32 @@
+{
+  "initial-results.json": {
+    "sha256": "28d3093ceb2ab9f7610c1955908800e8a0f5060b0706117cd161359fc1905891",
+    "bytes": 272780,
+    "gzipBytes": 16606,
+    "gzipSha256": "a4c50f38f8aff9bf6a22d8cb98f86a784496641a7ae997cdeb6fcc2ead2fc3ae"
+  },
+  "final-results.json": {
+    "sha256": "71999a91f4bdd99ad1a6a0293da12f680518a768e8504e8c122fc50351b5b972",
+    "bytes": 391682,
+    "gzipBytes": 24289,
+    "gzipSha256": "040cde8a31960c9198653a1000b4ad3500e116a7299e9ccb72da3b98829c9ed7"
+  },
+  "primitive-results.json": {
+    "sha256": "1d800509fa8cf06aea3a995b0c9f9a0ecf7c0741a5c30b5ce1ac3e5336ac5267",
+    "bytes": 71041,
+    "gzipBytes": 7120,
+    "gzipSha256": "e07950200295f717f495a62e220affa4bb410e7a3b7a342d07dfed429433086f"
+  },
+  "kernel-results.json": {
+    "sha256": "7189ee494aa37e97abcd30e3ff93c34ac80c94268e93c8c68c3aa11034aad1be",
+    "bytes": 54348,
+    "gzipBytes": 8286,
+    "gzipSha256": "ac31a3f4406020bf848dc5bf54ae0281c5c1a557ab7409ee7669dc66f17d0571"
+  },
+  "kernel-geometry-aligned-results.json": {
+    "sha256": "2096c6a84862accd1679228bfae9e2d67196134ff442b513fb4d6df595ebb4b5",
+    "bytes": 23757,
+    "gzipBytes": 4736,
+    "gzipSha256": "978f3ea60d55a14a90c4334b64b7885dc3f35e693b35840ad415018cb4e26c7e"
+  }
+}

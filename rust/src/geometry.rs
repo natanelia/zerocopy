@@ -3,6 +3,13 @@
 
 use crate::memory::*;
 
+// Aligned published vector spans need no per-coordinate null branch. Volatile
+// raw reads also retain the legacy aligned address-zero direct-call behavior.
+#[inline(always)]
+unsafe fn load_aligned_f64(p: u32) -> f64 {
+    core::ptr::read_volatile(core::ptr::without_provenance::<f64>(p as usize))
+}
+
 const MIN_X: u32 = 2112;
 const MIN_Y: u32 = 2120;
 const MAX_X: u32 = 2128;
@@ -38,14 +45,28 @@ pub unsafe extern "C" fn bboxXY(root: u32, depth: u32, tail: u32, size: u32) {
         let p = xyLeaf(root, depth, tail, size, base);
         let end = p + 32u32.min(size - base) * 8;
         let mut q = p;
-        while q < end {
-            let x = load_f64(q); let y = load_f64(q + 8);
-            // Strict comparisons ignore NaN axes and retain first signed zeros.
-            if x < lx { lx = x; }
-            if y < ly { ly = y; }
-            if x > hx { hx = x; }
-            if y > hy { hy = y; }
-            q += 16;
+        // Test alignment once per leaf. Preserve unaligned direct ABI inputs
+        // through the general loader; ordinary published vectors are aligned.
+        if p & 7 == 0 {
+            while q < end {
+                let x = load_aligned_f64(q); let y = load_aligned_f64(q + 8);
+                // Strict comparisons ignore NaN axes and retain first signed zeros.
+                if x < lx { lx = x; }
+                if y < ly { ly = y; }
+                if x > hx { hx = x; }
+                if y > hy { hy = y; }
+                q += 16;
+            }
+        } else {
+            while q < end {
+                let x = load_f64(q); let y = load_f64(q + 8);
+                // Strict comparisons ignore NaN axes and retain first signed zeros.
+                if x < lx { lx = x; }
+                if y < ly { ly = y; }
+                if x > hx { hx = x; }
+                if y > hy { hy = y; }
+                q += 16;
+            }
         }
         base += 32;
     }

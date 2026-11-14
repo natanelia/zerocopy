@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "node": "v24.22.1",
+  "coreSha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
+  "readers": 12,
+  "initialCanaryReaders": 8,
+  "readersAttachedDuringWriterSession": 4,
+  "writerRounds": 60,
+  "queryCyclesDuringWriterSession": 596224,
+  "arenas": [
+    {
+      "initialBytes": 131072,
+      "finalBytes": 1507328,
+      "retainedPublishedBytes": 11536
+    },
+    {
+      "initialBytes": 131072,
+      "finalBytes": 786432,
+      "retainedPublishedBytes": 17992
+    }
+  ],
+  "fullScratchCanaryBytesPerArena": 65536,
+  "perInstanceHeapGlobalsIsolated": true,
+  "attachmentAndQueriesWriteNoArenaBytes": true,
+  "readerAtomicWrites": 0,
+  "viewFreezeCalls": 0,
+  "explicitMaterializationsAreFreshAndIndependent": true,
+  "explicitFreezeStillAvailable": true,
+  "retainedJsonViewsSurviveGrowth": true,
+  "repeatedAttachmentPreservesOlderSnapshots": true
+}
