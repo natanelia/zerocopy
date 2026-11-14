@@ -1,0 +1,25 @@
+// After building PR #75: node prepare.mjs [/path/to/dist]
+import { stripTypeScriptTypes } from 'node:module';
+import { cpSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root=fileURLToPath(new URL('../../',import.meta.url)), here=fileURLToPath(new URL('./',import.meta.url));
+const source=resolve(process.argv[2]??join(root,'dist')), output=join(here,'.runtime');
+mkdirSync(output,{recursive:true});
+for(const name of ['utf8','freeze-json']) writeFileSync(join(output,`${name}.mjs`),stripTypeScriptTypes(readFileSync(join(root,`${name}.ts`),'utf8')));
+for(const arm of ['before','after']) cpSync(source,join(output,arm,'dist'),{recursive:true});
+const after=join(output,'after','dist'), files=readdirSync(after).filter(name=>name.endsWith('.js'));
+const marker='const parsed = JSON.parse(decodeUtf8(decoder2, this.bytes.subarray(ptr, ptr + len)));\n    const nested = parseNestedType(type);';
+const targets=files.filter(name=>readFileSync(join(after,name),'utf8').includes(marker));
+if(targets.length!==1) throw Error('Revisit the experiment patch: expected one Arena.decodeAt site');
+const file=join(after,targets[0]), input=readFileSync(file,'utf8');
+const replaced=input.replace(marker,'const nested = parseNestedType(type);\n    const parsed = nested ? JSON.parse(decodeUtf8(decoder2, this.bytes.subarray(ptr, ptr + len))) : parseUtf8JSON(this.bytes.subarray(ptr, ptr + len));');
+if(!replaced.includes('result = freezeJSON(parsed);')) throw Error('Expected object freeze site');
+writeFileSync(file,'import { parseUtf8JSON } from "./_direct-json.mjs";\n'+replaced.replace('result = freezeJSON(parsed);','result = parsed;'));
+cpSync(join(here,'direct-json.mjs'),join(after,'_direct-json.mjs'));
+const hash=path=>createHash('sha256').update(readFileSync(path)).digest('hex');
+const manifest={source,baseline:'b4c08def84b905026632bfd27612da4efef0a3f0',patch:'Only Arena.decodeAt object materialization uses parseUtf8JSON; existing address/key caches, nested collections, map traversal, writers and worker transport are preserved.',before:{},after:{}};
+for(const arm of ['before','after']) for(const name of readdirSync(join(output,arm,'dist')).filter(name=>name.endsWith('.js')||name.endsWith('.mjs'))) manifest[arm][name]=hash(join(output,arm,'dist',name));
+writeFileSync(join(output,'build-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+console.log(`Prepared exact baseline and experimental decoder variants (${targets[0]}).`);

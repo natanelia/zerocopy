@@ -1,0 +1,34 @@
+{
+  "source": "/workspace/scratch/19a1c1ea84dd/zerocopy/dist",
+  "baseline": "b4c08def84b905026632bfd27612da4efef0a3f0",
+  "patch": "Only Arena.decodeAt object materialization uses parseUtf8JSON; existing address/key caches, nested collections, map traversal, writers and worker transport are preserved.",
+  "before": {
+    "chunk-8606sqdp.js": "a9997246507619f8f5122e2b5720a50b650d7c5a95bc0598ce625aa905160c32",
+    "chunk-9jph3cep.js": "321ef01007ac2281013c1179b6ab6c7aa2d87a0061a8c157b45c4c5e55f8217e",
+    "chunk-hp088bng.js": "2300ae84cf3679bc647fb0f92855eca01b447a307b99eaf7c8a0008cf361aaa3",
+    "chunk-kyq79qhn.js": "897a5d1a0c54f4baee5b112dde6c3b0f4b4f814f8077eab8b10b4a38180fd57c",
+    "chunk-pfd0btn6.js": "5d9ea17cc77890f808a433056582ce1942ad9153dcaf96bf55718609a1e399de",
+    "geometry.js": "ab0eb9b53aede6611a5a19178810aeac9aafa41370cae10488a42f543bd08a1e",
+    "numeric.js": "15c3a776194364b230e85dcbdd87619c886796b8423c570b2a8e5731b16cfae9",
+    "redux.js": "ad53357225637d4ae275dbc2da2916d700bdf91740784e3a02b91c1da918d0a3",
+    "shared.js": "46e9698e9a05a00eabafab19365002527d726c989ac47dd76720c4c1d75b9dd1",
+    "state.js": "65621e390b5ee05dbc1683ade7353571a017fe1473de07c7d828d86f294236df",
+    "tanstack-db-collection.js": "414d0079820dba778d425a31fe2fe80ae42aa038fe8fcc95ae7ef370e0e6bd84",
+    "worker.js": "7c113257ed5227e33d01378b4fabf8a1be02773b85825cd5045ebe70cb99032a"
+  },
+  "after": {
+    "_direct-json.mjs": "6d9216e537b3b0fc6e7dafd708fd9957e31fd37c8f3c6ded3b52c91bd39ba7e8",
+    "chunk-8606sqdp.js": "a9997246507619f8f5122e2b5720a50b650d7c5a95bc0598ce625aa905160c32",
+    "chunk-9jph3cep.js": "321ef01007ac2281013c1179b6ab6c7aa2d87a0061a8c157b45c4c5e55f8217e",
+    "chunk-hp088bng.js": "949b75a10d89b0267d659ed3b8de17b324bc932a41d6e3edc0b781506b663a6d",
+    "chunk-kyq79qhn.js": "897a5d1a0c54f4baee5b112dde6c3b0f4b4f814f8077eab8b10b4a38180fd57c",
+    "chunk-pfd0btn6.js": "5d9ea17cc77890f808a433056582ce1942ad9153dcaf96bf55718609a1e399de",
+    "geometry.js": "ab0eb9b53aede6611a5a19178810aeac9aafa41370cae10488a42f543bd08a1e",
+    "numeric.js": "15c3a776194364b230e85dcbdd87619c886796b8423c570b2a8e5731b16cfae9",
+    "redux.js": "ad53357225637d4ae275dbc2da2916d700bdf91740784e3a02b91c1da918d0a3",
+    "shared.js": "46e9698e9a05a00eabafab19365002527d726c989ac47dd76720c4c1d75b9dd1",
+    "state.js": "65621e390b5ee05dbc1683ade7353571a017fe1473de07c7d828d86f294236df",
+    "tanstack-db-collection.js": "414d0079820dba778d425a31fe2fe80ae42aa038fe8fcc95ae7ef370e0e6bd84",
+    "worker.js": "7c113257ed5227e33d01378b4fabf8a1be02773b85825cd5045ebe70cb99032a"
+  }
+}

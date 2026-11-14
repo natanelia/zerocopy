@@ -1,0 +1,25 @@
+{
+  "baseline": "b4c08def84b905026632bfd27612da4efef0a3f0",
+  "evidenceFiles": {
+    ".gitignore": "f501d3603b1536b7183d8ef80bcd127f983677e79db314440339230037781011",
+    "AUDIT.md": "d411dab61e71cf2550f3f03e4d5749e81fa094c8b15141ffbcf64f9ec6bd03cd",
+    "JSON-PARSERS.md": "cd71761f4dc104d9a30b56df20cfcbccb9e5016f6e3385c9ff9f715bcc51bc99",
+    "README.md": "d81f0c84aa6dc4c15e1db7fb317abbb2ad93743a6659eebff653b3bbffb3e3b9",
+    "bench-worker.mjs": "39c47a1f0c2016e5863197e82132a4f744b4851e95512268f2d30fe318858591",
+    "build-manifest.json": "40a8c17f36aa9f44c239ac90c6ca378f5f96a17992424392a5e320a320df0021",
+    "direct-json-guarded-checks.mjs": "5b48ace0513fa529262e31c242ad6d69d5da1ca6c5efe33038852aadc6461239",
+    "direct-json-guarded.mjs": "a9b5608176763d304c6a7e30b48eccc24ea6806abb49b7eea9ff355ee80716f8",
+    "guarded-parser-notes.md": "9d6598333963a941f02de17064aaaaef2170f7e354ec51282882cc627722f3ec",
+    "node-codec.json.gz": "3ccd24423a74fa35f5f9a12d07099cc024c84644ce93599bd2374d4144a858e2",
+    "node-reader.json.gz": "68cdbaa33e334d6aec844007a58eb740355a5b5b3caf57bbdca4a1839eb18333",
+    "prepare.mjs": "5a41099306d23fb548b7163812471361f2f321c2d83ede0ed9c461f37070fcee",
+    "run.mjs": "e5751e9ddf681db7fd21b67472692fea1d0d6675f94707a557e4a37be08741e1",
+    "summarize.mjs": "348f097c49f34828e5090fa1933937662303fd1cd4f870119ca37c41f700ee58",
+    "summary.json": "d695cd977581cd0f0384896a1bb1fb9c68fec2afd4b629927800f272b2b79a5c"
+  },
+  "uncompressedResults": {
+    "node-codec": "370e9dbc65efdb9d51531a2f31593ab836553d9f53a93aad6cf1333ff71d4189",
+    "node-reader": "a4945fc5aedf6b36c1484ba9b3e056f1cb96aab32af9eb9c03be39278adf8de6"
+  },
+  "scope": "Two JavaScript direct-byte parsers; Node measurements. Rust assessment is source analysis; no Rust or browser performance measurement."
+}

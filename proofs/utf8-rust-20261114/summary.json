@@ -1,0 +1,605 @@
+{
+  "status": "pass",
+  "baseline": "b4c08def84b905026632bfd27612da4efef0a3f0",
+  "codecSamples": 140,
+  "readerSamples": 21,
+  "node": "v24.22.1",
+  "v8": "13.6.233.17-node.58",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "affinity": "CPUs 2,3",
+  "codecs": [
+    {
+      "kind": "catalog",
+      "count": 10000,
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 56.102412000000186,
+      "afterMedianMs": 50.95543799999996,
+      "ratioOfMedians": 0.9082575273234205,
+      "pairedGeometricRatio": 0.9815583392108437,
+      "ci95": [
+        0.6426727530053298,
+        1.499140532672247
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "kind": "catalog",
+      "count": 10000,
+      "before": "native-a",
+      "after": "original",
+      "beforeMedianMs": 56.102412000000186,
+      "afterMedianMs": 187.4209219999998,
+      "ratioOfMedians": 3.3406927673626434,
+      "pairedGeometricRatio": 3.299908391091729,
+      "ci95": [
+        2.164843542037515,
+        5.030107339465596
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "catalog",
+      "count": 10000,
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 56.102412000000186,
+      "afterMedianMs": 122.4292089999999,
+      "ratioOfMedians": 2.182245016488765,
+      "pairedGeometricRatio": 1.9572214447211254,
+      "ci95": [
+        1.5080888159903272,
+        2.5401128521470446
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "catalog",
+      "count": 10000,
+      "before": "original",
+      "after": "guarded",
+      "beforeMedianMs": 187.4209219999998,
+      "afterMedianMs": 122.4292089999999,
+      "ratioOfMedians": 0.6532312811906882,
+      "pairedGeometricRatio": 0.5931138724955954,
+      "ci95": [
+        0.41824928755925095,
+        0.8410870650840887
+      ],
+      "fasterPairs": 6,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "count": 10000,
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 77.80810899999778,
+      "afterMedianMs": 67.22094699999798,
+      "ratioOfMedians": 0.8639324083817522,
+      "pairedGeometricRatio": 1.054487282965022,
+      "ci95": [
+        0.8043378640457161,
+        1.3824332779039172
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "count": 10000,
+      "before": "native-a",
+      "after": "original",
+      "beforeMedianMs": 77.80810899999778,
+      "afterMedianMs": 300.3557490000021,
+      "ratioOfMedians": 3.8602113951903223,
+      "pairedGeometricRatio": 4.309564231031929,
+      "ci95": [
+        3.538821317360193,
+        5.248172257322102
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "count": 10000,
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 77.80810899999778,
+      "afterMedianMs": 263.9590169999974,
+      "ratioOfMedians": 3.392435832105943,
+      "pairedGeometricRatio": 3.4886737821591236,
+      "ci95": [
+        2.82864129338963,
+        4.302717628695799
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "unicode",
+      "count": 10000,
+      "before": "original",
+      "after": "guarded",
+      "beforeMedianMs": 300.3557490000021,
+      "afterMedianMs": 263.9590169999974,
+      "ratioOfMedians": 0.8788212573883364,
+      "pairedGeometricRatio": 0.8095189200425861,
+      "ci95": [
+        0.6619007568020157,
+        0.9900591216621483
+      ],
+      "fasterPairs": 6,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "count": 2000,
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 39.549465000000055,
+      "afterMedianMs": 34.183209000002535,
+      "ratioOfMedians": 0.8643153327106318,
+      "pairedGeometricRatio": 0.9025034575597843,
+      "ci95": [
+        0.7012838426077935,
+        1.1614590860649519
+      ],
+      "fasterPairs": 5,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "count": 2000,
+      "before": "native-a",
+      "after": "original",
+      "beforeMedianMs": 39.549465000000055,
+      "afterMedianMs": 354.0682830000005,
+      "ratioOfMedians": 8.952542923147002,
+      "pairedGeometricRatio": 8.288679881602043,
+      "ci95": [
+        7.271807735011154,
+        9.447748989415363
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "count": 2000,
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 39.549465000000055,
+      "afterMedianMs": 163.94402400000035,
+      "ratioOfMedians": 4.145290562084724,
+      "pairedGeometricRatio": 3.998463694260447,
+      "ci95": [
+        3.2319472791949146,
+        4.946773735214355
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "numeric",
+      "count": 2000,
+      "before": "original",
+      "after": "guarded",
+      "beforeMedianMs": 354.0682830000005,
+      "afterMedianMs": 163.94402400000035,
+      "ratioOfMedians": 0.4630293982022674,
+      "pairedGeometricRatio": 0.4824005452467324,
+      "ci95": [
+        0.4092174615577173,
+        0.5686714471286621
+      ],
+      "fasterPairs": 7,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "count": 10000,
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 92.32677700000204,
+      "afterMedianMs": 97.88365899999917,
+      "ratioOfMedians": 1.0601871112645578,
+      "pairedGeometricRatio": 0.8907649437603731,
+      "ci95": [
+        0.5672484089083015,
+        1.3987913805866445
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "count": 10000,
+      "before": "native-a",
+      "after": "original",
+      "beforeMedianMs": 92.32677700000204,
+      "afterMedianMs": 203.47284900000523,
+      "ratioOfMedians": 2.2038335530763815,
+      "pairedGeometricRatio": 1.8126421914486421,
+      "ci95": [
+        1.063410304145432,
+        3.08974974326597
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "count": 10000,
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 92.32677700000204,
+      "afterMedianMs": 183.31324499999755,
+      "ratioOfMedians": 1.985482987237749,
+      "pairedGeometricRatio": 1.6597873815970967,
+      "ci95": [
+        0.9391735640537129,
+        2.9333173947295963
+      ],
+      "fasterPairs": 1,
+      "pairs": 7
+    },
+    {
+      "kind": "large-early",
+      "count": 10000,
+      "before": "original",
+      "after": "guarded",
+      "beforeMedianMs": 203.47284900000523,
+      "afterMedianMs": 183.31324499999755,
+      "ratioOfMedians": 0.9009223879299633,
+      "pairedGeometricRatio": 0.9156729273032171,
+      "ci95": [
+        0.775847546783595,
+        1.0806980227906955
+      ],
+      "fasterPairs": 6,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "count": 10000,
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 94.88721000000078,
+      "afterMedianMs": 94.38638500000525,
+      "ratioOfMedians": 0.994721891390889,
+      "pairedGeometricRatio": 1.1081358063522926,
+      "ci95": [
+        0.768420464511189,
+        1.5980378217818343
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "count": 10000,
+      "before": "native-a",
+      "after": "original",
+      "beforeMedianMs": 94.88721000000078,
+      "afterMedianMs": 202.77063700000872,
+      "ratioOfMedians": 2.136964897587431,
+      "pairedGeometricRatio": 2.1227119057554673,
+      "ci95": [
+        1.551012849000199,
+        2.90513765746078
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "count": 10000,
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 94.88721000000078,
+      "afterMedianMs": 169.66273199999705,
+      "ratioOfMedians": 1.788046376324013,
+      "pairedGeometricRatio": 1.8016260533142867,
+      "ci95": [
+        1.4389945267951147,
+        2.255641960786249
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "kind": "large-late",
+      "count": 10000,
+      "before": "original",
+      "after": "guarded",
+      "beforeMedianMs": 202.77063700000872,
+      "afterMedianMs": 169.66273199999705,
+      "ratioOfMedians": 0.8367223899384888,
+      "pairedGeometricRatio": 0.8487379038245384,
+      "ci95": [
+        0.546754272483792,
+        1.3175133065097824
+      ],
+      "fasterPairs": 6,
+      "pairs": 7
+    }
+  ],
+  "phases": [
+    {
+      "phase": "constructionMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 72.839812,
+      "afterMedianMs": 74.10262999999998,
+      "ratioOfMedians": 1.017336920089799,
+      "pairedGeometricRatio": 0.980514307936334,
+      "ci95": [
+        0.6159178866202989,
+        1.5609358470548151
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "constructionMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 72.839812,
+      "afterMedianMs": 57.653362000000016,
+      "ratioOfMedians": 0.7915089347018087,
+      "pairedGeometricRatio": 0.7405986123011621,
+      "ci95": [
+        0.4931147115930643,
+        1.1122894767638516
+      ],
+      "fasterPairs": 5,
+      "pairs": 7
+    },
+    {
+      "phase": "publicationMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 8.567935999999918,
+      "afterMedianMs": 8.501434000000017,
+      "ratioOfMedians": 0.9922382706873742,
+      "pairedGeometricRatio": 0.982722852679158,
+      "ci95": [
+        0.38767729799445094,
+        2.4911033227219965
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "publicationMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 8.567935999999918,
+      "afterMedianMs": 6.344848000000013,
+      "ratioOfMedians": 0.7405340095911167,
+      "pairedGeometricRatio": 0.8260457905552062,
+      "ci95": [
+        0.42283417671763257,
+        1.613757084138561
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "firstQueryMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 49.66300699999999,
+      "afterMedianMs": 48.06222200000002,
+      "ratioOfMedians": 0.967767054459671,
+      "pairedGeometricRatio": 1.0699448813438481,
+      "ci95": [
+        0.7332170011231696,
+        1.5613141094113756
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "firstQueryMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 49.66300699999999,
+      "afterMedianMs": 76.594067,
+      "ratioOfMedians": 1.5422760647578186,
+      "pairedGeometricRatio": 1.6488124064831746,
+      "ci95": [
+        1.1773635122774226,
+        2.309042469401971
+      ],
+      "fasterPairs": 0,
+      "pairs": 7
+    },
+    {
+      "phase": "repeatQueryMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 4.735913000000039,
+      "afterMedianMs": 4.981196000000011,
+      "ratioOfMedians": 1.0517921254043243,
+      "pairedGeometricRatio": 1.3645726640674694,
+      "ci95": [
+        0.32303214998352303,
+        5.764313414671479
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "repeatQueryMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 4.735913000000039,
+      "afterMedianMs": 6.381943999999976,
+      "ratioOfMedians": 1.3475636060037257,
+      "pairedGeometricRatio": 1.2615436612475914,
+      "ci95": [
+        0.6957421609093664,
+        2.287474439027564
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "readyMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 126.47657099999998,
+      "afterMedianMs": 136.62173600000006,
+      "ratioOfMedians": 1.0802137891609986,
+      "pairedGeometricRatio": 0.9985620218889003,
+      "ci95": [
+        0.674036506513471,
+        1.479335469107741
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "readyMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 126.47657099999998,
+      "afterMedianMs": 144.78288200000003,
+      "ratioOfMedians": 1.1447407283045337,
+      "pairedGeometricRatio": 1.0611813520335782,
+      "ci95": [
+        0.8759206773410204,
+        1.2856253894157001
+      ],
+      "fasterPairs": 2,
+      "pairs": 7
+    },
+    {
+      "phase": "updateMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 0.787576999999942,
+      "afterMedianMs": 0.633576000000005,
+      "ratioOfMedians": 0.8044622938456197,
+      "pairedGeometricRatio": 1.0008928113898874,
+      "ci95": [
+        0.6841354955893513,
+        1.4643099595774662
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "updateMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 0.787576999999942,
+      "afterMedianMs": 0.994451999999967,
+      "ratioOfMedians": 1.2626727291427253,
+      "pairedGeometricRatio": 1.824203081318152,
+      "ci95": [
+        0.6739786744103484,
+        4.93742162510112
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "editPublicationMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 2.3831749999999374,
+      "afterMedianMs": 1.7506140000000414,
+      "ratioOfMedians": 0.7345721568915784,
+      "pairedGeometricRatio": 1.2775701576825857,
+      "ci95": [
+        0.4060693204383791,
+        4.019475064107412
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "editPublicationMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 2.3831749999999374,
+      "afterMedianMs": 2.597560000000044,
+      "ratioOfMedians": 1.0899577244642598,
+      "pairedGeometricRatio": 1.3315274149225667,
+      "ci95": [
+        0.49940989420429716,
+        3.5501204066355436
+      ],
+      "fasterPairs": 2,
+      "pairs": 7
+    },
+    {
+      "phase": "updatedQueryMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 23.545740000000023,
+      "afterMedianMs": 22.947834,
+      "ratioOfMedians": 0.9746066167383135,
+      "pairedGeometricRatio": 0.9018722148937177,
+      "ci95": [
+        0.6005613613857825,
+        1.3543553486698814
+      ],
+      "fasterPairs": 4,
+      "pairs": 7
+    },
+    {
+      "phase": "updatedQueryMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 23.545740000000023,
+      "afterMedianMs": 26.63444499999997,
+      "ratioOfMedians": 1.1311789308809128,
+      "pairedGeometricRatio": 1.1079280612306643,
+      "ci95": [
+        0.6936186614501527,
+        1.7697110200235782
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    },
+    {
+      "phase": "retainedQueryMs",
+      "before": "native-a",
+      "after": "native-b",
+      "beforeMedianMs": 3.083565999999962,
+      "afterMedianMs": 3.3838839999999664,
+      "ratioOfMedians": 1.0973930832030214,
+      "pairedGeometricRatio": 0.9122553598573272,
+      "ci95": [
+        0.4612609645150661,
+        1.80420609071774
+      ],
+      "fasterPairs": 2,
+      "pairs": 7
+    },
+    {
+      "phase": "retainedQueryMs",
+      "before": "native-a",
+      "after": "guarded",
+      "beforeMedianMs": 3.083565999999962,
+      "afterMedianMs": 3.339723000000049,
+      "ratioOfMedians": 1.083071677402102,
+      "pairedGeometricRatio": 0.8844827804005257,
+      "ci95": [
+        0.6189024547068754,
+        1.2640276070573384
+      ],
+      "fasterPairs": 3,
+      "pairs": 7
+    }
+  ],
+  "limitations": "Node only, shared host, seven pairs, exploratory unadjusted t intervals on log ratios. Same-build native-a/native-b control is reported, never used to normalize timings. Worker/module startup excluded. Memory consumption and Rust/Wasm performance unmeasured. All raw samples retained."
+}
