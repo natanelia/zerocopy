@@ -14,7 +14,9 @@ export function freezeJSON<T>(value: T): T {
         if (child !== null && typeof child === 'object') todo.push(child);
       }
     } else {
-      for (const child of Object.values(item)) {
+      const keys = Object.keys(item);
+      for (let i = 0; i < keys.length; i++) {
+        const child = (item as Record<string, unknown>)[keys[i]];
         if (child !== null && typeof child === 'object') todo.push(child);
       }
     }
