@@ -4,7 +4,7 @@ import { BASELINE_CASES, BENCHMARK_CASES, EDIT_PUBLICATION_PHASES, casesForPhase
 import { entriesFor, editsFor, queryIds } from '../assets/catalog-core.mjs';
 import { reference, verifyAnswer } from '../assets/catalog-reference.mjs';
 import { RPC } from '../assets/feature-core.mjs';
-import { createStorage } from '../_site/compare/assets/feature-storage.mjs';
+import { createStorage } from '../_site/assets/feature-storage.mjs';
 
 test('replica publication defaults to incremental and rejects unknown modes', () => {
   assert.equal(validateUpdateMode(), 'incremental');
@@ -35,7 +35,7 @@ test('actual readers receive full or incremental copies on every edit and retain
       // Capture replies in-process so object identity reveals whether unchanged
       // records were copied. Publications still cross a structured-clone boundary.
       globalThis.self = { postMessage: value => { response = value; } };
-      await import(`../_site/compare/assets/feature-reader.mjs?case=${id}`);
+      await import(`../_site/assets/feature-reader.mjs?case=${id}`);
       const receive = globalThis.self.onmessage;
       async function request(type, body = {}) {
         response = undefined;

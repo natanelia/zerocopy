@@ -3,7 +3,7 @@ import { once } from 'node:events';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
-import { createPreview } from '../serve.mjs';
+import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 import { generateColumns } from '../assets/explorer-core.mjs';
 import { reference } from '../assets/explorer-reference.mjs';
 import { INVESTIGATION_CASES } from '../assets/explorer-benchmark-cases.mjs';
@@ -25,8 +25,11 @@ try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1080 }, reducedMotion: 'reduce' });
   page = await context.newPage(); page.setDefaultTimeout(60_000); page.on('pageerror', error => errors.push(error.message));
   await page.goto(origin + base);
-  assert.equal(await page.locator('.use-case-card').count(), 6);
+  assert.deepEqual(await page.locator('.pattern-links a').evaluateAll(links => links.map(link => link.getAttribute('href'))),
+    ['catalog', 'editors', 'data-tables', 'graphs', 'analytics', 'simulations'].map(slug => `${base}docs/${slug}/`));
   assert.match(await page.locator('h1').innerText(), /Share your data/);
+  await page.goto(origin + base + 'use-cases/');
+  assert.equal(await page.locator('.use-case-card').count(), 6);
   await page.goto(origin + base + 'historical/log-explorer/');
   assert.equal(await page.locator('#log-size').inputValue(), '100000');
   await page.locator('#load-logs').click(); await count('view-count', 100000); await matches(100000);

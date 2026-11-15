@@ -1,9 +1,9 @@
 import { once } from 'node:events';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { webkit } from 'playwright';
-import { createPreview } from '../serve.mjs';
+import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
-const library = new URL('../_site/historical/log-compare/library/', import.meta.url);
+const library = new URL('../_site/library/', import.meta.url);
 const originals = new Map(readdirSync(library).filter(name => name.endsWith('.js')).map(name => [new URL(name, library), readFileSync(new URL(name, library), 'utf8')]));
 const server = createPreview({ base: meta.base });
 server.listen(0, '127.0.0.1'); await once(server, 'listening');

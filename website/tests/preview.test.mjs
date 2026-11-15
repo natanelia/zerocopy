@@ -151,7 +151,7 @@ for (const [label, github, expectedPaths, preview, publishAllowed] of hostingSce
       const run = workflowValue(step, 'run', 8);
       const checks = [...run.matchAll(/^node website\/tests\/([\w-]+\.mjs)(.*)$/gm)].map(([, script, args]) => [script, args.trim()]);
       if (step === deploymentStep) {
-        assert.deepEqual(checks, ['docs-browser', 'memory-charts-browser', 'feature-browser', 'isolation-browser', 'browser',
+        assert.deepEqual(checks, ['docs-browser', 'studio-browser', 'memory-charts-browser', 'feature-browser', 'benchmark-dashboard-browser', 'isolation-browser', 'browser',
           'explorer-browser', 'comparison-browser', 'memory-browser'].map(name => [name + '.mjs', '']));
       } else {
         assert.deepEqual(checks, [['isolation-browser.mjs', '--hosting-only']]);

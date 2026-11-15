@@ -1,10 +1,10 @@
-/** Render the real built pages; graphs must remain useful with JavaScript off. */
+/** Retained historical chart fixtures remain usable with JavaScript off. Current charts are checked by the dashboard suite. */
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
-import { createPreview } from '../serve.mjs';
+import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 import { chartData } from '../memory-charts.mjs';
 const base = JSON.parse(readFileSync(new URL('../_site/build.json',import.meta.url))).base;
 const artifacts=process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/',import.meta.url)); mkdirSync(artifacts,{recursive:true});

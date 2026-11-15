@@ -5,7 +5,7 @@ import { readReference, verifyReadAnswer } from '../assets/catalog-read-referenc
 import { entriesFor, editsFor, queryIds } from '../assets/catalog-core.mjs';
 import { publicationFor } from '../assets/catalog-benchmark-core.mjs';
 import { RPC } from '../assets/feature-core.mjs';
-import { createStorage } from '../_site/investigation-benchmark/assets/feature-storage.mjs';
+import { createStorage } from '../_site/benchmarks/assets/feature-storage.mjs';
 
 test('actual read actors measure cold and repeat before verifying captured source contracts', async () => {
   const originalSelf = globalThis.self;
@@ -15,7 +15,7 @@ test('actual read actors measure cold and repeat before verifying captured sourc
       const initial = storage.build(entriesFor(count));
       let sequence = 0, response;
       globalThis.self = { postMessage: value => { response = value; } };
-      await import(`../_site/investigation-benchmark/assets/read-benchmark-reader.mjs?case=${definition.id}`);
+      await import(`../_site/benchmarks/assets/read-benchmark-reader.mjs?case=${definition.id}`);
       const receive = globalThis.self.onmessage;
       async function request(type, body = {}) {
         response = undefined;
@@ -66,7 +66,7 @@ test('reader protocol rejects a query over the fixed reply bound before reading'
   try {
     let response;
     globalThis.self = { postMessage: value => { response = value; } };
-    await import('../_site/investigation-benchmark/assets/read-benchmark-reader.mjs?bounds');
+    await import('../_site/benchmarks/assets/read-benchmark-reader.mjs?bounds');
     await globalThis.self.onmessage({ data: { protocol: RPC, type: 'read', id: 1, slot: 'first', ids: Array(1001).fill('product/000000') } });
     assert.match(response.error, /at most 1000/);
   } finally {

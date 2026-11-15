@@ -131,8 +131,8 @@ async function publish({ github, context, core }) {
     if (!live) throw new Error('Pages did not serve the tested revision before the verification deadline');
     core.setOutput('url', url);
     const run = `https://github.com/${repository}/actions/runs/${context.runId}`;
-    await comment(`### Preview ready\n\n[**Open live comparison**](${url}compare/) · [Documentation home](${url}) · [Benchmark](${url}investigation-benchmark/)\n\nHead: \`${head}\` · Tested build: \`${meta.sourceCommit}\` · [Checks](${run})\n\nThis comment updates after each successful build. The URL is commit-specific to prevent stale scripts and service workers. Shared-memory setup runs automatically (one refresh on a first visit when needed). Select **Load all four paths** to start the comparison.\n\nPublic development preview. No accounts, uploads, analytics, or production data.`);
-    await core.summary.addHeading('Verified website preview').addLink('Open preview', url).addLink('Live comparison', url + 'compare/').write();
+    await comment(`### Preview ready\n\n[**Open Benchmarks**](${url}benchmarks/) · [Home](${url}) · [Playground](${url}playground/) · [Documentation](${url}docs/choose-zerocopy/)\n\nHead: \`${head}\` · Tested build: \`${meta.sourceCommit}\` · [Checks](${run})\n\nMemory charts and performance results are together on **Benchmarks**. Select **Run on my device** to measure locally. Shared-memory setup runs automatically (one refresh on a first visit when needed). This commit-specific link updates after each successful build.\n\nPublic development preview. No accounts, uploads, analytics, or production data.`);
+    await core.summary.addHeading('Verified website preview').addLink('Open Benchmarks', url + 'benchmarks/').addLink('Home', url).write();
   } catch (error) {
     await comment(`### Preview not ready\n\nThe preview was not verified, so no working preview link is claimed.\n\n${String(error.message).replace(/[<>]/g, '')}\n\n[Deployment run](https://github.com/${repository}/actions/runs/${context.runId})`);
     throw error;

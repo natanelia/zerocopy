@@ -17,7 +17,9 @@ test('the homepage identifies the library, not only its slogan', () => {
   const html = read('index.html');
   assert.match(html, /<title>natanelia\/zerocopy: Immutable collections for JavaScript and TypeScript<\/title>/);
   const body = html.split('<body')[1];
-  assert.ok(body.includes(`<a href="${repository}">${projectName}</a>`));
+  const repositoryLinks = [...body.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+    .filter(([, href]) => href === repository).map(([, , label]) => label.replace(/<[^>]*>/g, ''));
+  assert.ok(repositoryLinks.some(label => label.includes(projectName)), 'Visible repository identity survives decorative badge markup');
   assert.match(body, /zerocopy is a JavaScript and TypeScript library/);
   assert.ok(body.includes(`href="${npmPackage}"`));
   assert.match(read('index.html'), /SharedArrayBuffer/);
