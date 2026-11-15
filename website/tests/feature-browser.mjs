@@ -10,8 +10,39 @@ import { READ_CASES } from '../assets/catalog-read-workloads.mjs';
 import { READ_PHASES } from '../assets/catalog-benchmark-results.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(artifacts, { recursive: true });
-const server = createPreview({ base: meta.base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
+const server = createPreview({ base: meta.base });
+// Fault injection belongs to this test server. Enabling browser interception
+// after hundreds of short-lived workers can wait on stale Chromium targets.
+// Keep normal responses unchanged and toggle only the requested metadata fault.
+let overrideBuildMetadata = false;
+const requestListeners = server.listeners('request');
+assert.equal(requestListeners.length, 1, 'Expected one preview request handler');
+const [serveRequest] = requestListeners;
+server.removeListener('request', serveRequest);
+server.on('request', (request, response) => {
+  if (overrideBuildMetadata && new URL(request.url, 'http://localhost').pathname === meta.base + 'build.json') {
+    response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
+      'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Embedder-Policy': 'require-corp' });
+    response.end(JSON.stringify({ ...meta, sourceCommit: 'f'.repeat(40) }));
+    return;
+  }
+  Reflect.apply(serveRequest, server, [request, response]);
+});
+server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
+async function bounded(promise, timeoutMs, label) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} exceeded ${timeoutMs} ms`)), timeoutMs);
+    })]);
+  } finally { clearTimeout(timer); }
+}
+async function downloadJSON(download, label) {
+  const path = await bounded(download.path(), 20000, `${label} download completion`);
+  assert.equal(typeof path, 'string', `${label} download must have a local file`);
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
 // A normal navigation restores the template placeholder; bfcache can restore
 // the cleared stopped page. Both must have no record data or active session.
 async function assertEmptySession(page, panels) {
@@ -69,7 +100,7 @@ try {
   for (const name of browserNames) {
     assert.ok(['chromium', 'firefox', 'webkit'].includes(name));
     const browser = await ({ chromium, firefox, webkit })[name].launch({ headless: true, ...(name === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
-    let activePage;
+    let activePage, recordDiagnostic, engineFailure;
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const page = activePage = await context.newPage(), errors = [], diagnostics = [];
@@ -77,6 +108,7 @@ try {
         diagnostics.push({ at: new Date().toISOString(), page: source.url(), ...entry });
         writeFileSync(`${artifacts}/feature-events-${name}.json`, JSON.stringify(diagnostics, null, 2));
       };
+      recordDiagnostic = record;
       const observe = observed => {
         observed.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }, observed); });
         observed.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }, observed));
@@ -189,7 +221,7 @@ try {
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 240000 });
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
-      const suite = JSON.parse(readFileSync(await download.path(), 'utf8'));
+      const suite = await downloadJSON(download, 'completed benchmark');
       // Preserve the run even if a later presentation assertion fails.
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(suite, null, 2));
       const raw = suite.legacy;
@@ -296,23 +328,29 @@ try {
       }
       await page.setViewportSize({ width: 1440, height: 1000 });
       record({ type: 'phase', name: 'benchmark build identity is checked again before every run' });
-      await page.route('**/build.json', route => route.fulfill({ json: { ...meta, sourceCommit: 'f'.repeat(40) } }));
+      overrideBuildMetadata = true;
+      record({ type: 'phase', name: 'changed build metadata enabled in test HTTP server' });
       await page.locator('#feature-run').click();
+      record({ type: 'phase', name: 'benchmark requested with changed metadata' });
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Run failed:'));
+      record({ type: 'phase', name: 'changed metadata rejected before measurement' });
       assert.equal(await page.locator('#feature-run').isDisabled(), true, 'failed verification invalidates earlier build identity');
       const mismatchPromise = page.waitForEvent('download'); await page.locator('#feature-export').click();
-      const mismatch = JSON.parse(readFileSync(await (await mismatchPromise).path(), 'utf8'));
+      const mismatch = await downloadJSON(await mismatchPromise, 'build mismatch');
+      record({ type: 'phase', name: 'build mismatch evidence exported' });
       assert.equal(mismatch.status, 'failed'); assert.equal(mismatch.identityStatus, 'failed');
       assert.equal(mismatch.buildIdentity, null); assert.equal(mismatch.assetVerification, null);
       assert.equal(mismatch.raw.length + mismatch.legacy.raw.length, 0); assert.equal(mismatch.summary, null);
       assert.match(mismatch.failures[0].message, /different commits/);
-      await page.unroute('**/build.json'); await page.reload(); await page.locator('#feature-run:not([disabled])').waitFor();
+      overrideBuildMetadata = false;
+      await page.reload(); await page.locator('#feature-run:not([disabled])').waitFor();
+      record({ type: 'phase', name: 'original build metadata restored' });
       record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
       await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
       assert.equal(await page.locator('#feature-benchmark-results .feature-timing-row').count(), 0, 'Stop clears previous bars');
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), false);
       const partialPromise = page.waitForEvent('download'); await page.locator('#feature-export').click();
-      const partial = JSON.parse(readFileSync(await (await partialPromise).path(), 'utf8'));
+      const partial = await downloadJSON(await partialPromise, 'cancelled benchmark');
       assert.equal(partial.status, 'cancelled'); assert.equal(partial.summary, null); assert.ok(partial.failures.length > 0);
       await page.locator('#feature-run').click(); await page.goto(origin + meta.base + 'docs/catalog/'); await page.goBack();
       await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);
@@ -373,12 +411,21 @@ try {
       } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
       console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 162 benchmark records across explicit read workloads and both legacy copy modes, headerless workers, no-JS charts and mobile layout at ${meta.base}`);
     } catch (error) {
+      engineFailure = error;
+      // Write the original failure before any browser-dependent diagnostics.
+      console.error(`Failure in ${name} at ${activePage?.url() ?? 'startup'}: ${error.stack ?? error}`);
+      recordDiagnostic?.({ type: 'test-failure', message: error.message, stack: error.stack }, activePage);
       if (activePage && !activePage.isClosed()) {
-        console.error(`Failure in ${name} at ${activePage.url()}`);
-        console.error((await activePage.locator('body').innerText().catch(() => '')).slice(0, 5000));
-        await activePage.screenshot({ path: `${artifacts}/feature-failure-${name}.png`, fullPage: true }).catch(() => {});
+        const body = await bounded(activePage.locator('body').innerText({ timeout: 3000 }), 4000, 'Failure body capture').catch(diagnostic => `Body unavailable: ${diagnostic.message}`);
+        console.error(body.slice(0, 5000));
+        await bounded(activePage.screenshot({ path: `${artifacts}/feature-failure-${name}.png`, fullPage: true, timeout: 5000 }), 6000, 'Failure screenshot')
+          .catch(diagnostic => console.error(`Screenshot unavailable: ${diagnostic.message}`));
       }
       throw error;
-    } finally { await browser.close(); }
+    } finally {
+      overrideBuildMetadata = false;
+      try { await bounded(browser.close(), 10000, 'Browser cleanup'); }
+      catch (error) { console.error(error.message); if (!engineFailure) throw error; }
+    }
   }
 } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); clearTimeout(deadline); }
