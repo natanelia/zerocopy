@@ -48,6 +48,8 @@ Mobile captures use a 390 × 844 viewport. Desktop captures use 1440 × 1000; St
 
 Chromium and WebKit remain the default hosted browser gates. The local environment has Firefox available; hosted results are reported on the PR after execution. The expensive browser flows run once at the deployment target. Alternate root/project prefixes retain their static and isolation checks, preserving the reduced two-build CI structure.
 
+Chromium's worker cleanup gate also checks the browser's own dedicated-worker inventory. It must first observe at least three targets during the existing benchmark, then confirm zero after cleanup. Inventory errors or timeouts fail the gate. The diagnostic artifact records these snapshots alongside Playwright's worker handles; Firefox and WebKit retain their worker-close event checks.
+
 ## Reproduce
 
 Build the library with the pinned Rust toolchain and repository dependencies, then:

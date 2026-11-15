@@ -50,6 +50,101 @@ async function bounded(promise, timeoutMs, label) {
     })]);
   } finally { clearTimeout(timer); }
 }
+const chromiumWorkerAudits = new WeakMap();
+async function createChromiumWorkerAudit(browser, evidencePath) {
+  const filter = [{ type: 'worker', exclude: false }, { exclude: true }];
+  const evidence = {
+    schema: 'zerocopy-browser-worker-lifecycle/v1', browser: browser.version(), sourceCommit: meta.sourceCommit,
+    authority: 'Chromium Target.getTargets across the entire fresh browser; all dedicated workers, including blob URLs',
+    filter, created: 0, destroyed: 0, unknownDestroyed: 0, positiveObservation: null, shutdowns: [], errors: [],
+  };
+  const flush = () => writeFileSync(evidencePath, JSON.stringify(evidence, null, 2));
+  let session, started = false, version = 0, fatalError;
+  const known = new Set(), waiters = new Set();
+  const changed = () => { version++; for (const wake of waiters) wake(); };
+  const created = ({ targetInfo }) => {
+    if (targetInfo.type !== 'worker') return;
+    known.add(targetInfo.targetId); evidence.created++; changed();
+  };
+  const destroyed = ({ targetId }) => {
+    if (known.delete(targetId)) evidence.destroyed++;
+    else evidence.unknownDestroyed++;
+    changed();
+  };
+  const fail = (label, error, lastTargets) => {
+    fatalError ??= new Error(`${label}: ${error.message}; last dedicated targets: ${JSON.stringify(lastTargets)}`, { cause: error });
+    evidence.errors.push({ at: new Date().toISOString(), label, message: error.message, lastTargets });
+    flush();
+    return fatalError;
+  };
+  try {
+    session = await bounded(browser.newBrowserCDPSession(), 10000, 'Chromium worker audit session');
+    session.on('Target.targetCreated', created);
+    session.on('Target.targetDestroyed', destroyed);
+    await bounded(session.send('Target.setDiscoverTargets', { discover: true, filter }), 10000, 'Chromium worker target discovery');
+  } catch (error) { throw fail('Chromium worker audit unavailable', error, null); }
+
+  async function targetsUntil(predicate, label) {
+    if (fatalError) throw fatalError;
+    const deadline = Date.now() + 10000;
+    let lastTargets = null;
+    const remaining = () => {
+      const ms = deadline - Date.now();
+      if (ms <= 0) throw new Error('Worker inventory deadline exceeded 10000 ms');
+      return ms;
+    };
+    try {
+      for (;;) {
+        const before = version;
+        const budget = remaining();
+        const reply = await bounded(session.send('Target.getTargets', { filter }), budget, `${label} inventory`);
+        assert.ok(Array.isArray(reply.targetInfos), 'CDP must return a target inventory');
+        assert.ok(reply.targetInfos.every(info => info.type === 'worker' && typeof info.targetId === 'string' && typeof info.url === 'string'), 'CDP must honor the dedicated-worker filter');
+        lastTargets = reply.targetInfos.map(({ targetId, type, url, attached, parentFrameId, browserContextId }) => ({ targetId, type, url, attached, parentFrameId, browserContextId }));
+        // A positive snapshot is direct coverage. For zero, repeat if a target
+        // event arrived while the request was in flight; never trust stale zero.
+        if (predicate(lastTargets) && (lastTargets.length > 0 || before === version)) return lastTargets;
+        if (before !== version) continue;
+        let wake;
+        try {
+          await bounded(new Promise(resolve => { wake = resolve; waiters.add(wake); }), remaining(), `${label} target change`);
+        } finally { waiters.delete(wake); }
+      }
+    } catch (error) { throw fail(label, error, lastTargets); }
+  }
+  return {
+    get started() { return started; },
+    begin() { started = true; },
+    async observeRunning() {
+      assert.equal(started, true);
+      const targets = await targetsUntil(items => items.length >= 3, 'Chromium owner and two reader target coverage');
+      evidence.positiveObservation = { at: new Date().toISOString(), targets };
+      flush();
+      console.log(`Chromium worker coverage: observed ${targets.length} dedicated targets during the existing benchmark run.`);
+    },
+    async assertStopped(page, label) {
+      if (!evidence.positiveObservation || evidence.positiveObservation.targets.length < 3) {
+        throw fail(label, new Error('No positive whole-browser observation of an owner and two dedicated reader targets'), null);
+      }
+      const targets = await targetsUntil(items => items.length === 0, label);
+      assert.equal(targets.length, 0, `${label}: no actual Chromium dedicated targets may remain`);
+      const lifecycle = workerLifecycles.get(page);
+      const playwright = {
+        created: lifecycle?.created ?? null, closed: lifecycle?.closed ?? null,
+        pendingCount: page.workers().length, pendingURLs: page.workers().map(worker => worker.url()),
+      };
+      evidence.shutdowns.push({ at: new Date().toISOString(), label, targets, playwright });
+      flush();
+      if (label.startsWith('Completed runs')) console.log(`Chromium worker shutdown: zero actual dedicated targets across the browser; ${playwright.pendingCount} stale Playwright handles.`);
+      if (playwright.pendingCount) console.warn(`${label}: Chromium dedicated-target inventory is zero; stale Playwright handles: ${JSON.stringify(playwright)}`);
+    },
+    dispose() {
+      session.off('Target.targetCreated', created);
+      session.off('Target.targetDestroyed', destroyed);
+      flush();
+    },
+  };
+}
 const workerLifecycles = new WeakMap();
 function observeWorkers(page) {
   const state = { created: 0, closed: 0 };
@@ -60,6 +155,11 @@ function observeWorkers(page) {
   });
 }
 async function assertWorkersStopped(page, label, timeoutMs = 10000) {
+  const chromiumAudit = chromiumWorkerAudits.get(page.context().browser());
+  if (chromiumAudit?.started) {
+    await chromiumAudit.assertStopped(page, label);
+    return;
+  }
   // terminate() can return before Chromium's worker-target close notification
   // reaches Playwright. Await
   // those events; do not sleep, disconnect handles, or accept a nonzero count.
@@ -228,6 +328,7 @@ try {
       writeFileSync(`${artifacts}/benchmark-dashboard-${name}-events.json`, JSON.stringify(events, null, 2));
     };
     try {
+      if (name === 'chromium') chromiumWorkerAudits.set(browser, await createChromiumWorkerAudit(browser, `${artifacts}/benchmark-dashboard-${name}-workers.json`));
       record('recorded charts without JavaScript');
       const plainContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
       const plain = await plainContext.newPage(); await plain.goto(url);
@@ -264,10 +365,16 @@ try {
 
       record('complete benchmark requested');
       const startedAt = Date.now();
+      const chromiumAudit = chromiumWorkerAudits.get(browser);
+      chromiumAudit?.begin();
       await page.getByRole('button', { name: 'Run performance benchmark on my device', exact: true }).click();
       assert.equal(new URL(page.url()).pathname, meta.base + 'benchmarks/', 'One click runs the test in place');
       assert.equal(await page.locator('#feature-run').isDisabled(), true);
       assert.equal(await page.locator('#feature-result-origin').getAttribute('data-result-origin'), 'recorded', 'In-flight samples must not replace completed evidence');
+      if (chromiumAudit) {
+        await chromiumAudit.observeRunning();
+        record('Chromium inventory positively observed owner and two reader targets');
+      }
       await page.waitForFunction(() => /^(Complete\.|Run failed:)/.test(document.querySelector('#feature-benchmark-status').textContent), undefined, { timeout: 240000 });
       assert.match(await page.locator('#feature-benchmark-status').innerText(), /^Complete\./, 'A benchmark error must fail the gate immediately');
       assert.equal(await page.locator('#feature-result-origin').getAttribute('data-result-origin'), 'device');
@@ -375,6 +482,7 @@ try {
       throw error;
     } finally {
       serverFault = undefined;
+      chromiumWorkerAudits.get(browser)?.dispose();
       try { await bounded(browser.close(), 10000, 'Browser cleanup'); }
       catch (error) { console.error(error.message); if (!engineFailure) throw error; }
     }
