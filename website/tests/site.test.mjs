@@ -141,14 +141,24 @@ test('retained comparison fixtures keep their workload boundaries', () => {
   }
 });
 
-test('retained benchmark fixtures preserve copy strategies and the original layout', () => {
-  const catalog = regressionHTML('investigation-benchmark/');
-  for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
-  assert.match(catalog, /<h1>One product catalog\.<br>Four implementations\.<\/h1>/);
+test('benchmark page exposes explicit read contracts in one memory-first destination', () => {
+  const catalog = readFileSync(join(out, 'benchmarks/index.html'), 'utf8');
+  assert.match(catalog, /<h1>Benchmarks(?:<span>\.<\/span>)?<\/h1>/);
+  assert.ok(catalog.indexOf('id="memory"') >= 0);
+  assert.ok(catalog.indexOf('id="memory"') < catalog.indexOf('id="performance"'), 'historical memory appears before live timing controls');
+  for (const text of ['.get()', 'getView()', 'first answer', 'legacy', 'fingerprint', 'frozen', 'mutable']) {
+    assert.ok(catalog.toLowerCase().includes(text.toLowerCase()), text);
+  }
+  assert.ok(catalog.includes('feature-build-identity'));
+  assert.ok(catalog.includes('id="feature-benchmark-results"'));
   assert.doesNotMatch(catalog, /feature-benchmark-preview|data-preview-case|feature-preview-status/);
-  assert.ok(catalog.includes('<div id="feature-benchmark-results" aria-live="polite"></div>'));
   const css = readFileSync(join(out, 'assets/feature.css'), 'utf8');
   assert.doesNotMatch(css, /feature-benchmark-preview|feature-preview-status/);
+});
+
+test('retained benchmark fixtures preserve copy strategies and workload limits', () => {
+  const catalog = regressionHTML('investigation-benchmark/');
+  for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
   const historical = regressionHTML('historical/log-benchmark/');
   for (const text of ['incremental copy', 'full copy', '42 measured samples', 'Queries use data already attached']) assert.ok(historical.includes(text), text);
   const live = regressionHTML('compare/');

@@ -8,6 +8,7 @@ import turfBBox from '@turf/bbox';
 import { SharedList, getWorkerData, initWorker } from '../dist/shared.js';
 import { bboxXY } from '../dist/geometry.js';
 import { coordinates, bboxReference, pairs, exact, random } from './geometry-fixtures.mjs';
+import { kernelCompiler, kernelSourceFiles } from './kernel-provenance.mjs';
 
 if (!isMainThread) {
   const { points } = await initWorker(workerData);
@@ -110,7 +111,9 @@ if (!isMainThread) {
     const row = { count, kind, iterations, ms, publicOverTurf: ms.turf / ms.public, publicOverSharedIteration: ms['shared-forEach'] / ms.public, samples };
     rows.push(row); console.log('BBOX BULK BENCH', JSON.stringify({ ...row, samples: undefined }));
   }
-  const report = { commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), runtime: process.versions, arch: process.arch, cpu: cpus()[0]?.model, date: new Date().toISOString(), checks, seeds: 4096, warmup: 8, rounds: 21, sourceSha256: createHash('sha256').update(readFileSync('geometry-kernels.as.ts')).digest('hex'), sink, rows };
+  const root = new URL('../', import.meta.url);
+  const sourceHashes = Object.fromEntries(kernelSourceFiles(root).map(file => [file, createHash('sha256').update(readFileSync(new URL(file, root))).digest('hex')]));
+  const report = { commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), runtime: process.versions, arch: process.arch, cpu: cpus()[0]?.model, date: new Date().toISOString(), checks, seeds: 4096, warmup: 8, rounds: 21, compiler: kernelCompiler(root), sourceHashes, sourceSha256: createHash('sha256').update(JSON.stringify(sourceHashes)).digest('hex'), sink, rows };
   mkdirSync('proofs/results', { recursive: true });
   writeFileSync(`proofs/results/geometry-bbox-bulk-${process.versions.bun ? 'bun' : 'node'}-${process.arch}.json`, JSON.stringify(report, null, 2));
   // Separate bulk-operation gate. This does not approve the rejected SIMD paths.

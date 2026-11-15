@@ -1,9 +1,9 @@
-/** Real product-catalog workers, equivalent answers, lifecycle, export and visual checks. */
+/** Retained product-catalog comparison workers, equivalent answers, lifecycle and visuals. */
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { chromium, webkit } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 import { formatMilliseconds, compareElapsed } from '../assets/catalog-timings.mjs';
 const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
@@ -59,11 +59,15 @@ async function assertTimings(page, phase) {
     assert.equal(entry.delta, entry.kind === 'native' ? 'Native baseline · this run' : comparison === '—' ? 'Relative comparison unavailable at this precision.' : `${comparison}. Native: ${formatMilliseconds(native)}.`);
   }
 }
-const deadline = setTimeout(() => { console.error('Feature browser gate exceeded 240 seconds'); process.exit(1); }, 240000); deadline.unref();
+const browserNames = process.env.FEATURE_BROWSERS?.split(',') || ['chromium', 'webkit'];
+// The public dashboard suite runs all v4 samples once; this gate keeps the
+// independent comparison fixtures and their 1k/100k lifecycle regressions.
+const gateTimeoutMs = browserNames.length * 300000;
+const deadline = setTimeout(() => { console.error(`Feature browser gate exceeded ${gateTimeoutMs / 1000} seconds`); process.exit(1); }, gateTimeoutMs); deadline.unref();
 try {
-  for (const name of process.env.FEATURE_BROWSERS?.split(',') || ['chromium', 'webkit']) {
-    assert.ok(['chromium', 'webkit'].includes(name));
-    const browser = await ({ chromium, webkit })[name].launch({ headless: true, ...(name === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
+  for (const name of browserNames) {
+    assert.ok(['chromium', 'firefox', 'webkit'].includes(name));
+    const browser = await ({ chromium, firefox, webkit })[name].launch({ headless: true, ...(name === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
     let activePage;
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
@@ -161,90 +165,12 @@ try {
       await page.locator('#feature-view').selectOption('initial'); await page.waitForFunction(() => document.querySelector('#feature-view-label').textContent === 'Initial · revision 0');
       assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 0/);
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
-      record({ type: 'phase', name: 'complete benchmark and export' });
-      await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
-      const caseIds = ['shared', 'native-full', 'immutable-full', 'immer-full', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
-      const baselineIds = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
-      const editedPhases = ['editPublicationMs', 'updatePublicationMs'];
-      const allPhases = ['generationMs', 'constructionMs', 'publicationMs', 'firstQueryMs', 'repeatQueryMs', 'updateMs', ...editedPhases, 'updatedQueryMs'];
-      assert.equal((await page.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'One product catalog. Four implementations.');
-      assert.equal(await page.locator('.feature-benchmark-preview, [data-preview-case], #feature-preview-status').count(), 0, 'No preview panel or placeholder bars');
-      assert.equal(await page.locator('#feature-benchmark-results').innerText(), '', 'Charts appear only after a completed run');
-      await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
-      await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 90000 });
-      const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
-      const raw = JSON.parse(readFileSync(await download.path(), 'utf8'));
-      assert.equal(raw.workload, 'product-catalog');
-      assert.equal(raw.schema, 'zerocopy-product-catalog-browser/v3'); assert.equal(raw.raw.length, 63); assert.equal(raw.raw.filter(record => !record.warmup).length, 49);
-      assert.equal(raw.sourceCommit, meta.sourceCommit); assert.deepEqual(raw.dependencies, meta.dependencies);
-      assert.deepEqual(raw.cases.map(item => item.id), caseIds);
-      assert.deepEqual(Object.keys(raw.summary), caseIds);
-      assert.deepEqual(Object.keys(raw.config.phaseCaseIds), allPhases);
-      for (const phase of allPhases) {
-        assert.deepEqual(raw.config.phaseCaseIds[phase], editedPhases.includes(phase) ? caseIds : baselineIds, phase);
-      }
-      assert.equal(raw.config.samplesPerCase, 7); assert.equal(raw.config.warmups, 2);
-      for (const item of raw.cases) {
-        const samples = raw.raw.filter(sample => sample.caseId === item.id);
-        assert.equal(samples.length, 9); assert.equal(samples.filter(sample => sample.warmup).length, 2);
-        assert.ok(samples.every(sample => sample.kind === item.kind && sample.updateMode === item.updateMode));
-        assert.match(item.label, item.updateMode === 'shared' ? /shared snapshot/ : item.updateMode === 'full' ? /full copy/ : /incremental copy/);
-        assert.deepEqual(item.measuredPhases, item.updateMode === 'full' ? editedPhases : allPhases);
-        assert.deepEqual(Object.keys(raw.summary[item.id]), item.measuredPhases);
-      }
-      for (const record of raw.raw) {
-        assert.equal(record.verification.updated.answer.validation.unavailable, 100);
-        assert.equal(record.verification.initial.answer.validation.unavailable, 0);
-        assert.equal(record.verification.updated.answer.lookup.found, 910);
-        assert.ok(record.updatePublicationMs >= record.editPublicationMs);
-        const full = record.updateMode === 'full';
-        for (const phase of allPhases) {
-          assert.equal(Object.hasOwn(record, phase), !full || editedPhases.includes(phase), `${record.caseId}: ${phase} exported only when measured`);
-        }
-        if (full) {
-          assert.deepEqual(Object.keys(record.verification), ['updated', 'initial']);
-          assert.equal(record.editGenerationMs, undefined);
-        } else {
-          assert.equal(record.verification.first.answer.lookup.found, 910);
-          assert.equal(record.verification.first.answer.lookup.fingerprint, record.verification.repeat.answer.lookup.fingerprint);
-          assert.ok(record.updatePublicationMs >= record.updateMs);
-          assert.ok(Number.isFinite(record.editGenerationMs));
-        }
-        const initialRecords = record.kind === 'shared' ? 0 : 1000;
-        const editRecords = record.kind === 'shared' ? 0 : full ? 1000 : 100;
-        assert.deepEqual(record.publication.initial, { recordsPerReader: initialRecords, totalRecords: initialRecords * 2 });
-        assert.deepEqual(record.publication.edit, { recordsPerReader: editRecords, totalRecords: editRecords * 2 });
-      }
-      assert.equal(await page.locator('.feature-timing-group').count(), allPhases.length);
-      for (const section of await page.locator('.feature-timing-group').all()) {
-        const phase = await section.getAttribute('data-phase');
-        assert.deepEqual(await section.locator('[data-case]').evaluateAll(rows => rows.map(row => row.dataset.case)),
-          editedPhases.includes(phase) ? caseIds : baselineIds, `${phase}: correct visible cases and order`);
-        const visibleIds = editedPhases.includes(phase) ? caseIds : baselineIds;
-        assert.deepEqual(await section.locator('.feature-timing-value').allTextContents(),
-          visibleIds.map(id => `${raw.summary[id][phase].median.toFixed(2)} ms`), `${phase}: displayed bars match measured medians`);
-      }
-      writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(raw, null, 2));
-      for (const width of [390, 320]) {
-        await page.setViewportSize({ width, height: 844 });
-        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px completed benchmark`);
-      }
-      await page.setViewportSize({ width: 1440, height: 1000 });
-      record({ type: 'phase', name: 'benchmark Stop and navigation during startup' });
-      await page.locator('#feature-count').selectOption('100000'); await page.locator('#feature-run').click(); await page.locator('#feature-cancel').click();
-      assert.equal(await page.locator('#feature-benchmark-results .feature-timing-row').count(), 0, 'Stop clears previous bars');
-      assert.match(await page.locator('#feature-benchmark-status').innerText(), /Stopped/); assert.equal(await page.locator('#feature-export').isDisabled(), true);
-      await page.locator('#feature-run').click(); await page.goto(origin + meta.base + 'docs/catalog/'); await page.goBack();
-      await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);
-      await page.goto(origin + meta.base + 'docs/catalog/'); await page.goto(origin + meta.base + 'investigation-benchmark/');
-      await page.locator('#feature-run:not([disabled])').waitFor(); await page.locator('#feature-run').click();
-      await page.goBack(); await page.goForward();
-      await page.locator('#feature-run:not([disabled])').waitFor(); assert.equal(await page.locator('#feature-export').isDisabled(), true);
-      assert.equal(await page.locator('#feature-benchmark-results').innerText(), '');
+      // Full benchmark exports, read/legacy case matrices, source verification,
+      // cancellation and public navigation are covered by benchmark-dashboard-browser.
       record({ type: 'phase', name: 'mobile layout and loaded registry' });
       for (const width of [390, 320]) {
         await page.setViewportSize({ width, height: 844 });
-        for (const route of ['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'historical/log-explorer/']) {
+        for (const route of ['compare/', 'docs/memory-comparison/', 'historical/log-explorer/']) {
           await page.goto(origin + meta.base + route);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px ${route}`);
           for (const field of await page.locator('.feature-controls input, .feature-controls select, .feature-timing-controls select').all()) {
@@ -267,10 +193,6 @@ try {
       const plain = await plainContext.newPage();
       await plain.goto(origin + meta.base + 'explorer/'); await plain.waitForURL(origin + meta.base + 'compare/');
       assert.match(await plain.locator('h1').innerText(), /product/i);
-      await plain.goto(origin + meta.base + 'investigation-benchmark/');
-      assert.equal((await plain.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'One product catalog. Four implementations.');
-      assert.equal(await plain.locator('.feature-benchmark-preview, [data-preview-case]').count(), 0);
-      assert.equal(await plain.locator('#feature-benchmark-results').innerText(), '');
       await plain.goto(origin + meta.base + 'docs/memory-comparison/');
       assert.equal(await plain.locator('[data-feature-memory-chart]').count(), 2);
       assert.match(await plain.locator('[data-feature-memory-chart="rss-eight"]').innerText(), /Separate 8-reader run/);
@@ -291,7 +213,7 @@ try {
         await staticPage.locator('#feature-stop').click(); await staticPage.locator('#feature-load:not([disabled])').waitFor();
         assert.deepEqual(errors, []); await staticContext.close();
       } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
-      console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 63 benchmark records with both copy modes, headerless workers, no-JS charts and mobile layout at ${meta.base}`);
+      console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, headerless comparison workers, historical no-JS memory charts and mobile layout at ${meta.base}`);
     } catch (error) {
       if (activePage && !activePage.isClosed()) {
         console.error(`Failure in ${name} at ${activePage.url()}`);

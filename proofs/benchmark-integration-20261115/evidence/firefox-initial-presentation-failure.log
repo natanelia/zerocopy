@@ -1,0 +1,206 @@
+Failure in firefox at http://127.0.0.1:36875/investigation-benchmark/
+Skip to content
+zerocopy.
+Documentation
+Use cases
+Catalog benchmark
+Search
+⌘ K
+GitHub ↗
+BENCHMARKS
+Memory. Reads.
+The complete cost.
+
+Recorded memory first. Then measure complete objects, selected fields and cached reads on your device.
+
+Recorded memory
+Run performance
+Method & evidence
+HISTORICAL RECORDING
+Memory with reader workers
+Run performance ↓
+
+These fixed Node.js recordings use an earlier synthetic fixture and retain their original source commits and dates. They do not measure the current Rust build or this browser. Each replica receives the full catalog initially, then incremental edits.
+
+Whole-process RAM: 2 / 4 readers
+Original 2/4-reader run · AMD EPYC 9V74 80-Core Processor
+100,000 synthetic records · 100 replacements · initial + current retained
+Recorded Node.js · absolute endpoint RSS · MiB · zero-based scale
+
+2 reader workers
+
+SharedMap
+186.40 MiB
+Native Map
+349.68 MiB
+Immutable.js Map
+389.86 MiB
+Immer Map
+349.97 MiB
+0
+310
+620 MiB
+
+SharedMap: 186.40 MiB; native Map baseline: 349.68 MiB. 46.69% lower median RSS with the same reader count.
+
+4 reader workers
+
+SharedMap
+215.45 MiB
+Native Map
+551.53 MiB
+Immutable.js Map
+612.83 MiB
+Immer Map
+551.98 MiB
+0
+310
+620 MiB
+
+SharedMap: 215.45 MiB; native Map baseline: 551.53 MiB. 60.94% lower median RSS with the same reader count.
+
+Each result includes the complete Node process, owner, readers and runtime. These are post-GC endpoint samples after the first edit with revision 0 and revision 1 retained, not peak or high-water RSS. No startup baseline is subtracted. Zero-reader controls are excluded from this savings chart and remain in the method and raw data.
+
+Exact values and trial ranges
+
+2026-10-11 · Node v22.23.3 · linux x64 · source 8ad5788 · AMD EPYC 9V74 80-Core Processor · 6.17.0-1022-azure. Not browser RAM.
+Open SVG · Download measured data
+
+Separate eight-reader recording
+
+Memory accounting, owner-only controls and complete evidence →
+
+YOUR DEVICE · CHECKED ANSWERS
+One catalog. Explicit read workloads.
+Lower time is better
+
+Compare standard .get(), selective getView() and the cost through the first useful answer. Each API starts with fresh readers.
+
+Shared memory is ready. This demo runs locally.
+
+Source 22933ebf35f2 · uncommitted build · fetched library and workload hashes verified · browser versions in export
+
+Products
+Run on my device
+Export raw JSON
+
+Complete. 126 measured samples and 36 warm-ups passed current and retained-revision checks. Source 22933ebf35f2.
+
+Your device · 1,000 products · source 22933ebf35f2 (uncommitted)
+
+Cold full-object .get()
+
+Complete deeply frozen records. First access in a fresh reader. Local query work in the slower of two parallel readers. Result messaging is excluded.
+
+SharedMap · .get()
+get
+17.84 ms
+Native Map · .get()
+get
+0.56 ms
+Immutable.js Map · .get()
+get
+2.40 ms
+Immer Map · .get()
+get
+0.40 ms
+
+Source 22933ebf35f2 · 7 measured samples · ranges and individual reader times in export
+
+Cached full-object .get()
+
+The same 1,000 IDs immediately repeated, before any validation pass. Local query work in the slower of two parallel readers. Result messaging is excluded.
+
+SharedMap · .get()
+get
+1.42 ms
+Native Map · .get()
+get
+0.74 ms
+Immutable.js Map · .get()
+get
+1.54 ms
+Immer Map · .get()
+get
+0.40 ms
+
+Source 22933ebf35f2 · 7 measured samples · ranges and individual reader times in export
+
+Selective application query
+
+Available books → ID, name, price and revision. Every implementation returns the same projection. Local query work in the slower of two parallel readers. Result messaging is excluded.
+
+SharedMap · .get()
+get
+34.54 ms
+Native Map · .get()
+get
+0.78 ms
+Immutable.js Map · .get()
+get
+2.04 ms
+Immer Map · .get()
+get
+0.72 ms
+SharedMap · getView()
+getView
+21.18 ms
+
+Source 22933ebf35f2 · 7 measured samples · ranges and individual reader times in export
+
+Construction through first full answer
+
+Per-sample construction + initial publication + first worker round-trip, then the median. Includes both reader acknowledgements; excludes worker startup and input generation.
+
+SharedMap · .get()
+get
+42.56 ms
+Native Map · .get()
+get
+48.20 ms
+Immutable.js Map · .get()
+get
+64.38 ms
+Immer Map · .get()
+get
+39.46 ms
+
+Source 22933ebf35f2 · 7 measured samples · ranges and individual reader times in export
+
+Construction, publication & worker transport
+Explicit view materialization · separate contracts
+Legacy catalog control · unchanged full-field fingerprint workload
+Method, timing boundaries & correctness
+
+Historical SharedList benchmark · Scalar-number Map transport control
+
+zerocopy.
+
+Share your data. Keep your options.
+
+Get started
+Know the trade-offs
+Feedback ↗
+npm package ↗
+MIT license
+
+Source build v0.2.1 · 22933eb
+No analytics. Benchmarks stay in your browser.
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+'' !== '260.70 ms'
+
+    at file:///workspace/scratch/9fdaf99732c2/zerocopy/website/tests/feature-browser.mjs:223:18 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '',
+  expected: '260.70 ms',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.22.1

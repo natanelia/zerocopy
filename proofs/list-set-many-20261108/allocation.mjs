@@ -4,6 +4,7 @@ import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { study, makeFixture } from './workloads.mjs';
+import { withKernelSources } from '../kernel-provenance.mjs';
 
 const [rootArg, outputArg] = process.argv.slice(2);
 assert.ok(rootArg && outputArg, 'Usage: node allocation.mjs BUILT_REPOSITORY OUTPUT_JSON');
@@ -50,7 +51,7 @@ const report = { schema: 'zerocopy-list-batch-allocation/v1', measuredAt: new Da
   runtime: process.version, bun: process.versions.bun ?? null,
   harnessSha256: hash(readFileSync(new URL(import.meta.url))), workloadSha256: hash(readFileSync(new URL('./workloads.mjs', import.meta.url))),
   scope: 'Exact append-only WASM writer allocation for one complete batch; includes unreachable intermediate scalar paths and any batch staging above 4096 distinct edits. Excludes JS objects, native-array storage, total backing capacity, RSS, and GC; this is not a cross-library total-memory comparison.',
-  sourceHashes: Object.fromEntries(['persistent-core.as.ts', 'shared-list.ts', 'persistent-core.wasm'].map(name => [name, hash(readFileSync(join(root, name)))])), rows };
+  sourceHashes: Object.fromEntries(withKernelSources(root, ['shared-list.ts', 'persistent-core.wasm']).map(name => [name, hash(readFileSync(join(root, name)))])), rows };
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, JSON.stringify(report, null, 2) + '\n', { flag: 'wx' });
 console.log(JSON.stringify(rows, null, 2));

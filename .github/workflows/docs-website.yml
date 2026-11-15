@@ -24,14 +24,14 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm && bun run build:browser && bun run build:types
       - run: npm --prefix website install --ignore-scripts --no-package-lock
@@ -43,31 +43,50 @@ jobs:
         run: node --test proofs/memory-startup.mjs
       - name: Check deployment safety
         run: node --test website/tests/preview.test.mjs
-      - name: Check root-hosted site
+      - name: Check root hosting paths and workers
+        id: root-host
+        env:
+          SITE_BASE: /
+          BROWSER_ARTIFACTS_DIR: website/artifacts/hosting-root
         run: |
           node website/build.mjs
+          mkdir -p "$BROWSER_ARTIFACTS_DIR"
+          cp website/_site/build.json "$BROWSER_ARTIFACTS_DIR/build.json"
+          node --test website/tests/*.test.mjs
+          node website/tests/isolation-browser.mjs --hosting-only
+      - name: Check production paths before the PR preview
+        if: github.event_name == 'pull_request'
+        id: pages-host
+        env:
+          SITE_BASE: /zerocopy/
+          SITE_ORIGIN: https://natanelia.github.io
+          BROWSER_ARTIFACTS_DIR: website/artifacts/hosting-pages
+        run: |
+          node website/build.mjs
+          mkdir -p "$BROWSER_ARTIFACTS_DIR"
+          cp website/_site/build.json "$BROWSER_ARTIFACTS_DIR/build.json"
+          node --test website/tests/*.test.mjs
+          node website/tests/isolation-browser.mjs --hosting-only
+      - name: Build and fully check the deployment target
+        # Run expensive behavior checks once. Build this target last so the
+        # publishable directory contains exactly the site those checks exercised.
+        id: deployment
+        env:
+          SITE_BASE: ${{ github.event_name == 'pull_request' && format('/zerocopy/previews/pr-{0}/{1}/', github.event.pull_request.number, github.event.pull_request.head.sha) || '/zerocopy/' }}
+          SITE_ORIGIN: https://natanelia.github.io
+          SITE_PREVIEW_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
+          SITE_HEAD_COMMIT: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
+          BROWSER_ARTIFACTS_DIR: website/artifacts/deployment
+        run: |
+          node website/build.mjs
+          mkdir -p "$BROWSER_ARTIFACTS_DIR"
+          cp website/_site/build.json "$BROWSER_ARTIFACTS_DIR/build.json"
           node --test website/tests/*.test.mjs
           node website/tests/docs-browser.mjs
           node website/tests/studio-browser.mjs
           node website/tests/memory-charts-browser.mjs
           node website/tests/feature-browser.mjs
           node website/tests/benchmark-dashboard-browser.mjs
-          node website/tests/isolation-browser.mjs
-          node website/tests/browser.mjs
-          node website/tests/explorer-browser.mjs
-          node website/tests/comparison-browser.mjs
-          node website/tests/memory-browser.mjs
-      - name: Build and check GitHub Pages subpath
-        env:
-          SITE_BASE: /zerocopy/
-          SITE_ORIGIN: https://natanelia.github.io
-        run: |
-          node website/build.mjs
-          node --test website/tests/*.test.mjs
-          node website/tests/docs-browser.mjs
-          node website/tests/studio-browser.mjs
-          node website/tests/memory-charts-browser.mjs
-          node website/tests/feature-browser.mjs
           node website/tests/isolation-browser.mjs
           node website/tests/browser.mjs
           node website/tests/explorer-browser.mjs
@@ -83,25 +102,8 @@ jobs:
             website/artifacts/
           include-hidden-files: true
           retention-days: 14
-      - name: Build and check commit-specific PR preview
-        if: github.event_name == 'pull_request'
-        env:
-          SITE_BASE: /zerocopy/previews/pr-${{ github.event.pull_request.number }}/${{ github.event.pull_request.head.sha }}/
-          SITE_PREVIEW_PR: ${{ github.event.pull_request.number }}
-          SITE_HEAD_COMMIT: ${{ github.event.pull_request.head.sha }}
-          SITE_ORIGIN: https://natanelia.github.io
-        run: |
-          node website/build.mjs
-          node --test website/tests/*.test.mjs
-          node website/tests/docs-browser.mjs
-          node website/tests/studio-browser.mjs
-          node website/tests/memory-charts-browser.mjs
-          node website/tests/feature-browser.mjs
-          node website/tests/isolation-browser.mjs
-          node website/tests/comparison-browser.mjs
-          node website/tests/explorer-browser.mjs
-          node website/tests/memory-browser.mjs
       - name: Retain publishable output
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: docs-publishable

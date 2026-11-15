@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, copyFileSync, mkdirSync, mkdtempSync, read
 import { resolve, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
+import { kernelCompiler, withKernelSources } from './kernel-provenance.mjs';
 const root = resolve(import.meta.dirname, '..');
 const original = resolve(process.argv[2] ?? '../baseline'), previous = resolve(process.argv[3] ?? '../previous');
 const output = resolve(process.argv[4] ?? 'proofs/results/revision.json');
@@ -16,7 +17,7 @@ const run = (command, args, cwd, env = {}) => {
   if (p.status !== 0) throw Error(`${command} failed: ${p.stdout}\n${p.stderr}`); return p.stdout;
 };
 function fingerprint(dir) {
-  const files = readdirSync(dir).filter(p => p === 'persistent-core.as.ts' || ['arena.ts', 'read-cache.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')).sort();
+  const files = withKernelSources(dir, readdirSync(dir).filter(p => ['arena.ts', 'read-cache.ts', 'compaction.ts', 'codec.ts', 'types.ts', 'utf8.ts', 'wasm-utils.ts', 'set-key.ts', 'shared.ts', 'json-view.ts'].includes(p) || /^(shared-|linked-list|singly-linked-list|doubly-linked-list|ordered-map|priority-queue|sorted-tree).*\.ts$/.test(p) && !p.endsWith('.test.ts')));
   const hash = createHash('sha256'); for (const f of files) hash.update(f + '\0').update(readFileSync(join(dir, f))).update('\0');
   return { files, sha256: hash.digest('hex') };
 }
@@ -30,7 +31,7 @@ try {
   run(bun, ['run', 'build:wasm'], original);
   for (const name of names) copyFileSync(join(original, `${name}.wasm`), join(temp, `${name}-original.wasm`));
   for (const name of names) {
-    run(process.execPath, [join(root, 'node_modules/assemblyscript/bin/asc.js'), `${name}.as.ts`, '-o', `${name}.wasm`, ...flags], original);
+    run(process.execPath, [join(original, 'node_modules/assemblyscript/bin/asc.js'), `${name}.as.ts`, '-o', `${name}.wasm`, ...flags], original);
     copyFileSync(join(original, `${name}.wasm`), join(temp, `${name}-matched.wasm`));
   }
   for (const dir of [previous, root]) run(process.execPath, ['scripts/build-wasm.mjs'], dir);
@@ -51,6 +52,6 @@ try {
     return { name, originalMs, matchedMs, previousMs, currentMs, versusMatched: matchedMs / currentMs, versusPrevious: previousMs / currentMs };
   });
   if (fingerprint(root).sha256 !== sources.current.sha256) throw Error('Source changed during measurement');
-  const result = { measuredAt: new Date().toISOString(), referenceCommits: { original: '7aea44447177d37a303ab5c1b26d7c5e00e1c1f7', previous: '59bd5ad9f84358f828968910c66b9a2e80c0673d' }, sources, benchmarkSHA256, compiler: JSON.parse(readFileSync(join(root, 'node_modules/assemblyscript/package.json'))).version, flags, candidateWasmSHA256: createHash('sha256').update(readFileSync(join(root, 'persistent-core.wasm'))).digest('hex'), summary, rounds };
+  const result = { measuredAt: new Date().toISOString(), referenceCommits: { original: '7aea44447177d37a303ab5c1b26d7c5e00e1c1f7', previous: '59bd5ad9f84358f828968910c66b9a2e80c0673d' }, sources, benchmarkSHA256, compilers: { original: kernelCompiler(original), previous: kernelCompiler(previous), current: kernelCompiler(root) }, matchedArm: 'Historical label for the original AssemblyScript source with optimized flags; the current engine uses its own compiler.', flags, candidateWasmSHA256: createHash('sha256').update(readFileSync(join(root, 'persistent-core.wasm'))).digest('hex'), summary, rounds };
   writeFileSync(output, JSON.stringify(result) + '\n'); rmSync(output + '.partial'); console.log(JSON.stringify(summary, null, 2));
 } finally { rmSync(temp, { recursive: true, force: true }); }

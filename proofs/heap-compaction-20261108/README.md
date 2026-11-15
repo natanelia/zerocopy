@@ -179,7 +179,7 @@ Local validation of V3 passed:
   2,520 measured batches**.
 
 [Validation metadata](validation.json) records the observed local checks. The
-[dedicated workflow](../../.github/workflows/heap-compaction.yml) repeats focused
+[dedicated workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/heap-compaction.yml) repeats focused
 correctness, real workers, workload oracles and saved-evidence verification. It
 does not collect new timings. Full-suite, package and broader type checks remain
 in the repository's main CI workflow and are not claimed here as local results.

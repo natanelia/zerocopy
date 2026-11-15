@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { kernelSourceFiles } from '../kernel-provenance.mjs';
 
 const root = resolve(process.argv[2] ?? '.'), output = resolve(process.argv[3] ?? 'list-set-many-browser.json');
 assert.ok(!existsSync(output), 'Use a new output path; do not replace recorded evidence');
@@ -21,7 +22,7 @@ for (const name of ['browser-values.mjs', 'browser-worker.mjs', 'browser-case.mj
   routes.set(`/proof/${name}`, content); hashes[name] = hash(content);
 }
 assert.ok(routes.has('/build/shared.js'), 'Build the portable bundle first');
-hashes['persistent-core.as.ts'] = hash(readFileSync(resolve(root, 'persistent-core.as.ts')));
+for (const name of kernelSourceFiles(root)) hashes[name] = hash(readFileSync(resolve(root, name)));
 hashes['shared-list.ts'] = hash(readFileSync(resolve(root, 'shared-list.ts')));
 const result = { schema: 'zerocopy-list-set-many-browser/v1', startedAt: new Date().toISOString(), root,
   node: process.version, hashes, driverSha256: hash(readFileSync(fileURLToPath(import.meta.url))), status: 'running' };

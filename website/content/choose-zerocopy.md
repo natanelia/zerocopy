@@ -54,6 +54,8 @@ Shared publications carry snapshot descriptors and memory handles instead of ser
 
 It does not mean zero allocations or zero work. Building collections allocates storage. Encoding strings and objects, creating descriptors, attaching workers, decoding JSON, and returning results all have costs. Repeated reads can use process-local caches; those caches also consume memory. Native collections can be faster or smaller for a particular workload.
 
+Choose the read API for the answer you need. For object values, `get()` returns a complete deeply frozen JavaScript value. [`getView()`](../../docs/api.md#read-selected-json-fields) reads selected fields from the stored UTF-8 bytes; a view's `toObject()` explicitly creates a fresh native value. The benchmark compares these operations separately so a selective query is not mistaken for a faster full-object read.
+
 Shared memory is for trusted application workers. Code that holds the underlying memory can write to it; the supported immutable APIs do not turn raw shared memory into a security boundary.
 
 ## Try it in this order

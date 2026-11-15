@@ -1,0 +1,149 @@
+[
+  {
+    "file": "results/aa-bun.json.gz",
+    "sha256": "081eb6da90a518ea1daed6f3584ad14e21f99315af15864a1127af97565fa0d5",
+    "uncompressedSha256": "8910d83fa4c9d2a2f106976a24f8bed66c73151d2f896e1cbaa9ca2a1ac5bf8c",
+    "bytes": 14616,
+    "uncompressedBytes": 91454
+  },
+  {
+    "file": "results/aa-chromium.json.gz",
+    "sha256": "b5187be742cd710d5980083bcf82674e5e2343eb584bc1dc4d060e535803a50c",
+    "uncompressedSha256": "bccbb390454bb3d616b746b4cf859f4203a778961d0fc993e2a84bec5a46d77f",
+    "bytes": 8330,
+    "uncompressedBytes": 62303
+  },
+  {
+    "file": "results/aa-node.json.gz",
+    "sha256": "6f5becfe924d6786090b76051162d110b49d007b75ea6cf1370328bf8b183378",
+    "uncompressedSha256": "2b872b8eed4038560e167c01e243d332e14ec07b96ae30aba86248280e9ac84c",
+    "bytes": 14752,
+    "uncompressedBytes": 91792
+  },
+  {
+    "file": "results/audit-aa.json.gz",
+    "sha256": "b7bd44fd51436e4faa36bdb0d3a1fc7034f2df292d63fa83f6a8c9490dc126b4",
+    "uncompressedSha256": "66339d622bea5d4e7df7ee441b95acfb4ee231d69fc610b89c10872c333a01e2",
+    "bytes": 17960,
+    "uncompressedBytes": 96362
+  },
+  {
+    "file": "results/audit-bounded.json.gz",
+    "sha256": "823d235e541bbef05f459091cbb56788a5c2f8d7c63bae72b2e951f4ce690a75",
+    "uncompressedSha256": "590b4032bcff7e8c68491307b9c08a735cafb1ac03e12342198f9191f83a91a2",
+    "bytes": 23925,
+    "uncompressedBytes": 116948
+  },
+  {
+    "file": "results/audit-final.json.gz",
+    "sha256": "9e3920f882e176f3bd8ee12de7968ee590eab6c8404266c583c935673f0645af",
+    "uncompressedSha256": "83996130fd9d6a1a5e7628b3e97081989e8a1ce7be308557a9bca40cf2020de7",
+    "bytes": 79200,
+    "uncompressedBytes": 401782
+  },
+  {
+    "file": "results/diagnostic-exploratory-chromium.json.gz",
+    "sha256": "412c39dafeb2a7243dcd07be53c2cbd3a49f349d42d708b184d92f59cdb05657",
+    "uncompressedSha256": "492b62a3a43c01712622d098255f3c8e95342c5dbccfcda24bea9b39cf27c002",
+    "bytes": 6920,
+    "uncompressedBytes": 38918
+  },
+  {
+    "file": "results/diagnostic-native-json.json.gz",
+    "sha256": "8d0894181e7521593666c4e1936ae8a3d2b0bffd9b721e453779a0961d6fadcb",
+    "uncompressedSha256": "af7a4b3852f41077ac5a3d19be98e11871022dd23c9e611b4315580833d43ef6",
+    "bytes": 2448,
+    "uncompressedBytes": 17450
+  },
+  {
+    "file": "results/diagnostic-reader-only-chromium.json.gz",
+    "sha256": "18e36a9fb14f6cc527c1ec4e219e829ef16859889251c414badcf1a8213ea7e7",
+    "uncompressedSha256": "2ae9da2a35466c0ff22847d04764a0eab7a444b202493d2d1ad1b2488919097b",
+    "bytes": 6024,
+    "uncompressedBytes": 24639
+  },
+  {
+    "file": "results/diagnostic-reader-only-node.json.gz",
+    "sha256": "6e14caac682dbe068a292eb47878075af58c0407711b3aa6d4b16b77f0daf8fb",
+    "uncompressedSha256": "43ae77026e7bf253afdc515cdb57669b59c85760413ce84bf214b82601ef088a",
+    "bytes": 9356,
+    "uncompressedBytes": 44683
+  },
+  {
+    "file": "results/diagnostic-reader-only.patch.gz",
+    "sha256": "e9078860a2391be15b7ae5040691049a26f9d0eda7bab34d8a8902e980deb4dd",
+    "uncompressedSha256": "be2237760a0648345a1e1baf3e63c4a84780dbc3a880da20c54fdfc102b2418a",
+    "bytes": 1531,
+    "uncompressedBytes": 4103
+  },
+  {
+    "file": "results/final-bun.json.gz",
+    "sha256": "c6f12790c8a354383eca4525ef63019ae54e93de60c3f940e944b70ec3b8086b",
+    "uncompressedSha256": "626419c1d6ec086edea0d1d0c131ccf35bec8825d03acf38763f2a58f3e6e80e",
+    "bytes": 26789,
+    "uncompressedBytes": 199751
+  },
+  {
+    "file": "results/final-chromium.json.gz",
+    "sha256": "87692db29a1ea5c1c354f7051edd9ca1b9cbdc5dea8d5745e5d4daf885bc84d5",
+    "uncompressedSha256": "cc2269b187afaef07480d39d5cf953e15c3dbda2c5864ae6225f17e02e675bda",
+    "bytes": 18576,
+    "uncompressedBytes": 207336
+  },
+  {
+    "file": "results/final-node.json.gz",
+    "sha256": "43da41137c1836c294841e2b7fdd06af3913943fbc7949a2b6f4d34859bb804a",
+    "uncompressedSha256": "e1aef114bd7caea11afb7363f1104e8fd06848569c7fc0954ec58158e5c84d2d",
+    "bytes": 27213,
+    "uncompressedBytes": 200926
+  },
+  {
+    "file": "results/rejected-whole-batch-bun.json.gz",
+    "sha256": "990bb5ddadf365277f6a0d29c93f085178fdd7c0a724835e187bc59cfc7a9d7c",
+    "uncompressedSha256": "2b5a9e6c70ee599a32d1b8de88f0e6a2c5e4faed93783dadd44a46024409106b",
+    "bytes": 19339,
+    "uncompressedBytes": 126126
+  },
+  {
+    "file": "results/rejected-whole-batch-chromium.json.gz",
+    "sha256": "5b878066fe7797154a77e3c7b6f4b30dea28cf2a4a3cb1a7672dd996a65635b2",
+    "uncompressedSha256": "998799a6d9b9de5d9bf625d14a6e49800798196682a1a45794f7a758df094d3b",
+    "bytes": 12645,
+    "uncompressedBytes": 122829
+  },
+  {
+    "file": "results/rejected-whole-batch-node.json.gz",
+    "sha256": "7e0c7fa8a9c299f28bd525563b8d87ae1dd7989e48f21954960806f421f696b6",
+    "uncompressedSha256": "19f21c6c68ff816b8476398cd7dc149085e77e8bbbbde36647bdf8f9af8e9341",
+    "bytes": 19586,
+    "uncompressedBytes": 126660
+  },
+  {
+    "file": "results/summary-final.json.gz",
+    "sha256": "27036807c951629579e106aa7937aa1f0362274c04597d71f6fab20fc58c6d57",
+    "uncompressedSha256": "78394868e747bc5198c57d3628bcdcd3b8b776ac7c5c8285c27e87230cbd078d",
+    "bytes": 17134,
+    "uncompressedBytes": 99699
+  },
+  {
+    "file": "results/superseded-bounded-bun.json.gz",
+    "sha256": "237e02a87be6ff12bd63cd5b7219632c34f2998d6de4d2ead13918ace65fa0eb",
+    "uncompressedSha256": "73b27d0aaf598e1afdb78b58737f8ba9dc2fc8fca04316c0497c1049a1ddb3f9",
+    "bytes": 19329,
+    "uncompressedBytes": 125739
+  },
+  {
+    "file": "results/superseded-bounded-chromium.json.gz",
+    "sha256": "79eb458acd77bd4aa221799c61c6e0aa627b8bbd0d17d3398563846f4bdbf6dc",
+    "uncompressedSha256": "35d754b80dc8fb726cca00b5db68d64dddd60693ad530154c89df96eb4f60bfe",
+    "bytes": 12757,
+    "uncompressedBytes": 122811
+  },
+  {
+    "file": "results/superseded-bounded-node.json.gz",
+    "sha256": "c1f030f29e3140b1b2d1b9e6b9c3d0796f992f030d633587994cd19c6c8c9bc2",
+    "uncompressedSha256": "0186e8a73c816b159932c0a8e4073cca59d120f95ff2c0621fc87725bd7db81e",
+    "bytes": 19624,
+    "uncompressedBytes": 126712
+  }
+]

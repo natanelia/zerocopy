@@ -1,0 +1,17 @@
+name: Set up Rust WASM compiler
+description: Install the repository-pinned Rust compiler and wasm32 target.
+runs:
+  using: composite
+  steps:
+    - name: Install pinned toolchain
+      shell: bash
+      run: |
+        node --input-type=module <<'JS'
+        import { readFileSync } from 'node:fs';
+        import { join } from 'node:path';
+        import { execFileSync } from 'node:child_process';
+        const config = readFileSync(join(process.env.GITHUB_WORKSPACE, 'rust-toolchain.toml'), 'utf8');
+        const toolchain = /^channel\s*=\s*"(\d+\.\d+\.\d+)"\s*$/m.exec(config)?.[1];
+        if (!toolchain) throw new Error('rust-toolchain.toml must pin an exact Rust version');
+        execFileSync('rustup', ['toolchain', 'install', toolchain, '--profile', 'minimal', '--target', 'wasm32-unknown-unknown'], { stdio: 'inherit' });
+        JS

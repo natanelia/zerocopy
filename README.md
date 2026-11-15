@@ -112,7 +112,7 @@ In the recorded 10,000-key test, warm `SharedMap` reads were **3.99× faster tha
 
 Browser use requires **cross-origin isolation**. There is **one writer per arena**; other threads read immutable snapshots. Workers receive new snapshots asynchronously, so their current view can lag behind the owner.
 
-Shared backing storage does not mean zero allocation. Strings and JSON still need decoding. Storage is append-only; long-lived applications need a [compaction strategy](docs/architecture.md#compact-at-an-application-boundary). Bun defaults to copy transport, and browser SharedWorker connections need [explicit copy mode](docs/workers.md#connect-a-sharedworker).
+Shared backing storage does not mean zero allocation. Requested strings and materialized JSON still need decoding; object maps and lists also offer [`getView()`](docs/api.md#read-selected-json-fields) to read selected fields directly from the stored UTF-8 bytes. Storage is append-only; long-lived applications need a [compaction strategy](docs/architecture.md#compact-at-an-application-boundary). Bun defaults to copy transport, and browser SharedWorker connections need [explicit copy mode](docs/workers.md#connect-a-sharedworker).
 
 For small data that stays on one thread, use a native `Map` or array. Reach for zerocopy when sharing large, versioned data is the problem you need to solve.
 

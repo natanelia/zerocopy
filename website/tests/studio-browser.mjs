@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { chromium, webkit } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
@@ -21,8 +21,8 @@ async function publish(page, stock, revision, price) {
 
 try {
   for (const name of process.env.STUDIO_BROWSERS?.split(',') || ['chromium', 'webkit']) {
-    assert.ok(['chromium', 'webkit'].includes(name));
-    const browser = await ({ chromium, webkit })[name].launch({ headless: true,
+    assert.ok(['chromium', 'firefox', 'webkit'].includes(name));
+    const browser = await ({ chromium, firefox, webkit })[name].launch({ headless: true,
       ...(name === 'chromium' ? { args: ['--no-sandbox'], ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) } : {}) });
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });

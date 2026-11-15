@@ -149,6 +149,10 @@ export class Arena {
     }
   }
   private readonly objects = new Map<number, unknown>();
+  private objectRoot = 0;
+  private objectCode = 0;
+  private objectKeys: Map<string, unknown> | undefined;
+  private objectKeyChars = 0;
   private readonly keys = new Map<string, KeyToken>();
   private keyBytes = 0;
   private objectBytes = 0;
@@ -516,7 +520,19 @@ export class Arena {
     if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
     if (!root) return undefined;
     const code = (type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0) + (prefix ? 4 : 0);
-    if (!sorted && code !== 0 && code !== 4 && (root === this.valueRoot || !this.valueRoot)) {
+    if (code === 0 || code === 4) {
+      if (!sorted && (root === this.objectRoot || !this.objectRoot)) {
+        if (!this.objectRoot) { this.objectRoot = root; this.objectCode = code; }
+        if (code === this.objectCode) {
+          const hit = this.objectKeys?.get(key);
+          if (hit !== undefined) return hit;
+          return this.readObject(root, key, type, prefix, code);
+        }
+      }
+      const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
+      return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+    }
+    if (!sorted && (root === this.valueRoot || !this.valueRoot)) {
       if (!this.valueRoot) { this.valueRoot = root; this.valueCode = code; }
       else if (!this.valueCode) this.valueCode = code;
       if (code === this.valueCode) {
@@ -526,14 +542,38 @@ export class Arena {
       }
     }
     let slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
     // A root change can still resolve to the exact same immutable leaf.
     slot = this.reads?.slot(key);
-    if (code !== 0 && code !== 4 && slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
+    if (slot !== undefined && this.reads.root(slot) === root && this.reads.code(slot) === code) return this.reads.value(slot);
     const result = leaf ? this.leafValue(type, leaf, prefix) : undefined;
-    if (code !== 0 && code !== 4 && slot !== undefined) this.reads.cacheValue(slot, code, result);
+    if (slot !== undefined) this.reads.cacheValue(slot, code, result);
     return result;
+  }
+  private readObject(root: number, key: string, type: string, prefix: number, code: number): any {
+    const map = this.objectKeys ??= new Map();
+    const leaf = this.findUncached(root, key);
+    if (!leaf) return undefined;
+    const ascii = this.lastReadAscii, view = this.dv;
+    const ptr = leaf + 16 + view.getUint32(leaf + 8, true) + prefix;
+    const value = this.leafValue(type, leaf, prefix, view);
+    // The address cache owns decoded values and its existing memory limits.
+    // A key only adds a reference to an accepted value, never another retained
+    // object graph. Its separate root leaves the primitive read cache intact.
+    if (value !== undefined && this.objects.get(ptr) === value) {
+      const cacheKey = ascii ? key : normalizeKey(key);
+      if (this.objectRoot === root && this.objectCode === code && this.objectKeys === map) {
+        // A nested factory may reenter this arena while decoding. Account for
+        // the current entry instead of relying on its state before the call.
+        const present = map.has(cacheKey);
+        if (present || map.size < 2048 && this.objectKeyChars + cacheKey.length <= 131072) {
+          map.set(cacheKey, value);
+          if (!present) this.objectKeyChars += cacheKey.length;
+        }
+      }
+    }
+    return value;
   }
   private readPrimitive(root: number, key: string, type: string, prefix: number, code: number, present: boolean): any {
     this.valueMap ??= new Map();
@@ -670,10 +710,18 @@ export class Arena {
       }
       const prefix = hash & ((1 << this.prefixBits) - 1), word = prefix >>> 5, bit = 1 << (prefix & 31);
       if (!(this.prefixValid[word] & bit)) {
-        this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        // A one-off prefix needs only the direct lookup. Materialize its
+        // reusable directory entry after another key actually needs it.
+        // Allocated addresses are below 0x7fff0000, so this is not a pointer.
+        this.prefixChildren[prefix] = 0xffffffff;
         this.prefixValid[word] |= bit;
+        candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+      } else {
+        if (this.prefixChildren[prefix] === 0xffffffff) {
+          this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+        }
+        candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
       }
-      candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
     } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
     if (!candidate) return 0;
     const bucket = view.getUint32(candidate, true) === 2;
@@ -794,12 +842,53 @@ export class Arena {
       }
       return this.wasm.mapBatch(root, input, latest.size) >>> 0;
     }
-    const leaves: number[] = [];
-    for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
+    const leaves: number[] = latest.size >= 64 ? this.packedLeaves(type, latest) : [];
+    if (latest.size < 64) for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
     // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
     const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
+  }
+
+  private packedLeaves(type: string, latest: ReadonlyMap<string, any>): number[] {
+    const leaves: number[] = [];
+    // Keep one bounded byte stage, not all serialized values. Each invocation
+    // owns its stage so a toJSON/getter can recursively build another map.
+    const stage = new Uint8Array(Math.min(1048576, Math.max(65536, latest.size * 256))), view = new DataView(stage.buffer);
+    let length = 0, first = 0;
+    const flush = () => {
+      if (!length) return;
+      // mapLeaf preserves the existing four-byte record alignment.
+      const base = this.wasm.mapLeaf(0, length - 16) >>> 0;
+      this.refresh(); this.bytes.set(stage.subarray(0, length), base);
+      for (let i = first; i < leaves.length; i++) leaves[i] += base;
+      first = leaves.length; length = 0;
+    };
+    for (const [key, value] of latest) {
+      const text = this.text(type, value);
+      let valueBytes = encodeUtf8ForWrite(encoder, text), keyBytes: Uint8Array | undefined;
+      let keyLength = key.length;
+      for (let i = 0; i < key.length; i++) if (key.charCodeAt(i) > 127) { keyBytes = encoder.encode(key); keyLength = keyBytes.length; break; }
+      const recordLength = Math.ceil((16 + keyLength + valueBytes.length) / 4) * 4;
+      if (recordLength > stage.length) {
+        flush();
+        leaves.push(this.leaf(type, key, value, undefined, encodeUtf8ForWrite(encoder, text)));
+        first = leaves.length; continue;
+      }
+      if (length + recordLength > stage.length) {
+        flush();
+        // Allocation hooks may reenter and reuse the UTF-8 encoding buffer.
+        valueBytes = encodeUtf8ForWrite(encoder, text);
+      }
+      let hash = 2166136261;
+      for (let i = 0; i < keyLength; i++) { const c = keyBytes ? keyBytes[i] : key.charCodeAt(i); stage[length + 16 + i] = c; hash = Math.imul(hash ^ c, 16777619); }
+      view.setUint32(length, 0, true); view.setUint32(length + 4, hash >>> 0, true);
+      view.setUint32(length + 8, keyLength, true); view.setUint32(length + 12, valueBytes.length, true);
+      stage.set(valueBytes, length + 16 + keyLength);
+      leaves.push(length); length += recordLength;
+    }
+    flush();
+    return leaves;
   }
 
   private vectorRoot = -1;

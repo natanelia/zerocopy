@@ -2,6 +2,10 @@
 
 The [README](../README.md#performance) compares zerocopy with Immutable.js and native collections. Reports in this directory preserve experiments against specific source versions. Do not apply their historical results or implementation descriptions to a different engine build.
 
+Current pull requests run the shared correctness checks in [CI](../.github/workflows/ci.yml). Use the manual [Diagnostics](../.github/workflows/diagnostics.yml) workflow for a selected compatibility or performance investigation; timing experiments do not run on every pull request.
+
+The former experiment-specific workflows are retained in [Git history](https://github.com/natanelia/zerocopy/tree/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows), and report links below point to those archived definitions. To reproduce a historical experiment, check out its recorded source revision and follow that revision's workflow. This includes branch-specific protocols such as block traversal and worker-arena source manifests, which intentionally bind their original workflow and compiler inputs. Existing recordings, checksums, and historical patches remain unchanged.
+
 | Report | Comparison |
 | --- | --- |
 | [Redux heap encoding](redux-heap-read-view-20261108/README.md) | Reuse native memory views; paired Node/Bun gains and a measured fresh-Arena constructor cost, November 8, 2026 |

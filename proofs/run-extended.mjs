@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { kernelCompiler, withKernelSources } from './kernel-provenance.mjs';
 const root = resolve(import.meta.dirname, '..'), matched = resolve(process.argv[2]), previous = resolve(process.argv[3]);
 const output = resolve(process.argv[4] ?? 'proofs/results/extended.json'), bun = process.env.BUN_BIN ?? 'bun';
 if (new Set([root, matched, previous]).size !== 3) throw Error('Use separate directories');
@@ -12,12 +13,12 @@ function run(command, args, cwd, env = {}) {
 }
 const sources = {};
 for (const [name, dir] of Object.entries({ matched, previous, current: root })) {
-  const files = readdirSync(dir).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts') && !['benchmark.ts'].includes(f)).sort(), hash = createHash('sha256');
+  const files = withKernelSources(dir, readdirSync(dir).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts') && !['benchmark.ts'].includes(f))), hash = createHash('sha256');
   for (const f of files) hash.update(f + '\0').update(readFileSync(join(dir, f))).update('\0');
-  sources[name] = { files, sha256: hash.digest('hex') };
+  sources[name] = { files, sha256: hash.digest('hex'), compiler: kernelCompiler(dir) };
 }
 for (const name of ['shared-map', 'shared-list', 'linked-list', 'singly-linked-list', 'doubly-linked-list', 'ordered-map', 'sorted-tree', 'priority-queue']) {
-  run(process.execPath, [join(root, 'node_modules/assemblyscript/bin/asc.js'), name + '.as.ts', '-o', name + '.wasm', ...flags], matched);
+  run(process.execPath, [join(matched, 'node_modules/assemblyscript/bin/asc.js'), name + '.as.ts', '-o', name + '.wasm', ...flags], matched);
 }
 for (const dir of [root, previous]) run(process.execPath, ['scripts/build-wasm.mjs'], dir);
 const cases = ['ordered.write+scan', 'sorted.write+scan', 'sorted.longPrefix+scan', 'map.coldGetAfterBulk', 'map.objectWrite+read', 'queue.fullCycle'];

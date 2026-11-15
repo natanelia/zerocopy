@@ -3,17 +3,19 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 import { createPreview } from '../serve.mjs';
 
 const build = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
-const recording = JSON.parse(readFileSync(new URL('../assets/catalog-benchmark-recording.json', import.meta.url)));
+const recording = JSON.parse(readFileSync(new URL('../assets/catalog-read-recording.json', import.meta.url)));
 const output = fileURLToPath(new URL('../review/screenshots/', import.meta.url));
 mkdirSync(output, { recursive: true });
 const server = createPreview({ base: build.base });
 server.listen(0, '127.0.0.1'); await once(server, 'listening');
-const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'],
-  ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) });
+const engine = process.env.CAPTURE_BROWSER || 'chromium';
+assert.ok(['chromium', 'firefox', 'webkit'].includes(engine), 'Unknown capture browser');
+const browser = await ({ chromium, firefox, webkit })[engine].launch({ headless: true,
+  ...(engine === 'chromium' ? { args: ['--no-sandbox'], ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) } : {}) });
 const captures = [], errors = [];
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
@@ -30,7 +32,7 @@ try {
   }
   assert.deepEqual(errors, []);
   writeFileSync(output + 'benchmark-capture.json', JSON.stringify({ sourceCommit: build.sourceCommit, base: build.base,
-    browser: browser.version(), reducedMotion: true, captures,
+    engine, browser: browser.version(), reducedMotion: true, captures,
     performance: { display: 'recorded', sourceCommit: recording.sourceCommit, measuredAt: recording.measuredAt,
       entries: recording.config.entries, readers: recording.config.readers, samplesPerCase: recording.config.samplesPerCase },
   }, null, 2) + '\n');

@@ -151,7 +151,7 @@ The existing [real Node worker-session proof](../worker-sessions.mjs) passes:
 two real workers, all 12 types, nested values, shared backing, growth,
 descriptor-only updates, retained snapshots, compaction and Toolkit publication.
 The existing [main CI](../../.github/workflows/ci.yml) and
-[worker-session CI](../../.github/workflows/worker-sessions.yml) also run the
+[worker-session CI](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/worker-sessions.yml) also run the
 default suite, built workers, package checks and Chromium validation for the PR.
 Browser performance is not measured by this study.
 

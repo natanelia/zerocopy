@@ -199,7 +199,7 @@ The [unit cache tests](../json-read-cache.test.ts), [freeze-helper tests](../fre
 - 746 distinct unit and integration tests passed: the full 739-test run and the seven new cache tests.
 - The public JSON-read proof passed seven tests under Node. Under Bun, six tests passed and one shared-memory worker case was skipped; Bun's supported copy transport was tested.
 - Type checks, public-export checks, real-worker checks, and installed-package checks passed.
-- Local browser-engine runs were unavailable. The [GitHub workflow](../.github/workflows/json-read-performance.yml) checks Node and Bun on x64 and ARM64, and Chromium, Firefox, and WebKit on x64.
+- Local browser-engine runs were unavailable. The [GitHub workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/json-read-performance.yml) checks Node and Bun on x64 and ARM64, and Chromium, Firefox, and WebKit on x64.
 
 **GitHub CI status: pending.** The local results above do not establish browser or ARM64 performance.
 

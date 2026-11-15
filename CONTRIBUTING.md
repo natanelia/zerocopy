@@ -1,12 +1,33 @@
 # Contributing
 
-Use Bun 1.4.2 and Node.js 22 to match the recorded build. Direct development dependencies are pinned in `package.json`.
+Use Bun 1.4.2, Node.js 22 or newer, and the Rust toolchain pinned in `rust-toolchain.toml`. Direct development dependencies, including the Binaryen WASM build tool, are pinned in `package.json`. Applications using the published package do not need Rust.
+
+## Continuous integration
+
+Normal pull requests use two build jobs: one for the library and one for the website. Each job installs dependencies and builds its inputs once. The website's short publication job runs only after its checks pass.
+
+| Workflow | When it runs | Responsibility |
+| --- | --- | --- |
+| [CI](.github/workflows/ci.yml) | Pull requests and pushes to `main` | Full unit and Chromium suites, types, compiled worker and optional-import regressions, documentation examples, package consumption, and evidence preservation |
+| [Documentation website](.github/workflows/docs-website.yml) | Pull requests, pushes to `main`, or manual runs | Static checks for supported hosting paths, focused isolation/worker checks for alternate paths, and the full browser suite once against the actual publication target |
+| [Diagnostics](.github/workflows/diagnostics.yml) | Manual selection | A selected compatibility or performance investigation on one runner, with optional browser checks |
+| [Publish npm package](.github/workflows/npm-publish.yml) | Version tags or a manual release from `main` | Existing release validation and trusted npm publication |
+
+Use Diagnostics when changing kernels, transport behavior, or hot paths that need an explicit performance or platform comparison. Select the relevant suite and platform; ARM and alternate Node versions do not launch additional jobs on every pull request. Benchmark baseline/candidate pairs run sequentially on the same runner. A diagnostic measurement is not evidence for a different source revision, platform, or workload.
+
+Diagnostics offers compatibility, JSON reads, UTF-8 writes, numeric kernels, geometry, spatial kernels, and retained memory. Choose Node 22 or 24 and x64 or ARM64; browser checks are optional on x64. JSON and UTF-8 comparisons accept a baseline branch, tag, or commit. Each revision uses its own dependencies, so the retained manifests must be checked before attributing a difference solely to source changes. Results, partial output, runtime versions, source commits, and manifests are retained together. Kernel suites keep their existing performance thresholds.
+
+Earlier experiment-specific workflows are available in [Git history](https://github.com/natanelia/zerocopy/tree/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows). Their scripts and recorded evidence remain in `proofs/`; reproduce those historical experiments from their documented revisions. Do not add another always-running workflow for a one-off benchmark. Add distinct correctness coverage to the shared CI checks and keep costly measurements in Diagnostics.
 
 ## Set up and test
 
+Install Rust through rustup, then run these commands from the checkout. The compiler and WASM target are build dependencies only.
+
 ```sh
+rustup toolchain install 1.100.0 --profile minimal --target wasm32-unknown-unknown
 bun install
 bun run build:wasm
+node --test scripts/rust-wasm.node.mjs
 bun run build:browser
 bun run build:types
 bun run typecheck
@@ -41,7 +62,9 @@ The server prints its address and supplies cross-origin isolation headers. Brows
 
 ## Where changes belong
 
-Collection wrappers and their unit tests are at the repository root. Shared allocation and value handling belong in `arena.ts`; persistent WASM operations belong in `persistent-core.as.ts`. Keep Redux and TanStack integration behind their existing entry points.
+Collection wrappers and their unit tests are at the repository root. Shared allocation and value handling belong in `arena.ts`; persistent WASM operations belong in `rust/src/maps.rs` and `rust/src/collections.rs`. Byte readers, selective JSON access, numeric reductions, and geometry kernels have separate modules under `rust/src/`. Keep Redux and TanStack integration behind their existing entry points.
+
+The Rust crate uses `no_std`, has no Cargo dependencies, and exports scalar arguments and results over the existing arena layout. Build release artifacts through `bun run build:wasm`: its Binaryen pass promotes compiler state placeholders into instance-local WASM globals and audits the generated modules. A raw `cargo build` output is an intermediate artifact, not a distributable kernel. See [the engine contract](docs/architecture.md#rust-wasm-engine) before changing memory access or exported functions.
 
 Use `demo/` for browser integration tests, `proofs/` for benchmark drivers and measurements, `scripts/` for build and documentation checks, and `docs/` for user guides. See the [source map](docs/architecture.md#source-map) before changing module boundaries.
 
@@ -87,7 +110,7 @@ Inspect the package contents and use the local archive in a consumer test. These
 
 ## npm releases
 
-The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 or newer for local checks. `npm publish --access public` runs `prepublishOnly`: WASM, portable JavaScript, declarations, type checks, the test suite, the Redux proof, and the packed-package consumer check. Do not bypass this gate with `--ignore-scripts` when publishing.
+The package name is `zerocopy`. Use Bun 1.4.2 for release builds and Node.js 22 or newer for local checks. `npm publish --access public` runs `prepublishOnly`: WASM, negative build-audit tests, portable JavaScript, declarations, type checks, the test suite, the Redux proof, and the packed-package consumer check. Do not bypass this gate with `--ignore-scripts` when publishing.
 
 The consumer check installs the tarball in a temporary application outside the repository. It checks all public Node and Bun entry points, retained immutable snapshots, the real Node worker proof, and TypeScript imports. It also rejects development files and missing exported declarations.
 

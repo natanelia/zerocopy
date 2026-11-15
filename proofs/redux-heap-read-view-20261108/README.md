@@ -107,7 +107,7 @@ The final [preflight log](validation/final-preflight-v3.txt) records all 17 test
 - [Chromium 153.0.8010.0](browser-check.mjs), with cross-origin isolation and actual shared/copy workers, full independent numeric/boolean wire rows, ties and special values, retained old/new snapshots after owner growth, and rejected writes. This is correctness evidence without browser timing.
 - All eight final workloads checked once against baseline and candidate in both runtimes; see the [workload smoke log](validation/workload-smoke-v3.txt) and [smoke script](smoke-v3.mjs).
 
-The [verification workflow](../../.github/workflows/redux-heap-read-view.yml) repeats focused tests, builds/types, worker/browser and late-import checks, workload oracles and all saved evidence verification. It does not collect performance measurements. Broader repository and installed-package checks are recorded separately by the final integration review.
+The [verification workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/redux-heap-read-view.yml) repeats focused tests, builds/types, worker/browser and late-import checks, workload oracles and all saved evidence verification. It does not collect performance measurements. Broader repository and installed-package checks are recorded separately by the final integration review.
 
 ## Combined correctness validation
 

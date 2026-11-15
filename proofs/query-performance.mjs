@@ -77,11 +77,12 @@ const uniqueVariants = variants.filter(x => x.name !== 'original').map(variant =
 });
 const servers = [...variants, ...uniqueVariants];
 for (const variant of servers) { variant.server.listen(0, '127.0.0.1'); await once(variant.server, 'listening'); variant.origin = `http://127.0.0.1:${variant.server.address().port}`; }
+const engines = process.env.QUERY_PERF_BROWSERS?.split(',') ?? ['chromium', 'webkit'];
 const runs = [], rounds = Number(process.env.PERF_REPEATS ?? 3);
 assert.ok(Number.isSafeInteger(rounds) && rounds >= 1 && rounds <= 10);
 const median = values => { const a = [...values].sort((a, b) => a - b); const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
 try {
-  for (const engine of process.env.QUERY_PERF_BROWSERS?.split(',') ?? ['chromium', 'webkit']) {
+  for (const engine of engines) {
     assert.ok(['chromium', 'webkit'].includes(engine));
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true, ...(engine === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
     try {
@@ -119,7 +120,7 @@ try {
     } finally { await browser.close(); }
   }
   const summary = {};
-  for (const engine of ['chromium', 'webkit']) {
+  for (const engine of engines) {
     summary[engine] = {};
     for (const variant of variants.map(x => x.name)) {
       const set = runs.filter(x => x.engine === engine && x.variant === variant && x.fixture === 'repeated');

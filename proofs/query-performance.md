@@ -87,7 +87,7 @@ checked-out repository's current `origin/main`. Both revisions are recorded in
 the result files. The control accepts old and new schedulers but rejects other
 query or fixture changes. This prevents unrelated changes from being credited
 to the collection engine. It uses the repository's exact build and dependency
-setup. Run the steps in `.github/workflows/query-performance.yml`
+setup. Run the steps in [archived workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/query-performance.yml)
 to build both websites, then run:
 
 ```sh

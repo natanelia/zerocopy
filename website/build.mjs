@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { buildIdentity } from './build-identity.mjs';
 import { pages, evidencePages, benchmarkRedirects, projectName, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
 import { writeFeatureMemoryAssets } from './feature-memory-charts.mjs';
@@ -48,7 +49,9 @@ const demoScripts = new Map([
   ['playground/', ['main.mjs', 'capability.mjs', 'isolation.mjs', 'playground.mjs', 'snapshot-worker.mjs']],
 ]);
 const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'catalog-timings.mjs', 'catalog-benchmark-core.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
-demoScripts.set('benchmarks/', [...featureScripts, 'feature-benchmark.mjs', 'benchmark-bars.mjs']);
+const readBenchmarkScripts = ['catalog-read-workloads.mjs', 'catalog-read-reference.mjs', 'read-benchmark-reader.mjs', 'read-benchmark-owner.mjs', 'read-benchmark-runner.mjs', 'catalog-benchmark-results.mjs'];
+const benchmarkScripts = [...featureScripts, ...readBenchmarkScripts, 'feature-benchmark.mjs', 'benchmark-bars.mjs'];
+demoScripts.set('benchmarks/', benchmarkScripts);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
   for (const file of [...scripts, 'search.mjs']) cpSync(join(here, 'assets', file), join(out, route, 'assets', file));
@@ -104,11 +107,11 @@ for (const page of evidencePages) {
 }
 for (const [heading, anchor, text] of [
   ['Memory', 'memory', 'Compare recorded whole-process memory use for ZeroCopy, native Map, Immutable.js and Immer, with two and four reader workers.'],
-  ['Performance', 'performance', 'Run the product catalog benchmark in your browser. Compare shared snapshots, incremental copies and full copies.'],
+  ['Performance', 'performance', 'Run the product catalog benchmark in your browser. Compare cold and cached full-object reads, selective queries, construction through the first answer, and incremental or full-copy publication.'],
   ['Method and source data', 'sources', 'Download recorded memory and performance measurements, original reports, samples, methodology and environment.'],
 ]) search.push({ title: 'Benchmarks', description: 'Memory and performance in one place.', heading, context: '', route: `benchmarks/#${anchor}`, text });
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
-writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
+writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex'), ...buildIdentity(root, here, [...benchmarkScripts, 'search.mjs']) }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', route: '404.html', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
 for (const route of demoScripts.keys()) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');

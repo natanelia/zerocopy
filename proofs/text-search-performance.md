@@ -70,7 +70,7 @@ Each variant uses two warm-up rounds and seven measured samples per path. There 
 
 The query phase includes search, summaries, visible rows, cooperative task yields, and worker messages. Initial data generation and collection construction are separate; worker startup and DOM rendering are excluded. The construction report is not an equal-operation speed comparison: native includes input generation, Immutable.js converts that input, and shared construction also encodes it. This experiment makes no measured-memory or application-wide performance claim. Historical benchmark files are unchanged.
 
-To reproduce, use `.github/workflows/text-search.yml`. It builds the baseline and candidate separately, runs `proofs/text-search-browser.mjs` in both engines, and then runs `proofs/text-search-performance.mjs`. Raw data is written to `proofs/results/text-search/`. `by-query.json` records every sample, and `manifest.json` records the method. Do not compare results from different machines as an engine-only speedup.
+To reproduce, use [archived workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/text-search.yml). It builds the baseline and candidate separately, runs `proofs/text-search-browser.mjs` in both engines, and then runs `proofs/text-search-performance.mjs`. Raw data is written to `proofs/results/text-search/`. `by-query.json` records every sample, and `manifest.json` records the method. Do not compare results from different machines as an engine-only speedup.
 
 ## Correctness coverage
 

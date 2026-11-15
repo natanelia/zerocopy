@@ -55,7 +55,7 @@ export function regressionHTML(route, base = meta.base) {
     return `<!doctype html><html><head><meta http-equiv="refresh" content="0;url=${target}"><script>location.replace(${JSON.stringify(target)} + location.search + location.hash)</script></head><body><a href="${target}">Continue to regression fixture</a></body></html>`;
   } else return undefined;
   let html = shell({ title, description: 'Test-only benchmark regression fixture. Never published.', body, script, base, route, version: meta.version, sha: meta.sourceCommit, noindex: true });
-  for (const style of ['memory-charts.css', 'feature.css', ...(route === 'historical/log-compare/' ? ['comparison.css'] : [])]) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/${style}"></head>`);
+  for (const style of ['memory-charts.css', 'feature.css', ...(route === 'investigation-benchmark/' ? ['benchmarks.css'] : []), ...(route === 'historical/log-compare/' ? ['comparison.css'] : [])]) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/${style}"></head>`);
   if (meta.preview) html = html.replace('<header class="site-header">', `<aside class="preview-banner">PR #${meta.preview.number} preview · ${meta.preview.headCommit.slice(0, 7)} · Not a release · <a href="${repository}/pull/${meta.preview.number}">Return to PR</a></aside><header class="site-header">`);
   if (demo) html = html.replaceAll(`src="${base}assets/`, `src="${base}${route}assets/`);
   return html;

@@ -1,0 +1,51 @@
+{
+  "purpose": "Correctness and presentation validation only; not runtime before/after performance evidence",
+  "browser": "Firefox 155.0",
+  "sourceCommit": "3143c471cae28b89c8b7f50ce7b4cbb75874c65c",
+  "sourceDirty": true,
+  "driverCommit": "d42ddea0fafbf8b3c78c88a0fb738d015f98640e",
+  "dirtyExplanation": "Build source and all runtime/workload assets are from 3143c471. The test driver included the collapsed-text assertion repair later committed as d42ddea0. Runtime and workload hashes identify the exact compiled inputs.",
+  "measuredAt": "2026-11-15T00:08:47.286Z",
+  "viewport": {
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile": [
+      390,
+      844
+    ]
+  },
+  "readSamples": 99,
+  "legacySamples": 63,
+  "files": {
+    "evidence/firefox-initial-presentation-failure.log": {
+      "bytes": 5276,
+      "sha256": "29c9dfd04b2411dce649606e8748a11b2402a56207f05dfc147098477fb49ddb"
+    },
+    "evidence/firefox-validation.json.gz": {
+      "bytes": 85492,
+      "sha256": "ecadfb889270bdcd132e4d3dc0c2bb5642ec6ea23991c902fe64422a892b8135"
+    },
+    "evidence/firefox-validation.log": {
+      "bytes": 241,
+      "sha256": "764a5033b55731804e59e917df27991810b74cce1e7c3b8db17680462deb6b1c"
+    },
+    "evidence/hosted-build-before.json": {
+      "bytes": 1045,
+      "sha256": "a6c4c0fe0e58316497d15f06117de9fe5db1c3f43b0fdd59c413320defb0ecb9"
+    },
+    "screenshots/firefox-desktop.png": {
+      "bytes": 471343,
+      "sha256": "2d66bf06b89afaf08a6ba5456f507d9f57beacb02630a86156ddb50b47dddcb1"
+    },
+    "screenshots/firefox-mobile.png": {
+      "bytes": 461640,
+      "sha256": "44d80bcce0516a79c8c872614fe99d63c57e8eb97de0893ea3d5000011b36cf1"
+    },
+    "screenshots/firefox-results.png": {
+      "bytes": 116062,
+      "sha256": "251719ce8d74d7ef42809a1207f8f789cc5770c4e684f777f7282d73e377e115"
+    }
+  }
+}
