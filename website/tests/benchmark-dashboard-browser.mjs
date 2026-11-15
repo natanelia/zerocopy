@@ -87,7 +87,7 @@ async function createChromiumWorkerAudit(browser, evidencePath) {
   async function targetsUntil(predicate, label) {
     if (fatalError) throw fatalError;
     const deadline = Date.now() + 10000;
-    let lastTargets = null;
+    let lastTargets = null, checks = 0;
     const remaining = () => {
       const ms = deadline - Date.now();
       if (ms <= 0) throw new Error('Worker inventory deadline exceeded 10000 ms');
@@ -101,14 +101,22 @@ async function createChromiumWorkerAudit(browser, evidencePath) {
         assert.ok(Array.isArray(reply.targetInfos), 'CDP must return a target inventory');
         assert.ok(reply.targetInfos.every(info => info.type === 'worker' && typeof info.targetId === 'string' && typeof info.url === 'string'), 'CDP must honor the dedicated-worker filter');
         lastTargets = reply.targetInfos.map(({ targetId, type, url, attached, parentFrameId, browserContextId }) => ({ targetId, type, url, attached, parentFrameId, browserContextId }));
+        evidence.lastInventory = { at: new Date().toISOString(), label, checks: ++checks, targets: lastTargets };
         // A positive snapshot is direct coverage. For zero, repeat if a target
         // event arrived while the request was in flight; never trust stale zero.
         if (predicate(lastTargets) && (lastTargets.length > 0 || before === version)) return lastTargets;
         if (before !== version) continue;
-        let wake;
+        // Target notifications can be missing for nested workers after their
+        // parent closes. Refresh the authoritative inventory even without an
+        // event; notifications only make the next check happen sooner.
+        const refreshMs = Math.min(100, remaining());
+        let wake, refresh;
         try {
-          await bounded(new Promise(resolve => { wake = resolve; waiters.add(wake); }), remaining(), `${label} target change`);
-        } finally { waiters.delete(wake); }
+          await new Promise(resolve => {
+            wake = resolve; waiters.add(wake);
+            refresh = setTimeout(resolve, refreshMs);
+          });
+        } finally { clearTimeout(refresh); waiters.delete(wake); }
       }
     } catch (error) { throw fail(label, error, lastTargets); }
   }
