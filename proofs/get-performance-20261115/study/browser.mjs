@@ -50,9 +50,10 @@ const origin = `http://127.0.0.1:${server.address().port}`, pairs = Number(args.
 if (!Number.isInteger(pairs) || pairs < 2) throw new Error('Invalid predetermined pair count');
 mkdirSync(output, { recursive: true });
 const manifest = { ...sourceManifest, browser: args.browser, pairs, sourceManifestSHA256: hash(readFileSync(resolve(args.manifest))),
+  cpuAffinity: null, sourceManifestCpuAffinity: sourceManifest.cpuAffinity ?? null,
   mode, cases: [...(mode !== 'local' ? WEBSITE_CASE_IDS : []), ...(mode !== 'website' ? sourceManifest.cases : [])],
   schedule: Array.from({ length: pairs }, (_, pair) => (pair % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']).map(variant => ({ pair, variant, runtime: { name: args.browser } }))).flat(),
-  methodology: sourceManifest.methodology + ' Browser records use a fresh browser process per variant. Website cases run first and use exact frozen Track A worker runners with selected runtime libraries. Optional local fixture cases follow and use warm code with fresh read-only attachment; these are distinct timer boundaries.' };
+  methodology: sourceManifest.methodology + ' Browser records use a fresh browser process per variant. This runner does not set browser CPU affinity. Website cases run first and use exact frozen Track A worker runners with selected runtime libraries. Optional local fixture cases follow and use warm code with fresh read-only attachment; these are distinct timer boundaries.' };
 writeFileSync(resolve(output, 'manifest.json'), JSON.stringify(manifest, null, 2));
 const completions = [];
 try {
