@@ -63,7 +63,7 @@ try {
     try {
       browser = await playwright[args.browser].launch({ headless: true, ...(args.executable ? { executablePath: args.executable } : {}) });
       const page = await browser.newPage();
-      await page.exposeFunction('recordStudySample', record => { emit({ type: 'sample', ...record }); });
+      await page.exposeFunction('recordStudySample', record => { emit({ ...record, type: 'sample' }); });
       await page.goto(origin);
       emit({ type: 'process-start', pair, variant, runtime: { name: args.browser, version: browser.version(), userAgent: await page.evaluate(() => navigator.userAgent),
         crossOriginIsolated: await page.evaluate(() => crossOriginIsolated) } });
@@ -92,11 +92,11 @@ try {
         });
         return { status: records.every(record => record.status === 'passed') ? 'passed' : 'failed', records: records.length + websiteRecords.length, importMs };
       }, { variant, pair, warmups: manifest.warmups, cases: sourceManifest.cases, mode });
-      emit({ type: 'process-end', ...conclusion });
+      emit({ ...conclusion, type: 'process-end' });
       if (conclusion.status !== 'passed') code = 1;
     } catch (error) {
       code = 1; failure = { name: error?.name, message: error?.message ?? String(error), stack: error?.stack };
-      emit({ type: 'process-failure', ...failure });
+      emit({ ...failure, type: 'process-failure' });
     } finally {
       await browser?.close();
       await new Promise(resolveFinish => stream.end(resolveFinish));

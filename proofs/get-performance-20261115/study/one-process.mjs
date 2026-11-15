@@ -23,7 +23,7 @@ try {
     hash: async text => createHash('sha256').update(text).digest('hex'),
     gc: globalThis.Bun ? () => Bun.gc(true) : globalThis.gc,
     memory: () => ({ ...process.memoryUsage(), maxRSSKiB: process.resourceUsage().maxRSS, gcAvailable: !!(globalThis.gc || globalThis.Bun) }),
-    onRecord: record => emit({ type: 'sample', ...record }),
+    onRecord: record => emit({ ...record, type: 'sample' }),
   });
   const failed = records.some(record => record.status !== 'passed');
   emit({ type: 'process-end', status: failed ? 'failed' : 'passed', endedAt: new Date().toISOString(), importMs, records: records.length,

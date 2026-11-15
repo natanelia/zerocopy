@@ -51,7 +51,7 @@ export function verifyPlainCapture(api, definition, capture, expected) {
   if (definition.shape !== 'nested-number-map') { exact(capture, expected); return; }
   const contents = capture.map(value => {
     if (value === undefined) return undefined;
-    if (!(value instanceof api.SharedMap) || value.type !== 'number' || value.size !== 1 || !Object.isFrozen(value)) throw new Error('Nested descriptor did not reconstruct a frozen numeric SharedMap');
+    if (!(value instanceof api.SharedMap) || value.valueType !== 'number' || value.size !== 1 || !Object.isFrozen(value)) throw new Error('Nested descriptor did not reconstruct a frozen numeric SharedMap');
     return value.get('value');
   });
   exact(contents, expected);
@@ -59,8 +59,11 @@ export function verifyPlainCapture(api, definition, capture, expected) {
 
 /** No instruments or view APIs. All benchmarks call the ordinary .get() path. */
 export async function runCase(api, harness, definition, options = {}) {
-  const record = { caseId: definition.id, ...definition, studyVersion: STUDY_VERSION, fixtureVersion: FIXTURE_VERSION,
-    api: definition.kind === 'map' ? 'SharedMap.get' : 'SharedList.get', status: 'running', timer: 'local synchronous query; result array included; no worker transport',
+  const { type: valueType, ...fixtureDefinition } = definition;
+  const record = { caseId: definition.id, ...fixtureDefinition, valueType, studyVersion: STUDY_VERSION, fixtureVersion: FIXTURE_VERSION,
+    api: definition.kind === 'map' ? 'SharedMap.get' : 'SharedList.get',
+    freezeBehavior: valueType === 'object' ? 'deeply frozen native JSON; scalar roots unchanged' : definition.shape === 'nested-number-map' ? 'frozen collection handle' : 'primitive value; no freezing',
+    status: 'running', timer: 'local synchronous query; result array included; no worker transport',
     warmPasses: WARM_PASSES, coldDefinition: 'fresh read-only attachment with empty decoded caches; no prior map/list API reads or decoding; code may be warm and the untimed byte-canary copy has already touched the payload, so CPU caches are not cold', measurements: {}, memory: {}, correctness: {} };
   const fixture = makeFixture(definition, harness.catalog);
   record.fixtureSHA256 = await options.hash(JSON.stringify({ definition, entries: fixture.entries, requests: fixture.requests, edits: fixture.edits }));

@@ -14,6 +14,7 @@ export async function runWebsiteStudy({ variant, warmups = 1 }, { onRecord, hash
     const caseId = WEBSITE_CASE_IDS[caseOrder];
     for (let sample = 0; sample <= warmups; sample++) {
       const record = { caseId, caseOrder, processSample: sample, warmup: sample < warmups, fixtureSHA256, api: 'SharedMap.get',
+        collection: 'map', valueType: 'object', freezeBehavior: 'deeply frozen native JSON',
         status: 'running', codeState: 'fresh owner and two fresh reader workers; empty reader caches and new module instances; browser module/Wasm compilation cache state is unspecified',
         measurements: {}, memory: { available: false, reason: 'Worker heaps are not exposed by a portable browser API; see separate local/Node memory guardrails' } };
       let peer;
