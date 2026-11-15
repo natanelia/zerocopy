@@ -185,6 +185,8 @@ try {
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-status').textContent.startsWith('Complete.'), undefined, { timeout: 240000 });
       const downloadPromise = page.waitForEvent('download'); await page.locator('#feature-export').click(); const download = await downloadPromise;
       const suite = JSON.parse(readFileSync(await download.path(), 'utf8'));
+      // Preserve the run even if a later presentation assertion fails.
+      writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(suite, null, 2));
       const raw = suite.legacy;
       assert.equal(suite.schema, 'zerocopy-product-catalog-browser/v4');
       assert.equal(suite.status, 'complete');
@@ -220,8 +222,8 @@ try {
         assert.ok(READ_PHASES.includes(phase), `rendered read phase ${phase} is summarized`);
         for (const row of await section.locator('[data-case]').all()) {
           const id = await row.getAttribute('data-case');
-          assert.equal(await row.locator('.feature-timing-value').innerText(), `${suite.summary[id][phase].median.toFixed(2)} ms`);
-          assert.equal(await row.locator('code.benchmark-api').innerText(), READ_CASES.find(item => item.id === id).api);
+          assert.equal(await row.locator('.feature-timing-value').textContent(), `${suite.summary[id][phase].median.toFixed(2)} ms`);
+          assert.equal(await row.locator('code.benchmark-api').textContent(), READ_CASES.find(item => item.id === id).api);
         }
       }
       assert.equal(raw.workload, 'product-catalog');
