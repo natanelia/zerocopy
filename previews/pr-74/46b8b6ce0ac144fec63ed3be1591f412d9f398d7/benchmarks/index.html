@@ -1,0 +1,504 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101110"><title>Memory and performance benchmarks · zerocopy</title><meta name="description" content="Compare recorded memory use, see measured performance results, and run the checked product-catalog benchmark on your device in one click."><meta property="og:title" content="Memory and performance benchmarks · zerocopy"><meta property="og:description" content="Compare recorded memory use, see measured performance results, and run the checked product-catalog benchmark on your device in one click."><meta property="og:type" content="website"><link rel="canonical" href="https://natanelia.github.io/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/"><meta property="og:url" content="https://natanelia.github.io/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/"><meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/site.css"><script type="module" src="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/assets/main.mjs"></script><script type="module" src="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/assets/feature-benchmark.mjs"></script><link rel="stylesheet" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/benchmarks.css"><link rel="stylesheet" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/comparison.css"></head><body data-base="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/" data-source="c71be789744829cb335d1c591cb32634c9f3bb5d"><a class="skip" href="#main">Skip to content</a>
+  <aside class="preview-banner">PR #74 preview · 46b8b6c · Not a release · <a href="https://github.com/natanelia/zerocopy/pull/74">Return to PR</a></aside><header class="site-header"><a class="wordmark" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/" aria-label="zerocopy home"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/playground/" >Playground</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/" aria-current="page">Benchmarks</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/docs/choose-zerocopy/" >Documentation</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="https://github.com/natanelia/zerocopy">GitHub <svg class="external-arrow" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 12.5 12 4M4 4h8v8"/></svg></a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu <span aria-hidden="true">☰</span></button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/playground/" >Playground</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/" aria-current="page">Benchmarks</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/docs/choose-zerocopy/" >Documentation</a><a href="https://github.com/natanelia/zerocopy">GitHub <svg class="external-arrow" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 12.5 12 4M4 4h8v8"/></svg></a></nav>
+  <main id="main" class="wrap evidence-page">
+    <header class="benchmark-intro"><span class="eyebrow">MEMORY &amp; PERFORMANCE</span><h1>Benchmarks<span>.</span></h1><p>Compare memory use. Run the performance test on your device.</p></header>
+    <section id="memory" class="benchmark-memory" aria-labelledby="memory-heading">
+    <div class="benchmark-section-heading"><div><span class="eyebrow">01 / MEMORY</span><h2 id="memory-heading">Whole-process memory</h2></div><span class="benchmark-unit">MiB · lower is better</span></div>
+    <p class="benchmark-workload">100,000 synthetic records <span>·</span> 100 replacements <span>·</span> initial + current revision retained</p>
+    <div class="benchmark-memory-grid"><figure class="benchmark-chart" data-memory-readers="2" data-memory-maximum="650117120">
+      <figcaption><h3>2 reader workers</h3><p><strong>46.7%</strong> less RAM vs native Map</p></figcaption>
+      <div class="benchmark-bars"><div class="benchmark-bar" data-memory-kind="shared" data-memory-bytes="195457024">
+        <div class="benchmark-bar-label"><span>ZeroCopy</span><strong>186.40 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:30.064894153225808%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="native" data-memory-bytes="366665728">
+        <div class="benchmark-bar-label"><span>Native Map</span><strong>349.68 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:56.39994959677419%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="immutable" data-memory-bytes="408797184">
+        <div class="benchmark-bar-label"><span>Immutable.js</span><strong>389.86 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:62.880544354838705%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="immer" data-memory-bytes="366972928">
+        <div class="benchmark-bar-label"><span>Immer</span><strong>349.97 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:56.447202620967744%"></span></div>
+      </div></div>
+      <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>310</span><span>620 MiB</span></div>
+    </figure><figure class="benchmark-chart" data-memory-readers="4" data-memory-maximum="650117120">
+      <figcaption><h3>4 reader workers</h3><p><strong>60.9%</strong> less RAM vs native Map</p></figcaption>
+      <div class="benchmark-bars"><div class="benchmark-bar" data-memory-kind="shared" data-memory-bytes="225910784">
+        <div class="benchmark-bar-label"><span>ZeroCopy</span><strong>215.45 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:34.749243951612904%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="native" data-memory-bytes="578318336">
+        <div class="benchmark-bar-label"><span>Native Map</span><strong>551.53 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:88.95602318548387%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="immutable" data-memory-bytes="642596864">
+        <div class="benchmark-bar-label"><span>Immutable.js</span><strong>612.83 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:98.84324596774194%"></span></div>
+      </div><div class="benchmark-bar" data-memory-kind="immer" data-memory-bytes="578797568">
+        <div class="benchmark-bar-label"><span>Immer</span><strong>551.98 <small>MiB</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:89.02973790322581%"></span></div>
+      </div></div>
+      <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>310</span><span>620 MiB</span></div>
+    </figure></div>
+    <div class="benchmark-source"><p><span class="benchmark-recorded">Recorded</span> 2026-10-11 · Node 22.23.3 · AMD EPYC 9V74 · median of 3 trials</p><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/feature-memory-data.json" download>Raw data ↓</a></div>
+    <p class="benchmark-caveat">Earlier synthetic fixture with incremental copies. Post-GC process RAM, not browser or peak memory. The owner-only control uses more RAM with ZeroCopy.</p>
+    <details class="benchmark-method"><summary>Memory method &amp; controls</summary><div>
+      <p>Absolute process RSS includes the owner, all readers, and the Node runtime. The charts use the same zero-based scale and compare matched reader counts after the first edit. All implementations retain revision 0 and revision 1. Native Map, Immutable.js, and Immer send only the 100 changed records on updates.</p>
+      <p>The owner-only control uses 158.19 MiB for ZeroCopy SharedMap and 143.25 MiB for native Map. These historical measurements use runtime <a href="https://github.com/natanelia/zerocopy/commit/8ad5788648db93c18994fdde9b8fdb12e3a4957b">8ad5788</a>, before later optimizations. They do not measure the current product catalog or this browser.</p>
+      <p>Each bar is the median of three fresh processes. Raw data contains every sample, observed ranges, source hashes, and environment. The separate eight-reader recording uses a different host and remains in the full report.</p>
+      <p>The original reports are available in <a href="#sources">source data</a> below.</p>
+    </div></details>
+  </section>
+    <section id="performance" class="benchmark-performance" aria-labelledby="benchmark-performance-title">
+    <div class="benchmark-section-heading"><div><span class="eyebrow">02 / PERFORMANCE</span><h2 id="benchmark-performance-title">Now try your device.</h2></div><span class="benchmark-unit">Real workers · checked results</span></div>
+    <p class="benchmark-workload">2 readers <span>·</span> 1,000 requested IDs <span>·</span> 100 edits <span>·</span> 7 samples per case</p>
+    <form id="feature-benchmark-form" class="benchmark-controls" data-benchmark-view="compact">
+      <button id="feature-run" class="button primary" aria-label="Run performance benchmark on my device" disabled>Run on my device <span aria-hidden="true">→</span></button>
+      <button id="feature-cancel" type="button" class="button secondary" hidden>Stop run</button>
+      <button id="feature-export" type="button" class="button secondary" disabled hidden>Download my results</button>
+      <a id="feature-recorded-export" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/catalog-read-recording.json" download>Download recorded JSON ↓</a>
+      <details class="benchmark-run-options"><summary>Run options</summary><label for="feature-count">Products<select id="feature-count"><option value="1000">1,000</option><option value="10000" selected>10,000</option><option value="100000">100,000</option></select></label></details>
+    </form>
+    <div class="capability-notice" id="capability" role="status"><span class="status-dot"></span><span id="capability-text">Preparing this demo…</span><button id="enable-isolation" hidden type="button">Retry setup</button></div><p class="capability-help" id="capability-help" hidden>Setup normally runs automatically. This host may need one page refresh to enable shared memory. If your browser blocks service workers or isolation, open this page in a full browser or use a host with COOP/COEP headers. Documentation stays available; there is no copy-mode fallback.</p>
+    <noscript><p class="benchmark-status">Enable JavaScript to run on your device. The recorded charts and downloads stay available.</p></noscript>
+    <p id="feature-benchmark-status" class="benchmark-status" role="status">Run once to compare your device. Completed results stay visible while it runs.</p>
+    <progress id="feature-benchmark-progress" value="0" max="162" hidden aria-label="Benchmark progress"></progress>
+    <p id="feature-result-origin" class="benchmark-recorded" data-result-origin="recorded"><strong>Recorded sample</strong> · Firefox 155 / Linux · 2026-11-15 · 10,000 products · 2 readers</p>
+    <div id="feature-benchmark-results"><div class="benchmark-results"><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="firstQueryMs" data-timing-maximum="14.180000000000007">
+    <figcaption><h3>Cold full-object .get()</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Complete deeply frozen records, first accessed in fresh readers. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="14.180000000000007">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 11.120–31.000 ms · 7 measured samples">14.18 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="0.7800000000000011">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.540–0.920 ms · 7 measured samples">0.78 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:5.500705218617777%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="2.3799999999999955">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 1.500–3.980 ms · 7 measured samples">2.38 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:16.78420310296188%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="1.3799999999999955">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.560–2.300 ms · 7 measured samples">1.38 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:9.73201692524679%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>14.18 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="repeatQueryMs" data-timing-maximum="1.1800000000000068">
+    <figcaption><h3>Cached full-object .get()</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">The same 1,000 IDs repeated immediately, before validation. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="0.8799999999999955">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.560–2.820 ms · 7 measured samples">0.88 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:74.57627118643985%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="0.5199999999999818">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.420–0.840 ms · 7 measured samples">0.52 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:44.0677966101677%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="1.1800000000000068">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.760–4.560 ms · 7 measured samples">1.18 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="0.7200000000000273">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.520–1.360 ms · 7 measured samples">0.72 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:61.01694915254433%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>1.18 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="selective-fields" data-phase="firstQueryMs" data-timing-maximum="15.319999999999993">
+    <figcaption><h3>Selective application query</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Available books → ID, name, price and revision. Every implementation produces the same answer. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="selective-shared-get" data-kind="shared" data-median-ms="15.319999999999993">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 9.880–34.760 ms · 7 measured samples">15.32 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-native-get" data-kind="native" data-median-ms="1.2800000000000011">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.980–3.600 ms · 7 measured samples">1.28 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:8.355091383812022%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-immutable-get" data-kind="immutable" data-median-ms="2.6399999999999864">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 1.660–8.480 ms · 7 measured samples">2.64 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:17.23237597911219%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-immer-get" data-kind="immer" data-median-ms="1.1800000000000068">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.920–3.780 ms · 7 measured samples">1.18 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:7.702349869451745%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-shared-view" data-kind="shared" data-median-ms="10.900000000000006">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView</code></span><strong class="benchmark-value" title="Range 9.620–38.380 ms · 7 measured samples">10.90 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:71.14882506527422%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>15.32 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="constructionToFirstAnswerMs" data-timing-maximum="167.27999999999997">
+    <figcaption><h3>Construction through first answer</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Construction + initial publication + first full-object worker round-trip, added within each sample before the median. Excludes worker startup and input generation.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="68.62">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 44.400–76.280 ms · 7 measured samples">68.62 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:41.02104256336682%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="109.58">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 95.460–180.740 ms · 7 measured samples">109.58 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:65.50693448110952%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="127.35999999999999">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 119.500–161.700 ms · 7 measured samples">127.36 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:76.13582018173123%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="167.27999999999997">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 86.900–245.680 ms · 7 measured samples">167.28 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>167.28 ms</span></div>
+  </figure></div>
+    <details class="benchmark-method benchmark-other-phases"><summary>Setup, transport &amp; retained revisions</summary><div><div class="benchmark-results"><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="startupMs" data-timing-maximum="194.09999999999854">
+    <figcaption><h3>Worker and module setup</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Owner/reader creation and module loading. Measured separately from construction through first answer.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="194.09999999999854">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 164.200–227.600 ms · 7 measured samples">194.10 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="117.54000000000087">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 87.580–261.200 ms · 7 measured samples">117.54 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:60.5564142194754%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="135.97999999999956">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 105.480–243.140 ms · 7 measured samples">135.98 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:70.05667181865049%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="146.94000000000233">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 125.640–167.240 ms · 7 measured samples">146.94 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:75.70324574961536%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>194.10 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="constructionMs" data-timing-maximum="35.379999999999995">
+    <figcaption><h3>Construct the collection</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Owner-side construction. Fixture generation is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="35.379999999999995">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 27.680–56.960 ms · 7 measured samples">35.38 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="5.319999999999993">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 3.080–12.940 ms · 7 measured samples">5.32 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:15.03674392312039%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="13.560000000000002">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 9.940–18.880 ms · 7 measured samples">13.56 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:38.32673827020917%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="12.140000000000015">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 8.920–21.940 ms · 7 measured samples">12.14 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:34.3131712832109%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>35.38 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="publicationMs" data-timing-maximum="130.33999999999997">
+    <figcaption><h3>Publish and attach</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Encoding, delivery, replica reconstruction/freezing or shared attachment, and both reader acknowledgements.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="1.160000000000025">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.900–2.040 ms · 7 measured samples">1.16 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:0.8899800521712637%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="100.68">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 68.840–165.080 ms · 7 measured samples">100.68 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:77.24413073500078%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="102.83999999999997">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 95.360–140.860 ms · 7 measured samples">102.84 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:78.90133497007825%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="130.33999999999997">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 70.300–209.220 ms · 7 measured samples">130.34 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>130.34 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="firstRoundTripMs" data-timing-maximum="18.559999999999974">
+    <figcaption><h3>First query including messages</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Owner elapsed time through both complete replies. Includes scheduling and full-result transport.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="18.559999999999974">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 15.620–39.520 ms · 7 measured samples">18.56 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="11.199999999999989">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 5.820–21.300 ms · 7 measured samples">11.20 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:60.34482758620692%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="8.45999999999998">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 6.440–15.120 ms · 7 measured samples">8.46 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:45.58189655172409%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="8.920000000000016">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 5.860–20.280 ms · 7 measured samples">8.92 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:48.06034482758636%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>18.56 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="repeatRoundTripMs" data-timing-maximum="7.9599999999999795">
+    <figcaption><h3>Repeated query including messages</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">The repeated full-object request/reply. Cached local read time is shown above.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="7.819999999999993">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 6.120–12.840 ms · 7 measured samples">7.82 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:98.24120603015092%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="7.660000000000025">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 6.280–15.880 ms · 7 measured samples">7.66 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:96.23115577889504%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="7.619999999999948">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 5.700–15.640 ms · 7 measured samples">7.62 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:95.72864321607999%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="7.9599999999999795">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 6.100–16.980 ms · 7 measured samples">7.96 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>7.96 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="selective-fields" data-phase="repeatQueryMs" data-timing-maximum="3.5800000000000125">
+    <figcaption><h3>Repeated selective query</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Identical projection repeated before validation. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="selective-shared-get" data-kind="shared" data-median-ms="0.8199999999999932">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.580–2.280 ms · 7 measured samples">0.82 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:22.90502793296062%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-native-get" data-kind="native" data-median-ms="2.280000000000001">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.800–3.080 ms · 7 measured samples">2.28 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:63.68715083798864%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-immutable-get" data-kind="immutable" data-median-ms="1.4399999999999977">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.900–3.780 ms · 7 measured samples">1.44 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:40.223463687150634%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-immer-get" data-kind="immer" data-median-ms="0.9200000000000159">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.660–2.280 ms · 7 measured samples">0.92 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:25.698324022346725%"></span></div>
+      </div><div class="benchmark-bar" data-case="selective-shared-view" data-kind="shared" data-median-ms="3.5800000000000125">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView</code></span><strong class="benchmark-value" title="Range 2.920–4.860 ms · 7 measured samples">3.58 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>3.58 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="updateMs" data-timing-maximum="2.3799999999999955">
+    <figcaption><h3>Replace 100 complete records</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Owner-side replacements. Input generation and publication are excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="0.7200000000000273">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.560–1.020 ms · 7 measured samples">0.72 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:30.252100840337338%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="2.280000000000001">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.760–2.820 ms · 7 measured samples">2.28 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:95.79831932773132%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="0.660000000000025">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.540–0.980 ms · 7 measured samples">0.66 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:27.731092436975896%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="2.3799999999999955">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 1.640–9.160 ms · 7 measured samples">2.38 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>2.38 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="editPublicationMs" data-timing-maximum="4.7999999999999545">
+    <figcaption><h3>Publish the edited records</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Shared descriptors or 100 incremental replacements, including both reader acknowledgements.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="0.6000000000000227">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.580–1.800 ms · 7 measured samples">0.60 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:12.500000000000592%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="4.119999999999976">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 2.800–5.780 ms · 7 measured samples">4.12 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:85.83333333333366%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="2.5">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 1.500–3.820 ms · 7 measured samples">2.50 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:52.083333333333826%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="4.7999999999999545">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 3.700–12.460 ms · 7 measured samples">4.80 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>4.80 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="updatedQueryMs" data-timing-maximum="9.120000000000005">
+    <figcaption><h3>Read the updated revision</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Complete records after replacing 100 products. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="9.120000000000005">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 7.440–20.760 ms · 7 measured samples">9.12 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="0.4000000000000341">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.220–4.180 ms · 7 measured samples">0.40 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:4.385964912281073%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="0.539999999999992">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.380–1.480 ms · 7 measured samples">0.54 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:5.921052631578857%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="0.4399999999999977">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.320–0.560 ms · 7 measured samples">0.44 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:4.824561403508745%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>9.12 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="full-object-get" data-phase="retainedQueryMs" data-timing-maximum="0.5399999999999636">
+    <figcaption><h3>Read the retained revision</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Complete records from the unchanged initial snapshot. Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="full-shared-get" data-kind="shared" data-median-ms="0.37999999999999545">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.260–0.520 ms · 7 measured samples">0.38 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:70.37037037037427%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-native-get" data-kind="native" data-median-ms="0.4000000000000057">
+        <div class="benchmark-bar-label"><span>Native Map<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.220–2.040 ms · 7 measured samples">0.40 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:74.07407407408012%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immutable-get" data-kind="immutable" data-median-ms="0.5399999999999636">
+        <div class="benchmark-bar-label"><span>Immutable.js<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.380–2.400 ms · 7 measured samples">0.54 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="full-immer-get" data-kind="immer" data-median-ms="0.4000000000000057">
+        <div class="benchmark-bar-label"><span>Immer<code class="benchmark-api">get</code></span><strong class="benchmark-value" title="Range 0.260–1.080 ms · 7 measured samples">0.40 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:74.07407407408012%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>0.54 ms</span></div>
+  </figure></div></div></details>
+    <details class="benchmark-method benchmark-other-phases"><summary>Explicit view materialization · separate contracts</summary><div><p>toObject() returns fresh mutable native values. toObject({ freeze: true }) returns fresh deeply frozen values. Neither row measures standard .get() or its decoded-object cache.</p><div class="benchmark-results"><figure class="benchmark-chart" data-track="reads" data-workload="explicit-materialization" data-phase="firstQueryMs" data-timing-maximum="15.719999999999999">
+    <figcaption><h3>Create objects from views</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Local query time in the slower of two parallel readers. Result messaging is excluded.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="materialize-shared-frozen" data-kind="shared" data-median-ms="15.719999999999999">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView().toObject({ freeze: true })</code></span><strong class="benchmark-value" title="Range 12.280–27.720 ms · 7 measured samples">15.72 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="materialize-shared-mutable" data-kind="shared" data-median-ms="15.660000000000025">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView().toObject()</code></span><strong class="benchmark-value" title="Range 10.100–20.460 ms · 7 measured samples">15.66 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:99.61832061068719%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>15.72 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="reads" data-workload="explicit-materialization" data-phase="repeatQueryMs" data-timing-maximum="14.299999999999955">
+    <figcaption><h3>Repeat explicit materialization</h3><span class="benchmark-unit">Median · ms · lower is better</span><p class="benchmark-chart-note">Fresh native objects are created again. This is not a cached .get() read.</p></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="materialize-shared-frozen" data-kind="shared" data-median-ms="9.319999999999993">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView().toObject({ freeze: true })</code></span><strong class="benchmark-value" title="Range 6.540–20.160 ms · 7 measured samples">9.32 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:65.17482517482533%"></span></div>
+      </div><div class="benchmark-bar" data-case="materialize-shared-mutable" data-kind="shared" data-median-ms="14.299999999999955">
+        <div class="benchmark-bar-label"><span>ZeroCopy<code class="benchmark-api">getView().toObject()</code></span><strong class="benchmark-value" title="Range 5.360–16.160 ms · 7 measured samples">14.30 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>14.30 ms</span></div>
+  </figure></div></div></details>
+    <details class="benchmark-method benchmark-other-phases"><summary>Legacy catalog control · all 9 operations</summary><div><p>The original workload includes full-field fingerprints inside the query timer and worker reply transport. Only the independent reference comparison is untimed. Full-copy rows appear only for edited publication and combined replacement/publication.</p><div class="benchmark-results"><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="generationMs" data-timing-maximum="33.94">
+    <figcaption><h3>Generate the catalog</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="33.94">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 24.700–80.440 ms · 7 measured samples">33.94 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="26.120000000000005">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 24.680–90.840 ms · 7 measured samples">26.12 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:76.95934001178553%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="24.720000000000013">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 22.080–90.640 ms · 7 measured samples">24.72 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:72.83441367118448%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="25.519999999999982">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 22.820–76.620 ms · 7 measured samples">25.52 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:75.19151443724215%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>33.94 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="constructionMs" data-timing-maximum="41.68000000000001">
+    <figcaption><h3>Construct the map</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="41.68000000000001">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 28.040–85.400 ms · 7 measured samples">41.68 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="3.8400000000000034">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 3.340–16.980 ms · 7 measured samples">3.84 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:9.213051823416514%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="13.060000000000002">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 8.360–33.520 ms · 7 measured samples">13.06 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:31.333973128598846%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="12.040000000000006">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 9.500–33.560 ms · 7 measured samples">12.04 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:28.886756238003848%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>41.68 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="publicationMs" data-timing-maximum="135.64000000000001">
+    <figcaption><h3>Publish the initial map</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="1.5199999999999818">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 0.700–3.640 ms · 7 measured samples">1.52 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:1.120613388380995%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="102.05999999999997">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 68.620–152.900 ms · 7 measured samples">102.06 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:75.24329106458269%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="135.64000000000001">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 87.580–211.340 ms · 7 measured samples">135.64 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="114.93999999999997">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 65.960–218.880 ms · 7 measured samples">114.94 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:84.73901503981124%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>135.64 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="firstQueryMs" data-timing-maximum="18.04000000000002">
+    <figcaption><h3>First query on fresh readers</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="18.04000000000002">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 13.740–29.880 ms · 7 measured samples">18.04 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="6.299999999999983">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 5.340–12.740 ms · 7 measured samples">6.30 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:34.92239467849211%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="7.579999999999984">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 5.040–17.760 ms · 7 measured samples">7.58 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:42.01773835920164%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="7.6200000000000045">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 4.540–15.320 ms · 7 measured samples">7.62 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:42.23946784922392%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>18.04 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="repeatQueryMs" data-timing-maximum="7.839999999999975">
+    <figcaption><h3>Repeat the same query</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="5.760000000000048">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 3.080–8.840 ms · 7 measured samples">5.76 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:73.46938775510289%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="4.21999999999997">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 3.220–9.240 ms · 7 measured samples">4.22 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:53.826530612244696%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="7.839999999999975">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 4.280–13.820 ms · 7 measured samples">7.84 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="4.21999999999997">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 3.420–14.180 ms · 7 measured samples">4.22 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:53.826530612244696%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>7.84 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="updateMs" data-timing-maximum="2.079999999999984">
+    <figcaption><h3>Replace 100 product objects</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="0.660000000000025">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 0.520–3.560 ms · 7 measured samples">0.66 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:31.73076923077068%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="1.200000000000017">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 0.740–3.440 ms · 7 measured samples">1.20 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:57.69230769230895%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="0.7400000000000091">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 0.540–1.240 ms · 7 measured samples">0.74 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:35.57692307692379%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="2.079999999999984">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 1.380–5.800 ms · 7 measured samples">2.08 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>2.08 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="editPublicationMs" data-timing-maximum="116.21999999999997">
+    <figcaption><h3>Publish the edited revision</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="0.6800000000000068">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 0.500–2.100 ms · 7 measured samples">0.68 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:0.5850972293925374%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-full" data-kind="native" data-median-ms="116.21999999999997">
+        <div class="benchmark-bar-label"><span>Native Map · full copy</span><strong class="benchmark-value" title="Range 63.900–176.740 ms · 7 measured samples">116.22 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-full" data-kind="immutable" data-median-ms="114.04000000000002">
+        <div class="benchmark-bar-label"><span>Immutable.js · full copy</span><strong class="benchmark-value" title="Range 83.560–284.300 ms · 7 measured samples">114.04 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:98.12424711753575%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-full" data-kind="immer" data-median-ms="97.97999999999996">
+        <div class="benchmark-bar-label"><span>Immer · full copy</span><strong class="benchmark-value" title="Range 69.500–120.960 ms · 7 measured samples">97.98 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:84.30562725864739%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="2.7800000000000296">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 1.760–4.840 ms · 7 measured samples">2.78 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:2.392015143693022%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="2.919999999999959">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 1.620–4.700 ms · 7 measured samples">2.92 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:2.5124763379796593%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="5.340000000000003">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 4.480–17.040 ms · 7 measured samples">5.34 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:4.594734124935472%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>116.22 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="updatePublicationMs" data-timing-maximum="117.07999999999998">
+    <figcaption><h3>Replace and publish 100 products</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="2.3999999999999773">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 1.200–4.240 ms · 7 measured samples">2.40 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:2.0498804236419352%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-full" data-kind="native" data-median-ms="117.07999999999998">
+        <div class="benchmark-bar-label"><span>Native Map · full copy</span><strong class="benchmark-value" title="Range 64.540–177.520 ms · 7 measured samples">117.08 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-full" data-kind="immutable" data-median-ms="114.68">
+        <div class="benchmark-bar-label"><span>Immutable.js · full copy</span><strong class="benchmark-value" title="Range 84.160–284.780 ms · 7 measured samples">114.68 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:97.95011957635806%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-full" data-kind="immer" data-median-ms="99.39999999999998">
+        <div class="benchmark-bar-label"><span>Immer · full copy</span><strong class="benchmark-value" title="Range 71.160–123.960 ms · 7 measured samples">99.40 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:84.89921421250426%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="3.8600000000000136">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 2.600–7.500 ms · 7 measured samples">3.86 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:3.296891014690822%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="3.7799999999999727">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 2.180–5.380 ms · 7 measured samples">3.78 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:3.2285616672360553%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="7.439999999999998">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 6.020–19.200 ms · 7 measured samples">7.44 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:6.354629313290057%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>117.08 ms</span></div>
+  </figure><figure class="benchmark-chart" data-track="legacy" data-workload="catalog-fingerprint" data-phase="updatedQueryMs" data-timing-maximum="13">
+    <figcaption><h3>Query the edited revision</h3><span class="benchmark-unit">Median · ms · lower is better</span></figcaption>
+    <div class="benchmark-bars"><div class="benchmark-bar" data-case="shared" data-kind="shared" data-median-ms="13">
+        <div class="benchmark-bar-label"><span>ZeroCopy · shared snapshot</span><strong class="benchmark-value" title="Range 10.640–20.040 ms · 7 measured samples">13.00 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:100%"></span></div>
+      </div><div class="benchmark-bar" data-case="native-incremental" data-kind="native" data-median-ms="4.780000000000001">
+        <div class="benchmark-bar-label"><span>Native Map · incremental copy</span><strong class="benchmark-value" title="Range 2.800–7.440 ms · 7 measured samples">4.78 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:36.769230769230774%"></span></div>
+      </div><div class="benchmark-bar" data-case="immutable-incremental" data-kind="immutable" data-median-ms="7.960000000000036">
+        <div class="benchmark-bar-label"><span>Immutable.js · incremental copy</span><strong class="benchmark-value" title="Range 3.620–12.480 ms · 7 measured samples">7.96 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:61.23076923076951%"></span></div>
+      </div><div class="benchmark-bar" data-case="immer-incremental" data-kind="immer" data-median-ms="4.759999999999991">
+        <div class="benchmark-bar-label"><span>Immer · incremental copy</span><strong class="benchmark-value" title="Range 2.920–12.460 ms · 7 measured samples">4.76 <small>ms</small></strong></div>
+        <div class="benchmark-bar-track" aria-hidden="true"><span style="width:36.61538461538454%"></span></div>
+      </div></div>
+    <div class="benchmark-scale" aria-hidden="true"><span>0</span><span>13.00 ms</span></div>
+  </figure></div></div></details></div>
+    <details id="sources" class="benchmark-method"><summary>Method, environment &amp; source data</summary><div>
+      <p id="feature-build-identity" class="benchmark-identity" role="status">Checking the source build metadata…</p>
+      <p>Median of seven measured samples after two warm-ups. Eleven read cases and seven original catalog cases rotate through fresh owner and two-reader workers. Every warm-up and measured sample is retained: 99 read samples and 63 catalog samples. These are timings, not memory measurements.</p>
+      <h3>Full objects, selected fields and the first answer</h3>
+      <p><strong>Full-object .get():</strong> complete, deeply frozen records. The cold query is the first access in a fresh reader; the cached query immediately repeats the same 1,000 IDs before any validation pass. All implementations receive the same 910 hits and 90 misses.</p>
+      <p><strong>Selective query:</strong> find available books and return ID, name, price and revision. Native Map, Immutable.js, Immer, ZeroCopy .get() and ZeroCopy getView() return the same ordered projection. Selective queries do not compute a full-record fingerprint.</p>
+      <p><strong>Construction through first answer:</strong> construction + initial publication + first full-object worker round-trip, added within each sample before the median. It includes both reader acknowledgements and full-result transport. Worker startup, module loading, input generation, reference checks and DOM paint are excluded. Worker startup is reported separately.</p>
+      <p>Local read bars show the slower of two parallel reader durations; both individual durations remain in the export. The separate worker round-trip includes scheduling and complete response transport. After first and repeat queries finish, an independent reference checks every result value, count, miss and position. Current revision 1 and retained revision 0 are checked after replacing 100 records.</p>
+      <p>Explicit getView().toObject() returns fresh mutable native values; getView().toObject({ freeze: true }) returns fresh deeply frozen values. These are separate materialization workloads, not standard .get() or its decoded-object cache.</p>
+      <h3>The original catalog control</h3>
+      <p>Legacy query timers include full-field fingerprints and worker reply transport; only the independent reference comparison is untimed. Full-copy bars appear only for publishing an edit and replacing + publishing 100 products, directly below SharedMap. Other legacy operations use the four baseline cases. Initial replica publication copies the complete catalog; incremental edits copy only 100 changed records.</p>
+      <h3>Source identity and interrupted runs</h3>
+      <p>Page setup reads build metadata without loading the library. Run rechecks the source commit and verifies fetched library, workload and dependency hashes before workers start. Fetched hashes do not attest already evaluated browser modules. Raw JSON includes build/browser identity, APIs, freeze contracts, timing boundaries, all samples and correctness checks.</p>
+      <p>Stopping or failing a run keeps the previous completed charts. The interrupted attempt can be downloaded separately with its partial samples and failure details; incomplete medians never replace a complete result.</p>
+      <p id="feature-recording-details">Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0<br>9 logical cores reported · source <a href="https://github.com/natanelia/zerocopy/commit/c1247f59f8d5a1022398c80ccc9e6c91cb008de2">c1247f5</a> · Immutable.js 5.1.9 · Immer 11.1.21 · 2026-11-15T00:33:17.351Z · read workload v1 · committed build · fetched library, workload and dependency hashes verified</p>
+      <p>Original reports, including the complete historical tables and reproduction commands:</p>
+      <ul class="benchmark-source-files"><li><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/assets/catalog-benchmark-recording.json" download>Earlier v3 catalog recording (.json)</a></li><li><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/markdown/memory-comparison.md" download>SharedMap memory report (.md)</a></li><li><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/markdown/benchmarks.md" download>Collection operation results (.md)</a></li><li><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/markdown/historical-sharedlist-memory.md" download>Earlier SharedList memory report (.md)</a></li></ul>
+    </div></details>
+  </section>
+  </main>
+  <footer class="site-footer"><div><a class="wordmark" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg><span>zerocopy.</span></a><p>Shared data. Independent possibilities.</p><a class="footer-repo" href="https://github.com/natanelia/zerocopy">natanelia/zerocopy <svg class="external-arrow" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 12.5 12 4M4 4h8v8"/></svg></a></div><div class="footer-links"><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/docs/getting-started/">Get started</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/docs/choose-zerocopy/">Is it a fit?</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/use-cases/">Use cases</a><a href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/benchmarks/">Benchmarks</a><a href="https://www.npmjs.com/package/zerocopy">npm package <svg class="external-arrow" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 12.5 12 4M4 4h8v8"/></svg></a><a href="https://github.com/natanelia/zerocopy/blob/main/LICENSE">MIT license</a></div><p class="build-info">Made for people who build.<br>No analytics. No data uploads.<br><span>Source v0.2.1 · <a href="https://github.com/natanelia/zerocopy/commit/c71be789744829cb335d1c591cb32634c9f3bb5d">c71be78</a></span></p></footer>
+  <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off" aria-describedby="search-status search-help" aria-controls="search-results"><p id="search-status" role="status">Type a topic to find a guide.</p><button id="search-retry" class="text-button" type="button" hidden>Retry search</button><nav aria-label="Search results"><ol id="search-results"></ol></nav><p id="search-help">↓ ↑ to move · Enter to open · Esc to close</p><a class="search-browse" href="/zerocopy/previews/pr-74/46b8b6ce0ac144fec63ed3be1591f412d9f398d7/docs/getting-started/">Browse documentation →</a></dialog><div class="toast" role="status" aria-live="polite"></div>
+  </body></html>
