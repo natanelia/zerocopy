@@ -22,6 +22,8 @@ The first Firefox attempt completed the benchmark but exposed a test assertion t
 
 Hosted website run [43656962551](https://github.com/natanelia/zerocopy/actions/runs/43656962551) caught eager hash-verification requests during passive page setup: the isolation test observed 36 library requests where it required zero. Asset verification now starts only with Run; metadata remains visible on page load. The existing isolation assertion is preserved, and the main feature test also checks that setup fetches no library files. A local parallel static run also hit an existing short scheduling timeout in `isolation-slot.test.mjs`; its focused rerun and the complete serial run both passed (169/169). These failures are not performance evidence.
 
+Hosted run [43657585068](https://github.com/natanelia/zerocopy/actions/runs/43657585068) completed all 162 Chromium 153.0.8010.12 samples, output checks, median assertions and desktop/mobile captures in about 19 seconds of benchmark execution. The independent export verifier also passed. The browser driver then stalled while enabling late request interception for the stale-metadata test, eventually hitting its existing ten-minute gate. The complete raw export and event trace are preserved with hashes in `chromium-validation-manifest.json`; the validation build is GitHub's combined test commit `12b0917b04810a2ab78a8bb6a04f863cde268d1b`. The fault is now injected by the test HTTP server, leaving browser request routing unchanged. The deadline and stale-build assertions remain in place.
+
 ## Reproduce
 
 Build the library and website with the versions in `CONTRIBUTING.md`, then run:

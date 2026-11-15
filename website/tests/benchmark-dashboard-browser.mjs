@@ -12,16 +12,51 @@ const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.
 const recorded = JSON.parse(readFileSync(new URL('../assets/catalog-read-recording.json', import.meta.url)));
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
 mkdirSync(artifacts, { recursive: true });
-const server = createPreview({ base: meta.base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
+const server = createPreview({ base: meta.base });
+// Toggle faults in the test HTTP server. Enabling browser request interception
+// after 162 short-lived worker samples can wait on stale Chromium targets.
+// Normal requests still use the production preview handler byte for byte.
+let serverFault;
+const requestListeners = server.listeners('request');
+assert.equal(requestListeners.length, 1, 'Expected one preview request handler');
+const [serveRequest] = requestListeners;
+server.removeListener('request', serveRequest);
+server.on('request', (request, response) => {
+  const path = new URL(request.url, 'http://localhost').pathname;
+  const metadataFault = serverFault === 'metadata' && path === meta.base + 'build.json';
+  const libraryFault = serverFault === 'library' && path === meta.base + 'benchmarks/library/shared.js';
+  if (metadataFault || libraryFault) {
+    response.writeHead(200, {
+      'Content-Type': metadataFault ? 'application/json' : 'text/javascript',
+      'Cache-Control': 'no-store',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    });
+    response.end(metadataFault ? JSON.stringify({ ...meta, sourceCommit: 'f'.repeat(40) }) : '// intentionally different library bytes');
+    return;
+  }
+  Reflect.apply(serveRequest, server, [request, response]);
+});
+server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
 const url = origin + meta.base + 'benchmarks/';
 const ready = page => page.locator('#feature-run:not([disabled])').waitFor();
 const visibleCount = value => value.schema.endsWith('/v4') ? 4 : 2;
+async function bounded(promise, timeoutMs, label) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} exceeded ${timeoutMs} ms`)), timeoutMs);
+    })]);
+  } finally { clearTimeout(timer); }
+}
 async function downloadResult(page) {
   const pending = page.waitForEvent('download');
   await page.locator('#feature-export').click();
   const download = await pending;
-  return { value: JSON.parse(readFileSync(await download.path(), 'utf8')), filename: download.suggestedFilename() };
+  const path = await bounded(download.path(), 20000, 'Benchmark export download completion');
+  assert.equal(typeof path, 'string', 'Benchmark export must have a local file');
+  return { value: JSON.parse(readFileSync(path, 'utf8')), filename: download.suggestedFilename() };
 }
 async function capture(page, filename) {
   await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
@@ -138,8 +173,14 @@ try {
     assert.ok(['chromium', 'firefox', 'webkit'].includes(name));
     const browser = await ({ chromium, firefox, webkit })[name].launch({ headless: true,
       ...(name === 'chromium' ? { args: ['--no-sandbox'], ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) } : {}) });
-    let activePage;
+    let activePage, engineFailure;
+    const events = [];
+    const record = (phase, details = {}) => {
+      events.push({ at: new Date().toISOString(), phase, ...details });
+      writeFileSync(`${artifacts}/benchmark-dashboard-${name}-events.json`, JSON.stringify(events, null, 2));
+    };
     try {
+      record('recorded charts without JavaScript');
       const plainContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
       const plain = await plainContext.newPage(); await plain.goto(url);
       assert.equal(await plain.locator('[data-memory-readers]').count(), 2);
@@ -151,6 +192,7 @@ try {
       assert.equal(await plain.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await plainContext.close();
 
+      record('metadata-only setup and keyboard disclosures');
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const page = activePage = await context.newPage(), errors = [], requests = [];
       page.setDefaultTimeout(20000);
@@ -171,6 +213,7 @@ try {
       await capture(page, `benchmark-dashboard-${name}-recorded-mobile.png`);
       await page.setViewportSize({ width: 1440, height: 1000 });
 
+      record('complete benchmark requested');
       const startedAt = Date.now();
       await page.getByRole('button', { name: 'Run performance benchmark on my device', exact: true }).click();
       assert.equal(new URL(page.url()).pathname, meta.base + 'benchmarks/', 'One click runs the test in place');
@@ -186,9 +229,11 @@ try {
       assert.equal(raw.config.entries, recorded.config.entries);
       assert.ok(Date.parse(raw.measuredAt) >= startedAt);
       assertExport(raw, `${artifacts}/benchmark-dashboard-${name}.json`);
+      record('completed benchmark exported and independently verified');
       await assertCharts(page, raw);
       assert.equal(page.workers().length, 0, 'Completed runs release every owner and reader');
       await capture(page, `benchmark-dashboard-${name}-device-desktop.png`);
+      record('cancelled attempt preserves completed evidence');
       const completed = await chartData(page);
       const provenance = await page.locator('#feature-result-origin').innerText();
       await page.locator('#feature-run').click();
@@ -207,13 +252,15 @@ try {
       assert.ok(cancelled.value.failures.length > 0);
       assert.equal(page.workers().length, 0, 'Stop releases workers');
 
-      await page.route('**/build.json', route => route.fulfill({ json: { ...meta, sourceCommit: 'f'.repeat(40) } }));
+      serverFault = 'metadata';
+      record('changed build metadata enabled in test HTTP server');
       await page.locator('#feature-run').click();
       const mismatch = await assertFailedAttempt(page, /different commits/, completed, provenance);
       assert.equal(mismatch.identityStatus, 'failed');
       assert.equal(mismatch.buildIdentity, null); assert.equal(mismatch.assetVerification, null);
       assert.equal(await page.locator('#feature-run').isDisabled(), true, 'Rejected build identity cannot be reused');
-      await page.unroute('**/build.json');
+      serverFault = undefined;
+      record('changed metadata rejected before measurement and failure exported');
 
       for (const width of [390, 320]) {
         await page.setViewportSize({ width, height: 844 });
@@ -226,15 +273,18 @@ try {
       assert.equal(await page.locator('#feature-export').isVisible(), false);
       // The metadata can match while fetched library bytes are stale.
       const recordedCharts = await chartData(page), recordedOrigin = await page.locator('#feature-result-origin').innerText();
-      const tampered = `${origin}${meta.base}benchmarks/library/shared.js`;
-      await page.route(tampered, route => route.fulfill({ status: 200, contentType: 'text/javascript', body: '// intentionally different library bytes' }));
+      serverFault = 'library';
+      record('changed library bytes enabled in test HTTP server');
       await page.locator('#feature-run').click();
       const badHash = await assertFailedAttempt(page, /Build mismatch for shared\.js/, recordedCharts, recordedOrigin);
       assert.equal(badHash.identityStatus, 'failed');
       assert.equal(badHash.assetVerification, null);
-      await page.unroute(tampered); const hashReloadFrom = requests.length;
+      serverFault = undefined;
+      record('changed library rejected before measurement and failure exported');
+      const hashReloadFrom = requests.length;
       await page.reload(); await assertPassive(page, requests, hashReloadFrom);
 
+      record('navigation during a running attempt');
       // Leave a running attempt, then restore both back and forward history.
       await page.locator('#feature-run').click();
       await page.waitForFunction(() => document.querySelector('#feature-benchmark-progress').value > 0);
@@ -247,6 +297,7 @@ try {
       await assertCharts(page, recorded);
       assert.deepEqual(errors, []); await context.close();
 
+      record('worker startup failure before measurement');
       const failedContext = await browser.newContext();
       await failedContext.addInitScript(() => {
         window.Worker = class { constructor() { throw new Error('Dashboard test worker startup failure'); } };
@@ -258,14 +309,25 @@ try {
       assert.equal(await failed.locator('#feature-recorded-export').isVisible(), true);
       await assertCharts(failed, recorded);
       assert.equal(failed.workers().length, 0); await failedContext.close();
+      record('all dashboard assertions passed');
       console.log(`Passed ${name}: memory-first SSR, recorded provenance, one-click v4 run/export, all read and legacy medians, keyboard disclosure, partial cancel/worker failure, stale metadata and asset rejection, navigation, and 320px/390px layouts.`);
     } catch (error) {
+      engineFailure = error;
+      // Log the actual failure before browser-dependent diagnostics or cleanup.
+      console.error(`Failure in ${name} at ${activePage?.url() ?? 'startup'}: ${error.stack ?? error}`);
+      record('test failure', { message: error.message, stack: error.stack });
       if (activePage && !activePage.isClosed()) {
-        console.error(`Failure in ${name} at ${activePage.url()}`);
-        console.error(await activePage.locator('#feature-benchmark-status, #feature-build-identity').allTextContents().catch(() => []));
-        await activePage.screenshot({ path: `${artifacts}/benchmark-dashboard-${name}-failure.png`, fullPage: true }).catch(() => {});
+        const status = await bounded(activePage.locator('#feature-benchmark-status, #feature-build-identity').allTextContents(), 4000, 'Failure status capture')
+          .catch(diagnostic => [`Status unavailable: ${diagnostic.message}`]);
+        console.error(status);
+        await bounded(activePage.screenshot({ path: `${artifacts}/benchmark-dashboard-${name}-failure.png`, fullPage: true, timeout: 5000 }), 6000, 'Failure screenshot')
+          .catch(diagnostic => console.error(`Screenshot unavailable: ${diagnostic.message}`));
       }
       throw error;
-    } finally { await browser.close(); }
+    } finally {
+      serverFault = undefined;
+      try { await bounded(browser.close(), 10000, 'Browser cleanup'); }
+      catch (error) { console.error(error.message); if (!engineFailure) throw error; }
+    }
   }
 } finally { clearTimeout(deadline); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }

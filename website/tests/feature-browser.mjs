@@ -10,6 +10,14 @@ const meta = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url)); mkdirSync(artifacts, { recursive: true });
 const server = createPreview({ base: meta.base }); server.listen(0, '127.0.0.1'); await once(server, 'listening');
 const origin = `http://127.0.0.1:${server.address().port}`;
+async function bounded(promise, timeoutMs, label) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} exceeded ${timeoutMs} ms`)), timeoutMs);
+    })]);
+  } finally { clearTimeout(timer); }
+}
 // A normal navigation restores the template placeholder; bfcache can restore
 // the cleared stopped page. Both must have no record data or active session.
 async function assertEmptySession(page, panels) {
@@ -68,7 +76,7 @@ try {
   for (const name of browserNames) {
     assert.ok(['chromium', 'firefox', 'webkit'].includes(name));
     const browser = await ({ chromium, firefox, webkit })[name].launch({ headless: true, ...(name === 'chromium' && process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE, args: ['--no-sandbox'] } : {}) });
-    let activePage;
+    let activePage, recordDiagnostic, engineFailure;
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const page = activePage = await context.newPage(), errors = [], diagnostics = [];
@@ -76,6 +84,7 @@ try {
         diagnostics.push({ at: new Date().toISOString(), page: source.url(), ...entry });
         writeFileSync(`${artifacts}/feature-events-${name}.json`, JSON.stringify(diagnostics, null, 2));
       };
+      recordDiagnostic = record;
       const observe = observed => {
         observed.on('pageerror', error => { errors.push(error.message); record({ type: 'pageerror', message: error.message, stack: error.stack }, observed); });
         observed.on('requestfailed', request => record({ type: 'requestfailed', url: request.url(), resource: request.resourceType(), failure: request.failure() }, observed));
@@ -190,7 +199,7 @@ try {
       await page.screenshot({ path: `${artifacts}/feature-explorer-${name}-mobile.png`, fullPage: true });
       assert.deepEqual(errors, []); await context.close();
       const plainContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
-      const plain = await plainContext.newPage();
+      const plain = activePage = await plainContext.newPage();
       await plain.goto(origin + meta.base + 'explorer/'); await plain.waitForURL(origin + meta.base + 'compare/');
       assert.match(await plain.locator('h1').innerText(), /product/i);
       await plain.goto(origin + meta.base + 'docs/memory-comparison/');
@@ -215,12 +224,20 @@ try {
       } finally { staticServer.closeAllConnections(); await new Promise(resolve => staticServer.close(resolve)); }
       console.log(`Passed ${name}: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, headerless comparison workers, historical no-JS memory charts and mobile layout at ${meta.base}`);
     } catch (error) {
+      engineFailure = error;
+      // Preserve the original failure before any browser-dependent diagnostics.
+      console.error(`Failure in ${name} at ${activePage?.url() ?? 'startup'}: ${error.stack ?? error}`);
+      recordDiagnostic?.({ type: 'test-failure', message: error.message, stack: error.stack }, activePage);
       if (activePage && !activePage.isClosed()) {
-        console.error(`Failure in ${name} at ${activePage.url()}`);
-        console.error((await activePage.locator('body').innerText().catch(() => '')).slice(0, 5000));
-        await activePage.screenshot({ path: `${artifacts}/feature-failure-${name}.png`, fullPage: true }).catch(() => {});
+        const body = await bounded(activePage.locator('body').innerText({ timeout: 3000 }), 4000, 'Failure body capture').catch(diagnostic => `Body unavailable: ${diagnostic.message}`);
+        console.error(body.slice(0, 5000));
+        await bounded(activePage.screenshot({ path: `${artifacts}/feature-failure-${name}.png`, fullPage: true, timeout: 5000 }), 6000, 'Failure screenshot')
+          .catch(diagnostic => console.error(`Screenshot unavailable: ${diagnostic.message}`));
       }
       throw error;
-    } finally { await browser.close(); }
+    } finally {
+      try { await bounded(browser.close(), 10000, 'Browser cleanup'); }
+      catch (error) { console.error(error.message); if (!engineFailure) throw error; }
+    }
   }
 } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); clearTimeout(deadline); }

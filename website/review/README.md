@@ -2,6 +2,8 @@
 
 The website rewrite now includes the Rust migration, the consolidated CI setup, and the separate read workloads from benchmark PR #78. The homepage explains shared storage, Snapshot Studio uses real reader workers, and one **Benchmarks** page contains memory and performance. This integration does not change the production collection or Rust implementation.
 
+The integration includes main through `cd711288` and benchmark PR #78 through `06d986ee`. The latter also fixes a hosted Chromium test-driver stall: stale-build and changed-asset faults are injected by the test server, with the same failure assertions and measurement deadlines. Its existing Chromium validation evidence is preserved alongside the Firefox recording below.
+
 ## One benchmark destination
 
 The homepage, desktop/mobile navigation, docs sidebar, search and PR preview point to `/benchmarks/`. Eleven older comparison, benchmark and report URLs redirect to its memory, performance or source-data sections. Original Markdown reports remain downloadable. Historical interactive interfaces run only as internal regression fixtures and are not deployed.
