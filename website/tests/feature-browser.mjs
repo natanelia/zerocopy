@@ -173,7 +173,12 @@ try {
       assert.match(await page.locator('#feature-detail').innerText(), /"priceCents": 0/);
       await page.locator('#feature-stop').click(); await page.locator('#feature-load:not([disabled])').waitFor();
       record({ type: 'phase', name: 'complete benchmark and export' });
+      const setupRequests = [], observeSetup = request => setupRequests.push(request.url());
+      page.on('request', observeSetup);
       await page.goto(origin + meta.base + 'investigation-benchmark/'); await page.locator('#feature-run:not([disabled])').waitFor();
+      page.off('request', observeSetup);
+      assert.equal(setupRequests.filter(url => url.includes('/library/')).length, 0, 'Passive benchmark setup does not load library/Wasm files');
+      assert.match(await page.locator('#feature-build-identity').innerText(), /metadata checked · files verified when you run/);
       const caseIds = ['shared', 'native-full', 'immutable-full', 'immer-full', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
       const baselineIds = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
       const editedPhases = ['editPublicationMs', 'updatePublicationMs'];

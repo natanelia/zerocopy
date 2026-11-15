@@ -43,18 +43,27 @@ async function verifyFiles(hashes, baseURL, signal) {
   }));
   return Object.fromEntries(entries);
 }
-async function loadIdentity(runToken = generation) {
+async function loadIdentity(runToken = generation, verifyAssets = false) {
   const check = ++identityGeneration;
   identityController?.abort();
   const request = identityController = new AbortController();
   identityLoading = true; buildIdentity = assetVerification = undefined;
-  $('feature-build-identity').textContent = 'Checking the current source build and fetched files…';
+  $('feature-build-identity').textContent = verifyAssets ? 'Checking the current source build and fetched files…' : 'Checking the source build metadata…';
   $('feature-build-identity').classList.remove('feature-error'); controls();
   const isCurrent = () => check === identityGeneration && runToken === generation;
   try {
     const value = await fetchJSON(new URL('../../build.json', import.meta.url), request.signal);
     if (!/^[a-f0-9]{40}$/.test(value.sourceCommit) || value.sourceCommit !== document.body.dataset.source) throw new Error('The page and build metadata have different commits; reload this page');
     if (!/^[a-f0-9]{64}$/.test(value.librarySHA256)) throw new Error('Build identity is missing the library hash');
+    // Passive setup must not load library/Wasm bytes. The run action repeats
+    // metadata checks and verifies every asset before it creates any workers.
+    if (!verifyAssets) {
+      if (!isCurrent()) return false;
+      buildIdentity = value;
+      $('feature-build-identity').textContent = `Source ${value.sourceCommit.slice(0, 12)}${value.sourceDirty ? ' · uncommitted build' : ''} · metadata checked · files verified when you run`;
+      $('feature-build-identity').title = value.sourceCommit;
+      return true;
+    }
     const [libraryFilesSHA256, benchmarkFilesSHA256, vendorFilesSHA256] = await Promise.all([
       verifyFiles(value.libraryFilesSHA256, new URL('../library/', import.meta.url), request.signal),
       verifyFiles(value.benchmarkFilesSHA256, new URL('./', import.meta.url), request.signal),
@@ -208,7 +217,7 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
   $('feature-benchmark-progress').max = TOTAL_SAMPLES; $('feature-benchmark-progress').value = 0; $('feature-benchmark-progress').hidden = false;
   let attempt;
   try {
-    const verified = await loadIdentity(token);
+    const verified = await loadIdentity(token, true);
     if (token !== generation) return;
     if (!verified) throw new Error($('feature-build-identity').textContent);
     run.buildIdentity = buildIdentity; run.assetVerification = assetVerification; run.environment = browserDetails;
