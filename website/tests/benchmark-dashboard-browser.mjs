@@ -50,6 +50,54 @@ async function bounded(promise, timeoutMs, label) {
     })]);
   } finally { clearTimeout(timer); }
 }
+const workerLifecycles = new WeakMap();
+function observeWorkers(page) {
+  const state = { created: 0, closed: 0 };
+  workerLifecycles.set(page, state);
+  page.on('worker', worker => {
+    state.created++;
+    worker.once('close', () => { state.closed++; });
+  });
+}
+async function assertWorkersStopped(page, label, timeoutMs = 10000) {
+  // terminate() can return before Chromium's worker-target close notification
+  // reaches Playwright. Await
+  // those events; do not sleep, disconnect handles, or accept a nonzero count.
+  if (page.workers().length) {
+    await new Promise((resolve, reject) => {
+      const watched = new Set();
+      let settled = false, timer;
+      const finish = error => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        page.off('worker', watch);
+        page.off('close', closedPage);
+        for (const worker of watched) worker.off('close', check);
+        error ? reject(error) : resolve();
+      };
+      const check = () => { if (page.workers().length === 0) finish(); };
+      const watch = worker => {
+        if (settled || watched.has(worker)) return;
+        watched.add(worker); worker.on('close', check);
+      };
+      const closedPage = () => finish(new Error(`${label}: page closed before worker shutdown was observed`));
+      timer = setTimeout(() => {
+        const state = workerLifecycles.get(page);
+        finish(new Error(`${label}: worker shutdown exceeded ${timeoutMs} ms; ${JSON.stringify({
+          created: state?.created ?? null, closed: state?.closed ?? null,
+          pendingCount: page.workers().length, pendingURLs: page.workers().map(worker => worker.url()),
+        })}`));
+      }, timeoutMs);
+      page.on('worker', watch);
+      page.on('close', closedPage);
+      for (const worker of page.workers()) watch(worker);
+      // Subscribe before checking again, covering closure during registration.
+      check();
+    });
+  }
+  assert.equal(page.workers().length, 0, label);
+}
 async function downloadResult(page) {
   const pending = page.waitForEvent('download');
   await page.locator('#feature-export').click();
@@ -147,7 +195,7 @@ function assertExport(value, path) {
 }
 async function assertPassive(page, requests, from = 0) {
   await ready(page);
-  assert.equal(page.workers().length, 0, 'Recorded charts start no benchmark workers');
+  await assertWorkersStopped(page, 'Recorded charts retain no benchmark workers');
   assert.equal(requests.slice(from).filter(request => request.includes('/library/')).length, 0, 'Setup, reload and return stay metadata-only');
 }
 async function assertFailedAttempt(page, message, charts, provenance) {
@@ -160,7 +208,7 @@ async function assertFailedAttempt(page, message, charts, provenance) {
   assert.equal(failed.summary, null); assert.equal(failed.legacy.summary, null);
   assert.equal(failed.raw.length + failed.legacy.raw.length, 0);
   assert.match(failed.failures[0].message, message);
-  assert.equal(page.workers().length, 0);
+  await assertWorkersStopped(page, 'Failed attempts release every worker');
   return failed;
 }
 
@@ -195,6 +243,7 @@ try {
       record('metadata-only setup and keyboard disclosures');
       const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
       const page = activePage = await context.newPage(), errors = [], requests = [];
+      observeWorkers(page);
       page.setDefaultTimeout(20000);
       page.on('pageerror', error => errors.push(error.message));
       page.on('request', request => requests.push(request.url()));
@@ -231,7 +280,7 @@ try {
       assertExport(raw, `${artifacts}/benchmark-dashboard-${name}.json`);
       record('completed benchmark exported and independently verified');
       await assertCharts(page, raw);
-      assert.equal(page.workers().length, 0, 'Completed runs release every owner and reader');
+      await assertWorkersStopped(page, 'Completed runs release every owner and reader');
       await capture(page, `benchmark-dashboard-${name}-device-desktop.png`);
       record('cancelled attempt preserves completed evidence');
       const completed = await chartData(page);
@@ -250,7 +299,7 @@ try {
       assert.ok(cancelled.value.raw.length + cancelled.value.legacy.raw.length > 0, 'Export keeps samples completed before Stop');
       assert.ok(cancelled.value.raw.length + cancelled.value.legacy.raw.length < 162, 'Interrupted attempt is never exported as complete');
       assert.ok(cancelled.value.failures.length > 0);
-      assert.equal(page.workers().length, 0, 'Stop releases workers');
+      await assertWorkersStopped(page, 'Stop releases workers');
 
       serverFault = 'metadata';
       record('changed build metadata enabled in test HTTP server');
@@ -302,13 +351,13 @@ try {
       await failedContext.addInitScript(() => {
         window.Worker = class { constructor() { throw new Error('Dashboard test worker startup failure'); } };
       });
-      const failed = activePage = await failedContext.newPage(); await failed.goto(url); await ready(failed);
+      const failed = activePage = await failedContext.newPage(); observeWorkers(failed); await failed.goto(url); await ready(failed);
       await failed.locator('#feature-run').click();
       await assertFailedAttempt(failed, /Dashboard test worker startup failure/, await chartData(failed), await failed.locator('#feature-result-origin').innerText());
       assert.equal(await failed.locator('#feature-result-origin').getAttribute('data-result-origin'), 'recorded');
       assert.equal(await failed.locator('#feature-recorded-export').isVisible(), true);
       await assertCharts(failed, recorded);
-      assert.equal(failed.workers().length, 0); await failedContext.close();
+      await assertWorkersStopped(failed, 'Startup failure leaves no workers'); await failedContext.close();
       record('all dashboard assertions passed');
       console.log(`Passed ${name}: memory-first SSR, recorded provenance, one-click v4 run/export, all read and legacy medians, keyboard disclosure, partial cancel/worker failure, stale metadata and asset rejection, navigation, and 320px/390px layouts.`);
     } catch (error) {
