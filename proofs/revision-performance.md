@@ -60,6 +60,6 @@ Bulk vector input becomes stored value blocks rather than a second staging copy.
 
 The [CI summary](results/readme-ci-summary.json) records exact medians, ratios, allocations, environment details, and checksums. The [raw artifact](https://github.com/natanelia/zerocopy/actions/runs/34764774485/artifacts/10319983686) holds all timing samples, worker results, and allocation records. Its recorded retention end is October 13, 2026; the committed summary remains.
 
-Use the [revision driver](run-revision.mjs) with the pinned source checkouts and the commands in the [revision workflow](../.github/workflows/performance-revision.yml). Build all compared engines with matching dependencies. Keep new output separate from the recorded summary.
+Use the [revision driver](run-revision.mjs) with the pinned source checkouts and the commands in the [revision workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/performance-revision.yml). Build all compared engines with matching dependencies. Keep new output separate from the recorded summary.
 
 The [initial performance report](README.md#initial-persistent-engine-experiment) and `results/local.json` describe the earlier implementation, not this revision.

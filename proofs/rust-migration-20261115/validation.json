@@ -1,0 +1,118 @@
+{
+  "baselineCommit": "b4c08def84b905026632bfd27612da4efef0a3f0",
+  "unitTests": {
+    "command": "bun --bun node_modules/vitest/vitest.mjs run --pool=forks --maxWorkers=2",
+    "passed": 1260,
+    "files": 66,
+    "failed": 0
+  },
+  "nodeTests": {
+    "command": "node --test --test-concurrency=1 --test-timeout=15000 scripts/rust-wasm.node.mjs proofs/worker-tasks.mjs proofs/worker-task-lifecycle.node.mjs proofs/list-query.mjs proofs/list-query-regression.mjs proofs/memory-startup.mjs",
+    "passed": 58,
+    "failed": 0
+  },
+  "buildGuardTests": {
+    "passed": 7,
+    "includesRenamedStackRejection": true
+  },
+  "typechecks": [
+    "main",
+    "typed-values (exactOptionalPropertyTypes true and false)",
+    "redux",
+    "geometry",
+    "worker"
+  ],
+  "documentation": {
+    "examples": 19,
+    "preservedNumericalRows": 77,
+    "recordedEvidenceChanges": 0
+  },
+  "installedPackageChecks": [
+    "Node exports",
+    "Bun exports",
+    "immutable snapshots",
+    "real Node worker sharing",
+    "TypeScript consumer"
+  ],
+  "builds": {
+    "persistent-core": {
+      "functions": 83,
+      "instructions": 26512,
+      "readOnlyFunctions": 25,
+      "dataSegments": 0,
+      "linearStackUses": 0,
+      "promoted": 277,
+      "instanceGlobals": [
+        "batch_change",
+        "capacity",
+        "heap_end",
+        "inserted_count",
+        "write_map_root",
+        "write_map_size",
+        "writer_first_valid",
+        "writer_index_root"
+      ],
+      "bytes": 54845,
+      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a"
+    },
+    "numeric-kernels": {
+      "functions": 4,
+      "instructions": 533,
+      "readOnlyFunctions": 4,
+      "dataSegments": 0,
+      "linearStackUses": 0,
+      "promoted": 0,
+      "instanceGlobals": [],
+      "bytes": 1297,
+      "sha256": "b8938625b09c1cf191a277b3e8be046525b1264a59ab446be04809be2d905043"
+    },
+    "numeric-kernels-simd": {
+      "functions": 4,
+      "instructions": 641,
+      "readOnlyFunctions": 4,
+      "dataSegments": 0,
+      "linearStackUses": 0,
+      "promoted": 0,
+      "instanceGlobals": [],
+      "bytes": 1529,
+      "sha256": "951137eccac6fdad93b3dbd281564d7db297eb81b56332e2e90a067d1ed3d007"
+    },
+    "geometry-kernels": {
+      "functions": 6,
+      "instructions": 417,
+      "readOnlyFunctions": 6,
+      "dataSegments": 0,
+      "linearStackUses": 0,
+      "promoted": 8,
+      "instanceGlobals": [
+        "bbox_max_x",
+        "bbox_max_y",
+        "bbox_min_x",
+        "bbox_min_y"
+      ],
+      "bytes": 1199,
+      "sha256": "36da9253c5cf3eeb7bc863a85747a666a9009557855cde73f6f8400a6d486804"
+    }
+  },
+  "productionCommitBeforeGeometryTuning": "9a2d32e40004934da7b071d94d1caf576e521a6c",
+  "coreAndSharedEntryUnchangedAfterGeometryTuning": true,
+  "initialMainCI": {
+    "commit": "9a2d32e40004934da7b071d94d1caf576e521a6c",
+    "result": "success",
+    "url": "https://github.com/natanelia/zerocopy/actions/runs/43651233667",
+    "includes": [
+      "browser workers/isolation",
+      "npm package",
+      "all types and tests"
+    ]
+  },
+  "secondaryCIHarnessFix": "Geometry byte-integrity test had a 5-second timeout while Vitest compared an inherited arena byte by byte. Reset its arena and use native full-buffer equality, retaining every byte check. Applied native equality to the new JSON-view integrity tests too.",
+  "geometryFollowup": {
+    "focusedTestsPassed": 63,
+    "files": 4,
+    "rawABICalls": 80,
+    "rawABIComponents": 320,
+    "fullMemoryNoWriteChecks": 80,
+    "parityRerunPassed": true
+  }
+}

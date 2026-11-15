@@ -3,12 +3,14 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { kernelSourceFiles } from './kernel-provenance.mjs';
 
 export const BASELINE_COMMIT = '3773c6e519c7c0958da13727ed1082f449f3ee25';
 export const ALLOWED_SOURCE_CHANGES = ['arena.ts', 'shared.ts'];
 export const GUARD_SCOPE = {
   root: 'Root TS/JS source files excluding .test/.spec files, root WASM binaries, package.json, tsconfig*.json, and bunfig.toml/json',
   scripts: 'Direct scripts/build-* and scripts/build.* files',
+  kernels: 'Rust source modules, Cargo/toolchain/ABI configuration, and the WASM finishing pass when present; legacy root AS sources otherwise',
   boundary: 'Scoped to this repository layout and the pinned baseline; not a recursive universal build-input graph',
 };
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -24,7 +26,7 @@ export function sourcePaths(root) {
   if (existsSync(scripts)) for (const entry of readdirSync(scripts, { withFileTypes: true })) {
     if ((entry.isFile() || entry.isSymbolicLink()) && /^build[-.]/.test(entry.name)) paths.push(`scripts/${entry.name}`);
   }
-  return paths.sort();
+  return [...new Set([...paths, ...kernelSourceFiles(root)])].sort();
 }
 export function manifest(root, paths) {
   const files = [...new Set(paths)].sort().map(path => {

@@ -26,15 +26,29 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.2'
+      - name: Install pinned Rust compiler and WASM target
+        uses: ./.github/actions/setup-rust
       - run: bun install
       - run: bun run build:wasm
+      - name: Verify Rust WASM build rejection guards
+        run: node --test scripts/rust-wasm.node.mjs
+      - name: Verify aligned and unaligned geometry reads
+        run: node proofs/rust-migration-20261115/geometry-abi.mjs
       - run: bun run build:browser && bun run build:types
+      - name: Verify Rust kernels with real workers
+        run: node proofs/rust-migration-20261115/workers.mjs
       - run: bun run typecheck
       - run: bun run typecheck:redux
       - run: bun run typecheck:values
       - run: bun run typecheck:geometry
       - name: Check public worker task declarations
         run: bunx tsc --noEmit -p tsconfig.worker.json
+      - name: Check optional numeric and text-search declarations
+        run: |
+          bunx tsc --noEmit -p tsconfig.numeric.json
+          bunx tsc --noEmit -p tsconfig.text-search.json
+      - name: Check diagnostic selection and evidence safeguards
+        run: node --test scripts/ci/diagnostics.node.mjs
       - name: Run unit and integration tests
         shell: bash
         run: bun run test 2>&1 | tee vitest.log
@@ -61,11 +75,21 @@ jobs:
           fi
       - name: Check examples from Markdown
         run: node scripts/check-doc-examples.mjs
+      - name: Check distinct native and worker regressions
+        shell: bash
+        env:
+          CI_REGRESSION_ARTIFACTS: proofs/results/ci-regressions
+        run: node scripts/ci/check-regressions.mjs native 2>&1 | tee native-regressions.log
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
       - name: Run all real Chromium integration tests
         shell: bash
         run: bun run test:browser 2>&1 | tee browser.log
+      - name: Check checkpoint, heap, and batched-list browser workers
+        shell: bash
+        env:
+          CI_REGRESSION_ARTIFACTS: proofs/results/ci-regressions
+        run: node scripts/ci/check-regressions.mjs browser 2>&1 | tee browser-regressions.log
       - name: Check documented browser workers and isolation guards
         run: node scripts/check-doc-browser.mjs
       - name: Check typed task examples from Markdown
@@ -108,6 +132,9 @@ jobs:
           path: |
             vitest.log
             browser.log
+            native-regressions.log
+            browser-regressions.log
+            proofs/results/ci-regressions/
             worker-tasks.log
             worker-docs.log
             dist/

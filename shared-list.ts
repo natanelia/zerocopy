@@ -1,6 +1,7 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
+import { JsonView } from './json-view';
 import { compileStringSearch, type TextSearchOptions } from './text-search';
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
@@ -75,6 +76,20 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     }
     const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
     return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
+  }
+  /** Read selected JSON fields from shared bytes without decoding/freezing the whole value. */
+  getView(this: T extends 'object' ? SharedList<T> : never, index: number): JsonView | undefined {
+    if (this.type !== 'object') throw new TypeError('JSON views require an object list');
+    if (!validIndex(index, this.size)) return undefined;
+    const block = index >>> 5, a = this.arena;
+    if (block !== this.#readBlock) {
+      this.#readAddress = block === ((this.size - 1) >>> 5)
+        ? this.tail : a.wasm.vecLeaf(this.root, this.depth, index) >>> 0;
+      this.#readView ??= a.dv;
+      this.#readBlock = block;
+    }
+    const view = this.#readView!, pointer = view.getFloat64(this.#readAddress + (index & 31) * 8, true);
+    return new JsonView(a, pointer + 4, view.getUint32(pointer, true));
   }
   /** Compile a literal substring predicate bound to this immutable snapshot.
    * Valid indices match like get(index).includes(term), or lowercase/includes

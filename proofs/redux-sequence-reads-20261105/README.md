@@ -309,7 +309,7 @@ Coverage includes block/tree boundaries and dequeued offsets, booleans, signed
 zero, NaN/infinities, explicit cached stack tops, all codec limits, Unicode and
 frozen/nested values, exact errors, getter receiver/call counts, changing
 prototype readers, decoder recursion, custom Arena subclasses and memory
-growth. The [dedicated CI workflow](../../.github/workflows/redux-sequence-reads.yml)
+growth. The [dedicated CI workflow](https://github.com/natanelia/zerocopy/blob/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows/redux-sequence-reads.yml)
 runs correctness checks and verifies the saved evidence; it does not rerun
 performance timings.
 

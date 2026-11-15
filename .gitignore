@@ -6,7 +6,9 @@ bun.lock
 # Build outputs
 dist/
 build/
+rust/target/
 *.wasm
+*.wat
 
 # IDE
 .vscode/

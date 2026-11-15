@@ -17,11 +17,11 @@ Map keys are strings. Set values are strings or numbers. Other collections take 
 | `'string'` | UTF-8 text |
 | `'number'` | JavaScript number |
 | `'boolean'` | Boolean |
-| `'object'` | JSON data, decoded into deeply frozen values |
+| `'object'` | JSON data; `get()` decodes deeply frozen values, while supported `getView()` reads stay on the stored bytes |
 | `json<T>()` | The object codec with TypeScript-checked fields and deeply read-only reads |
 | `'SharedMap<number>'`, for example | A nested shared collection snapshot |
 
-The `'object'` codec is not an arbitrary-object serializer. Functions, prototypes, cycles, and object identity are not preserved as general JavaScript values. Inserting JSON data involves serialization; reading it involves decoding. `toArray()` and entry tuples are detached containers, not shared JavaScript arrays.
+The `'object'` codec is not an arbitrary-object serializer. Functions, prototypes, cycles, and object identity are not preserved as general JavaScript values. Inserting JSON data involves serialization; materializing it involves decoding. `toArray()` and entry tuples are detached containers, not shared JavaScript arrays.
 
 ## Choose a collection
 
@@ -87,7 +87,52 @@ The value-bearing helpers are `map`, `list`, `stack`, `queue`, `linkedList`, `do
 
 The generic type is retained in `WorkerData<T>`, `initWorker()`, `compact()`, and `compactMany()`. A worker message received as `unknown` still needs the application's matching transport type and validation at the message boundary. Type annotations do not validate a different process's input. The legacy `initWorker<T>(untypedData)` form remains available; its explicit type argument is a caller assertion, not a check of the payload.
 
-This feature keeps JSON byte storage. Writes serialize the value; a read cache miss decodes a local, deeply frozen object. It does not provide direct shared-memory field access or binary records. Existing Redux import checks remain in place; they are separate from ordinary collection writes.
+This feature keeps JSON byte storage. Writes serialize the value; a `get()` cache miss decodes a local, deeply frozen object. For selected fields, use the separate view API below. Existing Redux import checks remain in place; they are separate from ordinary collection writes.
+
+## Read selected JSON fields
+
+`SharedMap.getView(key)` and `SharedList.getView(index)` return a `JsonView` for an `'object'` or `json<T>()` value. A missing key or index returns `undefined`. Other value codecs reject this method. Existing `get()` behavior is unchanged.
+
+<!-- example: json-view -->
+```ts
+import { SharedMap, SharedList, JsonView } from 'zerocopy';
+
+const products = new SharedMap('object').set('headphones', {
+  name: 'Wireless headphones', stock: 12,
+  details: { color: 'black' }, tags: ['audio', 'portable'],
+});
+const product = products.getView('headphones')!;
+
+product.get('stock');                 // 12
+product.equals('name', 'Wireless headphones'); // true
+product.has('missing');               // false
+
+const details = product.get('details');
+if (details instanceof JsonView) details.get('color'); // 'black'
+
+const rows = new SharedList('object').push([10, 20]);
+rows.getView(0)?.at(1);               // 20
+
+const editable = product.toObject(); // Fresh, detached, mutable JS object
+editable.stock = 0;
+product.get('stock');                // Still 12
+```
+
+| View operation | Result |
+| --- | --- |
+| `get(field)` | An own object field as a scalar or nested `JsonView`; `undefined` if absent or the view is not an object |
+| `has(field)` | Whether an own object field exists, without materializing its value |
+| `equals(field, scalar)` | Scalar equality; string comparisons inspect the stored bytes without creating a decoded value string |
+| `at(index)` | An array element as a scalar or nested `JsonView`; `undefined` for an invalid index or a non-array |
+| `value()` | A root scalar, or the same view for an object or array |
+| `type` | `'object'`, `'array'`, `'string'`, `'number'`, `'boolean'`, or `'null'` |
+| `byteLength` | The selected value's UTF-8 byte length, computed lazily for nested values |
+| `toObject({ freeze?: boolean })` | A fresh detached JS value; deep freezing is opt-in with `{ freeze: true }` |
+| `toJSON()` | Materializes a detached value; `JSON.stringify(view)` invokes this method |
+
+Views retain their immutable record and remain valid after collection updates and memory growth. They do not expose writable bytes or create a decoded object cache. View wrappers are small JavaScript objects; returning a selected string decodes that string, and decimal, exponent, or large integer tokens use JavaScript number conversion for the same rounding as normal JSON reads. Unselected values are not converted into JavaScript objects or frozen.
+
+Field and index lookup scans the preceding members or elements without building an index. Repeated reads of many fields can therefore favor an ordinary cached `get()`. Choose views when you need selected fields or predicates and want to avoid materializing the full record. `json<T>()` keeps its typed `get()` contract; a view exposes JSON value kinds rather than promising a typed object tree.
 
 ## Maps
 

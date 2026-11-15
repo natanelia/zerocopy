@@ -9,11 +9,33 @@ const acceptsSharedInput = (() => {
   }
 })();
 
+const nativeDecode = TextDecoder.prototype.decode;
+const READ_SCRATCH_BYTES = 65536;
+let readScratch: Uint8Array | undefined;
+let readingShared = false;
+
+function decodeSharedUtf8(decoder: TextDecoder, bytes: Uint8Array): string {
+  if (readingShared || bytes.byteLength > READ_SCRATCH_BYTES) {
+    const input = bytes.slice();
+    return decoder.decode(input);
+  }
+  readingShared = true;
+  try {
+    const scratch = readScratch ??= new Uint8Array(READ_SCRATCH_BYTES);
+    scratch.set(bytes);
+    const input = scratch.subarray(0, bytes.byteLength);
+    // Preserve the original copy-before-getter order. A replaced decoder may
+    // retain its argument or reenter; only the native method borrows scratch.
+    const decode = decoder.decode;
+    return Reflect.apply(decode, decoder, [decode === nativeDecode ? input : input.slice()]);
+  } finally {
+    readingShared = false;
+  }
+}
+
 export function decodeUtf8(decoder: TextDecoder, bytes: Uint8Array): string {
-  const input = !acceptsSharedInput && bytes.buffer instanceof SharedArrayBuffer
-    ? bytes.slice()
-    : bytes;
-  return decoder.decode(input);
+  if (!acceptsSharedInput && bytes.buffer instanceof SharedArrayBuffer) return decodeSharedUtf8(decoder, bytes);
+  return decoder.decode(bytes);
 }
 
 const supportsEncodeInto = typeof TextEncoder.prototype.encodeInto === 'function';

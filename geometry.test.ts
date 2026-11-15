@@ -1,7 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { Buffer } from 'node:buffer';
 import { bboxXY } from './geometry';
 import { SharedList, resetSharedList } from './shared-list';
 import { getWorkerData, initWorker } from './shared';
+
+// Vitest shares modules across files. Keep the byte-integrity assertion scoped
+// to this test's arena, rather than a large arena left by another test suite.
+beforeEach(() => resetSharedList());
 
 describe('bboxXY', () => {
   it('returns independent bounds with exact signed-zero and NaN handling', () => {
@@ -27,7 +32,8 @@ describe('bboxXY', () => {
     expect(bboxXY(attached)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(p)).toEqual([0, 0, 2, 3]);
     expect(bboxXY(newer)).toEqual([-99, 0, 4, 4]);
-    expect(new Uint8Array(memory.buffer)).toEqual(before);
+    // Compare every byte without the test framework building a large diff tree.
+    expect(Buffer.from(memory.buffer).equals(Buffer.from(before.buffer))).toBe(true);
   });
   it('keeps old arenas and separate kernel instances independent', () => {
     const old = new SharedList('number').pushMany([0, 1, 2, 3]);

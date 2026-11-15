@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { cpus } from 'node:os';
 import { createHash } from 'node:crypto';
+import { kernelCompiler, withKernelSources } from './kernel-provenance.mjs';
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { Map as ImmutableMap, OrderedMap as ImmutableOrderedMap, List as ImmutableList, Stack as ImmutableStack } from 'immutable';
 import { SharedMap, SharedList, SharedStack, SharedQueue, SharedLinkedList, SharedDoublyLinkedList, SharedOrderedMap, SharedSortedMap } from '../shared';
@@ -179,11 +180,11 @@ for (const key of rowKeys) {
   }
 }
 const root = new URL('../', import.meta.url);
-const engineFiles = readdirSync(root).filter(f => /^(arena|read-cache|codec|compaction|set-key|types|utf8|wasm-utils|shared.*|persistent-core\.as)\.ts$/.test(f) && !f.endsWith('.test.ts')).sort();
+const engineFiles = withKernelSources(root, readdirSync(root).filter(f => /^(arena|read-cache|codec|compaction|set-key|types|utf8|wasm-utils|freeze-json|json-view|shared.*)\.ts$/.test(f) && !f.endsWith('.test.ts')));
 const hash = createHash('sha256');
 for (const file of engineFiles) hash.update(file + '\0').update(readFileSync(new URL(file, root))).update('\0');
 const result = { schema: 1, sourceCommit: process.env.SOURCE_COMMIT ?? 'uncommitted; use engineSHA256', measuredAt: new Date().toISOString(), round, N, warmups, includeArenaSetup, caseFilter: process.env.CASE_FILTER ?? null,
-  runtime: { bun: Bun.version, platform: process.platform, arch: process.arch, cpu: cpus()[0].model, immutable: JSON.parse(readFileSync(new URL('node_modules/immutable/package.json', root), 'utf8')).version, assemblyscript: JSON.parse(readFileSync(new URL('node_modules/assemblyscript/package.json', root), 'utf8')).version },
+  runtime: { bun: Bun.version, platform: process.platform, arch: process.arch, cpu: cpus()[0].model, immutable: JSON.parse(readFileSync(new URL('node_modules/immutable/package.json', root), 'utf8')).version, kernelCompiler: kernelCompiler(root) },
   engineFiles, engineSHA256: hash.digest('hex'), wasmSHA256: createHash('sha256').update(readFileSync(new URL('persistent-core.wasm', root))).digest('hex'), benchmarkSHA256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'), rows };
 const output = process.argv[2] ?? `proofs/results/readme-libraries-round-${round}.json`;
 mkdirSync(new URL('proofs/results/', root), { recursive: true });

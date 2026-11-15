@@ -4,7 +4,7 @@ import {
   SharedSet, SharedOrderedSet, SharedSortedSet, json, list, map, stack, queue,
   linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue,
   set, orderedSet, sortedSet, getWorkerData, initWorker, compact, compactMany,
-  type DeepReadonly, type ValueOf, type JsonType, type WorkerData,
+  type DeepReadonly, type ValueOf, type JsonType, type WorkerData, type JsonView, type JsonViewValue,
 } from '../dist/types/shared';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
@@ -26,6 +26,10 @@ const input: Lane = {
 };
 const lanes = new SharedMap(LaneValue).set('lane-1', input);
 const lane = lanes.get('lane-1');
+const laneView = lanes.getView('lane-1');
+const viewField = laneView?.get('speedLimit');
+type TypedMapView = Assert<Equal<typeof laneView, JsonView | undefined>>;
+type ViewField = Assert<Equal<typeof viewField, JsonViewValue | undefined>>;
 type MapRead = Assert<Equal<typeof lane, DeepReadonly<Lane> | undefined>>;
 type NoAny = Assert<Equal<IsAny<NonNullable<typeof lane>>, false>>;
 type Descriptor = Assert<Equal<typeof LaneValue, JsonType<Lane>>>;
@@ -68,6 +72,8 @@ lanes.forEach(value => {
 lanes.setMany([['bad', { ...input, speedLimit: false }]]);
 
 const laneList = new SharedList(LaneValue).push(input).pushMany([input]).set(0, input);
+const laneListView = laneList.getView(0);
+type TypedListView = Assert<Equal<typeof laneListView, JsonView | undefined>>;
 const editedLanes = laneList.setMany([[0, input], [1, input]] as const);
 type ListBatch = Assert<Equal<typeof editedLanes, typeof laneList>>;
 // @ts-expect-error Indexed bulk updates keep the descriptor's object shape.
@@ -129,6 +135,18 @@ type InvalidSet = Assert<Equal<ValueOf<'SharedSet<object>'>, never>>;
 const numberMap = new SharedMap('number').set('n', 1);
 type PrimitiveRead = Assert<Equal<ReturnType<typeof numberMap.get>, number | undefined>>;
 new SharedMap('object').set('legacy', { unrestricted: true });
+new SharedMap('object').getView('legacy');
+new SharedList('object').getView(0);
+// @ts-expect-error Number map records are not JSON byte records.
+new SharedMap('number').getView('n');
+// @ts-expect-error String map records are not JSON byte records.
+new SharedMap('string').getView('s');
+// @ts-expect-error Number list elements are not JSON byte records.
+new SharedList('number').getView(0);
+// @ts-expect-error String list elements are not JSON byte records.
+new SharedList('string').getView(0);
+// @ts-expect-error Nested collection descriptors do not use the JSON object codec.
+tiles.getView('tile');
 
 const compacted = compact(lanes);
 type Compacted = Assert<Equal<typeof compacted, typeof lanes>>;

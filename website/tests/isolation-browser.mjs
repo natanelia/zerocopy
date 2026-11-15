@@ -7,6 +7,10 @@ import { createPreview } from '../serve.mjs';
 import { ATTEMPT_PARAMETER } from '../assets/isolation.mjs';
 import { cacheEarlyRegistration } from './isolation-registration-cache.mjs';
 
+// Alternate URL prefixes need real hosting/worker coverage, while the deployment
+// target also runs every failure-recovery and concurrency regression below.
+const hostingOnly = process.argv.includes('--hosting-only');
+assert.ok(process.argv.slice(2).every(argument => argument === '--hosting-only'), 'Unknown isolation test option');
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR || fileURLToPath(new URL('../artifacts/', import.meta.url));
 mkdirSync(artifacts, { recursive: true });
 const { base } = JSON.parse(readFileSync(new URL('../_site/build.json', import.meta.url)));
@@ -65,7 +69,7 @@ async function navigations(page) {
 for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'webkit']) {
   assert.ok(['chromium', 'webkit'].includes(name));
   const browser = await ({ chromium, webkit })[name].launch({ headless: true });
-  const errors = [];
+  const errors = [], workerChecks = [];
   try {
     for (const isolated of [true, false]) {
       const server = createPreview({ base, isolated });
@@ -101,10 +105,27 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
         await page.goto(origin + base + 'docs/getting-started/');
         assert.equal(await page.evaluate(() => navigator.serviceWorker.controller), null, 'Demo workers must not control the guides');
         assert.deepEqual(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).map(value => value.scope).sort()), isolated ? [] : demos.map(([route]) => origin + base + route).sort());
+        if (hostingOnly) {
+          // Follow actual module URLs under this prefix and require a worker to
+          // observe an edit while keeping its original immutable snapshot.
+          await page.goto(origin + base + 'playground/'); await ready(page, 'start-playground');
+          await page.locator('#start-playground').click();
+          await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '12');
+          await page.locator('#stock').fill('6'); await page.locator('#apply-edit').click();
+          await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '6');
+          assert.match(await page.locator('#owner-value').innerText(), /^6\s*units$/);
+          assert.match(await page.locator('#retained-value').innerText(), /^12\s*units$/);
+          assert.ok(workers.length > 0, 'The hosting check must start a real application worker');
+          assert.ok(workers.every(url => url.startsWith(origin + base + 'playground/')), 'Worker modules must stay under the deployment prefix');
+          workerChecks.push({ hosting: isolated ? 'headers' : 'service-worker', current: 6, retained: 12,
+            workerPaths: workers.map(url => new URL(url).pathname) });
+          await page.screenshot({ path: `${artifacts}/hosting-${name}-${isolated ? 'headers' : 'service-worker'}.png` });
+          await page.locator('#stop-playground').click();
+        }
         await context.close();
-        console.log(`Passed: ${name}, all ${demos.length} demos, automatic first visit, return visit, preserved URL, no data work (${isolated ? 'headers' : 'no headers'}).`);
+        console.log(`Passed: ${name}, all ${demos.length} demos, automatic first visit, return visit, preserved URL, no setup data work${hostingOnly ? ', and real worker snapshot update' : ''} (${isolated ? 'headers' : 'no headers'}).`);
 
-        if (isolated) continue;
+        if (isolated || hostingOnly) continue;
         // A real first visit while all web-storage access throws. No storage-based loop guard.
         const storage = await browser.newContext();
         await storage.addInitScript(() => {
@@ -245,7 +266,7 @@ for (const name of process.env.ISOLATION_BROWSERS?.split(',') || ['chromium', 'w
       } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
     }
     assert.deepEqual(errors, []);
-    writeFileSync(`${artifacts}/isolation-${name}.json`, JSON.stringify({ status: 'verified', engine: name, browserVersion: browser.version(), base, routes: demos.map(([route]) => route), hosting: ['headers', 'service-worker'] }, null, 2) + '\n');
+    writeFileSync(`${artifacts}/isolation-${name}.json`, JSON.stringify({ status: 'verified', coverage: hostingOnly ? 'hosting-only' : 'full', engine: name, browserVersion: browser.version(), base, routes: demos.map(([route]) => route), hosting: ['headers', 'service-worker'], workerChecks }, null, 2) + '\n');
   } finally { await browser.close(); }
 }
 console.log(`Automatic isolation verified at ${base}. No enable click was used on successful first visits.`);
