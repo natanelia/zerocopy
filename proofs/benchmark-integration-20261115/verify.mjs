@@ -1,10 +1,12 @@
 /** Recompute a completed v4 export without rerunning or importing its statistics. */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { gunzipSync } from 'node:zlib';
 
 const file = process.argv[2];
 if (!file) throw new Error('Usage: node proofs/benchmark-integration-20261115/verify.mjs EXPORT.json');
-const data = JSON.parse(readFileSync(file, 'utf8'));
+const bytes = readFileSync(file);
+const data = JSON.parse((file.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
 assert.equal(data.schema, 'zerocopy-product-catalog-browser/v4');
 assert.equal(data.status, 'complete');
 assert.equal(data.identityStatus, 'verified');

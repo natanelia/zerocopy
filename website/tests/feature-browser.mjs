@@ -277,13 +277,17 @@ try {
           visibleIds.map(id => `${raw.summary[id][phase].median.toFixed(2)} ms`), `${phase}: displayed bars match measured medians`);
       }
       writeFileSync(`${artifacts}/feature-benchmark-${name}.json`, JSON.stringify(suite, null, 2));
+      await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: `${artifacts}/feature-benchmark-${name}-desktop.png`, fullPage: true });
       await page.locator('#feature-benchmark-results').scrollIntoViewIfNeeded();
       await page.screenshot({ path: `${artifacts}/feature-benchmark-${name}-results.png` });
       for (const width of [390, 320]) {
         await page.setViewportSize({ width, height: 844 });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name} ${width}px completed benchmark`);
-        if (width === 390) await page.screenshot({ path: `${artifacts}/feature-benchmark-${name}-mobile.png`, fullPage: true });
+        if (width === 390) {
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.screenshot({ path: `${artifacts}/feature-benchmark-${name}-mobile.png`, fullPage: true });
+        }
       }
       await page.setViewportSize({ width: 1440, height: 1000 });
       record({ type: 'phase', name: 'benchmark build identity is checked again before every run' });
