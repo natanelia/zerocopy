@@ -1,7 +1,8 @@
 {
-  "sourceCommit": "e9ae75712fcd883821c0b6ff4fe88b3c79b58cce",
+  "sourceCommit": "a0ba7eabb5d5f4da82c0da7214849d41fe099c12",
   "base": "/zerocopy/",
-  "browser": "153.0.8010.0",
+  "engine": "firefox",
+  "browser": "155.0",
   "reducedMotion": true,
   "captures": [
     {
@@ -54,13 +55,13 @@
     }
   ],
   "studio": {
-    "workers": 3,
     "currentRevision": 2,
     "currentStock": 4,
     "pinnedStock": [
       12,
       7,
       12
-    ]
+    ],
+    "workers": 3
   }
 }

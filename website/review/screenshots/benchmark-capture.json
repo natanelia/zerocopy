@@ -1,7 +1,8 @@
 {
-  "sourceCommit": "e9ae75712fcd883821c0b6ff4fe88b3c79b58cce",
+  "sourceCommit": "a0ba7eabb5d5f4da82c0da7214849d41fe099c12",
   "base": "/zerocopy/",
-  "browser": "153.0.8010.0",
+  "engine": "firefox",
+  "browser": "155.0",
   "reducedMotion": true,
   "captures": [
     {
@@ -23,8 +24,8 @@
   ],
   "performance": {
     "display": "recorded",
-    "sourceCommit": "ab1eae5c2ecc8497ed1b5a4c422febc0e5e4f492",
-    "measuredAt": "2026-11-11T23:59:12.980Z",
+    "sourceCommit": "c1247f59f8d5a1022398c80ccc9e6c91cb008de2",
+    "measuredAt": "2026-11-15T00:33:17.351Z",
     "entries": 10000,
     "readers": 2,
     "samplesPerCase": 7
