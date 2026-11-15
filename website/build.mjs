@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { buildIdentity } from './build-identity.mjs';
 import { pages, projectName, repository, basePath } from './config.mjs';
 import { renderMarkdown, escape } from './render.mjs';
 import { comparison } from './comparison-template.mjs';
@@ -57,7 +58,8 @@ const historicalDemos = new Map([['historical/log-compare/', demoScripts.get('co
 const featureScripts = ['main.mjs', 'capability.mjs', 'isolation.mjs', 'feature-core.mjs', 'catalog-core.mjs', 'catalog-reference.mjs', 'catalog-peer.mjs', 'catalog-timings.mjs', 'catalog-benchmark-core.mjs', 'feature-storage.mjs', 'feature-peer.mjs', 'feature-reader.mjs', 'feature-owner.mjs'];
 demoScripts.set('compare/', [...featureScripts, 'feature.mjs']);
 demoScripts.delete('explorer/');
-demoScripts.set('investigation-benchmark/', [...featureScripts, 'feature-benchmark.mjs']);
+const readBenchmarkScripts = ['catalog-read-workloads.mjs', 'catalog-read-reference.mjs', 'read-benchmark-reader.mjs', 'read-benchmark-owner.mjs', 'read-benchmark-runner.mjs', 'catalog-benchmark-results.mjs'];
+demoScripts.set('investigation-benchmark/', [...featureScripts, ...readBenchmarkScripts, 'feature-benchmark.mjs']);
 for (const [route, scripts] of historicalDemos) demoScripts.set(route, scripts);
 for (const [route, scripts] of demoScripts) {
   mkdirSync(join(out, route, 'assets'), { recursive: true });
@@ -118,7 +120,7 @@ for (const page of pages) {
     heading: section.title, context: section.context, route: `docs/${page.slug}/${section.id ? '#' + section.id : ''}`, text: section.text });
 }
 writeFileSync(join(out, 'search.json'), JSON.stringify(search));
-writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex') }, null, 2));
+writeFileSync(join(out, 'build.json'), JSON.stringify({ sourceCommit: sha, version, dependencies: { immutable: immutablePackage.version, immer: immerPackage.version }, base, ...(preview ? { preview } : {}), pages: siteRoutes, librarySHA256: createHash('sha256').update(readFileSync(join(root, 'dist/shared.js'))).digest('hex'), ...buildIdentity(root, here, [...featureScripts, ...readBenchmarkScripts, 'feature-benchmark.mjs']) }, null, 2));
 writeFileSync(join(out, '404.html'), shell({ title: 'Page not found', route: '404.html', description: 'Find your way back to the zerocopy docs.', base, version, sha, noindex: true, body: `<main id="main" class="wrap not-found"><span class="eyebrow">404 / WRONG TURN</span><h1>This page isn't here.</h1><p>The data didn't disappear. This address just has no page.</p><a class="button primary" href="${base}docs/getting-started/">Open the documentation →</a></main>` }));
 for (const route of demoScripts.keys()) cpSync(join(here, 'assets/isolation-sw.js'), join(out, route, 'isolation-sw.js'));
 writeFileSync(join(out, '.nojekyll'), '');

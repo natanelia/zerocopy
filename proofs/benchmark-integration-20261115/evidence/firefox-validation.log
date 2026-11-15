@@ -1,0 +1,1 @@
+Passed firefox: real product-catalog workers at 1k/100k, sparse edits/history, Stop/restart/navigation, 162 benchmark records across explicit read workloads and both legacy copy modes, headerless workers, no-JS charts and mobile layout at /

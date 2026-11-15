@@ -61,7 +61,7 @@ self.onmessage = async ({ data }) => {
 };
 ```
 
-Each `.get(id)` is a local read. JSON values decode into deeply frozen JavaScript objects in the reading thread. They are not direct binary field views. The current implementation can retain up to 2,048 decoded objects and 2 MiB of encoded object content in each arena's read cache. The benchmark separates first and repeated queries because the selected IDs can fit that cache.
+Each `.get(id)` is a local read. JSON values decode into deeply frozen JavaScript objects in the reading thread. They are not direct binary field views. The current implementation can retain up to 2,048 decoded objects and 2 MiB of encoded object content in each arena's read cache. That byte budget is not a limit on decoded JavaScript heap. The benchmark separates first and repeated queries because the selected IDs can fit that cache. `getView(id)` is an explicitly different API for reading selected fields from bytes; a faster view query does not demonstrate faster `.get()`.
 
 ## Give every design equivalent work
 
@@ -69,7 +69,7 @@ The live comparison generates the same ID/object pairs for all four implementati
 
 Every owner and reader keeps initial and current revisions. Native makes one shallow `new Map(initial)` when the first edit must preserve the initial collection. It then mutates its exclusively owned current Map on later edits. Changed objects are replaced, never mutated. Immutable.js uses `withMutations`; Immer uses one `produce` batch. These local update mechanisms are separate from data copying between workers. Sharing unchanged objects or collection structure within one worker does not share that worker’s JavaScript heap with another worker.
 
-The separate benchmark measures the four baseline implementations across all phases and adds the three full-copy cases **only** for **Publish the edited revision** and **Replace and publish 100 products**:
+The benchmark's preserved legacy control measures the four baseline implementations across all phases and adds the three full-copy cases **only** for **Publish the edited revision** and **Replace and publish 100 products**:
 
 - **Incremental copy:** clone the full catalog at load, then only the 100 changed ID/object pairs per edit.
 - **Full copy:** clone the full catalog at load and the entire updated catalog to each reader on every edit, including unchanged objects. Readers rebuild or freeze the received collection and preserve their retained initial revision.
@@ -80,9 +80,13 @@ SharedMap uses generic object `setMany` for initial construction and replacement
 
 ## Read the measurements
 
-The browser benchmark starts fresh owner and reader workers for every sample. Startup and module loading are outside the phase timers. Four baseline cases measure input generation, construction, initial publication, first/repeated queries, owner edits, and edit publication. Three additional full-copy cases measure **only** edited publication and the directly measured edit-plus-publication duration. Two warm-ups and seven measured samples per case run in rotating order: 49 measured samples across seven cases. The version 3 export includes all 63 records (including warm-ups), each case's measured phases, and the library and copy strategy; unrelated full-copy metrics are absent.
+The browser benchmark starts fresh owner and reader workers for every sample and API. Its primary charts distinguish full-object `.get()`, the immediate cached repeat, and an identical selective projection using either `.get()` or `getView()`. The selective query returns ID, name, price and revision for available books; it never computes a full-record fingerprint. Explicit mutable and frozen `toObject()` materialization appears separately.
 
-The same 1,000 IDs, 100 edits and two reader jobs apply to every path. Baseline first queries use fresh attachments; repeated queries can use local caches. All paths, including full-copy cases, verify current and retained records against the independent reference after measured operations. Fingerprints cover every requested ID and all relevant record fields. Browser timings exclude DOM painting and do not measure memory.
+Local read times include output capture and exclude messaging. Both readers run in parallel; the chart uses the slower local duration and exports both. Construction through first answer adds construction, publication and the first complete worker round-trip **within each sample**, then computes the median. It excludes input generation and separately reported worker/module startup. Correctness checks inspect captured first and repeat answers only after both timings, then verify current and retained revisions after 100 edits.
+
+The legacy control retains four baseline cases across input generation, construction, initial publication, first/repeated queries, owner edits and edit publication. Three additional full-copy cases measure **only** edited publication and the directly measured edit-plus-publication duration. Two warm-ups and seven measured samples per case run in rotating order: 49 measured legacy samples across seven cases. The version 4 export includes all 63 legacy records under a nested v3 workload, plus 99 records for eleven read cases. Unrelated full-copy metrics remain absent. Build and workload hashes, exact APIs, timer boundaries, raw order and failures accompany the results.
+
+The same 1,000 IDs, 100 edits and two readers apply to every path within each workload. Baseline first queries use fresh attachments; repeated queries can use local caches. All paths, including full-copy cases, verify current and retained records against the independent reference after measured operations. Legacy fingerprints cover every requested ID and all relevant record fields; **fingerprint generation is timed**, while the independent comparison is untimed. Browser timings exclude DOM painting and do not measure memory.
 
 The separate [recorded memory report](../../docs/feature-map-memory.md) preserves the earlier synthetic-record fixture with **incremental copy only** for native, Immutable.js and Immer replicas. It does not measure this product catalog or full-copy updates. It uses fresh Node processes, 100,000 records, zero/two/four readers plus a separate eight-reader cohort and three trials per case. It reports JavaScript retention, tracked buffers, unique backing capacity, arena-used bytes and RSS separately. The original [SharedList memory report](../../docs/memory-comparison.md) remains historical evidence for its log-column workload.
 

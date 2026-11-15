@@ -1,0 +1,24 @@
+{
+  "purpose": "Correctness and presentation validation; not a runtime before/after baseline",
+  "workflow": "https://github.com/natanelia/zerocopy/actions/runs/43657585068",
+  "headCommit": "9e51a092e58ca68b2972ca7c50d03c434201e9f4",
+  "sourceCommit": "12b0917b04810a2ab78a8bb6a04f863cde268d1b",
+  "sourceDirty": false,
+  "browser": "Chromium 153.0.8010.12",
+  "benchmarkStatus": "complete",
+  "readSamples": 99,
+  "legacySamples": 63,
+  "runStatus": "failed after successful benchmark; browser automation stalled when enabling late build-metadata request interception",
+  "files": {
+    "evidence/chromium-validation.json.gz": {
+      "bytes": 89067,
+      "sha256": "9e645e65bdd46cfdf35009d6c602eedb1d9e6a6db688d0780657c3dfc583c707",
+      "uncompressedSHA256": "c272d67e77f77c4ecb6d673444f49da6482917f860dfc0ffc887afb81ed03add"
+    },
+    "evidence/chromium-lifecycle-stall-events.json.gz": {
+      "bytes": 18729,
+      "sha256": "cd805e13c2ae5c408b18f37d31104ab3dd6cba88a9e5673fe451dd2820ab7d4d",
+      "uncompressedSHA256": "2c4e1b71871c6a7b5106a957b20ab0009aa34a3b2c86fda0fee9844f665618be"
+    }
+  }
+}

@@ -135,10 +135,16 @@ test('the catalog is the sole live comparison and old workloads stay historical'
   }
 });
 
-test('benchmark pages disclose copy strategies while preserving the original catalog layout', () => {
+test('benchmark page separates read contracts and preserves historical memory and legacy copy strategies', () => {
   const catalog = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
   for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
-  assert.match(catalog, /<h1>One product catalog\.<br>Four implementations\.<\/h1>/);
+  assert.match(catalog, /<h1>Memory\. Reads\.<br>The complete cost\.<\/h1>/);
+  assert.ok(catalog.indexOf('id="memory"') < catalog.indexOf('id="performance"'), 'historical memory appears before live timing controls');
+  for (const text of ['Full-object .get()', 'Selective query', 'Construction through first answer', 'Legacy catalog control', 'fingerprint generation inside the query timer', 'No validation pass runs between them']) {
+    assert.ok(catalog.includes(text), text);
+  }
+  assert.ok(catalog.includes('getView().toObject()'));
+  assert.ok(catalog.includes('feature-build-identity'));
   assert.doesNotMatch(catalog, /feature-benchmark-preview|data-preview-case|feature-preview-status/);
   assert.ok(catalog.includes('<div id="feature-benchmark-results" aria-live="polite"></div>'));
   const css = readFileSync(join(out, 'assets/feature.css'), 'utf8');
