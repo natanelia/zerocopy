@@ -2,6 +2,23 @@
 
 Use Bun 1.4.2, Node.js 22 or newer, and the Rust toolchain pinned in `rust-toolchain.toml`. Direct development dependencies, including the Binaryen WASM build tool, are pinned in `package.json`. Applications using the published package do not need Rust.
 
+## Continuous integration
+
+Normal pull requests use two build jobs: one for the library and one for the website. Each job installs dependencies and builds its inputs once. The website's short publication job runs only after its checks pass.
+
+| Workflow | When it runs | Responsibility |
+| --- | --- | --- |
+| [CI](.github/workflows/ci.yml) | Pull requests and pushes to `main` | Full unit and Chromium suites, types, compiled worker and optional-import regressions, documentation examples, package consumption, and evidence preservation |
+| [Documentation website](.github/workflows/docs-website.yml) | Pull requests, pushes to `main`, or manual runs | Static checks for supported hosting paths, focused isolation/worker checks for alternate paths, and the full browser suite once against the actual publication target |
+| [Diagnostics](.github/workflows/diagnostics.yml) | Manual selection | A selected compatibility or performance investigation on one runner, with optional browser checks |
+| [Publish npm package](.github/workflows/npm-publish.yml) | Version tags or a manual release from `main` | Existing release validation and trusted npm publication |
+
+Use Diagnostics when changing kernels, transport behavior, or hot paths that need an explicit performance or platform comparison. Select the relevant suite and platform; ARM and alternate Node versions do not launch additional jobs on every pull request. Benchmark baseline/candidate pairs run sequentially on the same runner. A diagnostic measurement is not evidence for a different source revision, platform, or workload.
+
+Diagnostics offers compatibility, JSON reads, UTF-8 writes, numeric kernels, geometry, spatial kernels, and retained memory. Choose Node 22 or 24 and x64 or ARM64; browser checks are optional on x64. JSON and UTF-8 comparisons accept a baseline branch, tag, or commit. Each revision uses its own dependencies, so the retained manifests must be checked before attributing a difference solely to source changes. Results, partial output, runtime versions, source commits, and manifests are retained together. Kernel suites keep their existing performance thresholds.
+
+Earlier experiment-specific workflows are available in [Git history](https://github.com/natanelia/zerocopy/tree/6ee24d20e6be91e1d757995770654a249b489d0f/.github/workflows). Their scripts and recorded evidence remain in `proofs/`; reproduce those historical experiments from their documented revisions. Do not add another always-running workflow for a one-off benchmark. Add distinct correctness coverage to the shared CI checks and keep costly measurements in Diagnostics.
+
 ## Set up and test
 
 Install Rust through rustup, then run these commands from the checkout. The compiler and WASM target are build dependencies only.
