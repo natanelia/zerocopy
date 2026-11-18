@@ -38,6 +38,7 @@ if (phase !== 'browser') {
     ['Redux heap codecs in real workers', 'proofs/redux-heap-read-view-20261108/node-workers.mjs'],
     ['Redux sequence codecs in real workers', 'proofs/redux-sequence-reads-20261105/worker.mjs'],
     ['Batched list edits in shared/copied workers', 'proofs/list-set-many-20261108/worker.mjs', 'list', '.'],
+    ['Selected JSON strings in retained shared/copied workers', 'proofs/json-string-scan-20261118/workers.mjs'],
   ]) node(name, [file, ...args]);
 
   // Import-order regressions need fresh processes: the main Vitest suite
