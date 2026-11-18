@@ -49,6 +49,30 @@ function fromBase64(text: string, length: number): Uint8Array {
   for (let i = 0; i < length; i++) bytes[i] = raw.charCodeAt(i);
   return bytes;
 }
+// Select a byte-oriented API once, without importing Node-only modules into
+// the browser bundle. Older engines retain the unchanged portable decoder.
+const nativeFromBase64 = (Uint8Array as typeof Uint8Array & {
+  fromBase64?: (text: string) => Uint8Array;
+}).fromBase64;
+const byteBuffer = typeof nativeFromBase64 === 'function' ? undefined : (globalThis as {
+  Buffer?: { from?: (text: string, encoding: 'base64') => Uint8Array };
+}).Buffer;
+const bufferFromBase64 = byteBuffer?.from;
+const decodeBase64Bytes = typeof nativeFromBase64 === 'function'
+  ? (text: string) => nativeFromBase64.call(Uint8Array, text)
+  : typeof bufferFromBase64 === 'function'
+    ? (text: string) => bufferFromBase64.call(byteBuffer, text, 'base64') : undefined;
+function fromByteBase64(text: string, length: number): Uint8Array {
+  // Direct inputs may have getters that return a String object after the
+  // initial validation. Keep atob's original coercions for those inputs.
+  if (typeof text !== 'string') return fromBase64(text, length);
+  if (text.length !== Math.ceil(length / 3) * 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(text)) fail('invalid base64 arena');
+  // The byte decoders accept unused padding bits like atob. Our original
+  // length and alphabet checks remain in force, including before Buffer.from.
+  const bytes = decodeBase64Bytes!(text);
+  if (bytes.length !== length) fail('arena length does not match its data');
+  return bytes;
+}
 function ownValue(value: object, key: string): unknown {
   const descriptor = Object.getOwnPropertyDescriptor(value, key);
   if (!descriptor || !('value' in descriptor)) fail('state accessors are not supported');
@@ -207,7 +231,8 @@ export function decodeZerocopyState<T = unknown>(input: unknown, options: Zeroco
       || typeof item.base64 !== 'string' || typeof item.checksum !== 'number' || !Number.isInteger(item.checksum) || item.checksum < 0 || item.checksum > 0xffffffff) fail('invalid arena record');
     total += item.used as number;
     if (total > bound.maxBytes) fail('arena data exceeds maxBytes');
-    const copy = fromBase64(item.base64 as string, item.used as number);
+    const copy = decodeBase64Bytes ? fromByteBase64(item.base64 as string, item.used as number)
+      : fromBase64(item.base64 as string, item.used as number);
     if (hashBytes(copy) !== item.checksum) fail('arena checksum mismatch');
     copies.set(item.id as string, { used: item.used as number, copy });
   }

@@ -1,0 +1,12 @@
+proofs/redux-types.ts(3,27): error TS7016: Could not find a declaration file for module 'zerocopy'. '/workspace/scratch/d3b3ec32e60a/zerocopy-serialization/dist/shared.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/zerocopy` if it exists or add a new declaration (.d.ts) file containing `declare module 'zerocopy';`
+proofs/redux-types.ts(11,8): error TS7016: Could not find a declaration file for module 'zerocopy/redux'. '/workspace/scratch/d3b3ec32e60a/zerocopy-serialization/dist/redux.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/zerocopy` if it exists or add a new declaration (.d.ts) file containing `declare module 'zerocopy/redux';`
+proofs/redux-types.ts(23,77): error TS7006: Parameter 'state' implicitly has an 'any' type.
+proofs/redux-types.ts(27,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(2,33): error TS2307: Cannot find module '../dist/types/shared' or its corresponding type declarations.
+type-tests/typed-redux.ts(3,92): error TS2307: Cannot find module '../dist/types/redux' or its corresponding type declarations.
+type-tests/typed-redux.ts(13,90): error TS7006: Parameter 'state' implicitly has an 'any' type.
+type-tests/typed-redux.ts(16,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(18,1): error TS2578: Unused '@ts-expect-error' directive.
+type-tests/typed-redux.ts(20,1): error TS2578: Unused '@ts-expect-error' directive.

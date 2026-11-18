@@ -1,0 +1,6 @@
+Verified aa-v2.json.gz: 32 processes, 288 measured batches, 4 independent paired estimates
+Verified aa-v3.json.gz: 48 processes, 432 measured batches, 6 independent paired estimates
+Verified formal-v2.json.gz: 120 processes, 1080 measured batches, 10 independent paired estimates
+Verified formal-v3.json.gz: 144 processes, 1296 measured batches, 12 independent paired estimates
+Verified pilot-v1.json.gz: 32 processes, 288 measured batches, 8 independent paired estimates
+Verified pilot-v3.json.gz: 40 processes, 360 measured batches, 10 independent paired estimates
