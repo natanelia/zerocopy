@@ -1,0 +1,53 @@
+{
+  "runtime": "v24.22.1",
+  "writer": {
+    "checks": [
+      "callback-growth",
+      "forks",
+      "reentrancy",
+      "special-values",
+      "original-byte-immutability"
+    ]
+  },
+  "checks": [
+    {
+      "transport": "shared",
+      "first": {
+        "type": "scanned",
+        "ok": true,
+        "count": 1067
+      },
+      "second": {
+        "type": "complete",
+        "ok": true,
+        "checked": [
+          "retained-snapshot",
+          "new-root-after-growth",
+          "read-only",
+          "all-value-types",
+          "published-bytes"
+        ]
+      }
+    },
+    {
+      "transport": "copy",
+      "first": {
+        "type": "scanned",
+        "ok": true,
+        "count": 1067
+      },
+      "second": {
+        "type": "complete",
+        "ok": true,
+        "checked": [
+          "retained-snapshot",
+          "new-root-after-growth",
+          "read-only",
+          "all-value-types",
+          "published-bytes"
+        ]
+      }
+    }
+  ],
+  "timingMeasurements": false
+}

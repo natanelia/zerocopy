@@ -1,0 +1,92 @@
+{
+  "runtime": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "timingMeasurements": false,
+  "sources": {
+    "arena.ts": "15fc0a16a8db39c2178ef6655d90b95f20e5635fa411a60d0bc04a4f5e1e3403",
+    "shared-map.ts": "729c51f57919d410fff877db750a368c15755f23047c26cbbb13015d99818380"
+  },
+  "workload": "7be5a9137ca87fca55bc83c740de16097b6f4ab4f68e12ff1ab579d00dd36de3",
+  "driver": "dc624a7766a273091917c959e011deca5308750a8ce0d1873190f2b4520c2cfa",
+  "checks": [
+    {
+      "case": "number-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-65536",
+      "expectedDigest": "0c5f542433692f1fdccd420d36d2009fa4b292b42bb1d8d65a89826dd0e18a97",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-overlay-4096",
+      "expectedDigest": "611b3af1a6ea40c319e19778faf56bfe218ff7639d41fca70976592533b9c10c",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "number-64",
+      "expectedDigest": "3089b5ad40d2eaea60063f0a2ce6b9ad59ee2b8bdab5c64c3b5c447c0b181aa7",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "boolean-4096",
+      "expectedDigest": "3b9a7ba6e3cc2ee0fea0a8ec1a6b53cee7923ff7499bfa652d637f683d32fd24",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "string-1024",
+      "expectedDigest": "fd243a3f2a73e89a5be759a2a39064bb46bf598eb35f103ed177b2ed6ad559ad",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "json-256",
+      "expectedDigest": "be8e1966c650913efa38575c538e42055c6a2e4e58a8d44a50cc19bd2eac8e64",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "unicode-4096",
+      "expectedDigest": "538aca009eceba90db9bb5c6406c02cd0eab05f05575b4b4354f063c728cfbb5",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "entries-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    },
+    {
+      "case": "get-4096",
+      "expectedDigest": "166d63fef8c31b96f9295f03dae3499a019cbb78ebeb5a706e03d0773fb4361d",
+      "checksumsAndFullSequenceOraclesPassed": true
+    }
+  ]
+}

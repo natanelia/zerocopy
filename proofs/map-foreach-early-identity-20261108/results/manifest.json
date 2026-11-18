@@ -1,0 +1,14 @@
+{
+  "confirmation.json.gz": {
+    "sha256": "6ecb194fe663f55d9ecb9b322c80ad41527aa53bbd125add97464abbb737620f",
+    "uncompressedSha256": "1e920acc4639750330c5b24bfbc752e143451fae425615bd0bef3796ea17db3d",
+    "compressedBytes": 126274,
+    "uncompressedBytes": 916077
+  },
+  "aa.json.gz": {
+    "sha256": "0e1cae1aac1a3a00a01ac385cbcbc670326c11e5d2ca50a09a0750acdd3ba433",
+    "uncompressedSha256": "af4e17be793c94ee206aace8401a116dca8c2ebbcb1344d6de426f1a3d570848",
+    "compressedBytes": 51463,
+    "uncompressedBytes": 328892
+  }
+}

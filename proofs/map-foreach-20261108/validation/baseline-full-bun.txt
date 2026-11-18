@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy
+
+
+ Test Files  60 passed (60)
+      Tests  1186 passed (1186)
+   Start at  20:52:11
+   Duration  48.57s (transform 1.41s, setup 0ms, import 3.09s, tests 188.91s, environment 9ms)
