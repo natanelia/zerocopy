@@ -1,5 +1,7 @@
 # JSON array cursor: measured results
 
+A newer [raw-value confirmation](confirmation-v2/README.md) repeats this comparison with ordinary result Arrays, strict actual-value checks, and a primed retained-view cursor. The original results below remain unchanged.
+
 Repeated `JsonView.at(i)` calls now retain the last successful array position in reader-local state. Forward reads skip only the intervening values; repeated indexes reuse the position; backward reads use the original scanner. A full forward traversal therefore avoids repeatedly scanning its earlier elements.
 
 ## Results

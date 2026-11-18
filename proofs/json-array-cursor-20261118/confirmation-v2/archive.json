@@ -1,0 +1,29 @@
+{
+  "format": "gzip; exact original JSON bytes; mtime=0",
+  "files": [
+    {
+      "sourceName": "smoke.json",
+      "archiveName": "smoke.json.gz",
+      "sourceBytes": 56915,
+      "archiveBytes": 9224,
+      "sourceSha256": "080d2e25a6bd7d8a8a2636aeac749cdbfaacc0a71c5d87923466093904a83c83",
+      "archiveSha256": "89b050356e03c860c38791b82927e17cabfd9225294811b0aacc0d909906a4e9"
+    },
+    {
+      "sourceName": "formal.json",
+      "archiveName": "formal.json.gz",
+      "sourceBytes": 199200,
+      "archiveBytes": 15255,
+      "sourceSha256": "132f8567fc06682316632ca394d9d9c5e3918bdde6a1c8fecb29bb6be8d3e429",
+      "archiveSha256": "637139a4699e7e1ae9b69e30c640660bf5f83aef9b1f97eec18418a84e01ffac"
+    },
+    {
+      "sourceName": "identical-control.json",
+      "archiveName": "identical-control.json.gz",
+      "sourceBytes": 100080,
+      "archiveBytes": 9151,
+      "sourceSha256": "ff081387b9fee805eeff2c8a15029451c3f7d302b26cdcaeeca67e4d4fc69ee0",
+      "archiveSha256": "302d448116ac97bad029f989b63ef8c48d550b2999c99e744e92ea3e4e5239e8"
+    }
+  ]
+}
