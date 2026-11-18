@@ -227,9 +227,19 @@ pub unsafe extern "C" fn jsonFieldCandidate(start: u32, end: u32, hash: u32) -> 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn jsonArrayAt(start: u32, end: u32, index: u32) -> u32 {
+pub unsafe extern "C" fn jsonArrayAt(start: u32, end: u32, mut index: u32) -> u32 {
     if start >= end || load_u8(start) != 91 { return 0; }
-    jsonArrayAtFrom(space(start + 1, end), end, index)
+    let mut p = space(start + 1, end);
+    while p < end && load_u8(p) != 93 {
+        if index == 0 { return p; }
+        index -= 1;
+        p = jsonValueEnd(p, end);
+        if p == 0 { return 0; }
+        p = space(p, end);
+        if p >= end || load_u8(p) != 44 { return 0; }
+        p = space(p + 1, end);
+    }
+    0
 }
 
 /// Continue from a known element in the same immutable array. `index` is
