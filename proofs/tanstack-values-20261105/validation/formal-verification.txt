@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "mode": "formal",
+  "pairs": 120,
+  "subjects": 240,
+  "measuredBatches": 2160,
+  "shortestMeasuredBatchMs": 0.6985710000000154,
+  "warmupTimedMsRange": [
+    500.00511899999964,
+    537.6701330000001
+  ],
+  "rawSha256": "86241b0079284bdb85ba38eb69457b8b9fdadefdc69744687b1f36e8a695fd6d",
+  "checkedSourceBuilds": true
+}
