@@ -120,26 +120,33 @@ export function compileStringSearch(arena: Arena, term: string, options: TextSea
     if (needle[i] === needle[j]) j++;
     prefix[i] = j;
   }
-  return raw => {
+  // Choose the case mode once, outside the byte-by-byte search loop.
+  if (sensitive) return raw => {
     let start = raw + 4;
     const byteLength = view.getUint32(raw, true), end = start + byteLength;
-    if (sensitive) {
-      if (byteLength < length) return false;
-      if (bytes[start] !== needle[0]) {
-        // This view shares the original bytes and bounds native search to one
-        // string. Skip its impossible prefix before entering the KMP loop.
-        const first = bytes.subarray(start, end).indexOf(needle[0]);
-        if (first < 0) return false;
-        start += first;
-      }
+    if (byteLength < length) return false;
+    if (bytes[start] !== needle[0]) {
+      // This view shares the original bytes and bounds native search to one
+      // string. Skip its impossible prefix before entering the KMP loop.
+      const first = bytes.subarray(start, end).indexOf(needle[0]);
+      if (first < 0) return false;
+      start += first;
     }
     let j = 0;
     for (let p = start; p < end; p++) {
+      const code = bytes[p];
+      while (j && code !== needle[j]) j = prefix[j - 1];
+      if (code === needle[j] && ++j === length) return true;
+    }
+    return false;
+  };
+  return raw => {
+    const start = raw + 4, end = start + view.getUint32(raw, true);
+    let j = 0;
+    for (let p = start; p < end; p++) {
       let code = bytes[p];
-      if (!sensitive) {
-        if (code > 127) return fallback(raw);
-        if (code >= 65 && code <= 90) code += 32;
-      }
+      if (code > 127) return fallback(raw);
+      if (code >= 65 && code <= 90) code += 32;
       while (j && code !== needle[j]) j = prefix[j - 1];
       if (code === needle[j] && ++j === length) return true;
     }

@@ -1,0 +1,4992 @@
+{
+  "schema": "zerocopy-long-search-loops/v1",
+  "study": "pilot",
+  "status": "complete",
+  "startedAt": "2026-11-04T19:07:41.681Z",
+  "hardware": {
+    "platform": "linux",
+    "release": "6.18.57",
+    "arch": "x64",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCpus": 9,
+    "affinity": "Cpus_allowed_list:\t2"
+  },
+  "method": {
+    "pairs": 2,
+    "warmupBatches": 5,
+    "minimumWarmupMs": 0,
+    "samples": 9,
+    "rows": 2048,
+    "order": "AB, BA per runtime; case order alternates by pair; one build per fresh process",
+    "timed": "Compile one predicate and scan every index per repetition; accumulate and check index-weighted checksums after timing",
+    "excluded": "Data generation, collection construction, per-row oracle checks and shared-memory digests",
+    "estimate": "Per-process medians, paired after/before ratios, geometric mean; primary/control deterministic 10000-resample percentile bootstrap over whole process pairs",
+    "source": "db18f79354230218574df9535276934595c75ec1bdba8d549540fb72018b625c",
+    "fixtures": "62ea7ce2e598b508a7deaf8e6245d94cd809fd6854f522948da5b94a5ebdad4c",
+    "cases": [
+      {
+        "name": "missing-first-byte",
+        "role": "preservation",
+        "term": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZtarget",
+        "caseSensitive": true,
+        "repetitions": 64
+      },
+      {
+        "name": "late-start-hit",
+        "role": "preservation",
+        "term": "Request-processing-completed-for-map-validation",
+        "caseSensitive": true,
+        "repetitions": 64
+      },
+      {
+        "name": "first-byte-near-end",
+        "role": "preservation",
+        "term": "Request-processing-completed-for-map-validation",
+        "caseSensitive": true,
+        "repetitions": 64
+      },
+      {
+        "name": "multibyte-needle",
+        "role": "preservation",
+        "term": "🚦🚦🚦🚦🚦🚦🚦🚦🚦",
+        "caseSensitive": true,
+        "repetitions": 64
+      },
+      {
+        "name": "needle-longer-than-row",
+        "role": "preservation",
+        "term": "request-processing-completed-for-map-validation",
+        "caseSensitive": true,
+        "repetitions": 512
+      },
+      {
+        "name": "common-first-byte",
+        "role": "control",
+        "term": "request-processing-completed-for-map-validation",
+        "caseSensitive": true,
+        "repetitions": 8
+      },
+      {
+        "name": "immediate-hit",
+        "role": "target",
+        "term": "request-processing-completed-for-map-validation",
+        "caseSensitive": true,
+        "repetitions": 128
+      },
+      {
+        "name": "overlapping-prefix",
+        "role": "target",
+        "term": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+        "caseSensitive": true,
+        "repetitions": 4
+      },
+      {
+        "name": "insensitive-ascii",
+        "role": "control",
+        "term": "request-processing-completed-for-map-validation",
+        "caseSensitive": false,
+        "repetitions": 8
+      },
+      {
+        "name": "insensitive-unicode",
+        "role": "control",
+        "term": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+        "caseSensitive": false,
+        "repetitions": 8
+      },
+      {
+        "name": "short-query",
+        "role": "control",
+        "term": "validation",
+        "caseSensitive": false,
+        "repetitions": 512
+      },
+      {
+        "name": "immediate-hit-33-bytes",
+        "role": "control",
+        "term": "request-processing-completed-okay",
+        "caseSensitive": true,
+        "repetitions": 128
+      },
+      {
+        "name": "common-suffix-middle-mismatch",
+        "role": "control",
+        "term": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "caseSensitive": true,
+        "repetitions": 4
+      },
+      {
+        "name": "early-false-suffix-candidates",
+        "role": "control",
+        "term": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+        "caseSensitive": true,
+        "repetitions": 8
+      }
+    ]
+  },
+  "before": {
+    "root": "/workspace/scratch/83f1d4baba1f/zerocopy-r2-final-base",
+    "head": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+    "source": {
+      "arena.ts": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+      "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+      "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+      "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+      "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+      "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+      "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+      "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+      "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+      "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+      "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+      "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+      "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+      "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+      "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+      "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+      "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+      "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+      "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+      "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+      "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+      "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+      "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+      "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+      "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+      "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+      "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+      "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+      "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+      "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+      "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+      "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+      "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+      "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+      "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+      "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+      "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+      "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+      "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+      "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+      "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+      "text-search.ts": "180832bfe92b4a413510574aef20681076fb554e9d1b888b6223a6aef31a512f",
+      "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+      "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+      "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+      "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+      "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+      "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+      "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+      "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+      "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea"
+    },
+    "build": {
+      "chunk-4pqgvvxp.js": "b53bec60c40d975c4eb90d920e0e281474e5af72bc9e6cb42f30f86cb556bbd8",
+      "chunk-5qfqrsqm.js": "19c0c761d9bce5d3877c2339854c92d0a2df55240101d3995bbce88f6e33d2e9",
+      "chunk-6t3aw271.js": "73fd26b44637157c74333baf26b35ce35b01d0fd2bf71368186f2bc150388445",
+      "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+      "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+      "geometry.js": "496a6b96f14f6e1689c22ab8905f8f5b5c3cdf6c4a25f95b93acc62fd55703f5",
+      "numeric.js": "418f7e33233ff84d18eb5bf0ed76d9b3cae8616feb24aca6369eac922c15c74e",
+      "redux.js": "366c3e95a44024551bbabfcafca9982e04616de905e436b128a4fabcaf35dda0",
+      "shared.js": "d8c565b60aa23736c3ea4e8076d72d5510b61b83f4f9d8c59328a1a08787fe55",
+      "state.js": "945d757db7468b063e5ec54732852a1bbbe612c771015217fadc98e9435f89f1",
+      "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+      "worker.js": "ee2a9319df44e5997a22e6cf417ad052baa6a3805245ee9911511746f85f6387"
+    }
+  },
+  "after": {
+    "root": "/workspace/scratch/83f1d4baba1f/zerocopy-r2-search",
+    "head": "09b1a385a7c2ac9b027a4055335ae2f9449abe6e",
+    "source": {
+      "arena.ts": "1b3df20353a94f9cc8c7fec64f0ee19bc959a598640937d9af1560fa11add7a8",
+      "benchmark.ts": "e111c13a568776677e23c917b6b8227abba367612d838e637821fe6704f72043",
+      "codec.ts": "b8db477ef09b39140604a89a6550a470ca03bb14447b82c1bebbb4094bad0164",
+      "compaction.ts": "a0af63d00d16f01004455c4e238c1607e9812976b6ca92b7588ca4f1e877b6ab",
+      "doubly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "freeze-json.ts": "dd8de05df67a8770eff048b28b9697d20a3ef4ef87bfabfff7d7f5a6f01a8ec2",
+      "geometry-kernels.as.ts": "1134426957e721fad6d45a023450883d9cba4e84712aa7043c63c3e6ed3473fb",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "geometry-runtime.ts": "4eedfd5f69220966f78ec4524a0af4db6ba6fc48781e661eb8960339c3374e3a",
+      "geometry-wasm.ts": "f0b24a5ce90baf53e01725627b84167d51c5277a828c3e4c7bd594be9cb9dcc2",
+      "geometry.ts": "07fdff198244b20410013fed056108872e43c17684901b55ede9cbac61bd8da7",
+      "linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "memory.ts": "07cf2d30f0695d9ffbea29ce6d5dff76436a6ccf5fd4dfc097204edc5fe26380",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+      "numeric-kernels.as.ts": "2bec50bc5b982006a2b9971afd3eb499169089e452c5529555daa6505ecf28f7",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "numeric-spatial.as.ts": "79d7788a73e271849c4d87c5c9f8ac0923826a62873a7d2adc46508a63cf4f57",
+      "numeric-wasm.ts": "1fa7509baff6d73228f1d15e40b63dc99f29c46861545596e3d85bb851c83fbc",
+      "numeric.ts": "28b9f8b8738c8524ac1f4b3e4a290e8979a294dcf60ef3f8dc7558c793294f7b",
+      "ordered-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "package.json": "f2fe4346febbcb1284e50696fefac4498660fa7bed438b4f857dd3b3aba479a9",
+      "persistent-core.as.ts": "baa5d5a7682af2738a216566d3a8b61ee8f298e3abb61e34eb597d3ae277f976",
+      "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "priority-queue.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "read-cache.ts": "6b3295e0a94150fe5d73720494d6a9a14e5af7e6f68fe0b39df6203a52aef2bb",
+      "redux-checkpoint.ts": "05a5110d6407c04629e954df3b745c46f19a3626253c057d93c6fdb87953278d",
+      "redux-codec.ts": "6677302e6c0d6199d2170c7f6c7d611e5ba3936fb90c3b05957a4b50f1f61ff6",
+      "redux-heap-codec.ts": "931cd8d136eb84925238e852db03ec6df5d61ff66611edb20f665c4bc01d951f",
+      "redux-internal.ts": "f29c5b1eeff9bd16bc3c6dc4cf068bf80653a3315dbc1d77bfc83c523ae99f32",
+      "redux-jsan.ts": "6c1a5c35dd8dba22886bba7ba8ab68b1f9db29c04fdef9c22e7029c8626fc36a",
+      "redux.ts": "1f00241ecf7a80a960c7fbcde308cc310d473b2ee8fb36da447b591eef6f1e6a",
+      "scripts/build-browser.ts": "e1ef33e9c2a0d1c80713566c65305bbc997d4f556e4c49fb5e784df7d12b6713",
+      "scripts/build-wasm.mjs": "f38535664c3d19f93fba4a9fe27851b6eadb7600d66bd4898f729c77ca7acbf9",
+      "set-key.ts": "129404ca859d29046b162c979974501808607c43f8e881d46146a0b7fc995660",
+      "shared-doubly-linked-list.ts": "04dd7a8c1a4784805abc05214575da73f24d6a364038cc74fade00d86a69e39e",
+      "shared-hash-reader.as.ts": "59646cf6c13c9b1b8ca861fbe4c92030394e877712003f6437474f8e5ba3d22c",
+      "shared-linked-list.ts": "5b37641a9dcc1f5076871ddf690b9dd7f5e97dfe658f22b1e0deecaede9eac2b",
+      "shared-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "shared-list.ts": "3f2cbcaadd70aa8d815a43a0d7d1acb845c9564246ef6d135b66a96071264811",
+      "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-map.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "shared-map.ts": "9e46fe6d3074580f9a07ac59191d0b86a7480cbec9747828f55ab963fa68bac9",
+      "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-ordered-map.ts": "84c510a228983837d35490617c1cde7a31e07b0afb409731032e404a7e068966",
+      "shared-ordered-set.ts": "a623384e5e394cffca7821ec2d1ba1aaa7eae4ec6713f89631b4c39584f72965",
+      "shared-priority-queue.ts": "934ae7e08eee789b1fb922d944484ffb2072a5848d7fb6ee5ecba3683c2a21bc",
+      "shared-queue.ts": "ac21aedf12e2d484bb7f92a0f20c04006e47457e555842ab0f9a52019aab741e",
+      "shared-runtime.as.ts": "90a96c36076de0374128f10a29271f2d184df7339b3fcf6bc85eac408cb7eec8",
+      "shared-set.ts": "31581f31e3107db6bb9d9766fa267e0cbc542fb86f13a10690e33d0b555997ae",
+      "shared-sorted-map.ts": "96e76794c733179384b0d555a00ff4c40ce0f541a06560eca7966a6c0a151b68",
+      "shared-sorted-set.ts": "6e06829035e81971f00537eba79665134c1bc632b4648b6007717955891fa95a",
+      "shared-stack.ts": "3684ed3f0119039460969f09115d572c7baf8a16d943d3a1341117c6dd6b3dcc",
+      "shared-text-reader.as.ts": "7bb347ddb2736b5dc56f633b371512f2008f3c750788da92fe3e67a4f35d15c3",
+      "shared.ts": "fd08edcab8aed06bed9401edc16c1da67ca10a5c8c1601f127461dd17d3943e3",
+      "singly-linked-list.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "sorted-tree.as.ts": "e7a9097d866e56dd249a5670db043c1d4c9a95dd820563b0f15f22ff9fcda97e",
+      "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "state.ts": "999db9629a5f10fe64304065d8ba60c05c11769dafcf925415c10475583fbadd",
+      "tanstack-db-collection.ts": "6466d22d4cc55e47b1fe86de122962c37af331e5cfb4726d1ebf3e17ea3b5048",
+      "text-search.ts": "4af3b6c4a11d3f350dedaac52b2af4244356aa22bca79b90c6a52e1be020c04a",
+      "types.ts": "9deafce9cdcad8a0676c5c930ef8e069aac76391a2fea2ce8f0a13a443a8ba5e",
+      "utf8.ts": "68d26ddad81f106d9cc463f1212085210bdb3f0d43c9a0cfa319adc1f9c260e3",
+      "vitest.browser.config.ts": "1e916bdb39bc4515fb0f0c01b85992f76cca0d1444daf529bb50af12ab3e671f",
+      "vitest.config.ts": "6bae9f4e513173dec6c089c4fcaf3957c5cb9aa3195173f1d5ace6a60140a489",
+      "wasm-utils.ts": "ee017aaceeef679c110722e2af5e4cebb9ca21850b57652dfc710d5e9c09f97a",
+      "worker-protocol.ts": "21868d3b9b0d2479837b733f342a2980adbe2dadee0ea7692a27611be73085d2",
+      "worker-redux.ts": "e584f51c1f1768c2760b34e899af292d70f5d16a2eca6100d6e8797a73e78fa0",
+      "worker-tasks.ts": "b65f57fd70d93574f1c596db6b79b6e10b4a5672d281ff5428bf2ab3e08ffb6a",
+      "worker.ts": "5bb4e740785dd133199c82f23f7eb462801a4ad285b43509e3badcd0e6b05cea"
+    },
+    "build": {
+      "chunk-2708a83g.js": "0ae06ce84381b9c3b0c69411bf01d52760b044fd9b77a0257d33dacb8c6c906a",
+      "chunk-frvxra5e.js": "2c37b5369ab5d29c6186ea6004e07e49816b470b94e62ec937d7f622c9672810",
+      "chunk-j5ej7r96.js": "263cad3644b46e70c36c9c8c376deea2b768118be4d1b1aae809896effe1ae74",
+      "chunk-naz6wrqq.js": "608981a67c37604e883f1567a4f6a050e4d6fb5ff9da4f11fc8689ae3117364f",
+      "chunk-tge0m2rv.js": "ca2d1319dbd8b1853de09202f63e763e9588a0fa77a4485e3db36cbdf62d644a",
+      "geometry.js": "34291c130a5d354055326f5a05478a1ea6100a8581e0ba47bfdda119e893781b",
+      "numeric.js": "7880ea7f8a09d27b48f3cbde85d7630089cdf9573e504fc38c004085bd7dd3f3",
+      "redux.js": "f778d243a5c89196894700647454a380264029a050e33d16a13c876ccac8042d",
+      "shared.js": "ec99b58fcaf190a9709dd176e2ef69e30893832a510310d83b264b9ee2804f7f",
+      "state.js": "aa5eed2fc9490d50ba30beccda04e1f347a92ea1fb562ffe96a4dcfbfdb839fb",
+      "tanstack-db-collection.js": "cc2d7551a45eff9e62423475a3009539449dc62a3799d10bd985e6a611e8b586",
+      "worker.js": "220a3c18624c8d9cda01f59a14c58dd36b561aed1b80f60e76dec0e9da8ab313"
+    }
+  },
+  "runs": [
+    {
+      "pair": 0,
+      "variant": "before",
+      "start": "2026-11-04T19:07:41.683Z",
+      "runtime": "node",
+      "version": "24.22.1",
+      "versions": {
+        "node": "24.22.1",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.9",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "3.5.9",
+        "simdjson": "4.6.11",
+        "simdutf": "6.4.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.30.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.17-node.58",
+        "zlib": "1.3.2.1-motley-285e94b",
+        "zstd": "1.5.7"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": false,
+      "records": [
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            83.76156900000001,
+            67.23891599999999,
+            53.229713000000004,
+            65.31163700000002,
+            76.18050100000005
+          ],
+          "sampleBatchMs": [
+            68.97817900000001,
+            58.669958000000065,
+            54.908166999999935,
+            51.52160500000002,
+            55.62524999999994,
+            54.10524799999996,
+            52.63633200000004,
+            50.20724699999994,
+            52.698222999999984
+          ],
+          "medianMs": 0.8453944999999994
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            90.16462299999989,
+            66.29218600000013,
+            57.79250000000002,
+            64.20094700000004,
+            62.035347999999885
+          ],
+          "sampleBatchMs": [
+            58.01383600000008,
+            57.99241400000005,
+            58.80335400000013,
+            71.19896900000003,
+            57.6799860000001,
+            73.4851349999999,
+            70.40233899999998,
+            61.73245399999996,
+            64.6606119999999
+          ],
+          "medianMs": 0.9645695937499994
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            86.49903199999994,
+            53.83895699999994,
+            55.37628399999994,
+            55.953179999999975,
+            44.78460700000005
+          ],
+          "sampleBatchMs": [
+            44.362567000000126,
+            44.30532399999993,
+            44.59293600000001,
+            73.58157699999992,
+            77.22160900000017,
+            76.75953100000015,
+            75.93566199999987,
+            76.63696200000004,
+            76.94407200000023
+          ],
+          "medianMs": 1.186494718749998
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            101.41603299999997,
+            85.71110099999987,
+            85.23250800000005,
+            82.8028720000002,
+            83.14326200000005
+          ],
+          "sampleBatchMs": [
+            57.462176,
+            56.209186000000045,
+            58.982516999999916,
+            54.54018700000006,
+            52.27220699999998,
+            53.91976599999998,
+            59.999415000000226,
+            56.58559000000014,
+            57.033254999999826
+          ],
+          "medianMs": 0.8841498437500022
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            27.55337899999995,
+            13.494995000000017,
+            16.742823000000044,
+            14.459309000000303,
+            12.795650000000023
+          ],
+          "sampleBatchMs": [
+            14.508964000000105,
+            12.301895000000059,
+            14.747795000000224,
+            13.152388999999857,
+            12.379913000000215,
+            13.970442000000276,
+            14.535393999999997,
+            13.03994399999965,
+            30.280243000000155
+          ],
+          "medianMs": 0.027286019531250538
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            57.85830399999986,
+            44.274460000000545,
+            50.74677799999972,
+            58.49614199999996,
+            46.94886499999939
+          ],
+          "sampleBatchMs": [
+            51.30892500000027,
+            72.25710299999992,
+            53.73392899999999,
+            46.11041000000023,
+            43.487693999999465,
+            43.52428899999995,
+            43.71074100000078,
+            44.88053499999933,
+            45.4915060000003
+          ],
+          "medianMs": 5.686438250000037
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            53.87163599999985,
+            55.30345599999964,
+            55.4719299999997,
+            54.318529999999555,
+            54.50518000000011
+          ],
+          "sampleBatchMs": [
+            58.606424999999945,
+            52.514446999999564,
+            54.38888400000087,
+            54.41812800000025,
+            51.74444500000027,
+            51.147994999999355,
+            53.88857999999982,
+            53.452181000000564,
+            55.64544900000055
+          ],
+          "medianMs": 0.4210045312499986
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            51.21856200000002,
+            49.20636699999977,
+            50.34979199999998,
+            49.6658809999999,
+            52.63601999999992
+          ],
+          "sampleBatchMs": [
+            48.30966400000034,
+            51.32169700000031,
+            48.4585790000001,
+            50.86785299999974,
+            48.62460999999985,
+            50.70723100000032,
+            50.367128000000776,
+            62.98961599999984,
+            55.19488999999976
+          ],
+          "medianMs": 12.67680775000008
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            51.69477999999981,
+            44.82553899999948,
+            44.37440999999944,
+            45.27422600000045,
+            59.87960600000042
+          ],
+          "sampleBatchMs": [
+            45.29300400000011,
+            44.62597800000003,
+            48.732702000000245,
+            52.26660199999969,
+            53.659693999999945,
+            51.311461999999665,
+            53.413142000000335,
+            56.2494200000001,
+            49.334499999999935
+          ],
+          "medianMs": 6.413932749999958
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            111.0924129999994,
+            74.4582419999997,
+            75.01307900000029,
+            73.10861600000044,
+            72.0942930000001
+          ],
+          "sampleBatchMs": [
+            74.39219500000036,
+            73.2424860000001,
+            71.03845499999989,
+            81.17137100000036,
+            81.80684699999983,
+            73.34547199999997,
+            69.06552200000078,
+            66.47491799999989,
+            71.31285000000025
+          ],
+          "medianMs": 9.155310750000012
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            48.360295000000406,
+            54.97212500000023,
+            28.15071800000078,
+            45.76102499999979,
+            37.609849999998914
+          ],
+          "sampleBatchMs": [
+            31.132375999999567,
+            34.74700600000142,
+            35.86784600000101,
+            39.969412999998895,
+            38.420233000000735,
+            41.25954300000012,
+            53.299473999999464,
+            35.34269300000051,
+            31.565537999998924
+          ],
+          "medianMs": 0.07005438671875197
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            57.00622099999964,
+            52.93125299999883,
+            47.88820500000111,
+            51.21374400000059,
+            52.28543300000092
+          ],
+          "sampleBatchMs": [
+            64.07288200000039,
+            53.85192800000004,
+            50.62183300000106,
+            50.95134899999903,
+            50.75324699999874,
+            52.64536099999896,
+            50.05033200000071,
+            57.98243799999909,
+            50.11098099999981
+          ],
+          "medianMs": 0.3980574140624924
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            68.1293540000006,
+            67.05321399999957,
+            59.748231999999916,
+            65.777376,
+            56.2340949999998
+          ],
+          "sampleBatchMs": [
+            58.853079999998954,
+            55.670915999999124,
+            53.07055799999944,
+            76.19082399999934,
+            59.392995000000155,
+            58.74260200000026,
+            46.48408299999937,
+            48.78172500000073,
+            47.15343800000119
+          ],
+          "medianMs": 13.917728999999781
+        },
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            133.29211600000053,
+            115.62858600000072,
+            104.26623599999948,
+            111.59528299999874,
+            176.43785899999966
+          ],
+          "sampleBatchMs": [
+            134.98937400000068,
+            104.40564000000086,
+            106.64849099999992,
+            115.83631199999945,
+            104.73506799999996,
+            128.618394000001,
+            116.94799600000078,
+            128.6278429999984,
+            119.77078699999947
+          ],
+          "medianMs": 14.618499500000098
+        }
+      ]
+    },
+    {
+      "pair": 0,
+      "variant": "after",
+      "start": "2026-11-04T19:07:53.906Z",
+      "runtime": "node",
+      "version": "24.22.1",
+      "versions": {
+        "node": "24.22.1",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.9",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "3.5.9",
+        "simdjson": "4.6.11",
+        "simdutf": "6.4.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.30.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.17-node.58",
+        "zlib": "1.3.2.1-motley-285e94b",
+        "zstd": "1.5.7"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": false,
+      "records": [
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            66.77173199999999,
+            50.97257000000002,
+            52.06677400000004,
+            50.36404599999997,
+            66.766479
+          ],
+          "sampleBatchMs": [
+            60.56162499999999,
+            52.01900699999999,
+            53.67602300000004,
+            67.14235999999994,
+            57.55028000000004,
+            52.68413199999998,
+            51.04361599999993,
+            53.909812999999986,
+            50.31881700000008
+          ],
+          "medianMs": 0.8386878593750007
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            82.23075899999992,
+            87.64949699999988,
+            57.07555100000013,
+            67.19878499999982,
+            70.53053100000011
+          ],
+          "sampleBatchMs": [
+            55.50149599999986,
+            55.55463000000009,
+            56.603192000000035,
+            57.58825100000013,
+            72.97629100000017,
+            67.64496499999996,
+            65.64433800000006,
+            60.97072500000013,
+            56.00001999999995
+          ],
+          "medianMs": 0.899816421875002
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            76.10189300000002,
+            57.710149999999885,
+            59.10827599999993,
+            76.9145440000002,
+            54.48153300000013
+          ],
+          "sampleBatchMs": [
+            81.03306900000007,
+            57.68203799999992,
+            77.37769600000001,
+            77.99868399999968,
+            76.95889100000022,
+            69.70795499999986,
+            52.55441199999996,
+            75.98785300000009,
+            77.58157299999993
+          ],
+          "medianMs": 1.2024826718750035
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            92.5293899999997,
+            67.73736299999973,
+            52.025452000000314,
+            82.89952799999992,
+            81.69321599999967
+          ],
+          "sampleBatchMs": [
+            81.58250899999985,
+            73.01231000000007,
+            51.90573200000017,
+            58.87405399999989,
+            48.477220000000216,
+            55.050197000000026,
+            49.45472899999959,
+            48.18166599999995,
+            48.617159999999785
+          ],
+          "medianMs": 0.8110270625000027
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            20.500918000000183,
+            9.628940000000057,
+            15.017268000000058,
+            9.645905000000312,
+            9.556781999999657
+          ],
+          "sampleBatchMs": [
+            9.703773000000183,
+            17.97124699999995,
+            18.817017999999734,
+            12.825933999999961,
+            10.570745999999872,
+            9.752966000000015,
+            10.319167000000107,
+            9.639937000000373,
+            11.941616000000067
+          ],
+          "medianMs": 0.02064598828124975
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            37.6933640000002,
+            31.737304000000222,
+            34.93721200000027,
+            33.96309799999926,
+            32.26371500000005
+          ],
+          "sampleBatchMs": [
+            31.585665999999947,
+            34.53984500000024,
+            32.14518700000008,
+            33.97552300000007,
+            42.53131399999984,
+            30.63922300000013,
+            31.547609000000193,
+            32.01445000000058,
+            31.247909000000618
+          ],
+          "medianMs": 4.001806250000072
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            41.2195329999995,
+            40.50446900000043,
+            41.54316999999992,
+            39.37149700000009,
+            38.80262099999982
+          ],
+          "sampleBatchMs": [
+            40.02643999999964,
+            40.565309999999954,
+            38.801980000000185,
+            41.87070400000084,
+            46.630153000000064,
+            39.124604999999974,
+            38.27631400000064,
+            40.54278599999998,
+            39.88722999999936
+          ],
+          "medianMs": 0.3127065624999972
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            39.190692000000126,
+            37.53619299999991,
+            38.64873299999999,
+            38.145070999999916,
+            39.19203499999912
+          ],
+          "sampleBatchMs": [
+            39.1017609999999,
+            38.70263299999988,
+            37.87682499999937,
+            38.916087999999945,
+            38.41577000000052,
+            38.256163999999444,
+            42.26359400000001,
+            38.510559000000285,
+            39.41914999999972
+          ],
+          "medianMs": 9.67565824999997
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            45.564031000000796,
+            40.63901799999985,
+            38.554824999999255,
+            40.81832200000008,
+            41.24946799999998
+          ],
+          "sampleBatchMs": [
+            41.47613300000012,
+            42.053460000000086,
+            47.371415999999954,
+            49.82451399999991,
+            41.458856999999625,
+            41.938303999999334,
+            44.57087599999977,
+            44.68520499999977,
+            41.106456999999864
+          ],
+          "medianMs": 5.256682500000011
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            88.99585699999989,
+            72.84832499999993,
+            65.94754900000044,
+            64.24803400000019,
+            63.111707000000024
+          ],
+          "sampleBatchMs": [
+            61.5911559999995,
+            61.86118299999998,
+            61.88636000000042,
+            63.3438900000001,
+            63.49113699999998,
+            60.644108999999844,
+            60.76889300000039,
+            60.931681999999455,
+            62.75353900000027
+          ],
+          "medianMs": 7.732647874999998
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            56.259461999999985,
+            29.515455000000657,
+            27.366355000000112,
+            28.45427000000018,
+            28.507167999999183
+          ],
+          "sampleBatchMs": [
+            31.17293299999983,
+            28.792061000000103,
+            28.155447000000095,
+            27.999010999999882,
+            28.602731999999378,
+            28.68507200000022,
+            39.101050000000214,
+            26.713544999999613,
+            28.329412000000048
+          ],
+          "medianMs": 0.055864710937498785
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            34.082909000000654,
+            31.92943600000035,
+            34.06696499999998,
+            32.82675999999992,
+            37.1286999999993
+          ],
+          "sampleBatchMs": [
+            33.60293300000012,
+            32.381868999999824,
+            30.99380100000053,
+            32.06916600000022,
+            32.20831499999986,
+            31.466256000000612,
+            31.2489429999996,
+            31.262415000000146,
+            32.650150999998914
+          ],
+          "medianMs": 0.25054035937500174
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            43.995944000000236,
+            42.93203799999901,
+            40.676933000000645,
+            41.270338000000265,
+            41.30521399999998
+          ],
+          "sampleBatchMs": [
+            42.65122499999961,
+            39.94934599999942,
+            39.88691800000015,
+            41.3273590000008,
+            40.238822999999684,
+            39.67807899999934,
+            44.611353999998755,
+            41.76427700000022,
+            39.577440000000934
+          ],
+          "medianMs": 10.059705749999921
+        },
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            85.37334699999883,
+            89.63964599999963,
+            85.54628199999934,
+            83.97727899999882,
+            83.65416899999946
+          ],
+          "sampleBatchMs": [
+            82.84277099999963,
+            84.7356749999999,
+            85.94724899999892,
+            81.72292500000003,
+            80.75903699999981,
+            80.6008669999992,
+            80.15214000000014,
+            85.21692299999995,
+            81.1167600000008
+          ],
+          "medianMs": 10.215365625000004
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "after",
+      "start": "2026-11-04T19:08:03.966Z",
+      "runtime": "node",
+      "version": "24.22.1",
+      "versions": {
+        "node": "24.22.1",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.9",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "3.5.9",
+        "simdjson": "4.6.11",
+        "simdutf": "6.4.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.30.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.17-node.58",
+        "zlib": "1.3.2.1-motley-285e94b",
+        "zstd": "1.5.7"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": true,
+      "records": [
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            78.38689299999999,
+            62.030168,
+            63.15871199999998,
+            63.19502699999998,
+            63.902806999999996
+          ],
+          "sampleBatchMs": [
+            63.563252999999975,
+            62.098329000000035,
+            65.01435600000002,
+            63.15537800000004,
+            63.58166999999992,
+            64.28727800000001,
+            64.03000499999996,
+            63.679786000000036,
+            62.78567899999996
+          ],
+          "medianMs": 7.94770874999999
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            29.497678000000178,
+            42.51583399999981,
+            28.721647000000075,
+            29.286783999999898,
+            28.87527399999999
+          ],
+          "sampleBatchMs": [
+            28.563161000000036,
+            33.977834999999914,
+            28.85886000000005,
+            29.29082100000005,
+            27.418371999999863,
+            31.960022000000208,
+            34.89287300000001,
+            30.41252499999996,
+            30.28468500000008
+          ],
+          "medianMs": 7.57117125000002
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            33.1371979999999,
+            20.966719999999896,
+            20.369223000000147,
+            19.56040300000018,
+            19.82405400000016
+          ],
+          "sampleBatchMs": [
+            21.60592799999995,
+            19.2634129999999,
+            19.225306000000046,
+            20.980650999999853,
+            19.989368999999897,
+            20.04195699999991,
+            19.742492999999968,
+            19.638738999999987,
+            18.806685000000016
+          ],
+          "medianMs": 0.15423822656249975
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            53.147387999999864,
+            30.778889000000163,
+            33.284987,
+            38.243353999999954,
+            32.90044200000011
+          ],
+          "sampleBatchMs": [
+            33.923765,
+            33.68157599999995,
+            36.38174600000002,
+            30.778258000000278,
+            35.76138700000001,
+            31.34436800000003,
+            39.67681100000027,
+            32.06591800000024,
+            28.917386999999962
+          ],
+          "medianMs": 0.0657843281249999
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            121.5428109999998,
+            92.6337169999997,
+            75.03394800000024,
+            81.67601800000011,
+            59.065849999999955
+          ],
+          "sampleBatchMs": [
+            79.70327100000031,
+            74.30481999999984,
+            59.62422199999992,
+            60.800272999999834,
+            59.3708529999999,
+            59.84733899999992,
+            69.45425399999976,
+            63.15946399999984,
+            59.128491999999824
+          ],
+          "medianMs": 7.600034124999979
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            45.009563999999955,
+            44.564232999999604,
+            40.603165999999874,
+            42.074147999999695,
+            40.6790689999998
+          ],
+          "sampleBatchMs": [
+            39.99022600000035,
+            38.77587399999993,
+            38.25050400000009,
+            41.8006419999997,
+            44.49598200000037,
+            39.620848000000024,
+            44.431666999999834,
+            45.004195999999865,
+            42.87464499999987
+          ],
+          "medianMs": 5.225080249999962
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            30.08817399999998,
+            30.27354800000012,
+            30.27750500000002,
+            27.728721999999834,
+            32.573059999999714
+          ],
+          "sampleBatchMs": [
+            36.16139000000021,
+            32.7894610000003,
+            32.56097299999965,
+            33.211637999999766,
+            28.812541000000238,
+            32.7509740000005,
+            31.756970000000365,
+            31.343676999999843,
+            30.648135000000366
+          ],
+          "medianMs": 8.140243249999912
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            31.220273999999336,
+            31.57142500000009,
+            31.180624999999964,
+            29.828719000000092,
+            29.954375000000255
+          ],
+          "sampleBatchMs": [
+            29.546911000000364,
+            32.4207150000002,
+            32.21310699999958,
+            31.630141999999978,
+            30.884665000000496,
+            28.415071999999782,
+            28.534708999999566,
+            28.211640000000443,
+            27.8000090000005
+          ],
+          "medianMs": 0.23083524218750284
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            35.43491699999959,
+            32.81551099999979,
+            32.27716100000089,
+            31.815897000000405,
+            33.38767899999948
+          ],
+          "sampleBatchMs": [
+            31.420701000000008,
+            32.22389199999998,
+            32.12057900000036,
+            31.25040799999988,
+            32.31850299999951,
+            32.93086099999982,
+            34.08954100000028,
+            44.012001000000055,
+            35.92281400000047
+          ],
+          "medianMs": 4.039812874999939
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            20.521742999999333,
+            15.986492999999427,
+            15.731980999999905,
+            16.163880000000063,
+            16.348978999999417
+          ],
+          "sampleBatchMs": [
+            15.173819999999978,
+            15.051785999999993,
+            15.282243000000562,
+            15.339258999999402,
+            15.93192099999942,
+            15.276233999999931,
+            15.136844000000565,
+            15.844229000000269,
+            15.010683999999856
+          ],
+          "medianMs": 0.029836394531249866
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            53.81644000000051,
+            56.40848300000016,
+            57.38698699999986,
+            54.70302500000071,
+            52.746148000000176
+          ],
+          "sampleBatchMs": [
+            54.72322500000064,
+            52.65933800000039,
+            50.68997899999977,
+            52.168674999999894,
+            59.88297000000057,
+            52.96295900000041,
+            50.92828699999973,
+            52.66163599999982,
+            51.50920200000019
+          ],
+          "medianMs": 0.8228021562500061
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            47.63022099999944,
+            46.871267000000444,
+            47.3827680000004,
+            46.8730800000003,
+            49.205291999999645
+          ],
+          "sampleBatchMs": [
+            47.0368269999999,
+            48.49014399999942,
+            49.98702899999989,
+            48.24165999999968,
+            49.86789899999985,
+            48.23647299999993,
+            47.598503000000164,
+            48.063594000000194,
+            48.74129300000004
+          ],
+          "medianMs": 0.753775937499995
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            55.06952199999978,
+            51.393567000000075,
+            55.130253999999695,
+            52.90462200000002,
+            54.427575000000616
+          ],
+          "sampleBatchMs": [
+            57.1762690000005,
+            67.89173000000028,
+            54.36106500000005,
+            53.165955999999824,
+            55.80652199999986,
+            59.56952399999955,
+            60.99144800000067,
+            60.97281099999964,
+            52.61678800000027
+          ],
+          "medianMs": 0.8933792031250078
+        },
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            48.78610599999956,
+            51.91072600000007,
+            48.32076899999993,
+            49.44766600000003,
+            49.79202500000065
+          ],
+          "sampleBatchMs": [
+            55.33159700000033,
+            47.66885900000125,
+            47.67447600000014,
+            55.96343800000068,
+            51.96274500000072,
+            50.68445900000006,
+            49.045742000000246,
+            49.51828299999943,
+            47.898653999998714
+          ],
+          "medianMs": 0.7737231718749911
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "before",
+      "start": "2026-11-04T19:08:12.682Z",
+      "runtime": "node",
+      "version": "24.22.1",
+      "versions": {
+        "node": "24.22.1",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.9",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.3",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "137",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "3.5.9",
+        "simdjson": "4.6.11",
+        "simdutf": "6.4.0",
+        "sqlite": "3.53.4",
+        "tz": "2026e",
+        "undici": "7.30.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "13.6.233.17-node.58",
+        "zlib": "1.3.2.1-motley-285e94b",
+        "zstd": "1.5.7"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": true,
+      "records": [
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            105.788163,
+            92.17152899999996,
+            89.52707600000002,
+            100.67459300000002,
+            96.53270600000002
+          ],
+          "sampleBatchMs": [
+            99.311871,
+            99.04445799999996,
+            98.13270599999998,
+            97.016975,
+            99.28634299999999,
+            99.53160700000012,
+            101.91039799999999,
+            99.0539940000001,
+            99.20098299999995
+          ],
+          "medianMs": 12.400122874999994
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            51.878584000000046,
+            44.98487799999998,
+            45.26313200000004,
+            44.02458699999988,
+            43.331503999999995
+          ],
+          "sampleBatchMs": [
+            52.08551200000011,
+            50.57401099999993,
+            45.237973999999895,
+            47.96028799999999,
+            45.115632000000005,
+            47.09578099999976,
+            47.65665599999966,
+            83.11446500000011,
+            45.18355900000006
+          ],
+          "medianMs": 11.914163999999914
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            62.88801599999988,
+            50.608302000000094,
+            50.974377000000004,
+            51.444246999999905,
+            46.23003199999994
+          ],
+          "sampleBatchMs": [
+            35.828320000000076,
+            48.90189499999997,
+            38.82263499999999,
+            34.691065999999864,
+            38.9508850000002,
+            41.89332699999977,
+            37.344804000000295,
+            35.172303000000284,
+            41.129269999999906
+          ],
+          "medianMs": 0.30330183593749993
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            56.35547200000019,
+            47.14058799999975,
+            48.60820300000023,
+            48.95762400000012,
+            41.4273189999999
+          ],
+          "sampleBatchMs": [
+            30.154569999999694,
+            25.37309899999991,
+            25.721947999999884,
+            26.869618000000173,
+            25.857629999999972,
+            25.101494000000002,
+            35.29672800000026,
+            26.493047000000388,
+            26.371926000000258
+          ],
+          "medianMs": 0.0515076679687505
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            112.01256300000023,
+            70.4900520000001,
+            65.94857899999988,
+            63.765758000000005,
+            62.07914600000004
+          ],
+          "sampleBatchMs": [
+            63.01590100000021,
+            69.0359370000001,
+            68.0068339999998,
+            66.29522499999985,
+            63.778236999999535,
+            62.1191060000001,
+            62.65954000000056,
+            71.33071999999993,
+            64.395896
+          ],
+          "medianMs": 8.049487
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            49.14642499999991,
+            43.9606219999996,
+            42.68413099999998,
+            43.204945999999836,
+            43.043525999999474
+          ],
+          "sampleBatchMs": [
+            47.98887999999988,
+            42.09639700000025,
+            43.64757399999962,
+            42.58997199999976,
+            42.746807000000445,
+            44.09837599999992,
+            43.6426790000005,
+            43.817088000000695,
+            52.854496999999355
+          ],
+          "medianMs": 5.455946749999953
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            43.647226000000046,
+            43.56427199999962,
+            44.75470299999961,
+            46.03686900000048,
+            63.24237499999981
+          ],
+          "sampleBatchMs": [
+            45.96925800000008,
+            47.87664500000028,
+            50.26023900000018,
+            69.68332800000007,
+            49.44276400000035,
+            56.084484999999404,
+            65.14218000000074,
+            62.672771999999895,
+            55.12794699999995
+          ],
+          "medianMs": 13.781986749999987
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            70.04770400000052,
+            72.1173519999993,
+            70.77687900000001,
+            71.04321499999969,
+            70.68200799999977
+          ],
+          "sampleBatchMs": [
+            69.89320399999997,
+            71.11210800000026,
+            72.05662200000006,
+            70.89365199999975,
+            71.41859399999976,
+            53.62855799999943,
+            47.52864700000009,
+            51.85541199999989,
+            49.88232799999969
+          ],
+          "medianMs": 0.5460406562499998
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            57.88662000000022,
+            52.61752499999966,
+            44.34386100000029,
+            40.55922299999929,
+            44.0715169999994
+          ],
+          "sampleBatchMs": [
+            45.958206000000246,
+            38.531098000000384,
+            45.169378000000506,
+            40.14516800000001,
+            46.83387399999992,
+            51.25500899999952,
+            45.90254400000049,
+            44.70147399999951,
+            52.26753899999949
+          ],
+          "medianMs": 5.737818000000061
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            20.10434599999917,
+            15.425763999999617,
+            21.915940000000774,
+            21.0408180000004,
+            19.60608499999944
+          ],
+          "sampleBatchMs": [
+            12.827666000000136,
+            12.675578999999743,
+            13.1143119999997,
+            20.474566999999297,
+            17.75087100000019,
+            17.06481100000019,
+            15.915305999999873,
+            14.670145000000048,
+            14.592620000000352
+          ],
+          "medianMs": 0.028652626953125093
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            62.49301000000014,
+            62.17125099999976,
+            61.00822200000039,
+            57.72100399999999,
+            69.15379500000017
+          ],
+          "sampleBatchMs": [
+            66.97853099999975,
+            60.71287299999949,
+            58.37224199999946,
+            57.039199999999255,
+            59.207093999999415,
+            57.57741999999962,
+            57.676236999999674,
+            61.56009300000005,
+            55.71854600000006
+          ],
+          "medianMs": 0.9120662812499916
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            62.34125500000118,
+            59.362075000000914,
+            54.91073499999948,
+            51.77929800000129,
+            54.123794000001
+          ],
+          "sampleBatchMs": [
+            51.57518499999969,
+            54.240687999999864,
+            54.293728000000556,
+            54.399373999998716,
+            53.358947999999145,
+            51.93653099999938,
+            50.56078600000001,
+            50.19144700000106,
+            53.41158600000017
+          ],
+          "medianMs": 0.8337335624999866
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            66.1155920000001,
+            63.02967799999897,
+            57.19988899999953,
+            55.992473999998765,
+            58.07466999999997
+          ],
+          "sampleBatchMs": [
+            54.079829000000245,
+            69.35851900000125,
+            55.20305999999982,
+            54.72482800000034,
+            54.89772600000106,
+            58.520964000001186,
+            61.820480000000316,
+            59.37951999999859,
+            66.3803910000006
+          ],
+          "medianMs": 0.9143900625000185
+        },
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            53.8100570000006,
+            51.73745600000075,
+            55.49047699999937,
+            49.865953000000445,
+            49.75619000000006
+          ],
+          "sampleBatchMs": [
+            48.85001200000079,
+            48.082180999999764,
+            57.52894800000104,
+            48.94559500000105,
+            45.25410499999998,
+            49.37677600000097,
+            47.61996300000101,
+            50.17916900000091,
+            59.16327900000033
+          ],
+          "medianMs": 0.7647749218750164
+        }
+      ]
+    },
+    {
+      "pair": 0,
+      "variant": "before",
+      "start": "2026-11-04T19:08:23.710Z",
+      "runtime": "bun",
+      "version": "1.4.2",
+      "versions": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.3",
+        "unicode": "17.0",
+        "sqlite": "3.53.2",
+        "modules": "147"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": false,
+      "records": [
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            29.559676000000003,
+            20.367897999999997,
+            18.447192,
+            14.308887999999996,
+            13.748003999999995
+          ],
+          "sampleBatchMs": [
+            13.735365000000002,
+            13.07554399999998,
+            14.019418000000002,
+            13.306006999999994,
+            13.587174000000005,
+            13.588817000000006,
+            13.83433199999999,
+            13.938797999999991,
+            13.369339999999966
+          ],
+          "medianMs": 0.2123252656250001
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            31.37218200000001,
+            19.503592999999967,
+            15.711212999999987,
+            18.53407100000004,
+            16.361961000000008
+          ],
+          "sampleBatchMs": [
+            16.26022999999998,
+            17.07156600000002,
+            18.371849999999995,
+            16.243965000000003,
+            16.670059000000037,
+            16.784869999999955,
+            16.39055400000001,
+            17.25450799999993,
+            18.722621000000004
+          ],
+          "medianMs": 0.2622635937499993
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            17.369940000000042,
+            14.655484000000001,
+            15.59300799999994,
+            14.98628599999995,
+            14.910933999999997
+          ],
+          "sampleBatchMs": [
+            15.443224999999984,
+            23.687344000000053,
+            13.956553999999983,
+            14.472230999999965,
+            13.082223999999997,
+            14.916751999999974,
+            14.514884000000052,
+            13.83770699999991,
+            14.58407699999998
+          ],
+          "medianMs": 0.2267950625000008
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            18.30453,
+            18.049881000000028,
+            18.46817299999998,
+            16.02873599999998,
+            17.252264999999966
+          ],
+          "sampleBatchMs": [
+            18.148807999999917,
+            17.285463999999934,
+            17.099368000000027,
+            17.089492999999948,
+            16.567506999999978,
+            17.814411000000064,
+            16.627515000000017,
+            15.885191999999961,
+            17.087170000000015
+          ],
+          "medianMs": 0.2670233281249992
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            27.6430170000001,
+            25.61620300000004,
+            27.814500999999836,
+            26.592043999999987,
+            26.04085299999997
+          ],
+          "sampleBatchMs": [
+            25.783901999999898,
+            25.536323999999922,
+            32.956047000000126,
+            26.659353999999894,
+            25.654399000000012,
+            28.471900000000005,
+            25.464326999999912,
+            26.034173999999894,
+            25.470866000000115
+          ],
+          "medianMs": 0.0503591835937498
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            46.94659200000001,
+            42.11949400000003,
+            43.06456900000012,
+            42.859414000000015,
+            41.686660000000074
+          ],
+          "sampleBatchMs": [
+            49.372247000000016,
+            43.7788680000001,
+            43.12555199999997,
+            43.5350390000001,
+            49.90523899999994,
+            42.67481900000007,
+            43.63237499999991,
+            49.45423200000005,
+            46.79784600000016
+          ],
+          "medianMs": 5.472358500000013
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            55.52452600000015,
+            46.995714000000135,
+            46.9549020000004,
+            59.33019800000011,
+            53.095900999999685
+          ],
+          "sampleBatchMs": [
+            65.24352499999986,
+            68.2960479999997,
+            74.43657500000018,
+            74.19412199999988,
+            67.19977500000005,
+            72.56131899999991,
+            62.83778900000016,
+            61.153857000000244,
+            67.91312100000005
+          ],
+          "medianMs": 0.5305712578125004
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            39.98406700000032,
+            37.494922000000315,
+            37.1215000000002,
+            37.29368400000021,
+            36.89729800000032
+          ],
+          "sampleBatchMs": [
+            31.593949000000066,
+            37.78955900000028,
+            32.964362000000165,
+            27.36153400000012,
+            35.81720399999995,
+            23.790890000000218,
+            22.316397999999936,
+            24.08131000000003,
+            24.205563999999868
+          ],
+          "medianMs": 6.84038350000003
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            41.25673900000038,
+            44.93289999999979,
+            43.256778999999824,
+            43.151894000000084,
+            42.75629899999967
+          ],
+          "sampleBatchMs": [
+            42.82191700000021,
+            45.71432700000014,
+            42.76485099999991,
+            46.98318500000005,
+            46.95278999999982,
+            44.247566000000006,
+            42.718083000000206,
+            48.034360000000106,
+            43.308426000000054
+          ],
+          "medianMs": 5.530945750000001
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            154.89137800000026,
+            120.79905700000018,
+            109.56592699999965,
+            92.28382899999997,
+            104.6661550000008
+          ],
+          "sampleBatchMs": [
+            101.78360799999973,
+            103.23653999999988,
+            121.13380700000016,
+            105.87463300000036,
+            79.42012100000011,
+            82.88541000000077,
+            85.50114099999973,
+            91.88644199999999,
+            89.63530899999932
+          ],
+          "medianMs": 11.485805249999999
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            60.45308000000023,
+            53.9684129999996,
+            38.304149999999936,
+            40.034269999999196,
+            44.9012730000004
+          ],
+          "sampleBatchMs": [
+            41.00284399999964,
+            40.05479999999989,
+            36.87315200000012,
+            40.98187299999972,
+            41.82422000000042,
+            42.61212599999999,
+            44.39207999999962,
+            42.64097899999979,
+            40.42327700000078
+          ],
+          "medianMs": 0.0800836796874993
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            32.372260999999526,
+            28.109302000000753,
+            28.76310999999987,
+            31.360083000000486,
+            29.6118349999997
+          ],
+          "sampleBatchMs": [
+            28.76595300000008,
+            28.046378000000004,
+            31.849527000000307,
+            30.4107469999999,
+            32.692535000000134,
+            30.442423999999846,
+            30.210411000000022,
+            29.616723000000093,
+            32.15404799999942
+          ],
+          "medianMs": 0.23758396093749923
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            28.22339000000011,
+            30.964578000000074,
+            30.688388999999916,
+            25.86644199999955,
+            23.804190000000744
+          ],
+          "sampleBatchMs": [
+            27.877709000000323,
+            28.58482600000025,
+            26.288747000000512,
+            30.554540000000088,
+            30.329577999999856,
+            24.970666000000165,
+            24.53796599999987,
+            26.419471000000158,
+            33.87429299999985
+          ],
+          "medianMs": 6.969427250000081
+        },
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            80.68454800000018,
+            75.37219199999981,
+            77.74493299999995,
+            80.66394800000035,
+            79.77724800000033
+          ],
+          "sampleBatchMs": [
+            74.76584900000034,
+            70.08060699999987,
+            81.67766200000005,
+            70.42445800000041,
+            77.09497600000032,
+            61.69461600000068,
+            62.77712800000063,
+            66.71230400000059,
+            62.65050899999915
+          ],
+          "medianMs": 8.760075874999984
+        }
+      ]
+    },
+    {
+      "pair": 0,
+      "variant": "after",
+      "start": "2026-11-04T19:08:31.940Z",
+      "runtime": "bun",
+      "version": "1.4.2",
+      "versions": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.3",
+        "unicode": "17.0",
+        "sqlite": "3.53.2",
+        "modules": "147"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": false,
+      "records": [
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            31.88835800000001,
+            21.081069,
+            20.69122399999999,
+            18.302868999999987,
+            18.093828000000002
+          ],
+          "sampleBatchMs": [
+            17.830840999999992,
+            16.130475999999987,
+            17.208380000000005,
+            18.07070299999998,
+            17.47085100000001,
+            15.953944000000035,
+            16.04143399999998,
+            18.55381299999999,
+            21.083226999999965
+          ],
+          "medianMs": 0.27298204687500016
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            41.09853500000003,
+            23.72377700000004,
+            19.34322800000001,
+            20.148956999999996,
+            24.218412999999998
+          ],
+          "sampleBatchMs": [
+            21.002947999999947,
+            23.853199000000018,
+            26.315083000000072,
+            38.94174500000008,
+            16.141351999999983,
+            16.314440000000104,
+            17.90713100000005,
+            17.642115999999987,
+            17.496589000000085
+          ],
+          "medianMs": 0.2797989218750008
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            19.193153999999936,
+            15.421039999999948,
+            16.630919999999946,
+            17.076373999999987,
+            15.293942000000015
+          ],
+          "sampleBatchMs": [
+            24.695642999999905,
+            18.814409999999953,
+            14.594619999999964,
+            19.251701000000025,
+            17.573073000000022,
+            14.368203999999992,
+            15.216886999999929,
+            16.709236999999916,
+            15.809918999999923
+          ],
+          "medianMs": 0.2610818281249987
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            20.657613000000083,
+            20.246121000000016,
+            22.882209999999986,
+            21.052190999999993,
+            23.246195999999827
+          ],
+          "sampleBatchMs": [
+            18.456578000000036,
+            18.347173999999995,
+            18.243871000000127,
+            19.994706999999835,
+            18.865866000000096,
+            19.47817800000007,
+            18.963592999999946,
+            17.756955999999946,
+            20.345379000000094
+          ],
+          "medianMs": 0.2947791562500015
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            44.92001200000004,
+            31.647289,
+            32.430144000000155,
+            31.107413999999835,
+            30.73788599999989
+          ],
+          "sampleBatchMs": [
+            44.69912699999986,
+            31.631730999999945,
+            42.531258999999864,
+            40.26115800000002,
+            39.402151,
+            30.560195999999905,
+            34.562836999999945,
+            33.31395600000019,
+            29.97771499999999
+          ],
+          "medianMs": 0.06750554101562489
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            42.88483700000006,
+            36.237491999999975,
+            46.64565300000004,
+            44.98615000000018,
+            42.419995999999855
+          ],
+          "sampleBatchMs": [
+            42.123302000000194,
+            45.89944699999978,
+            46.92904300000009,
+            52.83087299999988,
+            40.05915199999981,
+            56.0409209999998,
+            53.00808099999995,
+            36.392277999999806,
+            43.75110300000006
+          ],
+          "medianMs": 5.737430874999973
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            58.85991600000034,
+            57.86990799999967,
+            56.194486999999754,
+            56.312089000000014,
+            56.057266000000254
+          ],
+          "sampleBatchMs": [
+            55.19201999999996,
+            54.70315500000015,
+            55.555722999999944,
+            56.152876000000106,
+            55.632996000000276,
+            55.685101999999915,
+            55.25866799999994,
+            54.45578299999988,
+            55.19516599999997
+          ],
+          "medianMs": 0.43170834374999956
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            41.32440400000041,
+            36.64414600000009,
+            36.773715999999695,
+            36.4517249999999,
+            36.69514100000015
+          ],
+          "sampleBatchMs": [
+            25.535206000000017,
+            23.10605200000009,
+            30.63652699999966,
+            28.92386800000031,
+            36.729887999999846,
+            35.753197,
+            27.51597700000002,
+            28.209957999999915,
+            36.444132999999965
+          ],
+          "medianMs": 7.230967000000078
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            61.68910599999981,
+            62.88438099999985,
+            53.60058600000002,
+            53.297615999999834,
+            46.37112399999978
+          ],
+          "sampleBatchMs": [
+            46.32667799999945,
+            47.745586,
+            59.32517299999927,
+            53.219946000000164,
+            59.251578999999765,
+            71.22392799999943,
+            72.65557100000024,
+            50.552112999999736,
+            56.77046200000041
+          ],
+          "medianMs": 7.096307750000051
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            174.98116599999958,
+            109.1730349999998,
+            132.2383519999994,
+            102.24337800000012,
+            99.16842400000041
+          ],
+          "sampleBatchMs": [
+            99.74568799999997,
+            110.6586670000006,
+            111.81966199999988,
+            117.08960799999932,
+            96.99272099999962,
+            100.5269530000005,
+            106.93880999999965,
+            110.56998099999964,
+            111.41371900000013
+          ],
+          "medianMs": 13.821247624999955
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            83.48082499999964,
+            63.08995200000027,
+            53.332344000000376,
+            53.654341999999815,
+            56.5196390000001
+          ],
+          "sampleBatchMs": [
+            52.82705299999998,
+            52.380119999999806,
+            51.93699100000049,
+            53.285383999999794,
+            53.18281200000001,
+            52.893772000000354,
+            53.014672000000246,
+            52.64781700000003,
+            52.217616999999336
+          ],
+          "medianMs": 0.10317783789062496
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            42.97876999999971,
+            43.84444600000006,
+            42.78321000000051,
+            42.99941999999919,
+            43.197025000000394
+          ],
+          "sampleBatchMs": [
+            43.014022000000296,
+            43.30588700000044,
+            36.31846399999995,
+            41.05411000000004,
+            31.001244000000042,
+            29.68800199999987,
+            34.275157999999465,
+            33.3429129999995,
+            31.022694999999658
+          ],
+          "medianMs": 0.2677746718749958
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            32.475885000000744,
+            25.134266000000025,
+            27.165654999999788,
+            25.161686000000373,
+            24.36808800000017
+          ],
+          "sampleBatchMs": [
+            31.896623000000545,
+            30.356464999999844,
+            23.416873999999552,
+            26.71298200000001,
+            28.942644999999175,
+            25.17453999999998,
+            26.599362999999357,
+            28.487467999999353,
+            31.38152799999989
+          ],
+          "medianMs": 7.121866999999838
+        },
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            76.56927499999983,
+            107.48544299999958,
+            91.76414699999987,
+            92.58388100000047,
+            82.81365399999959
+          ],
+          "sampleBatchMs": [
+            63.62169300000096,
+            74.63767999999982,
+            66.31799899999896,
+            76.04730500000005,
+            71.593347,
+            76.24840399999994,
+            79.84789199999977,
+            77.52717399999892,
+            75.8636719999995
+          ],
+          "medianMs": 9.482958999999937
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "after",
+      "start": "2026-11-04T19:08:41.196Z",
+      "runtime": "bun",
+      "version": "1.4.2",
+      "versions": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.3",
+        "unicode": "17.0",
+        "sqlite": "3.53.2",
+        "modules": "147"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": true,
+      "records": [
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            70.212916,
+            68.58739499999999,
+            63.74411200000003,
+            57.707179,
+            59.46002800000002
+          ],
+          "sampleBatchMs": [
+            60.44958700000001,
+            85.84106600000007,
+            64.85719899999992,
+            59.200313999999935,
+            59.20423100000005,
+            58.12109600000008,
+            65.13909000000001,
+            63.39495699999998,
+            60.257784000000015
+          ],
+          "medianMs": 7.556198375000001
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            24.650778000000173,
+            21.497832000000017,
+            24.87838899999997,
+            24.503134000000045,
+            26.673270000000002
+          ],
+          "sampleBatchMs": [
+            21.928698000000168,
+            23.576590000000124,
+            22.002366000000166,
+            23.091109999999844,
+            24.24906400000009,
+            24.939047999999957,
+            22.678379000000177,
+            22.161286999999902,
+            21.154493000000002
+          ],
+          "medianMs": 5.669594750000044
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            24.133415999999897,
+            26.380593999999974,
+            23.250782000000072,
+            28.942330999999967,
+            23.360300999999936
+          ],
+          "sampleBatchMs": [
+            25.138847999999825,
+            22.24433799999997,
+            23.252894000000197,
+            24.902865999999904,
+            28.322578999999905,
+            24.729522000000088,
+            25.992680000000064,
+            24.92073000000005,
+            24.400814999999966
+          ],
+          "medianMs": 0.19455364062499925
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            60.16293100000007,
+            45.94735700000001,
+            36.759862999999996,
+            39.04375500000015,
+            37.62348900000006
+          ],
+          "sampleBatchMs": [
+            36.768685000000005,
+            45.72304699999995,
+            43.82986699999992,
+            52.308120000000145,
+            38.21645099999978,
+            40.55909900000006,
+            40.95294200000035,
+            48.536177999999836,
+            37.841415999999754
+          ],
+          "medianMs": 0.07998621484375068
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            136.17270800000006,
+            112.48358499999995,
+            107.1882770000002,
+            105.21071499999971,
+            107.62947800000029
+          ],
+          "sampleBatchMs": [
+            108.60292900000013,
+            112.83398400000033,
+            113.3720970000004,
+            100.7307780000001,
+            69.93218699999989,
+            73.48172000000022,
+            82.02211299999999,
+            81.3559739999996,
+            79.46949300000006
+          ],
+          "medianMs": 10.252764124999999
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            60.793007000000216,
+            36.44155099999989,
+            36.84585199999992,
+            37.66351600000007,
+            36.398777999999766
+          ],
+          "sampleBatchMs": [
+            34.31386100000009,
+            35.27740300000005,
+            36.98317599999973,
+            34.614488000000165,
+            38.284528999999566,
+            40.495937000000595,
+            43.70725700000003,
+            40.26096300000063,
+            43.117725000000064
+          ],
+          "medianMs": 4.785566124999946
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            26.50652600000012,
+            24.33808399999998,
+            25.495544999999765,
+            22.952095999999983,
+            23.197091
+          ],
+          "sampleBatchMs": [
+            23.46927500000038,
+            22.452715000000353,
+            21.7584539999998,
+            21.805984000000535,
+            23.800076999999874,
+            22.21108600000025,
+            21.806063999999424,
+            22.520386000000144,
+            24.00934700000016
+          ],
+          "medianMs": 5.613178750000088
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            30.12388699999974,
+            32.02084500000001,
+            34.91967999999997,
+            32.477882999999565,
+            31.551297000000886
+          ],
+          "sampleBatchMs": [
+            31.271961999999803,
+            32.4658759999993,
+            31.339022000000114,
+            31.717483999999786,
+            29.886664999999994,
+            35.117693000000145,
+            31.251863000000412,
+            31.981426000000283,
+            31.936373999999887
+          ],
+          "medianMs": 0.24779284374999833
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            41.323239999999714,
+            34.58696500000042,
+            36.873922000000675,
+            38.492465999999695,
+            36.270456000000195
+          ],
+          "sampleBatchMs": [
+            33.374675000000025,
+            38.972773999999845,
+            38.59564899999987,
+            32.43702300000041,
+            32.565278000000035,
+            68.02341200000046,
+            31.291951999999583,
+            32.823036000000684,
+            33.66985299999942
+          ],
+          "medianMs": 4.171834375000003
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            38.088715999999295,
+            39.03137599999991,
+            37.97353500000008,
+            36.211669000000256,
+            35.061870000000454
+          ],
+          "sampleBatchMs": [
+            33.46329700000024,
+            33.71022300000004,
+            34.29852699999992,
+            32.154152999999496,
+            32.797348000000056,
+            36.136037000000215,
+            33.08450399999947,
+            35.95333000000028,
+            37.39921099999992
+          ],
+          "medianMs": 0.06584027929687508
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            20.730646999999408,
+            21.78327099999933,
+            19.834757999999965,
+            22.23734500000046,
+            20.345540999999685
+          ],
+          "sampleBatchMs": [
+            18.952006000000438,
+            20.753811999999925,
+            26.533220000000256,
+            19.91971300000023,
+            18.92340400000012,
+            22.058028999999806,
+            19.186373999999887,
+            20.82190300000002,
+            19.073495999999977
+          ],
+          "medianMs": 0.3112455156250036
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            19.270147999999608,
+            18.129194000000098,
+            19.558987000000343,
+            21.557996000000458,
+            20.578620999999657
+          ],
+          "sampleBatchMs": [
+            21.815558000000237,
+            21.033838000000287,
+            19.56544699999995,
+            21.279531999999563,
+            15.693928000000597,
+            17.11116200000015,
+            17.192402999999103,
+            19.476956000000428,
+            21.16485300000022
+          ],
+          "medianMs": 0.3057101093749992
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            22.993838999999753,
+            22.321288999999524,
+            25.500672000000122,
+            22.875232000000324,
+            20.627865000000384
+          ],
+          "sampleBatchMs": [
+            21.99542500000007,
+            21.418209000000388,
+            20.85346000000027,
+            18.813180000000102,
+            18.712349999999788,
+            19.613158000000112,
+            20.105328999999983,
+            18.417993000000024,
+            20.12514899999951
+          ],
+          "medianMs": 0.31414576562499974
+        },
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            17.027438000000075,
+            18.092779999999948,
+            18.4245719999999,
+            18.45528800000011,
+            18.537309999999707
+          ],
+          "sampleBatchMs": [
+            16.14539799999966,
+            18.815523000000212,
+            18.380286999999953,
+            20.791817999999694,
+            17.303177000000687,
+            17.005895000000237,
+            16.03438300000016,
+            16.12601900000027,
+            17.694649000000027
+          ],
+          "medianMs": 0.27036214062501074
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "before",
+      "start": "2026-11-04T19:08:48.726Z",
+      "runtime": "bun",
+      "version": "1.4.2",
+      "versions": {
+        "node": "26.3.0",
+        "bun": "1.4.2",
+        "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+        "openssl": "1.1.0",
+        "llhttp": "9.3.0",
+        "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+        "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+        "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+        "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+        "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+        "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+        "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+        "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+        "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+        "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+        "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+        "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+        "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "v8": "14.6.202.34-node.20",
+        "uv": "1.48.0",
+        "napi": "10",
+        "icu": "78.3",
+        "unicode": "17.0",
+        "sqlite": "3.53.2",
+        "modules": "147"
+      },
+      "platform": "linux",
+      "arch": "x64",
+      "reverse": true,
+      "records": [
+        {
+          "name": "early-false-suffix-candidates",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "3d1493f4c5f144933817c865a2b939d6386e80844b4b323b5d82eb2b2d9a415a"
+          },
+          "fixtureDigest": "c000d018e20a74182fbb9a83695fb2403e1871cac9205c4e5d36cf27bdd64e2b",
+          "warmupBatchMs": [
+            88.69941899999999,
+            71.887361,
+            69.89421099999998,
+            70.31340900000004,
+            75.77012299999996
+          ],
+          "sampleBatchMs": [
+            67.27754500000003,
+            68.47806199999991,
+            59.19636400000002,
+            57.76084100000003,
+            60.37235199999998,
+            62.178679999999986,
+            68.45005200000003,
+            66.26407099999994,
+            61.34803699999998
+          ],
+          "medianMs": 7.772334999999998
+        },
+        {
+          "name": "common-suffix-middle-mismatch",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2195840,
+            "bytes": "630f7adf217a600a5f9af645daab1cf9361006d30b2fe0093455700dcd4f761e"
+          },
+          "fixtureDigest": "e2224efaaedae05297ac260a61621a090130eb22e21124f20c5a3896eba10ec4",
+          "warmupBatchMs": [
+            31.388975000000073,
+            21.963665999999876,
+            23.717392000000018,
+            22.450407999999925,
+            20.52220800000009
+          ],
+          "sampleBatchMs": [
+            23.027014999999892,
+            20.709569999999985,
+            22.59850500000016,
+            23.018313000000035,
+            25.864839000000075,
+            23.388882000000194,
+            24.715970000000198,
+            24.648385999999846,
+            21.444389
+          ],
+          "medianMs": 5.756753749999973
+        },
+        {
+          "name": "immediate-hit-33-bytes",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 33,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2146608,
+            "bytes": "21d55cf4816caa792e2d9cb02b47fabdda96cc28ef35f0a1e7905c5df6643dd7"
+          },
+          "fixtureDigest": "16c8ee0923940b84fb4a82d86c7219422aaf74c9b24e9723a369518914b2dbae",
+          "warmupBatchMs": [
+            32.036731000000145,
+            31.33140400000002,
+            30.360914999999977,
+            30.357589999999846,
+            32.85143199999993
+          ],
+          "sampleBatchMs": [
+            31.676688000000013,
+            31.24852800000008,
+            35.007290999999896,
+            34.22292300000004,
+            35.145856000000094,
+            39.14086999999995,
+            32.514421000000084,
+            35.76085699999999,
+            36.3711209999999
+          ],
+          "medianMs": 0.2734944609374992
+        },
+        {
+          "name": "short-query",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 10,
+          "caseSensitive": false,
+          "repetitions": 512,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "d19a40a18956e7bff325644294870897697d8cc67ef661fedbe81a998a5ffd3c",
+          "warmupBatchMs": [
+            63.43291199999999,
+            66.79684700000007,
+            51.315618000000086,
+            57.4831650000001,
+            51.502550000000156
+          ],
+          "sampleBatchMs": [
+            56.42564399999992,
+            64.70424700000012,
+            54.60467400000016,
+            48.422991999999795,
+            55.86623499999996,
+            51.65568399999984,
+            51.1965409999998,
+            51.89368800000011,
+            51.106408999999985
+          ],
+          "medianMs": 0.10135485937500022
+        },
+        {
+          "name": "insensitive-unicode",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 40,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2158952,
+            "bytes": "a99c65af17488b57e0a0a6f9bf481b54a03aad10868e8ff18e26874f3a54cc4e"
+          },
+          "fixtureDigest": "5cdae67c74bd4d20fa0fc4194d4b209f14ceb2b5c3c93cc835930050e74430b6",
+          "warmupBatchMs": [
+            153.98845500000016,
+            109.52351599999974,
+            108.16751699999986,
+            106.54852000000028,
+            107.22606899999982
+          ],
+          "sampleBatchMs": [
+            108.34603800000014,
+            103.46315999999979,
+            90.55524400000013,
+            88.36218199999985,
+            93.5279559999999,
+            94.53274800000008,
+            93.8229339999998,
+            87.18570899999986,
+            88.8379589999995
+          ],
+          "medianMs": 11.690994499999988
+        },
+        {
+          "name": "insensitive-ascii",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": false,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "05076400b1744466273344628689254f0af44f7b3662c361ae50e991f670c5e1"
+          },
+          "fixtureDigest": "f8190c3a95639506870c7a05033743b28eac4fa8ccdba728a18af29712772bf6",
+          "warmupBatchMs": [
+            37.39047500000015,
+            33.80228100000022,
+            38.96770699999979,
+            41.07818099999986,
+            46.61997499999961
+          ],
+          "sampleBatchMs": [
+            51.425382000000354,
+            42.77069699999993,
+            37.247520000000804,
+            40.09793700000046,
+            45.64746800000012,
+            28.119974000000184,
+            28.333349999999882,
+            29.186405999999806,
+            30.757464999999684
+          ],
+          "medianMs": 4.6559400000001006
+        },
+        {
+          "name": "overlapping-prefix",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 65,
+          "caseSensitive": true,
+          "repetitions": 4,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2204224,
+            "bytes": "a00c3ef2ffe642c47e84e11470cc41f3be6203a0643fb6bdfdd1ff87035b9a70"
+          },
+          "fixtureDigest": "4b410861e8bd754ca86a4e19ccf74c32cacfe7d6fa6a895a614ea9b67657afea",
+          "warmupBatchMs": [
+            24.98969599999964,
+            25.028213999999934,
+            25.51218599999993,
+            25.36461700000018,
+            30.506493999999293
+          ],
+          "sampleBatchMs": [
+            27.849903000000268,
+            23.195951000000605,
+            25.588308999999754,
+            25.390526000000136,
+            24.48334100000011,
+            24.766630000000077,
+            25.57128400000056,
+            25.15474599999925,
+            23.96314799999982
+          ],
+          "medianMs": 6.288686499999812
+        },
+        {
+          "name": "immediate-hit",
+          "role": "target",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 128,
+          "checksum": 6292480,
+          "immutableBytes": {
+            "used": 2171456,
+            "bytes": "3daf03976445034a6a9a15704d13d00a8682593c50c12fd3a511e41ef6b7a740"
+          },
+          "fixtureDigest": "8dc297d486cbeb661327163f660b82b3bc0921b136c7b45bcaa7605db2186234",
+          "warmupBatchMs": [
+            37.852286999999706,
+            34.94457500000044,
+            34.87513199999921,
+            36.41966299999967,
+            35.157781000000796
+          ],
+          "sampleBatchMs": [
+            37.15884900000037,
+            34.15547499999957,
+            34.33848600000056,
+            40.821852000000035,
+            47.133151,
+            44.290586000000076,
+            39.70840099999987,
+            41.13525600000048,
+            46.08794099999977
+          ],
+          "medianMs": 0.3189207187500003
+        },
+        {
+          "name": "common-first-byte",
+          "role": "control",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 8,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "41b33c6d529d336ef0fdb0afe4cf3ffc93596e10a876721daf66447595769bac"
+          },
+          "fixtureDigest": "73cdd9196474f46bbbf643293a5f6fd1a3f9039ca880827478528bef292fde6c",
+          "warmupBatchMs": [
+            74.56912200000079,
+            48.478525999999874,
+            50.572643000000426,
+            46.808790000000045,
+            47.31146600000011
+          ],
+          "sampleBatchMs": [
+            55.91873099999975,
+            52.20501400000012,
+            45.222609000000375,
+            46.84249,
+            51.799532,
+            49.71443999999974,
+            91.79057100000045,
+            46.02014099999997,
+            48.64387199999965
+          ],
+          "medianMs": 6.2143049999999675
+        },
+        {
+          "name": "needle-longer-than-row",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 512,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 147760,
+            "bytes": "63a63274273f7e67c352408ed739dba50b304d57703440639883832837621826"
+          },
+          "fixtureDigest": "941ac8f239e54ce7eae4b6fa64c172fc7a881ee6a07692acceefb011613e4e1f",
+          "warmupBatchMs": [
+            35.98490799999945,
+            32.270980000000236,
+            39.4624759999997,
+            36.222421000000395,
+            31.540616999999656
+          ],
+          "sampleBatchMs": [
+            32.70616500000051,
+            31.138420000000224,
+            30.902329999999893,
+            31.134594999999536,
+            30.165116999999555,
+            34.67248099999961,
+            30.093399999999747,
+            29.676512000000002,
+            35.82921699999952
+          ],
+          "medianMs": 0.06080975585937409
+        },
+        {
+          "name": "multibyte-needle",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 36,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2113920,
+            "bytes": "5d91c0067cd3545c7d8b04e33d5d5964796f11da53dc45f350c50ece1634d046"
+          },
+          "fixtureDigest": "3ead48dbd09819513c39e490724d546ae8825a9b02812e0dabb3f02beb566d31",
+          "warmupBatchMs": [
+            25.375834000000395,
+            19.758412999999564,
+            21.584571999999753,
+            19.456575000000157,
+            18.88143300000047
+          ],
+          "sampleBatchMs": [
+            21.88381500000014,
+            18.60787700000037,
+            24.56293799999912,
+            21.914756000000125,
+            20.47556600000007,
+            20.54620100000011,
+            18.442401000000245,
+            18.63269400000081,
+            19.766004000000066
+          ],
+          "medianMs": 0.3199307187500011
+        },
+        {
+          "name": "first-byte-near-end",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097536,
+            "bytes": "dd73f6e5d7b159e27e0dac9e8445c79f171332dfa9b146475618f30312ca0303"
+          },
+          "fixtureDigest": "c5a15dfa637474da703dcf249c2bfdcbe16c7b0951bc26d601c859d328ea46c1",
+          "warmupBatchMs": [
+            16.613228999999592,
+            19.149489999999787,
+            16.00105099999928,
+            17.871553999999378,
+            16.965079999999944
+          ],
+          "sampleBatchMs": [
+            17.27812400000039,
+            18.658086000000367,
+            16.982324999999946,
+            16.632658000000447,
+            18.451435000000856,
+            20.66540900000018,
+            19.79660899999999,
+            21.751788999999917,
+            19.56510099999923
+          ],
+          "medianMs": 0.29153259375000573
+        },
+        {
+          "name": "late-start-hit",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 47,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 1572352,
+          "immutableBytes": {
+            "used": 2121912,
+            "bytes": "b2a1ce9df91ec1298536d3c8ebdd4f50eb58f2281e29a0d56580391f385d26ef"
+          },
+          "fixtureDigest": "6fc3145bdd74bb4622e45e9fa3b994098a078b233fac2af21fbd756fc90ceba3",
+          "warmupBatchMs": [
+            18.62823600000047,
+            20.95089199999984,
+            20.735673000000133,
+            21.53207399999974,
+            22.561009000000013
+          ],
+          "sampleBatchMs": [
+            18.313349999999446,
+            19.047027999999955,
+            18.65363399999933,
+            20.89402700000028,
+            20.353916000000027,
+            19.381663999999546,
+            21.95722399999977,
+            21.30472699999973,
+            19.313011999999617
+          ],
+          "medianMs": 0.3028384999999929
+        },
+        {
+          "name": "missing-first-byte",
+          "role": "preservation",
+          "rows": 2048,
+          "queryBytes": 46,
+          "caseSensitive": true,
+          "repetitions": 64,
+          "checksum": 0,
+          "immutableBytes": {
+            "used": 2097456,
+            "bytes": "b6a4ed0d4c132c1d12030149dcb40d5f3b285bec3bc26cc2d7af959fc5999c74"
+          },
+          "fixtureDigest": "cf2cf910c42fc9ecd36495dee06737f5f52d5a66450676d42c3c55828b87292a",
+          "warmupBatchMs": [
+            16.496806000000106,
+            16.563874999999825,
+            19.71005200000036,
+            17.980046000000584,
+            15.272549999999683
+          ],
+          "sampleBatchMs": [
+            17.180139999999483,
+            16.978461000000607,
+            14.702855000000454,
+            18.73691299999973,
+            18.3868480000001,
+            17.393745999999737,
+            16.626758999999765,
+            15.955493000000388,
+            16.24222800000007
+          ],
+          "medianMs": 0.2652884531250095
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "runtime": "node",
+      "name": "missing-first-byte",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.8050847109375079,
+      "afterMs": 0.8062055156249959,
+      "ratio": 1.0018355805274852,
+      "speedup": 0.9981677826549954,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.8453944999999994,
+          "after": 0.8386878593750007,
+          "ratio": 0.9920668508903255
+        },
+        {
+          "before": 0.7647749218750164,
+          "after": 0.7737231718749911,
+          "ratio": 1.0117005013423244
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "late-start-hit",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.939479828125009,
+      "afterMs": 0.8965978125000049,
+      "ratio": 0.9546899353367554,
+      "speedup": 1.0474605031289683,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.9645695937499994,
+          "after": 0.899816421875002,
+          "ratio": 0.9328683256298245
+        },
+        {
+          "before": 0.9143900625000185,
+          "after": 0.8933792031250078,
+          "ratio": 0.9770219950580333
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "first-byte-near-end",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 1.0101141406249923,
+      "afterMs": 0.9781293046874993,
+      "ratio": 0.9572249304899311,
+      "speedup": 1.0446865393363456,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 1.186494718749998,
+          "after": 1.2024826718750035,
+          "ratio": 1.0134749467252997
+        },
+        {
+          "before": 0.8337335624999866,
+          "after": 0.753775937499995,
+          "ratio": 0.9040969098566272
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "multibyte-needle",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.8981080624999969,
+      "afterMs": 0.8169146093750044,
+      "ratio": 0.9096812560719928,
+      "speedup": 1.0992861437180799,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.8841498437500022,
+          "after": 0.8110270625000027,
+          "ratio": 0.9172959405389259
+        },
+        {
+          "before": 0.9120662812499916,
+          "after": 0.8228021562500061,
+          "ratio": 0.9021297828512544
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "needle-longer-than-row",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.027969323242187816,
+      "afterMs": 0.025241191406249808,
+      "ratio": 0.8876437373534607,
+      "speedup": 1.1265781055150947,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.027286019531250538,
+          "after": 0.02064598828124975,
+          "ratio": 0.7566507917215263
+        },
+        {
+          "before": 0.028652626953125093,
+          "after": 0.029836394531249866,
+          "ratio": 1.0413144519021373
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "common-first-byte",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 5.712128125000049,
+      "afterMs": 4.0208095625000055,
+      "ratio": 0.7039067106783793,
+      "speedup": 1.4206427994361146,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 5.686438250000037,
+          "after": 4.001806250000072,
+          "ratio": 0.7037456618824703
+        },
+        {
+          "before": 5.737818000000061,
+          "after": 4.039812874999939,
+          "ratio": 0.7040677963295273
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "immediate-hit",
+      "role": "target",
+      "pairs": 2,
+      "beforeMs": 0.4835225937499992,
+      "afterMs": 0.27177090234375,
+      "ratio": 0.5603555527839621,
+      "speedup": 1.784581227100889,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.4210045312499986,
+          "after": 0.3127065624999972,
+          "ratio": 0.7427629378988976
+        },
+        {
+          "before": 0.5460406562499998,
+          "after": 0.23083524218750284,
+          "ratio": 0.4227436905024468
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "overlapping-prefix",
+      "role": "target",
+      "pairs": 2,
+      "beforeMs": 13.229397250000034,
+      "afterMs": 8.90795074999994,
+      "ratio": 0.671425893172086,
+      "speedup": 1.489367643055286,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 12.67680775000008,
+          "after": 9.67565824999997,
+          "ratio": 0.7632566842389724
+        },
+        {
+          "before": 13.781986749999987,
+          "after": 8.140243249999912,
+          "ratio": 0.5906436711673605
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "insensitive-ascii",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 5.934939749999955,
+      "afterMs": 5.2408813749999865,
+      "ratio": 0.8859415971389386,
+      "speedup": 1.1287425753902987,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 6.413932749999958,
+          "after": 5.256682500000011,
+          "ratio": 0.8195724378307592
+        },
+        {
+          "before": 5.455946749999953,
+          "after": 5.225080249999962,
+          "ratio": 0.9576853458109736
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "insensitive-unicode",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 8.602398875000006,
+      "afterMs": 7.6663409999999885,
+      "ratio": 0.8929995532342949,
+      "speedup": 1.1198213889113016,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 9.155310750000012,
+          "after": 7.732647874999998,
+          "ratio": 0.8446079096769039
+        },
+        {
+          "before": 8.049487,
+          "after": 7.600034124999979,
+          "ratio": 0.9441637864624143
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "short-query",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 0.06078102734375124,
+      "afterMs": 0.060824519531249344,
+      "ratio": 1.0091980164180596,
+      "speedup": 0.990885815996046,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.07005438671875197,
+          "after": 0.055864710937498785,
+          "ratio": 0.7974477196093285
+        },
+        {
+          "before": 0.0515076679687505,
+          "after": 0.0657843281249999,
+          "ratio": 1.27717543269307
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "immediate-hit-33-bytes",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 0.35067962499999616,
+      "afterMs": 0.20238929296875074,
+      "ratio": 0.5657498940461276,
+      "speedup": 1.7675655099963066,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.3980574140624924,
+          "after": 0.25054035937500174,
+          "ratio": 0.6294075942915827
+        },
+        {
+          "before": 0.30330183593749993,
+          "after": 0.15423822656249975,
+          "ratio": 0.5085304745543411
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "common-suffix-middle-mismatch",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 12.915946499999848,
+      "afterMs": 8.81543849999997,
+      "ratio": 0.6777323226613736,
+      "speedup": 1.4755087909532185,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 13.917728999999781,
+          "after": 10.059705749999921,
+          "ratio": 0.7227979327661919
+        },
+        {
+          "before": 11.914163999999914,
+          "after": 7.57117125000002,
+          "ratio": 0.6354765009110228
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "early-false-suffix-candidates",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 13.509311187500046,
+      "afterMs": 9.081537187499997,
+      "ratio": 0.6692425365025703,
+      "speedup": 1.4942266001589686,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 14.618499500000098,
+          "after": 10.215365625000004,
+          "ratio": 0.6987971388581937
+        },
+        {
+          "before": 12.400122874999994,
+          "after": 7.94770874999999,
+          "ratio": 0.6409379028028377
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "missing-first-byte",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.2388068593750048,
+      "afterMs": 0.27167209375000545,
+      "ratio": 1.1446691264887567,
+      "speedup": 0.87361489609445,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.2123252656250001,
+          "after": 0.27298204687500016,
+          "ratio": 1.2856785840886666
+        },
+        {
+          "before": 0.2652884531250095,
+          "after": 0.27036214062501074,
+          "ratio": 1.0191251727703747
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "late-start-hit",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.2825510468749961,
+      "afterMs": 0.29697234375000026,
+      "ratio": 1.0519959704238944,
+      "speedup": 0.950573983279667,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.2622635937499993,
+          "after": 0.2797989218750008,
+          "ratio": 1.0668614651171022
+        },
+        {
+          "before": 0.3028384999999929,
+          "after": 0.31414576562499974,
+          "ratio": 1.0373376094023947
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "first-byte-near-end",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.25916382812500327,
+      "afterMs": 0.28339596874999895,
+      "ratio": 1.098709467337413,
+      "speedup": 0.9101587177758437,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.2267950625000008,
+          "after": 0.2610818281249987,
+          "ratio": 1.1511795064982853
+        },
+        {
+          "before": 0.29153259375000573,
+          "after": 0.3057101093749992,
+          "ratio": 1.0486309796192153
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "multibyte-needle",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.29347702343750015,
+      "afterMs": 0.30301233593750254,
+      "ratio": 1.0363283144052153,
+      "speedup": 0.9649451685337137,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.2670233281249992,
+          "after": 0.2947791562500015,
+          "ratio": 1.103945330619238
+        },
+        {
+          "before": 0.3199307187500011,
+          "after": 0.3112455156250036,
+          "ratio": 0.9728528627731297
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "needle-longer-than-row",
+      "role": "preservation",
+      "pairs": 2,
+      "beforeMs": 0.05558446972656195,
+      "afterMs": 0.06667291015624999,
+      "ratio": 1.2047295778608351,
+      "speedup": 0.8300617984125858,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.0503591835937498,
+          "after": 0.06750554101562489,
+          "ratio": 1.3404812429088537
+        },
+        {
+          "before": 0.06080975585937409,
+          "after": 0.06584027929687508,
+          "ratio": 1.0827255983256099
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "common-first-byte",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 5.84333174999999,
+      "afterMs": 4.954632624999988,
+      "ratio": 0.838955082640543,
+      "speedup": 1.1919589268743462,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 5.472358500000013,
+          "after": 5.737430874999973,
+          "ratio": 1.0484384155387407
+        },
+        {
+          "before": 6.2143049999999675,
+          "after": 4.171834375000003,
+          "ratio": 0.6713275861097943
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "immediate-hit",
+      "role": "target",
+      "pairs": 2,
+      "beforeMs": 0.4247459882812503,
+      "afterMs": 0.33975059374999894,
+      "ratio": 0.7951084597000537,
+      "speedup": 1.257690051967551,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.5305712578125004,
+          "after": 0.43170834374999956,
+          "ratio": 0.8136670379204028
+        },
+        {
+          "before": 0.3189207187500003,
+          "after": 0.24779284374999833,
+          "ratio": 0.7769731760332618
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "overlapping-prefix",
+      "role": "target",
+      "pairs": 2,
+      "beforeMs": 6.564534999999921,
+      "afterMs": 6.422072875000083,
+      "ratio": 0.971364948691685,
+      "speedup": 1.029479189409586,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 6.84038350000003,
+          "after": 7.230967000000078,
+          "ratio": 1.0570996494567952
+        },
+        {
+          "before": 6.288686499999812,
+          "after": 5.613178750000088,
+          "ratio": 0.8925836500198023
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "insensitive-ascii",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 5.093442875000051,
+      "afterMs": 5.940936937499998,
+      "ratio": 1.148363802441369,
+      "speedup": 0.8708041805863662,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 5.530945750000001,
+          "after": 7.096307750000051,
+          "ratio": 1.2830188670717029
+        },
+        {
+          "before": 4.6559400000001006,
+          "after": 4.785566124999946,
+          "ratio": 1.0278410213619253
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "insensitive-unicode",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 11.588399874999993,
+      "afterMs": 12.037005874999977,
+      "ratio": 1.02727721323238,
+      "speedup": 0.9734470765232387,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 11.485805249999999,
+          "after": 13.821247624999955,
+          "ratio": 1.2033329247855702
+        },
+        {
+          "before": 11.690994499999988,
+          "after": 10.252764124999999,
+          "ratio": 0.8769796380453356
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "short-query",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 0.09071926953124976,
+      "afterMs": 0.09158202636718782,
+      "ratio": 1.0083388178200259,
+      "speedup": 0.9917301430108046,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.0800836796874993,
+          "after": 0.10317783789062496,
+          "ratio": 1.2883753380619267
+        },
+        {
+          "before": 0.10135485937500022,
+          "after": 0.07998621484375068,
+          "ratio": 0.789170004644886
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "immediate-hit-33-bytes",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 0.2555392109374992,
+      "afterMs": 0.23116415624999753,
+      "ratio": 0.8954093028310424,
+      "speedup": 1.1168076954731987,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 0.23758396093749923,
+          "after": 0.2677746718749958,
+          "ratio": 1.127073859777255
+        },
+        {
+          "before": 0.2734944609374992,
+          "after": 0.19455364062499925,
+          "ratio": 0.7113622702196516
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "common-suffix-middle-mismatch",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 6.363090500000027,
+      "afterMs": 6.395730874999941,
+      "ratio": 1.0031954817585453,
+      "speedup": 0.9968146968196628,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 6.969427250000081,
+          "after": 7.121866999999838,
+          "ratio": 1.0218726366646207
+        },
+        {
+          "before": 5.756753749999973,
+          "after": 5.669594750000044,
+          "ratio": 0.9848596963175767
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "early-false-suffix-candidates",
+      "role": "control",
+      "pairs": 2,
+      "beforeMs": 8.266205437499991,
+      "afterMs": 8.519578687499969,
+      "ratio": 1.0258737623956249,
+      "speedup": 0.9747788048159022,
+      "ratio95CI": null,
+      "points": [
+        {
+          "before": 8.760075874999984,
+          "after": 9.482958999999937,
+          "ratio": 1.0825201899292858
+        },
+        {
+          "before": 7.772334999999998,
+          "after": 7.556198375000001,
+          "ratio": 0.9721915453978763
+        }
+      ]
+    }
+  ],
+  "completedAt": "2026-11-04T19:08:56.889Z"
+}

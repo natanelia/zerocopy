@@ -1,0 +1,14 @@
+{
+  "disposition": "preliminary-pilot-retained-source-selected-unchanged",
+  "reason": "The pilot had large Bun pair/order variation. The same source and fixtures were kept for the predefined warmed six-pair primary; all controls and initial slowdowns remain in the record.",
+  "pilotProcessCount": 8,
+  "primaryProcessCount": 24,
+  "sourceUnchanged": true,
+  "files": {
+    "specialized/benchmark.mjs": "db18f79354230218574df9535276934595c75ec1bdba8d549540fb72018b625c",
+    "specialized/fixtures.mjs": "62ea7ce2e598b508a7deaf8e6245d94cd809fd6854f522948da5b94a5ebdad4c",
+    "specialized/pilot.json": "44c3408aae1634572a2bca57660a6139acbf9c480334769c1d78b3e4cb2c5f2b",
+    "specialized/progress.txt": "b94175c7e31edd0c6ec513ddbd150663f5d4d142b5343949b56aeb373098ef17",
+    "specialized/text-search.source.txt": "4af3b6c4a11d3f350dedaac52b2af4244356aa22bca79b90c6a52e1be020c04a"
+  }
+}
