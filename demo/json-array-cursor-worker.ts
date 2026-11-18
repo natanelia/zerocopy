@@ -8,7 +8,11 @@ self.onmessage = async ({ data }) => {
     if (data.phase === 'prime') retained = attached.map.getView('record').get('items');
     const start = data.phase === 'prime' ? 0 : 128, end = data.phase === 'prime' ? 128 : 1024;
     let sum = 0;
-    for (let index = start; index < end; index++) sum += retained.at(index);
+    for (let index = start; index < end; index++) {
+      const value = retained.at(index);
+      if (value !== index) throw new Error(`${data.phase}: unexpected value at index ${index}`);
+      sum += value;
+    }
     if (data.phase !== 'prime' && (retained.at(1024) !== undefined || retained.at(3) !== 3
       || attached.map.getView('record').get('items').at(0) !== -1)) throw new Error('Retained cursor changed');
     for (let arenaIndex = 0; arenaIndex < before.length; arenaIndex++) {

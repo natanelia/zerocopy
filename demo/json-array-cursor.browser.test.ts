@@ -1,16 +1,29 @@
 import { expect, test } from 'vitest';
 import { SharedMap, getWorkerData, resetMap } from '../dist/shared.js';
 
-test('JSON array cursors remain private and valid in a worker after owner growth', async () => {
+test('JSON array cursors remain private and valid in a worker after owner growth', async ({ signal }) => {
   resetMap();
   const map = new SharedMap('object').set('record', {
     items: Array.from({ length: 1024 }, (_, index) => index), after: [9999],
   });
   const worker = new Worker(new URL('./json-array-cursor-worker.ts', import.meta.url), { type: 'module' });
   const ask = (phase: string, payload: any) => new Promise<any>((resolve, reject) => {
-    worker.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
-    worker.onerror = event => reject(new Error(event.message));
-    worker.postMessage({ phase, payload });
+    const cleanup = () => {
+      signal.removeEventListener('abort', onAbort);
+      worker.onmessage = null;
+      worker.onerror = null;
+    };
+    const fail = (error: unknown) => { cleanup(); reject(error); };
+    const onAbort = () => fail(signal.reason ?? new Error('Worker request aborted'));
+    if (signal.aborted) { onAbort(); return; }
+    signal.addEventListener('abort', onAbort, { once: true });
+    worker.onmessage = ({ data }) => {
+      cleanup();
+      if (data.error) reject(new Error(data.error));
+      else resolve(data);
+    };
+    worker.onerror = event => fail(new Error(event.message));
+    try { worker.postMessage({ phase, payload }); } catch (error) { fail(error); }
   });
   try {
     const payload = getWorkerData({ map }, { copy: false });
