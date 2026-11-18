@@ -1,0 +1,15 @@
+✔ all shipped kernels preserve their scalar ABI and pass the shared-memory audit (74.438979ms)
+✔ attachment and private allocator/bbox state never modify an imported arena (2.643272ms)
+✔ the build rejects shared data initialization and start functions (15.397053ms)
+✔ the audit follows reader calls and rejects hidden writes and memory growth (3.753558ms)
+✔ the build rejects a Rust linear stack even in a writer (4.446912ms)
+✔ the audit rejects host callbacks and residual state addresses (1.746524ms)
+✔ promotion preserves zero-filled-independent initial state and rejects width changes (29.4894ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 794.713356

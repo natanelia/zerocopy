@@ -298,7 +298,15 @@ export class Arena {
     this.refresh();
     let value = '';
     if (len <= 32) {
-      for (let i = 0; i < len; i++) {
+      let i = 0;
+      // Read only complete groups inside this immutable string's byte range.
+      for (; i + 4 <= len; i += 4) {
+        const a = this.bytes[ptr + i], b = this.bytes[ptr + i + 1];
+        const c = this.bytes[ptr + i + 2], d = this.bytes[ptr + i + 3];
+        if ((a | b | c | d) & 0x80) break;
+        value += String.fromCharCode(a, b, c, d);
+      }
+      for (; i < len; i++) {
         const c = this.bytes[ptr + i];
         if (c > 127) { value = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)); break; }
         value += String.fromCharCode(c);

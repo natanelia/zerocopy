@@ -1,0 +1,4 @@
+$ bun --bun node_modules/vitest/vitest.mjs run "--maxWorkers=1" --no-file-parallelism
+
+ RUN  v4.1.11 /workspace/scratch/240add2fd2cb/zerocopy-ascii-current
+

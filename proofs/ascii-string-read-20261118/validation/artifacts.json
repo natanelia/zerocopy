@@ -1,0 +1,339 @@
+{
+  "baseCommit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+  "versions": {
+    "node": "v24.22.3",
+    "bun": "1.4.2",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "variants": {
+    "baseline": {
+      "path": "/workspace/scratch/240add2fd2cb/zerocopy-main-20261118",
+      "arenaSha256": "84ec482a8fd1ee95f912fb2b095074ce6b5294e01afe215cd75c57851cf57e41",
+      "wasm": [
+        {
+          "file": "doubly-linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "geometry-kernels.wasm",
+          "bytes": 1199,
+          "sha256": "36da9253c5cf3eeb7bc863a85747a666a9009557855cde73f6f8400a6d486804"
+        },
+        {
+          "file": "linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "numeric-kernels-simd.wasm",
+          "bytes": 1529,
+          "sha256": "951137eccac6fdad93b3dbd281564d7db297eb81b56332e2e90a067d1ed3d007"
+        },
+        {
+          "file": "numeric-kernels.wasm",
+          "bytes": 1297,
+          "sha256": "b8938625b09c1cf191a277b3e8be046525b1264a59ab446be04809be2d905043"
+        },
+        {
+          "file": "ordered-map.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "persistent-core.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "priority-queue.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "shared-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "shared-map.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "singly-linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "sorted-tree.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        }
+      ],
+      "browserBundles": [
+        {
+          "file": "dist/chunk-6rmn2nvh.js",
+          "bytes": 14720,
+          "sha256": "5d437783e0d297547bdd35e8a197e82a9da0e1268fd5a532fcc6623720cb16fd"
+        },
+        {
+          "file": "dist/chunk-855jx2y2.js",
+          "bytes": 135559,
+          "sha256": "b26e41c8900cf64fe8b79ee97222f821827bbafa69df265b0d6cf102f78c9d2b"
+        },
+        {
+          "file": "dist/chunk-8jzj20mc.js",
+          "bytes": 3549,
+          "sha256": "1314cb50832f969c808530dc2b2e97f436ddc2c4077a8c37207a09be3a8a06fc"
+        },
+        {
+          "file": "dist/chunk-8y0rwpp8.js",
+          "bytes": 43251,
+          "sha256": "bdab83ced445391d43068ea099d5a2f6bc4f21429f34887bdb6c143973ca6283"
+        },
+        {
+          "file": "dist/chunk-qewdzsxw.js",
+          "bytes": 42976,
+          "sha256": "44ee19fbf0c4889d737b0604500993d64ed10ef79a067c3e751d86f03cea3dc2"
+        },
+        {
+          "file": "dist/geometry.js",
+          "bytes": 2908,
+          "sha256": "702b7117451965f51cfd4264f42ca9b8fc3d13ff9279f1c9e8b0e5e582555b4d"
+        },
+        {
+          "file": "dist/numeric.js",
+          "bytes": 6071,
+          "sha256": "b9016672ff5b5895de41919f0cc19f6545e0f25c3e5738aa8049d3c3f053d4ee"
+        },
+        {
+          "file": "dist/redux.js",
+          "bytes": 44213,
+          "sha256": "65b5c0b0e738bdc717a052cc96e1c35450fc850ddcf51a485f4fbff1ae1febd6"
+        },
+        {
+          "file": "dist/shared.js",
+          "bytes": 2179,
+          "sha256": "798dc947f0926d8a77bec1bff545dcc8bc189b7c6325555a1a0f0384a61ac489"
+        },
+        {
+          "file": "dist/state.js",
+          "bytes": 224,
+          "sha256": "c31c184797df179639d9ebc152c735d2918c5466684655db4bfaec4406ae880a"
+        },
+        {
+          "file": "dist/tanstack-db-collection.js",
+          "bytes": 3707,
+          "sha256": "4b19fd6dd55a762264467b6a880b0ea30e57c61985a9876637ce84495e929550"
+        },
+        {
+          "file": "dist/worker.js",
+          "bytes": 682,
+          "sha256": "497d3db44832485d953b18b0a449067c05cbb8ff826cf82cbe61063d774a1a60"
+        }
+      ]
+    },
+    "candidate": {
+      "path": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+      "arenaSha256": "1086868a41a1d7f12ec9a4704e4b5131018edac8653c6e7a834201fc4431ac5c",
+      "wasm": [
+        {
+          "file": "doubly-linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "geometry-kernels.wasm",
+          "bytes": 1199,
+          "sha256": "36da9253c5cf3eeb7bc863a85747a666a9009557855cde73f6f8400a6d486804"
+        },
+        {
+          "file": "linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "numeric-kernels-simd.wasm",
+          "bytes": 1529,
+          "sha256": "951137eccac6fdad93b3dbd281564d7db297eb81b56332e2e90a067d1ed3d007"
+        },
+        {
+          "file": "numeric-kernels.wasm",
+          "bytes": 1297,
+          "sha256": "b8938625b09c1cf191a277b3e8be046525b1264a59ab446be04809be2d905043"
+        },
+        {
+          "file": "ordered-map.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "persistent-core.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "priority-queue.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "shared-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "shared-map.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "singly-linked-list.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        },
+        {
+          "file": "sorted-tree.wasm",
+          "bytes": 55289,
+          "sha256": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134"
+        }
+      ],
+      "browserBundles": [
+        {
+          "file": "dist/chunk-6109nfrg.js",
+          "bytes": 43251,
+          "sha256": "845e4660cfddb36758847fffa9e669a4264ddc4524f7710c4ae3b410c166e824"
+        },
+        {
+          "file": "dist/chunk-879kgwjf.js",
+          "bytes": 3549,
+          "sha256": "0bb1c048871f64c039825ad95ccd663b94441efae3425c0ca6538536510c00ea"
+        },
+        {
+          "file": "dist/chunk-hav0wp4k.js",
+          "bytes": 135853,
+          "sha256": "339c768a1802b8ef72b3951e5ee4b5cb4eb9c6d134e3d87b7898ca712e89c4d1"
+        },
+        {
+          "file": "dist/chunk-s8p4rhet.js",
+          "bytes": 14720,
+          "sha256": "3955df518b5696111fe83a0650a9d94d22e40ce6e7ad80c86c2f0afc95802ee8"
+        },
+        {
+          "file": "dist/chunk-w744mnam.js",
+          "bytes": 42976,
+          "sha256": "5939174441617077b659d90638c68cd037ef83a32c63385cab8113f77edc4e9a"
+        },
+        {
+          "file": "dist/geometry.js",
+          "bytes": 2908,
+          "sha256": "8945e7926be14ea04021d8ad54cf0f17f27545825ab558efa6ba744c164e4e8e"
+        },
+        {
+          "file": "dist/numeric.js",
+          "bytes": 6071,
+          "sha256": "fc131718b4410ae607805bcc0d2d475de7c3791ea5a2e7eb7198e99c5dc04016"
+        },
+        {
+          "file": "dist/redux.js",
+          "bytes": 44213,
+          "sha256": "16df465bc71609c135905658898dc67f20c41d0aa2c35d159be15aa76f1f4f28"
+        },
+        {
+          "file": "dist/shared.js",
+          "bytes": 2179,
+          "sha256": "c8f650bb2365dec313a5bc5febf935316414a96a69adb1af02998618403a783c"
+        },
+        {
+          "file": "dist/state.js",
+          "bytes": 224,
+          "sha256": "efe1deb51c4473b250984ccb16a367c885b1bcf85c79d38ab1ece912ec96e3e8"
+        },
+        {
+          "file": "dist/tanstack-db-collection.js",
+          "bytes": 3707,
+          "sha256": "588dbea8af8f2402dcee219f0f5f0fec27f3237204590b83cffefe5268857067"
+        },
+        {
+          "file": "dist/worker.js",
+          "bytes": 682,
+          "sha256": "292b0b590308816eef12187310a8fe33e024846fbc5aaab24da6a35cedc296cd"
+        }
+      ]
+    }
+  },
+  "wasmArtifactsByteIdentical": true,
+  "rawLogs": [
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/baseline-build-browser.log",
+      "bytes": 71,
+      "sha256": "c14e8b857d6dd48fec00e0419f28f77310f2963aafa092d6a9a9568b9113a0c2"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/baseline-build-wasm.log",
+      "bytes": 2838,
+      "sha256": "884cf89df66df5206f62d8aac1edade07349b6a36b841488f5ec7a523f541d28"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-build-browser.log",
+      "bytes": 71,
+      "sha256": "72525728042b1489b47f2e7d29a980a53f07b1ccb162e20dfbf62807a13e140a"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-build-types.log",
+      "bytes": 86,
+      "sha256": "e8fdec539d26b5219273605f384f6cb2cb2faa7e9dc675e00f24f642ba768c65"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-build-wasm.log",
+      "bytes": 2838,
+      "sha256": "3cb120ad2eb9eb8dfc2fd0dbc26ef0d959e518f735815730a2a09d303d738c72"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-rust-audit.log",
+      "bytes": 730,
+      "sha256": "db3c3a73871891488fd2734503ac649408d918999f1c388ca391f1e398395542"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-tests-standard.log",
+      "bytes": 298,
+      "sha256": "497e21ea21b47afbb3d5acb273df9807ffc922688e003d81e30d33ba9861f4c5"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-tests.log",
+      "bytes": 157,
+      "sha256": "30c79ce0f10eaad9968fc0d6dd748fbb26c8e398236026d4b18894e903f09278"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-typecheck-geometry.log",
+      "bytes": 41,
+      "sha256": "9e313aafed0cfca93856bde26a2451f752a170dbeecc53f57ad04a20a873eb4c"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-typecheck-redux.log",
+      "bytes": 38,
+      "sha256": "374cbb55fe3257bdddc5c84dfbc7e930d11e11f9f5efa89d07055a9f1d915863"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-typecheck-values.log",
+      "bytes": 126,
+      "sha256": "9ad899b37dc8a5653c21f027dd43c744d1fb9d34488c878300d40372e89ffffd"
+    },
+    {
+      "file": "proofs/ascii-string-read-20261118/validation/candidate-typecheck.log",
+      "bytes": 15,
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+    }
+  ],
+  "fullSuite": {
+    "command": "bun run test",
+    "log": "candidate-tests-standard.log",
+    "filesPassed": 69,
+    "testsPassed": 1280,
+    "exit": 0
+  },
+  "initialCustomRunner": "The --maxWorkers=1 --no-file-parallelism attempt was interrupted without a result. Its original log and explicit exit-130 status are retained separately. The unmodified project command is the validation gate.",
+  "performanceTimingsRun": false
+}

@@ -1,0 +1,14 @@
+{
+  "baseline": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+  "patchFrom": "1242908762b554e3574365c486d5a6c52d5e568f",
+  "patchThrough": "639335f59306ff532371cd84ad31c453f0680b56",
+  "files": [
+    "arena.ts",
+    "arena-string.test.ts"
+  ],
+  "patchSha256": "21439aebd7617723325613900fe9a9ac76e464d2fd48f240d680aafa2faa11cc",
+  "baselineArenaSha256": "84ec482a8fd1ee95f912fb2b095074ce6b5294e01afe215cd75c57851cf57e41",
+  "candidateArenaSha256": "1086868a41a1d7f12ec9a4704e4b5131018edac8653c6e7a834201fc4431ac5c",
+  "candidateTestSha256": "c3594472468c90cb9f91f869adcfbc849f919007c2620a21f9bb621e3eb14b5a",
+  "note": "Only the exact source/test patch was applied to current main. Both current checkouts include merged JSON improvements #81 and #83. Dependencies use the same pinned installed packages; official WASM/browser builds follow."
+}

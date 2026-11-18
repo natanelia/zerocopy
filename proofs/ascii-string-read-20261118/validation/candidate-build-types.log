@@ -1,0 +1,1 @@
+$ tsc --emitDeclarationOnly --noEmit false --declarationMap false --outDir dist/types

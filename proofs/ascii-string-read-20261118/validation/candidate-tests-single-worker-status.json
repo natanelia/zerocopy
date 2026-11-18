@@ -1,0 +1,16 @@
+{
+  "command": [
+    "bun",
+    "run",
+    "test",
+    "--maxWorkers=1",
+    "--no-file-parallelism"
+  ],
+  "log": "candidate-tests.log",
+  "disposition": "Interrupted after over seven minutes with no recorded progress beyond RUN header. No test result was established.",
+  "exit": 130,
+  "termination": "Control-C sent to the owned exec session 60787",
+  "headerLastModifiedAt": "2026-11-18T13:08:07.508136+00:00",
+  "recordedAt": "2026-11-18T13:15:06.074317+00:00",
+  "diagnosis": "A separate tool invocation exposed only its own process namespace, so the original test process CPU/thread state and exact stall cause could not be established. Rerun uses the unmodified project test command."
+}

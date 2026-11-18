@@ -1,0 +1,10 @@
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/240add2fd2cb/zerocopy-ascii-current
+
+
+ Test Files  69 passed (69)
+      Tests  1280 passed (1280)
+   Start at  21:15:06
+   Duration  32.07s (transform 1.50s, setup 0ms, import 2.97s, tests 124.35s, environment 13ms)
+

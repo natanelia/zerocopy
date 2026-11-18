@@ -1,0 +1,134 @@
+[
+  {
+    "log": "baseline-build-wasm.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-main-20261118",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "build:wasm"
+    ],
+    "startedAt": "2026-11-18T13:07:52.654541+00:00",
+    "finishedAt": "2026-11-18T13:07:56.350878+00:00",
+    "exit": 0
+  },
+  {
+    "log": "baseline-build-browser.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-main-20261118",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "build:browser"
+    ],
+    "startedAt": "2026-11-18T13:07:56.351298+00:00",
+    "finishedAt": "2026-11-18T13:07:56.394306+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-build-wasm.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "build:wasm"
+    ],
+    "startedAt": "2026-11-18T13:07:56.394654+00:00",
+    "finishedAt": "2026-11-18T13:07:58.651656+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-rust-audit.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "node",
+      "--test",
+      "scripts/rust-wasm.node.mjs"
+    ],
+    "startedAt": "2026-11-18T13:07:58.652041+00:00",
+    "finishedAt": "2026-11-18T13:07:59.493122+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-build-browser.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "build:browser"
+    ],
+    "startedAt": "2026-11-18T13:07:59.495339+00:00",
+    "finishedAt": "2026-11-18T13:07:59.518885+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-build-types.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "build:types"
+    ],
+    "startedAt": "2026-11-18T13:07:59.519320+00:00",
+    "finishedAt": "2026-11-18T13:08:01.082978+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-typecheck.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "typecheck"
+    ],
+    "startedAt": "2026-11-18T13:08:01.083938+00:00",
+    "finishedAt": "2026-11-18T13:08:02.607431+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-typecheck-values.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "typecheck:values"
+    ],
+    "startedAt": "2026-11-18T13:08:02.608596+00:00",
+    "finishedAt": "2026-11-18T13:08:06.331021+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-typecheck-redux.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "typecheck:redux"
+    ],
+    "startedAt": "2026-11-18T13:08:06.331667+00:00",
+    "finishedAt": "2026-11-18T13:08:06.970871+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-typecheck-geometry.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "typecheck:geometry"
+    ],
+    "startedAt": "2026-11-18T13:08:06.971339+00:00",
+    "finishedAt": "2026-11-18T13:08:07.260038+00:00",
+    "exit": 0
+  },
+  {
+    "log": "candidate-tests-standard.log",
+    "cwd": "/workspace/scratch/240add2fd2cb/zerocopy-ascii-current",
+    "command": [
+      "/workspace/scratch/240add2fd2cb/tools/node_modules/.bin/bun",
+      "run",
+      "test"
+    ],
+    "startedAt": "2026-11-18T13:15:06.074687+00:00",
+    "finishedAt": "2026-11-18T13:15:38.695442+00:00",
+    "exit": 0
+  }
+]

@@ -1,0 +1,17 @@
+✔ cached leaves preserve boolean, JSON, and nested codecs in shared and copied views (9.144124ms)
+✔ literal search preserves case, punctuation, null bytes and every short-needle boundary (41.316882ms)
+✔ seeded ASCII data exercises short and long needles at every byte position (34.769371ms)
+✔ Unicode case expansion, contextual casing, surrogate halves and UTF-8 replacements match JavaScript (4.094525ms)
+✔ seeded arbitrary UTF-16 texts and needles preserve includes semantics (92.949887ms)
+✔ query compilation never materializes an ASCII dataset or writes into a reader arena (9.535506ms)
+✔ invalid indices, invalid options and non-string collections are rejected predictably (0.412875ms)
+✔ compiled predicates retain their snapshot after forks, growth, pops and resets (500.291888ms)
+✔ real readers keep their compiled snapshot while the owner grows memory (157.76149ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1056.25239

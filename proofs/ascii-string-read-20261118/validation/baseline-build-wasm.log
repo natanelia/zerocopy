@@ -1,0 +1,41 @@
+$ node scripts/build-wasm.mjs
+   Compiling zerocopy-kernels v0.1.0 (/workspace/scratch/240add2fd2cb/zerocopy-main-20261118/rust)
+warning: unstable feature specified for `-Ctarget-feature`: `atomics`
+  |
+  = note: this feature is not stably supported; its behavior can change in the future
+  = note: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+  = note: for more information, see issue #162235 <https://github.com/rust-lang/rust/issues/162235>
+
+warning: `zerocopy-kernels` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1.24s
+persistent-core.wasm: 55289 bytes; 26 audited reader functions; no linear stack or data segments
+   Compiling zerocopy-kernels v0.1.0 (/workspace/scratch/240add2fd2cb/zerocopy-main-20261118/rust)
+warning: unstable feature specified for `-Ctarget-feature`: `atomics`
+  |
+  = note: this feature is not stably supported; its behavior can change in the future
+  = note: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+  = note: for more information, see issue #162235 <https://github.com/rust-lang/rust/issues/162235>
+
+warning: `zerocopy-kernels` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.21s
+numeric-kernels.wasm: 1297 bytes; 4 audited reader functions; no linear stack or data segments
+   Compiling zerocopy-kernels v0.1.0 (/workspace/scratch/240add2fd2cb/zerocopy-main-20261118/rust)
+warning: unstable feature specified for `-Ctarget-feature`: `atomics`
+  |
+  = note: this feature is not stably supported; its behavior can change in the future
+  = note: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+  = note: for more information, see issue #162235 <https://github.com/rust-lang/rust/issues/162235>
+
+warning: `zerocopy-kernels` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.20s
+numeric-kernels-simd.wasm: 1529 bytes; 4 audited reader functions; no linear stack or data segments
+   Compiling zerocopy-kernels v0.1.0 (/workspace/scratch/240add2fd2cb/zerocopy-main-20261118/rust)
+warning: unstable feature specified for `-Ctarget-feature`: `atomics`
+  |
+  = note: this feature is not stably supported; its behavior can change in the future
+  = note: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+  = note: for more information, see issue #162235 <https://github.com/rust-lang/rust/issues/162235>
+
+warning: `zerocopy-kernels` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.15s
+geometry-kernels.wasm: 1199 bytes; 6 audited reader functions; no linear stack or data segments
