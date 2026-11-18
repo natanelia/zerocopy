@@ -1,0 +1,14 @@
+{
+  "valid": true,
+  "report": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-confirmation.json",
+  "reportSha256": "901a37f40d225f4ac1a2b394e93e848b6fe97bb81a2830a5e7216dc9163147a7",
+  "samples": 28,
+  "rows": 364,
+  "cases": 13,
+  "summaries": 26,
+  "timedValueVerificationClaimsChecked": 190840832,
+  "readerArenaVerificationClaimsChecked": 19152,
+  "sourceAndBundleContentsChecked": true,
+  "harnessContentsChecked": true,
+  "scope": "Checks frozen-file hashes, recorded integrity counts and summary arithmetic; does not rerun timed reads."
+}

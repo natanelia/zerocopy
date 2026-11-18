@@ -1,0 +1,516 @@
+{
+  "schema": "zerocopy-ascii-performance-decision/v1",
+  "date": "2026-11-18",
+  "decision": "reject",
+  "recommendedForMerge": false,
+  "pullRequestCreated": false,
+  "reason": "Both Bun Unicode cold-read controls exceed the predeclared 1.10 median ratio limit and are slower in six of seven pairs.",
+  "sourceIdentity": {
+    "baseline": {
+      "commit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+      "sourceManifestSha256": "44b656608ebd08e9243684287d630e2770f75ec6f75e623c0d24f6f3621cf795",
+      "bundleManifestSha256": "f1ec3e610bd5ca5dad56cee66a8b5a9b9dd16ea555e0641a319cdbcba3e3fbae",
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "candidate": {
+      "commit": "10bebf25d2a6ad01bb8203a19facc33c75c03190",
+      "sourceManifestSha256": "cafa9f9ce05d0743c286d274811e4a2ad8a03a36b653f85e3f0d46b59d83edca",
+      "bundleManifestSha256": "234a8b8b471dbd8c2e691b86927bd8ea8fa6e5a03bb7e493382688df707f7371",
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tree": "21e1cb17a7d4a6af7132d774c7381dfacee5c649",
+      "implementationCommit": "97cced8c52ffde8f4be5ca6810526c723911b9e4",
+      "branch": "perf/ascii-string-decode-20261118",
+      "donorCommit": "639335f59306ff532371cd84ad31c453f0680b56"
+    }
+  },
+  "plan": {
+    "file": "PLAN.md",
+    "sha256": "9f4fe9673f5abdad8445c0a333a0fb27828f76c1de9195a6c3b57952f422ed0b",
+    "addendumFile": "WARM-VALIDITY-ADDENDUM.md",
+    "addendumSha256": "a0ea61978ccb1ffb316f47628f80a8797d688b183394cc08686645330dc7fb15"
+  },
+  "frozenHarness": {
+    "driverSha256": "c21ef9efd67b0c98cd7ac9fcce155d2682300eb0063462a6c55c783ffb2389e0",
+    "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b",
+    "verifierSha256": "2191e12bc403f2414c98fa3c6e9110f78fbb1c4597d7b175fa1fae60eb315432"
+  },
+  "method": {
+    "pairsPerRuntime": 7,
+    "runtimes": [
+      "node",
+      "bun"
+    ],
+    "casesPerProcess": 13,
+    "batchScale": 2,
+    "warmups": 8,
+    "allowedCpus": "2",
+    "freshProcessesPerStudy": 28,
+    "timedOperationsPerCaseSample": 524288,
+    "ratioDefinition": "candidate elapsedMs / baseline elapsedMs within the same pair",
+    "aaNormalizationApplied": false,
+    "mainReportsReplacedOrPooled": false,
+    "runtimeVersions": {
+      "node": {
+        "version": "24.22.3",
+        "v8": "13.6.233.17-node.63"
+      },
+      "bun": {
+        "version": "1.4.2",
+        "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057"
+      }
+    },
+    "platform": "linux",
+    "architecture": "x64",
+    "cpuModel": "AMD EPYC 9V45 96-Core Processor"
+  },
+  "reports": {
+    "aa": {
+      "file": "results/ascii-current-aa.json.gz",
+      "rawJsonSha256": "f5d928e5b12169a3f3b582d3d9591e116d2f47084e7b7788140251870482e397",
+      "gzipSha256": "4af59094b9f992fcbfd15eb243b4af9d2769954b87c8a12478d7a42ece576215",
+      "verificationFile": "results/ascii-current-aa-verified.json",
+      "startedAt": "2026-11-18T13:19:43.526Z",
+      "finishedAt": "2026-11-18T13:23:04.677Z"
+    },
+    "ab": {
+      "file": "results/ascii-current-confirmation.json.gz",
+      "rawJsonSha256": "901a37f40d225f4ac1a2b394e93e848b6fe97bb81a2830a5e7216dc9163147a7",
+      "gzipSha256": "68904103d3e7bbb5fdb9d03f1e929437c73f59fb975d19b261511d7fc32c46bd",
+      "verificationFile": "results/ascii-current-confirmation-verified.json",
+      "startedAt": "2026-11-18T13:23:52.209Z",
+      "finishedAt": "2026-11-18T13:26:46.623Z"
+    }
+  },
+  "independentVerification": {
+    "fullFileAndHarnessChecksPassed": true,
+    "allRatiosAndSummariesRecomputedFromRawSamples": true,
+    "samplesPerStudy": 28,
+    "workloadRowsPerStudy": 364,
+    "summaryRowsPerStudy": 26,
+    "recordedTimedValueVerificationClaimsPerStudy": 190840832,
+    "recordedReaderArenaVerificationClaimsPerStudy": 19152,
+    "newCorrectnessTestsOrBenchmarksRunForDecision": false
+  },
+  "thresholds": {
+    "nodePrimaryMaximumMedianRatio": 0.9,
+    "nodePrimaryMinimumFasterPairs": 6,
+    "controlHoldMedianRatioGreaterThan": 1.1,
+    "controlRejectMinimumSlowerPairs": 6,
+    "aaValidityBand": [
+      0.9,
+      1.1
+    ],
+    "aaValidityMinimumDirectionalPairs": 6,
+    "shortBatchWarningMs": 20
+  },
+  "nodePrimaryGate": {
+    "status": "pass",
+    "passed": 4,
+    "required": 4,
+    "cases": [
+      "node/list.string.get.ascii16.cold",
+      "node/list.string.get.ascii32.cold",
+      "node/map.keys.ascii16.cold",
+      "node/map.keys.ascii32.cold"
+    ]
+  },
+  "controlGate": {
+    "status": "reject",
+    "rejectingCases": [
+      "bun/list.string.get.unicode.cold",
+      "bun/map.keys.unicode.cold"
+    ],
+    "additionalHoldCases": [
+      "bun/list.string.get.ascii16.warm"
+    ]
+  },
+  "abCaseResults": [
+    {
+      "runtime": "node",
+      "name": "list.string.get.ascii16.cold",
+      "medianPairedRatio": 0.5705798696746582,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 90.11820200000011,
+      "shortBatchWarning": false,
+      "gate": "node-primary",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.ascii32.cold",
+      "medianPairedRatio": 0.5627082650531856,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 284.0873150000007,
+      "shortBatchWarning": false,
+      "gate": "node-primary",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.ascii16.over-cap",
+      "medianPairedRatio": 0.6565083141534573,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 85.62766699999975,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.ascii16.warm",
+      "medianPairedRatio": 0.8768987652640904,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 9.587156999999934,
+      "shortBatchWarning": true,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.boundaries.cold",
+      "medianPairedRatio": 0.556920266367679,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 118.70414100000016,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.unicode.cold",
+      "medianPairedRatio": 0.9221470556280079,
+      "candidateFasterPairs": 5,
+      "candidateSlowerPairs": 2,
+      "tiedPairs": 0,
+      "minimumBatchMs": 149.51895600000012,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "list.string.get.ascii64.cold",
+      "medianPairedRatio": 1.0026579485861427,
+      "candidateFasterPairs": 3,
+      "candidateSlowerPairs": 4,
+      "tiedPairs": 0,
+      "minimumBatchMs": 101.5353769999997,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.ascii16.cold",
+      "medianPairedRatio": 0.7347308558739662,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 136.72656200000006,
+      "shortBatchWarning": false,
+      "gate": "node-primary",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.ascii32.cold",
+      "medianPairedRatio": 0.34319278659617886,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 283.406289,
+      "shortBatchWarning": false,
+      "gate": "node-primary",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.ascii16.over-cap",
+      "medianPairedRatio": 0.884172708903738,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 120.63136699999995,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.ascii16.warm",
+      "medianPairedRatio": 0.8925305787869018,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 50.908809000000474,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.boundaries.cold",
+      "medianPairedRatio": 0.5729433586424307,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 199.1728750000002,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "node",
+      "name": "map.keys.unicode.cold",
+      "medianPairedRatio": 0.8980025226390992,
+      "candidateFasterPairs": 4,
+      "candidateSlowerPairs": 3,
+      "tiedPairs": 0,
+      "minimumBatchMs": 199.17117700000017,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.ascii16.cold",
+      "medianPairedRatio": 0.7444961780057171,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 193.00847999999996,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.ascii32.cold",
+      "medianPairedRatio": 0.6997150771657771,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 468.89587500000005,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.ascii16.over-cap",
+      "medianPairedRatio": 0.4650484991054127,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 130.528818,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.ascii16.warm",
+      "medianPairedRatio": 1.1669506509352343,
+      "candidateFasterPairs": 2,
+      "candidateSlowerPairs": 5,
+      "tiedPairs": 0,
+      "minimumBatchMs": 5.6057300000002215,
+      "shortBatchWarning": true,
+      "gate": "material-control",
+      "status": "hold"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.boundaries.cold",
+      "medianPairedRatio": 0.6693159606239595,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 162.57755599999996,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.unicode.cold",
+      "medianPairedRatio": 1.11104319862404,
+      "candidateFasterPairs": 1,
+      "candidateSlowerPairs": 6,
+      "tiedPairs": 0,
+      "minimumBatchMs": 120.25403499999993,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "reject"
+    },
+    {
+      "runtime": "bun",
+      "name": "list.string.get.ascii64.cold",
+      "medianPairedRatio": 1.0662855385882335,
+      "candidateFasterPairs": 3,
+      "candidateSlowerPairs": 4,
+      "tiedPairs": 0,
+      "minimumBatchMs": 80.17758600000025,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.ascii16.cold",
+      "medianPairedRatio": 0.730303337249806,
+      "candidateFasterPairs": 6,
+      "candidateSlowerPairs": 1,
+      "tiedPairs": 0,
+      "minimumBatchMs": 218.30229000000008,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.ascii32.cold",
+      "medianPairedRatio": 0.6886692094831699,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 479.751808,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.ascii16.over-cap",
+      "medianPairedRatio": 0.4267241151575981,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 134.0721920000001,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.ascii16.warm",
+      "medianPairedRatio": 1.05908464556233,
+      "candidateFasterPairs": 3,
+      "candidateSlowerPairs": 4,
+      "tiedPairs": 0,
+      "minimumBatchMs": 23.52683700000034,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.boundaries.cold",
+      "medianPairedRatio": 0.5025388814989947,
+      "candidateFasterPairs": 7,
+      "candidateSlowerPairs": 0,
+      "tiedPairs": 0,
+      "minimumBatchMs": 168.50780900000018,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "pass"
+    },
+    {
+      "runtime": "bun",
+      "name": "map.keys.unicode.cold",
+      "medianPairedRatio": 1.259752830385335,
+      "candidateFasterPairs": 1,
+      "candidateSlowerPairs": 6,
+      "tiedPairs": 0,
+      "minimumBatchMs": 126.39371099999971,
+      "shortBatchWarning": false,
+      "gate": "material-control",
+      "status": "reject"
+    }
+  ],
+  "aaValidity": {
+    "status": "hold",
+    "flags": [
+      {
+        "runtime": "bun",
+        "name": "list.string.get.ascii16.warm",
+        "medianPairedRatio": 1.1474994501625524,
+        "candidateFasterPairs": 1,
+        "candidateSlowerPairs": 6,
+        "tiedPairs": 0,
+        "minimumBatchMs": 5.70150300000023,
+        "shortBatchWarning": true
+      }
+    ],
+    "otherBandExcursionsBelowConsistencyThreshold": [
+      {
+        "runtime": "node",
+        "name": "list.string.get.boundaries.cold",
+        "medianPairedRatio": 1.1311875897396795,
+        "candidateFasterPairs": 2,
+        "candidateSlowerPairs": 5,
+        "tiedPairs": 0,
+        "minimumBatchMs": 191.94758000000002,
+        "shortBatchWarning": false
+      },
+      {
+        "runtime": "bun",
+        "name": "list.string.get.boundaries.cold",
+        "medianPairedRatio": 1.1098727564311452,
+        "candidateFasterPairs": 2,
+        "candidateSlowerPairs": 5,
+        "tiedPairs": 0,
+        "minimumBatchMs": 256.8888259999999,
+        "shortBatchWarning": false
+      },
+      {
+        "runtime": "bun",
+        "name": "map.keys.ascii32.cold",
+        "medianPairedRatio": 1.1216575724259765,
+        "candidateFasterPairs": 3,
+        "candidateSlowerPairs": 4,
+        "tiedPairs": 0,
+        "minimumBatchMs": 643.4438600000001,
+        "shortBatchWarning": false
+      }
+    ],
+    "otherRowsMeetingValidityFlag": 0,
+    "normalizationApplied": false
+  },
+  "warmFollowup": {
+    "eligible": false,
+    "executed": false,
+    "reason": "The addendum cancels the extra warm-cache block after independent confirmed control regressions; both Bun Unicode controls reject the candidate.",
+    "plannedCases": [
+      "list.string.get.ascii16.warm",
+      "map.keys.ascii16.warm"
+    ],
+    "plannedRuntimes": [
+      "node",
+      "bun"
+    ],
+    "plannedPairs": 7,
+    "plannedBatchScale": 16,
+    "plannedWarmups": 8,
+    "plannedAllowedCpus": "2"
+  },
+  "preservedTriggerPrecisionNote": {
+    "addendumRecordedAaWarmMedianRatio": 1.1468,
+    "completedRawAaWarmMedianRatio": 1.1474994501625524,
+    "effectOnGate": "none",
+    "originalAddendumBytesPreserved": true,
+    "explanation": "The addendum preserved the initially communicated value; this decision uses the completed raw report."
+  },
+  "scope": "Engineering acceptance decision for this frozen candidate on the recorded Node/Bun versions and CPU-2-bound environment; not a universal speed claim or statistical-significance claim.",
+  "nextAction": "Preserve the rejected experiment and evidence. No performance PR, merge recommendation, further runtime variant, or warm follow-up."
+}

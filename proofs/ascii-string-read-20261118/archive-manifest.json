@@ -1,0 +1,107 @@
+{
+  "schema": "zerocopy-ascii-proof-archive/v1",
+  "date": "2026-11-18",
+  "scope": "New archive copies and derived decision documents; existing plans, harnesses, sources and original reports were not modified.",
+  "entries": [
+    {
+      "file": "results/ascii-current-aa.json.gz",
+      "sourceFile": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-aa.json",
+      "sourceBytes": 547775,
+      "sourceSha256": "f5d928e5b12169a3f3b582d3d9591e116d2f47084e7b7788140251870482e397",
+      "archivedBytes": 23927,
+      "archivedSha256": "4af59094b9f992fcbfd15eb243b4af9d2769954b87c8a12478d7a42ece576215",
+      "encoding": "gzip",
+      "decodedSha256": "f5d928e5b12169a3f3b582d3d9591e116d2f47084e7b7788140251870482e397",
+      "decodedBytesMatchSource": true,
+      "compressionLevel": 9,
+      "gzipMtime": 0
+    },
+    {
+      "file": "results/ascii-current-aa-verified.json",
+      "sourceFile": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-aa-verified.json",
+      "sourceBytes": 559,
+      "sourceSha256": "200358f162bcf247c602e30a89c450105693f00ddfb1494b3bd0b056f9994bf2",
+      "archivedBytes": 559,
+      "archivedSha256": "200358f162bcf247c602e30a89c450105693f00ddfb1494b3bd0b056f9994bf2",
+      "encoding": "identity",
+      "decodedSha256": "200358f162bcf247c602e30a89c450105693f00ddfb1494b3bd0b056f9994bf2",
+      "decodedBytesMatchSource": true
+    },
+    {
+      "file": "results/ascii-current-confirmation.json.gz",
+      "sourceFile": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-confirmation.json",
+      "sourceBytes": 547963,
+      "sourceSha256": "901a37f40d225f4ac1a2b394e93e848b6fe97bb81a2830a5e7216dc9163147a7",
+      "archivedBytes": 24810,
+      "archivedSha256": "68904103d3e7bbb5fdb9d03f1e929437c73f59fb975d19b261511d7fc32c46bd",
+      "encoding": "gzip",
+      "decodedSha256": "901a37f40d225f4ac1a2b394e93e848b6fe97bb81a2830a5e7216dc9163147a7",
+      "decodedBytesMatchSource": true,
+      "compressionLevel": 9,
+      "gzipMtime": 0
+    },
+    {
+      "file": "results/ascii-current-confirmation-verified.json",
+      "sourceFile": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-confirmation-verified.json",
+      "sourceBytes": 569,
+      "sourceSha256": "792309704ee85b2aa4df5ecdc10834fbce16ccd46b1120d2b5411aabecca6e98",
+      "archivedBytes": 569,
+      "archivedSha256": "792309704ee85b2aa4df5ecdc10834fbce16ccd46b1120d2b5411aabecca6e98",
+      "encoding": "identity",
+      "decodedSha256": "792309704ee85b2aa4df5ecdc10834fbce16ccd46b1120d2b5411aabecca6e98",
+      "decodedBytesMatchSource": true
+    },
+    {
+      "file": "WARM-VALIDITY-ADDENDUM.md",
+      "sourceFile": "/workspace/scratch/240add2fd2cb/perf-harness-followup/ascii-current-warm-validity-ADDENDUM-20261118.md",
+      "sourceBytes": 5605,
+      "sourceSha256": "a0ea61978ccb1ffb316f47628f80a8797d688b183394cc08686645330dc7fb15",
+      "archivedBytes": 5605,
+      "archivedSha256": "a0ea61978ccb1ffb316f47628f80a8797d688b183394cc08686645330dc7fb15",
+      "encoding": "identity",
+      "decodedSha256": "a0ea61978ccb1ffb316f47628f80a8797d688b183394cc08686645330dc7fb15",
+      "decodedBytesMatchSource": true
+    }
+  ],
+  "frozenFiles": [
+    {
+      "file": "PLAN.md",
+      "bytes": 10480,
+      "sha256": "9f4fe9673f5abdad8445c0a333a0fb27828f76c1de9195a6c3b57952f422ed0b"
+    },
+    {
+      "file": "benchmark.mjs",
+      "bytes": 11905,
+      "sha256": "c21ef9efd67b0c98cd7ac9fcce155d2682300eb0063462a6c55c783ffb2389e0"
+    },
+    {
+      "file": "ascii-workloads.mjs",
+      "bytes": 11492,
+      "sha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+    },
+    {
+      "file": "ascii-verify.mjs",
+      "bytes": 16477,
+      "sha256": "2191e12bc403f2414c98fa3c6e9110f78fbb1c4597d7b175fa1fae60eb315432"
+    }
+  ],
+  "derivedFiles": [
+    {
+      "file": "decision.json",
+      "bytes": 16485,
+      "sha256": "b0a6817d95e8447ba5cd112e092348cdef25c7098852c2b099d647bf349c7e38"
+    },
+    {
+      "file": "README.md",
+      "bytes": 8287,
+      "sha256": "736bb8b14f11903a0df099909b1f783ced56fd502ce22ede157b762b581490f6"
+    }
+  ],
+  "decisionDerivedFrom": [
+    "results/ascii-current-aa.json.gz",
+    "results/ascii-current-confirmation.json.gz"
+  ],
+  "rawReportBytesPreserved": true,
+  "verificationOutputBytesPreserved": true,
+  "addendumBytesPreserved": true
+}
