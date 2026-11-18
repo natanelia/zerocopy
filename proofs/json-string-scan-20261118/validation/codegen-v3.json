@@ -1,0 +1,41 @@
+{
+  "comparison": "Optimized function bodies, exported call targets canonicalized by export name",
+  "rows": [
+    {
+      "name": "jsonArrayAt",
+      "equal": true,
+      "baselineSha256": "78e9950b5cccc36658e6fcf763b59ebeb6a5a61b5b0a71982676b465c166f78a",
+      "candidateSha256": "78e9950b5cccc36658e6fcf763b59ebeb6a5a61b5b0a71982676b465c166f78a"
+    },
+    {
+      "name": "jsonValueEnd",
+      "equal": true,
+      "baselineSha256": "27007d1015f62d3a82e1ab7ba27489ade8f15944bf6644bd43fce9274f4088b7",
+      "candidateSha256": "27007d1015f62d3a82e1ab7ba27489ade8f15944bf6644bd43fce9274f4088b7"
+    },
+    {
+      "name": "jsonFieldAscii8",
+      "equal": true,
+      "baselineSha256": "4eed2588cea8cb96dc62aaaa1a5a5966eab241c2f54b8f126e8318ef566a0eb3",
+      "candidateSha256": "4eed2588cea8cb96dc62aaaa1a5a5966eab241c2f54b8f126e8318ef566a0eb3"
+    },
+    {
+      "name": "jsonFieldCandidate",
+      "equal": true,
+      "baselineSha256": "7256a5f0d88651c76016e70270f84664c074952f5253280fdaab9f80faca3556",
+      "candidateSha256": "7256a5f0d88651c76016e70270f84664c074952f5253280fdaab9f80faca3556"
+    },
+    {
+      "name": "jsonInteger",
+      "equal": true,
+      "baselineSha256": "9c81e340035b9452d95c4739955a8af461335318d1097ce66b378636f04f1ad7",
+      "candidateSha256": "9c81e340035b9452d95c4739955a8af461335318d1097ce66b378636f04f1ad7"
+    },
+    {
+      "name": "jsonStringEnd",
+      "equal": false,
+      "baselineSha256": "a836de6d514ca360e56d0b9e818cacba612f893df28cb618fce440dd62239002",
+      "candidateSha256": "6501f318853672a8e57f340a83d2d9cbd022240f548f3fe964de07df5d2e2a9d"
+    }
+  ]
+}

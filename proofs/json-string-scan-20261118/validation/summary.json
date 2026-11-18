@@ -1,0 +1,131 @@
+{
+  "runtimeSourceSha256": "f74f4f1d4851254b1c1794b6d0bf4cf2328f7f6cb156d49851a818fd07d08a97",
+  "scope": "V3 changes jsonStringEnd only among JSON selectors. The scalar private string_end is restored verbatim.",
+  "savedLog": "full-v3-bun.log.gz",
+  "fullBunSuite": {
+    "command": "bun --bun node_modules/vitest/vitest.mjs run",
+    "exitCode": 0,
+    "testFiles": 67,
+    "testsPassed": 1266,
+    "wallSeconds": 33.82
+  },
+  "sessionObservations": {
+    "provenanceNote": "These results are transcribed from successful tool output; separate raw stdout logs were not retained. They are not new executions during evidence packaging.",
+    "focusedNodeTests": {
+      "command": "node node_modules/vitest/vitest.mjs run json-string-scan.test.ts json-view.test.ts --no-file-parallelism --maxWorkers=1",
+      "exitCode": 0,
+      "testsPassed": 20
+    },
+    "typecheck": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0
+    },
+    "wasmAudit": {
+      "command": "node --test scripts/rust-wasm.node.mjs",
+      "exitCode": 0,
+      "testsPassed": 7
+    },
+    "workerProof": {
+      "command": "node proofs/json-string-scan-20261118/workers.mjs",
+      "exitCode": 0,
+      "result": {
+        "ok": true,
+        "node": "v24.22.3",
+        "readers": 2,
+        "modes": [
+          "shared",
+          "copied"
+        ],
+        "initialCapacity": 131072,
+        "finalCapacity": 327680,
+        "retainedSelectedStrings": [
+          "ascii",
+          "unicode",
+          "escaped"
+        ],
+        "sharedBytesUnchanged": true
+      }
+    },
+    "initialTestTimeout": "The first V1 Bun focused run timed out in one asynchronous retained-reader test while Vitest deeply compared MiB-sized Uint8Arrays. Native Buffer equality replaced only those assertions. The runtime was unchanged, and focused tests then passed in Node and Bun.",
+    "reportVerifier": {
+      "provenanceNote": "Reported passing by the coordinating agent for all four final reports; no new verifier execution during packaging. The separately saved independent formal audit is archived.",
+      "reports": [
+        "results/formal.json.gz",
+        "results/identical-control.json.gz",
+        "results/escaped-control-confirmation.json.gz",
+        "results/escaped-control-identical.json.gz"
+      ]
+    }
+  },
+  "codegen": {
+    "file": "codegen-v3.json",
+    "comparison": "Optimized function bodies with exported call targets canonicalized by export name",
+    "equalToBaseline": [
+      "jsonArrayAt",
+      "jsonValueEnd",
+      "jsonFieldAscii8",
+      "jsonFieldCandidate",
+      "jsonInteger"
+    ],
+    "changed": [
+      "jsonStringEnd"
+    ]
+  },
+  "size": {
+    "persistentCoreWasm": {
+      "baselineBytes": 54845,
+      "candidateBytes": 55074,
+      "deltaBytes": 229,
+      "baselineSha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
+      "candidateSha256": "a84616b8d8df08b66495e9f1d8c9a341d4503fd2fdc11f3f88ce1bed19d03f69"
+    },
+    "allPortableJavaScriptBundlesUncompressed": {
+      "baselineBytes": 299031,
+      "candidateBytes": 299335,
+      "note": "Sum of all portable .js modules, not the download size of a single entry point and not compressed transfer size."
+    }
+  },
+  "notMeasured": [
+    "JavaScript heap allocations",
+    "peak RSS",
+    "GC pause attribution",
+    "browser timing",
+    "cross-worker transport latency"
+  ],
+  "formatAndAbiChanged": false,
+  "localRuntimeFreezeCommit": "390666c6517e34bd28dac108441d3c36b23c8309",
+  "publishedCandidateCommit": "4082a1fd6055f085dc081fd82f96ebdd92399f05",
+  "publishedCandidateTree": "7456328291ee7d6e72567071ae78d2192fcc19c8",
+  "independentAudit": {
+    "file": "final-independent-audit.json.gz",
+    "verified": true,
+    "issues": 0,
+    "report": "results/formal.json.gz",
+    "casesPerRuntime": 25,
+    "runtimes": [
+      "node",
+      "bun"
+    ],
+    "recomputedRows": 50
+  },
+  "postTimingTestRegistrationChange": "The existing selected-string worker node(...) call moved immediately after the existing Portable JSON reads and shared/copied workers check to avoid a merge conflict with the separate JSON-array PR. The worker script and runtime/harness files are byte-identical to the measured commit. This registration placement was not rerun locally during evidence packaging.",
+  "hostedCiReported": [
+    {
+      "runId": 44296155146,
+      "scope": "runtime and library",
+      "result": "success",
+      "url": "https://github.com/natanelia/zerocopy/actions/runs/44296155146",
+      "associatedCommit": "4082a1fd6055f085dc081fd82f96ebdd92399f05",
+      "associationEvidence": "Coordinating agent queried workflow runs with commit_sha=4082a1f; normalized connector records reported completed/success without a separate head_sha field."
+    },
+    {
+      "runId": 44296155262,
+      "scope": "website",
+      "result": "success",
+      "url": "https://github.com/natanelia/zerocopy/actions/runs/44296155262",
+      "associatedCommit": "4082a1fd6055f085dc081fd82f96ebdd92399f05",
+      "associationEvidence": "Coordinating agent queried workflow runs with commit_sha=4082a1f; normalized connector records reported completed/success without a separate head_sha field."
+    }
+  ],
+  "hostedCiPlacementNote": "These runs precede the later test-only hook placement change."
+}
