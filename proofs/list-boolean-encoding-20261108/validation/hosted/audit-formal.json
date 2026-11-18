@@ -1,0 +1,246 @@
+{
+  "verified": true,
+  "record": "/home/runner/work/zerocopy/zerocopy/proofs/list-boolean-encoding-20261108/results/formal.json",
+  "mode": "formal",
+  "processes": 312,
+  "timedBatches": 2808,
+  "verifiedOutputs": 71698128,
+  "measuredBatchesBelow2ms": 63,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "boolean-256-control",
+      "pairedRatio": 1.013570045560195,
+      "interval95": [
+        0.9810745322525383,
+        1.047141887271468
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-1024-control",
+      "pairedRatio": 0.9836917342521888,
+      "interval95": [
+        0.9488901018002045,
+        1.0197697564768404
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32767-control",
+      "pairedRatio": 1.0230407171444584,
+      "interval95": [
+        0.8157799936266708,
+        1.2829590295326783
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32768",
+      "pairedRatio": 0.7729038402402566,
+      "interval95": [
+        0.6398300946127835,
+        0.9336546550216
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32769",
+      "pairedRatio": 0.7293066399622635,
+      "interval95": [
+        0.6073171025865388,
+        0.875799763958164
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-262144",
+      "pairedRatio": 0.771171450295056,
+      "interval95": [
+        0.7155045548069983,
+        0.8311692801321121
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-prefix-31",
+      "pairedRatio": 0.819619324241493,
+      "interval95": [
+        0.6728754655691254,
+        0.9983657764990528
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-prefix-32",
+      "pairedRatio": 0.9052106325884318,
+      "interval95": [
+        0.8829102749557679,
+        0.9280742478528745
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-prefix-65",
+      "pairedRatio": 0.7249783504760181,
+      "interval95": [
+        0.7166578382208181,
+        0.7333954652108071
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "number-control-1024",
+      "pairedRatio": 1.1128040771902814,
+      "interval95": [
+        0.9890493053023465,
+        1.2520436621031372
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "string-control-256",
+      "pairedRatio": 1.0005928028868083,
+      "interval95": [
+        0.9822970333589582,
+        1.0192293401979748
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "object-control-128",
+      "pairedRatio": 0.9961593377028614,
+      "interval95": [
+        0.8770599515792572,
+        1.1314316932448936
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-boolean-push-control",
+      "pairedRatio": 0.9508924664262631,
+      "interval95": [
+        0.9168704931790629,
+        0.9861768804131799
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-256-control",
+      "pairedRatio": 1.0029638988760303,
+      "interval95": [
+        0.9541655936444694,
+        1.054257865876716
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-1024-control",
+      "pairedRatio": 0.9983940047351474,
+      "interval95": [
+        0.9588752615029775,
+        1.0395414593642536
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32767-control",
+      "pairedRatio": 1.0601062885117745,
+      "interval95": [
+        0.9532660127958044,
+        1.178921022943194
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32768",
+      "pairedRatio": 0.8536060763461555,
+      "interval95": [
+        0.708839277115471,
+        1.027938712059238
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32769",
+      "pairedRatio": 0.8721305369146201,
+      "interval95": [
+        0.7255320039888167,
+        1.0483502715763144
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-262144",
+      "pairedRatio": 0.6096979960320296,
+      "interval95": [
+        0.48813092584496637,
+        0.7615408626732598
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-prefix-31",
+      "pairedRatio": 0.8224596286383928,
+      "interval95": [
+        0.6674472969264953,
+        1.013473039526742
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-prefix-32",
+      "pairedRatio": 0.7965155150831088,
+      "interval95": [
+        0.6565321998128155,
+        0.9663455439794042
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-prefix-65",
+      "pairedRatio": 0.8309329502365247,
+      "interval95": [
+        0.6779438457102881,
+        1.0184465456211707
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "number-control-1024",
+      "pairedRatio": 0.9829498025474439,
+      "interval95": [
+        0.9287687157336321,
+        1.0402916226187353
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "string-control-256",
+      "pairedRatio": 1.0119838989732721,
+      "interval95": [
+        0.7801520331933554,
+        1.3127074829109966
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "object-control-128",
+      "pairedRatio": 0.9977070597820831,
+      "interval95": [
+        0.9239494967897438,
+        1.0773525832283983
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-boolean-push-control",
+      "pairedRatio": 1.0263617713640156,
+      "interval95": [
+        0.9564943250648197,
+        1.10133270853028
+      ]
+    }
+  ]
+}

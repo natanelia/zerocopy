@@ -1,0 +1,165 @@
+{
+  "schema": "zerocopy-boolean-hosted-provenance/v1",
+  "repository": "natanelia/zerocopy",
+  "runId": 42496326065,
+  "jobId": 128779354371,
+  "artifactId": 13624401094,
+  "conclusion": "success",
+  "runUrl": "https://github.com/natanelia/zerocopy/actions/runs/42496326065",
+  "jobUrl": "https://github.com/natanelia/zerocopy/actions/runs/42496326065/job/128779354371",
+  "artifactUrl": "https://github.com/natanelia/zerocopy/actions/runs/42496326065/artifacts/13624401094",
+  "zipFile": "boolean-final-hosted.zip",
+  "zipSha256": "9ea14568e5ff6adaecc52f886f452076edc34a480a0db0cbe7a48d8559d78df6",
+  "allExtractedFilesMatchZip": true,
+  "baselineCommit": "a4265a0608ec25eec5719496225212db6b251989",
+  "measuredCommit": "becc7f72ec6d78d41924fca88b476fa3ea5d2d06",
+  "host": {
+    "arch": "x64",
+    "platform": "linux",
+    "release": "7.0.0-1017-azure",
+    "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+    "affinity": "0"
+  },
+  "formalStartedAt": "2026-11-08T15:46:19.936Z",
+  "formalCompletedAt": "2026-11-08T15:54:18.891Z",
+  "archivePolicy": "Exact raw bytes compressed with gzip level9 and mtime0; no JSON fields rewritten.",
+  "records": [
+    {
+      "source": "pilot-v2.json",
+      "archive": "results/pilot-v2.json.gz",
+      "rawBytes": 290036,
+      "gzipBytes": 43537,
+      "rawSha256": "10fd0b719ff30703517f9f0548ca1829660477dccf77f8e9f40df240e1734d9f",
+      "gzipSha256": "f708e1339694512a969efaf122857968a4a1be2b7dcf00db2237446ca933144a",
+      "gzipMtime": 0,
+      "exactByteRoundTrip": true
+    },
+    {
+      "source": "formal.json",
+      "archive": "results/formal.json.gz",
+      "rawBytes": 1618151,
+      "gzipBytes": 231086,
+      "rawSha256": "0f559e877691e4ebf8cf944ef69133ff690ce1682bb284d24d1db87fd8047529",
+      "gzipSha256": "44bbe7f244e70943a9948e7902805a48d5984b6df3ef670544d1a09e7f600f86",
+      "gzipMtime": 0,
+      "exactByteRoundTrip": true
+    },
+    {
+      "source": "aa.json",
+      "archive": "results/aa.json.gz",
+      "rawBytes": 427915,
+      "gzipBytes": 70316,
+      "rawSha256": "ea64e0b598ec36888bd37026c99aa1319ad03d3a85469b22ac305ce47376aa9c",
+      "gzipSha256": "91d117eb7ad8a8873c9632a173fd2d3665bf30629f1529f48f81f7af58593d9b",
+      "gzipMtime": 0,
+      "exactByteRoundTrip": true
+    },
+    {
+      "source": "reference-comparison.json",
+      "archive": "results/reference-comparison.json.gz",
+      "rawBytes": 272729,
+      "gzipBytes": 42966,
+      "rawSha256": "84f046575d41dd7b66871e6af3c44a2995bc008667665e0a66b04ee4528fe400",
+      "gzipSha256": "2aff97f8f5ebaf52fea603c305efa8a94fe855f9f41cb2ff84d2e48d359b9c51",
+      "gzipMtime": 0,
+      "exactByteRoundTrip": true
+    }
+  ],
+  "uploadedMembers": [
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/aa.json",
+      "bytes": 427915,
+      "sha256": "ea64e0b598ec36888bd37026c99aa1319ad03d3a85469b22ac305ce47376aa9c"
+    },
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/formal.json",
+      "bytes": 1618151,
+      "sha256": "0f559e877691e4ebf8cf944ef69133ff690ce1682bb284d24d1db87fd8047529"
+    },
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/pilot-console.txt",
+      "bytes": 3795,
+      "sha256": "d62e756ac43ee15bcf833add4f4b1995670885745a633d5bf812766fd1ddae25"
+    },
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/pilot-v2.json",
+      "bytes": 290036,
+      "sha256": "10fd0b719ff30703517f9f0548ca1829660477dccf77f8e9f40df240e1734d9f"
+    },
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/pilot.json",
+      "bytes": 294980,
+      "sha256": "a391a593a7524bd412b8694d8d9e8e0f89f412539f5348f0cff7158a8941dbe1"
+    },
+    {
+      "path": "proofs/list-boolean-encoding-20261108/results/reference-comparison.json",
+      "bytes": 272729,
+      "sha256": "84f046575d41dd7b66871e6af3c44a2995bc008667665e0a66b04ee4528fe400"
+    },
+    {
+      "path": "boolean-ci-results/aa-console.txt",
+      "bytes": 4840,
+      "sha256": "9e84bbd5a72d0972576484b0cb52aaceaea9d3b8fbe6cca70d043101f1532a20"
+    },
+    {
+      "path": "boolean-ci-results/allocation-bun.json",
+      "bytes": 43806,
+      "sha256": "36263eb1683c9bc5e50d28f512fd2884bba99c7d47f8a6bbf2f4fe837122251d"
+    },
+    {
+      "path": "boolean-ci-results/allocation-node.json",
+      "bytes": 43334,
+      "sha256": "8f11c3de810b8d6dc10f2625683cb620c94cb722d39bca55ade9478005440a69"
+    },
+    {
+      "path": "boolean-ci-results/audit-aa.json",
+      "bytes": 1898,
+      "sha256": "2a04cd0d43c8b7ba379d28ea5bf3d8f385ad58436826da3c8ca603d659d371a5"
+    },
+    {
+      "path": "boolean-ci-results/audit-formal.json",
+      "bytes": 5476,
+      "sha256": "37a6dcf58bd0e488a550c537c9ae8417683858133f9c0bc6da40605b436907ee"
+    },
+    {
+      "path": "boolean-ci-results/audit-pilot-v1.json",
+      "bytes": 1933,
+      "sha256": "b5b32d96d90a5a19be2ba932b42974fcb5379ca04e6923325c77bd3a4ca6795a"
+    },
+    {
+      "path": "boolean-ci-results/audit-pilot-v2.json",
+      "bytes": 1957,
+      "sha256": "49b1b0950581a43e7923a5789587e2431fe6fade18a79639e318fcf1262aee44"
+    },
+    {
+      "path": "boolean-ci-results/browser.json",
+      "bytes": 1046,
+      "sha256": "bc78fd5e006e507fa68cac3d95f3e508c23381c7109f07250197a17c68c8351b"
+    },
+    {
+      "path": "boolean-ci-results/formal-console.txt",
+      "bytes": 23831,
+      "sha256": "119a44379930c53afce87f0ba2938231335dbe5ba4d40ad9cd52d03cb19209d4"
+    },
+    {
+      "path": "boolean-ci-results/pilot-v2-console.txt",
+      "bytes": 3964,
+      "sha256": "42a17069228aa1254d181ec7970c5544d30c7df2d31ad3ed668d8ecac3818a5d"
+    },
+    {
+      "path": "boolean-ci-results/reference-comparison-console.txt",
+      "bytes": 7002,
+      "sha256": "a4d5d50066d78c8b4a79f9da4aaadd62e83b714f133fa6f9d3ea75d5113de8e7"
+    },
+    {
+      "path": "boolean-ci-results/smoke-bun.json",
+      "bytes": 27331,
+      "sha256": "e92cf0d5f659cc54e899d401f9ea29aa4c4339fb6f51a30156fd248b4d97e8d5"
+    },
+    {
+      "path": "boolean-ci-results/smoke-node.json",
+      "bytes": 26859,
+      "sha256": "5e8fb5f095de55a2beb9b4ab321578ba79acf4e1f2f64f05b02489371abcc8a4"
+    }
+  ]
+}

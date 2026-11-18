@@ -1,0 +1,84 @@
+{
+  "verified": true,
+  "record": "/home/runner/work/zerocopy/zerocopy/proofs/list-boolean-encoding-20261108/results/pilot.json",
+  "mode": "pilot",
+  "processes": 48,
+  "timedBatches": 432,
+  "verifiedOutputs": 1006952,
+  "measuredBatchesBelow2ms": 0,
+  "exactCurrentBuild": false,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "boolean-255-control",
+      "pairedRatio": 1.106668015432053,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-256",
+      "pairedRatio": 1.8118400311656422,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-1024",
+      "pairedRatio": 1.3984409184167204,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32768",
+      "pairedRatio": 0.7300791298301259,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-262144",
+      "pairedRatio": 0.8136894355939026,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-control-1024",
+      "pairedRatio": 1.1453465149117803,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-255-control",
+      "pairedRatio": 0.9883862948298259,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-256",
+      "pairedRatio": 0.7963823108598675,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-1024",
+      "pairedRatio": 0.9646191250422019,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32768",
+      "pairedRatio": 0.9197441376032109,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-262144",
+      "pairedRatio": 0.7533058367571849,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-control-1024",
+      "pairedRatio": 1.2062130980168275,
+      "interval95": null
+    }
+  ]
+}

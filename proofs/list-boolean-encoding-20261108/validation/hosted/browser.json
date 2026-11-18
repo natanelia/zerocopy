@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "timingMeasurements": false,
+  "crossOriginIsolated": true,
+  "appendCounts": [
+    256,
+    1024,
+    32767,
+    32768,
+    32769,
+    262144
+  ],
+  "results": [
+    {
+      "copy": false,
+      "reads": 215182,
+      "pausedIteratorVerified": true,
+      "readOnlyRejected": true,
+      "completeOutputsVerified": true,
+      "publishedBytesPreserved": true,
+      "initialCapacity": 393216,
+      "finalCapacity": 2752512
+    },
+    {
+      "copy": true,
+      "reads": 207522,
+      "pausedIteratorVerified": true,
+      "readOnlyRejected": true,
+      "completeOutputsVerified": true,
+      "publishedBytesPreserved": true,
+      "initialCapacity": 393216,
+      "finalCapacity": 2752512
+    }
+  ],
+  "browser": "153.0.8010.12",
+  "sources": {
+    "arena.ts": "6f21a542109703cbeaaf0ef95f32bbc5a347ea6d54369731c6de6ffeb286674f",
+    "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+    "dist/shared.js": "65aafe83e350a51dbad30d33440880a56718e49e733264bd07aadaf77857d73f"
+  }
+}

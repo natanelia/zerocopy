@@ -1,0 +1,84 @@
+{
+  "verified": true,
+  "record": "/workspace/scratch/106b5ee34aad/zerocopy-list-booleans/proofs/list-boolean-encoding-20261108/results/pilot-v2.json.gz",
+  "mode": "pilot",
+  "processes": 48,
+  "timedBatches": 432,
+  "verifiedOutputs": 253260,
+  "measuredBatchesBelow2ms": 0,
+  "exactCurrentBuild": true,
+  "rows": [
+    {
+      "runtime": "node",
+      "name": "boolean-1024-control",
+      "pairedRatio": 0.9581769976486009,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32767-control",
+      "pairedRatio": 0.9508885653281149,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32768",
+      "pairedRatio": 0.7216631994398292,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-32769",
+      "pairedRatio": 0.7239412967080756,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "boolean-262144",
+      "pairedRatio": 0.7950802643921134,
+      "interval95": null
+    },
+    {
+      "runtime": "node",
+      "name": "number-control-1024",
+      "pairedRatio": 1.0044069575661925,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-1024-control",
+      "pairedRatio": 1.0263610292582166,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32767-control",
+      "pairedRatio": 1.193418401083315,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32768",
+      "pairedRatio": 0.7211732479787885,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-32769",
+      "pairedRatio": 0.973375454013458,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "boolean-262144",
+      "pairedRatio": 0.6431432361078309,
+      "interval95": null
+    },
+    {
+      "runtime": "bun",
+      "name": "number-control-1024",
+      "pairedRatio": 1.0342426953391854,
+      "interval95": null
+    }
+  ]
+}
