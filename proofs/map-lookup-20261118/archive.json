@@ -1,0 +1,170 @@
+{
+  "schema": "zerocopy-map-rejected-evidence/v1",
+  "verdict": "rejected",
+  "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+  "publishedCandidateCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+  "format": "gzip; exact original JSON bytes; empty filename; mtime=0",
+  "files": [
+    {
+      "sourceName": "map-formal.json",
+      "archiveName": "map-formal.json.gz",
+      "sourceBytes": 243118,
+      "archiveBytes": 19023,
+      "sourceSha256": "106b9e3d3da6ab8f24813af514933602057b63b78aef3e3bd94da13c36168fb3",
+      "archiveSha256": "eb8930d78527e8e4c9db00aae0e81df9e288d04f623107b529c8608c1f14d6be",
+      "samples": 28,
+      "pairsPerRuntime": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "measuredCandidateTrackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceManifestSha256": "8f13bd82c3e55f0b7f2eae28cb11f272125fc70c5de6396dc492290e08701b82",
+      "bundleManifestSha256": "e4c2a4ab5e3e60fe8478083abddad9d0f0572b7c893b6c5f6ec536b274129f46"
+    },
+    {
+      "sourceName": "map-identical-control.json",
+      "archiveName": "map-identical-control.json.gz",
+      "sourceBytes": 243062,
+      "archiveBytes": 18132,
+      "sourceSha256": "3f632e1885a29701eac5b9e1a08d305bcb19cd576d59826c1f85399babe70731",
+      "archiveSha256": "8b25670160e2a468750f180bb45e5a2ddb7841b7c59d89efa87a0b3c0bb21715",
+      "samples": 28,
+      "pairsPerRuntime": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "measuredCandidateTrackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceManifestSha256": "a6fe0f6a55ad98294c9f36b7ae2e3c39abd493a1e9816259a152383fd2876d68",
+      "bundleManifestSha256": "4f36bad25773ea0d159439f77037b933d9c8fccc2f658230ccfa20a0897c46b1"
+    },
+    {
+      "sourceName": "map-large.json",
+      "archiveName": "map-large.json.gz",
+      "sourceBytes": 144130,
+      "archiveBytes": 12839,
+      "sourceSha256": "f580cf7bce381664adf1767378647c8372441d742a2cc54588f7e0711cbe837b",
+      "archiveSha256": "3c0178eefac6d57d8e22d568fa36207432b81ad4b2ee81404d65a7dc43afe938",
+      "samples": 28,
+      "pairsPerRuntime": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "measuredCandidateTrackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceManifestSha256": "8f13bd82c3e55f0b7f2eae28cb11f272125fc70c5de6396dc492290e08701b82",
+      "bundleManifestSha256": "e4c2a4ab5e3e60fe8478083abddad9d0f0572b7c893b6c5f6ec536b274129f46"
+    },
+    {
+      "sourceName": "map-pack-screen.json",
+      "archiveName": "map-pack-screen.json.gz",
+      "sourceBytes": 124815,
+      "archiveBytes": 13469,
+      "sourceSha256": "0a47243b3679950ba7301689398a058900ed676b6ced4f769fb5ff9bb38fd2f2",
+      "archiveSha256": "2a93b5963fe776a0a0bfb5c646e2e91aba3000e22f5c0c9f35783a9d0e461b0a",
+      "samples": 12,
+      "pairsPerRuntime": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "measuredCandidateTrackedDiffSha256": "18da895a64a6099c60f064f2a3465685b09f8e1ddaf50ec875bfad8539b7343d",
+      "sourceManifestSha256": "41d95cfa851331b7277d8eff7a3385b3d568293e1166f7393143d6b04507014c",
+      "bundleManifestSha256": "19863ed84a7f2a20653632d038b94fbd91f6d3933d9c9ef740eac13047099f5e"
+    },
+    {
+      "sourceName": "map-pack-large-screen.json",
+      "archiveName": "map-pack-large-screen.json.gz",
+      "sourceBytes": 79744,
+      "archiveBytes": 10247,
+      "sourceSha256": "c63442622503bb91a67793476c1893741518ba58eb710eada47ec3ec299c4a94",
+      "archiveSha256": "8725f528d9c4ceff494039df2d72b137737db6ee71b25369b8c6a736cca79e0f",
+      "samples": 12,
+      "pairsPerRuntime": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "measuredCandidateTrackedDiffSha256": "18da895a64a6099c60f064f2a3465685b09f8e1ddaf50ec875bfad8539b7343d",
+      "sourceManifestSha256": "41d95cfa851331b7277d8eff7a3385b3d568293e1166f7393143d6b04507014c",
+      "bundleManifestSha256": "19863ed84a7f2a20653632d038b94fbd91f6d3933d9c9ef740eac13047099f5e"
+    },
+    {
+      "sourceName": "map-prefix-screen.json",
+      "archiveName": "map-prefix-screen.json.gz",
+      "sourceBytes": 124770,
+      "archiveBytes": 13355,
+      "sourceSha256": "70f41196798d9b59d3715bd64ebf3c38605c61e22d7021a28285ba2ef17d725f",
+      "archiveSha256": "442c35956ef94a6ab2687baa747c617e9fb097d0f1965d70ca7d15e4005de23d",
+      "samples": 12,
+      "pairsPerRuntime": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "0b41c27e5122059017040376eecb8e08507f4aef",
+      "measuredCandidateTrackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceManifestSha256": "43817efa6128e6dbd73a84a0981c877a429c70fb793769381448c0f13a82f391",
+      "bundleManifestSha256": "b1f40fa4b3ca55bafd3c47a31ca3d7c5e759bea04f333589caae2f6410cca75b"
+    },
+    {
+      "sourceName": "map-prefix-large-screen.json",
+      "archiveName": "map-prefix-large-screen.json.gz",
+      "sourceBytes": 79812,
+      "archiveBytes": 10241,
+      "sourceSha256": "9b55a3fef0ebdbafa9ace6e4c5a2b07f54fb74f92fc4d059955774681091fcd9",
+      "archiveSha256": "04d0198ff8f522f7ce7ada0f739600d796dcf0b8c8e5a3147c584ae1fb2c7d79",
+      "samples": 12,
+      "pairsPerRuntime": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "measuredCandidateCommit": "0b41c27e5122059017040376eecb8e08507f4aef",
+      "measuredCandidateTrackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceManifestSha256": "43817efa6128e6dbd73a84a0981c877a429c70fb793769381448c0f13a82f391",
+      "bundleManifestSha256": "b1f40fa4b3ca55bafd3c47a31ca3d7c5e759bea04f333589caae2f6410cca75b"
+    }
+  ],
+  "patches": [
+    {
+      "name": "map-pack-refinement.patch",
+      "baseCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "localExperimentCommit": "6e0933b7561bfbc90ae3f84a16010b2707f3da5f",
+      "bytes": 2486,
+      "sha256": "c5c3be24b5dbb044ba5c305a20c626a60069726f1684c26bd1c703517340f343",
+      "publishedExperimentCommit": false
+    },
+    {
+      "name": "map-prefix-refinement.patch",
+      "baseCommit": "56337fa7aa6dda4eed4dfcc22ecd7edf073cd082",
+      "localExperimentCommit": "0b41c27e5122059017040376eecb8e08507f4aef",
+      "bytes": 8407,
+      "sha256": "f4c436f5272268596d251b80ff9711e35cd35c5598ef2afa2f09607f1505c30e",
+      "publishedExperimentCommit": false
+    }
+  ],
+  "supportingFiles": [
+    {
+      "path": "../performance-20261118/benchmark.mjs",
+      "bytes": 12555,
+      "sha256": "f9aaad1e867d508daad68efc26c25c6b9f0f15527d1d6c3a5b53102ffa099753"
+    },
+    {
+      "path": "../performance-20261118/workloads.mjs",
+      "bytes": 17286,
+      "sha256": "5051365c93a7b0ae550d64f0bb1509caed1307ebf2873af530619096c9dd5780"
+    },
+    {
+      "path": "../performance-20261118/verify.mjs",
+      "bytes": 14317,
+      "sha256": "90ed7efbd4b8b1169db30b112c007a63fc6eba7d87dbfe98e511e31082b1ac39"
+    }
+  ]
+}

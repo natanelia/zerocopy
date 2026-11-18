@@ -1,0 +1,141 @@
+{
+  "verifier": "../performance-20261118/verify.mjs",
+  "verifierSha256": "90ed7efbd4b8b1169db30b112c007a63fc6eba7d87dbfe98e511e31082b1ac39",
+  "reports": [
+    {
+      "path": "proofs/map-lookup-20261118/map-formal.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "eb8930d78527e8e4c9db00aae0e81df9e288d04f623107b529c8608c1f14d6be",
+      "decodedJsonSha256": "106b9e3d3da6ab8f24813af514933602057b63b78aef3e3bd94da13c36168fb3",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 28,
+      "caseCount": 11,
+      "identicalBuilds": false
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-identical-control.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "8b25670160e2a468750f180bb45e5a2ddb7841b7c59d89efa87a0b3c0bb21715",
+      "decodedJsonSha256": "3f632e1885a29701eac5b9e1a08d305bcb19cd576d59826c1f85399babe70731",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 28,
+      "caseCount": 11,
+      "identicalBuilds": true
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-large.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "3c0178eefac6d57d8e22d568fa36207432b81ad4b2ee81404d65a7dc43afe938",
+      "decodedJsonSha256": "f580cf7bce381664adf1767378647c8372441d742a2cc54588f7e0711cbe837b",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 28,
+      "caseCount": 5,
+      "identicalBuilds": false
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-pack-screen.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "2a93b5963fe776a0a0bfb5c646e2e91aba3000e22f5c0c9f35783a9d0e461b0a",
+      "decodedJsonSha256": "0a47243b3679950ba7301689398a058900ed676b6ced4f769fb5ff9bb38fd2f2",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 12,
+      "caseCount": 11,
+      "identicalBuilds": false
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-pack-large-screen.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "8725f528d9c4ceff494039df2d72b137737db6ee71b25369b8c6a736cca79e0f",
+      "decodedJsonSha256": "c63442622503bb91a67793476c1893741518ba58eb710eada47ec3ec299c4a94",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 12,
+      "caseCount": 5,
+      "identicalBuilds": false
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-prefix-screen.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "442c35956ef94a6ab2687baa747c617e9fb097d0f1965d70ca7d15e4005de23d",
+      "decodedJsonSha256": "70f41196798d9b59d3715bd64ebf3c38605c61e22d7021a28285ba2ef17d725f",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 12,
+      "caseCount": 11,
+      "identicalBuilds": false
+    },
+    {
+      "path": "proofs/map-lookup-20261118/map-prefix-large-screen.json.gz",
+      "verified": true,
+      "issues": [],
+      "archiveSha256": "04d0198ff8f522f7ce7ada0f739600d796dcf0b8c8e5a3147c584ae1fb2c7d79",
+      "decodedJsonSha256": "9b55a3fef0ebdbafa9ace6e4c5a2b07f54fb74f92fc4d059955774681091fcd9",
+      "schema": "zerocopy-paired-public-api/v1",
+      "pairs": 3,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 12,
+      "caseCount": 5,
+      "identicalBuilds": false
+    }
+  ],
+  "totalProcessSamples": 132,
+  "allArchiveHashesAndDecodedHashesMatchManifest": true,
+  "allOriginalRawBytesPreservedLocally": true,
+  "gzipMtimeZeroAndEmptyFilename": true,
+  "bothPatchesApplyCleanlyToPublishedCandidate": true,
+  "runtimeDiffAgainst56337faEmpty": true,
+  "scope": "Read-only consistency audit; summaries independently recomputed from every recorded sample. No authenticity or statistical-significance claim.",
+  "documentationPreservation": {
+    "passed": true,
+    "command": "node scripts/check-docs.mjs --base 1242908762b554e3574365c486d5a6c52d5e568f --preserve",
+    "recordedNumericRowsPreserved": 77,
+    "recordedNumericRowsTotal": 77,
+    "historicalEvidenceFilesChanged": 0,
+    "markdownFilesChecked": 88
+  },
+  "whitespaceCheck": {
+    "documentationAndVerifierPassed": true,
+    "byteExactPatchesExcluded": [
+      "map-pack-refinement.patch",
+      "map-prefix-refinement.patch"
+    ],
+    "reason": "Unified-diff blank context lines are significant and retained byte-for-byte; both reconstruction patches pass git apply --check."
+  }
+}

@@ -1,0 +1,173 @@
+diff --git a/arena.ts b/arena.ts
+index c860f00..f4c3976 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -679,39 +679,43 @@ export class Arena {
+     this.reads.remember(key, root, leaf); return leaf;
+   }
+   private findUncached(root: number, key: string): number {
+-    let encoded: Uint8Array | undefined;
++    let hash = 2166136261, encoded: Uint8Array | undefined;
++    let q0 = 0, q1 = 0, q2 = 0, q3 = 0;
+     packed: if (key.length <= 16) {
+-      // Pack each character once. Hashing, trie traversal and complete equality
+-      // then stay in the read-only kernel, with no shared key staging buffer.
++      // Hash and pack each character once. The existing root-specific prefix
++      // index still chooses the subtree; the kernel completes key equality.
+       const length = key.length;
+-      let q0 = 0, q1 = 0, q2 = 0, q3 = 0, i = 0;
++      let i = 0;
+       for (; i < length && i < 4; i++) {
+         const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
++        hash = Math.imul(hash ^ c, 16777619);
+         q0 |= c << (i * 8);
+       }
+       for (; i < length && i < 8; i++) {
+         const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
++        hash = Math.imul(hash ^ c, 16777619);
+         q1 |= c << ((i - 4) * 8);
+       }
+       for (; i < length && i < 12; i++) {
+         const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
++        hash = Math.imul(hash ^ c, 16777619);
+         q2 |= c << ((i - 8) * 8);
+       }
+       for (; i < length; i++) {
+         const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
++        hash = Math.imul(hash ^ c, 16777619);
+         q3 |= c << ((i - 12) * 8);
+       }
+-      this.lastReadAscii = true;
+-      return this.wasm.mapFindAscii16(root, length, q0, q1, q2, q3) >>> 0;
+     }
+-    let hash = encoded ? hashBytes(encoded) : 2166136261;
+-    if (!encoded) for (let i = 0; i < key.length; i++) {
++    if (encoded) hash = hashBytes(encoded);
++    else if (key.length > 16) for (let i = 0; i < key.length; i++) {
+       const code = key.charCodeAt(i);
+       if (code > 127) { encoded = encoder.encode(key); hash = hashBytes(encoded); break; }
+       hash = Math.imul(hash ^ code, 16777619);
+     }
+     this.lastReadAscii = !encoded;
+     const length = encoded?.length ?? key.length, view = this.dv, bytes = this.bytes;
++    const packed = !encoded && length <= 16;
+     // The generic journal path is retained for low-level imported descriptors.
+     if (root && view.getUint32(root, true) === 0xffffffff) {
+       for (let j = 0; j < view.getUint32(root + 12, true); j++) {
+@@ -740,15 +744,18 @@ export class Arena {
+         // Allocated addresses are below 0x7fff0000, so this is not a pointer.
+         this.prefixChildren[prefix] = 0xffffffff;
+         this.prefixValid[word] |= bit;
+-        candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
++        candidate = packed ? this.wasm.mapFindPacked16From(root, hash >>> 0, 0, length, q0, q1, q2, q3) >>> 0
++          : this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+       } else {
+         if (this.prefixChildren[prefix] === 0xffffffff) {
+           this.prefixChildren[prefix] = this.wasm.mapHashPrefix(root, hash >>> 0, this.prefixBits) >>> 0;
+         }
+-        candidate = this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
++        candidate = packed ? this.wasm.mapFindPacked16From(this.prefixChildren[prefix], hash >>> 0, this.prefixBits, length, q0, q1, q2, q3) >>> 0
++          : this.wasm.mapHashCandidateFrom(this.prefixChildren[prefix], hash >>> 0, this.prefixBits) >>> 0;
+       }
+-    } else candidate = this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
+-    if (!candidate) return 0;
++    } else candidate = packed ? this.wasm.mapFindPacked16From(root, hash >>> 0, 0, length, q0, q1, q2, q3) >>> 0
++      : this.wasm.mapHashCandidate(root, hash >>> 0) >>> 0;
++    if (!candidate || packed) return candidate;
+     const bucket = view.getUint32(candidate, true) === 2;
+     const count = bucket ? view.getUint32(candidate + 8, true) : 1;
+     for (let j = 0; j < count; j++) {
+diff --git a/map-ascii-reader.test.ts b/map-ascii-reader.test.ts
+index 372c64b..e18b6b7 100644
+--- a/map-ascii-reader.test.ts
++++ b/map-ascii-reader.test.ts
+@@ -49,7 +49,7 @@ describe('scratch-free short ASCII map lookups', () => {
+       owner.buf.set(bytes, leaf + 16);
+       owner.buf.fill(0xa5, leaf + 16 + length, capacity);
+       expect(owner.used).toBe(capacity);
+-      expect(owner.wasm.mapFindAscii16(leaf, length, ...packed)).toBe(leaf);
++      expect(owner.wasm.mapFindPacked16From(leaf, hashBytes(bytes), 0, length, ...packed)).toBe(leaf);
+     }
+   });
+ 
+diff --git a/rust/src/readers.rs b/rust/src/readers.rs
+index c92f318..104229c 100644
+--- a/rust/src/readers.rs
++++ b/rust/src/readers.rs
+@@ -31,17 +31,6 @@ pub unsafe extern "C" fn mapHashPrefix(mut root: u32, hash: u32, bits: u32) -> u
+     root
+ }
+ 
+-#[inline(always)]
+-fn hash_part(mut hash: u32, mut word: u32, count: u32) -> u32 {
+-    let mut i = 0;
+-    while i < count {
+-        hash = (hash ^ (word & 255)).wrapping_mul(16777619);
+-        word >>= 8;
+-        i += 1;
+-    }
+-    hash
+-}
+-
+ #[inline(always)]
+ unsafe fn matches_packed8(pointer: u32, count: u32, lo: u32, hi: u32) -> bool {
+     let word = (lo as u64) | ((hi as u64) << 32);
+@@ -66,27 +55,14 @@ unsafe fn matches_packed16(leaf: u32, length: u32, q0: u32, q1: u32, q2: u32, q3
+     } else { matches_packed8(leaf + 16, length, q0, q1) }
+ }
+ 
+-/// Hash and compare a 0..16-byte key passed entirely in scalar arguments.
++/// Compare a 0..16-byte key passed entirely in scalar arguments, starting from
++/// the same root or cached prefix subtree used by the generic hash reader.
+ /// This reader never stages bytes in the shared arena. Every comparison stays
+ /// inside the published key, including short keys at the end of a memory page.
+ #[no_mangle]
+-pub unsafe extern "C" fn mapFindAscii16(mut root: u32, length: u32, q0: u32, q1: u32, q2: u32, q3: u32) -> u32 {
++pub unsafe extern "C" fn mapFindPacked16From(root: u32, hash: u32, shift: u32, length: u32, q0: u32, q1: u32, q2: u32, q3: u32) -> u32 {
+     if length > 16 { return 0; }
+-    let mut hash = hash_part(2166136261, q0, length.min(4));
+-    if length > 4 { hash = hash_part(hash, q1, (length - 4).min(4)); }
+-    if length > 8 { hash = hash_part(hash, q2, (length - 8).min(4)); }
+-    if length > 12 { hash = hash_part(hash, q3, length - 12); }
+-    if root != 0 && load_u32(root) == 0xffff_ffff {
+-        let mut i = 0;
+-        let count = load_u32(root + 12);
+-        while i < count {
+-            let leaf = load_u32(root + 16 + i * 4);
+-            if load_u32(leaf + 4) == hash && matches_packed16(leaf, length, q0, q1, q2, q3) { return leaf; }
+-            i += 1;
+-        }
+-        root = load_u32(root + 4);
+-    }
+-    let candidate = mapHashCandidate(root, hash);
++    let candidate = mapHashCandidateFrom(root, hash, shift);
+     if candidate == 0 { return 0; }
+     if load_u32(candidate) != 2 {
+         return if matches_packed16(candidate, length, q0, q1, q2, q3) { candidate } else { 0 };
+diff --git a/rust/wasm-abi.json b/rust/wasm-abi.json
+index ce8e8ee..7f127a4 100644
+--- a/rust/wasm-abi.json
++++ b/rust/wasm-abi.json
+@@ -1,7 +1,7 @@
+ {
+   "persistent-core": {
+-    "mapFindAscii16": {
+-      "params": ["i32", "i32", "i32", "i32", "i32", "i32"],
++    "mapFindPacked16From": {
++      "params": ["i32", "i32", "i32", "i32", "i32", "i32", "i32", "i32"],
+       "results": ["i32"]
+     },
+     "mapHashCandidate": {
+diff --git a/scripts/rust-wasm.mjs b/scripts/rust-wasm.mjs
+index 6fd8212..2e3a5c2 100644
+--- a/scripts/rust-wasm.mjs
++++ b/scripts/rust-wasm.mjs
+@@ -78,7 +78,7 @@ export function abiOf(module) {
+ 
+ export const readerExports = [
+   'getHeapEnd', 'mapSize', 'mapFind', 'mapChild', 'keyBuf', 'batchBuf',
+-  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix', 'mapFindAscii16',
++  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix', 'mapFindPacked16From',
+   'textContains16', 'textContainsBlock16', 'vecLeaf', 'vecGet', 'blockGet',
+   'mapNumber', 'radixSize', 'radixFind', 'journalFind', 'compareLeaves',
+   'jsonValueEnd', 'jsonStringEnd', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonArrayAt', 'jsonInteger',
