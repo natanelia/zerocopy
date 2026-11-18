@@ -76,6 +76,7 @@ export class JsonView {
   readonly #start: number;
   readonly #bound: number;
   #end: number | undefined;
+  #arrayCursor: { index: number; pointer: number } | undefined;
 
   /** @internal A retained arena keeps the published record alive. */
   constructor(arena: Arena, pointer: number, length: number) {
@@ -128,8 +129,19 @@ export class JsonView {
   /** Read a zero-based array index; invalid/out-of-range indices return undefined. */
   at(index: number): JsonViewValue | undefined {
     if (!Number.isInteger(index) || index < 0 || index > 0xffffffff || this.#arena.buf[this.#start] !== 91) return undefined;
-    const pointer = this.#arena.wasm.jsonArrayAt(this.#start, this.#bound, index) >>> 0;
-    return pointer ? this.#read(pointer) : undefined;
+    // Published JSON never moves. Forward reads can resume from the previous
+    // element instead of scanning every earlier element again. The cursor is
+    // local to this view; backward reads still start at the opening bracket.
+    const cursor = this.#arrayCursor, wasm = this.#arena.wasm;
+    let pointer: number;
+    if (cursor && index >= cursor.index) {
+      pointer = index === cursor.index ? cursor.pointer
+        : wasm.jsonArrayAtFrom(cursor.pointer, this.#bound, index - cursor.index) >>> 0;
+    } else pointer = wasm.jsonArrayAt(this.#start, this.#bound, index) >>> 0;
+    if (!pointer) return undefined;
+    if (cursor) { cursor.index = index; cursor.pointer = pointer; }
+    else this.#arrayCursor = { index, pointer };
+    return this.#read(pointer);
   }
 
   /** Strict scalar equality; string predicates do not create a JS value string. */

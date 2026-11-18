@@ -227,9 +227,17 @@ pub unsafe extern "C" fn jsonFieldCandidate(start: u32, end: u32, hash: u32) -> 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn jsonArrayAt(start: u32, end: u32, mut index: u32) -> u32 {
+pub unsafe extern "C" fn jsonArrayAt(start: u32, end: u32, index: u32) -> u32 {
     if start >= end || load_u8(start) != 91 { return 0; }
-    let mut p = space(start + 1, end);
+    jsonArrayAtFrom(space(start + 1, end), end, index)
+}
+
+/// Continue from a known element in the same immutable array. `index` is
+/// relative to that element. Stop at its array's closing bracket even when
+/// `end` is the enclosing record bound and includes following siblings.
+#[no_mangle]
+pub unsafe extern "C" fn jsonArrayAtFrom(start: u32, end: u32, mut index: u32) -> u32 {
+    let mut p = start;
     while p < end && load_u8(p) != 93 {
         if index == 0 { return p; }
         index -= 1;
