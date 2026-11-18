@@ -1,0 +1,21 @@
+Built 12 portable modules: 234045 bytes
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-map
+
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  18:36:21
+   Duration  717ms (transform 448ms, setup 0ms, import 585ms, tests 697ms, environment 1ms)
+
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (shared).
+Ordered projections preserved cold decode boundaries and old snapshots after growth/reset (copy).
+✔ proofs/ordered-map-projections-20261105/worker.mjs (248.735304ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 257.683022

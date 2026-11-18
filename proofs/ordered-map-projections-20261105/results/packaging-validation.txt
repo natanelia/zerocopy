@@ -1,0 +1,8 @@
+{"path":"proofs/ordered-map-projections-20261105/results/pilot-v1.json.gz","rawBytes":712391,"rawSha256":"629e10d59561d246ed059b862c0b5411175b7085f6c756f522160803720098ec","phase":"pilot","pairs":40,"summaries":20,"checkedCalls":10524720,"checkedElements":378225960}
+{"path":"proofs/ordered-map-projections-20261105/results/pilot-v2.json.gz","rawBytes":707755,"rawSha256":"0a61ccb07d0e21d76efcc02ba36743abee0770ba6602eb032ed6f4df48dc0c03","phase":"pilot","pairs":40,"summaries":20,"checkedCalls":10068180,"checkedElements":383702400}
+{"path":"proofs/ordered-map-projections-20261105/results/formal-v2.json.gz","rawBytes":1993895,"rawSha256":"91969ef9b4d2c9ea62b89ca1f2184f2c567843b1f715ce74e86b344ca8e3112b","phase":"formal","pairs":136,"summaries":24,"checkedCalls":64897449,"checkedElements":1841180704}
+Formal source identities and common repeat plans exactly match the recorded V2 pilot.
+Combined validation logs, exact runtime identities and the clean 58-file / 1,127-test follow-up verified.
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (59 Markdown files).
