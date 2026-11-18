@@ -1,0 +1,894 @@
+{
+  "schema": "zerocopy-followup-archive/v1",
+  "capturedAt": "2026-11-18T13:01:58.733Z",
+  "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+  "scripts": [
+    {
+      "path": "harness/ascii-verify.mjs",
+      "bytes": 16327,
+      "sha256": "b91d5c9cd89feb01eaa4c97fda4b123ade836f1dcad6a6cfe1e3fcea26d90e90"
+    },
+    {
+      "path": "harness/ascii-workloads-v1.mjs",
+      "bytes": 11500,
+      "sha256": "bbdd8d9deffb58358386053704095ea0357e8051c73a5661034c6d1f2ff15ce0"
+    },
+    {
+      "path": "harness/ascii-workloads.mjs",
+      "bytes": 11492,
+      "sha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+    },
+    {
+      "path": "harness/attach-workloads.mjs",
+      "bytes": 11929,
+      "sha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687"
+    },
+    {
+      "path": "harness/benchmark.mjs",
+      "bytes": 11555,
+      "sha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151"
+    },
+    {
+      "path": "harness/boolean-verify.mjs",
+      "bytes": 15496,
+      "sha256": "154b34831c928a54215e942758bc9ab4f18b97afbf2c12840db4e435809799e1"
+    },
+    {
+      "path": "harness/boolean-workloads.mjs",
+      "bytes": 11121,
+      "sha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+    },
+    {
+      "path": "harness/map-verify.mjs",
+      "bytes": 14922,
+      "sha256": "c4cccdf95a2744d92571f0cfcdb05243020f448d9ea118085f5d41c86a130f55"
+    },
+    {
+      "path": "harness/map-workloads-v1.mjs",
+      "bytes": 8985,
+      "sha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241"
+    },
+    {
+      "path": "harness/map-workloads.mjs",
+      "bytes": 9561,
+      "sha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81"
+    }
+  ],
+  "reports": [
+    {
+      "path": "results/ascii-bytes-screen-summary.json.gz",
+      "bytes": 2118,
+      "sha256": "3e4cf2e5a01051a4d3dd85f54496bb660f8521ad656f1281a9396ebbe6f37b23",
+      "originalFile": "ascii-bytes-screen-summary.json",
+      "originalBytes": 11217,
+      "originalSha256": "b839e5bf44fad0a53095378acb5776872253206e5a3036ed84af41da1d5a3c7f"
+    },
+    {
+      "path": "results/ascii-bytes-screen.json.gz",
+      "bytes": 15768,
+      "sha256": "8a626768fd2601a1e5cc3fed3b05334f033c1a9a2689af979537814c6aa553c4",
+      "originalFile": "ascii-bytes-screen.json",
+      "originalBytes": 259206,
+      "originalSha256": "8ad80754540873d59ce7d33cba076f2d0f88bdd4a0ddacee4aaf3bfb1d19ce42",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "639335f59306ff532371cd84ad31c453f0680b56",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/ascii-screen-summary.json.gz",
+      "bytes": 2120,
+      "sha256": "a9406f30f5d9a3fd899e0851e76bbdc0b9a87374a450ce0245baf9bb16f6b756",
+      "originalFile": "ascii-screen-summary.json",
+      "originalBytes": 11194,
+      "originalSha256": "ecb92d73c10d88d08cb719885f0eae169b8e8e29d2cc314630792e0b12813f90"
+    },
+    {
+      "path": "results/ascii-screen.json.gz",
+      "bytes": 15801,
+      "sha256": "529671aa5532278ed67f9e19bef2e31ed4e0de31a9013e98bb51f3e7b38b99b6",
+      "originalFile": "ascii-screen.json",
+      "originalBytes": 259141,
+      "originalSha256": "82f66e4d1c8e2895fdb9b274b66c918d0db625f30004c5a2c29ccc8a81877470",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/ascii-smoke-summary.json.gz",
+      "bytes": 20,
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalFile": "ascii-smoke-summary.json",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-smoke-v2-summary.json.gz",
+      "bytes": 1522,
+      "sha256": "05f57385e2d4c1a1be8f47dce98d70b16c0090df4e41d9452758c56d9331b71d",
+      "originalFile": "ascii-smoke-v2-summary.json",
+      "originalBytes": 9834,
+      "originalSha256": "0d929d009dd9b384e40a9d941713d01c77c3a795e161970ce9cded4aa0273176"
+    },
+    {
+      "path": "results/ascii-smoke-v2.json.gz",
+      "bytes": 11464,
+      "sha256": "1de87c43883194865e0819ece147c11f4a074b36b40945fab4cd3996b12a3fef",
+      "originalFile": "ascii-smoke-v2.json",
+      "originalBytes": 114835,
+      "originalSha256": "dc6bd6d61d1061bea811f03817a40ce8bf510328ad928790645f119091664a8a",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/ascii-smoke.json.gz",
+      "bytes": 7088,
+      "sha256": "41fe574df7de8397b7305310af6cc55f4623063e1abfa201e78e5c29e945027b",
+      "originalFile": "ascii-smoke.json",
+      "originalBytes": 34615,
+      "originalSha256": "cf2a078a22385494d292009900c3220d56a94cefdd6502a8bdae902e5d23929e",
+      "study": {
+        "complete": false,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "bbdd8d9deffb58358386053704095ea0357e8051c73a5661034c6d1f2ff15ce0"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 0,
+        "error": "Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --expose-gc /tmp/zerocopy-followup-Em7nge/benchmark.mjs --worker --entry /tmp/zerocopy-followup-Em7nge/baseline/dist/shared.js --config /tmp/zerocopy-followup-Em7nge/config.json --rotation 0\nfile:///tmp/zerocopy-followup-Em7nge/workloads.mjs:4\nconst equal = (actual, expected, label) => check(Object.is(actual, expected), `${label}: ${String(actual)} !== ${String(expected)}`);\n                                                                                           ^\n\nTypeError: Cannot convert object to primitive value\n    at equal (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:4:92)\n    at verifyStates (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:127:5)\n    at measure (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:174:3)\n    at async run (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:217:76)\n    at async file:///tmp/zerocopy-followup-Em7nge/benchmark.mjs:45:18\n\nNode.js v24.22.3\n\n    at genericNodeError (node:internal/errors:986:15)\n    at wrappedFn (node:internal/errors:540:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///workspace/scratch/240add2fd2cb/perf-harness-followup/benchmark.mjs:119:33"
+      }
+    },
+    {
+      "path": "results/attach-screen-summary.json.gz",
+      "bytes": 1557,
+      "sha256": "3ef2db6be7adc4f3bb1dc8ebd8b4b19934ae5cf762b81dc9b62c86f43523b664",
+      "originalFile": "attach-screen-summary.json",
+      "originalBytes": 7699,
+      "originalSha256": "e5ee342b1728ffd92b02f6fc46c034fc27db69dc0a120da82974f08e7dbe2368"
+    },
+    {
+      "path": "results/attach-screen.json.gz",
+      "bytes": 15881,
+      "sha256": "6bb542ea7298a670a10670247edae8f6056693481bbca3c4328ebbcea6b342e0",
+      "originalFile": "attach-screen.json",
+      "originalBytes": 254846,
+      "originalSha256": "c1897a94a1a3a830ed242387f9415f297027ffff2c2e81f585947d5c85ec1c7a",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "attach.shared1",
+            "attach.shared32",
+            "attach.copied1",
+            "attach.shared1.first-get",
+            "attach.shared32.first-get",
+            "attach.copied1.first-get",
+            "diagnostic.prepare.number",
+            "diagnostic.prepare.boolean",
+            "diagnostic.prepare.interleaved"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5c155970f9354894c5a613612e69ad00d14404ce",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/attach-smoke-summary.json.gz",
+      "bytes": 1108,
+      "sha256": "fbe75d0c1edb56f35b1dae605bbc1d253dc201b476b44d696aa6ac303d3a3e6e",
+      "originalFile": "attach-smoke-summary.json",
+      "originalBytes": 6746,
+      "originalSha256": "40b0d68b294714c889a761331359eab78ad1a7a12a676a6abafae46c818d2687"
+    },
+    {
+      "path": "results/attach-smoke.json.gz",
+      "bytes": 11890,
+      "sha256": "4426874b008bd11ba33ebefc73c880580a50bcb6ddd3a126de81982e8c4544a4",
+      "originalFile": "attach-smoke.json",
+      "originalBytes": 109864,
+      "originalSha256": "fe4f18115733e1f8816c402606beebdeaac67271474f7a79401282b221a25bb1",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "attach.shared1",
+            "attach.shared32",
+            "attach.copied1",
+            "attach.shared1.first-get",
+            "attach.shared32.first-get",
+            "attach.copied1.first-get",
+            "diagnostic.prepare.number",
+            "diagnostic.prepare.boolean",
+            "diagnostic.prepare.interleaved"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5c155970f9354894c5a613612e69ad00d14404ce",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/boolean-long-screen-summary.json.gz",
+      "bytes": 1377,
+      "sha256": "084881e5bd95e28c288e770f5effc4cd361cf57b5b3a6e1a17e69d0d51dc9484",
+      "originalFile": "boolean-long-screen-summary.json",
+      "originalBytes": 7090,
+      "originalSha256": "1ae8abec8674d2663fb7bebd5cc2e97b30582aa66a8935c503a3508868dc43ed"
+    },
+    {
+      "path": "results/boolean-long-screen-verified.json.gz",
+      "bytes": 669,
+      "sha256": "afde6e3f01f7382b1a23cda3b985728e4a249a92480567003e6561ffbda465a9",
+      "originalFile": "boolean-long-screen-verified.json",
+      "originalBytes": 2016,
+      "originalSha256": "a87777794d2fa20941a0476250b65e4c2402e064ecc5e9c5f72cacf2e4e028c1"
+    },
+    {
+      "path": "results/boolean-long-screen.json.gz",
+      "bytes": 12540,
+      "sha256": "10e14de913b98e64abc0bc325baa6d73d51ad3e538322b14c1c1d4e7e4870fa5",
+      "originalFile": "boolean-long-screen.json",
+      "originalBytes": 176828,
+      "originalSha256": "7e73fafdb006f2b15204fd78982d5ea5e1e50ae04b6f9318f6704e69b13bce72",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 32,
+          "batchScale": 16,
+          "only": [
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm"
+          ],
+          "caseNames": [
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/boolean-screen-summary.json.gz",
+      "bytes": 5348,
+      "sha256": "36a60bef9cd7e4ceb8a192e4b0a88bb5f20f32cb1174ca732d990908835c3ac2",
+      "originalFile": "boolean-screen-summary.json",
+      "originalBytes": 31716,
+      "originalSha256": "059d34f5e06379c6fb4e53a0b8478796e1c68b672321d3beeddb7532a05e4168"
+    },
+    {
+      "path": "results/boolean-screen-verified.json.gz",
+      "bytes": 667,
+      "sha256": "e8c43d7047773e55d8cdc184ec25e655032395778cc7f49d5b12cb8b688d1df7",
+      "originalFile": "boolean-screen-verified.json",
+      "originalBytes": 2014,
+      "originalSha256": "364869550e2c75a5aa5e9c19efea93dcb823d19bc734040a70a0270aba932bf8"
+    },
+    {
+      "path": "results/boolean-screen.json.gz",
+      "bytes": 37186,
+      "sha256": "3394a2a6dfe6e8b119529e0ca953d08ae8f28b918443c4354d7bb806c0f9f88c",
+      "originalFile": "boolean-screen.json",
+      "originalBytes": 616615,
+      "originalSha256": "0cc97a4c47a8e099a0d7a86ffd26a83153724c7ce22263eceac95fe4bc785922",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.boolean.get.sequential.31.fresh",
+            "list.boolean.get.sequential.31.warm",
+            "list.boolean.get.shuffled.31.fresh",
+            "list.boolean.get.shuffled.31.warm",
+            "list.boolean.get.tail.31.fresh",
+            "list.boolean.get.tail.31.warm",
+            "list.boolean.get.sequential.32.fresh",
+            "list.boolean.get.sequential.32.warm",
+            "list.boolean.get.shuffled.32.fresh",
+            "list.boolean.get.shuffled.32.warm",
+            "list.boolean.get.tail.32.fresh",
+            "list.boolean.get.tail.32.warm",
+            "list.boolean.get.sequential.33.fresh",
+            "list.boolean.get.sequential.33.warm",
+            "list.boolean.get.shuffled.33.fresh",
+            "list.boolean.get.shuffled.33.warm",
+            "list.boolean.get.tail.33.fresh",
+            "list.boolean.get.tail.33.warm",
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.boolean.get.tail.8192.fresh",
+            "list.boolean.get.tail.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm",
+            "list.string.get.sequential.8192.fresh",
+            "list.string.get.sequential.1024.warm",
+            "list.string.get.shuffled.8192.fresh",
+            "list.string.get.shuffled.1024.warm",
+            "list.object.get.sequential.8192.fresh",
+            "list.object.get.sequential.1024.warm",
+            "list.object.get.shuffled.8192.fresh",
+            "list.object.get.shuffled.1024.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/boolean-smoke-summary.json.gz",
+      "bytes": 3709,
+      "sha256": "24082e1bf09f9db535c7f87dd50ddfbade75f03fecf59228022f9324f502d0fa",
+      "originalFile": "boolean-smoke-summary.json",
+      "originalBytes": 28028,
+      "originalSha256": "a371df6e5708b08870afc4615025171903ca2be5e3bdd711fb9ffcd5d99704df"
+    },
+    {
+      "path": "results/boolean-smoke-verified.json.gz",
+      "bytes": 665,
+      "sha256": "8a53790c565249a84189472ffb5d48d79452a00b5ff7e2c84a1f70d0b95e69e4",
+      "originalFile": "boolean-smoke-verified.json",
+      "originalBytes": 2007,
+      "originalSha256": "cb34e65e21b0174c884816506465cd53a1de7af4319fdd4c7b7b3025da6db43a"
+    },
+    {
+      "path": "results/boolean-smoke.json.gz",
+      "bytes": 18923,
+      "sha256": "501623583c2cd459af14fecc063ed963e7c3ec05e88a94650d90fd6d3446eb1e",
+      "originalFile": "boolean-smoke.json",
+      "originalBytes": 247914,
+      "originalSha256": "c2eab44ffc1b80ff584eec1d5bf553ff825578019503817060c713e599aa3bb4",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.boolean.get.sequential.31.fresh",
+            "list.boolean.get.sequential.31.warm",
+            "list.boolean.get.shuffled.31.fresh",
+            "list.boolean.get.shuffled.31.warm",
+            "list.boolean.get.tail.31.fresh",
+            "list.boolean.get.tail.31.warm",
+            "list.boolean.get.sequential.32.fresh",
+            "list.boolean.get.sequential.32.warm",
+            "list.boolean.get.shuffled.32.fresh",
+            "list.boolean.get.shuffled.32.warm",
+            "list.boolean.get.tail.32.fresh",
+            "list.boolean.get.tail.32.warm",
+            "list.boolean.get.sequential.33.fresh",
+            "list.boolean.get.sequential.33.warm",
+            "list.boolean.get.shuffled.33.fresh",
+            "list.boolean.get.shuffled.33.warm",
+            "list.boolean.get.tail.33.fresh",
+            "list.boolean.get.tail.33.warm",
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.boolean.get.tail.8192.fresh",
+            "list.boolean.get.tail.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm",
+            "list.string.get.sequential.8192.fresh",
+            "list.string.get.sequential.1024.warm",
+            "list.string.get.shuffled.8192.fresh",
+            "list.string.get.shuffled.1024.warm",
+            "list.object.get.sequential.8192.fresh",
+            "list.object.get.sequential.1024.warm",
+            "list.object.get.shuffled.8192.fresh",
+            "list.object.get.shuffled.1024.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/boolean-verifier-alias-checks.json.gz",
+      "bytes": 369,
+      "sha256": "208fe8f561ecbff30885d2e13f84b9d6647be56d0dcfab07e3671ed875221bf1",
+      "originalFile": "boolean-verifier-alias-checks.json",
+      "originalBytes": 788,
+      "originalSha256": "ecdfa0bb0d668a42a28b249847db8e70dd854648eb1a8b9d35ed7b3d1988abf2"
+    },
+    {
+      "path": "results/map-inline-screen-summary.json.gz",
+      "bytes": 3418,
+      "sha256": "d8849f55824b92ce452801b2005ebf8ec50d21b5a384bd143d217707707ab9a2",
+      "originalFile": "map-inline-screen-summary.json",
+      "originalBytes": 18826,
+      "originalSha256": "481137e2d92a560f53ce2e7d12949258fde8dd3ea2d1d96bb4f40e436bab6cfa"
+    },
+    {
+      "path": "results/map-inline-screen.json.gz",
+      "bytes": 20051,
+      "sha256": "b8e6cf2a6fe2c76ee90f91a7b9d4f4225aa924c778cb855124be09d81f218755",
+      "originalFile": "map-inline-screen.json",
+      "originalBytes": 319181,
+      "originalSha256": "614b529fd8c5f442da520a65a28e766d0e168f02d3a21e9f6be1cf9c089fa711",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5a00e4fa391e5eea1d4aeb92d3e5c395b5780335",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/map-screen-summary.json.gz",
+      "bytes": 20,
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalFile": "map-screen-summary.json",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/map-screen-v2-summary.json.gz",
+      "bytes": 3405,
+      "sha256": "3d3c5cc55c45f96d16b3e5855536c33980ef5aee71f34b8dc72d9ddf35eece1c",
+      "originalFile": "map-screen-v2-summary.json",
+      "originalBytes": 18819,
+      "originalSha256": "851cd47d90edca75b8bdf8a0f7a7b8562740da57fa55af33ad25585614d4e898"
+    },
+    {
+      "path": "results/map-screen-v2.json.gz",
+      "bytes": 20057,
+      "sha256": "06d5a2e29c0adba3271a30526dd5a870c874753bb515e85939e04dbe2df25f17",
+      "originalFile": "map-screen-v2.json",
+      "originalBytes": 319218,
+      "originalSha256": "5d01df5e3ed5547be84b478906b3a7c34e05633c2660c2cae6bb00ec7e9897a7",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/map-screen.json.gz",
+      "bytes": 8880,
+      "sha256": "18b5d2257bd7266096f5eac63a325e157ba56e1ea30d3eae24750376668b52c2",
+      "originalFile": "map-screen.json",
+      "originalBytes": 56858,
+      "originalSha256": "2bfd172ebdb2814dfd8ca176787bec2253512da43298b7e71f962565ad969576",
+      "study": {
+        "complete": false,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 1,
+        "error": "Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --expose-gc /tmp/zerocopy-followup-qpXewe/benchmark.mjs --worker --entry /tmp/zerocopy-followup-qpXewe/candidate/dist/shared.js --config /tmp/zerocopy-followup-qpXewe/config.json --rotation 0\nfile:///tmp/zerocopy-followup-qpXewe/workloads.mjs:2\nconst check = (condition, message) => { if (!condition) throw new Error(message); };\n                                                              ^\n\nError: Lookup-directory backing size differs among identical sessions: 2 !== 1\n    at check (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:2:63)\n    at equal (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:3:44)\n    at measure (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:120:3)\n    at async run (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:137:74)\n    at async file:///tmp/zerocopy-followup-qpXewe/benchmark.mjs:45:18\n\nNode.js v24.22.3\n\n    at genericNodeError (node:internal/errors:986:15)\n    at wrappedFn (node:internal/errors:540:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///workspace/scratch/240add2fd2cb/perf-harness-followup/benchmark.mjs:119:33"
+      }
+    },
+    {
+      "path": "results/map-smoke-summary.json.gz",
+      "bytes": 2309,
+      "sha256": "7a8cd6d2885f1936881a70eb7b4c06f5fab88c6cfe50f32b2107b37003d655b1",
+      "originalFile": "map-smoke-summary.json",
+      "originalBytes": 16522,
+      "originalSha256": "b61547234652d9b2dc07f559cc9d2d925410af6dc1c9337e9975cc1b322d573c"
+    },
+    {
+      "path": "results/map-smoke.json.gz",
+      "bytes": 13138,
+      "sha256": "cfccc599dd9e490bbe31b929111ef9ff19d2c80942f9a452d5aaf44aafa9f867",
+      "originalFile": "map-smoke.json",
+      "originalBytes": 136693,
+      "originalSha256": "575a967f2219f536efad2367a59b5e414738498252d7f86bf7125f50b48967c2",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/map-verify-checks.json.gz",
+      "bytes": 479,
+      "sha256": "937ff0ca709e0d96fe5b945de49aa5d80611e334ef935ab33f2d4bee2c7ee15d",
+      "originalFile": "map-verify-checks.json",
+      "originalBytes": 1680,
+      "originalSha256": "c4057102873efb2d857f30bb58c4eaad4d8d2fe6268da2e4392143204d7e7fa4"
+    }
+  ],
+  "patches": [
+    {
+      "name": "map-directory",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+      "path": "patches/map-directory-72d9ad0.patch",
+      "bytes": 14244,
+      "sha256": "e82bdd28ddc6ff3c13ac5ac89b7786fd68c4ffc78f0901e26ab342aad3b1593f"
+    },
+    {
+      "name": "map-directory-inline",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "5a00e4fa391e5eea1d4aeb92d3e5c395b5780335",
+      "path": "patches/map-directory-inline-5a00e4f.patch",
+      "bytes": 20994,
+      "sha256": "40bfcb660fe0b88aa3ac40a6d7be259851205ad5db14285a71b560bdf459c4f6"
+    },
+    {
+      "name": "ascii-dataview",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+      "path": "patches/ascii-dataview-8144fbd.patch",
+      "bytes": 6027,
+      "sha256": "28d4afc96ccd56fd7397fe21878d5723bd200571a5f799922c1f1776bdccfd6a"
+    },
+    {
+      "name": "arena-lazy-scalar",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "5c155970f9354894c5a613612e69ad00d14404ce",
+      "path": "patches/arena-lazy-scalar-5c15597.patch",
+      "bytes": 4277,
+      "sha256": "6086eaeaf59aaf0b23612acada168c3bb78e86fa40b76337450721efe7805eb0"
+    },
+    {
+      "name": "list-boolean-get",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+      "path": "patches/list-boolean-get-333db44.patch",
+      "bytes": 3038,
+      "sha256": "a87ad8047a0ce67f1191ef8eb4f95676030b2274e01cdbaab20f7248c22daaf8"
+    },
+    {
+      "name": "ascii-byte-loads",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "639335f59306ff532371cd84ad31c453f0680b56",
+      "path": "patches/ascii-byte-loads-639335f.patch",
+      "bytes": 6063,
+      "sha256": "85a57761ec4bc7b2792bd2e6266678121555395c5faf19faa92cf266512994a3"
+    }
+  ]
+}

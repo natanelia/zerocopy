@@ -1,0 +1,1406 @@
+{
+  "schema": "zerocopy-followup-archive/v1",
+  "capturedAt": "2026-11-18T13:33:25.659Z",
+  "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+  "formalBaseline": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+  "scripts": [
+    {
+      "path": "harness/ascii-verify-formal.mjs",
+      "bytes": 16477,
+      "sha256": "2191e12bc403f2414c98fa3c6e9110f78fbb1c4597d7b175fa1fae60eb315432",
+      "sourceFile": "ascii-verify-formal.mjs"
+    },
+    {
+      "path": "harness/ascii-verify.mjs",
+      "bytes": 16327,
+      "sha256": "b91d5c9cd89feb01eaa4c97fda4b123ade836f1dcad6a6cfe1e3fcea26d90e90",
+      "sourceFile": "ascii-verify.mjs"
+    },
+    {
+      "path": "harness/ascii-workloads-v1.mjs",
+      "bytes": 11500,
+      "sha256": "bbdd8d9deffb58358386053704095ea0357e8051c73a5661034c6d1f2ff15ce0",
+      "sourceFile": "ascii-workloads-v1.mjs"
+    },
+    {
+      "path": "harness/ascii-workloads.mjs",
+      "bytes": 11492,
+      "sha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b",
+      "sourceFile": "ascii-workloads.mjs"
+    },
+    {
+      "path": "harness/attach-workloads.mjs",
+      "bytes": 11929,
+      "sha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687",
+      "sourceFile": "attach-workloads.mjs"
+    },
+    {
+      "path": "harness/benchmark-ascii-formal.mjs",
+      "bytes": 11905,
+      "sha256": "c21ef9efd67b0c98cd7ac9fcce155d2682300eb0063462a6c55c783ffb2389e0",
+      "sourceFile": "benchmark-ascii-formal.mjs"
+    },
+    {
+      "path": "harness/benchmark.mjs",
+      "bytes": 11555,
+      "sha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+      "sourceFile": "benchmark.mjs"
+    },
+    {
+      "path": "harness/boolean-verify.mjs",
+      "bytes": 15496,
+      "sha256": "154b34831c928a54215e942758bc9ab4f18b97afbf2c12840db4e435809799e1",
+      "sourceFile": "boolean-verify.mjs"
+    },
+    {
+      "path": "harness/boolean-workloads.mjs",
+      "bytes": 11121,
+      "sha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9",
+      "sourceFile": "boolean-workloads.mjs"
+    },
+    {
+      "path": "harness/map-verify.mjs",
+      "bytes": 14922,
+      "sha256": "c4cccdf95a2744d92571f0cfcdb05243020f448d9ea118085f5d41c86a130f55",
+      "sourceFile": "map-verify.mjs"
+    },
+    {
+      "path": "harness/map-workloads-v1.mjs",
+      "bytes": 8985,
+      "sha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241",
+      "sourceFile": "map-workloads-v1.mjs"
+    },
+    {
+      "path": "harness/map-workloads.mjs",
+      "bytes": 9561,
+      "sha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81",
+      "sourceFile": "map-workloads.mjs"
+    }
+  ],
+  "reports": [
+    {
+      "path": "results/ascii-bytes-screen-summary.json.gz",
+      "bytes": 2118,
+      "sha256": "3e4cf2e5a01051a4d3dd85f54496bb660f8521ad656f1281a9396ebbe6f37b23",
+      "sourceFile": "ascii-bytes-screen-summary.json",
+      "originalFile": "ascii-bytes-screen-summary.json",
+      "originalBytes": 11217,
+      "originalSha256": "b839e5bf44fad0a53095378acb5776872253206e5a3036ed84af41da1d5a3c7f"
+    },
+    {
+      "path": "results/ascii-bytes-screen.json.gz",
+      "bytes": 15768,
+      "sha256": "8a626768fd2601a1e5cc3fed3b05334f033c1a9a2689af979537814c6aa553c4",
+      "sourceFile": "ascii-bytes-screen.json",
+      "originalFile": "ascii-bytes-screen.json",
+      "originalBytes": 259206,
+      "originalSha256": "8ad80754540873d59ce7d33cba076f2d0f88bdd4a0ddacee4aaf3bfb1d19ce42",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "639335f59306ff532371cd84ad31c453f0680b56",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/ascii-current-aa-summary.json.gz",
+      "bytes": 3128,
+      "sha256": "d98d6404e181c7b388b1007e252e74e0f215420161febcce07d4acc3916d68ec",
+      "sourceFile": "ascii-current-aa-summary.json",
+      "originalFile": "ascii-current-aa-summary.json",
+      "originalBytes": 13885,
+      "originalSha256": "7a78b74796d8a0e7ee5dee4f797683c5193361bf41e4cf541a577f8b506a5bfa"
+    },
+    {
+      "path": "results/ascii-current-aa-verified.json.gz",
+      "bytes": 356,
+      "sha256": "b2d5c425e0d4bc961804d0793277c8d3475e877aaad793681cc1d4eee87ffc0d",
+      "sourceFile": "ascii-current-aa-verified.json",
+      "originalFile": "ascii-current-aa-verified.json",
+      "originalBytes": 559,
+      "originalSha256": "200358f162bcf247c602e30a89c450105693f00ddfb1494b3bd0b056f9994bf2"
+    },
+    {
+      "path": "results/ascii-current-aa.json.gz",
+      "bytes": 23080,
+      "sha256": "75d6ffb08a62ff469c5d0b1f56f3450356a2c3233f7223c64b5a5dbc5fd5a90e",
+      "sourceFile": "ascii-current-aa.json",
+      "originalFile": "ascii-current-aa.json",
+      "originalBytes": 547775,
+      "originalSha256": "f5d928e5b12169a3f3b582d3d9591e116d2f47084e7b7788140251870482e397",
+      "study": {
+        "complete": true,
+        "pairs": 7,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 2,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "c21ef9efd67b0c98cd7ac9fcce155d2682300eb0063462a6c55c783ffb2389e0",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+        "candidateCommit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+        "recordedSamples": 28
+      }
+    },
+    {
+      "path": "results/ascii-current-confirmation-summary.json.gz",
+      "bytes": 3156,
+      "sha256": "44ed2b94ffb9279e1708034e2a4610853d6e9f4da0dccb689f2557fdb7385e63",
+      "sourceFile": "ascii-current-confirmation-summary.json",
+      "originalFile": "ascii-current-confirmation-summary.json",
+      "originalBytes": 13889,
+      "originalSha256": "a7c52d08f2b849b6a22e93d701f591303d46f162a05bf327a6d492dc49d20824"
+    },
+    {
+      "path": "results/ascii-current-confirmation-verified.json.gz",
+      "bytes": 361,
+      "sha256": "3f057fdd4909f5d4ce09c390d551e867f3fdcd79c778a882cd1d33776aa9158b",
+      "sourceFile": "ascii-current-confirmation-verified.json",
+      "originalFile": "ascii-current-confirmation-verified.json",
+      "originalBytes": 569,
+      "originalSha256": "792309704ee85b2aa4df5ecdc10834fbce16ccd46b1120d2b5411aabecca6e98"
+    },
+    {
+      "path": "results/ascii-current-confirmation.json.gz",
+      "bytes": 23819,
+      "sha256": "9712b21ba36c50a31a03ed6941f9e1543db0dedaac94924dfc0c9e475f3da398",
+      "sourceFile": "ascii-current-confirmation.json",
+      "originalFile": "ascii-current-confirmation.json",
+      "originalBytes": 547963,
+      "originalSha256": "901a37f40d225f4ac1a2b394e93e848b6fe97bb81a2830a5e7216dc9163147a7",
+      "study": {
+        "complete": true,
+        "pairs": 7,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 2,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "c21ef9efd67b0c98cd7ac9fcce155d2682300eb0063462a6c55c783ffb2389e0",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+        "candidateCommit": "10bebf25d2a6ad01bb8203a19facc33c75c03190",
+        "recordedSamples": 28
+      }
+    },
+    {
+      "path": "results/ascii-current-validation-artifacts.json.gz",
+      "bytes": 2862,
+      "sha256": "063e5773da28709df1323aa32536ca90578da63e7f194822bb1651086d7fe747",
+      "sourceFile": "ascii-current-validation-artifacts.json",
+      "originalFile": "ascii-current-validation-artifacts.json",
+      "originalBytes": 12056,
+      "originalSha256": "88a7f2517d3b92d2a0d2e0e6b3b313a3f31186e9cc048230b1d6b02b98e591df"
+    },
+    {
+      "path": "results/ascii-current-validation-baseline-build-browser.log.gz",
+      "bytes": 89,
+      "sha256": "feaf254343a26fa870798ac311cdc115dabddd6ea3bb71457c6b092780eda6f3",
+      "sourceFile": "ascii-current-validation-baseline-build-browser.log",
+      "originalFile": "ascii-current-validation-baseline-build-browser.log",
+      "originalBytes": 71,
+      "originalSha256": "c14e8b857d6dd48fec00e0419f28f77310f2963aafa092d6a9a9568b9113a0c2",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-baseline-build-wasm.log.gz",
+      "bytes": 550,
+      "sha256": "11d23180356cb95d98b718f986aff4497624dbc2612a383fc51bf6fe9e770344",
+      "sourceFile": "ascii-current-validation-baseline-build-wasm.log",
+      "originalFile": "ascii-current-validation-baseline-build-wasm.log",
+      "originalBytes": 2838,
+      "originalSha256": "884cf89df66df5206f62d8aac1edade07349b6a36b841488f5ec7a523f541d28",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-build-browser.log.gz",
+      "bytes": 89,
+      "sha256": "6a6edc423b3abc4415ade4e8c764542161e52b444cb891fc2fd90d2035d1e454",
+      "sourceFile": "ascii-current-validation-candidate-build-browser.log",
+      "originalFile": "ascii-current-validation-candidate-build-browser.log",
+      "originalBytes": 71,
+      "originalSha256": "72525728042b1489b47f2e7d29a980a53f07b1ccb162e20dfbf62807a13e140a",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-build-types.log.gz",
+      "bytes": 91,
+      "sha256": "6d3ae32869d819ffa190cba55518a23a7538daa4efa4b9a1f99a1e7fe1ecdd50",
+      "sourceFile": "ascii-current-validation-candidate-build-types.log",
+      "originalFile": "ascii-current-validation-candidate-build-types.log",
+      "originalBytes": 86,
+      "originalSha256": "e8fdec539d26b5219273605f384f6cb2cb2faa7e9dc675e00f24f642ba768c65",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-build-wasm.log.gz",
+      "bytes": 546,
+      "sha256": "9bd639ec53203a4c7e7a879966c1ec94651520acd98c67f0e38b1864dc6a3161",
+      "sourceFile": "ascii-current-validation-candidate-build-wasm.log",
+      "originalFile": "ascii-current-validation-candidate-build-wasm.log",
+      "originalBytes": 2838,
+      "originalSha256": "3cb120ad2eb9eb8dfc2fd0dbc26ef0d959e518f735815730a2a09d303d738c72",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-rust-audit.log.gz",
+      "bytes": 430,
+      "sha256": "46bd398e31ef2da48b8a7c9bec9ed70f4cd85e6d07b92ee9943f1e53a4fdfe05",
+      "sourceFile": "ascii-current-validation-candidate-rust-audit.log",
+      "originalFile": "ascii-current-validation-candidate-rust-audit.log",
+      "originalBytes": 730,
+      "originalSha256": "db3c3a73871891488fd2734503ac649408d918999f1c388ca391f1e398395542",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-tests-single-worker-status.json.gz",
+      "bytes": 436,
+      "sha256": "3ed848f5e9a497e3d7ef1c6d3b091d42dae31fc4c66b3eb9a014962660525f36",
+      "sourceFile": "ascii-current-validation-candidate-tests-single-worker-status.json",
+      "originalFile": "ascii-current-validation-candidate-tests-single-worker-status.json",
+      "originalBytes": 696,
+      "originalSha256": "35cbcbeda78736f95f53a70455aa2b8a4c6497d9f3ac84eb24dde59cbbc46fe5"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-tests-standard-monitor.jsonl.gz",
+      "bytes": 433,
+      "sha256": "4380a32323806cc900683c91d93a86696dc070496a326a59446ae1a6d3888d80",
+      "sourceFile": "ascii-current-validation-candidate-tests-standard-monitor.jsonl",
+      "originalFile": "ascii-current-validation-candidate-tests-standard-monitor.jsonl",
+      "originalBytes": 3074,
+      "originalSha256": "c8aec9877a0e2aeb958da0ec5500a60755c0d77bbe42c17bd0a1379feae6bdd6"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-tests-standard.log.gz",
+      "bytes": 238,
+      "sha256": "8a37de216085b95e3fddb19d34934b2858ff016da099e8921fe0215f9af9c355",
+      "sourceFile": "ascii-current-validation-candidate-tests-standard.log",
+      "originalFile": "ascii-current-validation-candidate-tests-standard.log",
+      "originalBytes": 298,
+      "originalSha256": "497e21ea21b47afbb3d5acb273df9807ffc922688e003d81e30d33ba9861f4c5",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-tests.log.gz",
+      "bytes": 151,
+      "sha256": "671f1fb1dacea7963a1a3ebfe9b2b804d2d1fd24824ef463b97af6b78ce76230",
+      "sourceFile": "ascii-current-validation-candidate-tests.log",
+      "originalFile": "ascii-current-validation-candidate-tests.log",
+      "originalBytes": 157,
+      "originalSha256": "30c79ce0f10eaad9968fc0d6dd748fbb26c8e398236026d4b18894e903f09278",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-typecheck-geometry.log.gz",
+      "bytes": 58,
+      "sha256": "f1538ff2319566210b6de0edd173e62a08284d8c579164aed2b733ceaa39c481",
+      "sourceFile": "ascii-current-validation-candidate-typecheck-geometry.log",
+      "originalFile": "ascii-current-validation-candidate-typecheck-geometry.log",
+      "originalBytes": 41,
+      "originalSha256": "9e313aafed0cfca93856bde26a2451f752a170dbeecc53f57ad04a20a873eb4c",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-typecheck-redux.log.gz",
+      "bytes": 55,
+      "sha256": "f789138cb51927725a235b591d0e94355df70a8723479f213ad0a07b618c5cfc",
+      "sourceFile": "ascii-current-validation-candidate-typecheck-redux.log",
+      "originalFile": "ascii-current-validation-candidate-typecheck-redux.log",
+      "originalBytes": 38,
+      "originalSha256": "374cbb55fe3257bdddc5c84dfbc7e930d11e11f9f5efa89d07055a9f1d915863",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-typecheck-values.log.gz",
+      "bytes": 101,
+      "sha256": "f16fbd3e9a0d39766861b547e98cbfa21b89a67b24ddbd622c07a97b3d1bed06",
+      "sourceFile": "ascii-current-validation-candidate-typecheck-values.log",
+      "originalFile": "ascii-current-validation-candidate-typecheck-values.log",
+      "originalBytes": 126,
+      "originalSha256": "9ad899b37dc8a5653c21f027dd43c744d1fb9d34488c878300d40372e89ffffd",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-candidate-typecheck.log.gz",
+      "bytes": 35,
+      "sha256": "67be5567bde7f0f4c1fd5e775e918562bc1f228a849614e4ad48b4172e907169",
+      "sourceFile": "ascii-current-validation-candidate-typecheck.log",
+      "originalFile": "ascii-current-validation-candidate-typecheck.log",
+      "originalBytes": 15,
+      "originalSha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-commands.json.gz",
+      "bytes": 545,
+      "sha256": "cd0f5164f4ed32c7dc97e1f336aeae04cf5c98b0f80b8ca0298477aef2fc3271",
+      "sourceFile": "ascii-current-validation-commands.json",
+      "originalFile": "ascii-current-validation-commands.json",
+      "originalBytes": 4006,
+      "originalSha256": "8cece35119903be7cab4586759143988ba09093a36c760e74fde1f20cedce8cd"
+    },
+    {
+      "path": "results/ascii-current-validation-node-codecs-workers.log.gz",
+      "bytes": 592,
+      "sha256": "a7f4d1ffd9e4adb6be124b547174c022efb813b1e69b619271d590da80175f67",
+      "sourceFile": "ascii-current-validation-node-codecs-workers.log",
+      "originalFile": "ascii-current-validation-node-codecs-workers.log",
+      "originalBytes": 1007,
+      "originalSha256": "c9eb37b9d5feb694e4abf02ed1b54dc6017a89bdefc085041bfcb76bdde86672",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-current-validation-source-identity.json.gz",
+      "bytes": 551,
+      "sha256": "a485580790fdec377ff462bd0f0b819dc5343c2c6faa8188e684179b79028395",
+      "sourceFile": "ascii-current-validation-source-identity.json",
+      "originalFile": "ascii-current-validation-source-identity.json",
+      "originalBytes": 842,
+      "originalSha256": "d5d87770b4f9494f64002ade8459e506eaa42ac2f01efec168e74e2178931388"
+    },
+    {
+      "path": "results/ascii-screen-summary.json.gz",
+      "bytes": 2120,
+      "sha256": "a9406f30f5d9a3fd899e0851e76bbdc0b9a87374a450ce0245baf9bb16f6b756",
+      "sourceFile": "ascii-screen-summary.json",
+      "originalFile": "ascii-screen-summary.json",
+      "originalBytes": 11194,
+      "originalSha256": "ecb92d73c10d88d08cb719885f0eae169b8e8e29d2cc314630792e0b12813f90"
+    },
+    {
+      "path": "results/ascii-screen.json.gz",
+      "bytes": 15801,
+      "sha256": "529671aa5532278ed67f9e19bef2e31ed4e0de31a9013e98bb51f3e7b38b99b6",
+      "sourceFile": "ascii-screen.json",
+      "originalFile": "ascii-screen.json",
+      "originalBytes": 259141,
+      "originalSha256": "82f66e4d1c8e2895fdb9b274b66c918d0db625f30004c5a2c29ccc8a81877470",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/ascii-smoke-summary.json.gz",
+      "bytes": 20,
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "sourceFile": "ascii-smoke-summary.json",
+      "originalFile": "ascii-smoke-summary.json",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/ascii-smoke-v2-summary.json.gz",
+      "bytes": 1522,
+      "sha256": "05f57385e2d4c1a1be8f47dce98d70b16c0090df4e41d9452758c56d9331b71d",
+      "sourceFile": "ascii-smoke-v2-summary.json",
+      "originalFile": "ascii-smoke-v2-summary.json",
+      "originalBytes": 9834,
+      "originalSha256": "0d929d009dd9b384e40a9d941713d01c77c3a795e161970ce9cded4aa0273176"
+    },
+    {
+      "path": "results/ascii-smoke-v2.json.gz",
+      "bytes": 11464,
+      "sha256": "1de87c43883194865e0819ece147c11f4a074b36b40945fab4cd3996b12a3fef",
+      "sourceFile": "ascii-smoke-v2.json",
+      "originalFile": "ascii-smoke-v2.json",
+      "originalBytes": 114835,
+      "originalSha256": "dc6bd6d61d1061bea811f03817a40ce8bf510328ad928790645f119091664a8a",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1e3403bb2fa941f7e066af6950c2b34c130a860922c60fce14fb48cb5c8f544b"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/ascii-smoke.json.gz",
+      "bytes": 7088,
+      "sha256": "41fe574df7de8397b7305310af6cc55f4623063e1abfa201e78e5c29e945027b",
+      "sourceFile": "ascii-smoke.json",
+      "originalFile": "ascii-smoke.json",
+      "originalBytes": 34615,
+      "originalSha256": "cf2a078a22385494d292009900c3220d56a94cefdd6502a8bdae902e5d23929e",
+      "study": {
+        "complete": false,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.string.get.ascii16.cold",
+            "list.string.get.ascii32.cold",
+            "list.string.get.ascii16.over-cap",
+            "list.string.get.ascii16.warm",
+            "list.string.get.boundaries.cold",
+            "list.string.get.unicode.cold",
+            "list.string.get.ascii64.cold",
+            "map.keys.ascii16.cold",
+            "map.keys.ascii32.cold",
+            "map.keys.ascii16.over-cap",
+            "map.keys.ascii16.warm",
+            "map.keys.boundaries.cold",
+            "map.keys.unicode.cold"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "bbdd8d9deffb58358386053704095ea0357e8051c73a5661034c6d1f2ff15ce0"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+        "recordedSamples": 0,
+        "error": "Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --expose-gc /tmp/zerocopy-followup-Em7nge/benchmark.mjs --worker --entry /tmp/zerocopy-followup-Em7nge/baseline/dist/shared.js --config /tmp/zerocopy-followup-Em7nge/config.json --rotation 0\nfile:///tmp/zerocopy-followup-Em7nge/workloads.mjs:4\nconst equal = (actual, expected, label) => check(Object.is(actual, expected), `${label}: ${String(actual)} !== ${String(expected)}`);\n                                                                                           ^\n\nTypeError: Cannot convert object to primitive value\n    at equal (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:4:92)\n    at verifyStates (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:127:5)\n    at measure (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:174:3)\n    at async run (file:///tmp/zerocopy-followup-Em7nge/workloads.mjs:217:76)\n    at async file:///tmp/zerocopy-followup-Em7nge/benchmark.mjs:45:18\n\nNode.js v24.22.3\n\n    at genericNodeError (node:internal/errors:986:15)\n    at wrappedFn (node:internal/errors:540:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///workspace/scratch/240add2fd2cb/perf-harness-followup/benchmark.mjs:119:33"
+      }
+    },
+    {
+      "path": "results/attach-screen-summary.json.gz",
+      "bytes": 1557,
+      "sha256": "3ef2db6be7adc4f3bb1dc8ebd8b4b19934ae5cf762b81dc9b62c86f43523b664",
+      "sourceFile": "attach-screen-summary.json",
+      "originalFile": "attach-screen-summary.json",
+      "originalBytes": 7699,
+      "originalSha256": "e5ee342b1728ffd92b02f6fc46c034fc27db69dc0a120da82974f08e7dbe2368"
+    },
+    {
+      "path": "results/attach-screen.json.gz",
+      "bytes": 15881,
+      "sha256": "6bb542ea7298a670a10670247edae8f6056693481bbca3c4328ebbcea6b342e0",
+      "sourceFile": "attach-screen.json",
+      "originalFile": "attach-screen.json",
+      "originalBytes": 254846,
+      "originalSha256": "c1897a94a1a3a830ed242387f9415f297027ffff2c2e81f585947d5c85ec1c7a",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "attach.shared1",
+            "attach.shared32",
+            "attach.copied1",
+            "attach.shared1.first-get",
+            "attach.shared32.first-get",
+            "attach.copied1.first-get",
+            "diagnostic.prepare.number",
+            "diagnostic.prepare.boolean",
+            "diagnostic.prepare.interleaved"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5c155970f9354894c5a613612e69ad00d14404ce",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/attach-smoke-summary.json.gz",
+      "bytes": 1108,
+      "sha256": "fbe75d0c1edb56f35b1dae605bbc1d253dc201b476b44d696aa6ac303d3a3e6e",
+      "sourceFile": "attach-smoke-summary.json",
+      "originalFile": "attach-smoke-summary.json",
+      "originalBytes": 6746,
+      "originalSha256": "40b0d68b294714c889a761331359eab78ad1a7a12a676a6abafae46c818d2687"
+    },
+    {
+      "path": "results/attach-smoke.json.gz",
+      "bytes": 11890,
+      "sha256": "4426874b008bd11ba33ebefc73c880580a50bcb6ddd3a126de81982e8c4544a4",
+      "sourceFile": "attach-smoke.json",
+      "originalFile": "attach-smoke.json",
+      "originalBytes": 109864,
+      "originalSha256": "fe4f18115733e1f8816c402606beebdeaac67271474f7a79401282b221a25bb1",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "attach.shared1",
+            "attach.shared32",
+            "attach.copied1",
+            "attach.shared1.first-get",
+            "attach.shared32.first-get",
+            "attach.copied1.first-get",
+            "diagnostic.prepare.number",
+            "diagnostic.prepare.boolean",
+            "diagnostic.prepare.interleaved"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "833fd7da049db1ce272f2c74073e8b0c5e6b213cde39f29307d1c245969cc687"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5c155970f9354894c5a613612e69ad00d14404ce",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/boolean-long-screen-summary.json.gz",
+      "bytes": 1377,
+      "sha256": "084881e5bd95e28c288e770f5effc4cd361cf57b5b3a6e1a17e69d0d51dc9484",
+      "sourceFile": "boolean-long-screen-summary.json",
+      "originalFile": "boolean-long-screen-summary.json",
+      "originalBytes": 7090,
+      "originalSha256": "1ae8abec8674d2663fb7bebd5cc2e97b30582aa66a8935c503a3508868dc43ed"
+    },
+    {
+      "path": "results/boolean-long-screen-verified.json.gz",
+      "bytes": 669,
+      "sha256": "afde6e3f01f7382b1a23cda3b985728e4a249a92480567003e6561ffbda465a9",
+      "sourceFile": "boolean-long-screen-verified.json",
+      "originalFile": "boolean-long-screen-verified.json",
+      "originalBytes": 2016,
+      "originalSha256": "a87777794d2fa20941a0476250b65e4c2402e064ecc5e9c5f72cacf2e4e028c1"
+    },
+    {
+      "path": "results/boolean-long-screen.json.gz",
+      "bytes": 12540,
+      "sha256": "10e14de913b98e64abc0bc325baa6d73d51ad3e538322b14c1c1d4e7e4870fa5",
+      "sourceFile": "boolean-long-screen.json",
+      "originalFile": "boolean-long-screen.json",
+      "originalBytes": 176828,
+      "originalSha256": "7e73fafdb006f2b15204fd78982d5ea5e1e50ae04b6f9318f6704e69b13bce72",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 32,
+          "batchScale": 16,
+          "only": [
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm"
+          ],
+          "caseNames": [
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/boolean-screen-summary.json.gz",
+      "bytes": 5348,
+      "sha256": "36a60bef9cd7e4ceb8a192e4b0a88bb5f20f32cb1174ca732d990908835c3ac2",
+      "sourceFile": "boolean-screen-summary.json",
+      "originalFile": "boolean-screen-summary.json",
+      "originalBytes": 31716,
+      "originalSha256": "059d34f5e06379c6fb4e53a0b8478796e1c68b672321d3beeddb7532a05e4168"
+    },
+    {
+      "path": "results/boolean-screen-verified.json.gz",
+      "bytes": 667,
+      "sha256": "e8c43d7047773e55d8cdc184ec25e655032395778cc7f49d5b12cb8b688d1df7",
+      "sourceFile": "boolean-screen-verified.json",
+      "originalFile": "boolean-screen-verified.json",
+      "originalBytes": 2014,
+      "originalSha256": "364869550e2c75a5aa5e9c19efea93dcb823d19bc734040a70a0270aba932bf8"
+    },
+    {
+      "path": "results/boolean-screen.json.gz",
+      "bytes": 37186,
+      "sha256": "3394a2a6dfe6e8b119529e0ca953d08ae8f28b918443c4354d7bb806c0f9f88c",
+      "sourceFile": "boolean-screen.json",
+      "originalFile": "boolean-screen.json",
+      "originalBytes": 616615,
+      "originalSha256": "0cc97a4c47a8e099a0d7a86ffd26a83153724c7ce22263eceac95fe4bc785922",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "list.boolean.get.sequential.31.fresh",
+            "list.boolean.get.sequential.31.warm",
+            "list.boolean.get.shuffled.31.fresh",
+            "list.boolean.get.shuffled.31.warm",
+            "list.boolean.get.tail.31.fresh",
+            "list.boolean.get.tail.31.warm",
+            "list.boolean.get.sequential.32.fresh",
+            "list.boolean.get.sequential.32.warm",
+            "list.boolean.get.shuffled.32.fresh",
+            "list.boolean.get.shuffled.32.warm",
+            "list.boolean.get.tail.32.fresh",
+            "list.boolean.get.tail.32.warm",
+            "list.boolean.get.sequential.33.fresh",
+            "list.boolean.get.sequential.33.warm",
+            "list.boolean.get.shuffled.33.fresh",
+            "list.boolean.get.shuffled.33.warm",
+            "list.boolean.get.tail.33.fresh",
+            "list.boolean.get.tail.33.warm",
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.boolean.get.tail.8192.fresh",
+            "list.boolean.get.tail.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm",
+            "list.string.get.sequential.8192.fresh",
+            "list.string.get.sequential.1024.warm",
+            "list.string.get.shuffled.8192.fresh",
+            "list.string.get.shuffled.1024.warm",
+            "list.object.get.sequential.8192.fresh",
+            "list.object.get.sequential.1024.warm",
+            "list.object.get.shuffled.8192.fresh",
+            "list.object.get.shuffled.1024.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/boolean-smoke-summary.json.gz",
+      "bytes": 3709,
+      "sha256": "24082e1bf09f9db535c7f87dd50ddfbade75f03fecf59228022f9324f502d0fa",
+      "sourceFile": "boolean-smoke-summary.json",
+      "originalFile": "boolean-smoke-summary.json",
+      "originalBytes": 28028,
+      "originalSha256": "a371df6e5708b08870afc4615025171903ca2be5e3bdd711fb9ffcd5d99704df"
+    },
+    {
+      "path": "results/boolean-smoke-verified.json.gz",
+      "bytes": 665,
+      "sha256": "8a53790c565249a84189472ffb5d48d79452a00b5ff7e2c84a1f70d0b95e69e4",
+      "sourceFile": "boolean-smoke-verified.json",
+      "originalFile": "boolean-smoke-verified.json",
+      "originalBytes": 2007,
+      "originalSha256": "cb34e65e21b0174c884816506465cd53a1de7af4319fdd4c7b7b3025da6db43a"
+    },
+    {
+      "path": "results/boolean-smoke.json.gz",
+      "bytes": 18923,
+      "sha256": "501623583c2cd459af14fecc063ed963e7c3ec05e88a94650d90fd6d3446eb1e",
+      "sourceFile": "boolean-smoke.json",
+      "originalFile": "boolean-smoke.json",
+      "originalBytes": 247914,
+      "originalSha256": "c2eab44ffc1b80ff584eec1d5bf553ff825578019503817060c713e599aa3bb4",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "list.boolean.get.sequential.31.fresh",
+            "list.boolean.get.sequential.31.warm",
+            "list.boolean.get.shuffled.31.fresh",
+            "list.boolean.get.shuffled.31.warm",
+            "list.boolean.get.tail.31.fresh",
+            "list.boolean.get.tail.31.warm",
+            "list.boolean.get.sequential.32.fresh",
+            "list.boolean.get.sequential.32.warm",
+            "list.boolean.get.shuffled.32.fresh",
+            "list.boolean.get.shuffled.32.warm",
+            "list.boolean.get.tail.32.fresh",
+            "list.boolean.get.tail.32.warm",
+            "list.boolean.get.sequential.33.fresh",
+            "list.boolean.get.sequential.33.warm",
+            "list.boolean.get.shuffled.33.fresh",
+            "list.boolean.get.shuffled.33.warm",
+            "list.boolean.get.tail.33.fresh",
+            "list.boolean.get.tail.33.warm",
+            "list.boolean.get.sequential.8192.fresh",
+            "list.boolean.get.sequential.8192.warm",
+            "list.boolean.get.shuffled.8192.fresh",
+            "list.boolean.get.shuffled.8192.warm",
+            "list.boolean.get.tail.8192.fresh",
+            "list.boolean.get.tail.8192.warm",
+            "list.number.get.sequential.8192.fresh",
+            "list.number.get.sequential.8192.warm",
+            "list.number.get.shuffled.8192.fresh",
+            "list.number.get.shuffled.8192.warm",
+            "list.string.get.sequential.8192.fresh",
+            "list.string.get.sequential.1024.warm",
+            "list.string.get.shuffled.8192.fresh",
+            "list.string.get.shuffled.1024.warm",
+            "list.object.get.sequential.8192.fresh",
+            "list.object.get.sequential.1024.warm",
+            "list.object.get.shuffled.8192.fresh",
+            "list.object.get.shuffled.1024.warm"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "1823ae6f3e53cc1acf07090ae88a9630e2b6149ce7de7562da2933853cec25c9"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/boolean-verifier-alias-checks.json.gz",
+      "bytes": 369,
+      "sha256": "208fe8f561ecbff30885d2e13f84b9d6647be56d0dcfab07e3671ed875221bf1",
+      "sourceFile": "boolean-verifier-alias-checks.json",
+      "originalFile": "boolean-verifier-alias-checks.json",
+      "originalBytes": 788,
+      "originalSha256": "ecdfa0bb0d668a42a28b249847db8e70dd854648eb1a8b9d35ed7b3d1988abf2"
+    },
+    {
+      "path": "results/map-inline-screen-summary.json.gz",
+      "bytes": 3418,
+      "sha256": "d8849f55824b92ce452801b2005ebf8ec50d21b5a384bd143d217707707ab9a2",
+      "sourceFile": "map-inline-screen-summary.json",
+      "originalFile": "map-inline-screen-summary.json",
+      "originalBytes": 18826,
+      "originalSha256": "481137e2d92a560f53ce2e7d12949258fde8dd3ea2d1d96bb4f40e436bab6cfa"
+    },
+    {
+      "path": "results/map-inline-screen.json.gz",
+      "bytes": 20051,
+      "sha256": "b8e6cf2a6fe2c76ee90f91a7b9d4f4225aa924c778cb855124be09d81f218755",
+      "sourceFile": "map-inline-screen.json",
+      "originalFile": "map-inline-screen.json",
+      "originalBytes": 319181,
+      "originalSha256": "614b529fd8c5f442da520a65a28e766d0e168f02d3a21e9f6be1cf9c089fa711",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "5a00e4fa391e5eea1d4aeb92d3e5c395b5780335",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/map-screen-summary.json.gz",
+      "bytes": 20,
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "sourceFile": "map-screen-summary.json",
+      "originalFile": "map-screen-summary.json",
+      "originalBytes": 0,
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Preserved original non-JSON or empty output without alteration"
+    },
+    {
+      "path": "results/map-screen-v2-summary.json.gz",
+      "bytes": 3405,
+      "sha256": "3d3c5cc55c45f96d16b3e5855536c33980ef5aee71f34b8dc72d9ddf35eece1c",
+      "sourceFile": "map-screen-v2-summary.json",
+      "originalFile": "map-screen-v2-summary.json",
+      "originalBytes": 18819,
+      "originalSha256": "851cd47d90edca75b8bdf8a0f7a7b8562740da57fa55af33ad25585614d4e898"
+    },
+    {
+      "path": "results/map-screen-v2.json.gz",
+      "bytes": 20057,
+      "sha256": "06d5a2e29c0adba3271a30526dd5a870c874753bb515e85939e04dbe2df25f17",
+      "sourceFile": "map-screen-v2.json",
+      "originalFile": "map-screen-v2.json",
+      "originalBytes": 319218,
+      "originalSha256": "5d01df5e3ed5547be84b478906b3a7c34e05633c2660c2cae6bb00ec7e9897a7",
+      "study": {
+        "complete": true,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "9e6c849df3a786e1585c967dca78ea9011bb1b4cca69f8a38e03eda29e244e81"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 12
+      }
+    },
+    {
+      "path": "results/map-screen.json.gz",
+      "bytes": 8880,
+      "sha256": "18b5d2257bd7266096f5eac63a325e157ba56e1ea30d3eae24750376668b52c2",
+      "sourceFile": "map-screen.json",
+      "originalFile": "map-screen.json",
+      "originalBytes": 56858,
+      "originalSha256": "2bfd172ebdb2814dfd8ca176787bec2253512da43298b7e71f962565ad969576",
+      "study": {
+        "complete": false,
+        "pairs": 3,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 8,
+          "batchScale": 1,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 1,
+        "error": "Error: Command failed: /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --expose-gc /tmp/zerocopy-followup-qpXewe/benchmark.mjs --worker --entry /tmp/zerocopy-followup-qpXewe/candidate/dist/shared.js --config /tmp/zerocopy-followup-qpXewe/config.json --rotation 0\nfile:///tmp/zerocopy-followup-qpXewe/workloads.mjs:2\nconst check = (condition, message) => { if (!condition) throw new Error(message); };\n                                                              ^\n\nError: Lookup-directory backing size differs among identical sessions: 2 !== 1\n    at check (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:2:63)\n    at equal (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:3:44)\n    at measure (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:120:3)\n    at async run (file:///tmp/zerocopy-followup-qpXewe/workloads.mjs:137:74)\n    at async file:///tmp/zerocopy-followup-qpXewe/benchmark.mjs:45:18\n\nNode.js v24.22.3\n\n    at genericNodeError (node:internal/errors:986:15)\n    at wrappedFn (node:internal/errors:540:14)\n    at checkExecSyncError (node:child_process:943:11)\n    at execFileSync (node:child_process:979:15)\n    at file:///workspace/scratch/240add2fd2cb/perf-harness-followup/benchmark.mjs:119:33"
+      }
+    },
+    {
+      "path": "results/map-smoke-summary.json.gz",
+      "bytes": 2309,
+      "sha256": "7a8cd6d2885f1936881a70eb7b4c06f5fab88c6cfe50f32b2107b37003d655b1",
+      "sourceFile": "map-smoke-summary.json",
+      "originalFile": "map-smoke-summary.json",
+      "originalBytes": 16522,
+      "originalSha256": "b61547234652d9b2dc07f559cc9d2d925410af6dc1c9337e9975cc1b322d573c"
+    },
+    {
+      "path": "results/map-smoke.json.gz",
+      "bytes": 13138,
+      "sha256": "cfccc599dd9e490bbe31b929111ef9ff19d2c80942f9a452d5aaf44aafa9f867",
+      "sourceFile": "map-smoke.json",
+      "originalFile": "map-smoke.json",
+      "originalBytes": 136693,
+      "originalSha256": "575a967f2219f536efad2367a59b5e414738498252d7f86bf7125f50b48967c2",
+      "study": {
+        "complete": true,
+        "pairs": 1,
+        "runtimes": [
+          "node",
+          "bun"
+        ],
+        "config": {
+          "warmups": 0,
+          "batchScale": 0.015625,
+          "only": [],
+          "caseNames": [
+            "map.number.10000.q1",
+            "map.number.10000.q2",
+            "map.number.10000.q4",
+            "map.number.10000.q16",
+            "map.number.100000.q1",
+            "map.number.100000.q2",
+            "map.number.100000.q4",
+            "map.number.100000.q16",
+            "map.number.100000.q256",
+            "map.number.100000.q32768",
+            "map.string.10000.q1",
+            "map.string.10000.q16",
+            "map.object.4096.q1",
+            "map.object.4096.q16",
+            "map.number.100000.q1.miss",
+            "map.number.100000.q16.miss",
+            "map.number.100000.q1.unicode",
+            "map.number.100000.q16.unicode",
+            "map.number.1024.q16.warm",
+            "map.number.100000.q256.alternate-roots",
+            "map.number.10000.q1.attach",
+            "map.number.100000.q1.attach"
+          ]
+        },
+        "harness": {
+          "driverSha256": "49451ba38c70ea8b3177b8f1cfe93d4d82854d47ab40e2b6ad6bc1788abb7151",
+          "workloadsSha256": "65922f31a0260370b686c59cfd55eb14b8e775cd2a077e2e27c616e160a64241"
+        },
+        "baselineCommit": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidateCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+        "recordedSamples": 4
+      }
+    },
+    {
+      "path": "results/map-verify-checks.json.gz",
+      "bytes": 479,
+      "sha256": "937ff0ca709e0d96fe5b945de49aa5d80611e334ef935ab33f2d4bee2c7ee15d",
+      "sourceFile": "map-verify-checks.json",
+      "originalFile": "map-verify-checks.json",
+      "originalBytes": 1680,
+      "originalSha256": "c4057102873efb2d857f30bb58c4eaad4d8d2fe6268da2e4392143204d7e7fa4"
+    }
+  ],
+  "plans": [
+    {
+      "path": "plans/ascii-confirmation-PLAN.md",
+      "bytes": 8923,
+      "sha256": "92a4d057d020cf1d54d050a11c467ffa4364bb6447e6684932f63e209016b8c4",
+      "sourceFile": "ascii-confirmation-PLAN.md",
+      "originalFile": "ascii-confirmation-PLAN.md"
+    },
+    {
+      "path": "plans/ascii-current-confirmation-PLAN.md",
+      "bytes": 10480,
+      "sha256": "9f4fe9673f5abdad8445c0a333a0fb27828f76c1de9195a6c3b57952f422ed0b",
+      "sourceFile": "ascii-current-confirmation-PLAN.md",
+      "originalFile": "ascii-current-confirmation-PLAN.md"
+    },
+    {
+      "path": "plans/ascii-current-warm-validity-ADDENDUM-20261118.md",
+      "bytes": 5605,
+      "sha256": "a0ea61978ccb1ffb316f47628f80a8797d688b183394cc08686645330dc7fb15",
+      "sourceFile": "ascii-current-warm-validity-ADDENDUM-20261118.md",
+      "originalFile": "ascii-current-warm-validity-ADDENDUM-20261118.md"
+    }
+  ],
+  "patches": [
+    {
+      "name": "map-directory",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+      "expectedFiles": [
+        {
+          "file": "arena.ts",
+          "sha256": "44cdf9e0b07956a1d57841fa1f01b1377647f88c7f0aaf36301ebef578dff354"
+        },
+        {
+          "file": "map-memory.test.ts",
+          "sha256": "ed82be392f89ab0035640f2728fce69aefe3d2c4e0d0673e2cac31e08b63cfca"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/build-browser.log",
+          "sha256": "8fdd8f8ea337bcd38e97c0a86ab5a7e982d409a83311de991b367b73687bee89"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/focused-tests.log",
+          "sha256": "c9c1f38a0cd54ed0b0f75f990d3b69dc9ba6fb22a434a2c5f471ccf0bdb0dc51"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/reused-wasm.json",
+          "sha256": "fa92f9d362c1ffa2ef1d1137ac4290e6e9181087e83f996a3020aa0c7293a1fc"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/typecheck.log",
+          "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+        }
+      ],
+      "targetTree": "2c662780607fe7b3ff66d04757b960451ced930c",
+      "path": "patches/map-directory-72d9ad0.patch",
+      "bytes": 14244,
+      "sha256": "e82bdd28ddc6ff3c13ac5ac89b7786fd68c4ffc78f0901e26ab342aad3b1593f"
+    },
+    {
+      "name": "map-directory-inline",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "5a00e4fa391e5eea1d4aeb92d3e5c395b5780335",
+      "expectedFiles": [
+        {
+          "file": "arena.ts",
+          "sha256": "eea4aaede355987dc53049a667f8376e3326af9c1f7233e2698d7fe0fef1b9e5"
+        },
+        {
+          "file": "map-memory.test.ts",
+          "sha256": "ed82be392f89ab0035640f2728fce69aefe3d2c4e0d0673e2cac31e08b63cfca"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/refinement-validation/build-browser.log",
+          "sha256": "8a470e270b18785d13c7f26722c07997685494657a66eb7dbeffe466a233fd6e"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/refinement-validation/focused-tests.log",
+          "sha256": "09b77fb084be64bcddf6b7292ae25b6eb2090b8b1eceb0cd2adcc9dc78b91290"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/refinement-validation/reused-wasm.json",
+          "sha256": "fb44839ae8e973a17a0fe5046ae9e0a9ac0741ee50a937d235c7b68683dd0a4f"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/refinement-validation/typecheck.log",
+          "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/build-browser.log",
+          "sha256": "8fdd8f8ea337bcd38e97c0a86ab5a7e982d409a83311de991b367b73687bee89"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/focused-tests.log",
+          "sha256": "c9c1f38a0cd54ed0b0f75f990d3b69dc9ba6fb22a434a2c5f471ccf0bdb0dc51"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/reused-wasm.json",
+          "sha256": "fa92f9d362c1ffa2ef1d1137ac4290e6e9181087e83f996a3020aa0c7293a1fc"
+        },
+        {
+          "file": "proofs/map-directory-lazy-20261118/validation/typecheck.log",
+          "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+        }
+      ],
+      "targetTree": "97acaddb30df453b4ba49693f19869095e62e89b",
+      "path": "patches/map-directory-inline-5a00e4f.patch",
+      "bytes": 20994,
+      "sha256": "40bfcb660fe0b88aa3ac40a6d7be259851205ad5db14285a71b560bdf459c4f6"
+    },
+    {
+      "name": "ascii-dataview",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+      "expectedFiles": [
+        {
+          "file": "arena-string.test.ts",
+          "sha256": "c3594472468c90cb9f91f869adcfbc849f919007c2620a21f9bb621e3eb14b5a"
+        },
+        {
+          "file": "arena.ts",
+          "sha256": "2e7862edb2b80457deb5ca4578a0f926e91f7ee359a6c683c4810c0a465f711a"
+        }
+      ],
+      "targetTree": "6b4b05f80a36ecaf54b3a10072191afb3ecb9fcf",
+      "path": "patches/ascii-dataview-8144fbd.patch",
+      "bytes": 6027,
+      "sha256": "28d4afc96ccd56fd7397fe21878d5723bd200571a5f799922c1f1776bdccfd6a"
+    },
+    {
+      "name": "arena-lazy-scalar",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "5c155970f9354894c5a613612e69ad00d14404ce",
+      "expectedFiles": [
+        {
+          "file": "arena-prepare.test.ts",
+          "sha256": "bccba8e0afb122f5a45907cb966a724ed3df5ea6bfdf9f52bee16f627884379c"
+        },
+        {
+          "file": "arena.ts",
+          "sha256": "fa2f8d14c830771d462af80940282ea0aecb1ec993803cc82df9c8f1fd88b54c"
+        }
+      ],
+      "targetTree": "ea1dc4343222842b86a19ccff151956aef4aae7e",
+      "path": "patches/arena-lazy-scalar-5c15597.patch",
+      "bytes": 4277,
+      "sha256": "6086eaeaf59aaf0b23612acada168c3bb78e86fa40b76337450721efe7805eb0"
+    },
+    {
+      "name": "list-boolean-get",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+      "expectedFiles": [
+        {
+          "file": "shared-list.test.ts",
+          "sha256": "5034afa37a42d4afe8fb729643e5c4527b3dfaf1a8bdd12170175ec137e127cc"
+        },
+        {
+          "file": "shared-list.ts",
+          "sha256": "29d2d22c4af506f08bd30fb195eae7ff9e11919a02cb9a0bb9e591d461adf54a"
+        }
+      ],
+      "targetTree": "846e6b4513f8dc26adb24b691635bebcb2c99fc1",
+      "path": "patches/list-boolean-get-333db44.patch",
+      "bytes": 3038,
+      "sha256": "a87ad8047a0ce67f1191ef8eb4f95676030b2274e01cdbaab20f7248c22daaf8"
+    },
+    {
+      "name": "ascii-byte-loads",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "commit": "639335f59306ff532371cd84ad31c453f0680b56",
+      "expectedFiles": [
+        {
+          "file": "arena-string.test.ts",
+          "sha256": "c3594472468c90cb9f91f869adcfbc849f919007c2620a21f9bb621e3eb14b5a"
+        },
+        {
+          "file": "arena.ts",
+          "sha256": "1086868a41a1d7f12ec9a4704e4b5131018edac8653c6e7a834201fc4431ac5c"
+        }
+      ],
+      "targetTree": "73ade9d4cd58f7d8c733bb019d606ba6233aae2c",
+      "path": "patches/ascii-byte-loads-639335f.patch",
+      "bytes": 6063,
+      "sha256": "85a57761ec4bc7b2792bd2e6266678121555395c5faf19faa92cf266512994a3"
+    },
+    {
+      "name": "ascii-byte-loads-current",
+      "baseline": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+      "commit": "10bebf25d2a6ad01bb8203a19facc33c75c03190",
+      "scope": [
+        "arena.ts",
+        "arena-string.test.ts"
+      ],
+      "expectedFiles": [
+        {
+          "file": "arena-string.test.ts",
+          "sha256": "c3594472468c90cb9f91f869adcfbc849f919007c2620a21f9bb621e3eb14b5a"
+        },
+        {
+          "file": "arena.ts",
+          "sha256": "1086868a41a1d7f12ec9a4704e4b5131018edac8653c6e7a834201fc4431ac5c"
+        }
+      ],
+      "path": "patches/ascii-byte-loads-current-10bebf2.patch",
+      "bytes": 6063,
+      "sha256": "85a57761ec4bc7b2792bd2e6266678121555395c5faf19faa92cf266512994a3"
+    }
+  ]
+}

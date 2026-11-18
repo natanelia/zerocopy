@@ -1,0 +1,91 @@
+diff --git a/arena-prepare.test.ts b/arena-prepare.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..1e58be9a1243141261365c728e024155346e577a
+--- /dev/null
++++ b/arena-prepare.test.ts
+@@ -0,0 +1,54 @@
++import { expect, test } from 'vitest';
++import { Arena } from './arena';
++
++test.each(['number', 'boolean'])('reuses scalar bytes after preparing %s first', firstType => {
++  const arena = new Arena();
++  const first = arena.prepare(firstType, firstType === 'number' ? 1.5 : true);
++  const number = arena.prepare('number', 1.5);
++  expect(number.buffer).toBe(first.buffer);
++  if (firstType === 'number') expect(number).toBe(first);
++  expect(number.byteLength).toBe(8);
++
++  for (const [value, expected] of [
++    [0, [0, 0, 0, 0, 0, 0, 0, 0]],
++    [-0, [0, 0, 0, 0, 0, 0, 0, 128]],
++    [1.5, [0, 0, 0, 0, 0, 0, 248, 63]],
++    [-13.5, [0, 0, 0, 0, 0, 0, 43, 192]],
++    [Number.MIN_VALUE, [1, 0, 0, 0, 0, 0, 0, 0]],
++    [Infinity, [0, 0, 0, 0, 0, 0, 240, 127]],
++    [-Infinity, [0, 0, 0, 0, 0, 0, 240, 255]],
++  ] as const) {
++    expect(arena.prepare('number', value)).toBe(number);
++    expect(Array.from(number)).toEqual(expected);
++    const yes = arena.prepare('boolean', true), no = arena.prepare('boolean', false);
++    expect(yes.buffer).toBe(number.buffer);
++    expect(no.buffer).toBe(number.buffer);
++    expect(no).not.toBe(yes);
++    expect(Array.from(no)).toEqual([0]);
++    expect(Array.from(yes)).toEqual([0]);
++    expect(Array.from(arena.prepare('boolean', true))).toEqual([1]);
++    expect(Array.from(number)).toEqual([1, ...expected.slice(1)]);
++  }
++  expect(arena.prepare('number', NaN)).toBe(number);
++  expect(new DataView(number.buffer).getFloat64(0, true)).toBeNaN();
++  const other = new Arena().prepare('number', 42);
++  expect(other.buffer).not.toBe(number.buffer);
++  expect(new DataView(number.buffer).getFloat64(0, true)).toBeNaN();
++});
++
++test('rejects invalid primitive values before and after preparing bytes', () => {
++  const arena = new Arena();
++  const invalid = () => {
++    for (const value of [undefined, null, '1', false, true, {}, []]) {
++      expect(() => arena.prepare('number', value)).toThrow(new TypeError('Expected a number'));
++    }
++    for (const value of [undefined, null, 0, 1, 'true', {}, []]) {
++      expect(() => arena.prepare('boolean', value)).toThrow(new TypeError('Expected a boolean'));
++    }
++  };
++  invalid();
++  const prepared = arena.prepare('number', 1.5), before = prepared.slice();
++  invalid();
++  expect(prepared).toEqual(before);
++  expect(arena.prepare('number', 1.5)).toBe(prepared);
++});
+diff --git a/arena.ts b/arena.ts
+index 287565d67327d51516e4e3c83623fb85b34a0d5b..dcc8e9bfe6798acbf2ad82cbd3debcf0636ffb35 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -162,8 +162,8 @@ export class Arena {
+   // Bound both the number of keys and their retained UTF-16/UTF-8 storage.
+   private internedStrings: Map<string, number> | undefined;
+   private internedStringBytes = 0;
+-  private readonly scalar = new Uint8Array(8);
+-  private readonly scalarView = new DataView(this.scalar.buffer);
++  private scalar: Uint8Array | undefined;
++  private scalarView: DataView | undefined;
+ 
+   constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
+     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
+@@ -206,11 +206,13 @@ export class Arena {
+   prepare(type: string, value: any): Uint8Array {
+     if (type === 'number') {
+       if (typeof value !== 'number') throw new TypeError('Expected a number');
+-      this.scalarView.setFloat64(0, value, true); return this.scalar;
++      const scalar = this.scalar ??= new Uint8Array(8);
++      (this.scalarView ??= new DataView(scalar.buffer)).setFloat64(0, value, true); return scalar;
+     }
+     if (type === 'boolean') {
+       if (typeof value !== 'boolean') throw new TypeError('Expected a boolean');
+-      this.scalar[0] = value ? 1 : 0; return this.scalar.subarray(0, 1);
++      const scalar = this.scalar ??= new Uint8Array(8);
++      scalar[0] = value ? 1 : 0; return scalar.subarray(0, 1);
+     }
+     return encoder.encode(this.text(type, value));
+   }

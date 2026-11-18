@@ -1,0 +1,269 @@
+diff --git a/arena.ts b/arena.ts
+index 287565d67327d51516e4e3c83623fb85b34a0d5b..70d6584bea1dfbfcacf53824e7ba85de5cb991b3 100644
+--- a/arena.ts
++++ b/arena.ts
+@@ -112,6 +112,8 @@ export class Arena {
+   private view: DataView;
+   private reads: ReadCache | undefined;
+   private prefixRoot = 0;
++  private prefixPendingRoot = 0;
++  private prefixPendingHash = 0;
+   private prefixBits = 8;
+   private prefixChildren: Uint32Array | undefined;
+   private prefixValid: Uint32Array | undefined;
+@@ -678,6 +680,23 @@ export class Arena {
+     const leaf = this.findUncached(root, key);
+     this.reads.remember(key, root, leaf); return leaf;
+   }
++  private preparePrefixes(root: number, hash: number): boolean {
++    // One uncached query needs no directory. Keep its hash so the second
++    // query still resolves a shared prefix on the same schedule as before.
++    if (this.prefixPendingRoot !== root) {
++      this.prefixPendingRoot = root; this.prefixPendingHash = hash;
++      return false;
++    }
++    const firstHash = this.prefixPendingHash, bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
++    if (!this.prefixChildren || bits !== this.prefixBits) {
++      this.prefixChildren = new Uint32Array(1 << bits); this.prefixValid = new Uint32Array((1 << bits) >>> 5);
++    } else this.prefixValid!.fill(0);
++    this.prefixBits = bits; this.prefixRoot = root;
++    const prefix = firstHash & ((1 << bits) - 1);
++    this.prefixChildren[prefix] = 0xffffffff;
++    this.prefixValid![prefix >>> 5] = 1 << (prefix & 31);
++    return true;
++  }
+   private findUncached(root: number, key: string): number {
+     let hash = 2166136261, encoded: Uint8Array | undefined;
+     for (let i = 0; i < key.length; i++) {
+@@ -699,15 +718,8 @@ export class Arena {
+     }
+     let candidate: number;
+     // Historical roots also need prefix reuse after their value cache fills.
+-    // The exact-root check below invalidates the directory before any reuse.
+-    if (root) {
+-      if (this.prefixRoot !== root) {
+-        const bits = this.wasm.mapSize(root) > 16384 ? 12 : 8;
+-        if (!this.prefixChildren || bits !== this.prefixBits) {
+-          this.prefixChildren = new Uint32Array(1 << bits); this.prefixValid = new Uint32Array((1 << bits) >>> 5);
+-        } else this.prefixValid!.fill(0);
+-        this.prefixBits = bits; this.prefixRoot = root;
+-      }
++    // A one-off query to another root can leave the active directory intact.
++    if (root && (this.prefixRoot === root || this.preparePrefixes(root, hash))) {
+       const prefix = hash & ((1 << this.prefixBits) - 1), word = prefix >>> 5, bit = 1 << (prefix & 31);
+       if (!(this.prefixValid[word] & bit)) {
+         // A one-off prefix needs only the direct lookup. Materialize its
+diff --git a/map-memory.test.ts b/map-memory.test.ts
+index 7ad608872103b9de131046ba26736b994327e03a..022988636fd779f9f08196242cbe2fc24fbd00f2 100644
+--- a/map-memory.test.ts
++++ b/map-memory.test.ts
+@@ -79,19 +79,25 @@ describe('small root-specific read indexes', () => {
+     const source = ownerMap().setMany(keys.slice(0, 3).map((key, i) => [key, i] as const));
+     const owner = arenaOf(source), before = owner.buf.slice();
+     const { map } = await initWorker(getWorkerData({ map: source }, { copy }));
+-    const reader = arenaOf(map), native = reader.wasm;
++    const reader: any = arenaOf(map), native = reader.wasm;
+     const calls = { direct: 0, prefix: 0, reused: 0 };
++    let sizeCalls = 0;
+     Object.defineProperty(reader, 'wasm', { value: {
+       ...native,
++      mapSize(...args: number[]) { sizeCalls++; return native.mapSize(...args); },
+       mapHashCandidate(...args: number[]) { calls.direct++; return native.mapHashCandidate(...args); },
+       mapHashPrefix(...args: number[]) { calls.prefix++; return native.mapHashPrefix(...args); },
+       mapHashCandidateFrom(...args: number[]) { calls.reused++; return native.mapHashCandidateFrom(...args); },
+     } });
+     expect(map.get(keys[0])).toBe(0);
++    expect(reader.prefixChildren).toBeUndefined(); expect(reader.prefixValid).toBeUndefined();
++    expect(sizeCalls).toBe(0);
+     expect(calls).toEqual({ direct: 1, prefix: 0, reused: 0 });
+     // A miss sharing a seen prefix must resolve the subtree, not reuse the
+     // first leaf. Later hits still compare their complete keys.
+     expect(map.has(keys[3])).toBe(false);
++    expect(reader.prefixChildren.byteLength + reader.prefixValid.byteLength).toBe(1056);
++    expect(sizeCalls).toBe(1);
+     expect(map.get(keys[1])).toBe(1); expect(map.get(keys[2])).toBe(2);
+     expect(calls).toEqual({ direct: 1, prefix: 1, reused: 3 });
+     // A genuinely absent subtree is a valid cached zero, distinct from the
+@@ -102,6 +108,68 @@ describe('small root-specific read indexes', () => {
+     expect(Buffer.compare(Buffer.from(before), Buffer.from(owner.buf))).toBe(0);
+     expect(() => map.set('forbidden', 1)).toThrow(/read-only/);
+   });
++  for (const copy of [false, true]) for (const count of [3, 17000]) {
++    test(`a first miss defers the directory without hiding a colliding hit (copy=${copy}, count=${count})`, async () => {
++      const source = ownerMap().setMany([
++        ['costarring', 42] as const,
++        ...Array.from({ length: count - 1 }, (_, i) => [`key${i}`, i] as const),
++      ]);
++      const owner = arenaOf(source), before = owner.buf.slice();
++      const { map } = await initWorker(getWorkerData({ map: source }, { copy }));
++      const reader: any = arenaOf(map);
++      // These keys have the same complete hash, but only one exists.
++      expect(hashBytes(new TextEncoder().encode('costarring'))).toBe(hashBytes(new TextEncoder().encode('liquid')));
++      expect(map.get('liquid')).toBeUndefined();
++      expect(reader.prefixChildren).toBeUndefined(); expect(reader.prefixValid).toBeUndefined();
++      expect(map.get('costarring')).toBe(42);
++      expect(reader.prefixRoot).toBe(map.root);
++      expect(reader.prefixChildren.byteLength + reader.prefixValid.byteLength).toBe(count > 16384 ? 16896 : 1056);
++      expect(map.get('liquid')).toBeUndefined(); expect(map.get('key0')).toBe(0);
++      expect(reader.used).toBe(owner.used);
++      expect(Buffer.compare(Buffer.from(before), Buffer.from(owner.buf))).toBe(0);
++    });
++  }
++  test.each([false, true])('single queries to other roots retain the active directory (copy=%s)', async copy => {
++    const owner = new Arena();
++    const small = new SharedMap('number', 0, 0, owner).setMany([['costarring', 1], ['liquid', 2], ['界🙂', 3]]);
++    const large = small.setMany(Array.from({ length: 17000 }, (_, i) => [`key${i}`, i] as const));
++    const fork = large.set('costarring', -1).delete('liquid');
++    const before = owner.buf.slice();
++    const { a, b, c } = await initWorker(getWorkerData({ a: small, b: large, c: fork }, { copy }));
++    const reader: any = arenaOf(a);
++    expect(b.get('key0')).toBe(0); expect(b.get('key1')).toBe(1);
++    const largeDirectory = reader.prefixChildren;
++    expect(a.get('costarring')).toBe(1);
++    expect(b.get('key2')).toBe(2);
++    expect(reader.prefixRoot).toBe(b.root); expect(reader.prefixChildren).toBe(largeDirectory);
++    expect(a.get('liquid')).toBe(2);
++    expect(reader.prefixRoot).toBe(a.root);
++    expect(reader.prefixChildren.byteLength + reader.prefixValid.byteLength).toBe(1056);
++    expect(c.get('key3')).toBe(3); expect(a.get('界🙂')).toBe(3);
++    expect(reader.prefixRoot).toBe(a.root);
++    expect(c.get('key4')).toBe(4);
++    expect(reader.prefixRoot).toBe(c.root);
++    expect(reader.prefixChildren.byteLength + reader.prefixValid.byteLength).toBe(16896);
++    expect(c.get('costarring')).toBe(-1); expect(c.has('liquid')).toBe(false);
++    expect(b.get('key5')).toBe(5); expect(b.get('key6')).toBe(6);
++    expect(reader.prefixRoot).toBe(b.root);
++    expect(a.get('costarring')).toBe(1); expect(a.get('liquid')).toBe(2);
++    expect(reader.used).toBe(owner.used);
++    expect(Buffer.compare(Buffer.from(before), Buffer.from(owner.buf))).toBe(0);
++  });
++  test.each([false, true])('growth between the first two queries preserves pending prefixes (copy=%s)', async copy => {
++    const source = ownerMap().setMany([['costarring', 1], ['liquid', 2], ['界🙂', 3]]);
++    const owner = arenaOf(source), used = owner.used, before = owner.buf.slice(HEAP_START, used);
++    const { map } = await initWorker(getWorkerData({ map: source }, { copy }));
++    const reader: any = arenaOf(map);
++    expect(map.get('costarring')).toBe(1); expect(reader.prefixChildren).toBeUndefined();
++    owner.alloc(owner.memory.buffer.byteLength * 2);
++    expect(map.get('liquid')).toBe(2); expect(map.get('界🙂')).toBe(3);
++    expect(map.get('costarring')).toBe(1); expect(map.get('absent')).toBeUndefined();
++    expect(reader.prefixRoot).toBe(map.root);
++    expect(Buffer.compare(Buffer.from(before), Buffer.from(owner.buf.subarray(HEAP_START, used)))).toBe(0);
++    expect(() => map.set('forbidden', 1)).toThrow(/read-only/);
++  });
+   test('unresolved prefixes cannot escape their snapshot or directory size', async () => {
+     const owner = new Arena();
+     const small = new SharedMap('number', 0, 0, owner).setMany([['costarring', 1], ['liquid', 2], ['界🙂', 3]]);
+diff --git a/proofs/map-directory-lazy-20261118/validation/build-browser.log b/proofs/map-directory-lazy-20261118/validation/build-browser.log
+new file mode 100644
+index 0000000000000000000000000000000000000000..dcd6645571327c0caa4a2bbdd27311d628bd1ab0
+--- /dev/null
++++ b/proofs/map-directory-lazy-20261118/validation/build-browser.log
+@@ -0,0 +1,2 @@
++$ bun scripts/build-browser.ts
++Built 12 portable modules: 299452 bytes
+diff --git a/proofs/map-directory-lazy-20261118/validation/focused-tests.log b/proofs/map-directory-lazy-20261118/validation/focused-tests.log
+new file mode 100644
+index 0000000000000000000000000000000000000000..4f9b534c93dfda1738f59ca58550435d88b7e36b
+--- /dev/null
++++ b/proofs/map-directory-lazy-20261118/validation/focused-tests.log
+@@ -0,0 +1,10 @@
++$ bun --bun node_modules/vitest/vitest.mjs run map-memory.test.ts object-read-cache.test.ts worker-attachment.test.ts "utf8-read.test.ts" "--maxWorkers=1" --no-file-parallelism
++
++ RUN  v4.1.11 /workspace/scratch/240add2fd2cb/zerocopy-map-lazy
++
++
++ Test Files  4 passed (4)
++      Tests  66 passed (66)
++   Start at  20:30:39
++   Duration  5.40s (transform 288ms, setup 0ms, import 381ms, tests 4.88s, environment 0ms)
++
+diff --git a/proofs/map-directory-lazy-20261118/validation/reused-wasm.json b/proofs/map-directory-lazy-20261118/validation/reused-wasm.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..6746d2753d65d19e7f4a91b90a19bc2f6de380ac
+--- /dev/null
++++ b/proofs/map-directory-lazy-20261118/validation/reused-wasm.json
+@@ -0,0 +1,77 @@
++{
++  "note": "Unchanged Rust sources; reused generated artifacts from frozen baseline 1242908762b554e3574365c486d5a6c52d5e568f. Browser bundle is built locally from the candidate TypeScript sources.",
++  "artifacts": [
++    {
++      "name": "doubly-linked-list.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/doubly-linked-list.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "geometry-kernels.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/geometry-kernels.wasm",
++      "sha256": "36da9253c5cf3eeb7bc863a85747a666a9009557855cde73f6f8400a6d486804",
++      "bytes": 1199
++    },
++    {
++      "name": "linked-list.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/linked-list.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "numeric-kernels-simd.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/numeric-kernels-simd.wasm",
++      "sha256": "951137eccac6fdad93b3dbd281564d7db297eb81b56332e2e90a067d1ed3d007",
++      "bytes": 1529
++    },
++    {
++      "name": "numeric-kernels.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/numeric-kernels.wasm",
++      "sha256": "b8938625b09c1cf191a277b3e8be046525b1264a59ab446be04809be2d905043",
++      "bytes": 1297
++    },
++    {
++      "name": "ordered-map.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/ordered-map.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "persistent-core.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/persistent-core.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "priority-queue.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/priority-queue.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "shared-list.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/shared-list.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "shared-map.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/shared-map.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "singly-linked-list.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/singly-linked-list.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    },
++    {
++      "name": "sorted-tree.wasm",
++      "source": "/workspace/scratch/240add2fd2cb/zerocopy/sorted-tree.wasm",
++      "sha256": "2e6901f2427b084022d82f421a87290a06ab57fab93baf91ae156ca4275aa08a",
++      "bytes": 54845
++    }
++  ]
++}
+diff --git a/proofs/map-directory-lazy-20261118/validation/typecheck.log b/proofs/map-directory-lazy-20261118/validation/typecheck.log
+new file mode 100644
+index 0000000000000000000000000000000000000000..f5b99e8a88f3351bff2d974f340241915d097a47
+--- /dev/null
++++ b/proofs/map-directory-lazy-20261118/validation/typecheck.log
+@@ -0,0 +1 @@
++$ tsc --noEmit

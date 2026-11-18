@@ -1,0 +1,56 @@
+diff --git a/shared-list.test.ts b/shared-list.test.ts
+index 1d589a6d106f0a5ddf19d48c92cc2489c88277b1..0a709388e2972792f3cf2d5472c98da88f388488 100644
+--- a/shared-list.test.ts
++++ b/shared-list.test.ts
+@@ -1,4 +1,5 @@
+ import { SharedList, resetSharedList } from './shared-list';
++import { getWorkerData, initWorker } from './shared';
+ import { expect, test, describe, beforeEach } from 'vitest';
+ 
+ describe('SharedList', () => {
+@@ -134,6 +135,32 @@ describe('SharedList', () => {
+     expect(v.toArray()).toEqual([true, false, true]);
+   });
+ 
++  test('boolean get preserves exact values across leaves, forks, growth and attachments', async () => {
++    for (const size of [31, 32, 33, 1057]) {
++      const values = Array.from({ length: size }, (_, i) => i % 3 === 0);
++      const source = new SharedList('boolean').pushMany(values);
++      const fork = source.set(size - 1, !values[size - 1]).push(false);
++      const edited = [...values.slice(0, -1), !values[size - 1], false];
++      const shared = getWorkerData({ source, fork }, { copy: false });
++      for (const copy of [false, true]) {
++        const attached = await initWorker(getWorkerData({ source, fork }, { copy }));
++        const snapshots = [[source, values], [fork, edited], [attached.source, values], [attached.fork, edited]] as const;
++        for (const [snapshot, expected] of snapshots) expect(snapshot.get(0)).toBe(expected[0]);
++        shared.arenas[0].memory!.grow(1);
++        for (const [snapshot, expected] of snapshots) {
++          expect(Object.isFrozen(snapshot)).toBe(true);
++          for (let i = expected.length - 1; i >= 0; i--) expect(snapshot.get(i)).toBe(expected[i]);
++          for (let i = 0; i < expected.length; i++) expect(snapshot.get(i)).toBe(expected[i]);
++          for (const index of [-1, expected.length, NaN, Infinity, 1.5, '0']) {
++            expect(snapshot.get(index as number)).toBeUndefined();
++          }
++        }
++        expect(() => attached.source.push(true)).toThrow(/read-only/);
++        expect(() => attached.fork.set(0, false)).toThrow(/read-only/);
++      }
++    }
++  });
++
+   test('object type', () => {
+     const o1 = { x: 1 };
+     const o2 = { y: 2 };
+diff --git a/shared-list.ts b/shared-list.ts
+index fd964f6044917cfcb34954dc4167bcb454345551..fa77533a279fe9ab09f5a5c1f7ed25022ad96ae8 100644
+--- a/shared-list.ts
++++ b/shared-list.ts
+@@ -75,7 +75,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
+       this.#readBlock = block;
+     }
+     const raw = this.#readView!.getFloat64(this.#readAddress + (index & 31) * 8, true);
+-    return this.type === 'number' ? raw as ValueOf<T> : this.arena.decode(this.type, raw);
++    return this.type === 'number' ? raw as ValueOf<T> : this.type === 'boolean' ? (raw !== 0) as ValueOf<T> : this.arena.decode(this.type, raw);
+   }
+   /** Read selected JSON fields from shared bytes without decoding/freezing the whole value. */
+   getView(this: T extends 'object' ? SharedList<T> : never, index: number): JsonView | undefined {

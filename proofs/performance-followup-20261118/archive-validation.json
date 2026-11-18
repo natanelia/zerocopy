@@ -1,0 +1,88 @@
+{
+  "valid": true,
+  "archive": "/workspace/scratch/240add2fd2cb/zerocopy-performance-followup/proofs/performance-followup-20261118",
+  "repository": "/workspace/scratch/240add2fd2cb/zerocopy",
+  "inventories": [
+    {
+      "file": "inventory-001.json",
+      "sha256": "e10c94fe2b2b39a63993277c13e3908b16860a058457c0e33de53d198d69796f"
+    },
+    {
+      "file": "inventory-002.json",
+      "sha256": "cdc5dea3935ec4f6c0e2d1355cd667c11f580ad7f70358bc8e0c6121633e52bc"
+    }
+  ],
+  "archivedEntryChecks": 124,
+  "uniqueArchivedFiles": 77,
+  "decompressedReportChecks": 86,
+  "uniqueStudies": 15,
+  "incompleteStudiesPreserved": 2,
+  "sourceOriginalsChecked": 70,
+  "sourceDirectoryChecked": "/workspace/scratch/240add2fd2cb/perf-harness-followup",
+  "earlierEvidencePreserved": true,
+  "latestInventoryIncludesAllEarlierFiles": true,
+  "reconstructedPatches": [
+    {
+      "name": "map-directory",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "72d9ad0a421fbc72c4380667d08a3511819c53cb",
+      "tree": "2c662780607fe7b3ff66d04757b960451ced930c",
+      "changedFiles": 6,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "map-directory-inline",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "5a00e4fa391e5eea1d4aeb92d3e5c395b5780335",
+      "tree": "97acaddb30df453b4ba49693f19869095e62e89b",
+      "changedFiles": 10,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "ascii-dataview",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "8144fbd39d486ce04f7d935011be978f81c6848d",
+      "tree": "6b4b05f80a36ecaf54b3a10072191afb3ecb9fcf",
+      "changedFiles": 2,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "arena-lazy-scalar",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "5c155970f9354894c5a613612e69ad00d14404ce",
+      "tree": "ea1dc4343222842b86a19ccff151956aef4aae7e",
+      "changedFiles": 2,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "list-boolean-get",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "333db44292d62b4660c7695d2e445efc5bd85c70",
+      "tree": "846e6b4513f8dc26adb24b691635bebcb2c99fc1",
+      "changedFiles": 2,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "ascii-byte-loads",
+      "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+      "recordedCommit": "639335f59306ff532371cd84ad31c453f0680b56",
+      "tree": "73ade9d4cd58f7d8c733bb019d606ba6233aae2c",
+      "changedFiles": 2,
+      "fullTargetTreeMatched": true
+    },
+    {
+      "name": "ascii-byte-loads-current",
+      "baseline": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+      "recordedCommit": "10bebf25d2a6ad01bb8203a19facc33c75c03190",
+      "tree": "cb2218e177accfeaa6a93b427fbbfa5e2cd3f7eb",
+      "changedFiles": 2,
+      "fullTargetTreeMatched": false
+    }
+  ],
+  "exactCurrentMainTransplant": true,
+  "archiveChangesOnlyAdditions": true,
+  "trackedArchiveAdditions": 0,
+  "statusEntries": 83,
+  "headAndRealIndexUnchanged": true,
+  "scope": "Archive bytes, original hashes, harness coverage and patch trees only. No archived code, tests, builds or benchmarks executed. Disposable indexes may add Git objects; the checkout and real index are unchanged."
+}
