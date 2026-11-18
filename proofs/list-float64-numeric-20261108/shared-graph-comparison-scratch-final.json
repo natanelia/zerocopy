@@ -1,0 +1,134 @@
+{
+  "baseline": "/workspace/scratch/8d514edd7494/zerocopy",
+  "candidate": "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric",
+  "entry": "dist/shared.js",
+  "status": "PASSED",
+  "comparison": "Exact relative paths and complete SHA-256 content of every statically reachable JS module, with dynamic/require calls checked for literal paths",
+  "before": {
+    "files": {
+      "chunk-601qbgtx.js": {
+        "sha256": "3ca5bce9b30b907c4f4cf5c3d96ecb09f6d09f39c51a1133a71a79cb5dce3f50",
+        "bytes": 42976
+      },
+      "chunk-6xsztezz.js": {
+        "sha256": "611f3243d279c344c525a020a9ef0231bf43ebd62b054a60e3e61596d55eb08b",
+        "bytes": 3185
+      },
+      "chunk-aysdem6q.js": {
+        "sha256": "6ce2720c7cd2982d25ea1008f2c3921f657f05e5f8a8b3cfc99756bafa4705fb",
+        "bytes": 12803
+      },
+      "chunk-vmm7z6ce.js": {
+        "sha256": "b2d73181954abc572c34f81fa0f38034566880e77bd9c581937c0201143f7a39",
+        "bytes": 84031
+      },
+      "shared.js": {
+        "sha256": "fe05b36e1a0aa60ac71da9c084f52c910bdd644ba6e62486f47fd2afa0e271e8",
+        "bytes": 2141
+      }
+    },
+    "edges": {
+      "shared.js": [
+        "./chunk-601qbgtx.js",
+        "./chunk-6xsztezz.js",
+        "./chunk-aysdem6q.js",
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-601qbgtx.js": [
+        "./chunk-6xsztezz.js",
+        "./chunk-aysdem6q.js",
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-6xsztezz.js": [
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-vmm7z6ce.js": [],
+      "chunk-aysdem6q.js": [
+        "./chunk-vmm7z6ce.js"
+      ]
+    },
+    "external": [],
+    "unresolved": []
+  },
+  "after": {
+    "files": {
+      "chunk-601qbgtx.js": {
+        "sha256": "3ca5bce9b30b907c4f4cf5c3d96ecb09f6d09f39c51a1133a71a79cb5dce3f50",
+        "bytes": 42976
+      },
+      "chunk-6xsztezz.js": {
+        "sha256": "611f3243d279c344c525a020a9ef0231bf43ebd62b054a60e3e61596d55eb08b",
+        "bytes": 3185
+      },
+      "chunk-aysdem6q.js": {
+        "sha256": "6ce2720c7cd2982d25ea1008f2c3921f657f05e5f8a8b3cfc99756bafa4705fb",
+        "bytes": 12803
+      },
+      "chunk-vmm7z6ce.js": {
+        "sha256": "b2d73181954abc572c34f81fa0f38034566880e77bd9c581937c0201143f7a39",
+        "bytes": 84031
+      },
+      "shared.js": {
+        "sha256": "fe05b36e1a0aa60ac71da9c084f52c910bdd644ba6e62486f47fd2afa0e271e8",
+        "bytes": 2141
+      }
+    },
+    "edges": {
+      "shared.js": [
+        "./chunk-601qbgtx.js",
+        "./chunk-6xsztezz.js",
+        "./chunk-aysdem6q.js",
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-601qbgtx.js": [
+        "./chunk-6xsztezz.js",
+        "./chunk-aysdem6q.js",
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-6xsztezz.js": [
+        "./chunk-vmm7z6ce.js"
+      ],
+      "chunk-vmm7z6ce.js": [],
+      "chunk-aysdem6q.js": [
+        "./chunk-vmm7z6ce.js"
+      ]
+    },
+    "external": [],
+    "unresolved": []
+  },
+  "changes": [],
+  "changedRootSources": [
+    "numeric.ts"
+  ],
+  "wasm": {
+    "identical": true,
+    "before": {
+      "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    },
+    "after": {
+      "doubly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "geometry-kernels.wasm": "01652e1fd8dd0a8b6a1f808dc07ad2dd05d8918c966d99ed429657a51de4a9d0",
+      "linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "numeric-kernels-simd.wasm": "42ed864a9470363d567d6a253c09ff03e283310b97b458b7dda296e618138df7",
+      "numeric-kernels.wasm": "5a5114191016599a916768e6141babe2a3ec265ef00e28389e194177ad821d95",
+      "ordered-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "persistent-core.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "priority-queue.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "shared-map.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "singly-linked-list.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90",
+      "sorted-tree.wasm": "08b1e91c9ee6d3602c0a100f449f51555ee35e5641e1839b7f719d016c209d90"
+    }
+  }
+}

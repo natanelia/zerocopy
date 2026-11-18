@@ -1,0 +1,67 @@
+{
+  "runtime": {
+    "node": "26.3.0",
+    "bun": "1.4.2",
+    "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+    "openssl": "1.1.0",
+    "llhttp": "9.3.0",
+    "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+    "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+    "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+    "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+    "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+    "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+    "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+    "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+    "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+    "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+    "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+    "v8": "14.6.202.34-node.20",
+    "uv": "1.48.0",
+    "napi": "10",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "sqlite": "3.53.2",
+    "modules": "147"
+  },
+  "date": "2026-11-08T16:12:43.809Z",
+  "source": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "bundle": "7d340d274699dfde34472f3c2b5983846725ff38e6ee563aff37f14f9a11cbd6",
+  "driver": "d2d16eb4c50e369770f8b67b99fd1e00551bcf8ae097b71f2bf9e56b9074497f",
+  "checks": [
+    {
+      "scenario": "allocator-mutation",
+      "status": "passed",
+      "calls": 1,
+      "writes": 0,
+      "size": 65,
+      "inputDetached": false,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    },
+    {
+      "scenario": "allocator-detachment",
+      "status": "passed",
+      "calls": 1,
+      "writes": 0,
+      "size": 65,
+      "inputDetached": true,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    },
+    {
+      "scenario": "view-mutation",
+      "status": "passed",
+      "calls": 1,
+      "writes": 130,
+      "size": 65,
+      "inputDetached": false,
+      "rawBitsSha256": "2821a95909d3cd7da58cbc210b994f1b02e03ae03ecdf4cfee1e221ce4746157",
+      "retainedSnapshotUnchanged": true
+    }
+  ],
+  "timingMeasurements": false
+}

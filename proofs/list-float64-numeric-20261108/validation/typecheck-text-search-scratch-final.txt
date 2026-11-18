@@ -1,0 +1,2 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["node", "node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.text-search.json"]

@@ -1,0 +1,24 @@
+{
+  "frozenAt": "2026-11-08T16:22:19.734603+00:00",
+  "checkoutParent": "0ac8a005268335a6116f025e75f670b5cee6843e",
+  "before": "0ac8a005268335a6116f025e75f670b5cee6843e",
+  "runtimeSourceEdits": [
+    "numeric.ts"
+  ],
+  "sha256": {
+    "numeric.ts": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+    "tsconfig.numeric.json": "8f67a1a78069b80ae1eaf79f0e3e3207f6bd46d86b0b0dd58a6a69cd1b600f39",
+    "shared-list.ts": "81d410b0793ad8107aa448405e0c94d1a6273e23b594734b1df39e12fb6087b4",
+    "shared-list-float64.test.ts": "df5d9d11e59b070ef2c6af0b75e97d1142af9391a2fabbcf81a155151d4bfeb8",
+    "shared-list-float64-contract.test.ts": "a11dd7ce24379857c2050f629a852aeecd2c66b3a3d19ab3d6a818235bbf64c4",
+    "type-tests/list-float64.ts": "b89f12c0ded0459cef59c7b492f198b10272b64c1358260b8a7715774760d81d",
+    "proofs/list-float64-numeric-20261108/workloads.mjs": "28864a99be94cc1383789cc5882eae5917db19d6083020cf653cf158309ec8dd",
+    "proofs/list-float64-numeric-20261108/paired-benchmark.mjs": "9928f4d93332f467b2984e34db6732a1b593796a3ba3b12697a5289dd6a31c66",
+    "proofs/list-float64-numeric-20261108/PRE-BENCHMARK.md": "d462d3b40bd635099cc88edac1f4087b88e893d94cb601316814f49af8d69ab3",
+    "proofs/list-float64-numeric-20261108/shared-graph-result.json": "14dd64d061fd2e8912c5ce267becbdb1940a6d0ad4fc8ea9c6e30dce2b3ad316",
+    "proofs/list-float64-numeric-20261108/node-worker-result.json": "9f653a735ae19faae01ed1cf4378355b3510506c31f02aafac653b45aad97475",
+    "proofs/list-float64-numeric-20261108/shared-module-sources.json.gz": "62cd9bb1f159c0b8f5bea2b9592cb0429d52ee9a9e695120c86c1da2c0f04e7f",
+    "proofs/list-float64-numeric-20261108/shared-module-sources-manifest.json": "e0b760a4992cd9097dcadb58476cf9148de324cbb7be54db6bb23f5842abe1e6"
+  },
+  "noTimingCollectedYet": true
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "zerocopy-compressed-proof/v1",
+  "file": "shared-module-sources.json.gz",
+  "moduleCount": 5,
+  "rawBytes": 148980,
+  "compressedBytes": 36347,
+  "rawSha256": "da2a569f9c34f2fe4e93b73ab786d75f6eab20679bc625f06534965a6c4474ea",
+  "compressedSha256": "62cd9bb1f159c0b8f5bea2b9592cb0429d52ee9a9e695120c86c1da2c0f04e7f"
+}

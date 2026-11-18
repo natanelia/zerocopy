@@ -1,0 +1,68 @@
+{
+  "source": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "status": "interrupted after test failure and worker teardown timeout",
+  "results": [
+    {
+      "check": "build-types",
+      "exitCode": 0,
+      "seconds": 1.706
+    },
+    {
+      "check": "typecheck",
+      "exitCode": 0,
+      "seconds": 1.606
+    },
+    {
+      "check": "typecheck-values",
+      "exitCode": 0,
+      "seconds": 2.395
+    },
+    {
+      "check": "typecheck-values-loose-optional",
+      "exitCode": 0,
+      "seconds": 2.216
+    },
+    {
+      "check": "typecheck-numeric",
+      "exitCode": 0,
+      "seconds": 1.935
+    },
+    {
+      "check": "typecheck-numeric-loose-optional",
+      "exitCode": 0,
+      "seconds": 1.965
+    },
+    {
+      "check": "typecheck-redux",
+      "exitCode": 0,
+      "seconds": 0.827
+    },
+    {
+      "check": "typecheck-geometry",
+      "exitCode": 0,
+      "seconds": 0.443
+    },
+    {
+      "check": "typecheck-text-search",
+      "exitCode": 0,
+      "seconds": 0.738
+    },
+    {
+      "check": "typecheck-worker",
+      "exitCode": 0,
+      "seconds": 0.899
+    },
+    {
+      "check": "full-bun",
+      "exitCode": 130,
+      "interrupted": true,
+      "reason": "geometry growth test reported failure after 38133 ms; tanstack worker termination timed out; stopped before queued checks"
+    }
+  ],
+  "notRun": [
+    "focused-node",
+    "check-package",
+    "check-doc-examples",
+    "shared-graph"
+  ]
+}

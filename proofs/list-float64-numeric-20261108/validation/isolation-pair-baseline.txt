@@ -1,0 +1,12 @@
+Command: ["bun", "--bun", "node_modules/vitest/vitest.mjs", "run", "geometry.test.ts", "tanstack-db-collection.test.ts", "--maxWorkers=2"]
+Checkout: /workspace/scratch/8d514edd7494/zerocopy
+Outer subprocess deadline: 60 seconds; existing per-test timeout unchanged
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy
+
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  00:19:07
+   Duration  1.93s (transform 307ms, setup 0ms, import 394ms, tests 1.59s, environment 1ms)
+

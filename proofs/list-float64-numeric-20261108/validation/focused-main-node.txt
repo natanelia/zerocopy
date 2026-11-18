@@ -1,0 +1,10 @@
+Command: ["node", "node_modules/vitest/vitest.mjs", "run", "shared-list-float64.test.ts", "numeric.test.ts", "numeric-spatial.test.ts", "--maxWorkers=2"]
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric
+
+
+ Test Files  3 passed (3)
+      Tests  66 passed (66)
+   Start at  23:55:46
+   Duration  2.73s (transform 302ms, setup 0ms, import 400ms, tests 3.63s, environment 0ms)
+

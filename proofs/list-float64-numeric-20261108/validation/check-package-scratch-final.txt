@@ -1,0 +1,6 @@
+Source numeric.ts SHA-256: b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d
+Command: ["node", "scripts/check-package.mjs"]
+Outer subprocess deadline: 180 seconds; per-test timeouts unchanged
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+Package zerocopy@0.2.1: 145 files, 222895 bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.

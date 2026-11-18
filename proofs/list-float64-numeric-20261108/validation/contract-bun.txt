@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric
+
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  23:54:40
+   Duration  266ms (transform 101ms, setup 0ms, import 128ms, tests 65ms, environment 0ms)
+
