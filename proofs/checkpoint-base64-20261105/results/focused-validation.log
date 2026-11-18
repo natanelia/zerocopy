@@ -1,0 +1,25 @@
+$ tsc --noEmit
+$ bun --bun node_modules/vitest/vitest.mjs run redux-checkpoint.test.ts checkpoint-descriptor-validation.test.ts
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-checkpoint
+
+
+ Test Files  2 passed (2)
+      Tests  146 passed (146)
+   Start at  18:19:34
+   Duration  12.83s (transform 410ms, setup 0ms, import 531ms, tests 14.27s, environment 0ms)
+
+{"runtime":"node","mode":"auto","nativeAvailable":false,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"auto","nativeAvailable":true,"nativeCalls":13,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+{"runtime":"bun","mode":"fallback","nativeAvailable":true,"nativeCalls":0,"boundarySizes":[0,1,2,3,31,32,33,1023,1024,1025,4096],"passed":true}
+✔ Node runtime path (163.992013ms)
+✔ Bun native runtime path (108.11975ms)
+✔ Bun forced portable fallback (138.900079ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 507.849901

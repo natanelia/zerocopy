@@ -33,7 +33,13 @@ function limits(options: ZerocopyCodecOptions): Limits {
   }
   return result;
 }
+// Use the byte-oriented standard API when available; older engines keep the
+// existing portable encoder. Capture the method once, outside checkpoint work.
+const nativeToBase64 = (Uint8Array.prototype as Uint8Array & {
+  toBase64?: () => string;
+}).toBase64;
 function toBase64(bytes: Uint8Array): string {
+  if (typeof nativeToBase64 === 'function') return nativeToBase64.call(bytes);
   // A multiple of three keeps padding out of all intermediate chunks.
   const parts: string[] = [];
   for (let start = 0; start < bytes.length; start += 24576) {
