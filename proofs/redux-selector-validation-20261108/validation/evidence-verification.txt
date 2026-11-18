@@ -1,0 +1,6 @@
+Verified aa-v3.json.gz: 32 processes, 4 recomputed case/runtime estimates
+Verified formal-v3.json.gz: 216 processes, 18 recomputed case/runtime estimates
+Verified pilot-v2.json.gz: 56 processes, 14 recomputed case/runtime estimates
+Verified pilot-v3.json.gz: 56 processes, 14 recomputed case/runtime estimates
+Verified pilot.json.gz: 48 processes, 12 recomputed case/runtime estimates
+Verified 5 studies, 408 processes and 3672 measured batches; no retiming

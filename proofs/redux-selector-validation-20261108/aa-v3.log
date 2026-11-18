@@ -1,0 +1,36 @@
+aa: node same-map-number pair 1/4 before: 0.053 us, verified
+aa: node same-map-number pair 1/4 after: 0.058 us, verified
+aa: node different-map-control pair 1/4 before: 0.100 us, verified
+aa: node different-map-control pair 1/4 after: 0.093 us, verified
+aa: bun same-map-number pair 1/4 before: 0.037 us, verified
+aa: bun same-map-number pair 1/4 after: 0.037 us, verified
+aa: bun different-map-control pair 1/4 before: 0.061 us, verified
+aa: bun different-map-control pair 1/4 after: 0.063 us, verified
+aa: bun different-map-control pair 2/4 after: 0.064 us, verified
+aa: bun different-map-control pair 2/4 before: 0.063 us, verified
+aa: bun same-map-number pair 2/4 after: 0.039 us, verified
+aa: bun same-map-number pair 2/4 before: 0.068 us, verified
+aa: node different-map-control pair 2/4 after: 0.111 us, verified
+aa: node different-map-control pair 2/4 before: 0.095 us, verified
+aa: node same-map-number pair 2/4 after: 0.067 us, verified
+aa: node same-map-number pair 2/4 before: 0.052 us, verified
+aa: node same-map-number pair 3/4 before: 0.086 us, verified
+aa: node same-map-number pair 3/4 after: 0.082 us, verified
+aa: node different-map-control pair 3/4 before: 0.159 us, verified
+aa: node different-map-control pair 3/4 after: 0.106 us, verified
+aa: bun same-map-number pair 3/4 before: 0.040 us, verified
+aa: bun same-map-number pair 3/4 after: 0.036 us, verified
+aa: bun different-map-control pair 3/4 before: 0.064 us, verified
+aa: bun different-map-control pair 3/4 after: 0.064 us, verified
+aa: bun different-map-control pair 4/4 after: 0.060 us, verified
+aa: bun different-map-control pair 4/4 before: 0.062 us, verified
+aa: bun same-map-number pair 4/4 after: 0.035 us, verified
+aa: bun same-map-number pair 4/4 before: 0.039 us, verified
+aa: node different-map-control pair 4/4 after: 0.102 us, verified
+aa: node different-map-control pair 4/4 before: 0.097 us, verified
+aa: node same-map-number pair 4/4 after: 0.058 us, verified
+aa: node same-map-number pair 4/4 before: 0.051 us, verified
+node same-map-number: 0.053 -> 0.063 us, paired ratio 1.111 (0.919-1.343)
+node different-map-control: 0.098 -> 0.104 us, paired ratio 0.934 (0.633-1.377)
+bun same-map-number: 0.040 -> 0.037 us, paired ratio 0.829 (0.554-1.238)
+bun different-map-control: 0.063 -> 0.063 us, paired ratio 1.002 (0.961-1.045)
