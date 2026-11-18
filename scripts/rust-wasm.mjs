@@ -81,7 +81,7 @@ export const readerExports = [
   'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix',
   'textContains16', 'textContainsBlock16', 'vecLeaf', 'vecGet', 'blockGet',
   'mapNumber', 'radixSize', 'radixFind', 'journalFind', 'compareLeaves',
-  'jsonValueEnd', 'jsonStringEnd', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonArrayAt', 'jsonInteger',
+  'jsonValueEnd', 'jsonStringEnd', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonArrayAt', 'jsonArrayAtFrom', 'jsonInteger',
   'countInRange', 'countPointsInBox', 'bboxMinX', 'bboxMinY', 'bboxMaxX', 'bboxMaxY', 'xyLeaf', 'bboxXY',
 ];
 

@@ -1,0 +1,37 @@
+{
+  "format": "gzip; exact original JSON bytes; mtime=0",
+  "files": [
+    {
+      "sourceName": "json-formal.json",
+      "archiveName": "json-formal.json.gz",
+      "sourceBytes": 181238,
+      "archiveBytes": 15372,
+      "sourceSha256": "b35f94cee51f50b2474f769236cc84e98f1b58e9b7071ad59b1c8358a15e43b3",
+      "archiveSha256": "89c6f91f4e72fcb69a659199c3e9bc5816f53af6e5c47aa7e1a6966ade33d7ef"
+    },
+    {
+      "sourceName": "json-identical-control.json",
+      "archiveName": "json-identical-control.json.gz",
+      "sourceBytes": 94961,
+      "archiveBytes": 9323,
+      "sourceSha256": "fc846d876904275e9276f33dd6326f0dbf339b00aed42426d026779fe6805753",
+      "archiveSha256": "9dc7cb7ab8804ad627ada7005d72d462d0e2915aa056bcdf1c4c0f930f3f989c"
+    },
+    {
+      "sourceName": "json-screen.json",
+      "archiveName": "exploratory-initial.json.gz",
+      "sourceBytes": 96448,
+      "archiveBytes": 11534,
+      "sourceSha256": "14b49df3b2df03b33da550789e4541e442063e97c42d19dff24b63d695158e75",
+      "archiveSha256": "603504a7b192b003c05fa2851138934db738e71119f12199a71bbb1b33d01476"
+    },
+    {
+      "sourceName": "json-scanner-control.json",
+      "archiveName": "exploratory-restored-scanner.json.gz",
+      "sourceBytes": 57459,
+      "archiveBytes": 8970,
+      "sourceSha256": "15db1cd6f5a27c1ff7fd5e7fc3fa7ae777025049720344a0363e4c9bb78336d3",
+      "archiveSha256": "2f083b6da962651946c1799ab49012252800b717a22106f4de4437198ebda00f"
+    }
+  ]
+}

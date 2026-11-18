@@ -1,0 +1,661 @@
+{
+  "schema": "zerocopy-json-array-confirmation-audit/v2",
+  "recordedAt": "2026-11-18T11:56:00.908Z",
+  "verifierSha256": "0997b857aa034bbcf55125193e9348d3526caddc4b583e85547a2c4aef9112e5",
+  "reports": [
+    {
+      "report": "smoke.json.gz",
+      "archiveSha256": "89b050356e03c860c38791b82927e17cabfd9225294811b0aacc0d909906a4e9",
+      "decodedJsonSha256": "080d2e25a6bd7d8a8a2636aeac749cdbfaacc0a71c5d87923466093904a83c83",
+      "exactArchiveRoundTrip": true,
+      "runtimeIdentityMatchesOriginal": true,
+      "verified": true,
+      "issues": [],
+      "schema": "zerocopy-json-array-confirmation/v2",
+      "pairs": 1,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 4,
+      "caseCount": 7,
+      "config": {
+        "count": 10000,
+        "warmups": 0,
+        "batchScale": 0.01,
+        "group": "json-array",
+        "only": [],
+        "caseNames": [
+          "json-array.sequential.1024",
+          "json-array.sequential.4096",
+          "json-array.stride.4096",
+          "json-array.reverse.4096",
+          "json-array.random.4096",
+          "json-array.repeated.4096",
+          "json-array.fields.control"
+        ]
+      },
+      "sourceCommits": {
+        "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidate": "0b7c0960adcad3ec61b4a2557490be45df6dcdf7"
+      },
+      "bundleManifestSha256": {
+        "baseline": "4f36bad25773ea0d159439f77037b933d9c8fccc2f658230ccfa20a0897c46b1",
+        "candidate": "f21451691687a1f34251b7de6a950e0b78c2217b721f34b6aa08c309b5a2ab9e"
+      },
+      "identicalBuilds": false,
+      "recomputedSummary": [
+        {
+          "runtime": "node",
+          "name": "json-array.sequential.1024",
+          "baselineMedianMsPer10000": 40.253723958333374,
+          "candidateMedianMsPer10000": 15.809537760416669,
+          "pairedRatios": [
+            0.39274720959435006
+          ],
+          "medianPairedRatio": 0.39274720959435006,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 4.85669,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.sequential.4096",
+          "baselineMedianMsPer10000": 134.92698242187504,
+          "candidateMedianMsPer10000": 6.925314941406205,
+          "pairedRatios": [
+            0.05132639014895392
+          ],
+          "medianPairedRatio": 0.05132639014895392,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 2.8366089999999815,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.stride.4096",
+          "baselineMedianMsPer10000": 112.0230501302083,
+          "candidateMedianMsPer10000": 5.416178385416748,
+          "pairedRatios": [
+            0.04834878517520577
+          ],
+          "medianPairedRatio": 0.04834878517520577,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 1.663850000000025,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 111.65406738281258,
+          "candidateMedianMsPer10000": 127.39113769531248,
+          "pairedRatios": [
+            1.140944890601651
+          ],
+          "medianPairedRatio": 1.140944890601651,
+          "candidateFasterPairs": 0,
+          "minimumBatchMs": 45.733506000000034,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.random.4096",
+          "baselineMedianMsPer10000": 111.10285400390622,
+          "candidateMedianMsPer10000": 104.01783935546867,
+          "pairedRatios": [
+            0.9362301291721233
+          ],
+          "medianPairedRatio": 0.9362301291721233,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 42.60570699999997,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.repeated.4096",
+          "baselineMedianMsPer10000": 55.90345214843737,
+          "candidateMedianMsPer10000": 5.947219238281177,
+          "pairedRatios": [
+            0.1063837564537133
+          ],
+          "medianPairedRatio": 0.1063837564537133,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 2.4359809999999698,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 4.419794921875081,
+          "candidateMedianMsPer10000": 4.993234863281265,
+          "pairedRatios": [
+            1.1297435631160244
+          ],
+          "medianPairedRatio": 1.1297435631160244,
+          "candidateFasterPairs": 0,
+          "minimumBatchMs": 1.8103480000000332,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.sequential.1024",
+          "baselineMedianMsPer10000": 47.21325195312501,
+          "candidateMedianMsPer10000": 8.247024739583322,
+          "pairedRatios": [
+            0.17467605806461414
+          ],
+          "medianPairedRatio": 0.17467605806461414,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 2.5334859999999964,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.sequential.4096",
+          "baselineMedianMsPer10000": 160.8494995117188,
+          "candidateMedianMsPer10000": 2.9212011718749915,
+          "pairedRatios": [
+            0.018161083377584063
+          ],
+          "medianPairedRatio": 0.018161083377584063,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 1.1965239999999966,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.stride.4096",
+          "baselineMedianMsPer10000": 164.8807845052083,
+          "candidateMedianMsPer10000": 1.2725683593750128,
+          "pairedRatios": [
+            0.0077181119873602645
+          ],
+          "medianPairedRatio": 0.0077181119873602645,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 0.39093300000000397,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 154.60481201171876,
+          "candidateMedianMsPer10000": 185.05775390624999,
+          "pairedRatios": [
+            1.196972794690394
+          ],
+          "medianPairedRatio": 1.196972794690394,
+          "candidateFasterPairs": 0,
+          "minimumBatchMs": 63.326131000000004,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.random.4096",
+          "baselineMedianMsPer10000": 163.10197753906255,
+          "candidateMedianMsPer10000": 132.38656250000003,
+          "pairedRatios": [
+            0.8116796895874161
+          ],
+          "medianPairedRatio": 0.8116796895874161,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 54.225536000000005,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.repeated.4096",
+          "baselineMedianMsPer10000": 97.34683837890626,
+          "candidateMedianMsPer10000": 2.570361328125062,
+          "pairedRatios": [
+            0.026404158274975106
+          ],
+          "medianPairedRatio": 0.026404158274975106,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 1.0528200000000254,
+          "shortBatchWarning": true
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 1.5096948242188102,
+          "candidateMedianMsPer10000": 1.4645361328124995,
+          "pairedRatios": [
+            0.9700875364465279
+          ],
+          "medianPairedRatio": 0.9700875364465279,
+          "candidateFasterPairs": 1,
+          "minimumBatchMs": 0.5998739999999998,
+          "shortBatchWarning": true
+        }
+      ]
+    },
+    {
+      "report": "formal.json.gz",
+      "archiveSha256": "637139a4699e7e1ae9b69e30c640660bf5f83aef9b1f97eec18418a84e01ffac",
+      "decodedJsonSha256": "132f8567fc06682316632ca394d9d9c5e3918bdde6a1c8fecb29bb6be8d3e429",
+      "exactArchiveRoundTrip": true,
+      "runtimeIdentityMatchesOriginal": true,
+      "verified": true,
+      "issues": [],
+      "schema": "zerocopy-json-array-confirmation/v2",
+      "pairs": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 28,
+      "caseCount": 7,
+      "config": {
+        "count": 10000,
+        "warmups": 8,
+        "batchScale": 2,
+        "group": "json-array",
+        "only": [],
+        "caseNames": [
+          "json-array.sequential.1024",
+          "json-array.sequential.4096",
+          "json-array.stride.4096",
+          "json-array.reverse.4096",
+          "json-array.random.4096",
+          "json-array.repeated.4096",
+          "json-array.fields.control"
+        ]
+      },
+      "sourceCommits": {
+        "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidate": "0b7c0960adcad3ec61b4a2557490be45df6dcdf7"
+      },
+      "bundleManifestSha256": {
+        "baseline": "4f36bad25773ea0d159439f77037b933d9c8fccc2f658230ccfa20a0897c46b1",
+        "candidate": "f21451691687a1f34251b7de6a950e0b78c2217b721f34b6aa08c309b5a2ab9e"
+      },
+      "identicalBuilds": false,
+      "recomputedSummary": [
+        {
+          "runtime": "node",
+          "name": "json-array.sequential.1024",
+          "baselineMedianMsPer10000": 28.741811408996565,
+          "candidateMedianMsPer10000": 2.12933965682983,
+          "pairedRatios": [
+            0.07025960991926175,
+            0.10046990728838616,
+            0.07408508901993974,
+            0.08357672057264885,
+            0.07314421689796088,
+            0.08996135658089238,
+            0.051031680724068024
+          ],
+          "medianPairedRatio": 0.07408508901993974,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 103.65162799999996,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.sequential.4096",
+          "baselineMedianMsPer10000": 117.09661901474003,
+          "candidateMedianMsPer10000": 2.328394279479981,
+          "pairedRatios": [
+            0.01690819990028938,
+            0.022761202318084626,
+            0.018707540744579507,
+            0.023641678160027112,
+            0.019580428289405923,
+            0.020359140566060276,
+            0.01570781671019772
+          ],
+          "medianPairedRatio": 0.019580428289405923,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 100.25339399999996,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.stride.4096",
+          "baselineMedianMsPer10000": 115.03063631057738,
+          "candidateMedianMsPer10000": 0.7924057769775373,
+          "pairedRatios": [
+            0.006325237646544282,
+            0.00666187527420034,
+            0.006340525560791012,
+            0.009199124298300014,
+            0.007370843752942471,
+            0.009310434000566813,
+            0.007798138132175478
+          ],
+          "medianPairedRatio": 0.007370843752942471,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 38.146991000000014,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 120.66824340820293,
+          "candidateMedianMsPer10000": 118.94790039062492,
+          "pairedRatios": [
+            0.9404594875592349,
+            0.9723991369940816,
+            0.8947256937192146,
+            1.1622086711541466,
+            1.1633179008283459,
+            0.8935694277219416,
+            1.028079951692256
+          ],
+          "medianPairedRatio": 0.9723991369940816,
+          "candidateFasterPairs": 4,
+          "minimumBatchMs": 175.66212799999994,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.random.4096",
+          "baselineMedianMsPer10000": 118.94119079589815,
+          "candidateMedianMsPer10000": 75.70814819335928,
+          "pairedRatios": [
+            0.6235186642247723,
+            0.6767428522397441,
+            0.6419255540794656,
+            0.5488404422872328,
+            0.6119884488678249,
+            0.6607592482550461,
+            0.6965013016337316
+          ],
+          "medianPairedRatio": 0.6419255540794656,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 115.99684200000002,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.repeated.4096",
+          "baselineMedianMsPer10000": 60.04212379455563,
+          "candidateMedianMsPer10000": 2.830397262573239,
+          "pairedRatios": [
+            0.04806340866030882,
+            0.040731065890306326,
+            0.04091219749114855,
+            0.04059978621810014,
+            0.057089941436255336,
+            0.048424962979443854,
+            0.041805963531369096
+          ],
+          "medianPairedRatio": 0.041805963531369096,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 118.84696499999995,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 0.6017306137084955,
+          "candidateMedianMsPer10000": 0.6229474258422855,
+          "pairedRatios": [
+            0.9428741804554143,
+            1.0056312957829037,
+            1.0518394279906227,
+            1.0047304216470996,
+            0.9431921039747944,
+            1.6814269759610527,
+            0.8993781053685008
+          ],
+          "medianPairedRatio": 1.0047304216470996,
+          "candidateFasterPairs": 3,
+          "minimumBatchMs": 28.10819599999968,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.sequential.1024",
+          "baselineMedianMsPer10000": 39.59094642639159,
+          "candidateMedianMsPer10000": 1.7813881301879855,
+          "pairedRatios": [
+            0.05811340438607014,
+            0.04180301749187389,
+            0.050265511954098445,
+            0.04671645976584558,
+            0.04157905882565854,
+            0.04440359778691029,
+            0.0284149845677019
+          ],
+          "medianPairedRatio": 0.04440359778691029,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 62.212304,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.sequential.4096",
+          "baselineMedianMsPer10000": 176.18522781372073,
+          "candidateMedianMsPer10000": 1.8527990341186529,
+          "pairedRatios": [
+            0.010277042862969321,
+            0.011254305880116004,
+            0.011032058287452432,
+            0.010919629451216207,
+            0.009172126825893242,
+            0.010596573247926925,
+            0.0066145141376430395
+          ],
+          "medianPairedRatio": 0.010596573247926925,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 57.601596,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.stride.4096",
+          "baselineMedianMsPer10000": 167.29362239837647,
+          "candidateMedianMsPer10000": 1.098131141662596,
+          "pairedRatios": [
+            0.007090437189474169,
+            0.011352292929503956,
+            0.005907232702448838,
+            0.007167583419450067,
+            0.0065498634977359995,
+            0.007173841892285013,
+            0.0037435529556949505
+          ],
+          "medianPairedRatio": 0.007090437189474169,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 33.70907999999997,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 164.9542932128889,
+          "candidateMedianMsPer10000": 162.2922021484374,
+          "pairedRatios": [
+            0.9163136579321669,
+            1.1894264954704161,
+            0.8755092444274054,
+            1.0323199572196826,
+            1.016207210596214,
+            0.9132074633184212,
+            1.00535893965124
+          ],
+          "medianPairedRatio": 1.00535893965124,
+          "candidateFasterPairs": 3,
+          "minimumBatchMs": 235.8098419999999,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.random.4096",
+          "baselineMedianMsPer10000": 165.22413269042974,
+          "candidateMedianMsPer10000": 110.0792626953126,
+          "pairedRatios": [
+            0.735842822706513,
+            0.690829357767094,
+            0.7064865340955571,
+            0.7364787663670203,
+            0.627510291999889,
+            0.6449363621735698,
+            0.6813686795979397
+          ],
+          "medianPairedRatio": 0.690829357767094,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 169.84503900000004,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.repeated.4096",
+          "baselineMedianMsPer10000": 80.36698204040528,
+          "candidateMedianMsPer10000": 1.3686114883422864,
+          "pairedRatios": [
+            0.021297376998216478,
+            0.019091837547155568,
+            0.015410454926097562,
+            0.03322922690101017,
+            0.01632184454206481,
+            0.018417726768063407,
+            0.01536500775336575
+          ],
+          "medianPairedRatio": 0.018417726768063407,
+          "candidateFasterPairs": 7,
+          "minimumBatchMs": 59.873830999999996,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 0.3896320724487354,
+          "candidateMedianMsPer10000": 0.41461675643920926,
+          "pairedRatios": [
+            1.3514692609235024,
+            1.1373313695030218,
+            1.1346466396213575,
+            1.0468055750059253,
+            0.9547291645922901,
+            0.9890599828867799,
+            0.9807262094690954
+          ],
+          "medianPairedRatio": 1.0468055750059253,
+          "candidateFasterPairs": 3,
+          "minimumBatchMs": 17.942436999999998,
+          "shortBatchWarning": true
+        }
+      ]
+    },
+    {
+      "report": "identical-control.json.gz",
+      "archiveSha256": "302d448116ac97bad029f989b63ef8c48d550b2999c99e744e92ea3e4e5239e8",
+      "decodedJsonSha256": "ff081387b9fee805eeff2c8a15029451c3f7d302b26cdcaeeca67e4d4fc69ee0",
+      "exactArchiveRoundTrip": true,
+      "runtimeIdentityMatchesOriginal": true,
+      "verified": true,
+      "issues": [],
+      "schema": "zerocopy-json-array-confirmation/v2",
+      "pairs": 7,
+      "runtimes": [
+        "node",
+        "bun"
+      ],
+      "sampleCount": 28,
+      "caseCount": 2,
+      "config": {
+        "count": 10000,
+        "warmups": 8,
+        "batchScale": 4,
+        "group": "json-array",
+        "only": [
+          "json-array.reverse.4096",
+          "json-array.fields.control"
+        ],
+        "caseNames": [
+          "json-array.reverse.4096",
+          "json-array.fields.control"
+        ]
+      },
+      "sourceCommits": {
+        "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+        "candidate": "1242908762b554e3574365c486d5a6c52d5e568f"
+      },
+      "bundleManifestSha256": {
+        "baseline": "4f36bad25773ea0d159439f77037b933d9c8fccc2f658230ccfa20a0897c46b1",
+        "candidate": "4f36bad25773ea0d159439f77037b933d9c8fccc2f658230ccfa20a0897c46b1"
+      },
+      "identicalBuilds": true,
+      "recomputedSummary": [
+        {
+          "runtime": "node",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 116.76501007080078,
+          "candidateMedianMsPer10000": 113.30633514404296,
+          "pairedRatios": [
+            1.1413896883179226,
+            0.9900917123855739,
+            0.9169380357121122,
+            0.9341650689295639,
+            0.9963592078685088,
+            0.9703791835870982,
+            0.9536830783581827
+          ],
+          "medianPairedRatio": 0.9703791835870982,
+          "candidateFasterPairs": 6,
+          "minimumBatchMs": 339.035375,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "node",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 0.6208389759063722,
+          "candidateMedianMsPer10000": 0.5784012031555176,
+          "pairedRatios": [
+            1.0301829618129383,
+            0.9828250134257255,
+            1.154122893760031,
+            0.8328142140779944,
+            0.8486793940386514,
+            0.8464586980894955,
+            1.1620018761759343
+          ],
+          "medianPairedRatio": 0.9828250134257255,
+          "candidateFasterPairs": 4,
+          "minimumBatchMs": 53.08249199999999,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.reverse.4096",
+          "baselineMedianMsPer10000": 178.47517791748047,
+          "candidateMedianMsPer10000": 178.36992004394529,
+          "pairedRatios": [
+            1.0170291250498271,
+            1.050925150700642,
+            1.0112078582969573,
+            0.9228434905615968,
+            1.113937122122477,
+            1.1474613185061335,
+            0.9199529541439384
+          ],
+          "medianPairedRatio": 1.0170291250498271,
+          "candidateFasterPairs": 2,
+          "minimumBatchMs": 514.924658,
+          "shortBatchWarning": false
+        },
+        {
+          "runtime": "bun",
+          "name": "json-array.fields.control",
+          "baselineMedianMsPer10000": 0.4216979122161871,
+          "candidateMedianMsPer10000": 0.4193715953826902,
+          "pairedRatios": [
+            1.1551174899740997,
+            0.9725451597931558,
+            0.8409681494475961,
+            0.7625701979687679,
+            0.9944834518594811,
+            1.0390757425309882,
+            1.2112963360782827
+          ],
+          "medianPairedRatio": 0.9944834518594811,
+          "candidateFasterPairs": 4,
+          "minimumBatchMs": 34.69278800000001,
+          "shortBatchWarning": false
+        }
+      ]
+    }
+  ]
+}

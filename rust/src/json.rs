@@ -242,6 +242,24 @@ pub unsafe extern "C" fn jsonArrayAt(start: u32, end: u32, mut index: u32) -> u3
     0
 }
 
+/// Continue from a known element in the same immutable array. `index` is
+/// relative to that element. Stop at its array's closing bracket even when
+/// `end` is the enclosing record bound and includes following siblings.
+#[no_mangle]
+pub unsafe extern "C" fn jsonArrayAtFrom(start: u32, end: u32, mut index: u32) -> u32 {
+    let mut p = start;
+    while p < end && load_u8(p) != 93 {
+        if index == 0 { return p; }
+        index -= 1;
+        p = jsonValueEnd(p, end);
+        if p == 0 { return 0; }
+        p = space(p, end);
+        if p >= end || load_u8(p) != 44 { return 0; }
+        p = space(p + 1, end);
+    }
+    0
+}
+
 /// Safe integers need no selected-token string. NaN requests the exact native
 /// Number fallback for decimal/exponent/large-integer spellings; valid JSON
 /// cannot itself contain a NaN value. Preserve the sign of integer zero.

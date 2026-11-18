@@ -1,0 +1,255 @@
+{
+  "status": "passed",
+  "purpose": "Local correctness validation of both accepted changes together; no performance workloads",
+  "testedLocalParents": {
+    "cursor": "0b7c0960adcad3ec61b4a2557490be45df6dcdf7",
+    "string": "3f832b150d8304250ab5f79a53f38e3fd8fe2b6d"
+  },
+  "publishedEquivalentParents": {
+    "cursor": "0b7c0960adcad3ec61b4a2557490be45df6dcdf7",
+    "string": "74e5f05e135cc252d0b611519806b3e7bdb886da"
+  },
+  "publishedStringTreeEqualsTestedLocalStringTree": true,
+  "publishedStringTree": "adce0dc3dce5d0efb0be42787d35cf7f4e4dba73",
+  "testedCombinedTree": "340a0d5a8ad0184c90ba90c60b48fc720158448e",
+  "merge": "Automatic clean merge; both dedicated worker CI registrations retained",
+  "trackedFilesUnchanged": true,
+  "trackedManifestSha256": "4e274e37066218a4cf84aa085c3d577f69fd460df4772a9f8b3d104b125745b0",
+  "trackedFileCount": 1225,
+  "versions": {
+    "node": "v24.22.3",
+    "bun": "1.4.2",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "startedAt": "2026-11-18T11:56:08.218433+00:00",
+  "completedAt": "2026-11-18T11:56:57.028302+00:00",
+  "steps": [
+    {
+      "name": "source-whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        ".",
+        ":(exclude)**/*.patch"
+      ],
+      "log": "01-source-whitespace.log",
+      "startedAt": "2026-11-18T11:56:08.818737+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.008,
+      "completedAt": "2026-11-18T11:56:08.827984+00:00",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "name": "build-wasm",
+      "command": [
+        "node",
+        "scripts/build-wasm.mjs"
+      ],
+      "log": "02-build-wasm.log",
+      "startedAt": "2026-11-18T11:56:08.828893+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 4.06,
+      "completedAt": "2026-11-18T11:56:12.889686+00:00",
+      "logSha256": "5e26a203d94a94a23fec1018830a8f37673925b9a659acfca9fa79552bbaee35",
+      "passed": true
+    },
+    {
+      "name": "build-browser",
+      "command": [
+        "bun",
+        "scripts/build-browser.ts"
+      ],
+      "log": "03-build-browser.log",
+      "startedAt": "2026-11-18T11:56:12.892535+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.067,
+      "completedAt": "2026-11-18T11:56:12.961514+00:00",
+      "logSha256": "971018cae62e8b6d834bc30fe936f717f705ea895fa49b108238d067568933b3",
+      "passed": true
+    },
+    {
+      "name": "wasm-audits",
+      "command": [
+        "node",
+        "--test",
+        "scripts/rust-wasm.node.mjs"
+      ],
+      "log": "04-wasm-audits.log",
+      "startedAt": "2026-11-18T11:56:12.962413+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 1.274,
+      "completedAt": "2026-11-18T11:56:14.237412+00:00",
+      "logSha256": "91444382c6a2c42515a2ddfbc45f79e039841c54642ab71caab801dc652fc6ba",
+      "passed": true
+    },
+    {
+      "name": "build-types",
+      "command": [
+        "bun",
+        "run",
+        "build:types"
+      ],
+      "log": "05-build-types.log",
+      "startedAt": "2026-11-18T11:56:14.238290+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 2.427,
+      "completedAt": "2026-11-18T11:56:16.666123+00:00",
+      "logSha256": "e8fdec539d26b5219273605f384f6cb2cb2faa7e9dc675e00f24f642ba768c65",
+      "passed": true
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "log": "06-typecheck.log",
+      "startedAt": "2026-11-18T11:56:16.667294+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 1.527,
+      "completedAt": "2026-11-18T11:56:18.195355+00:00",
+      "logSha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "passed": true
+    },
+    {
+      "name": "typecheck-redux",
+      "command": [
+        "bun",
+        "run",
+        "typecheck:redux"
+      ],
+      "log": "07-typecheck-redux.log",
+      "startedAt": "2026-11-18T11:56:18.198135+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.768,
+      "completedAt": "2026-11-18T11:56:18.967118+00:00",
+      "logSha256": "374cbb55fe3257bdddc5c84dfbc7e930d11e11f9f5efa89d07055a9f1d915863",
+      "passed": true
+    },
+    {
+      "name": "typecheck-values",
+      "command": [
+        "bun",
+        "run",
+        "typecheck:values"
+      ],
+      "log": "08-typecheck-values.log",
+      "startedAt": "2026-11-18T11:56:18.968410+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 4.083,
+      "completedAt": "2026-11-18T11:56:23.053080+00:00",
+      "logSha256": "9ad899b37dc8a5653c21f027dd43c744d1fb9d34488c878300d40372e89ffffd",
+      "passed": true
+    },
+    {
+      "name": "typecheck-geometry",
+      "command": [
+        "bun",
+        "run",
+        "typecheck:geometry"
+      ],
+      "log": "09-typecheck-geometry.log",
+      "startedAt": "2026-11-18T11:56:23.054710+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.416,
+      "completedAt": "2026-11-18T11:56:23.472017+00:00",
+      "logSha256": "9e313aafed0cfca93856bde26a2451f752a170dbeecc53f57ad04a20a873eb4c",
+      "passed": true
+    },
+    {
+      "name": "full-bun-suite",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--maxWorkers=4"
+      ],
+      "log": "10-full-bun-suite.log",
+      "startedAt": "2026-11-18T11:56:23.473182+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 33.168,
+      "completedAt": "2026-11-18T11:56:56.642583+00:00",
+      "logSha256": "162056cb94f57c7dbdcb9e91d0c0cad02be4272f9441c4d7476b17440fe1c0b9",
+      "passed": true
+    },
+    {
+      "name": "array-cursor-workers",
+      "command": [
+        "node",
+        "proofs/json-array-cursor-20261118/workers.mjs"
+      ],
+      "log": "11-array-cursor-workers.log",
+      "startedAt": "2026-11-18T11:56:56.644959+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.166,
+      "completedAt": "2026-11-18T11:56:56.811189+00:00",
+      "logSha256": "d0f4be56e95dd7c3e043fd718abbede864062112fc0a4e44078260a1ba5368ac",
+      "passed": true
+    },
+    {
+      "name": "string-scan-workers",
+      "command": [
+        "node",
+        "proofs/json-string-scan-20261118/workers.mjs"
+      ],
+      "log": "12-string-scan-workers.log",
+      "startedAt": "2026-11-18T11:56:56.812236+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.167,
+      "completedAt": "2026-11-18T11:56:56.979584+00:00",
+      "logSha256": "532fe090b7cc0f6f93a6dbd6160ca3ad22794c83572a86704c2bb42723771c82",
+      "passed": true
+    }
+  ],
+  "fullSuite": {
+    "filesPassed": 68,
+    "testsPassed": 1274,
+    "durationSecondsReportedByVitest": 32.62,
+    "processElapsedSeconds": 33.168
+  },
+  "wasmAudit": {
+    "testsPassed": 7,
+    "persistentCoreBytes": 55289,
+    "persistentCoreReaderFunctions": 26
+  },
+  "arrayCursorWorkers": {
+    "ok": true,
+    "node": "v24.22.3",
+    "readers": 2,
+    "retainedArrayLength": 4096,
+    "initialCapacity": 131072,
+    "finalCapacity": 327680,
+    "sharedBytesUnchanged": true,
+    "cursorsSurviveGrowth": true
+  },
+  "stringScanWorkers": {
+    "ok": true,
+    "node": "v24.22.3",
+    "readers": 2,
+    "modes": [
+      "shared",
+      "copied"
+    ],
+    "initialCapacity": 131072,
+    "finalCapacity": 327680,
+    "retainedSelectedStrings": [
+      "ascii",
+      "unicode",
+      "escaped"
+    ],
+    "sharedBytesUnchanged": true
+  },
+  "whitespaceCheckScope": "All staged content except exact historical .patch artifacts; their context-line spaces are required by patch format",
+  "localWorktree": "/workspace/scratch/240add2fd2cb/zerocopy-json-combined",
+  "fullIdentityReport": {
+    "file": "results.json",
+    "sha256": "e05d8f5499d9b0216b6a53a012f3ad7721ad3163ecb932eb71fd8dee8849c33b"
+  }
+}
