@@ -30,6 +30,7 @@ if (phase !== 'browser') {
     'proofs/text-batch.mjs', 'proofs/long-text-search-worker.node.mjs',
   ]);
   node('Portable JSON reads and shared/copied workers', ['proofs/json-read-correctness.mjs']);
+  node('Selected JSON strings in retained shared/copied workers', ['proofs/json-string-scan-20261118/workers.mjs']);
   for (const [name, file, ...args] of [
     ['Numeric workers after memory growth', 'proofs/numeric-worker.mjs'],
     ['Spatial workers after memory growth', 'proofs/spatial-worker.mjs'],

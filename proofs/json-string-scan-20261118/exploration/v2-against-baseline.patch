@@ -1,0 +1,85 @@
+--- a/rust/src/json.rs
++++ b/rust/src/json.rs
+@@ -3,7 +3,7 @@
+ //! No allocator, stack scratch, writes, host callbacks, or temporary strings.
+ //! Values remain in the caller's immutable arena. These are bounded selectors,
+ //! not a complete validator for arbitrary JSON or malformed UTF-8.
+-use crate::memory::load_u8;
++use crate::memory::{load_u8, load_u64};
+ 
+ #[inline(always)]
+ unsafe fn space(mut p: u32, end: u32) -> u32 {
+@@ -16,7 +16,30 @@
+ }
+ 
+ #[inline(always)]
+-unsafe fn string_end(start: u32, end: u32) -> u32 {
++unsafe fn string_marker(mut p: u32, end: u32) -> u32 {
++    const ONES: u64 = 0x0101010101010101;
++    const HIGH: u64 = 0x8080808080808080;
++    while end - p >= 8 {
++        let word = load_u64(p);
++        let quote = word ^ 0x2222222222222222;
++        let slash = word ^ 0x5c5c5c5c5c5c5c5c;
++        let markers = ((quote.wrapping_sub(ONES) & !quote)
++            | (slash.wrapping_sub(ONES) & !slash)) & HIGH;
++        // A borrow may also mark a later byte; the first marked byte is exact.
++        // WASM words are little-endian, including unaligned loads.
++        if markers != 0 { return p + (markers.trailing_zeros() >> 3); }
++        p += 8;
++    }
++    while p < end {
++        let c = load_u8(p);
++        if c == 34 || c == 92 { break; }
++        p += 1;
++    }
++    p
++}
++
++#[inline(always)]
++unsafe fn escaped_string_end(start: u32, end: u32) -> u32 {
+     let mut p = start + 1;
+     while p < end {
+         let c = load_u8(p);
+@@ -30,25 +53,28 @@
+     0
+ }
+ 
++#[inline(always)]
++unsafe fn string_end(start: u32, end: u32) -> u32 {
++    let p = string_marker(start + 1, end);
++    if p == end { return 0; }
++    if load_u8(p) == 34 { return p + 1; }
++    if p + 1 == end { return 0; }
++    // Once escapes occur, preserve the scalar loop. Dense escaped text makes
++    // too little progress per word to benefit from another word comparison.
++    escaped_string_end(p + 1, end)
++}
++
+ /// Selected strings without escapes can decode their inner UTF-8 directly.
+ /// A negative end marks escapes; zero is invalid. Arena offsets stay below
+ /// 2 GiB, so both the boundary and this flag fit one scalar i32 result.
+ #[no_mangle]
+ pub unsafe extern "C" fn jsonStringEnd(start: u32, end: u32) -> i32 {
+     if start >= end || load_u8(start) != 34 { return 0; }
+-    let mut p = start + 1;
+-    let mut escaped = false;
+-    while p < end {
+-        let c = load_u8(p);
+-        p += 1;
+-        if c == 34 { return if escaped { -(p as i32) } else { p as i32 }; }
+-        if c == 92 {
+-            if p == end { return 0; }
+-            escaped = true;
+-            p += 1;
+-        }
+-    }
+-    0
++    let p = string_marker(start + 1, end);
++    if p == end { return 0; }
++    if load_u8(p) == 34 { return (p + 1) as i32; }
++    if p + 1 == end { return 0; }
++    -(escaped_string_end(p + 1, end) as i32)
+ }
+ 
+ /// End of one selected value, excluding trailing whitespace. Zero is invalid.

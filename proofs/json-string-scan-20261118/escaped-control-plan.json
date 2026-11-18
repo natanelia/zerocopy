@@ -1,0 +1,18 @@
+{
+  "createdAt": "2026-11-18T11:43:32.644Z",
+  "reason": "Formal Bun after-escaped-4096 control ratio 1.1414789226774003, slower in 5/7 pairs; investigate a concrete adverse row without replacing or pooling the original results.",
+  "cases": [
+    "json-string.string.escaped.4096",
+    "json-string.after.escaped.4096"
+  ],
+  "runtimes": [
+    "bun"
+  ],
+  "pairs": 7,
+  "warmups": 8,
+  "batchScale": 2,
+  "candidate": "4082a1fd6055f085dc081fd82f96ebdd92399f05",
+  "baseline": "1242908762b554e3574365c486d5a6c52d5e568f",
+  "followup": "Run candidate/baseline, followed by identical baseline/baseline; preserve every sample and direct ratio; no normalization.",
+  "decision": "A repeated >=1.10 time ratio and at least 6/7 slower pairs blocks readiness. A favorable follow-up does not erase the original adverse mixed-matrix result."
+}
