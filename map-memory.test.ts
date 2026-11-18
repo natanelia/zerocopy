@@ -74,7 +74,9 @@ describe('small root-specific read indexes', () => {
       }
       return keys;
     };
-    const keys = matching('present'), absent = matching('absent');
+    // These long keys exercise the generic prefix index; short ASCII keys
+    // use the scalar-argument reader instead.
+    const keys = matching('present/long-prefix'), absent = matching('absent/long-prefix');
     expect(prefix(keys[0])).not.toBe(prefix(absent[0]));
     const source = ownerMap().setMany(keys.slice(0, 3).map((key, i) => [key, i] as const));
     const owner = arenaOf(source), before = owner.buf.slice();
@@ -126,16 +128,16 @@ describe('small root-specific read indexes', () => {
   });
   test('prefix indexes are root-specific through forks, removals, and shared memory growth', () => {
     let base: any = ownerMap();
-    for (let i = 0; i < 10000; i++) base = base.set(`key${i}`, i);
+    for (let i = 0; i < 10000; i++) base = base.set(`historical/lookup/key/${i}`, i);
     const old: any = attached(base);
-    for (let i = 0; i < 10000; i++) expect(old.get(`key${i}`)).toBe(i);
+    for (let i = 0; i < 10000; i++) expect(old.get(`historical/lookup/key/${i}`)).toBe(i);
     let next = base;
-    for (let i = 0; i < 800; i++) next = next.set(`key${i}`, i + 1);
-    next = next.delete('key9999').set('large-range', 5);
+    for (let i = 0; i < 800; i++) next = next.set(`historical/lookup/key/${i}`, i + 1);
+    next = next.delete('historical/lookup/key/9999').set('large-range', 5);
     const current: any = attached(next);
     for (let i = 0; i < 10000; i++) {
-      expect(old.get(`key${i}`)).toBe(i);
-      expect(current.get(`key${i}`)).toBe(i === 9999 ? undefined : i < 800 ? i + 1 : i);
+      expect(old.get(`historical/lookup/key/${i}`)).toBe(i);
+      expect(current.get(`historical/lookup/key/${i}`)).toBe(i === 9999 ? undefined : i < 800 ? i + 1 : i);
     }
     const a: any = arenaOf(current);
     expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(1056);
@@ -143,15 +145,15 @@ describe('small root-specific read indexes', () => {
   });
   test('historical roots reuse prefix indexes beyond the value-cache limit', () => {
     let base: any = ownerMap();
-    for (let i = 0; i < 20000; i++) base = base.set(`key${i}`, i);
-    const newer = base.set('key0', -1), a: any = arenaOf(base);
+    for (let i = 0; i < 20000; i++) base = base.set(`historical/lookup/key/${i}`, i);
+    const newer = base.set('historical/lookup/key/0', -1), a: any = arenaOf(base);
     const before = a.buf.slice();
-    for (let i = 0; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
+    for (let i = 0; i < 20000; i++) expect(base.get(`historical/lookup/key/${i}`)).toBe(i);
     expect(a.prefixRoot).toBe(base.root);
     expect(a.prefixChildren.byteLength + a.prefixValid.byteLength).toBe(16896);
-    expect(newer.get('key0')).toBe(-1);
-    for (let i = 19000; i < 20000; i++) expect(base.get(`key${i}`)).toBe(i);
-    expect(base.get('key0')).toBe(0);
+    expect(newer.get('historical/lookup/key/0')).toBe(-1);
+    for (let i = 19000; i < 20000; i++) expect(base.get(`historical/lookup/key/${i}`)).toBe(i);
+    expect(base.get('historical/lookup/key/0')).toBe(0);
     expect(Buffer.compare(Buffer.from(before), Buffer.from(a.buf))).toBe(0);
   });
   test('same-prefix and exact-hash collisions retain complete key checks', () => {

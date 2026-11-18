@@ -679,8 +679,33 @@ export class Arena {
     this.reads.remember(key, root, leaf); return leaf;
   }
   private findUncached(root: number, key: string): number {
-    let hash = 2166136261, encoded: Uint8Array | undefined;
-    for (let i = 0; i < key.length; i++) {
+    let encoded: Uint8Array | undefined;
+    packed: if (key.length <= 16) {
+      // Pack each character once. Hashing, trie traversal and complete equality
+      // then stay in the read-only kernel, with no shared key staging buffer.
+      const length = key.length;
+      let q0 = 0, q1 = 0, q2 = 0, q3 = 0, i = 0;
+      for (; i < length && i < 4; i++) {
+        const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
+        q0 |= c << (i * 8);
+      }
+      for (; i < length && i < 8; i++) {
+        const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
+        q1 |= c << ((i - 4) * 8);
+      }
+      for (; i < length && i < 12; i++) {
+        const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
+        q2 |= c << ((i - 8) * 8);
+      }
+      for (; i < length; i++) {
+        const c = key.charCodeAt(i); if (c > 127) { encoded = encoder.encode(key); break packed; }
+        q3 |= c << ((i - 12) * 8);
+      }
+      this.lastReadAscii = true;
+      return this.wasm.mapFindAscii16(root, length, q0, q1, q2, q3) >>> 0;
+    }
+    let hash = encoded ? hashBytes(encoded) : 2166136261;
+    if (!encoded) for (let i = 0; i < key.length; i++) {
       const code = key.charCodeAt(i);
       if (code > 127) { encoded = encoder.encode(key); hash = hashBytes(encoded); break; }
       hash = Math.imul(hash ^ code, 16777619);

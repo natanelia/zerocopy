@@ -31,6 +31,76 @@ pub unsafe extern "C" fn mapHashPrefix(mut root: u32, hash: u32, bits: u32) -> u
     root
 }
 
+#[inline(always)]
+fn hash_part(mut hash: u32, mut word: u32, count: u32) -> u32 {
+    let mut i = 0;
+    while i < count {
+        hash = (hash ^ (word & 255)).wrapping_mul(16777619);
+        word >>= 8;
+        i += 1;
+    }
+    hash
+}
+
+#[inline(always)]
+unsafe fn matches_packed8(pointer: u32, count: u32, lo: u32, hi: u32) -> bool {
+    let word = (lo as u64) | ((hi as u64) << 32);
+    if count == 8 { return load_u64(pointer) == word; }
+    if count >= 4 {
+        return load_u32(pointer) == lo
+            && load_u32(pointer + count - 4) == (word >> ((count - 4) * 8)) as u32;
+    }
+    if count >= 2 {
+        return load_u16(pointer) as u32 == (lo & 65535)
+            && load_u8(pointer + count - 1) as u32 == ((lo >> ((count - 1) * 8)) & 255);
+    }
+    count == 0 || load_u8(pointer) as u32 == (lo & 255)
+}
+
+#[inline(always)]
+unsafe fn matches_packed16(leaf: u32, length: u32, q0: u32, q1: u32, q2: u32, q3: u32) -> bool {
+    if load_u32(leaf + 8) != length { return false; }
+    if length > 8 {
+        matches_packed8(leaf + 16, 8, q0, q1)
+            && matches_packed8(leaf + 24, length - 8, q2, q3)
+    } else { matches_packed8(leaf + 16, length, q0, q1) }
+}
+
+/// Hash and compare a 0..16-byte key passed entirely in scalar arguments.
+/// This reader never stages bytes in the shared arena. Every comparison stays
+/// inside the published key, including short keys at the end of a memory page.
+#[no_mangle]
+pub unsafe extern "C" fn mapFindAscii16(mut root: u32, length: u32, q0: u32, q1: u32, q2: u32, q3: u32) -> u32 {
+    if length > 16 { return 0; }
+    let mut hash = hash_part(2166136261, q0, length.min(4));
+    if length > 4 { hash = hash_part(hash, q1, (length - 4).min(4)); }
+    if length > 8 { hash = hash_part(hash, q2, (length - 8).min(4)); }
+    if length > 12 { hash = hash_part(hash, q3, length - 12); }
+    if root != 0 && load_u32(root) == 0xffff_ffff {
+        let mut i = 0;
+        let count = load_u32(root + 12);
+        while i < count {
+            let leaf = load_u32(root + 16 + i * 4);
+            if load_u32(leaf + 4) == hash && matches_packed16(leaf, length, q0, q1, q2, q3) { return leaf; }
+            i += 1;
+        }
+        root = load_u32(root + 4);
+    }
+    let candidate = mapHashCandidate(root, hash);
+    if candidate == 0 { return 0; }
+    if load_u32(candidate) != 2 {
+        return if matches_packed16(candidate, length, q0, q1, q2, q3) { candidate } else { 0 };
+    }
+    let mut i = 0;
+    let count = load_u32(candidate + 8);
+    while i < count {
+        let leaf = load_u32(candidate + 16 + i * 4);
+        if matches_packed16(leaf, length, q0, q1, q2, q3) { return leaf; }
+        i += 1;
+    }
+    0
+}
+
 const ONES: u64 = 0x0101010101010101;
 const HIGH: u64 = 0x8080808080808080;
 

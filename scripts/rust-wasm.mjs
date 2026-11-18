@@ -78,7 +78,7 @@ export function abiOf(module) {
 
 export const readerExports = [
   'getHeapEnd', 'mapSize', 'mapFind', 'mapChild', 'keyBuf', 'batchBuf',
-  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix',
+  'mapHashCandidate', 'mapHashCandidateFrom', 'mapHashPrefix', 'mapFindAscii16',
   'textContains16', 'textContainsBlock16', 'vecLeaf', 'vecGet', 'blockGet',
   'mapNumber', 'radixSize', 'radixFind', 'journalFind', 'compareLeaves',
   'jsonValueEnd', 'jsonStringEnd', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonArrayAt', 'jsonInteger',
