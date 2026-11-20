@@ -51,6 +51,23 @@ describe('JSON array cursor correctness', () => {
     expect(last.at(2)).toBe(8);
   });
 
+  test('random reads retain exact offsets as a large nested index is thinned', async () => {
+    const values = Array.from({ length: 33013 }, (_, i) =>
+      i % 19 === 0 ? { text: `道路 "] ${i}`, list: [i] } : i % 7 === 0 ? null : i);
+    const original = new SharedMap('object').set('doc', { values, after: ['outside'] });
+    for (const copy of [false, true]) {
+      const { original: reader } = await initWorker(getWorkerData({ original }, { copy }));
+      const array = reader.getView('doc')!.get('values') as JsonView;
+      // First rewind builds a short index, then irregular jumps grow it through
+      // three stride changes. Out-of-range probes must stop before the sibling.
+      const indexes = [129, 64, 31, 32, 33, 8191, 8192, 8193, 16385, 16384, 16383,
+        32769, 32768, 32767, 0xffffffff, values.length, values.length - 1];
+      for (let i = 0; i < 512; i++) indexes.push(i * 7919 % values.length);
+      for (const i of indexes) expect(materialize(array.at(i))).toEqual(values[i]);
+      expect(array.toObject()).toEqual(values);
+    }
+  });
+
   test('supports empty, scalar and one-element views without inventing elements', () => {
     for (const text of ['[]', ' [ ] ', '{}', 'null', 'true', '1', '"[]"']) {
       const { view } = fromText(text);
