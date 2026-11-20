@@ -20,7 +20,9 @@ describe('JSON array cursor correctness', () => {
       expect(materialize(view.at(index))).toEqual(expected);
     }
     expect(arena.used).toBe(used);
-    expect(arena.buf).toEqual(before);
+    const after = arena.buf;
+    expect(after.length).toBe(before.length);
+    expect(after.every((byte, i) => byte === before[i])).toBe(true);
     expect(view.toObject()).toEqual(values);
   });
 
@@ -123,7 +125,7 @@ describe('JSON array cursor correctness', () => {
 
   test('retains a read-only cursor after growth, edits and further attachments', async () => {
     const values = Array.from({ length: 1100 }, (_, index) => index);
-    const writer = new SharedMap('object').set('record', { items: values, after: [9999] });
+    const writer = new SharedMap('object', 0, 0, new Arena()).set('record', { items: values, after: [9999] });
     const { writer: reader } = await initWorker(getWorkerData({ writer }, { copy: false }));
     const items = reader.getView('record')!.get('items') as JsonView;
     for (let index = 0; index < 40; index++) expect(items.at(index)).toBe(index);
@@ -140,6 +142,8 @@ describe('JSON array cursor correctness', () => {
     expect((latest.getView('record')!.get('items') as JsonView).at(1)).toBe(-2);
     expect(items.toObject()).toEqual(values);
     expect(Object.isFrozen(reader.get('record')!.items)).toBe(true);
-    expect(arena.buf).toEqual(before);
+    const after = arena.buf;
+    expect(after.length).toBe(before.length);
+    expect(after.every((byte, i) => byte === before[i])).toBe(true);
   });
 });
