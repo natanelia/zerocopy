@@ -39,7 +39,7 @@ try {
   for (let pair = -2; pair < repetitions; pair++) {
     for (let i = 0; i < workloads.length; i++) {
       const id = workloads[(i + pair + 2) % workloads.length];
-      for (const label of (pair + i) % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
+      for (const label of (pair + workloads.indexOf(id)) % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
         const result = await pages[label].evaluate(async ({ id, count }) => {
           const { sampleReadCase } = await import('./assets/read-benchmark-runner.mjs');
           const { readCase } = await import('./assets/catalog-read-workloads.mjs');
