@@ -402,7 +402,9 @@ export function connectSharedSession<T extends SharedShape<T>>(options: ReaderOp
       if (known?.memory && source.memory) throw new Error('An existing arena cannot replace its memory');
       next.set(source.id, source.memory || source.copy ? source : { ...source, memory: known!.memory });
     }
-    const values = await initWorker<Record<string, SharedCollection>>({ ...payload, arenas: [...next.values()] });
+    const prior = initialized ? (data.single ? { value: reader.current as SharedCollection }
+      : reader.current as Readonly<Record<string, SharedCollection>>) : undefined;
+    const values = await initWorker<Record<string, SharedCollection>>({ ...payload, arenas: [...next.values()] }, { previous: prior });
     if (closed) return;
     const ids = identities(payload);
     const result: Record<string, SharedCollection> = Object.create(null);

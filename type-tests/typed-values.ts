@@ -155,6 +155,8 @@ type CompactedGroup = Assert<Equal<typeof group.tiles, typeof tiles>>;
 const payload = getWorkerData({ lanes, tiles, laneList, laneHeap });
 const restored = await initWorker(payload);
 type WorkerRead = Assert<Equal<ReturnType<typeof restored.lanes.get>, DeepReadonly<Lane> | undefined>>;
+const refreshed = await initWorker(payload, { previous: { lanes: restored.lanes } });
+type RefreshedLane = Assert<Equal<typeof refreshed.lanes, typeof lanes>>;
 type WorkerNested = Assert<Equal<typeof restored.tiles, typeof tiles>>;
 // Retain the legacy explicit type assertion for an untyped worker message.
 const untyped: WorkerData = payload;
