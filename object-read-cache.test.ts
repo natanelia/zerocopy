@@ -99,6 +99,22 @@ describe('bounded object key reads', () => {
     expect(first.map.get('key')).toBe(before);
   });
 
+  test('compares both byte edges of shared records at every word alignment', async () => {
+    for (const key of ['a', 'ab', 'abc', 'abcd']) {
+      const attach = (number: number) => getWorkerData({ map: new SharedMap('object', 0, 0,
+        new Arena({ id: 'edge-test' })).set(key, number) }, { copy: false });
+      const first = await initWorker(attach(1234567));
+      expect(first.map.get(key)).toBe(1234567);
+      for (const changed of [2234567, 1234568]) {
+        const current = await initWorker(attach(changed), { previous: first });
+        expect(current.map.get(key)).toBe(changed);
+      }
+      const small = await initWorker(attach(1));
+      expect(small.map.get(key)).toBe(1);
+      expect((await initWorker(attach(2), { previous: small })).map.get(key)).toBe(2);
+    }
+  });
+
   test('nested handles resolve against the current attachment even when descriptor bytes match', async () => {
     const publish = (number: number) => {
       const list = new SharedList('number', 0, 0, 0, new Arena({ id: 'nested-values' })).push(number);

@@ -77,12 +77,18 @@ export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
 
 // A renewed publication can carry a distinct JS wrapper for the producer's
 // memory. IDs and addresses select candidates; only identical bytes qualify.
-function sameRecordBytes(a: DataView, b: DataView, start: number, length: number): boolean {
+function sameRecordBytes(bytes: Uint8Array, oldBytes: Uint8Array, words: Uint32Array, oldWords: Uint32Array, start: number, length: number): boolean {
   const end = start + length;
-  if (end > a.byteLength || end > b.byteLength) return false;
+  if (end > bytes.length || end > oldBytes.length) return false;
+  // Both records start at the same address. Compare the unaligned edges as
+  // bytes and use native 32-bit loads for the aligned middle.
   let p = start;
-  for (; p + 4 <= end; p += 4) if (a.getUint32(p, true) !== b.getUint32(p, true)) return false;
-  for (; p < end; p++) if (a.getUint8(p) !== b.getUint8(p)) return false;
+  while (p < end && (p & 3)) {
+    if (bytes[p] !== oldBytes[p]) return false;
+    p++;
+  }
+  for (; p + 4 <= end; p += 4) if (words[p >>> 2] !== oldWords[p >>> 2]) return false;
+  for (; p < end; p++) if (bytes[p] !== oldBytes[p]) return false;
   return true;
 }
 
@@ -164,6 +170,7 @@ export class Arena {
   }
   private readonly objects = new Map<number, DecodedRecord>();
   private previousReader: WeakRef<Arena> | undefined;
+  private words: Uint32Array | undefined;
   private objectRoot = 0;
   private objectCode = 0;
   private objectKeys: Map<string, unknown> | undefined;
@@ -202,8 +209,10 @@ export class Arena {
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }
+  private get wordView(): Uint32Array { return this.words ??= new Uint32Array(this.buffer); }
   refresh(): void {
     if (this.buffer !== this.memory.buffer) {
+      this.words = undefined;
       this.buffer = this.memory.buffer;
       this.bytes = new Uint8Array(this.buffer);
       this.view = new DataView(this.buffer);
@@ -300,7 +309,7 @@ export class Arena {
     if (type === 'object' && this.previousReader && this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       const prior = this.previousReader.deref();
       const record = prior?.objects.get(ptr);
-      if (prior && record?.jsonLength === len && (this.memory === prior.memory || sameRecordBytes(this.view, prior.view, ptr, len))) {
+      if (prior && record?.jsonLength === len && (this.memory === prior.memory || sameRecordBytes(this.bytes, prior.bytes, this.wordView, prior.wordView, ptr, len))) {
         this.objects.set(ptr, record);
         this.objectBytes += len;
         return record.value;
