@@ -55,6 +55,12 @@ self.addEventListener('message', async (event: MessageEvent<WorkerData>) => {
 
 Do not put the shared memory in a transfer list. Shared transport shares its backing storage; it does not detach it from the owner.
 
+## Reading successive publications
+
+When a worker already holds the previous attachment, pass it to `initWorker` on the next publication. For example, `const next = await initWorker(payload, { previous: current })` lets `next.products.get(id)` reuse a deeply frozen JSON value that the worker already read at the same address. `connectSharedSession` does this automatically. A standalone `initWorker(payload)` starts a fresh reader.
+
+Reuse is limited to the existing decoded-record budget. It requires a matching arena ID, address and length. For different memory handles the reader also compares the complete byte range. Changed records decode on demand. Nested collection handles bind to the new attachment, and a weak reference lets an earlier reader be collected once the application releases it.
+
 ## Node.js
 
 Node workers do not use browser isolation headers. Save the files below together and run `node main.mjs` from an application with the built package installed.

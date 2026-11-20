@@ -11,7 +11,10 @@ const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as Buffer
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
 let nextId = 0;
+const MAX_DECODED_RECORDS = 2048;
+const MAX_DECODED_BYTES = 2 * 1024 * 1024;
 const PRESENT = Symbol("present; primitive value not decoded");
+interface DecodedRecord { value: unknown; jsonLength: number }
 interface KeyToken { bytes: Uint8Array | undefined; length: number; hash: number; ptr: number | undefined; readRoot?: number; readValue?: number }
 const realmId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 export const FORMAT_VERSION = 4;
@@ -70,6 +73,17 @@ export function createArenaRegistry(arenas: Map<string, Arena>): ArenaRegistry {
   const registry = { arenas, members: [] as Arena[], shared: true };
   arenaRegistries.set(arenas, registry);
   return registry;
+}
+
+// A renewed publication can carry a distinct JS wrapper for the producer's
+// memory. IDs and addresses select candidates; only identical bytes qualify.
+function sameRecordBytes(a: DataView, b: DataView, start: number, length: number): boolean {
+  const end = start + length;
+  if (end > a.byteLength || end > b.byteLength) return false;
+  let p = start;
+  for (; p + 4 <= end; p += 4) if (a.getUint32(p, true) !== b.getUint32(p, true)) return false;
+  for (; p < end; p++) if (a.getUint8(p) !== b.getUint8(p)) return false;
+  return true;
 }
 
 /** A single-writer, append-only allocation lifetime. Published bytes never change.
@@ -148,7 +162,8 @@ export class Arena {
       this.valueMap.delete(key); this.valueMapChars -= key.length; this.valueMapBytes -= oldBytes;
     }
   }
-  private readonly objects = new Map<number, unknown>();
+  private readonly objects = new Map<number, DecodedRecord>();
+  private previousReader: WeakRef<Arena> | undefined;
   private objectRoot = 0;
   private objectCode = 0;
   private objectKeys: Map<string, unknown> | undefined;
@@ -165,7 +180,7 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; previous?: Arena } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     this.wasm = this.#nativeWasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
@@ -173,6 +188,10 @@ export class Arena {
     this.readOnly = options.readOnly ?? false;
     if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
+    if (this.readOnly && options.previous?.readOnly && options.previous.id === this.id && typeof WeakRef === 'function') {
+      // Retaining a later snapshot must not pin every earlier reader and cache.
+      this.previousReader = new WeakRef(options.previous);
+    }
     this.buffer = this.memory.buffer;
     this.bytes = new Uint8Array(this.buffer);
     this.view = new DataView(this.buffer);
@@ -267,7 +286,7 @@ export class Arena {
       // Cached JSON and nested snapshots are immutable. A hit needs neither
       // the record length nor a refreshed view after shared memory growth.
       const cached = this.objects.get(raw + 4);
-      if (cached !== undefined) return cached;
+      if (cached !== undefined) return cached.value;
     }
     return this.decodeAt(type, raw + 4, this.dv.getUint32(raw, true));
   }
@@ -276,8 +295,17 @@ export class Arena {
     if (type === 'boolean') return this.buf[ptr] !== 0;
     if (type === 'string') return this.string(ptr, len);
     const cached = this.objects.get(ptr);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) return cached.value;
     this.refresh();
+    if (type === 'object' && this.previousReader && this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
+      const prior = this.previousReader.deref();
+      const record = prior?.objects.get(ptr);
+      if (prior && record?.jsonLength === len && (this.memory === prior.memory || sameRecordBytes(this.view, prior.view, ptr, len))) {
+        this.objects.set(ptr, record);
+        this.objectBytes += len;
+        return record.value;
+      }
+    }
     const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
     const nested = parseNestedType(type);
     let result: any;
@@ -288,7 +316,10 @@ export class Arena {
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
-    if (this.objects.size < 2048 && this.objectBytes + len <= 2097152) { this.objects.set(ptr, result); this.objectBytes += len; }
+    if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
+      this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
+      this.objectBytes += len;
+    }
     return result;
   }
   string(ptr: number, len: number): string {
@@ -561,7 +592,7 @@ export class Arena {
     // The address cache owns decoded values and its existing memory limits.
     // A key only adds a reference to an accepted value, never another retained
     // object graph. Its separate root leaves the primitive read cache intact.
-    if (value !== undefined && this.objects.get(ptr) === value) {
+    if (value !== undefined && this.objects.get(ptr)?.value === value) {
       const cacheKey = ascii ? key : normalizeKey(key);
       if (this.objectRoot === root && this.objectCode === code && this.objectKeys === map) {
         // A nested factory may reenter this arena while decoding. Account for

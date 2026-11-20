@@ -64,6 +64,56 @@ describe('bounded object key reads', () => {
     expect(byteReader.objectKeys.size).toBe(0); expect(byteReader.objectKeyChars).toBe(0);
   });
 
+  test.each([false, true])('reuses immutable JSON from an explicit previous attachment (copy=%s)', async copy => {
+    const owner = new Arena(), base = new SharedMap('object', 0, 0, owner);
+    const old = base.setMany([['same', { list: [1] }], ['changed', { n: 0 }]]);
+    const attach = (map: SharedMap<'object'>) => structuredClone(getWorkerData({ map }, { copy }));
+    const first = await initWorker(attach(old));
+    const saved = first.map.get('same');
+    expect(first.map.get('changed')).toEqual({ n: 0 });
+    const next = old.set('changed', { n: 1 }).set('large', { pad: 'x'.repeat(200000) });
+    const updated = await initWorker(attach(next), { previous: first });
+    expect(updated.map.get('same')).toBe(saved);
+    expect(updated.map.get('changed')).toEqual({ n: 1 });
+    expect(first.map.get('changed')).toEqual({ n: 0 });
+    const fork = await initWorker(attach(old.set('changed', { n: 2 })), { previous: updated });
+    expect(fork.map.get('same')).toBe(saved);
+    expect(fork.map.get('changed')).toEqual({ n: 2 });
+    expect((await initWorker(attach(next))).map.get('same')).not.toBe(saved);
+    expect(Object.isFrozen((saved as { list: number[] }).list)).toBe(true);
+  });
+
+  test('a reused arena ID and offset cannot substitute different bytes or lengths', async () => {
+    const publish = (value: object) => getWorkerData({ map: new SharedMap('object', 0, 0,
+      new Arena({ id: 'same-wire-id' })).set('key', value) }, { copy: false });
+    const first = await initWorker(publish({ text: 'a'.repeat(20) }));
+    const before = first.map.get('key');
+    for (let i = 0; i < 20; i++) {
+      const value = { text: 'a'.repeat(i) + 'b' + 'a'.repeat(19 - i) };
+      const next = await initWorker(publish(value), { previous: first });
+      expect(next.map.get('key')).toEqual(value);
+      expect(next.map.get('key')).not.toBe(before);
+    }
+    const short = await initWorker(publish({ text: '' }), { previous: first });
+    expect(short.map.get('key')).toEqual({ text: '' });
+    expect(first.map.get('key')).toBe(before);
+  });
+
+  test('nested handles resolve against the current attachment even when descriptor bytes match', async () => {
+    const publish = (number: number) => {
+      const list = new SharedList('number', 0, 0, 0, new Arena({ id: 'nested-values' })).push(number);
+      const parent = new SharedMap('SharedList<number>', 0, 0, new Arena({ id: 'nested-parent' })).set('list', list);
+      return getWorkerData({ parent }, { copy: false });
+    };
+    const first = await initWorker(publish(1));
+    const oldList = first.parent.get('list')!;
+    const next = await initWorker(publish(2), { previous: first });
+    const newList = next.parent.get('list')!;
+    expect(newList).not.toBe(oldList);
+    expect(newList.get(0)).toBe(2);
+    expect(oldList.get(0)).toBe(1);
+  });
+
   test('object reads do not claim the primitive fast path in a shared arena', async () => {
     const owner = new Arena();
     const metadata = new SharedMap('object', 0, 0, owner).set('item', { title: 'metadata' });

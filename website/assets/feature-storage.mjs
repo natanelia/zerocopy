@@ -31,8 +31,8 @@ export async function createStorage(kind) {
     if (value.arenas.some(arena => arena.copy || !(arena.memory?.buffer instanceof SharedArrayBuffer))) throw new Error('Shared memory is required; no copy fallback');
     return value;
   }
-  async function attach(value) {
-    if (kind === 'shared') return (await api.initWorker(value)).features;
+  async function attach(value, previous) {
+    if (kind === 'shared') return (await api.initWorker(value, previous && { previous: { features: previous } })).features;
     if (kind === 'immutable') return build(value);
     if (!(value instanceof Map)) throw new TypeError('Expected a cloned native Map');
     for (const record of value.values()) deepFreeze(record);
