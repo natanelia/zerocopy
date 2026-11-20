@@ -138,13 +138,16 @@ export class JsonView {
 
   /** Read a zero-based array index; invalid/out-of-range indices return undefined. */
   at(index: number): JsonViewValue | undefined {
-    if (!Number.isInteger(index) || index < 0 || index > 0xffffffff || this.#arena.buf[this.#start] !== 91) return undefined;
+    if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) return undefined;
+    const cursor = this.#arrayCursor;
+    // A successful cursor already establishes that this immutable value is an array.
+    if (!cursor && this.#arena.buf[this.#start] !== 91) return undefined;
     // Published JSON never moves. Forward reads can resume from the previous
     // element instead of scanning every earlier element again. The cursor is
     // local to this view. Build sparse offsets only after an expensive rewind.
-    const cursor = this.#arrayCursor, wasm = this.#arena.wasm;
+    const wasm = this.#arena.wasm;
     let pointer: number;
-    if (cursor && index >= cursor.index && (!cursor.checkpoints || index - cursor.index <= FIRST_STRIDE)) {
+    if (cursor && index >= cursor.index && (index - cursor.index <= FIRST_STRIDE || !cursor.checkpoints)) {
       pointer = index === cursor.index ? cursor.pointer
         : wasm.jsonArrayAtFrom(cursor.pointer, this.#bound, index - cursor.index) >>> 0;
     } else if (cursor && index >= FIRST_STRIDE) {
@@ -152,7 +155,7 @@ export class JsonView {
     } else pointer = wasm.jsonArrayAt(this.#start, this.#bound, index) >>> 0;
     if (!pointer) return undefined;
     if (cursor) { cursor.index = index; cursor.pointer = pointer; }
-    else this.#arrayCursor = { index, pointer };
+    else this.#arrayCursor = { index, pointer, checkpoints: undefined };
     return this.#read(pointer);
   }
 

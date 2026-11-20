@@ -54,7 +54,7 @@ describe('JSON array cursor correctness', () => {
   test('random reads retain exact offsets as a large nested index is thinned', async () => {
     const values = Array.from({ length: 33013 }, (_, i) =>
       i % 19 === 0 ? { text: `道路 "] ${i}`, list: [i] } : i % 7 === 0 ? null : i);
-    const original = new SharedMap('object').set('doc', { values, after: ['outside'] });
+    const original = new SharedMap('object', 0, 0, new Arena()).set('doc', { values, after: ['outside'] });
     for (const copy of [false, true]) {
       const { original: reader } = await initWorker(getWorkerData({ original }, { copy }));
       const array = reader.getView('doc')!.get('values') as JsonView;
