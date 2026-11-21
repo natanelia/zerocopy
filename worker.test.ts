@@ -102,6 +102,17 @@ describe('shared state and session protocol', () => {
     expect(pair.owner.frames.length).toBe(2); expect(seen).toEqual([1]);
     expect(original.map.has('x')).toBe(false);
   });
+  it('reuses unchanged frozen JSON on an ordinary session update', async () => {
+    const source = new SharedMap('object').setMany([['keep', { a: [1] }], ['edit', { n: 0 }]]);
+    const { state, reader } = await setup(source);
+    const initial = reader.current, keep = initial.get('keep');
+    expect(initial.get('edit')).toEqual({ n: 0 });
+    state.publish(source.set('edit', { n: 1 }));
+    await drain();
+    expect(reader.current.get('keep')).toBe(keep);
+    expect(reader.current.get('edit')).toEqual({ n: 1 });
+    expect(initial.get('edit')).toEqual({ n: 0 });
+  });
   it('publishes record roots atomically and preserves unchanged wrapper identity', async () => {
     const { state, reader } = await setup({ map: new SharedMap('number'), list: new SharedList('number').push(1) });
     const oldList = reader.current.list;

@@ -115,18 +115,29 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
   return Object.freeze({ __shared: true, version: FORMAT_VERSION, arenas: Object.freeze(arenas), structures: Object.freeze(serialized) }) as WorkerData<T>;
 }
 
-export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>): Promise<Readonly<T>>;
+/** A preceding read-only attachment from the same stream of immutable publications. */
+interface WorkerReadOptions<T> { readonly previous?: Readonly<Partial<NoInfer<T>>> }
+export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>, options?: WorkerReadOptions<T>): Promise<Readonly<T>>;
 /** Legacy untyped payloads require the caller to supply the application type. */
-export function initWorker<T extends StructureRecord<T>>(data: WorkerData): Promise<Readonly<T>>;
-export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData): Promise<Readonly<T>> {
+export function initWorker<T extends StructureRecord<T>>(data: WorkerData, options?: WorkerReadOptions<T>): Promise<Readonly<T>>;
+export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<T> | WorkerData, options?: WorkerReadOptions<T>): Promise<Readonly<T>> {
   if (!data?.__shared || data.version !== FORMAT_VERSION) throw new Error('Unsupported worker data; create a v4 payload with getWorkerData()');
+  let previous: Map<string, Arena> | undefined;
+  if (options?.previous) {
+    previous = new Map();
+    for (const collection of Object.values(options.previous) as (SharedStructure | undefined)[]) {
+      if (collection === undefined) continue;
+      const arena = arenaOf(collection);
+      if (arena.readOnly) previous.set(arena.id, arena);
+    }
+  }
   const arenas = new Map<string, Arena>();
   // A solitary reader needs only its original empty owned dependency Map.
   const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    const arena = new Arena({ ...source, readOnly: true, registry });
+    const arena = new Arena({ ...source, readOnly: true, registry, previous: previous?.get(source.id) });
     arenas.set(source.id, arena);
     registry?.members.push(arena);
   }
