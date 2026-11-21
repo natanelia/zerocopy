@@ -132,7 +132,7 @@ product.get('stock');                // Still 12
 
 Views retain their immutable record and remain valid after collection updates and memory growth. They do not expose writable bytes or create a decoded object cache. View wrappers are small JavaScript objects; returning a selected string decodes that string, and decimal, exponent, or large integer tokens use JavaScript number conversion for the same rounding as normal JSON reads. Unselected values are not converted into JavaScript objects or frozen.
 
-Field and index lookup scans the preceding members or elements without building an index. Repeated reads of many fields can therefore favor an ordinary cached `get()`. Choose views when you need selected fields or predicates and want to avoid materializing the full record. `json<T>()` keeps its typed `get()` contract; a view exposes JSON value kinds rather than promising a typed object tree.
+The first lookup of an object field scans preceding members. Later views of the same record in the same arena can reuse its field offset, including a cached miss. Each arena keeps at most 8,192 offsets across 64 field names, with up to 2,048 offsets per name. New field names are indexed from ranges of at least 32 bytes. Field names longer than 64 UTF-16 code units and ranges over 65,535 bytes use the scanner directly. Array views remember their last position and can build sparse checkpoints for indexed reads. Choose views when you need selected fields or predicates and want to avoid materializing the full record. `json<T>()` keeps its typed `get()` contract; a view exposes JSON value kinds rather than promising a typed object tree.
 
 ## Maps
 

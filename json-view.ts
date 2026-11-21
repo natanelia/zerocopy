@@ -1,64 +1,12 @@
 import type { Arena } from './arena';
+import { space, stringEquals } from './json-field-index';
 import { decodeUtf8 } from './utf8';
-import { freezeJSON } from './freeze-json';
+import { freezeParsedJSON } from './freeze-json';
 
 export type JsonScalar = string | number | boolean | null;
 export type JsonViewValue = JsonScalar | JsonView;
 export type JsonViewType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
-
-function space(bytes: Uint8Array, ptr: number, end: number): number {
-  while (ptr < end) {
-    const c = bytes[ptr];
-    if (c !== 32 && c !== 9 && c !== 10 && c !== 13) break;
-    ptr++;
-  }
-  return ptr;
-}
-function hex(c: number): number {
-  return c >= 48 && c <= 57 ? c - 48 : c >= 65 && c <= 70 ? c - 55 : c >= 97 && c <= 102 ? c - 87 : -1;
-}
-
-/** Compare a selected JSON string to JS UTF-16 without decoding/allocating it. */
-function stringEquals(bytes: Uint8Array, ptr: number, end: number, expected: string): boolean {
-  if (bytes[ptr] !== 34) return false;
-  let index = 0;
-  for (let p = ptr + 1; p < end;) {
-    let c = bytes[p++];
-    if (c === 34) return index === expected.length;
-    if (c === 92) {
-      if (p >= end) return false;
-      c = bytes[p++];
-      if (c === 117) {
-        if (p + 4 > end) return false;
-        const a = hex(bytes[p++]), b = hex(bytes[p++]), d = hex(bytes[p++]), e = hex(bytes[p++]);
-        if ((a | b | d | e) < 0) return false;
-        c = (a << 12) | (b << 8) | (d << 4) | e;
-      } else if (c === 98) c = 8;
-      else if (c === 102) c = 12;
-      else if (c === 110) c = 10;
-      else if (c === 114) c = 13;
-      else if (c === 116) c = 9;
-      else if (c !== 34 && c !== 47 && c !== 92) return false;
-    } else if (c >= 192) {
-      if (c < 224) {
-        if (p >= end) return false;
-        c = ((c & 31) << 6) | (bytes[p++] & 63);
-      } else if (c < 240) {
-        if (p + 2 > end) return false;
-        c = ((c & 15) << 12) | ((bytes[p++] & 63) << 6) | (bytes[p++] & 63);
-      } else {
-        if (p + 3 > end) return false;
-        c = ((c & 7) << 18) | ((bytes[p++] & 63) << 12) | ((bytes[p++] & 63) << 6) | (bytes[p++] & 63);
-        c -= 65536;
-        if (expected.charCodeAt(index++) !== (0xd800 | (c >> 10))) return false;
-        c = 0xdc00 | (c & 1023);
-      }
-    }
-    if (expected.charCodeAt(index++) !== c) return false;
-  }
-  return false;
-}
 
 // After a long rewind, remember one offset per stride. Thin the offsets as
 // the explored prefix grows. Even a very large array keeps at most 256 entries.
@@ -83,6 +31,7 @@ interface ArrayCursor {
  */
 export class JsonView {
   readonly #arena: Arena;
+  readonly #bytes: Uint8Array;
   readonly #start: number;
   readonly #bound: number;
   #end: number | undefined;
@@ -95,6 +44,9 @@ export class JsonView {
       || pointer + length > bytes.byteLength || pointer + length > 0x7fff0000) {
       throw new RangeError('Invalid JSON view range');
     }
+    // Shared memory growth can add pages, but the checked record stays inside
+    // this view. Every field read can use the same bytes for its whole lifetime.
+    this.#bytes = bytes;
     this.#arena = arena;
     this.#bound = pointer + length;
     this.#start = space(bytes, pointer, this.#bound);
@@ -111,7 +63,7 @@ export class JsonView {
   }
 
   get type(): JsonViewType {
-    switch (this.#arena.buf[this.#start]) {
+    switch (this.#bytes[this.#start]) {
       case 123: return 'object';
       case 91: return 'array';
       case 34: return 'string';
@@ -141,7 +93,7 @@ export class JsonView {
     if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) return undefined;
     const cursor = this.#arrayCursor;
     // A successful cursor already establishes that this immutable value is an array.
-    if (!cursor && this.#arena.buf[this.#start] !== 91) return undefined;
+    if (!cursor && this.#bytes[this.#start] !== 91) return undefined;
     // Published JSON never moves. Forward reads can resume from the previous
     // element instead of scanning every earlier element again. The cursor is
     // local to this view. Build sparse offsets only after an expensive rewind.
@@ -189,7 +141,7 @@ export class JsonView {
   equals(key: string, expected: JsonScalar): boolean {
     const pointer = this.#field(key);
     if (!pointer) return false;
-    const bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     if (typeof expected === 'string') return stringEquals(bytes, pointer, this.#bound, expected);
     if (expected === null) return bytes[pointer] === 110;
     if (typeof expected === 'boolean') return bytes[pointer] === (expected ? 116 : 102);
@@ -203,9 +155,10 @@ export class JsonView {
    * changing it cannot affect the shared record or subsequent reads. No cache.
    */
   toObject(options: { freeze?: boolean } = {}): any {
-    const bytes = this.#arena.buf;
-    const value = JSON.parse(decodeUtf8(decoder, bytes.subarray(this.#start, this.#valueEnd())));
-    return options.freeze === true ? freezeJSON(value) : value;
+    const bytes = this.#bytes;
+    const text = decodeUtf8(decoder, bytes.subarray(this.#start, this.#valueEnd()));
+    const value = JSON.parse(text);
+    return options.freeze === true ? freezeParsedJSON(value, text) : value;
   }
 
   /** JSON.stringify(view) explicitly materializes the selected value. */
@@ -220,40 +173,8 @@ export class JsonView {
 
   #field(key: string): number {
     if (typeof key !== 'string') throw new TypeError('JSON field names must be strings');
-    let bytes = this.#arena.buf;
-    if (bytes[this.#start] !== 123) return 0;
-    const wasm = this.#arena.wasm;
-    if (key.length <= 8) {
-      let lo = 0, hi = 0, ascii = true;
-      for (let i = 0; i < key.length; i++) {
-        const c = key.charCodeAt(i);
-        if (c > 127) { ascii = false; break; }
-        if (i < 4) lo |= c << (i * 8); else hi |= c << ((i - 4) * 8);
-      }
-      if (ascii) return wasm.jsonFieldAscii8(this.#start, this.#bound, key.length, lo, hi) >>> 0;
-    }
-    let hash = 2166136261;
-    for (let i = 0; i < key.length; i++) hash = Math.imul(hash ^ key.charCodeAt(i), 16777619);
-    let cursor = this.#start;
-    while (cursor < this.#bound) {
-      const candidate = wasm.jsonFieldCandidate(cursor, this.#bound, hash >>> 0) >>> 0;
-      if (!candidate) return 0;
-      const keyEnd = wasm.jsonValueEnd(candidate, this.#bound) >>> 0;
-      if (keyEnd <= candidate || keyEnd > this.#bound) throw new SyntaxError('Invalid JSON key');
-      bytes = this.#arena.buf;
-      let value = space(bytes, keyEnd, this.#bound);
-      if (bytes[value] !== 58) throw new SyntaxError('Invalid JSON member');
-      value = space(bytes, value + 1, this.#bound);
-      if (value >= this.#bound) throw new SyntaxError('Missing JSON value');
-      if (stringEquals(bytes, candidate, keyEnd, key)) return value;
-      // A matching hash is only a candidate, never an equality decision.
-      cursor = wasm.jsonValueEnd(value, this.#bound) >>> 0;
-      if (cursor <= value || cursor > this.#bound) throw new SyntaxError('Invalid JSON member');
-      cursor = space(bytes, cursor, this.#bound);
-      if (bytes[cursor] !== 44) return 0;
-      cursor = space(bytes, cursor + 1, this.#bound);
-    }
-    return 0;
+    if (this.#bytes[this.#start] !== 123) return 0;
+    return this.#arena.jsonFields.find(this.#arena, this.#bytes, this.#start, this.#bound, key);
   }
 
   #number(pointer: number): number {
@@ -263,11 +184,11 @@ export class JsonView {
     if (end <= pointer || end > this.#bound) throw new SyntaxError('Invalid JSON number');
     // Only the requested number token is converted. Native Number supplies
     // exact JS rounding for decimals, exponents, overflow and unsafe integers.
-    return Number(decodeUtf8(decoder, this.#arena.buf.subarray(pointer, end)));
+    return Number(decodeUtf8(decoder, this.#bytes.subarray(pointer, end)));
   }
 
   #read(pointer: number, root = false): JsonViewValue {
-    const bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     switch (bytes[pointer]) {
       case 123: case 91: {
         if (root) return this;
