@@ -12,7 +12,7 @@ listen(async data => {
     return true;
   }
   if (data.type === 'load') { current = await storage.attach(data.payload); retained = current; return current.size; }
-  if (data.type === 'replace') { current = await storage.attach(data.payload); return current.size; }
+  if (data.type === 'replace') { current = await storage.attach(data.payload, current); return current.size; }
   if (data.type === 'edit') { current = storage.update(current, data.changes, retained); return current.size; }
   if (data.type === 'read') {
     if (!slots.includes(data.slot) || captured.has(data.slot)) throw new Error('Read phase must be measured once');

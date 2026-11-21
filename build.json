@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "4c69aef6e37b6bc955fc708d671e33b5a066ac7a",
+  "sourceCommit": "2eb1bfda59f3e516ef174fafb08e1ae8b61d7bff",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9",
@@ -40,21 +40,21 @@
     "docs/catalog/",
     "docs/editors/"
   ],
-  "librarySHA256": "798dc947f0926d8a77bec1bff545dcc8bc189b7c6325555a1a0f0384a61ac489",
+  "librarySHA256": "6a09739d3a4d67bfe7daa232418e501aed51c0139caaba2c091b1b72300a7bb1",
   "sourceDirty": false,
   "libraryFilesSHA256": {
-    "chunk-6rmn2nvh.js": "5d437783e0d297547bdd35e8a197e82a9da0e1268fd5a532fcc6623720cb16fd",
-    "chunk-855jx2y2.js": "b26e41c8900cf64fe8b79ee97222f821827bbafa69df265b0d6cf102f78c9d2b",
-    "chunk-8jzj20mc.js": "1314cb50832f969c808530dc2b2e97f436ddc2c4077a8c37207a09be3a8a06fc",
-    "chunk-8y0rwpp8.js": "bdab83ced445391d43068ea099d5a2f6bc4f21429f34887bdb6c143973ca6283",
-    "chunk-qewdzsxw.js": "44ee19fbf0c4889d737b0604500993d64ed10ef79a067c3e751d86f03cea3dc2",
-    "geometry.js": "702b7117451965f51cfd4264f42ca9b8fc3d13ff9279f1c9e8b0e5e582555b4d",
-    "numeric.js": "b9016672ff5b5895de41919f0cc19f6545e0f25c3e5738aa8049d3c3f053d4ee",
-    "redux.js": "65b5c0b0e738bdc717a052cc96e1c35450fc850ddcf51a485f4fbff1ae1febd6",
-    "shared.js": "798dc947f0926d8a77bec1bff545dcc8bc189b7c6325555a1a0f0384a61ac489",
-    "state.js": "c31c184797df179639d9ebc152c735d2918c5466684655db4bfaec4406ae880a",
-    "tanstack-db-collection.js": "4b19fd6dd55a762264467b6a880b0ea30e57c61985a9876637ce84495e929550",
-    "worker.js": "497d3db44832485d953b18b0a449067c05cbb8ff826cf82cbe61063d774a1a60"
+    "chunk-4cs5jkad.js": "cff38e83f75e6f3ea4e535ee45ad1ea8dac963f0bb7daa8c62dca6e1c75c777c",
+    "chunk-g1864cm0.js": "1bc257e1c478c764d5ae1e92066d9f4967b1483aecf8b7fc79a35ad726b31714",
+    "chunk-m1e4dfh7.js": "0c77c7c449ef69684f2532cf6613d6232a7b2b25b1ed805f48d9aa0b81ed640a",
+    "chunk-sdw9e733.js": "891273ab11321b72123d7f5e52802a9bc3535cc35e8cc6a448d5c8c41d26918e",
+    "chunk-sk2m3h91.js": "978aeb99b861787123ec78675c81938e5e538e6b162d0a487cffe7083ae0dca5",
+    "geometry.js": "cc1a14a4de2dabfb3bd15e71decfd1edea7a9ab4be367a7e92ffb0851cdd809b",
+    "numeric.js": "d62b83c25e94782d80a561c53648b401315b41adfdd29f4b7e0be288ab925ea5",
+    "redux.js": "0167b2d28da1d60bce216aa9921159cbf54bf97002aa3fafa2725a8050cf74c8",
+    "shared.js": "6a09739d3a4d67bfe7daa232418e501aed51c0139caaba2c091b1b72300a7bb1",
+    "state.js": "074680d52e294fcf856c5b4ab3ead4183dc9e938240b31931aa8068e53d3d3f2",
+    "tanstack-db-collection.js": "c5229491831bc90d1faddbcd9c1a458a18c4d3f627f0a9538c58f7fba8a6518b",
+    "worker.js": "e97e1d4ca6ed4a57875abd0212c99b5f933c5805c028ce166436bd2c593ee72f"
   },
   "wasmFilesSHA256": {
     "doubly-linked-list.wasm": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134",
@@ -84,12 +84,12 @@
     "feature-core.mjs": "2507d69a7cbec0f390a91d8ffb0d2e53e734849818cdf7d2064d7d166677d5d9",
     "feature-owner.mjs": "e2232ec76008d5936faa69d03f5ce8de2d02ea9e4e3a22f969284e925bc4e6bc",
     "feature-peer.mjs": "368fd54a9a935a7881a8f50b5cbe11c8b5156d10bf57ab98e208a07906ae7c49",
-    "feature-reader.mjs": "daa57f77369925a0e4f9081873561e1037e8c3186f875c5693910cd8e32a53d3",
-    "feature-storage.mjs": "be7541e583dd9f02d8521c56111ca42d0ac315bf8d8e20a17e94f40db169ddb9",
+    "feature-reader.mjs": "fafad8320aaa4d8b34a880d0eb6c79cbb08a50bc36acf791790410f966789b1c",
+    "feature-storage.mjs": "7fadb44ac4c012811b959c630a6b5530f8f69a233b4d453604427416d4973946",
     "isolation.mjs": "a578e2eb149cbe4c8471a8e68b564a40830682f1474646470ae7f07d4cf7e7d3",
     "main.mjs": "132d915d4982e5b5e2d4db6840d405ea72fd018d5490928f68fb6246e56966b3",
     "read-benchmark-owner.mjs": "e355bf7611e5ff47f257dd5d00d74146e4d33c6dddcb391dd4f2db7eefbd4b55",
-    "read-benchmark-reader.mjs": "7c92a3fb6c8afffa7693082a5a8644c532bbbc6c019d243801e05fd7cc33d29b",
+    "read-benchmark-reader.mjs": "bb2d2c0cba965738404cb015aa573dd7a5a5160793c7dccc5c426a8d1c516ba8",
     "read-benchmark-runner.mjs": "97c35c852b8fd52d9ce3b5633494b4530d689094723dd37e049773aa9be6c4ba"
   },
   "vendorFilesSHA256": {
@@ -98,7 +98,7 @@
     "version.mjs": "1ac55c72fcc3e0112d2af8c87bac15ff781e3fe4d1316ed8a06e4ee0565b70a9"
   },
   "buildEnvironment": {
-    "node": "v22.23.4",
+    "node": "v22.23.5",
     "bun": "1.4.2",
     "rustCompiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
     "rustToolchain": "1.100.0"
