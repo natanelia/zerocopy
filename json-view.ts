@@ -60,6 +60,16 @@ function stringEquals(bytes: Uint8Array, ptr: number, end: number, expected: str
   return false;
 }
 
+// After a long rewind, remember one offset per stride. Thin the offsets as
+// the explored prefix grows. Even a very large array keeps at most 256 entries.
+const FIRST_STRIDE = 32;
+const MAX_OFFSETS = 256;
+interface ArrayCursor {
+  index: number;
+  pointer: number;
+  checkpoints?: { offsets: number[]; stride: number };
+}
+
 /**
  * A read-only view of one immutable JSON record or nested container.
  *
@@ -76,7 +86,7 @@ export class JsonView {
   readonly #start: number;
   readonly #bound: number;
   #end: number | undefined;
-  #arrayCursor: { index: number; pointer: number } | undefined;
+  #arrayCursor: ArrayCursor | undefined;
 
   /** @internal A retained arena keeps the published record alive. */
   constructor(arena: Arena, pointer: number, length: number) {
@@ -128,20 +138,51 @@ export class JsonView {
 
   /** Read a zero-based array index; invalid/out-of-range indices return undefined. */
   at(index: number): JsonViewValue | undefined {
-    if (!Number.isInteger(index) || index < 0 || index > 0xffffffff || this.#arena.buf[this.#start] !== 91) return undefined;
+    if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) return undefined;
+    const cursor = this.#arrayCursor;
+    // A successful cursor already establishes that this immutable value is an array.
+    if (!cursor && this.#arena.buf[this.#start] !== 91) return undefined;
     // Published JSON never moves. Forward reads can resume from the previous
     // element instead of scanning every earlier element again. The cursor is
-    // local to this view; backward reads still start at the opening bracket.
-    const cursor = this.#arrayCursor, wasm = this.#arena.wasm;
+    // local to this view. Build sparse offsets only after an expensive rewind.
+    const wasm = this.#arena.wasm;
     let pointer: number;
-    if (cursor && index >= cursor.index) {
+    if (cursor && index >= cursor.index && (index - cursor.index <= FIRST_STRIDE || !cursor.checkpoints)) {
       pointer = index === cursor.index ? cursor.pointer
         : wasm.jsonArrayAtFrom(cursor.pointer, this.#bound, index - cursor.index) >>> 0;
+    } else if (cursor && index >= FIRST_STRIDE) {
+      pointer = this.#seek(cursor, index);
     } else pointer = wasm.jsonArrayAt(this.#start, this.#bound, index) >>> 0;
     if (!pointer) return undefined;
     if (cursor) { cursor.index = index; cursor.pointer = pointer; }
-    else this.#arrayCursor = { index, pointer };
+    else this.#arrayCursor = { index, pointer, checkpoints: undefined };
     return this.#read(pointer);
+  }
+
+  #seek(cursor: ArrayCursor, index: number): number {
+    const wasm = this.#arena.wasm;
+    const checkpoints = cursor.checkpoints ??= {
+      offsets: [wasm.jsonArrayAt(this.#start, this.#bound, 0) >>> 0], stride: FIRST_STRIDE,
+    };
+    const offsets = checkpoints.offsets;
+    let stride = checkpoints.stride;
+    while (offsets.length * stride <= index) {
+      const previous = offsets[offsets.length - 1]!;
+      const next = wasm.jsonArrayAtFrom(previous, this.#bound, stride) >>> 0;
+      if (!next) return 0;
+      if (offsets.length === MAX_OFFSETS) {
+        for (let i = 1; i < MAX_OFFSETS / 2; i++) offsets[i] = offsets[2 * i]!;
+        offsets.length = MAX_OFFSETS / 2;
+        stride *= 2;
+        checkpoints.stride = stride;
+      }
+      offsets.push(next);
+    }
+    const block = Math.floor(index / stride), anchor = block * stride;
+    const useCursor = cursor.index > anchor && cursor.index <= index;
+    const pointer = useCursor ? cursor.pointer : offsets[block]!;
+    const distance = index - (useCursor ? cursor.index : anchor);
+    return distance ? wasm.jsonArrayAtFrom(pointer, this.#bound, distance) >>> 0 : pointer;
   }
 
   /** Strict scalar equality; string predicates do not create a JS value string. */
