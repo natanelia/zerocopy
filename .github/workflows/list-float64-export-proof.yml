@@ -1,0 +1,60 @@
+name: Numeric List Float64 export proof
+
+on:
+  push:
+    branches: [perf/list-float64-export-20261109]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Build candidate and check declarations
+        run: |
+          bun install
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:values
+      - name: Complete Bun unit and integration tests
+        run: bun run test 2>&1 | tee /tmp/list-float64-tests.log
+      - name: Package and existing Node worker regression checks
+        run: |
+          bun run check:package
+          node proofs/node-worker.mjs
+          node --test proofs/list-query.mjs proofs/list-query-regression.mjs
+      - name: Build pinned baseline with identical dependencies
+        env:
+          BASELINE: a4265a0608ec25eec5719496225212db6b251989
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/zerocopy-baseline" "$BASELINE"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/zerocopy-baseline/node_modules"
+          (cd "$RUNNER_TEMP/zerocopy-baseline" && bun run build:wasm && bun run build:browser)
+      - name: Paired fresh-process Node and Bun typed-array export benchmarks
+        run: |
+          node proofs/list-float64-export-20261109/compare.mjs "$RUNNER_TEMP/zerocopy-baseline" "$GITHUB_WORKSPACE" 2>&1 | tee /tmp/list-float64-benchmark.log
+      - name: Retain validation and before-after measurements
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: numeric-list-export-${{ github.sha }}
+          path: |
+            proofs/list-float64-export-20261109/results.json
+            /tmp/list-float64-tests.log
+            /tmp/list-float64-benchmark.log
+          retention-days: 7
+          if-no-files-found: warn
