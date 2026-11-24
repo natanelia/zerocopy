@@ -88,6 +88,24 @@ describe('bounded JSON string scanning', () => {
     expect(Buffer.from(arena.buf).equals(before)).toBe(true);
   });
 
+  test('skips mixed containers at every word alignment and respects the closing bound', () => {
+    const arena = new Arena();
+    const coordinates = Array.from({ length: 40 }, (_, i) => [103.854219 + i / 1234, -1.29136 - i / 456]);
+    const payload = [{ text: '道路🙂 [{ "a": 99 }] \\ \n'.repeat(25), coordinates }, [null, true, false]];
+    const expected = { payload, ok: true, trailingField: 42 };
+    for (let alignment = 0; alignment < 8; alignment++) {
+      const { pointer, end, view } = record(arena, JSON.stringify(expected), alignment);
+      expect(arena.wasm.jsonValueEnd(pointer, end)).toBe(end);
+      expect(arena.wasm.jsonValueEnd(pointer, end - 1)).toBe(0);
+      expect(view.get('ok')).toBe(true);
+      expect(view.get('trailingField')).toBe(42);
+      const nested = view.get('payload') as JsonView;
+      expect((nested.at(1) as JsonView).toObject()).toEqual(payload[1]);
+      expect(nested.at(2)).toBeUndefined();
+      expect(nested.toObject()).toEqual(payload);
+    }
+  });
+
   test.each([false, true])('retained map/list views remain read-only after owner growth (copy=%s)', async copy => {
     const arena = new Arena(), text = 'ordinary text 道路🙂 '.repeat(4096), escaped = text + '"\\\n';
     const source = new SharedMap('object', 0, 0, arena).set('record', { text, escaped, target: 37 });
