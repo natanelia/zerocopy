@@ -813,7 +813,26 @@ export class Arena {
     const leaves = new Set<number>();
     for (const key of keys) {
       if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
-      const leaf = root ? this.findUncached(root, key) : 0;
+      if (!root) continue;
+      // Resolve short keys with the writer's existing staging range. The first
+      // experiment spent more time in JS lookup even on all-miss batches.
+      // Match the scalar deletion encoding, including Unicode normalization.
+      let length = key.length;
+      if (length <= 49152) {
+        let encoded: Uint8Array | undefined;
+        for (let i = 0; i < length; i++) {
+          const c = key.charCodeAt(i);
+          if (c > 127) { encoded = encoder.encode(key); length = encoded.length; break; }
+          this.bytes[16384 + i] = c;
+        }
+        if (length <= 49152) {
+          if (encoded) this.bytes.set(encoded, 16384);
+          const leaf = this.wasm.mapFindStaged(root, length) >>> 0;
+          if (leaf) leaves.add(leaf);
+          continue;
+        }
+      }
+      const leaf = this.findUncached(root, key);
       if (leaf) leaves.add(leaf);
     }
     if (!leaves.size) return root;

@@ -471,6 +471,12 @@ unsafe fn delete_leaf_at(root: u32, leaf: u32, hash: u32, shift: u32) -> u32 {
     replace_child(root, next_bitmap, -1, digit, child, PUBLISHED)
 }
 
+// Writer-only key staging; this does not allocate or alter the root.
+#[no_mangle]
+pub unsafe extern "C" fn mapFindStaged(root: u32, length: u32) -> u32 {
+    mapFind(root, WRITE_STAGE, length, hash_at(WRITE_STAGE, length))
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn mapDeleteBytes(root: u32, length: u32) -> u32 {
     let hash = hash_at(WRITE_STAGE, length);

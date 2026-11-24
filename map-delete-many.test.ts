@@ -50,6 +50,26 @@ describe('batched persistent map deletion experiment', () => {
     expect(owner.buf.slice(65536, owner.used)).toEqual(before);
   });
 
+  test('staged and oversized keys use identical byte semantics', () => {
+    const asciiLimit = 'a'.repeat(49152);
+    const oversizedAscii = 'a'.repeat(49153);
+    const oversizedUtf8 = '路'.repeat(17000);
+    const entries = Array.from({ length: 80 }, (_, i) => ['feature/' + i, i] as const);
+    const base = new SharedMap('number', 0, 0, new Arena()).setMany([
+      ...entries, ['', 100], [asciiLimit, 101], [oversizedAscii, 102],
+      [oversizedUtf8, 103], ['\ufffd', 104], ['\ufeffkey', 105],
+    ]);
+    const keys = [...entries.slice(0, 65).map(([key]) => key), '', asciiLimit,
+      oversizedAscii, oversizedUtf8, '\ud800', asciiLimit, 'absent'];
+    const result = base.deleteMany(keys);
+    const scalar = keys.reduce((snapshot, key) => snapshot.delete(key), base);
+    expect(new Map(result.entries())).toEqual(new Map(scalar.entries()));
+    expect(result.size).toBe(16);
+    expect(result.get('\ufeffkey')).toBe(105);
+    expect(base.get(oversizedUtf8)).toBe(103);
+    expect(base.size).toBe(86);
+  });
+
   test('missing keys preserve identity, invalid input throws, empty roots stay empty', () => {
     const base = new SharedMap('number', 0, 0, new Arena()).set('key', 1);
     const missing = Array.from({ length: 100 }, (_, i) => 'missing/' + i);

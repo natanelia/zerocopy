@@ -171,6 +171,15 @@
         "i32"
       ]
     },
+    "mapFindStaged": {
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
     "mapDeleteBatch": {
       "params": [
         "i32",
