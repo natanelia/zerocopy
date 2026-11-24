@@ -2,6 +2,7 @@ import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from '
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 import { JsonView } from './json-view';
+import { NATIVE_LITTLE_ENDIAN } from './memory';
 import { compileStringSearch, type TextSearchOptions } from './text-search';
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
@@ -50,13 +51,14 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     const root = a.wasm.vecLink(this.root, this.depth, depth, this.size - 32, this.tail, 32) >>> 0;
     return new SharedList(this.type, root, depth, size, a, a.wasm.tailAppend(0, 0, raw) >>> 0);
   }
-  pushMany(values: readonly ValueOf<T>[]): SharedList<T> {
-    if (!values.length) return this;
+  pushMany(values: readonly ValueOf<T>[] | ([T] extends ['number'] ? Float32Array | Float64Array : never)): SharedList<T> {
+    const count = values.length;
+    if (!count) return this;
     const a = this.arena; a.assertWritable();
-    const size = checkedSize(this.size + values.length);
+    const size = checkedSize(this.size + count);
     const oldLength = this.size ? ((this.size - 1) & 31) + 1 : 0;
     // Encode first. User serialization may reenter the owning arena.
-    const input = a.encodeRange(this.type, values, this.tail, oldLength);
+    const input = a.encodeRange(this.type, values, count, this.tail, oldLength);
     const length = ((size - 1) & 31) + 1, treeSize = size - length;
     const depth = vectorDepth(treeSize), start = this.size - oldLength;
     const root = a.wasm.vecLink(this.root, this.depth, depth, start, input, treeSize - start) >>> 0;
@@ -235,6 +237,41 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
         for (let i = first; i < stop; i++) result[i] = a.decode(this.type, view.getFloat64(leaf + (i - first) * 8, true));
       }
     }
+    return result;
+  }
+  /** Copy a numeric snapshot into one contiguous, independently writable buffer. */
+  toFloat64Array(this: SharedList<'number'>): Float64Array<ArrayBuffer> {
+    if (this.type !== 'number') throw new TypeError('Float64Array output requires a numeric list');
+    const { size, root, depth, tail } = this;
+    // Native conversion wins for one or two leaves. It also handles host byte order.
+    if (size <= 64 || !NATIVE_LITTLE_ENDIAN) return new Float64Array(this.toArray());
+    const result = new Float64Array(size);
+    const a = this.arena, view = a.dv, source = view.buffer;
+    const output = new Uint8Array(result.buffer);
+    const tailStart = (size - 1) & ~31;
+    let start = 0, end = 0, written = 0, parent = 0;
+    // Bulk appends place consecutive leaves next to each other. An edit can
+    // replace just one leaf, so copy adjacent spans together in logical order.
+    for (let first = 0; first < size; first += 32) {
+      let leaf = tail;
+      if (first < tailStart) {
+        leaf = root;
+        if (depth) {
+          // One trie walk locates the parent of up to 32 consecutive leaves.
+          if ((first & 1023) === 0) parent = a.wasm.vecLeaf(root, depth - 1, first >>> 5) >>> 0;
+          leaf = view.getUint32(parent + ((first >>> 5) & 31) * 4, true);
+        }
+      }
+      if (leaf !== end) {
+        if (end !== start) {
+          output.set(new Uint8Array(source, start, end - start), written);
+          written += end - start;
+        }
+        start = leaf;
+      }
+      end = leaf + Math.min(32, size - first) * 8;
+    }
+    output.set(new Uint8Array(source, start, end - start), written);
     return result;
   }
   toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }

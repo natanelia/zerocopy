@@ -1,4 +1,4 @@
-import { memoryDescriptor } from './memory';
+import { memoryDescriptor, NATIVE_LITTLE_ENDIAN } from './memory';
 import { ReadCache } from './read-cache';
 import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
@@ -10,6 +10,10 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const typedArrayPrototype = Object.getPrototypeOf(Float64Array.prototype);
+const typedArrayTag = Object.getOwnPropertyDescriptor(typedArrayPrototype, Symbol.toStringTag)!.get!;
+const typedArrayBuffer = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'buffer')!.get!;
+const typedArrayOffset = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'byteOffset')!.get!;
 let nextId = 0;
 const MAX_DECODED_RECORDS = 2048;
 const MAX_DECODED_BYTES = 2 * 1024 * 1024;
@@ -947,14 +951,27 @@ export class Arena {
     return this.vectorView!.getFloat64(this.vectorAddress + (index & 31) * 8, true);
   }
 
-  encodeRange(type: string, values: readonly any[], prefix = 0, length = 0): number {
+  encodeRange(type: string, values: readonly any[] | Float32Array | Float64Array, count: number, prefix: number, length: number): number {
     this.assertWritable();
     const raw = type === 'number' ? values : values.map(value => this.encode(type, value));
-    const input = this.alloc((length + raw.length) * 8), dv = this.dv;
+    const input = this.alloc((length + count) * 8), destination = input + length * 8;
     if (length) this.bytes.copyWithin(input, prefix, prefix + length * 8);
-    for (let i = 0; i < raw.length; i++) {
-      if (typeof raw[i] !== 'number') throw new TypeError('Expected a number');
-      dv.setFloat64(input + (length + i) * 8, raw[i], true);
+    // For short inputs the scalar loop costs less than setting up typed views.
+    if (count >= 512 && NATIVE_LITTLE_ENDIAN && type === 'number' && ArrayBuffer.isView(raw)) {
+      const kind = typedArrayTag.call(raw);
+      if (kind === 'Float64Array' || kind === 'Float32Array') {
+        const buffer = typedArrayBuffer.call(raw), offset = typedArrayOffset.call(raw);
+        // Fix the copied range at the submitted length even if a shared input grows.
+        if (kind === 'Float64Array') this.bytes.set(new Uint8Array(buffer, offset, count * 8), destination);
+        else new Float64Array(this.buffer, destination, count).set(new Float32Array(buffer, offset, count));
+        return input;
+      }
+    }
+    const view = this.dv;
+    for (let i = 0; i < count; i++) {
+      const value = raw[i];
+      if (typeof value !== 'number') throw new TypeError('Expected a number');
+      view.setFloat64(destination + i * 8, value, true);
     }
     return input;
   }

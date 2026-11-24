@@ -5,9 +5,16 @@ Import optional geometry operations from `zerocopy/geometry`.
 ```ts
 import { SharedList } from 'zerocopy';
 import { bboxXY } from 'zerocopy/geometry';
-const coordinates = new SharedList('number').pushMany([0, 1, -2, 3, 4, -5]);
+const importedXY = new Float64Array([0, 1, -2, 3, 4, -5]);
+const coordinates = new SharedList('number').pushMany(importedXY);
 const bounds = bboxXY(coordinates); // [-2, -5, 4, 3]
+const renderBuffer = coordinates.toFloat64Array();
 ```
+
+Pass packed interleaved coordinates directly to `pushMany()` when importing
+lane or tile data. Use `toFloat64Array()` when handing a numeric snapshot to
+a renderer or transferring a coordinate buffer out of a worker. The returned
+array owns its buffer.
 
 `bboxXY` recomputes `[minX, minY, maxX, maxY]` from interleaved 2D coordinates. It reads the supplied snapshot directly and returns a fresh readonly tuple. It does not parse GeoJSON, transform coordinates, use cached bounds, or change existing collection methods. A caller must use this new API to benefit from it. Reuse previously calculated bounds when a snapshot has not changed.
 
@@ -35,3 +42,32 @@ The differential proof checks an independent JavaScript loop, pinned Turf 7.4.0,
 Each benchmark includes eight warm-up rounds and 21 measured rounds, with alternating execution order and checked output. Random points, road-like lines, and late-zero inputs are measured at four sizes. Timers include result construction but exclude input construction, compilation, and worker messaging. Turf is forced to recompute; its cached bbox path is not compared to a full scan. Flat JavaScript arrays and existing SharedList.forEach are reported separately. The bulk gate requires more than 5% public-API improvement over both Turf recomputation and existing SharedList iteration in every tested shape and size. It does not approve rejected SIMD versions.
 
 Raw results include all samples, CPU, architecture, runtime, commit, source digest, and test counts. Browser checks verify main-thread execution and same-realm read-only attachments. They do not claim actual browser-worker or Safari-device validation. See the performance decision document for measured results and rejected variants.
+
+### Map editing benchmarks
+
+Build a baseline checkout and the current checkout, then pass their portable
+build directories to the benchmark. It measures short lane writes, tile
+imports, packing read-only snapshots, and an import, bounds, edit, and pack
+workflow on synthetic lane geometry. It checks every result before timing and
+emits the individual timing samples.
+
+The combined workload imports two tiles of 131,072 XY points each, computes
+their bounds, edits 128 points per tile, and packs the edited coordinates.
+These are the medians of 25 paired samples against `2eb1bfd` on Linux x64.
+
+| Runtime | Baseline | Current | Speedup |
+| --- | ---: | ---: | ---: |
+| Chromium 156.0.8078.4 | 17.39 ms | 6.62 ms | 2.63× |
+| Node 26.13.1 | 14.64 ms | 4.82 ms | 3.04× |
+| Bun 1.4.2 | 12.53 ms | 7.33 ms | 1.71× |
+
+The baseline packs coordinates with `new Float64Array(list.toArray())`. The
+benchmark covers collection work on a single thread. It excludes map data
+fetching, renderer work, and worker message latency. The 24-point packing
+case changed by less than 0.15 µs per call in each runtime.
+
+```sh
+node proofs/hd-map-performance.mjs /path/to/baseline/dist dist
+bun proofs/hd-map-performance.mjs /path/to/baseline/dist dist
+node proofs/hd-map-performance.mjs /path/to/baseline/dist dist chromium
+```

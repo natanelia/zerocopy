@@ -4,6 +4,9 @@ const MINIMUM_BYTES = 2 * PAGE_BYTES;
 const MAXIMUM_BYTES = 0x7fff0000; // The allocator's existing address limit.
 let maximumBytes = 256 * 1024 * 1024;
 
+/** Typed arrays use native byte order; the arena always stores little-endian values. */
+export const NATIVE_LITTLE_ENDIAN = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+
 /** Set the growth limit for future arenas in this thread, before constructing data.
  * Existing arenas and attached shared memory keep their original limits.
  * A larger limit can reserve address space even when the initial buffer is small.

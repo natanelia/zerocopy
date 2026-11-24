@@ -222,6 +222,11 @@ queue.peek();     // 'first'
 remaining.peek(); // 'second'
 ```
 
+Numeric lists accept `Float64Array` and `Float32Array` inputs in `pushMany()`.
+They copy the input into the arena as 64-bit values. Use `toFloat64Array()` to
+copy any numeric snapshot, including a read-only worker attachment, into a
+contiguous `Float64Array` with its own transferable `ArrayBuffer`.
+
 `SharedList.setMany(entries)` applies several indexed edits to produce one
 new snapshot. It copies each affected tree node once, keeps the list's size,
 and preserves the original snapshot. It ignores out-of-range and non-integer
