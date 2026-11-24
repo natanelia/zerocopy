@@ -137,6 +137,12 @@ type PrimitiveRead = Assert<Equal<ReturnType<typeof numberMap.get>, number | und
 new SharedMap('object').set('legacy', { unrestricted: true });
 new SharedMap('object').getView('legacy');
 new SharedList('object').getView(0);
+const coordinates = new SharedList('number').pushMany(new Float64Array([1, 2])).pushMany(new Float32Array([3, 4]));
+type PackedCoordinates = Assert<Equal<ReturnType<typeof coordinates.toFloat64Array>, Float64Array<ArrayBuffer>>>;
+// @ts-expect-error Numeric typed-array input is specific to numeric lists.
+laneList.pushMany(new Float64Array([1, 2]));
+// @ts-expect-error Typed-array output is specific to numeric lists.
+laneList.toFloat64Array();
 // @ts-expect-error Number map records are not JSON byte records.
 new SharedMap('number').getView('n');
 // @ts-expect-error String map records are not JSON byte records.

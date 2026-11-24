@@ -1,4 +1,6 @@
 import { SharedList, resetSharedList } from './shared-list';
+import { Arena, HEAP_START } from './arena';
+import { getWorkerData, initWorker } from './shared';
 import { expect, test, describe, beforeEach } from 'vitest';
 
 describe('SharedList', () => {
@@ -77,6 +79,57 @@ describe('SharedList', () => {
   test('pushMany', () => {
     const v = new SharedList('number').pushMany([1, 2, 3]);
     expect(v.toArray()).toEqual([1, 2, 3]);
+  });
+
+  test.each([Float32Array, Float64Array])('pushMany copies %s subviews across growth and a partial tail', TypedArray => {
+    const arena = new Arena();
+    const prefix = Array.from({ length: 35 }, (_, i) => i * 0.25);
+    const base = new SharedList('number', 0, 0, 0, arena).pushMany(prefix);
+    const backing = new SharedArrayBuffer(8200 * TypedArray.BYTES_PER_ELEMENT);
+    const input = new TypedArray(backing).subarray(1, 8199);
+    for (let i = 0; i < input.length; i++) input[i] = i / 7;
+    input.set([-0, NaN, Infinity, -Infinity, 103.851959000013], 30);
+    const expected = Array.from(input);
+    const published = arena.buf.slice(HEAP_START, arena.used);
+    const result = base.pushMany(input);
+    input.fill(0);
+    expect(result.toArray()).toEqual([...prefix, ...expected]);
+    expect(base.toArray()).toEqual(prefix);
+    expect(arena.buf.subarray(HEAP_START, HEAP_START + published.length)).toEqual(published);
+    expect(result.pushMany(new TypedArray(0))).toBe(result);
+  });
+
+  test('toFloat64Array copies packed and fragmented snapshots with exact values and independent storage', () => {
+    const values = [-0, NaN, Infinity, -Infinity, Number.MIN_VALUE, 103.851959000013];
+    for (const size of [0, 1, 31, 32, 33, 1024, 1057]) {
+      const source = Array.from({ length: size }, (_, i) => values[i % values.length]);
+      const base = new SharedList('number').pushMany(source);
+      const edits = [[31, Math.PI], [32, -Math.PI], [size - 1, -0]] as const;
+      const edited = base.setMany(edits), expected = source.slice();
+      for (const [index, value] of edits) if (index >= 0 && index < size) expected[index] = value;
+      expect(Array.from(base.toFloat64Array())).toEqual(source);
+      const packed = edited.toFloat64Array();
+      expect(packed.buffer).toBeInstanceOf(ArrayBuffer);
+      expect(Array.from(packed)).toEqual(expected);
+      packed.fill(999);
+      expect(Array.from(edited.toFloat64Array())).toEqual(expected);
+    }
+    expect(() => SharedList.prototype.toFloat64Array.call(new SharedList('object') as never))
+      .toThrow('Float64Array output requires a numeric list');
+  });
+
+  test.each([false, true])('copies coordinate snapshots from read-only attachments (copy=%s)', async copy => {
+    const arena = new Arena();
+    const points = new SharedList('number', 0, 0, 0, arena).pushMany(Float64Array.from({ length: 65 }, (_, i) => i / 3));
+    const { points: reader } = await initWorker(getWorkerData({ points }, { copy }));
+    const expected = points.toArray(), before = arena.used;
+    expect(reader.pushMany(new Float64Array(0))).toBe(reader);
+    expect(() => reader.pushMany(new Float64Array([1, 2]))).toThrow(/read-only/);
+    const packed = reader.toFloat64Array();
+    expect(arena.used).toBe(before);
+    points.pushMany(new Float64Array(16384)).set(31, -33);
+    packed[0] = 999;
+    expect(Array.from(reader.toFloat64Array())).toEqual(expected);
   });
 
   test('crosses 32-element boundary', () => {
