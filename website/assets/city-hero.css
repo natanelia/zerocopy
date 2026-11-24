@@ -144,7 +144,7 @@
 .city-traces [data-job] { stroke: var(--job-line); stroke-width: 6; filter: drop-shadow(0 1px 1.5px #ffefcc); transition: opacity .4s; }
 .city-traces circle, .city-traces rect { fill: #fff3d6; }
 .city-traces ellipse { fill: #ffbb6f40; }
-.city-pin, .district-pin {
+.city-pin {
   position: absolute;
   display: flex;
   align-items: center;
@@ -155,11 +155,11 @@
   background: linear-gradient(155deg,#fff6df,#ffe4bf);
   box-shadow: 0 .18em .38em #45290c4d, inset 0 1px 0 white;
   color: var(--job-ink);
-  font: 400 clamp(12px,1.13cqw,27px)/1.1 var(--serif);
+  font: 400 clamp(12px,1cqw,15px)/1.2 Georgia,serif;
   padding: .33em .57em;
   translate: -50% -100%;
 }
-.city-pin::before, .district-pin::before {
+.city-pin::before {
   content: "";
   position: absolute;
   top: 100%;
@@ -172,23 +172,33 @@
   background: #fff0cd;
   box-shadow: 1px 1px 1px #77592d66;
 }
-.city-pin svg, .district-pin svg, .worker-slot svg, .snapshot-key svg { width: 1.03em; height: 1.03em; flex: none; }
+.city-pin svg, .worker-slot svg, .snapshot-key svg { width: 1.03em; height: 1.03em; flex: none; }
 .city-pin[data-job="school"] { left: 43%; top: 38%; }
 .city-pin[data-job="train"] { left: 50%; top: 48.2%; }
 .city-pin[data-job="utility"] { left: 62%; top: 59.8%; }
 .city-pin, .worker-slot { transition: opacity .35s, background-color .35s; }
 .city-pin[data-state="queued"], .city-traces [data-state="queued"] { opacity: 0; }
+/* Anchor the caption to the new buildings' footprint at every crop. */
 .district-pin {
-  left: 18.3%; top: 53%;
-  padding: .35em .65em;
-  color: #843411;
-  font-size: clamp(17px,1.87cqw,44px);
+  position: absolute;
+  left: 35.2%;
+  top: 62.7%;
+  translate: -100% .45rem;
+  padding: .2em .45em;
+  border-radius: 2px;
+  background: #fff3dfee;
+  color: #493b29;
+  font: 400 clamp(12px,.9cqw,14px)/1.25 Georgia,serif;
+  white-space: nowrap;
 }
-.district-pin::before { left: 66%; height: 6.7cqw; transform: rotate(-26deg); width: .25cqw; }
 .district-pin::after {
-  content: ""; position: absolute; left: calc(66% + 2.93cqw); top: calc(100% + 5.9cqw);
-  width: .78cqw; aspect-ratio: 1; translate: -40% -35%;
-  border-radius: 50%; background: #fff4d9; border: 2px solid #b96923;
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  width: 1px;
+  height: .45rem;
+  background: #655136;
 }
 .job-mark {
   display: inline-grid; place-items: center; width: .79em; height: .79em; flex: none;
@@ -212,7 +222,7 @@
   box-shadow: 0 3px 12px #112b252b,inset 0 1px 0 #fff9ed;
   backdrop-filter: blur(7px);
 }
-.snapshot-key { display: flex; align-items: center; gap: .45em; white-space: nowrap; font: 400 clamp(16px,1.53vw,31px)/1.1 var(--serif); }
+.snapshot-key { display: flex; align-items: center; gap: .45em; white-space: nowrap; font: 400 clamp(15px,1.14vw,18px)/1.2 Georgia,serif; }
 .worker-list { list-style: none; margin: 0; padding: 0 0 0 1vw; border-left: 1px solid #a89878; display: flex; align-items: center; flex-wrap: wrap; gap: clamp(4px,.4vw,9px); }
 .worker-slot, .idle-slot {
   display: inline-flex; align-items: center; justify-content: center; gap: .35em;
@@ -252,12 +262,9 @@
   .city-pin[data-job="school"] { left: 44%; }
   .city-pin[data-job="train"] { left: 49%; }
   .city-pin[data-job="utility"] { left: 57.6%; }
-  .district-pin { left: 26%; top: 54%; font-size: clamp(14px,3.5vw,22px); }
-  .district-pin::before { left: 42%; transform: rotate(12deg); height: 6cqw; }
-  .district-pin::after { left: calc(42% - 1.25cqw); top: calc(100% + 5.8cqw); width: 1.35cqw; }
   .worker-strip { position: relative; inset: auto; margin: -5% 4% 0; display: grid; grid-template-columns: 1fr auto; gap: 9px; padding: 12px; border-radius: 15px; }
   .city-hero { padding-bottom: 15px; background: #086268; }
-  .snapshot-key { font-size: clamp(17px,4.2vw,24px); }
+  .snapshot-key { font-size: clamp(15px,3.9vw,17px); }
   .worker-list { grid-column: 1/-1; grid-row: 2; border: 0; padding: 0; gap: 4px; }
   .worker-slot { position: relative; flex: 0 0 calc((100% - 8px) / 3); padding: 6px; justify-content: start; font-size: clamp(11px,3.05vw,15px); }
   .worker-slot svg { display: none; }
@@ -273,9 +280,8 @@
   .city-intro h1 { font-size: clamp(45px,6.5vw,62px); }
   .city-model { width: 122%; margin-left: -6%; margin-top: -20%; }
   .city-relief { mask-image: linear-gradient(transparent 29%,black 43% 88%,transparent 99%); }
-  .city-pin { font-size: 15px; }
+  .city-pin { font-size: 13px; }
   .city-pin[data-job="utility"] { left: 62%; }
-  .district-pin { font-size: 21px; }
   .worker-list { display: flex; }
   .worker-slot { flex: 0 1 auto; padding-inline: 12px 24px; }
   .worker-slot small { font-size: 10px; }

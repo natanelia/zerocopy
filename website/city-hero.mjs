@@ -1,5 +1,4 @@
 const symbols = {
-  home: '<path d="m2 10 10-8 10 8M5 9v12h5v-7h4v7h5V9"/>',
   school: '<path d="m2 10 10-7 10 7M4 10v11h16V10M10 21v-6h4v6M7 12h1m8 0h1M12 3V1"/>',
   train: '<rect x="5" y="2" width="14" height="16" rx="4"/><path d="M5 10h14M8 21l2-3m6 3-2-3M9 14h1m4 0h1"/>',
   utility: '<path d="m13 2-8 12h6l-1 8 9-13h-7z"/>',
@@ -52,7 +51,7 @@ export function cityHero(base) {
     <div class="city-window" aria-hidden="true"><div class="city-model">
       <img class="city-relief" width="1672" height="941" src="${base}assets/singapore-relief.webp" srcset="${base}assets/singapore-relief-900.webp 900w, ${base}assets/singapore-relief.webp 1672w" sizes="(max-width: 600px) 177vw, (max-width: 980px) 122vw, 100vw" fetchpriority="high" alt="">
       ${mapLayers()}
-      <div class="district-pin">${icon('home')} 30,000 new homes</div>${pins}
+      <span class="district-pin">30,000 new homes</span>${pins}
     </div></div>
     <p class="city-sr">A proposed district of 30,000 new homes rises in western Singapore. Three workers read the same city snapshot to estimate school demand, train capacity, and utility load beyond the district.</p>
     <div class="worker-strip"><div class="snapshot-key">${icon('snapshot')}<span>1 shared city snapshot</span></div>
