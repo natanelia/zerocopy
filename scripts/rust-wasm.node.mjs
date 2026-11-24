@@ -64,6 +64,7 @@ test('the audit follows reader calls and rejects hidden writes and memory growth
   rejects('(func $write (i32.store (i32.const 65536) (i32.const 7))) (func (export "jsonValueEnd") (call $write))', /shared-memory writes/);
   rejects('(func (export "mapFind") (drop (memory.grow (i32.const 1))))', /shared-memory writes\/growth/);
   rejects('(func (export "bboxXY") (memory.fill (i32.const 65536) (i32.const 0) (i32.const 8)))', /shared-memory writes/);
+  rejects('(func (export "bboxXYRange") (memory.fill (i32.const 65536) (i32.const 0) (i32.const 8)))', /shared-memory writes/);
 });
 
 test('the build rejects a Rust linear stack even in a writer', () => {

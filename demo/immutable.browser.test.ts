@@ -16,6 +16,8 @@ test('real browser worker reads shared, immutable, nested snapshots across updat
     const first = await send(getWorkerData({ map, list, nested }));
     expect(first.map).toEqual(input); expect(first.list).toEqual(Array.from(coords)); expect(first.nested).toEqual(first.list);
     expect(first.packed).toEqual(coords);
+    expect(first.lane).toEqual(coords.slice(950));
+    expect(first.laneBounds).toEqual([coords[950], coords[951], coords[1024], coords[1025]]);
     first.packed[0] = 100;
     const edited = list.setMany([[0, -0], [31, 9], [1025, -3.25]]);
     expect(first.frozen && first.blocked && first.shared).toBe(true);
@@ -25,6 +27,8 @@ test('real browser worker reads shared, immutable, nested snapshots across updat
     const expected = coords.slice();
     expected[0] = -0; expected[31] = 9; expected[1025] = -3.25;
     expect(second.packed).toEqual(expected);
+    expect(second.lane).toEqual(expected.slice(950));
+    expect(second.laneBounds).toEqual([coords[950], -3.25, coords[1024], coords[1023]]);
     expect(Object.is(second.packed[0], -0)).toBe(true);
     expect(second.nested).toEqual(Array.from(coords));
     expect(list.get(0)).toBe(0);

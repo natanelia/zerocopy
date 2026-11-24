@@ -24,6 +24,25 @@ The accepted kernel is scalar Wasm. SIMD implementations remain rejected experim
 
 Attached read-only snapshots and historical versions are supported. The kernel uses neither an allocator nor shared scratch. Results use instance-local globals and are copied to a new tuple before the synchronous call returns. There are no imported callbacks or asynchronous steps during the transfer. Workers have separate instances. Non-empty calls compile the module lazily and cache one instance per memory; empty input does not compile a module.
 
+## Refresh an edited lane
+
+Keep each lane's coordinate range when packing several lanes into one list.
+After editing a point, recompute the bounds of that lane and overwrite its
+span in the existing render buffer. Both operations also work in a reader
+after it receives the new snapshot.
+
+```ts
+const lane = { start: 2, end: 6 };
+const edited = coordinates.setMany([[2, -3], [3, 5]]);
+const laneBounds = bboxXY(edited, lane); // [-3, -5, 4, 5]
+edited.copyToFloat64Array(renderBuffer, { ...lane, offset: lane.start });
+```
+
+`start` and `end` count individual coordinates. `bboxXY` requires both
+indexes to be even and treats `end` as exclusive. A viewport can also pack
+several visible lanes into a smaller buffer by assigning each lane its own
+destination `offset`.
+
 ## Reproduce
 
 ```sh
@@ -53,9 +72,10 @@ emits the individual timing samples.
 
 The combined workload imports two tiles of 131,072 XY points each, computes
 their bounds, edits 128 points per tile, and packs the edited coordinates.
-These are the medians of 25 paired samples against `2eb1bfd` on Linux x64.
+These are the recorded medians of 25 paired samples for `fd6195b` against
+`2eb1bfd` on Linux x64.
 
-| Runtime | Baseline | Current | Speedup |
+| Runtime | `2eb1bfd` | `fd6195b` | Speedup |
 | --- | ---: | ---: | ---: |
 | Chromium 156.0.8078.4 | 17.39 ms | 6.62 ms | 2.63× |
 | Node 26.13.1 | 14.64 ms | 4.82 ms | 3.04× |
@@ -71,3 +91,30 @@ node proofs/hd-map-performance.mjs /path/to/baseline/dist dist
 bun proofs/hd-map-performance.mjs /path/to/baseline/dist dist
 node proofs/hd-map-performance.mjs /path/to/baseline/dist dist chromium
 ```
+
+### Range reads and reusable buffers
+
+This run compares the lane-range implementation with `fd6195b` using a
+synthetic tile of 131,072 XY points. The viewport cases read 16 lanes with
+128 points each. The edit case moves one XY point, recomputes that lane's
+bounds, and updates its span in an existing tile buffer. The baseline uses
+indexed reads for the same selected lanes. For a complete tile refresh into
+an existing buffer, it packs the snapshot and copies the result into that
+buffer. Both versions use the same `setMany` edits.
+
+Times are median microseconds per operation on an AMD EPYC-Milan Linux x64
+host on November 25, 2026. Each row uses ten warmups and 25 measured pairs
+with alternating build order and exact output checks before timing.
+
+| Runtime | Copy full tile into buffer | Copy 16 visible lanes | Bounds for 16 lanes | Edit and refresh one lane |
+| --- | ---: | ---: | ---: | ---: |
+| Chromium 156.0.8078.4 | 1,803.13 → 238.75 (7.55×) | 41.37 → 4.80 (8.61×) | 82.63 → 7.72 (10.70×) | 8.09 → 2.71 (2.98×) |
+| Node 26.13.1 | 672.61 → 160.42 (4.19×) | 45.45 → 5.63 (8.07×) | 73.59 → 6.55 (11.24×) | 8.24 → 2.43 (3.39×) |
+| Bun 1.4.2 | 668.87 → 138.91 (4.82×) | 28.79 → 7.10 (4.06×) | 51.50 → 7.12 (7.24×) | 7.02 → 2.26 (3.11×) |
+
+The measurements cover zerocopy operations before rendering or worker
+messaging. Full-tile packing into a fresh buffer varied more. In Chromium the
+edited-tile median rose from 1,518 to 1,786 µs, while the same-build control
+ranged from 1,677 to 2,068 µs across its two arms. The benchmark above also
+emits all control workloads and SHA-256 digests of the measured builds.
+[Raw paired samples and same-build controls](../proofs/results/hd-map-lane-ranges).

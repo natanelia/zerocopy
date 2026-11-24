@@ -38,17 +38,31 @@ pub unsafe extern "C" fn xyLeaf(root: u32, depth: u32, tail: u32, size: u32, ind
 #[no_mangle]
 pub unsafe extern "C" fn bboxXY(root: u32, depth: u32, tail: u32, size: u32) {
     if size & 1 != 0 { core::arch::wasm32::unreachable(); }
+    bbox_range(root, depth, tail, size, 0, size);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn bboxXYRange(root: u32, depth: u32, tail: u32, size: u32, start: u32, end: u32) {
+    if (size | start | end) & 1 != 0 || start > end || end > size {
+        core::arch::wasm32::unreachable();
+    }
+    bbox_range(root, depth, tail, size, start, end);
+}
+
+#[inline(always)]
+unsafe fn bbox_range(root: u32, depth: u32, tail: u32, size: u32, start: u32, end: u32) {
     let mut lx = f64::INFINITY; let mut ly = f64::INFINITY;
     let mut hx = f64::NEG_INFINITY; let mut hy = f64::NEG_INFINITY;
-    let mut base = 0;
-    while base < size {
+    let mut first_offset = (start & 31) * 8;
+    let mut base = if start == end { end } else { start & !31 };
+    while base < end {
         let p = xyLeaf(root, depth, tail, size, base);
-        let end = p + 32u32.min(size - base) * 8;
-        let mut q = p;
+        let stop = p + 32u32.min(end - base) * 8;
+        let mut q = p + first_offset;
         // Test alignment once per leaf. Preserve unaligned direct ABI inputs
         // through the general loader; ordinary published vectors are aligned.
         if p & 7 == 0 {
-            while q < end {
+            while q < stop {
                 let x = load_aligned_f64(q); let y = load_aligned_f64(q + 8);
                 // Strict comparisons ignore NaN axes and retain first signed zeros.
                 if x < lx { lx = x; }
@@ -58,7 +72,7 @@ pub unsafe extern "C" fn bboxXY(root: u32, depth: u32, tail: u32, size: u32) {
                 q += 16;
             }
         } else {
-            while q < end {
+            while q < stop {
                 let x = load_f64(q); let y = load_f64(q + 8);
                 // Strict comparisons ignore NaN axes and retain first signed zeros.
                 if x < lx { lx = x; }
@@ -68,6 +82,7 @@ pub unsafe extern "C" fn bboxXY(root: u32, depth: u32, tail: u32, size: u32) {
                 q += 16;
             }
         }
+        first_offset = 0;
         base += 32;
     }
     state_store_f64(MIN_X, lx); state_store_f64(MIN_Y, ly);

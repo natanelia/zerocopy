@@ -227,6 +227,13 @@ They copy the input into the arena as 64-bit values. Use `toFloat64Array()` to
 copy any numeric snapshot, including a read-only worker attachment, into a
 contiguous `Float64Array` with its own transferable `ArrayBuffer`.
 
+Use `copyToFloat64Array(target, { start, end, offset })` to copy a numeric
+snapshot into an existing `Float64Array`. Source indexes cover `[start, end)`
+and `offset` is the destination element index. They default to `0`, `size`,
+and `0`, respectively. The target must use an ordinary `ArrayBuffer`. The
+method throws `RangeError` for an invalid range or insufficient space and
+preserves destination values outside the copied span.
+
 `SharedList.setMany(entries)` applies several indexed edits to produce one
 new snapshot. It copies each affected tree node once, keeps the list's size,
 and preserves the original snapshot. It ignores out-of-range and non-integer

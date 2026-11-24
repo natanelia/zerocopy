@@ -1,4 +1,4 @@
-import { memoryDescriptor, NATIVE_LITTLE_ENDIAN } from './memory';
+import { memoryDescriptor, NATIVE_LITTLE_ENDIAN, typedArrayBuffer, typedArrayOffset, typedArrayTag } from './memory';
 import { ReadCache } from './read-cache';
 import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
@@ -10,10 +10,6 @@ export { freezeJSON } from './freeze-json';
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
-const typedArrayPrototype = Object.getPrototypeOf(Float64Array.prototype);
-const typedArrayTag = Object.getOwnPropertyDescriptor(typedArrayPrototype, Symbol.toStringTag)!.get!;
-const typedArrayBuffer = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'buffer')!.get!;
-const typedArrayOffset = Object.getOwnPropertyDescriptor(typedArrayPrototype, 'byteOffset')!.get!;
 let nextId = 0;
 const MAX_DECODED_RECORDS = 2048;
 const MAX_DECODED_BYTES = 2 * 1024 * 1024;
@@ -55,6 +51,9 @@ export function vectorDepth(size: number): number {
   return depth;
 }
 export function validIndex(index: number, size: number): boolean { return typeof index === 'number' && (index >>> 0) === index && index < size; }
+export function validListRange(start: number, end: number, size: number): boolean {
+  return Number.isInteger(start) && Number.isInteger(end) && start >= 0 && start <= end && end <= size;
+}
 export function checkedSize(size: number): number {
   if (typeof size !== 'number' || (size >>> 0) !== size || size > MAX_SIZE) throw new RangeError(`Size must be between 0 and ${MAX_SIZE}`);
   return size;

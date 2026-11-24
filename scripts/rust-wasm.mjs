@@ -83,6 +83,7 @@ export const readerExports = [
   'mapNumber', 'radixSize', 'radixFind', 'journalFind', 'compareLeaves',
   'jsonValueEnd', 'jsonStringEnd', 'jsonFieldAscii8', 'jsonFieldCandidate', 'jsonArrayAt', 'jsonArrayAtFrom', 'jsonInteger',
   'countInRange', 'countPointsInBox', 'bboxMinX', 'bboxMinY', 'bboxMaxX', 'bboxMaxY', 'xyLeaf', 'bboxXY',
+  'bboxXYRange',
 ];
 
 export function auditModule(module, expectedAbi, strictGlobals = false) {
