@@ -1,5 +1,5 @@
 {
-  "sourceCommit": "fd6195bce969423cd5257a5a17be3733502f13e1",
+  "sourceCommit": "abece65c0d8d52141ae6657d15636f9444de549f",
   "version": "0.2.1",
   "dependencies": {
     "immutable": "5.1.9",
@@ -40,25 +40,25 @@
     "docs/catalog/",
     "docs/editors/"
   ],
-  "librarySHA256": "5a340ec480743612e6c6c2824ef2ac6c86f076705fa10c8b193799c5f4f36224",
+  "librarySHA256": "ef17c874fa9484798fbf47ed953d5c9f5a73d0803996b40be1d3ce1246d103e2",
   "sourceDirty": false,
   "libraryFilesSHA256": {
-    "chunk-5exgnnr0.js": "6ae7f254dac833f86a57d421ecd317d6eb41e862070d162482188438d9ec307b",
-    "chunk-79he5yf1.js": "d51af5dbee99253dce990f0769e8951d88bbb3be26fad9d7dcb354cdcfca15cb",
-    "chunk-c01ebhvd.js": "f8f30448e1b44115d6f09a1ba9336cd1b19ce103967e7687073c6f3a76417172",
-    "chunk-fx3h0x7z.js": "3d05295a0f64c9c597e95b1f40fcb0c4da3966b57869a28420af64ab22ef9388",
-    "chunk-q8x113d3.js": "e2db31e8e65f9ce784aea14a2ed8626bbc7a679aeadbc19fb7528089d5b282f9",
-    "geometry.js": "3bf9c8799aace552f35ca4e5a55e8ec5d3730f093d4fdfc2eabf8ea2237ef594",
-    "numeric.js": "9f9763ccc96eaef484174914c19271efe4a3a404bd9c570d182af7b575ea7fa9",
-    "redux.js": "de45ff37819f7ba59708a3b3f60df8248c23f33f031e90b60dd1e54ddafb8338",
-    "shared.js": "5a340ec480743612e6c6c2824ef2ac6c86f076705fa10c8b193799c5f4f36224",
-    "state.js": "f70226f77ba46e446185b08a0186afcf78ebfc8d00680ef170a44d19efc3ccc6",
-    "tanstack-db-collection.js": "f3b8f21a89935891f0e480edb7e840d174acbbfbc990820abce44d8b703bb8ae",
-    "worker.js": "6279025a6436cb0031caeb06b4c2f8377b2e0c833b6cd10943676071be2679d2"
+    "chunk-7bb46f9b.js": "f419bbe1cad151a8a902e055c575651d9cfd95e637be4bbf1cbf623236dd1a53",
+    "chunk-mj0p3z9z.js": "d5f2477bf9990be7419109e966df532ed59332a3e0505e285cc32e6ffd031770",
+    "chunk-s8e99na9.js": "7d5034c60c4f1ac7a9506ce226ccef9652fc357a6e580fc100867cd3542d17ac",
+    "chunk-sz31dkd1.js": "685fb286a24c7106507c9ca72bcce98d33705d30e0ed7975cc1d5106a7b68358",
+    "chunk-w2ygg0c8.js": "267e2233345d7f7b8f6796c7536b3ae8157b30d38719dbb3f16b9dc5739c7f0c",
+    "geometry.js": "ecb0515c9908aacfbe8f97ef1c5f83740a44aeedc8f7b4227414bd7490e760a7",
+    "numeric.js": "1ae9df808b41f976769e22c0dcf5f487976b6db1fb9d76b5dd4c5d6d75728081",
+    "redux.js": "e97dd6a33214dc5a5f223e42de4212d1a09c969e12710a556c267df5d24ff93c",
+    "shared.js": "ef17c874fa9484798fbf47ed953d5c9f5a73d0803996b40be1d3ce1246d103e2",
+    "state.js": "915db7b765eb36a54b98a7b76eda3c8f3313bbc5f249233b2add6f2bf58502f6",
+    "tanstack-db-collection.js": "9662b7198aed7c51537b753cdfa988c915450e557964cd0e2add7a68886684bc",
+    "worker.js": "4febe77ead1640b995e0bc9fe0af4c17e17dfb5fdbe88d52531e719af4b6836e"
   },
   "wasmFilesSHA256": {
     "doubly-linked-list.wasm": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134",
-    "geometry-kernels.wasm": "36da9253c5cf3eeb7bc863a85747a666a9009557855cde73f6f8400a6d486804",
+    "geometry-kernels.wasm": "4388f5acf80a1db6e9b42fbd25ae5c875461ca0f936fba386182c5b2573600cd",
     "linked-list.wasm": "a6083119a4ce84851c9cab81267cb9852f4e09dd93ae9a6b16f579c015f36134",
     "numeric-kernels-simd.wasm": "951137eccac6fdad93b3dbd281564d7db297eb81b56332e2e90a067d1ed3d007",
     "numeric-kernels.wasm": "b8938625b09c1cf191a277b3e8be046525b1264a59ab446be04809be2d905043",
