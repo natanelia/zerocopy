@@ -79,7 +79,7 @@ export async function checkCityHero(browser, url, screenshots) {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.getByRole('button', { name: 'Copy npm install command' }).click();
     assert.equal(await page.evaluate(() => navigator.clipboard.readText()), 'npm i zerocopy');
-    const quickstart = page.getByRole('link', { name: 'Quickstart' });
+    const quickstart = hero.getByRole('link', { name: 'Quickstart', exact: true });
     await quickstart.click();
     assert.equal(new URL(page.url()).pathname, new URL('docs/getting-started/', url).pathname);
     assert.deepEqual(errors, []);

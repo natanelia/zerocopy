@@ -31,7 +31,20 @@ try {
   await page.locator('#search-input').fill('<script>alert(1)</script>'); assert.equal(await page.locator('.search-result').count(), 0);
   await page.keyboard.press('Escape'); assert.equal(await page.locator('dialog').evaluate(node => node.open), false);
   await page.screenshot({ path: screenshots + '/home-desktop.png', fullPage: true });
-  await page.goto(origin + base + 'docs/getting-started/'); assert.ok(await page.locator('article').innerText().then(text => text.includes('connectSharedSession')));
+  const nav = page.getByRole('navigation', { name: 'Main', exact: true });
+  const navLinks = () => nav.getByRole('link').evaluateAll(links => links.map(a => [a.textContent, a.pathname]));
+  const primaryLinks = await navLinks();
+  const homepageCards = await page.locator('.use-case-card').evaluateAll(links => links.map(a => a.pathname));
+  await page.getByRole('link', { name: 'All use cases' }).click();
+  assert.deepEqual(await page.locator('.use-case-card').evaluateAll(links => links.map(a => a.pathname)), homepageCards);
+  assert.equal(await nav.getByRole('link', { name: 'Use cases' }).getAttribute('aria-current'), 'page');
+  for (const label of ['Benchmarks', 'Docs']) {
+    await nav.getByRole('link', { name: label, exact: true }).click();
+    assert.deepEqual(await navLinks(), primaryLinks);
+    assert.equal(await nav.getByRole('link', { name: label }).getAttribute('aria-current'), 'page');
+    assert.equal(await page.locator('footer').getByRole('link', { name: 'zerocopy home' }).getAttribute('href'), base);
+  }
+  assert.ok(await page.locator('article').innerText().then(text => text.includes('connectSharedSession')));
   await page.screenshot({ path: screenshots + '/docs-desktop.png', fullPage: true });
   await page.goto(origin + base + 'playground/'); await page.getByRole('button', { name: 'Connect a worker' }).click();
   await page.waitForFunction(() => document.querySelector('#reader-value').firstChild.textContent === '12');
