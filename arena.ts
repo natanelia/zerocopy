@@ -800,6 +800,34 @@ export class Arena {
     return leaf ? this.wasm.mapDeleteLeaf(root, leaf) >>> 0 : root;
   }
 
+  deleteMany(root: number, keys: readonly string[]): number {
+    this.assertWritable();
+    // Keep the scalar path for small updates. The crossover is provisional
+    // until measured on Node, Bun, and browser engines.
+    if (keys.length < 64) {
+      for (const key of keys) root = this.delete(root, key);
+      return root;
+    }
+    // Resolve against the original immutable root. Deduplicate by actual
+    // leaf address, which also handles normalized Unicode aliases.
+    const leaves = new Set<number>();
+    for (const key of keys) {
+      if (typeof key !== 'string') throw new TypeError('Map keys must be strings');
+      const leaf = root ? this.findUncached(root, key) : 0;
+      if (leaf) leaves.add(leaf);
+    }
+    if (!leaves.size) return root;
+    if (leaves.size === this.wasm.mapSize(root)) return 0;
+    // Use reserved writer scratch when possible. Large batches allocate a
+    // contiguous pointer table, included in the benchmark's arena delta.
+    // No user iteration or callbacks remain when scratch is populated.
+    const input = leaves.size <= 12288 ? 16384 : this.alloc(leaves.size * 4);
+    const view = this.dv;
+    let offset = input;
+    for (const leaf of leaves) { view.setUint32(offset, leaf, true); offset += 4; }
+    return this.wasm.mapDeleteBatch(root, input, leaves.size) >>> 0;
+  }
+
   *leaves(root: number): Generator<number> {
     // Each iterator owns its continuation. No shared stack or scratch survives yield.
     if (root && this.dv.getUint32(root, true) === 0xffffffff) {

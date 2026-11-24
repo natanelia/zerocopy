@@ -589,6 +589,105 @@ pub unsafe extern "C" fn mapBatch(old: u32, input: u32, count: u32) -> u32 {
     batch_at(old, input, count, 0, heap_end())
 }
 
+// The input consists of distinct live leaves from the original snapshot.
+// Partition once per affected prefix; untouched children retain their pointers.
+unsafe fn delete_batch_at(old: u32, input: u32, count: u32, shift: u32) -> u32 {
+    if old == 0 || count == 0 { state_store_u32(BATCH_CHANGE, 0); return old; }
+    let size = mapSize(old);
+    if count == size {
+        state_store_u32(BATCH_CHANGE, count);
+        return 0;
+    }
+    if count <= 4 || shift >= 32 || !is_branch(old) {
+        let mut next = old;
+        let mut removed = 0;
+        let mut i = 0;
+        while i < count {
+            let leaf = load_u32(input + i * 4);
+            let result = delete_leaf_at(next, leaf, load_u32(leaf + 4), shift);
+            if result != next { removed += 1; next = result; }
+            i += 1;
+        }
+        state_store_u32(BATCH_CHANGE, removed);
+        return next;
+    }
+
+    // Same per-depth writer scratch as mapBatch. Recursive calls use the
+    // next frame; full_branch uses its separate scratch region.
+    let frame = 8192 + (shift / 4) * 256;
+    fill_zero(frame, 256);
+    let mut i = 0;
+    while i < count {
+        let digit = load_u32(load_u32(input + i * 4) + 4).wrapping_shr(shift) & 15;
+        store_u32(frame + digit * 4, load_u32(frame + digit * 4) + 1);
+        i += 1;
+    }
+    let mut offset = 0;
+    let mut digit = 0;
+    while digit < 16 {
+        store_u32(frame + 128 + digit * 4, offset);
+        offset += load_u32(frame + digit * 4);
+        digit += 1;
+    }
+    let mut start = 0;
+    digit = 0;
+    while digit < 16 {
+        let end = start + load_u32(frame + digit * 4);
+        let cursor = frame + 128 + digit * 4;
+        while load_u32(cursor) < end {
+            let pos = load_u32(cursor);
+            let leaf = load_u32(input + pos * 4);
+            let target = load_u32(leaf + 4).wrapping_shr(shift) & 15;
+            if target == digit { store_u32(cursor, pos + 1); }
+            else {
+                let target_cursor = frame + 128 + target * 4;
+                let dest = load_u32(target_cursor);
+                store_u32(input + pos * 4, load_u32(input + dest * 4));
+                store_u32(input + dest * 4, leaf);
+                store_u32(target_cursor, dest + 1);
+            }
+        }
+        start = end;
+        digit += 1;
+    }
+
+    let mut bitmap = 0;
+    let mut children = 0;
+    let mut removed = 0;
+    let mut last_child = 0;
+    start = 0;
+    digit = 0;
+    while digit < 16 {
+        let n = load_u32(frame + digit * 4);
+        let previous = branch_child(old, digit);
+        let child = if n != 0 {
+            let result = delete_batch_at(previous, input + start * 4, n, shift + 4);
+            removed += state_load_u32(BATCH_CHANGE);
+            result
+        } else { previous };
+        if child != 0 {
+            bitmap |= 1 << digit;
+            store_u32(frame + 128 + children * 4, child);
+            children += 1;
+            last_child = child;
+        }
+        start += n;
+        digit += 1;
+    }
+    state_store_u32(BATCH_CHANGE, removed);
+    if removed == 0 { return old; }
+    if bitmap == 0 { return 0; }
+    if children == 1 && !is_branch(last_child) { return last_child; }
+    let result = branch(bitmap, size - removed);
+    copy_words(result + 8, frame + 128, children * 4);
+    result
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn mapDeleteBatch(old: u32, input: u32, count: u32) -> u32 {
+    delete_batch_at(materialize_journal(old, 0), input, count, 0)
+}
+
 // Legacy scratch ABI. getInfo is intentionally writer-scratch-using; TS cold
 // readers use mapFind/mapChild/hash candidates instead.
 #[no_mangle]

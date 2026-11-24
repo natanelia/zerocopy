@@ -171,6 +171,16 @@
         "i32"
       ]
     },
+    "mapDeleteBatch": {
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "results": [
+        "i32"
+      ]
+    },
     "keyBuf": {
       "params": [],
       "results": [

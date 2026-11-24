@@ -68,8 +68,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
   }
   getMany(keys: readonly string[]): (ValueOf<T> | undefined)[] { return keys.map(k => this.get(k)); }
   deleteMany(keys: readonly string[]): SharedMap<T> {
-    const a = this.arena; a.assertWritable(); let root = this.root;
-    for (const key of keys) root = a.delete(root, key);
+    const a = this.arena, root = a.deleteMany(this.root, keys);
     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
   }
   *entries(): Generator<[string, ValueOf<T>]> {
