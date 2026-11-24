@@ -78,7 +78,7 @@ test('docs are prerendered and search points to generated pages', () => {
 });
 test('the first screen sells direct reads, not mandatory tasks or invented results', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.ok(home.includes('Share your data.')); assert.ok(home.includes('Tasks optional.'));
+  assert.ok(home.includes('Immutable collections for Node.js workers')); assert.ok(home.includes('Tasks optional.'));
   assert.ok(home.includes('Conceptual storage model. Not a memory measurement.'));
   for (const text of ['One writer on the main thread or in a worker', 'Main thread or worker', 'one allocating writer', 'Writer worker', 'Reader workers', 'snapshot delivery runs from the writer worker to reader workers', 'Example: main-thread writer']) assert.ok(home.includes(text), text);
   assert.ok(home.includes('id="worker-architecture"'));

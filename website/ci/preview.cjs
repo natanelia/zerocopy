@@ -16,12 +16,16 @@ function collect(directory) {
       const relative = prefix + name, absolute = path.join(folder, name), stat = fs.lstatSync(absolute);
       if (stat.isSymbolicLink() || !/^[A-Za-z0-9_.\/-]+$/.test(relative) || relative.split('/').some(part => part === '.' || part === '..')) throw new Error('Unsafe preview path');
       if (stat.isDirectory()) { walk(absolute, relative + '/'); continue; }
-      if (!stat.isFile() || !(/\.(html|json|mjs|js|css|svg|md|txt|xml)$/.test(name) || ['.nojekyll', '_headers'].includes(name))) throw new Error(`Unexpected preview file: ${relative}`);
+      // The site copies these source-controlled binary assets byte-for-byte.
+      // Their Git blob IDs can be reused in the tree without decoding them as text.
+      const binary = /^assets\/[A-Za-z0-9_.-]+\.(webp|woff2)$/.test(relative);
+      if (!stat.isFile() || !(binary || /\.(html|json|mjs|js|css|svg|md|txt|xml)$/.test(name) || ['.nojekyll', '_headers'].includes(name))) throw new Error(`Unexpected preview file: ${relative}`);
       if (relative.startsWith('.github/') || name === '.env') throw new Error('Preview must contain only static output');
       total += stat.size;
       if (total > 32 * 1024 * 1024 || files.length >= 2000) throw new Error('Preview artifact exceeds the safety limit');
-      const buffer = fs.readFileSync(absolute), content = new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+      const buffer = fs.readFileSync(absolute);
       const sha = crypto.createHash('sha1').update(`blob ${buffer.length}\0`).update(buffer).digest('hex');
+      const content = binary ? undefined : new TextDecoder('utf-8', { fatal: true }).decode(buffer);
       files.push({ path: relative, content, sha });
     }
   }
@@ -40,7 +44,10 @@ function changes(previous, files, prefix) {
   }
   for (const [name, file] of desired) {
     if (prefix ? !name.startsWith(prefix) : name.startsWith('previews/')) throw new Error('File is outside the publication boundary');
-    if (!old.has(name) || old.get(name) !== file.sha) entries.push({ path: name, mode: '100644', type: 'blob', content: file.content });
+    if (!old.has(name) || old.get(name) !== file.sha) {
+      const blob = file.content === undefined ? { sha: file.sha } : { content: file.content };
+      entries.push({ path: name, mode: '100644', type: 'blob', ...blob });
+    }
   }
   return entries;
 }
@@ -55,6 +62,10 @@ async function publish({ github, context, core }) {
   if (isPR) {
     const pr = await currentPR();
     if (pr.head.repo?.full_name !== repository) { core.info('External forks are not published on this origin.'); return; }
+    if (context.payload.action !== 'closed' && pr.body?.includes('<!-- no-pages-preview -->')) {
+      core.info('PR requested checks without publishing a Pages preview.');
+      return;
+    }
     head = pr.head.sha; prefix = `previews/pr-${number}/`;
     if (context.payload.action === 'closed' && pr.state !== 'closed') { core.info('PR reopened; retaining its preview.'); return; }
     if (context.payload.action !== 'closed') {

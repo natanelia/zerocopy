@@ -1,3 +1,4 @@
+import "./city-motion.mjs";
 const card = document.querySelector('.sharing-card');
 const range = document.querySelector('#worker-count');
 let mode = 'shared';

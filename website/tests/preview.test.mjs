@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { runInNewContext } from 'node:vm';
 import { mkdtempSync, writeFileSync, symlinkSync, mkdirSync, rmSync, readFileSync } from 'node:fs';
@@ -29,6 +30,32 @@ test('artifact collection rejects symlinks and non-static output', () => {
     symlinkSync('/etc/passwd', join(dir, 'leak.txt')); assert.throws(() => collect(dir), /Unsafe/); rmSync(join(dir, 'leak.txt'));
     writeFileSync(join(dir, 'publish.sh'), '#!'); assert.throws(() => collect(dir), /Unexpected/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+test('checked-in WebP and font assets keep their source bytes in the Pages tree', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'zc-preview-binary-'));
+  try {
+    writeFileSync(join(dir, 'index.html'), '<h1>Home</h1>');
+    writeFileSync(join(dir, 'build.json'), '{}');
+    mkdirSync(join(dir, 'assets'));
+    for (const name of ['singapore-relief.webp', 'dm-serif-text-latin-400-normal.woff2']) {
+      const source = readFileSync(new URL('../assets/' + name, import.meta.url));
+      const path = 'assets/' + name;
+      writeFileSync(join(dir, path), source);
+      const hash = createHash('sha1').update(`blob ${source.length}\0`).update(source).digest('hex');
+      const entry = changes([], collect(dir), '').find(item => item.path === path);
+      assert.equal(entry.sha, hash);
+      assert.ok(!('content' in entry));
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('a checks-only PR returns before contacting Pages or creating Git objects', async () => {
+  const repository = 'natanelia/zerocopy';
+  await publish({
+    github: { rest: { pulls: { get: async () => ({ data: { head: { repo: { full_name: repository } }, body: '<!-- no-pages-preview -->' } }) } } },
+    context: { repo: { owner: 'natanelia', repo: 'zerocopy' }, payload: { action: 'opened', pull_request: { number: 1 } } },
+    core: { info() {} },
+  });
 });
 test('workflow separates read-only builds and same-repository publication', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/docs-website.yml', import.meta.url), 'utf8');

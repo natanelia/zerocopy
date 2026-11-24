@@ -2,6 +2,8 @@
 
 A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
 
+The Singapore homepage animation models a proposed western housing district and three independent reads of one city snapshot. Its timeline, housing layers, and worker states are simulated in the DOM. The catalog comparison and benchmark pages run actual workers. The hero uses the completed scene with JavaScript disabled or reduced motion enabled. Bun defaults to copy transport.
+
 ## Local development
 
 Use the repository's [Bun, Node, and Rust setup](../CONTRIBUTING.md#set-up-and-test). Build the library first, then the website:
@@ -105,6 +107,8 @@ CI uploads the static output, test logs, and desktop/mobile screenshots. Existin
 The hosted workflow separately runs `scripts/check-vite-quickstart.mjs` once. It extracts the quickstart's four marked files into a temporary application, installs the documented npm versions with lifecycle scripts disabled, and checks Vite development and production preview in Chromium and WebKit. It records isolation headers, visible snapshot counts, package versions, screenshots, and the resolved lockfile. This is distinct from checking Markdown worker examples against the repository's own bundles.
 
 ## Automatic PR previews
+
+Include `<!-- no-pages-preview -->` in the PR body to run the checks and retain screenshot artifacts without publishing that PR to Pages.
 
 The `Documentation website` workflow now publishes tested **same-repository PRs** to GitHub Pages. Each preview has its own path:
 
