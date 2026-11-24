@@ -1,0 +1,10 @@
+{
+  "command": "/workspace/scratch/c22084f82996/tools/node_modules/.bin/bun --bun node_modules/vitest/vitest.mjs run",
+  "configuredMaxWorkers": 4,
+  "affinity": "not pinned; tool shell reports CPUs 0-8",
+  "elapsedSecondsBeforeInterruption": "approximately 210",
+  "termination": "SIGINT requested after only startup header, exit 130",
+  "testResultsReported": false,
+  "testTimeoutsChanged": false,
+  "sourceChangedDuringRun": false
+}

@@ -1,0 +1,29 @@
+{
+  "study": "map-foreach-early-identity-20261108",
+  "originalWorkload": {
+    "path": "proofs/map-foreach-20261108/workloads.mjs",
+    "sha256": "c292e9fa30fbae1586e0f40ebf3d4267fe3875306c1cc3f571b8f87ca7cf94b7"
+  },
+  "workload": {
+    "path": "workloads.mjs",
+    "sha256": "7be5a9137ca87fca55bc83c740de16097b6f4ab4f68e12ff1ab579d00dd36de3",
+    "changedMetadata": [
+      "id",
+      "changedSources",
+      "changedWasm",
+      "pilotCases"
+    ]
+  },
+  "unchangedCreateWorkloadSha256": "a1d1fbab62551ea2db00a28c44231c41809d3fe6aeabb7dbfdba44357d9cb14f",
+  "pairedDriver": {
+    "copiedFrom": "zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/paired-benchmark.mjs",
+    "sha256": "9928f4d93332f467b2984e34db6732a1b593796a3ba3b12697a5289dd6a31c66"
+  },
+  "unchangedFixtureSha256": "a88129e0adda7c5c567964347b382e2b763a4241f9eab2133cd626c4d6bdc750",
+  "oldProofFilesUnchanged": {
+    "workloads.mjs": "c292e9fa30fbae1586e0f40ebf3d4267fe3875306c1cc3f571b8f87ca7cf94b7",
+    "node-worker.mjs": "82be7ad404357ca8e4d6926b639a85dc306452f512148822d9e2ce4b23572e08",
+    "browser-check.mjs": "3865ed24949a0321825f98f7b03d81096baa92a06f31b4f46e8a03fc66745b4b",
+    "worker-fixtures.mjs": "a88129e0adda7c5c567964347b382e2b763a4241f9eab2133cd626c4d6bdc750"
+  }
+}

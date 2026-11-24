@@ -1,0 +1,19 @@
+{
+  "frozenAt": "2026-11-08T17:21:32.639914+00:00",
+  "checkoutParent": "97d09254b2c096c5a40fee8776bafb592b811a30",
+  "baseline": "0ac8a005268335a6116f025e75f670b5cee6843e",
+  "sha256": {
+    "arena.ts": "15fc0a16a8db39c2178ef6655d90b95f20e5635fa411a60d0bc04a4f5e1e3403",
+    "shared-map.ts": "729c51f57919d410fff877db750a368c15755f23047c26cbbb13015d99818380",
+    "proofs/map-foreach-early-identity-20261108/workloads.mjs": "7be5a9137ca87fca55bc83c740de16097b6f4ab4f68e12ff1ab579d00dd36de3",
+    "proofs/map-foreach-early-identity-20261108/paired-benchmark.mjs": "9928f4d93332f467b2984e34db6732a1b593796a3ba3b12697a5289dd6a31c66",
+    "proofs/map-foreach-early-identity-20261108/PRE-BENCHMARK.md": "13d63ebd5bbc81084620920d5bb0e121ce11874e30d2d52a68cc4f1caa167457",
+    "proofs/map-foreach-early-identity-20261108/node-worker-result.json": "521c2c8b1cce5da51e29d240ad8c7f0da8eac94474680d86e4551b71d78a91bb",
+    "proofs/map-foreach-early-identity-20261108/node-worker.mjs": "e3820d0c8461bf04e86a804c9c532125673c2f96e339951ec8225e982f263949",
+    "proofs/map-foreach-early-identity-20261108/browser-check.mjs": "214d688f609044debcdfca17436904bd16059d799c23106618e8fb1cbf091de9",
+    "proofs/map-foreach-early-identity-20261108/worker-fixtures.mjs": "a88129e0adda7c5c567964347b382e2b763a4241f9eab2133cd626c4d6bdc750",
+    "proofs/map-foreach-early-identity-20261108/integration-check.mjs": "7a104c770f35fe6087948a41953761a4103ab6457241ab7ab594552e08532565",
+    "proofs/map-foreach-early-identity-20261108/fixtures/numeric-pr71.ts.txt": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d"
+  },
+  "noTimingCollectedYet": true
+}

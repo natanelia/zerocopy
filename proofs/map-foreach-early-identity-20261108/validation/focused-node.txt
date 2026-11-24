@@ -1,0 +1,69 @@
+
+ RUN  v4.1.11 /workspace/scratch/8d514edd7494/zerocopy-map
+
+ ✓ shared-map.test.ts > SharedMap > empty get returns undefined 2ms
+ ✓ shared-map.test.ts > SharedMap > set and get single value 1ms
+ ✓ shared-map.test.ts > SharedMap > immutability - original unchanged 0ms
+ ✓ shared-map.test.ts > SharedMap > multiple keys 1ms
+ ✓ shared-map.test.ts > SharedMap > overwrite key 0ms
+ ✓ shared-map.test.ts > SharedMap > many keys 2ms
+ ✓ shared-map.test.ts > SharedMap > hash collision handling 0ms
+ ✓ shared-map.test.ts > SharedMap > missing key returns undefined 0ms
+ ✓ shared-map.test.ts > SharedMap > empty string key and value 0ms
+ ✓ shared-map.test.ts > SharedMap > unicode keys and values 1ms
+ ✓ shared-map.test.ts > SharedMap > long keys 0ms
+ ✓ shared-map.test.ts > SharedMap > branching at multiple levels 7ms
+ ✓ shared-map.test.ts > SharedMap > version isolation 0ms
+ ✓ shared-map.test.ts > SharedMap > structural sharing - nodes reused 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > does not visit or obtain a memory view for an empty map 2ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves UTF-8 key order and exact numeric values, including normalized duplicates 3ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > keeps old snapshots, updated branches and source bytes unchanged 56ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves boolean values and immutable decoded objects 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves string values and immutable decoded objects 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves object values and immutable decoded objects 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves SharedMap<number> values and immutable decoded objects 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves SharedList<number> values and immutable decoded objects 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > keeps custom comparator sorting, tie order and comparator reentry 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > preserves callback this, closes traversal after a throw, and can be read again 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > honors a subclass entries override even on an empty underlying root 0ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > honors replacement of the base entries prototype and preserves the receiver 0ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > looks up entries once and invokes the function even if its call property is replaced 0ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > propagates entries getter and callback errors on the override fallback 0ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > survives callback writes, shared-memory growth and recursive reads 2ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > decodes the key before a cold value decoder reenters and grows memory 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > merges imported nested journals with the same ordering and replacement rules 1ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > reads shared attachments without allocations 2ms
+ ✓ sorted-map-foreach.test.ts > SharedSortedMap natural-order forEach > reads copy attachments without allocations 2ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps number value order across leaf shapes, edits and forks 23ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps paused number iterators independent while the writer grows 3ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached number values immutable (copy=false) 2ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached number values immutable (copy=true) 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps boolean value order across leaf shapes, edits and forks 24ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps paused boolean iterators independent while the writer grows 2ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached boolean values immutable (copy=false) 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps attached boolean values immutable (copy=true) 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > preserves negative zero, infinities, NaN and unaligned numeric payloads 0ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps default and captured-view leaf decoding equivalent with value prefixes 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > handles legacy nested journals with a paused traversal 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps generator laziness, early return and throw behavior 1ms
+ ✓ map-values-view.test.ts > map values with one captured view > retains the string, frozen JSON and nested snapshot decoding paths 2ms
+ ✓ map-values-view.test.ts > map values with one captured view > keeps generic value iteration stable when nested reconstruction grows and forks the owning arena 2ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > preserves exact traversal order for dense nodes, overlays, collisions and nested journals 98ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > keeps arbitrary short/long UTF-8 keys, special numbers and primitive values 14ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > keeps traversal local when callbacks reenter, grow, edit and fork the same arena 6ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > starts with the current view when the root was allocated after shared memory growth 0ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > does not access the view or invoke a callback for an empty default map 0ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > calls callbacks with the same arguments and undefined receiver, and stops on the original exception 1ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > retains custom arena traversals and closes their iterators when a callback throws 1ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > retains custom value-decoder arguments, receiver and callback-time replacement 1ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > retains legacy journal duplicate filtering when a callback grows the owner 1ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > preserves read-only attachments across owner edits and growth (copy=false) 4ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > preserves read-only attachments across owner edits and growth (copy=true) 3ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > preserves frozen JSON and nested snapshot values 2ms
+ ✓ map-foreach.test.ts > SharedMap direct forEach > decodes the value before its key while nested reconstruction reenters and grows 2ms
+
+ Test Files  4 passed (4)
+      Tests  60 passed (60)
+   Start at  01:17:28
+   Duration  929ms (transform 812ms, setup 0ms, import 2.00s, tests 295ms, environment 0ms)
+

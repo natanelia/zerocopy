@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const variant = process.argv[2];
+const numericEntry = import.meta.resolve('zerocopy/numeric');
+const rootEntry = import.meta.resolve('zerocopy');
+assert.ok(numericEntry.endsWith('/numeric.ts'), numericEntry);
+assert.ok(rootEntry.endsWith('/shared.ts'), rootEntry);
+const { fromFloat64 } = await import('zerocopy/numeric');
+const list = fromFloat64(new Float64Array([1.25, -0, 17.5]));
+assert.deepEqual(list.toArray(), [1.25, -0, 17.5]);
+// owner is the public inherited static method on the returned constructor.
+// No internal package path or protected/private field is accessed.
+const owner = list.constructor.owner(list);
+const arenaPrototype = Object.getPrototypeOf(owner);
+const original = Object.getOwnPropertyDescriptor(arenaPrototype, 'leaves');
+assert.equal(typeof original.value, 'function');
+const failure = new Error('Traversal hook installed before root import');
+let hookCalls = 0;
+Object.defineProperty(arenaPrototype, 'leaves', { ...original,
+  value: function* preinstalledLeaves() { hookCalls++; throw failure; },
+});
+let hookCallsBeforeForEach, callbackCount = 0, caughtHook = false, mapSize;
+try {
+  const { SharedMap } = await import('zerocopy');
+  const map = new SharedMap('number').set('alpha', 1).set('beta', 2);
+  assert.equal(map.get('alpha'), 1); assert.equal(map.get('beta'), 2);
+  mapSize = map.size;
+  hookCallsBeforeForEach = hookCalls;
+  try { map.forEach(() => { callbackCount++; }); }
+  catch (error) { if (error !== failure) throw error; caughtHook = true; }
+} finally { Object.defineProperty(arenaPrototype, 'leaves', original); }
+const folder = dirname(fileURLToPath(rootEntry));
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+console.log(JSON.stringify({ variant, runtime: process.versions, numericEntry, rootEntry,
+  mapSize, hookCallsBeforeForEach, hookCalls, callbackCount, caughtHook,
+  source: Object.fromEntries(['numeric.ts', 'shared-map.ts', 'arena.ts', 'package.json'].map(name =>
+    [name, sha(readFileSync(join(folder, name)))])), timingMeasurements: false }, null, 2));
