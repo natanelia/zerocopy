@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 40
     env:
       BASELINE: fd6195bce969423cd5257a5a17be3733502f13e1
-      CANDIDATE: 4fb6cd25fb02ce381bac9ea13ecd1f90b3524de5
+      CANDIDATE: bfb7334ac88cbdefe288f209252d5088f955b1c2
       PAIRS: '11'
       WARMUPS: '3'
     steps:
@@ -37,7 +37,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
-          ref: 4fb6cd25fb02ce381bac9ea13ecd1f90b3524de5
+          ref: bfb7334ac88cbdefe288f209252d5088f955b1c2
           path: _candidate
           persist-credentials: false
       - uses: actions/setup-node@v4
