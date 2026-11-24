@@ -16,16 +16,18 @@ unsafe fn space(mut p: u32, end: u32) -> u32 {
 }
 
 #[inline(always)]
+fn matching_byte_markers(word: u64, repeated_byte: u64) -> u64 {
+    let difference = word ^ repeated_byte;
+    // A borrow can mark a later byte too. The first marked byte is exact.
+    (difference.wrapping_sub(0x0101010101010101) & !difference) & 0x8080808080808080
+}
+
+#[inline(always)]
 unsafe fn string_marker(mut p: u32, end: u32) -> u32 {
-    const ONES: u64 = 0x0101010101010101;
-    const HIGH: u64 = 0x8080808080808080;
     while end - p >= 8 {
         let word = load_u64(p);
-        let quote = word ^ 0x2222222222222222;
-        let slash = word ^ 0x5c5c5c5c5c5c5c5c;
-        let markers = ((quote.wrapping_sub(ONES) & !quote)
-            | (slash.wrapping_sub(ONES) & !slash)) & HIGH;
-        // A borrow may also mark a later byte; the first marked byte is exact.
+        let markers = matching_byte_markers(word, 0x2222222222222222)
+            | matching_byte_markers(word, 0x5c5c5c5c5c5c5c5c);
         // WASM words are little-endian, including unaligned loads.
         if markers != 0 { return p + (markers.trailing_zeros() >> 3); }
         p += 8;
@@ -68,20 +70,37 @@ pub unsafe extern "C" fn jsonStringEnd(start: u32, end: u32) -> i32 {
     -(string_end(p + 1, end) as i32)
 }
 
+#[inline(always)]
+fn container_marker(word: u64) -> u32 {
+    // The 0x20 bit distinguishes '[' from '{' and ']' from '}'.
+    let brackets = word | 0x2020202020202020;
+    let markers = matching_byte_markers(word, 0x2222222222222222)
+        | matching_byte_markers(brackets, 0x7b7b7b7b7b7b7b7b)
+        | matching_byte_markers(brackets, 0x7d7d7d7d7d7d7d7d);
+    // An empty mask has 64 trailing zero bits, so advance the whole word.
+    markers.trailing_zeros() >> 3
+}
+
 /// End of one selected value, excluding trailing whitespace. Zero is invalid.
 #[no_mangle]
 pub unsafe extern "C" fn jsonValueEnd(start: u32, end: u32) -> u32 {
     let start = space(start, end);
     if start >= end { return 0; }
     let first = load_u8(start);
-    if first == 34 { return string_end(start, end); }
+    // The sign marks escapes for decoding. Skippers only need the offset.
+    if first == 34 { return jsonStringEnd(start, end).unsigned_abs(); }
     if first == 123 || first == 91 {
         let mut depth = 1u32;
         let mut p = start + 1;
         while p < end {
+            if end - p >= 8 {
+                let advance = container_marker(load_u64(p));
+                p += advance;
+                if advance == 8 { continue; }
+            }
             let c = load_u8(p);
             if c == 34 {
-                p = string_end(p, end);
+                p = jsonStringEnd(p, end).unsigned_abs();
                 if p == 0 { return 0; }
                 continue;
             }
