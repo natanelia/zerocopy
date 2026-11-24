@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { freezeJSON } from './freeze-json';
+import { freezeJSON, freezeParsedJSON } from './freeze-json';
 import { getCodec } from './codec';
 
 // Inspect descriptors rather than using the production traversal algorithm.
@@ -98,4 +98,21 @@ describe('JSON freezing', () => {
     expect(decoded.geometry.coordinates[0][0]).toBe(103.85);
     expect(Object.isFrozen(input.geometry.coordinates[0])).toBe(false);
   });
+});
+
+test('freezes every container in parsed text with whitespace, nesting and quoted delimiters', () => {
+  for (const text of [
+    '{"x":1,"text":"plain","flag":false,"n":null}', '[-0,null,false,"a"]',
+    '[{"nested":[{}]}]', '  {"a":[1]}  ', '{"x":"{","[":[{"y":true}]}',
+    '{"__proto__":{"deep":[{"end":1}]}}', '[1,2,3]', '"["', '-0', 'null',
+    JSON.stringify({ text: 'x'.repeat(128), flat: 1 }),
+    JSON.stringify({ text: '['.repeat(128), nested: { values: [1, 2] } }),
+    JSON.stringify([{ text: 'x'.repeat(128) }]),
+    ' '.repeat(100) + '{"__proto__":{"deep":[]}}',
+  ]) {
+    const parsed = JSON.parse(text);
+    expect(Object.is(freezeParsedJSON(parsed, text), parsed)).toBe(true);
+    expectDeeplyFrozen(parsed);
+    expect(parsed).toEqual(JSON.parse(text));
+  }
 });

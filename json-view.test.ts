@@ -220,3 +220,62 @@ describe('JSON shared-byte views', () => {
     expect(reader.getView(1100)).toBeUndefined();
   });
 });
+
+test('field offsets distinguish ranges, arenas, and long or missing keys', () => {
+  const padding = 'x'.repeat(40);
+  const { arena, view } = fromText(`{"first":"${padding}","later":2}`);
+  const text = `{"first":"${padding}","later":4}`;
+  const data = encoder.encode(text);
+  const raw = arena.alloc(data.length);
+  arena.buf.set(data, raw);
+  const complete = new JsonView(arena, raw, data.length);
+  const short = new JsonView(arena, raw, text.indexOf(','));
+  for (let i = 0; i < 3; i++) {
+    expect(complete.get('later')).toBe(4);
+    expect(short.has('later')).toBe(false);
+    expect(view.get('later')).toBe(2);
+  }
+
+  const names = ['x', 'long field name', '名', '__proto__', 'a'.repeat(65)];
+  const entries = Array.from({ length: 2500 }, (_, i) => [String(i), {
+    [names[i % names.length]!]: i, ['field' + i % 80]: i,
+  }] as const);
+  const map = new SharedMap('object', 0, 0, new Arena()).setMany(entries);
+  for (let pass = 0; pass < 2; pass++) {
+    for (let n = 0; n < entries.length; n++) {
+      const i = pass === 0 ? n : entries.length - 1 - n;
+      const row = map.getView(String(i))!;
+      const name = names[i % names.length]!;
+      expect(row.get(name)).toBe(i);
+      expect(row.has(names[(i + 1) % names.length]!)).toBe(false);
+      expect(row.get('field' + i % 80)).toBe(i);
+    }
+  }
+  const other = fromText('{"later":99,"first":0}').view;
+  expect(other.get('later')).toBe(99);
+  expect(view.get('later')).toBe(2);
+});
+
+test('preserves offsets across the signed and unsigned 16-bit boundaries', () => {
+  const prefix = '{"pad":"', suffix = '","tail":17}';
+  for (const length of [32767, 32768, 65535, 65536]) {
+    const { view } = fromText(prefix + 'x'.repeat(length - prefix.length - suffix.length) + suffix);
+    for (let pass = 0; pass < 2; pass++) {
+      expect(view.byteLength).toBe(length);
+      expect(view.get('tail')).toBe(17);
+      expect(view.has('missing')).toBe(false);
+    }
+  }
+});
+
+test('preserves reads beyond the per-field and total offset budgets', () => {
+  const rows = Array.from({ length: 2052 }, (_, id) => ({ id, a: id, b: id, c: id, d: id }));
+  const list = new SharedList('object', 0, 0, 0, new Arena()).pushMany(rows);
+  for (let i = 0; i < rows.length; i++) {
+    const row = list.getView(i)!;
+    for (const key of ['id', 'a', 'b', 'c', 'd']) {
+      if (row.get(key) !== i) throw new Error('Wrong field ' + key + ' at row ' + i);
+    }
+  }
+  for (const i of [0, 1638, 2047, 2048, 2051]) expect(list.getView(i)!.get('d')).toBe(i);
+});
