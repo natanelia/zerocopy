@@ -118,6 +118,44 @@ describe('SharedList', () => {
       .toThrow('Float64Array output requires a numeric list');
   });
 
+  test('copies selected spans into reused Float64Array subviews across edited leaves and the tail', () => {
+    const special = [NaN, -0, Infinity, -Infinity, Number.MIN_VALUE, Math.PI];
+    const values = Float64Array.from({ length: 32869 }, (_, i) => special[i % special.length]);
+    const base = new SharedList('number').pushMany(values);
+    const edited = base.setMany([[31, 99], [32, 100], [1024, 101], [32768, 102], [32868, 103]]);
+    const expected = values.slice();
+    for (const i of [31, 32, 1024, 32768, 32868]) expected[i] = edited.get(i)!;
+
+    const target = new Float64Array(180);
+    const view = target.subarray(3, 174);
+    for (const [start, end] of [[0, 0], [30, 35], [29, 100], [117, 248], [997, 1063], [32751, 32869]]) {
+      target.fill(777);
+      edited.copyToFloat64Array(view, { start, end, offset: 4 });
+      expect(target.slice(0, 7)).toEqual(new Float64Array(7).fill(777));
+      expect(target.slice(7, 7 + end - start)).toEqual(expected.slice(start, end));
+      expect(target.slice(7 + end - start).every(value => value === 777)).toBe(true);
+    }
+    edited.copyToFloat64Array(values);
+    expect(values).toEqual(expected);
+    expect(base.get(31)).toBe(-0);
+  });
+
+  test('validates a coordinate copy before writing any destination bytes', () => {
+    const arena = new Arena();
+    const points = new SharedList('number', 0, 0, 0, arena).pushMany([1, 2, 3, 4]);
+    const target = new Float64Array(4).fill(99);
+    for (const options of [{ start: -1 }, { start: 0.5 }, { start: 3, end: 2 }, { end: 5 }, { end: NaN },
+      { offset: -1 }, { offset: Infinity }, { offset: 1 }]) {
+      expect(() => points.copyToFloat64Array(target, options)).toThrow(RangeError);
+    }
+    expect(() => points.copyToFloat64Array(new Float32Array(4) as never)).toThrow(TypeError);
+    expect(() => points.copyToFloat64Array(new Float64Array(arena.memory.buffer, points.tail, 4) as never))
+      .toThrow('Target must be backed by an ArrayBuffer');
+    points.copyToFloat64Array(target, { start: 4, offset: 4 });
+    expect(target).toEqual(new Float64Array(4).fill(99));
+    expect(points.toArray()).toEqual([1, 2, 3, 4]);
+  });
+
   test.each([false, true])('copies coordinate snapshots from read-only attachments (copy=%s)', async copy => {
     const arena = new Arena();
     const points = new SharedList('number', 0, 0, 0, arena).pushMany(Float64Array.from({ length: 65 }, (_, i) => i / 3));
@@ -130,6 +168,9 @@ describe('SharedList', () => {
     points.pushMany(new Float64Array(16384)).set(31, -33);
     packed[0] = 999;
     expect(Array.from(reader.toFloat64Array())).toEqual(expected);
+    const selected = new Float64Array(35);
+    reader.copyToFloat64Array(selected, { start: 30 });
+    expect(Array.from(selected)).toEqual(expected.slice(30));
   });
 
   test('crosses 32-element boundary', () => {

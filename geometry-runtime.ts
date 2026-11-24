@@ -3,6 +3,7 @@ import { SharedList } from './shared-list';
 
 export interface GeometryKernel {
   bboxXY(root: number, depth: number, tail: number, size: number): void;
+  bboxXYRange(root: number, depth: number, tail: number, size: number, start: number, end: number): void;
   bboxMinX(): number;
   bboxMinY(): number;
   bboxMaxX(): number;

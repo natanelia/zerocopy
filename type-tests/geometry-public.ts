@@ -1,6 +1,7 @@
 import { SharedList } from 'zerocopy';
 import { bboxXY, type BoundsXY } from 'zerocopy/geometry';
 const bounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]));
+const laneBounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]), { start: 2, end: 4 });
 const minimum: number = bounds[0];
 // @ts-expect-error The input must be numeric.
 bboxXY(new SharedList('string'));

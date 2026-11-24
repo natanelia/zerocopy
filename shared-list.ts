@@ -1,9 +1,10 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, validListRange, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 import { JsonView } from './json-view';
-import { NATIVE_LITTLE_ENDIAN } from './memory';
+import { NATIVE_LITTLE_ENDIAN, typedArrayBuffer, typedArrayLength, typedArrayOffset, typedArrayTag } from './memory';
 import { compileStringSearch, type TextSearchOptions } from './text-search';
+const arrayBufferByteLength = Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, 'byteLength')!.get!;
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
 /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
@@ -242,17 +243,58 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   /** Copy a numeric snapshot into one contiguous, independently writable buffer. */
   toFloat64Array(this: SharedList<'number'>): Float64Array<ArrayBuffer> {
     if (this.type !== 'number') throw new TypeError('Float64Array output requires a numeric list');
+    const result = new Float64Array(this.size);
+    this.#copyFloat64Range(result, 0, this.size, 0);
+    return result;
+  }
+
+  /** Copy [start, end) into a caller-owned buffer at the given element offset. */
+  copyToFloat64Array(
+    this: SharedList<'number'>,
+    target: Float64Array<ArrayBuffer>,
+    { start = 0, end = this.size, offset = 0 }: { start?: number; end?: number; offset?: number } = {},
+  ): void {
+    if (this.type !== 'number') throw new TypeError('Float64Array output requires a numeric list');
+    if (typedArrayTag.call(target) !== 'Float64Array') throw new TypeError('Expected a Float64Array target');
+    try {
+      // Shared buffers could alias published arena bytes through another wrapper.
+      arrayBufferByteLength.call(typedArrayBuffer.call(target));
+    } catch {
+      throw new TypeError('Target must be backed by an ArrayBuffer');
+    }
+    if (!validListRange(start, end, this.size)) throw new RangeError('Source range is outside the list');
+    if (!Number.isInteger(offset) || offset < 0 || offset > typedArrayLength.call(target) - (end - start)) {
+      throw new RangeError('Source range does not fit in the target');
+    }
+    this.#copyFloat64Range(target, start, end, offset);
+  }
+
+  #copyFloat64Range(target: Float64Array<ArrayBuffer>, start: number, end: number, offset: number): void {
+    if (start === end) return;
     const { size, root, depth, tail } = this;
-    // Native conversion wins for one or two leaves. It also handles host byte order.
-    if (size <= 64 || !NATIVE_LITTLE_ENDIAN) return new Float64Array(this.toArray());
-    const result = new Float64Array(size);
-    const a = this.arena, view = a.dv, source = view.buffer;
-    const output = new Uint8Array(result.buffer);
+    const a = this.arena, view = a.dv;
     const tailStart = (size - 1) & ~31;
-    let start = 0, end = 0, written = 0, parent = 0;
+    // Scalar reads avoid temporary views for short spans and handle host byte order.
+    if (end - start <= 64 || !NATIVE_LITTLE_ENDIAN) {
+      for (let index = start; index < end;) {
+        const first = index & ~31, stop = Math.min(end, first + 32);
+        const leaf = first >= tailStart ? tail : a.wasm.vecLeaf(root, depth, index) >>> 0;
+        for (; index < stop; index++) target[offset++] = view.getFloat64(leaf + (index - first) * 8, true);
+      }
+      return;
+    }
+
+    const source = view.buffer;
+    const output = new Uint8Array(typedArrayBuffer.call(target), typedArrayOffset.call(target) + offset * 8, (end - start) * 8);
+    const firstBlock = start & ~31;
+    // A range can start in the middle of a group of 32 leaves.
+    let parent = depth && firstBlock < tailStart && (firstBlock & 1023)
+      ? a.wasm.vecLeaf(root, depth - 1, firstBlock >>> 5) >>> 0 : 0;
+    let leafOffset = (start & 31) * 8;
+    let spanStart = -1, spanEnd = -1, written = 0;
     // Bulk appends place consecutive leaves next to each other. An edit can
     // replace just one leaf, so copy adjacent spans together in logical order.
-    for (let first = 0; first < size; first += 32) {
+    for (let first = firstBlock; first < end; first += 32) {
       let leaf = tail;
       if (first < tailStart) {
         leaf = root;
@@ -262,17 +304,18 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
           leaf = view.getUint32(parent + ((first >>> 5) & 31) * 4, true);
         }
       }
-      if (leaf !== end) {
-        if (end !== start) {
-          output.set(new Uint8Array(source, start, end - start), written);
-          written += end - start;
+      if (leaf !== spanEnd) {
+        const length = spanEnd - spanStart;
+        if (length) {
+          output.set(new Uint8Array(source, spanStart, length), written);
+          written += length;
         }
-        start = leaf;
+        spanStart = leaf + leafOffset;
+        leafOffset = 0;
       }
-      end = leaf + Math.min(32, size - first) * 8;
+      spanEnd = leaf + Math.min(32, end - first) * 8;
     }
-    output.set(new Uint8Array(source, start, end - start), written);
-    return result;
+    output.set(new Uint8Array(source, spanStart, spanEnd - spanStart), written);
   }
   toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }
   static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = defaultArena()): SharedList<T> {

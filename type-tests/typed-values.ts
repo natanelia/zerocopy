@@ -139,6 +139,11 @@ new SharedMap('object').getView('legacy');
 new SharedList('object').getView(0);
 const coordinates = new SharedList('number').pushMany(new Float64Array([1, 2])).pushMany(new Float32Array([3, 4]));
 type PackedCoordinates = Assert<Equal<ReturnType<typeof coordinates.toFloat64Array>, Float64Array<ArrayBuffer>>>;
+coordinates.copyToFloat64Array(new Float64Array(2), { start: 2, end: 4 });
+// @ts-expect-error The destination must have independently writable backing storage.
+coordinates.copyToFloat64Array(new Float64Array(new SharedArrayBuffer(32)));
+// @ts-expect-error Typed-array output is specific to numeric lists.
+laneList.copyToFloat64Array(new Float64Array(2));
 // @ts-expect-error Numeric typed-array input is specific to numeric lists.
 laneList.pushMany(new Float64Array([1, 2]));
 // @ts-expect-error Typed-array output is specific to numeric lists.
