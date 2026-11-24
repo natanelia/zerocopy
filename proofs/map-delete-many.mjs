@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { cpus } from 'node:os';
@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 
 // The same public API and fixtures run in both builds and all engines.
 // Setup, result validation, and memory inspection are outside elapsed time.
-async function benchmark({ baseline, candidate, pairs, warmups }) {
+async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }) {
   const builds = await Promise.all([baseline, candidate].map(path => import(path + 'shared.js')));
   const cases = [
     { name: 'single-delete-control', size: 10000, count: 1, type: 'number', pattern: 'random', repeats: 64 },
@@ -41,14 +41,14 @@ async function benchmark({ baseline, candidate, pairs, warmups }) {
 
     function check(map, reference, description) {
       if (map.size !== reference.size) throw new Error(name + ': wrong size (' + description + ')');
-      let seen = 0;
+      const seen = new Set();
       for (const [key, value] of map.entries()) {
-        if (!reference.has(key) || JSON.stringify(reference.get(key)) !== JSON.stringify(value)) {
+        if (seen.has(key) || !reference.has(key) || JSON.stringify(reference.get(key)) !== JSON.stringify(value)) {
           throw new Error(name + ': invalid value (' + description + ') for ' + key);
         }
-        seen++;
+        seen.add(key);
       }
-      if (seen !== reference.size) throw new Error(name + ': incorrect iteration count');
+      if (seen.size !== reference.size) throw new Error(name + ': incorrect iteration count');
     }
     const samples = [];
     for (let round = -warmups; round < pairs; round++) {
@@ -71,7 +71,7 @@ async function benchmark({ baseline, candidate, pairs, warmups }) {
         if (pattern === 'missing' && result !== base) throw new Error(name + ': no-op changed snapshot identity');
         for (const key of keys) if (result.has(key)) throw new Error(name + ': deleted key survives');
         // Exercise the published result too; attachment is outside timing.
-        const payload = structuredClone(build.getWorkerData({ result, base }, { copy: false }));
+        const payload = structuredClone(build.getWorkerData({ result, base }, { copy: copyAttachment }));
         const attached = await build.initWorker(payload);
         if (attached.result.size !== expected.size || attached.base.size !== original.size) {
           throw new Error(name + ': invalid attached sizes');
@@ -94,12 +94,14 @@ async function benchmark({ baseline, candidate, pairs, warmups }) {
     const candidateMs = median(measured.map(s => s.candidate.ms));
     rows.push({ ...workload, requestedKeys: keys.length, removedKeys: size - expected.size,
       baselineMs, candidateMs,
+      baselineP95Ms: measured.map(s => s.baseline.ms).sort((a, b) => a - b)[Math.ceil(measured.length * 0.95) - 1],
+      candidateP95Ms: measured.map(s => s.candidate.ms).sort((a, b) => a - b)[Math.ceil(measured.length * 0.95) - 1],
       pairedSpeedup: median(measured.map(s => s.baseline.ms / s.candidate.ms)),
       fasterPairs: measured.filter(s => s.candidate.ms < s.baseline.ms).length,
       baselineArenaBytes: median(measured.map(s => s.baseline.arenaBytes)),
       candidateArenaBytes: median(measured.map(s => s.candidate.arenaBytes)), samples });
   }
-  return { pairs, warmups, rows };
+  return { pairs, warmups, attachment: copyAttachment ? 'copied' : 'shared', rows };
 }
 
 const [baselinePath, candidatePath = 'dist', engine = 'node', pairArg = '11', warmupArg = '3'] = process.argv.slice(2);
@@ -114,13 +116,16 @@ if ((engine === 'bun') !== Boolean(process.versions.bun)) {
 const roots = { baseline: resolve(baselinePath), candidate: resolve(candidatePath) };
 const fingerprints = {};
 for (const [name, root] of Object.entries(roots)) {
-  fingerprints[name] = createHash('sha256').update(await readFile(join(root, 'shared.js'))).digest('hex');
+  const modules = (await readdir(root)).filter(file => file.endsWith('.js')).sort();
+  fingerprints[name] = Object.fromEntries(await Promise.all(modules.map(async file => [file,
+    createHash('sha256').update(await readFile(join(root, file))).digest('hex')])));
 }
 const meta = { cpu: cpus()[0].model, architecture: process.arch, platform: process.platform, fingerprints };
 if (engine === 'node' || engine === 'bun') {
   const result = await benchmark({
     baseline: pathToFileURL(roots.baseline + '/').href,
     candidate: pathToFileURL(roots.candidate + '/').href, pairs, warmups,
+    copyAttachment: engine === 'bun',
   });
   console.log(JSON.stringify({ runtime: engine + ' ' + (process.versions.bun ?? process.versions.node), ...meta, ...result }, null, 2));
 } else {
@@ -147,7 +152,7 @@ if (engine === 'node' || engine === 'bun') {
       await page.goto(origin);
       if (!await page.evaluate(() => crossOriginIsolated)) throw new Error('Shared memory requires an isolated page');
       const result = await page.evaluate(benchmark, {
-        baseline: origin + '/baseline/', candidate: origin + '/candidate/', pairs, warmups,
+        baseline: origin + '/baseline/', candidate: origin + '/candidate/', pairs, warmups, copyAttachment: false,
       });
       console.log(JSON.stringify({ runtime: engine + ' ' + browser.version(), ...meta, ...result }, null, 2));
     } finally { await browser.close(); }
