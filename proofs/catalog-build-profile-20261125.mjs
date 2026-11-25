@@ -76,6 +76,56 @@ async function verify(page) {
     return { payloadMs, verification: p.verifyReadAnswer(answer, p.readReference(p.count, 0, ids, definition)), contract: p.verifyReadContract(answer, definition) };
   });
 }
+function chronologicalSamples(profile, nodes) {
+  const { samples, timeDeltas, startTime, endTime } = profile;
+  if (!Array.isArray(samples) || !Array.isArray(timeDeltas) ||
+      samples.length !== timeDeltas.length || !samples.length) throw new Error('Invalid sample arrays');
+  if (!Number.isFinite(startTime) || !Number.isFinite(endTime) || endTime < startTime) throw new Error('Invalid profile bounds');
+  const unknown = samples.flatMap((id, index) => nodes.has(id) ? [] : [{ id, index }]);
+  if (unknown.length) throw new Error('Unknown CPU profile sample IDs: ' + JSON.stringify(unknown));
+  let elapsed = 0, negativeDeltas = 0;
+  const ordered = samples.map((id, index) => {
+    const delta = timeDeltas[index];
+    if (!Number.isFinite(delta)) throw new Error('Nonfinite delta at index ' + index);
+    if (delta < 0) negativeDeltas++;
+    elapsed += delta;
+    if (!Number.isFinite(elapsed)) throw new Error('Nonfinite accumulated timestamp at index ' + index);
+    return { id, index, elapsed };
+  });
+  // CDP samples can arrive out of timestamp order. Reorder the aligned
+  // samples, not individual deltas. Use the original index to break ties.
+  ordered.sort((a, b) => a.elapsed - b.elapsed || a.index - b.index);
+  const durationUs = endTime - startTime;
+  if (ordered[0].elapsed < 0 || ordered.at(-1).elapsed > durationUs) throw new Error('Sample timestamps outside profile bounds');
+  let previous = 0;
+  const weighted = ordered.map(({ id, index, elapsed }) => {
+    const delta = elapsed - previous;
+    previous = elapsed;
+    return { id, index, delta };
+  });
+  if (previous <= 0) throw new Error('Zero sampled duration');
+  return {
+    weighted, durationUs, negativeDeltas, coveredUs: previous,
+    leadingGapUs: ordered[0].elapsed, trailingGapUs: durationUs - previous,
+    coverage: previous / durationUs,
+  };
+}
+
+// Deterministic regression fixture: negative delta, tied timestamps,
+// sample association, unobserved end gap and invalid node diagnostics.
+{
+  const fixture = {"startTime":1000,"endTime":1040,"samples":[1,2,3,4,2],"timeDeltas":[10,10,-1,1,10]};
+  const nodes = new Map([[1, {}], [2, {}], [3, {}], [4, {}]]);
+  const result = chronologicalSamples(fixture, nodes);
+  assert.deepEqual(result.weighted, [{"id":1,"index":0,"delta":10},{"id":3,"index":2,"delta":9},{"id":2,"index":1,"delta":1},{"id":4,"index":3,"delta":0},{"id":2,"index":4,"delta":10}]);
+  assert.equal(result.negativeDeltas, 1);
+  assert.equal(result.coveredUs, 30);
+  assert.equal(result.leadingGapUs, 10);
+  assert.equal(result.trailingGapUs, 10);
+  assert.equal(result.coverage, 0.75);
+  assert.throws(() => chronologicalSamples({ ...fixture, samples: [99, 2, 3, 4, 2] }, nodes), /Unknown CPU profile sample IDs.*99/);
+}
+
 // Aggregate sampled time without dropping native/WASM/GC/idle or counting a
 // recursive frame twice per sample. Raw CDP profile is the source of truth.
 function summarize(profile) {
@@ -87,13 +137,10 @@ function summarize(profile) {
     const f = n.callFrame;
     return (f.functionName || '(anonymous)') + ' @ ' + (f.url || '(native)') + ':' + (f.lineNumber + 1);
   };
-  assert.equal(profile.samples.length, profile.timeDeltas.length);
-  let totalUs = 0;
-  for (let i = 0; i < profile.samples.length; i++) {
-    let id = profile.samples[i];
-    const delta = profile.timeDeltas[i];
-    assert(Number.isFinite(delta) && delta >= 0 && nodes.has(id));
-    totalUs += delta;
+  const { weighted, ...coverage } = chronologicalSamples(profile, nodes);
+  const totalUs = coverage.coveredUs;
+  for (const sample of weighted) {
+    let { id, delta } = sample;
     const leaf = label(nodes.get(id));
     self.set(leaf, (self.get(leaf) ?? 0) + delta);
     const visited = new Set();
@@ -105,7 +152,7 @@ function summarize(profile) {
     }
   }
   const top = m => [...m].sort((a,b) => b[1] - a[1]).slice(0, 40).map(([frame, us]) => ({ frame, us, fraction: us / totalUs }));
-  return { totalUs, samples: profile.samples.length, self: top(self), inclusive: top(inclusive) };
+  return { totalUs, samples: profile.samples.length, ...coverage, self: top(self), inclusive: top(inclusive) };
 }
 try {
   for (const [engine, launcher] of Object.entries({ chromium, firefox })) {

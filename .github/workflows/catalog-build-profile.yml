@@ -40,6 +40,7 @@ jobs:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
       - name: Build pinned baseline and record environment
+        id: baseline
         shell: bash
         run: |
           set -euo pipefail
@@ -71,6 +72,7 @@ jobs:
             sha256sum dist/*.js *.wasm website/node_modules/marked/lib/marked.esm.js
           ) 2>&1 | tee "$out/build.log"
       - name: Install browsers
+        id: browsers
         run: bunx playwright install --with-deps chromium firefox
       - name: Diagnostic stage timings and construction CPU profiles
         shell: bash
@@ -78,16 +80,19 @@ jobs:
           set -euo pipefail
           timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-build-profile-20261125.mjs _baseline "$RUNNER_TEMP/catalog-build-profile/stages" 7
       - name: Unmodified two-worker application timing controls
+        if: ${{ !cancelled() && steps.baseline.outcome == 'success' && steps.browsers.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/catalog-build-profile"
+          failed=0
           for engine in chromium firefox; do
             for count in 1000 10000 100000; do
               BROWSER="$engine" timeout --signal=TERM --kill-after=15s 360s node proofs/catalog-perf-20261121/website.mjs \
-                _baseline _baseline "$out/website-$engine-$count-aa.json" "$count" 7 full-shared-get
+                _baseline _baseline "$out/website-$engine-$count-aa.json" "$count" 7 full-shared-get || failed=1
             done
           done
+          exit "$failed"
       - name: Retain raw profiles, timings and build logs
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
