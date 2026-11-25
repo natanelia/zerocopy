@@ -1,27 +1,25 @@
-name: Map changed keys paired proof (temporary)
+name: Map diff phase qualification (no deploy)
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'shared-map.ts'
-      - 'map-changed-keys.test.ts'
-      - 'proofs/map-changed-keys-paired-20261125.mjs'
-      - '.github/workflows/map-changed-keys-proof.yml'
+  push:
+    branches: ['proof/map-diff-phase-20261125']
 permissions:
   contents: read
 concurrency:
-  group: map-changed-keys-proof-${{ github.event.pull_request.number }}
+  group: map-diff-phase-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   proof:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/map-changed-keys-20261125'
+    if: github.ref == 'refs/heads/proof/map-diff-phase-20261125'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
@@ -30,7 +28,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: 3807c15a1a1b4958aec407a79a8238067988877f
           path: _candidate
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -47,7 +45,7 @@ jobs:
           out="$RUNNER_TEMP/map-changed-keys"
           mkdir -p "$out"
           test "$(git -C _baseline rev-parse HEAD)" = "76ab6b53aa0d3b40202720ca12d9fcc904716cf2"
-          test "$(git -C _candidate rev-parse HEAD)" = "$(git rev-parse HEAD)"
+          test "$(git -C _candidate rev-parse HEAD)" = "3807c15a1a1b4958aec407a79a8238067988877f"
           cmp _candidate/package.json _baseline/package.json
           bun install
           {
@@ -77,14 +75,14 @@ jobs:
       - name: Focused runtime correctness
         run: cd _candidate && bun run typecheck && bun run test map-changed-keys.test.ts
       - name: Install browsers
-        run: bunx playwright install --with-deps chromium firefox
+        run: bunx playwright install --with-deps ${{ matrix.engine }}
       - name: Paired baseline scan versus candidate API with exact issue oracle
-        run: timeout --signal=TERM --kill-after=15s 2100s node proofs/map-changed-keys-paired-20261125.mjs _baseline _candidate "$RUNNER_TEMP/map-changed-keys/paired.json" 11
+        run: timeout --signal=TERM --kill-after=15s 2100s node proofs/map-changed-keys-paired-20261125.mjs _baseline _candidate "$RUNNER_TEMP/map-changed-keys/paired.json" 20 ${{ matrix.engine }}
       - name: Retain raw proof
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: map-changed-keys-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          name: map-diff-phase-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/map-changed-keys/
           retention-days: 30
           if-no-files-found: warn

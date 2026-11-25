@@ -6,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium, firefox } from 'playwright';
 
-const [checkout, candidateCheckout, output, rounds = '11'] = process.argv.slice(2);
+const [checkout, candidateCheckout, output, rounds = '20', engineFilter] = process.argv.slice(2);
 assert(checkout && candidateCheckout && output && Number.isInteger(+rounds) && +rounds > 0);
 const root = resolve(checkout);
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
@@ -47,6 +47,7 @@ function reader() {
   self.onmessage = async ({ data }) => {
     try {
       if (data.revision !== revision + 1) throw Error('Out of order revision');
+      const receivedAt = performance.timeOrigin + performance.now();
       api ??= await import(data.apiURL);
       const start = performance.now();
       const current = await api.initWorker(data.payload, prior ? { previous: { after: prior } } : undefined);
@@ -61,7 +62,9 @@ function reader() {
         for (const [key] of after.entries()) validate(key, after);
         prior = first = after; firstSignature = signature(first, data.probe);
         revision = data.revision;
-        self.postMessage({ attachMs, initialMs: performance.now() - initial, issues: [...issues].sort(), size: after.size });
+        const initialMs = performance.now() - initial, sortStart = performance.now();
+        const sortedIssues = [...issues].sort(), sortMs = performance.now() - sortStart;
+        self.postMessage({ receivedAt, beforePostAt: performance.timeOrigin + performance.now(), attachMs, initialMs, sortMs, issues: sortedIssues, size: after.size });
         return;
       }
       if (!before || before.root !== prior.root || before.size !== prior.size || before.arena.id !== prior.arena.id) throw Error('Stream predecessor mismatch');
@@ -90,11 +93,14 @@ function reader() {
         changed = after.changedKeysSince(before);
       } else if (!safe) {
         // Compaction/unrelated arenas: conservatively invalidate all keys.
-        for (const [key] of before.entries()) changed.add(key);
-        for (const [key] of after.entries()) changed.add(key);
-      } else if (data.mode === 'scan') scan(before.root, after.root);
+        for (const key of before.keys()) changed.add(key);
+        for (const key of after.keys()) changed.add(key);
+      } else if (data.mode === 'scan') { if (before.root !== after.root) scan(before.root, after.root); }
       else throw Error('Unknown mode');
       const detectMs = performance.now() - detectStart;
+      const canonicalStart = performance.now();
+      if (data.canonical) changed = new Set([...changed].sort());
+      const canonicalMs = performance.now() - canonicalStart;
       const expandStart = performance.now();
       const affected = new Set(changed), points = new Set(), edits = [];
       for (const key of changed) {
@@ -118,18 +124,20 @@ function reader() {
       const sameWrapperAcrossMessages = prior.arena === before.arena;
       const sameBufferAcrossMessages = prior.arena.memory.buffer === before.arena.memory.buffer;
       prior = after; revision = data.revision;
-      self.postMessage({ attachMs, detectMs, expandMs, validationMs, totalMs, keys: [...changed].sort(), issues: [...issues].sort(), affected: affected.size,
+      const sortStart = performance.now(), keys = [...changed].sort(), sortedIssues = [...issues].sort();
+      const sortMs = performance.now() - sortStart;
+      self.postMessage({ receivedAt, beforePostAt: performance.timeOrigin + performance.now(), canonicalMs, sortMs, attachMs, detectMs, expandMs, validationMs, totalMs, keys, issues: sortedIssues, affected: affected.size,
         visited, enumerated, skipped, fallback: !safe && data.mode !== 'producer', sameRootAcrossMessages, sameWrapperAcrossMessages, sameBufferAcrossMessages, size: after.size });
     } catch(error) { self.postMessage({ error: String(error.stack || error) }); }
   };
 }
 const cases = [
-  { count: 1000, edits: 10, kind: 'edges' },
-  { count: 10000, edits: 100, kind: 'sparse' },
+  { count: 100000, edits: 10, kind: 'edges' },
   { count: 100000, edits: 100, kind: 'sparse' },
   { count: 100000, edits: 1000, kind: 'churn' },
   { count: 10000, edits: 5000, kind: 'dense' },
-  { count: 100000, edits: 10000, kind: 'medium' }
+  { count: 100000, edits: 10000, kind: 'medium' },
+  { count: 100000, edits: 50000, kind: 'dense' }
 ];
 async function prepare(page, c, url) {
   await page.goto(url); assert(await page.evaluate(() => crossOriginIsolated));
@@ -167,7 +175,7 @@ async function prepare(page, c, url) {
       if(n!==native.size) throw Error('Traversal mismatch');
       const payload=pack(before,map);
       if(payload.arenas.some(a=>a.copy||!(a.memory.buffer instanceof SharedArrayBuffer))) throw Error('Not shared');
-      revisions.push({payload,issues:oracle(),size:map.size,keys:[...keys].sort(),required:required.sort(),fallback:before.arena!==map.arena});
+      revisions.push({payload,issues:oracle(),size:map.size,keys:[...keys].sort(),required:required.sort(),fallback:before.arena!==map.arena, ...(before.arena!==map.arena?{fallbackKeys:[...native.keys()].sort()}: {})});
     }
     // Move west boundary endpoint off the old east neighbor and onto a new
     // neighbor. Neither east lane is modified. Exact issue IDs must change.
@@ -208,35 +216,45 @@ async function prepare(page, c, url) {
     return revisions.map(({payload,...rest})=>({...rest,arenaCount:payload.arenas.length,arenaBytes:payload.arenas.reduce((s,a)=>s+a.used,0)}));
   },{c,source:'('+reader.toString()+')();'});
 }
-async function sample(page, mode, expected) {
-  const data=await page.evaluate(async mode=>{
+async function sample(page, mode, expected, phase, probe) {
+  const data=await page.evaluate(async ({mode,phase,probe})=>{
     const p=globalThis.__seq;
     const workers=Array.from({length:2},()=>new Worker(p.workerURL,{type:'module'}));
     try {
       const rows=[];
       for(let i=0;i<p.revisions.length;i++){
+        if (phase === 'isolated-canonical' && i === probe) await new Promise(r=>setTimeout(r,300));
         const rev=p.revisions[i], start=performance.now();
         const readers=await Promise.all(workers.map(w=>new Promise((resolve,reject)=>{
-          w.onmessage=e=>e.data.error?reject(Error(e.data.error)):resolve(e.data);
+          let sentAt, postSyncMs;
+          w.onmessage=e=>{
+            const receiptAt=performance.timeOrigin+performance.now();
+            if(e.data.error) reject(Error(e.data.error));
+            else resolve({...e.data,sentAt,receiptAt,postSyncMs,dispatchGapMs:e.data.receivedAt-sentAt,receiptGapMs:receiptAt-e.data.beforePostAt,workerElapsedMs:e.data.beforePostAt-e.data.receivedAt});
+          };
           w.onerror=e=>reject(Error(e.message));
-          w.postMessage({revision:i,mode,payload:rev.payload,apiURL:p.apiURL,probe:p.probe,...(mode==='producer'?{keys:rev.keys}:{})});
+          sentAt=performance.timeOrigin+performance.now();
+          w.postMessage({revision:i,mode,payload:rev.payload,apiURL:p.apiURL,probe:p.probe,canonical:phase==='isolated-canonical',...(mode==='producer'?{keys:rev.keys}:{})});
+          postSyncMs=performance.timeOrigin+performance.now()-sentAt;
         })));
         rows.push({roundTripMs:performance.now()-start,readers});
       }
       return rows;
     }finally{workers.forEach(w=>w.terminate());}
-  },mode);
+  },{mode,phase,probe});
   assert.equal(data.length,expected.length);
   for(let i=0;i<data.length;i++)for(const row of data[i].readers){
     const e=expected[i];
     assert.deepEqual(row.issues,e.issues);assert.equal(row.size,e.size);
+    for(const m of ['receivedAt','beforePostAt','sentAt','receiptAt','postSyncMs','dispatchGapMs','receiptGapMs','workerElapsedMs','sortMs'])assert(Number.isFinite(row[m]),m);
     if(i){
       assert.equal(row.fallback,e.fallback&&mode!=='producer');
       assert(row.sameRootAcrossMessages);
       const keys=new Set(row.keys);
       for(const key of e.required)assert(keys.has(key),'missed '+key);
-      if(!row.fallback) { const allowed=new Set(e.keys); for(const key of keys)assert(allowed.has(key),'unexpected '+key); }
-      for(const m of ['attachMs','detectMs','expandMs','validationMs','totalMs'])assert(Number.isFinite(row[m])&&row[m]>=0);
+      if(row.fallback) assert.deepEqual(row.keys,e.fallbackKeys);
+      else { const allowed=new Set(e.keys); for(const key of keys)assert(allowed.has(key),'unexpected '+key); }
+      for(const m of ['attachMs','detectMs','expandMs','validationMs','totalMs','canonicalMs'])assert(Number.isFinite(row[m])&&row[m]>=0);
       row.keyHash=createHash('sha256').update(JSON.stringify(row.keys)).digest('hex');row.keyCount=row.keys.length;delete row.keys;
     }
     row.issueHash=createHash('sha256').update(JSON.stringify(row.issues)).digest('hex');row.issueCount=row.issues.length;delete row.issues;
@@ -245,6 +263,7 @@ async function sample(page, mode, expected) {
 }
 try {
   for(const [engine,launcher] of Object.entries({chromium,firefox})){
+    if(engineFilter && engine!==engineFilter) continue;
     const browser=await launcher.launch();report.engines[engine]=browser.version();
     try{
       for(const c of cases){
@@ -253,15 +272,21 @@ try {
           const expected=await prepare(page,c,url), candidateExpected=await prepare(candidatePage,c,candidateURL),id=engine+'/'+c.count+'/'+c.kind;
           assert.deepEqual(candidateExpected,expected);
           report.cases.push({id,...c,expected});save();
-          for(const mode of ['scan','tree','producer'])await sample(mode==='tree'?candidatePage:page,mode,expected);
-          for(let pair=0;pair<+rounds;pair++){
-            const groups=pair%2?['producer','ab','aa']:['aa','ab','producer'];
-            for(const group of groups){
-              const modes=group==='aa'?['scan','scan']:group==='ab'?['scan','tree']:['scan','producer'];
-              if(pair%2)modes.reverse();
-              for(let order=0;order<2;order++){
-                const mode=modes[order],revisions=await sample(mode==='tree'?candidatePage:page,mode,expected);
-                report.samples.push({id,group,pair,order,mode,revisions});save();
+          const arms=[{arm:'base-scan',mode:'scan',page},{arm:'base-scan-repeat',mode:'scan',page},{arm:'candidate-scan',mode:'scan',page:candidatePage},{arm:'candidate-tree',mode:'tree',page:candidatePage},{arm:'candidate-producer',mode:'producer',page:candidatePage}];
+          for(const arm of arms)await sample(arm.page,arm.mode,expected,'continuous',null);
+          const phases=['continuous',...(c.kind==='sparse'||(c.kind==='dense'&&c.count===10000)?['isolated-canonical']:[])];
+          for(const phase of phases){
+            const n=phase==='isolated-canonical'?10:(c.kind==='sparse'||(c.kind==='dense'&&c.count===10000)?+rounds:10);
+            assert.equal(n%10,0,'balanced ten-round blocks');
+            for(let pair=0;pair<n;pair++){
+              // Five rotations and their reversals: every arm occupies each slot equally.
+              const rotation=pair%5, sequence=[...arms.slice(rotation),...arms.slice(0,rotation)];
+              if(Math.floor(pair/5)%2)sequence.reverse();
+              // Balanced, deterministic variation of the isolated target, including same-value and identity updates.
+              const probe=phase==='isolated-canonical'?[4,1,6,5,7][(pair*3+Math.floor(pair/5))%5]:null;
+              for(let order=0;order<sequence.length;order++){
+                const {arm,mode,page}=sequence[order],revisions=await sample(page,mode,expected,phase,probe);
+                report.samples.push({id,phase,probe,pair,order,arm,mode,revisions,sequenceMs:revisions.reduce((sum,r)=>sum+r.roundTripMs,0)});save();
               }
             }
           }
