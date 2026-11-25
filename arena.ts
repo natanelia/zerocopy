@@ -4,7 +4,7 @@ import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
-import { freezeJSON } from './freeze-json';
+import { freezeParsedJSON } from './freeze-json';
 export { freezeJSON } from './freeze-json';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
@@ -318,7 +318,8 @@ export class Arena {
         return record.value;
       }
     }
-    const parsed = JSON.parse(decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len)));
+    const text = decodeUtf8(decoder, this.bytes.subarray(ptr, ptr + len));
+    const parsed = JSON.parse(text);
     const nested = parseNestedType(type);
     let result: any;
     if (nested) {
@@ -327,7 +328,7 @@ export class Arena {
       const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
-    } else result = freezeJSON(parsed);
+    } else result = freezeParsedJSON(parsed, text);
     if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
       this.objectBytes += len;

@@ -22,3 +22,14 @@ export function freezeJSON<T>(value: T): T {
   }
   return value;
 }
+
+/** Only use with the exact text that JSON.parse consumed. A nested object or
+ * array always needs another literal opening delimiter. Delimiters inside
+ * strings and leading whitespace can only send us to the full traversal. */
+export function freezeParsedJSON<T>(value: T, text: string): T {
+  // For a short row, walking its few properties costs less than probing the text.
+  if (text.length < 96) return freezeJSON(value);
+  if (value === null || typeof value !== 'object') return value;
+  if (text.indexOf('{', 1) === -1 && text.indexOf('[', 1) === -1) return Object.freeze(value);
+  return freezeJSON(value);
+}
