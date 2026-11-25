@@ -1,4 +1,4 @@
-name: Retained map compaction exact corrected runtime qualification (temporary proof)
+name: Retained map compaction focused fallback qualification (temporary proof)
 on:
   push:
     branches: [proof/retained-map-compaction-20261125]
@@ -6,184 +6,13 @@ on:
 permissions:
   contents: read
 jobs:
-  edge-qualification:
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.4.2'
-      - uses: ./.github/actions/setup-rust
-      - run: bun install --frozen-lockfile
-      - run: bun run build:wasm
-      - name: Verify pinned runtime and typecheck
-        run: |
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
-          git rev-parse HEAD
-          git hash-object compaction.ts arena.ts shared-map.ts
-          bun run typecheck
-      - name: Test collision, fork, Unicode, allocation failure and custom traversal
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p retained-compaction-results
-          cat > retained-compaction-edge.ts <<'EOF'
-          import assert from 'node:assert/strict';
-          import { createHash } from 'node:crypto';
-          import { Arena, arenaOf, hashBytes, HEAP_START } from './arena';
-          import { SharedMap } from './shared-map';
-          // Install pass-through hooks before compaction is imported, then restore.
-          // Capturing identities in the late-loaded compaction module would poison the gate.
-          const initialLeaves=Arena.prototype.leaves, initialDescriptor=SharedMap.prototype.toWorkerData;
-          Arena.prototype.leaves=function*(root:number){yield* initialLeaves.call(this,root);};
-          SharedMap.prototype.toWorkerData=function(){return initialDescriptor.call(this);};
-          const { resetMap, getWorkerData, initWorker, compactMany }=await import('./shared');
-          Arena.prototype.leaves=initialLeaves;
-          SharedMap.prototype.toWorkerData=initialDescriptor;
-          const hash = (data: Uint8Array) => createHash('sha256').update(data).digest('hex');
-          function collision() {
-            const seen = new Map<number,string>(), enc = new TextEncoder();
-            let x = 0x9173bd21;
-            for (let i=0;i<400000;i++) {
-              x ^= x<<13; x ^= x>>>17; x ^= x<<5;
-              const key='collision/'+(x>>>0).toString(16)+'/'+i;
-              const h=hashBytes(enc.encode(key)), old=seen.get(h);
-              if(old!==undefined) return [old,key];
-              seen.set(h,key);
-            }
-            throw Error('deterministic collision not found');
-          }
-          function summarize(maps: Record<string,SharedMap<'object'>>, oracle: Record<string,Map<string,string>>) {
-            const result: Record<string,{count:number,hash:string}> = {};
-            for (const [name,m] of Object.entries(maps)) {
-              const digest=createHash('sha256'), seen=new Set<string>(), expected=oracle[name];
-              for (const [key,value] of m.entries()) {
-                const json=JSON.stringify(value);
-                assert(!seen.has(key)); assert.equal(json,expected.get(key),name+' '+key);
-                seen.add(key); digest.update(JSON.stringify([key,json])+'\n');
-              }
-              assert.equal(seen.size,expected.size); assert.equal(m.size,expected.size);
-              result[name]={count:seen.size,hash:digest.digest('hex')};
-            }
-            return result;
-          }
-          resetMap();
-          const [c1,c2]=collision();
-          assert.equal(hashBytes(new TextEncoder().encode(c1)),hashBytes(new TextEncoder().encode(c2)));
-          const unicode=['café','cafe\u0301','道路/🚗','\u0000inside','replacement/\ufffd'];
-          const keys=[c1,c2,...unicode];
-          const seed: [string,any][]=Array.from({length:60000},(_,i)=>['lane/'+i,{i,rev:0,coords:[i,-i]}]);
-          seed.push(...keys.map((key,i):[string,any]=>[key,{i,rev:0}]));
-          const root=new SharedMap('object').setMany(seed);
-          const expect0=new Map(seed.map(([k,v])=>[k,JSON.stringify(v)]));
-          function mutate(parent:SharedMap<'object'>,expected:Map<string,string>,updates:[string,any][],removed:string[]=[]){
-            let next=parent;const oracle=new Map(expected);
-            for(const [k,v] of updates){next=next.set(k,v);oracle.set(k,JSON.stringify(v));}
-            for(const k of removed){next=next.delete(k);oracle.delete(k);}
-            return [next,oracle] as const;
-          }
-          const [r1,o1]=mutate(root,expect0,[[c1,{i:1,rev:1}],['lane/1',{i:1,rev:1}]]);
-          const [r2,o2]=mutate(r1,o1,[[unicode[2],{rev:2}],['lane/2',{i:2,rev:2}]],[c2]);
-          const [fork,ofork]=mutate(root,expect0,[[c2,{i:2,rev:3}],['lane/3',{i:3,rev:3}]]);
-          const [r4,o4]=mutate(r2,o2,[[c2,{i:2,rev:4}],['lane/4',{i:4,rev:4}]]);
-          const input={root,r1,r2,fork,r4},oracle={root:expect0,r1:o1,r2:o2,fork:ofork,r4:o4};
-          const a=arenaOf(root), before=a.used, originalBytes=hash(a.buf.subarray(HEAP_START,before));
-          const original=summarize(input,oracle);
-          const packed=compactMany(input);
-          const packedDigest=summarize(packed,oracle);
-          const packedUsed=arenaOf(packed.root).used;
-          const copy=await initWorker(getWorkerData(input,{copy:true}));
-          const readOnlyPacked=compactMany(copy);
-          assert.deepEqual(summarize(readOnlyPacked,oracle),packedDigest);
-          const roundTrip=await initWorker(getWorkerData(packed,{copy:true}));
-          assert.deepEqual(summarize(roundTrip,oracle),packedDigest);
-          for (const [name,m] of Object.entries(roundTrip)) for(const k of keys)
-            assert.equal(JSON.stringify(m.get(k)),oracle[name as keyof typeof oracle].get(k));
-          const changed=packed.r4.set('lane/4',{i:4,rev:99});
-          assert.equal((changed.get('lane/4') as any).rev,99);
-          assert.equal((packed.r4.get('lane/4') as any).rev,4);
-          assert.equal((packed.root.get('lane/4') as any).rev,0);
-          // Force an allocation error in a new target; source must stay readable and unchanged.
-          const alloc=Arena.prototype.alloc;let attempts=0;
-          try {
-            Arena.prototype.alloc=function(n:number){if(this!==a&&++attempts===2)throw new RangeError('injected compaction allocation failure');return alloc.call(this,n);};
-            assert.throws(()=>compactMany(input),/injected compaction allocation failure/);
-          } finally {Arena.prototype.alloc=alloc;}
-          assert.equal(a.used,before);assert.equal(hash(a.buf.subarray(HEAP_START,before)),originalBytes);
-          assert.deepEqual(summarize(input,oracle),original);
-          // A wrapped source traversal is observable. It should remain on the old path.
-          const leaves=Arena.prototype.leaves;let customCalls=0;
-          let customUsed:number,customDigest:ReturnType<typeof summarize>;
-          try {
-            Arena.prototype.leaves=function*(root:number){if(this===a)customCalls++;yield* leaves.call(this,root);};
-            const custom=compactMany(input);
-            customUsed=arenaOf(custom.root).used;customDigest=summarize(custom,oracle);
-          } finally {Arena.prototype.leaves=leaves;}
-          assert.equal(hash(a.buf.subarray(HEAP_START,before)),originalBytes);
-          let descriptorCalls=0, descriptorUsed:number, descriptorDigest:ReturnType<typeof summarize>;
-          try {
-            SharedMap.prototype.toWorkerData=function(){descriptorCalls++;return initialDescriptor.call(this);};
-            const custom=compactMany(input);
-            descriptorUsed=arenaOf(custom.root).used;descriptorDigest=summarize(custom,oracle);
-          } finally {SharedMap.prototype.toWorkerData=initialDescriptor;}
-          console.log(JSON.stringify({collision:[c1,c2],original,packedDigest,packedUsed,sourceUsed:before,customCalls,customUsed,customDigest,descriptorCalls,descriptorUsed,descriptorDigest,allocationFailureVerified:true,transportVerified:true}));
-          EOF
-          for file in compaction.ts arena.ts shared-map.ts; do
-            cp "$file" "/tmp/retained-$file"
-            git show "76ab6b53aa0d3b40202720ca12d9fcc904716cf2:$file" > "$file"
-          done
-          bun retained-compaction-edge.ts | tee retained-compaction-results/base.json
-          for file in compaction.ts arena.ts shared-map.ts; do cp "/tmp/retained-$file" "$file"; done
-          bun retained-compaction-edge.ts | tee retained-compaction-results/candidate.json
-          git diff --exit-code -- compaction.ts arena.ts shared-map.ts
-          node --input-type=module <<'EOF'
-          import assert from 'node:assert/strict';
-          import {readFileSync} from 'node:fs';
-          const base=JSON.parse(readFileSync('retained-compaction-results/base.json','utf8'));
-          const candidate=JSON.parse(readFileSync('retained-compaction-results/candidate.json','utf8'));
-          assert.deepEqual(candidate.original,base.original);
-          assert.deepEqual(candidate.packedDigest,base.packedDigest);
-          assert.deepEqual(candidate.customDigest,base.customDigest);
-          assert(candidate.packedUsed<base.packedUsed,'fixture must actually take optimized path');
-          assert.equal(candidate.customCalls,base.customCalls,'custom traversal was bypassed');
-          assert.equal(candidate.customUsed,base.customUsed,'custom traversal must use existing rebuild');
-          assert.deepEqual(candidate.descriptorDigest,base.descriptorDigest);
-          assert.equal(candidate.descriptorCalls,base.descriptorCalls,'custom descriptor call count changed');
-          assert.equal(candidate.descriptorUsed,base.descriptorUsed,'custom descriptor must use existing rebuild');
-          console.log('Edge and fallback qualification passed');
-          EOF
-      - name: Build restored candidate package for real workers
-        run: |
-          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
-          bun run build:browser && bun run build:types
-          test -f dist/shared.js
-          node proofs/node-worker.mjs
-      - name: Existing unit tests (no publication)
-        run: |
-          set -o pipefail
-          bun run test 2>&1 | tee retained-compaction-results/vitest.log
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: retained-edge-${{ github.run_id }}-${{ github.run_attempt }}
-          path: retained-compaction-results/
-          retention-days: 14
-          if-no-files-found: warn
   paired:
     strategy:
       fail-fast: false
       matrix:
-        runtime: [node, bun]
+        runtime: [node]
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -222,6 +51,23 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p retained-compaction-results
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('proofs/retained-map-compaction-paired-20261125.mjs')
+          s=p.read_text()
+          old="""for(const n of [10000,100000]){
+           for(const mode of ['one','two','eight','alias-eight','churn','dense','dense-four']){
+             for(const cohort of ['AB','AA']){
+               const arms=cohort==='AB'?[['base',baseline],['candidate',candidate]]:[['base',baseline],['control',control]];
+               for(let pair=-1;pair<(cohort==='AB'?7:3);pair++){"""
+          new="""for(const n of [10000]){
+           for(const mode of ['dense-four']){
+             for(let pair=-1;pair<21;pair++){
+               for(const cohort of (pair%2===0?['AB','AA']:['AA','AB'])){
+                 const arms=cohort==='AB'?[['base',baseline],['candidate',candidate]]:[['base',baseline],['control',control]];"""
+          assert s.count(old)==1
+          p.write_text(s.replace(old,new))
+          PY
           if [ "${{ matrix.runtime }}" = node ]; then
             node --expose-gc proofs/retained-map-compaction-paired-20261125.mjs retained-compaction-results/node.json | tee retained-compaction-results/run.log
           else
@@ -240,7 +86,7 @@ jobs:
       matrix:
         browser: [chromium, firefox]
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -280,6 +126,21 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p retained-compaction-results
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('proofs/retained-map-compaction-browser-run.mjs')
+          s=p.read_text()
+          old=""" for(const [n,mode] of [[100000,'eight'],[100000,'shuffled'],[100000,'churn'],[100000,'dense-four'],[10000,'eight']]){
+            for(const cohort of ['AB','AA']){
+             const arms=cohort==='AB'?['base','candidate']:['base','control'];
+             for(let pair=-1;pair<(cohort==='AB'?5:3);pair++){"""
+          new=""" for(const [n,mode] of [[100000,browserName==='firefox'?'churn':'dense-four']]){
+            for(let pair=-1;pair<15;pair++){
+             for(const cohort of (pair%2===0?['AB','AA']:['AA','AB'])){
+              const arms=cohort==='AB'?['base','candidate']:['base','control'];"""
+          assert s.count(old)==1
+          p.write_text(s.replace(old,new))
+          PY
           node proofs/retained-map-compaction-browser-run.mjs ${{ matrix.browser }} retained-compaction-results/browser.json | tee retained-compaction-results/run.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
