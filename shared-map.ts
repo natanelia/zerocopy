@@ -72,6 +72,66 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     for (const key of keys) root = a.delete(root, key);
     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
   }
+  /**
+   * Conservatively identify keys that may have changed since a previous snapshot.
+   * Within one Arena, identical immutable leaves/subtrees are skipped; a
+   * rewritten but equal value may still be reported. Across different Arena
+   * instances all keys from both snapshots are returned (including compaction
+   * and separately attached payloads). Co-publish both snapshots in a single
+   * worker payload to enable structural comparison there.
+   * No values are decoded. Result order is unspecified.
+   */
+  changedKeysSince(previous: SharedMap<T>): Set<string> {
+    if (previous.valueType !== this.valueType) throw new TypeError('Map value types must match');
+    const changed = new Set<string>(), a = this.arena;
+    if (a !== previous.arena) {
+      for (const key of previous.keys()) changed.add(key);
+      for (const key of this.keys()) changed.add(key);
+      return changed;
+    }
+    if (this.root === previous.root) return changed;
+    const view = a.dv;
+    const addLeaves = (root: number): void => {
+      for (const p of a.leaves(root)) changed.add(a.leafKey(p, view));
+    };
+    // Branch format is shared with Arena.leaves. Journal roots and collision
+    // nodes deliberately use the generic leaf traversal.
+    const bitmap = (p: number, tag: number): number =>
+      tag === 0xffffffff ? 0 : tag & 0x80000000 ? view.getUint32(p + 8, true) >>> 16 :
+      (tag & 3) === 1 ? view.getUint32(p + 4, true) : 0;
+    const diff = (left: number, right: number): void => {
+      if (left === right) return;
+      if (!left || !right) { addLeaves(left || right); return; }
+      const lt = view.getUint32(left, true), rt = view.getUint32(right, true);
+      if (lt === 0 && rt === 0) {
+        changed.add(a.leafKey(left, view));
+        changed.add(a.leafKey(right, view));
+        return;
+      }
+      const lm = bitmap(left, lt), rm = bitmap(right, rt);
+      if (!lm || !rm) {
+        const old = new Set(a.leaves(left));
+        for (const p of a.leaves(right)) if (!old.delete(p)) changed.add(a.leafKey(p, view));
+        for (const p of old) changed.add(a.leafKey(p, view));
+        return;
+      }
+      // Ordinary branches store pointers in bitmap order. Overlay branches
+      // require mapChild to resolve the patch chain without materializing it.
+      const lp = !!(lt & 0x80000000), rp = !!(rt & 0x80000000);
+      let li = left + 8, ri = right + 8;
+      const union = lm | rm;
+      for (let digit = 0; digit < 16; digit++) {
+        const bit = 1 << digit;
+        if (!(union & bit)) continue;
+        let l = 0, r = 0;
+        if (lm & bit) { l = lp ? a.wasm.mapChild(left, digit) >>> 0 : view.getUint32(li, true); li += 4; }
+        if (rm & bit) { r = rp ? a.wasm.mapChild(right, digit) >>> 0 : view.getUint32(ri, true); ri += 4; }
+        diff(l, r);
+      }
+    };
+    diff(previous.root, this.root);
+    return changed;
+  }
   *entries(): Generator<[string, ValueOf<T>]> {
     if (!this.root) return;
     const a = this.arena, view = a.dv;
