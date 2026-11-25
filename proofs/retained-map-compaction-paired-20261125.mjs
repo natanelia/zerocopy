@@ -11,8 +11,8 @@ const base='76ab6b53aa0d3b40202720ca12d9fcc904716cf2';
 const output=process.argv[2]; assert(output);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const sha=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
-const report={base,head:git('rev-parse','HEAD'),runtime:process.versions,cpu:cpus()[0]?.model,
- hashes:Object.fromEntries(['compaction.ts','persistent-core.wasm','baseline-dist/shared.js','control-dist/shared.js','dist/shared.js'].map(p=>[p,sha(p)])),samples:[]};
+const report={base,candidateSource:'6cf0dee378f3225ec9934638fcc3056e79b7cabb',head:git('rev-parse','HEAD'),runtime:process.versions,cpu:cpus()[0]?.model,
+ hashes:Object.fromEntries(['compaction.ts','arena.ts','shared-map.ts','persistent-core.wasm','baseline-dist/shared.js','control-dist/shared.js','dist/shared.js'].map(p=>[p,sha(p)])),samples:[]};
 assert.equal(report.hashes['baseline-dist/shared.js'],report.hashes['control-dist/shared.js']);
 const collect=()=>{if(typeof globalThis.gc==='function')globalThis.gc();else globalThis.Bun?.gc?.(true);};
 function prepare(api,n,mode){

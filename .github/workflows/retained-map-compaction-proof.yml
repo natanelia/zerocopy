@@ -1,4 +1,4 @@
-name: Retained map compaction edge qualification (temporary proof)
+name: Retained map compaction exact corrected runtime qualification (temporary proof)
 on:
   push:
     branches: [proof/retained-map-compaction-20261125]
@@ -26,7 +26,7 @@ jobs:
       - name: Verify pinned runtime and typecheck
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code HEAD -- compaction.ts arena.ts shared-map.ts
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
           git rev-parse HEAD
           git hash-object compaction.ts arena.ts shared-map.ts
           bun run typecheck
@@ -160,8 +160,16 @@ jobs:
           assert.equal(candidate.descriptorUsed,base.descriptorUsed,'custom descriptor must use existing rebuild');
           console.log('Edge and fallback qualification passed');
           EOF
+      - name: Build restored candidate package for real workers
+        run: |
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
+          bun run build:browser && bun run build:types
+          test -f dist/shared.js
+          node proofs/node-worker.mjs
       - name: Existing unit tests (no publication)
-        run: bun run test
+        run: |
+          set -o pipefail
+          bun run test 2>&1 | tee retained-compaction-results/vitest.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -169,3 +177,114 @@ jobs:
           path: retained-compaction-results/
           retention-days: 14
           if-no-files-found: warn
+  paired:
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - name: Build pinned baseline and candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
+          git diff --name-only 76ab6b53aa0d3b40202720ca12d9fcc904716cf2 HEAD
+          for file in compaction.ts arena.ts shared-map.ts; do
+            cp "$file" "/tmp/retained-$file"
+            git show "76ab6b53aa0d3b40202720ca12d9fcc904716cf2:$file" > "$file"
+          done
+          bun run build:wasm && bun run build:browser
+          cp -a dist baseline-dist
+          cp -a dist control-dist
+          for file in compaction.ts arena.ts shared-map.ts; do cp "/tmp/retained-$file" "$file"; done
+          bun run build:browser
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
+          git hash-object compaction.ts arena.ts shared-map.ts
+          node --version && bun --version
+          sha256sum baseline-dist/*.js control-dist/*.js dist/*.js
+      - name: Measure paired retained revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p retained-compaction-results
+          if [ "${{ matrix.runtime }}" = node ]; then
+            node --expose-gc proofs/retained-map-compaction-paired-20261125.mjs retained-compaction-results/node.json | tee retained-compaction-results/run.log
+          else
+            bun proofs/retained-map-compaction-paired-20261125.mjs retained-compaction-results/bun.json | tee retained-compaction-results/run.log
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: retained-compaction-${{ matrix.runtime }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: retained-compaction-results/
+          retention-days: 14
+          if-no-files-found: error
+  browser-handoff:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - name: Build pinned baseline and candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
+          git diff --name-only 76ab6b53aa0d3b40202720ca12d9fcc904716cf2 HEAD
+          for file in compaction.ts arena.ts shared-map.ts; do
+            cp "$file" "/tmp/retained-$file"
+            git show "76ab6b53aa0d3b40202720ca12d9fcc904716cf2:$file" > "$file"
+          done
+          bun run build:wasm && bun run build:browser
+          cp -a dist baseline-dist
+          cp -a dist control-dist
+          for file in compaction.ts arena.ts shared-map.ts; do cp "/tmp/retained-$file" "$file"; done
+          bun run build:browser
+          git diff --exit-code 6cf0dee378f3225ec9934638fcc3056e79b7cabb -- compaction.ts arena.ts shared-map.ts
+          git hash-object compaction.ts arena.ts shared-map.ts
+          node --version && bun --version
+          sha256sum baseline-dist/*.js control-dist/*.js dist/*.js
+      - run: bunx playwright install --with-deps ${{ matrix.browser }}
+      - name: Measure real browser reader handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p retained-compaction-results
+          node proofs/retained-map-compaction-browser-run.mjs ${{ matrix.browser }} retained-compaction-results/browser.json | tee retained-compaction-results/run.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: retained-handoff-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: retained-compaction-results/
+          retention-days: 14
+          if-no-files-found: error

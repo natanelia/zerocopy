@@ -21,8 +21,8 @@ const server=createServer(async(req,res)=>{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const browser=await ({chromium,firefox}[browserName]).launch();
 const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex');
-const report={browser:browserName,version:browser.version(),head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),base:'76ab6b53aa0d3b40202720ca12d9fcc904716cf2',candidateSource:'3f8f0d89fb4fa95fec87bcce52ff21c44652fd3d',hashes:{},samples:[]};
-for(const p of ['compaction.ts','persistent-core.wasm','baseline-dist/shared.js','control-dist/shared.js','dist/shared.js'])report.hashes[p]=await sha(p);
+const report={browser:browserName,version:browser.version(),head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),base:'76ab6b53aa0d3b40202720ca12d9fcc904716cf2',candidateSource:'6cf0dee378f3225ec9934638fcc3056e79b7cabb',hashes:{},samples:[]};
+for(const p of ['compaction.ts','arena.ts','shared-map.ts','persistent-core.wasm','baseline-dist/shared.js','control-dist/shared.js','dist/shared.js'])report.hashes[p]=await sha(p);
 assert.equal(report.hashes['baseline-dist/shared.js'],report.hashes['control-dist/shared.js']);
 try{
  for(const [n,mode] of [[100000,'eight'],[100000,'shuffled'],[100000,'churn'],[100000,'dense-four'],[10000,'eight']]){
