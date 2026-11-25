@@ -1,5 +1,6 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { cpus } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -19,6 +20,10 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
     { name: 'nested-route', size: 10000, queries: 1000, shape: 'route' },
     { name: 'quoted-brackets', size: 10000, queries: 1000, shape: 'quoted' },
     { name: 'flat-long-message', size: 10000, queries: 1000, shape: 'long' },
+    ...['short','feature','route','quoted','long'].flatMap(shape => [
+      { name: 'view-frozen-' + shape, size: 1000, queries: 1000, shape, mode: 'view' },
+      { name: 'direct-codec-' + shape, size: 1000, queries: 1000, shape, mode: 'codec' },
+    ]),
   ];
   function row(shape, i) {
     const feature = { id: i, tile: 'tile/' + Math.floor(i / 1000), kind: i % 2 ? 'lane' : 'boundary',
@@ -41,28 +46,44 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
     for (const child of Object.values(value)) if (!frozen(child)) return false;
     return true;
   }
-  async function measure(api, payload, workload) {
+  async function measure(api, payload, workload, url) {
     const { size, queries, shape } = workload;
     const ids = Array.from({length: queries}, (_, n) => (n * 8191 + 7) % size);
     const keys = ids.map(i => 'feature/' + i);
+    let map, read, attachMs = 0;
+    if (workload.mode === 'codec') {
+      const { codecs } = await import(url + 'codec-proof.js');
+      const encoder = new TextEncoder();
+      const records = ids.map(id => {
+        const encoded = encoder.encode(JSON.stringify(row(shape, id)));
+        const buf = new Uint8Array(encoded.length + 6);
+        buf.set(encoded, 3);
+        return buf;
+      });
+      read = () => records.map(buf => codecs.object.decode(buf, 3, buf.length - 6));
+    } else {
+      const start = performance.now();
+      ({ map } = await api.initWorker(payload));
+      attachMs = performance.now() - start;
+      read = workload.mode === 'view'
+        ? () => keys.map(key => map.getView(key).toObject({ freeze: true }))
+        : () => keys.map(key => map.get(key));
+    }
     let start = performance.now();
-    const { map } = await api.initWorker(payload);
-    const attachMs = performance.now() - start;
-    const read = () => keys.map(key => map.get(key));
-    start = performance.now();
     const first = read();
     const firstMs = performance.now() - start;
     start = performance.now();
     const repeat = read();
     const repeatMs = performance.now() - start;
-    if (map.size !== size) throw Error('Incorrect map size');
+    if (map && map.size !== size) throw Error('Incorrect map size');
     for (let i = 0; i < keys.length; i++) {
       const expected = JSON.stringify(row(shape, ids[i]));
+      if (workload.mode && first[i] === repeat[i]) throw Error('Materialization must return fresh values');
       if (JSON.stringify(first[i]) !== expected || JSON.stringify(repeat[i]) !== expected || !frozen(first[i]) || !frozen(repeat[i])) {
         throw Error('Incorrect or mutable result: ' + workload.name + ' ' + keys[i]);
       }
     }
-    if (map.get('missing/record') !== undefined) throw Error('Incorrect missing key');
+    if (map && map.get('missing/record') !== undefined) throw Error('Incorrect missing key');
     return { attachMs, firstMs, repeatMs, checked: keys.length * 2 };
   }
   const browser = typeof window !== 'undefined';
@@ -70,7 +91,7 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
     // Each sample gets a fresh actual browser worker. Validation is outside
     // the local attach/read timers; wall time includes the verification too.
     const source = row.toString() + '\n' + frozen.toString() + '\n' + measure.toString() +
-      '\nself.onmessage = async ({data}) => { try { const api = await import(data.url); self.postMessage(await measure(api, data.payload, data.workload)); } catch (e) { self.postMessage({error: String(e)}); } };';
+      '\nself.onmessage = async ({data}) => { try { const api = data.workload.mode === "codec" ? null : await import(data.url + "shared.js"); self.postMessage(await measure(api, data.payload, data.workload, data.url)); } catch (e) { self.postMessage({error: String(e)}); } };';
     const blobUrl = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
     const worker = new Worker(blobUrl, { type: 'module' });
     try {
@@ -79,7 +100,7 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
         const timer = setTimeout(() => reject(Error('Worker timed out')), 20000);
         worker.onmessage = ({data}) => { clearTimeout(timer); if (data.error) reject(Error(data.error)); else resolve(data); };
         worker.onerror = error => { clearTimeout(timer); reject(Error(error.message)); };
-        worker.postMessage({ url: url + 'shared.js', payload, workload });
+        worker.postMessage({ url, payload, workload });
       });
       return { ...result, workerWallIncludingVerificationMs: performance.now() - start };
     } finally {
@@ -92,31 +113,34 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
   for (const workload of cases) {
     const { size, shape } = workload;
     const entries = Array.from({length: size}, (_, i) => ['feature/' + i, row(shape,i)]);
-    const payloads = builds.map(api => {
+    const payloads = workload.mode === 'codec' ? [null, null] : builds.map(api => {
       api.resetMap();
       const map = new api.SharedMap('object').setMany(entries);
       return api.getWorkerData({ map }, { copy: copyAttachment });
     });
     const samples = [];
-    for (let round = -warmups; round < pairs; round++) {
+    // Larger, balanced samples for the suspected regressions and new callers.
+    const casePairs = workload.name === 'flat-feature-100k' || workload.name === 'flat-feature-10k' || workload.name === 'very-wide-control'
+      ? pairs : Math.max(pairs, 22);
+    for (let round = -warmups; round < casePairs; round++) {
       const order = ((round + warmups + rows.length) & 1) ? [1,0] : [0,1];
       const sample = { round, order: order.map(i => i ? 'candidate' : 'baseline') };
       for (const i of order) {
         sample[i ? 'candidate' : 'baseline'] = browser
           ? await readInWorker(urls[i], payloads[i], workload)
-          : await measure(builds[i], payloads[i], workload);
+          : await measure(builds[i], payloads[i], workload, urls[i]);
       }
       samples.push(sample);
     }
     const measured = samples.filter(s => s.round >= 0);
     const metrics = {};
-    for (const metric of ['attachMs','firstMs','repeatMs']) {
+    for (const metric of workload.mode === 'codec' ? ['firstMs','repeatMs'] : ['attachMs','firstMs','repeatMs']) {
       const a = measured.map(s => s.baseline[metric]), b = measured.map(s => s.candidate[metric]);
       metrics[metric] = { baseline: median(a), candidate: median(b), baselineP95: p95(a), candidateP95: p95(b),
         pairedSpeedup: median(a.map((x,i) => b[i] > 0 ? x/b[i] : 1)),
         fasterPairs: a.filter((x,i) => x > b[i]).length };
     }
-    rows.push({ ...workload, metrics, samples });
+    rows.push({ ...workload, pairs: casePairs, metrics, samples });
   }
   return { pairs, warmups, attachment: copyAttachment ? 'copied' : 'shared', execution: browser ? 'fresh worker' : 'fresh local reader', rows };
 }
@@ -131,6 +155,11 @@ if ((engine === 'bun') !== Boolean(process.versions.bun)) {
   throw new Error('Use the requested Node or Bun runtime to invoke the driver');
 }
 const roots = { baseline: resolve(baselinePath), candidate: resolve(candidatePath) };
+// Bundle the internal codec independently with the same installed Bun version.
+// Both A/A directories resolve the same source; each A/B directory resolves its pinned checkout.
+for (const root of Object.values(roots)) {
+  execFileSync('bun', ['build', join(root, '..', 'codec.ts'), '--target=browser', '--format=esm', '--outfile', join(root, 'codec-proof.js')], { stdio: ['ignore', 'ignore', 'inherit'] });
+}
 const fingerprints = {};
 for (const [name, root] of Object.entries(roots)) {
   const modules = (await readdir(root)).filter(file => file.endsWith('.js')).sort();
