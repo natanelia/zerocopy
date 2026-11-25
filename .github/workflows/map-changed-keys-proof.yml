@@ -1,4 +1,4 @@
-name: Map diff phase qualification (no deploy)
+name: Map diff existing-path controls (no deploy)
 on:
   push:
     branches: ['proof/map-diff-phase-20261125']
@@ -15,7 +15,7 @@ jobs:
       matrix:
         engine: [chromium, firefox]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,7 +56,7 @@ jobs:
             rustc --version
             uname -a
             lscpu
-            sha256sum proofs/map-changed-keys-paired-20261125.mjs
+            sha256sum proofs/map-diff-existing-path-20261125.mjs proofs/map-lifecycle.mjs proofs/map-lifecycle-workload.mjs
             if [ -f bun.lock ]; then sha256sum bun.lock; fi
           } > "$out/environment.txt"
           if [ -f bun.lock ]; then cp bun.lock "$out/"; fi
@@ -76,13 +76,30 @@ jobs:
         run: cd _candidate && bun run typecheck && bun run test map-changed-keys.test.ts
       - name: Install browsers
         run: bunx playwright install --with-deps ${{ matrix.engine }}
-      - name: Paired baseline scan versus candidate API with exact issue oracle
-        run: timeout --signal=TERM --kill-after=15s 2100s node proofs/map-changed-keys-paired-20261125.mjs _baseline _candidate "$RUNNER_TEMP/map-changed-keys/paired.json" 20 ${{ matrix.engine }}
+      - name: Unchanged website catalog controls (no diff calls)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export BROWSER=${{ matrix.engine }}
+          out="$RUNNER_TEMP/map-changed-keys"
+          for count in 10000 100000; do
+            timeout --signal=TERM --kill-after=15s 900s node proofs/map-diff-existing-path-20261125.mjs _baseline _candidate "$out/catalog-$count.json" "$count" 12 full-shared-get,selective-shared-get,selective-shared-view
+          done
+      - name: Existing map iteration and lifecycle controls (Node and Bun)
+        if: ${{ matrix.engine == 'chromium' && !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/map-changed-keys"
+          for runtime in node bun; do
+            timeout --signal=TERM --kill-after=15s 240s "$runtime" proofs/map-lifecycle.mjs _baseline _baseline "$out/lifecycle-$runtime-aa.json" 7
+            timeout --signal=TERM --kill-after=15s 240s "$runtime" proofs/map-lifecycle.mjs _baseline _candidate "$out/lifecycle-$runtime-ab.json" 7
+          done
       - name: Retain raw proof
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: map-diff-phase-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+          name: map-diff-existing-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/map-changed-keys/
           retention-days: 30
           if-no-files-found: warn
