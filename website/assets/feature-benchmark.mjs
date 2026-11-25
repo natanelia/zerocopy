@@ -3,6 +3,7 @@ import { BENCHMARK_CASES, EDIT_PUBLICATION_PHASES, casesForPhase } from './catal
 import { READ_CASES, READ_WORKLOAD_VERSION } from './catalog-read-workloads.mjs';
 import { sampleReadCase } from './read-benchmark-runner.mjs';
 import { WARMUPS, SAMPLES, READ_PHASES, summarizeCases } from './catalog-benchmark-results.mjs';
+import { benchmarkBars, benchmarkOrigin, benchmarkRecordingDetails } from './benchmark-bars.mjs';
 import { queryIds } from './catalog-core.mjs';
 import { Peer } from './catalog-peer.mjs';
 import { immutableVersion, immerVersion } from '../vendor/version.mjs';
@@ -11,9 +12,13 @@ const $ = id => document.getElementById(id);
 const LEGACY_PHASES = { generationMs: 'Generate the catalog', constructionMs: 'Construct the map', publicationMs: 'Publish the initial map', firstQueryMs: 'First query on fresh readers', repeatQueryMs: 'Repeat the same query', updateMs: 'Replace 100 product objects', editPublicationMs: 'Publish the edited revision', updatePublicationMs: 'Replace and publish 100 products', updatedQueryMs: 'Query the edited revision' };
 const SCHEDULE = [...READ_CASES.map(definition => ({ track: 'reads', definition })), ...BENCHMARK_CASES.map(definition => ({ track: 'legacy', definition }))];
 const TOTAL_SAMPLES = SCHEDULE.length * (WARMUPS + SAMPLES);
-const fullCases = READ_CASES.filter(item => item.workload === 'full-object-get');
-const selectiveCases = READ_CASES.filter(item => item.workload === 'selective-fields');
-const materializationCases = READ_CASES.filter(item => !['full-object-get', 'selective-fields'].includes(item.workload));
+// Completed evidence stays visible while a new attempt runs. The export always
+// belongs to the latest attempt, including its failure or cancellation details.
+const recordedPresentation = {
+  results: $('feature-benchmark-results').innerHTML,
+  origin: $('feature-result-origin')?.innerHTML,
+  details: $('feature-recording-details')?.innerHTML,
+};
 let current, controller, generation = 0, result, activeAttempt, ready = false, running = false, buildIdentity, assetVerification, browserDetails;
 let identityGeneration = 0, identityController, identityLoading = false;
 
@@ -22,6 +27,9 @@ function controls() {
   $('feature-count').disabled = running;
   $('feature-cancel').hidden = !running;
   $('feature-export').disabled = !result || running;
+  $('feature-export').hidden = !result;
+  $('feature-export').textContent = result?.status === 'cancelled' ? 'Download stopped run'
+    : result?.status === 'failed' ? 'Download failed run' : 'Download my results';
 }
 checkCapability(() => { ready = true; controls(); });
 
@@ -101,67 +109,27 @@ async function loadIdentity(runToken = generation, verifyAssets = false) {
 }
 void loadIdentity();
 
-function node(tag, className, text) {
-  const element = document.createElement(tag);
-  if (className) element.className = className;
-  if (text !== undefined) element.textContent = text;
-  return element;
-}
-function timingGroup(value, cases, phase, title, note, legacy = false) {
-  const section = node('section', legacy ? 'feature-timing-group' : 'benchmark-read-group');
-  section.dataset.phase = phase;
-  if (!legacy) section.dataset.workload = cases[0]?.workload ?? 'none';
-  section.append(node('h3', '', title), node('p', 'lab-small', note));
-  const maximum = Math.max(.001, ...cases.map(({ id }) => value.summary[id][phase].median));
-  for (const definition of cases) {
-    const stats = value.summary[definition.id][phase], row = node('div', 'feature-timing-row');
-    row.dataset.case = definition.id;
-    const label = node('span', 'benchmark-row-name', definition.label);
-    if (!legacy) label.append(node('code', 'benchmark-api', definition.api));
-    const track = node('div', 'feature-timing-track'); track.setAttribute('aria-hidden', 'true');
-    const fill = node('div', 'feature-timing-fill'); fill.style.width = `${stats.median / maximum * 100}%`;
-    fill.dataset.kind = definition.kind; track.append(fill);
-    const time = node('strong', 'feature-timing-value', `${stats.median.toFixed(2)} ms`);
-    time.title = `Median of ${SAMPLES} samples; range ${stats.min.toFixed(3)}–${stats.max.toFixed(3)} ms`;
-    time.dataset.medianMs = String(stats.median);
-    row.append(label, track, time); section.append(row);
-  }
-  section.append(node('p', 'benchmark-chart-source', `Source ${buildIdentity.sourceCommit.slice(0, 12)} · 7 measured samples · ranges and individual reader times in export`));
-  return section;
-}
-function details(title, children, open = false) {
-  const element = node('details', 'benchmark-details'); element.open = open;
-  element.append(node('summary', '', title), ...children); return element;
-}
 function render(value) {
-  const fragment = document.createDocumentFragment();
-  fragment.append(node('p', 'benchmark-result-heading', `Your device · ${value.config.entries.toLocaleString()} products · source ${value.sourceCommit.slice(0, 12)}${buildIdentity.sourceDirty ? ' (uncommitted)' : ''}`));
-  const local = 'Local query work in the slower of two parallel readers. Result messaging is excluded.';
-  const pair = node('div', 'benchmark-read-grid');
-  pair.append(
-    timingGroup(value, fullCases, 'firstQueryMs', 'Cold full-object .get()', `Complete deeply frozen records. First access in a fresh reader. ${local}`),
-    timingGroup(value, fullCases, 'repeatQueryMs', 'Cached full-object .get()', `The same 1,000 IDs immediately repeated, before any validation pass. ${local}`),
-  ); fragment.append(pair);
-  fragment.append(timingGroup(value, selectiveCases, 'firstQueryMs', 'Selective application query', `Available books → ID, name, price and revision. Every implementation returns the same projection. ${local}`));
-  fragment.append(timingGroup(value, fullCases, 'constructionToFirstAnswerMs', 'Construction through first full answer', 'Per-sample construction + initial publication + first worker round-trip, then the median. Includes both reader acknowledgements; excludes worker startup and input generation.'));
-  fragment.append(details('Construction, publication & worker transport', [
-    timingGroup(value, fullCases, 'startupMs', 'Worker and module setup', 'Separate setup elapsed time before fixture generation and construction. Includes owner/reader creation and module loading. Excluded from construction-through-first-answer.'),
-    timingGroup(value, fullCases, 'constructionMs', 'Construct the collection', 'Owner-side collection construction. Fixture generation is excluded.'),
-    timingGroup(value, fullCases, 'publicationMs', 'Publish and attach', 'Encoding, delivery, replica reconstruction/freezing or shared attachment, and both acknowledgements.'),
-    timingGroup(value, fullCases, 'firstRoundTripMs', 'First query including messages', 'Owner elapsed time through both worker replies, including full-result transport. Independent reference checks follow the repeat query.'),
-    timingGroup(value, fullCases, 'repeatRoundTripMs', 'Repeated query including messages', 'The repeated full-object request/reply. Local reads appear in the cached chart above.'),
-    timingGroup(value, selectiveCases, 'repeatQueryMs', 'Repeated selective query', `Identical projection repeated before validation. ${local}`),
-  ]));
-  fragment.append(details('Explicit view materialization · separate contracts', [
-    node('p', 'lab-small', 'toObject() returns fresh mutable native values; toObject({ freeze: true }) returns fresh frozen native values. Neither row measures standard .get() or its decoded-object cache.'),
-    timingGroup(value, materializationCases, 'firstQueryMs', 'Create complete objects from views', local),
-    timingGroup(value, materializationCases, 'repeatQueryMs', 'Repeat explicit materialization', 'Fresh objects are created again. These rows are not cached native-object reads.'),
-  ]));
-  fragment.append(details('Legacy catalog control · unchanged full-field fingerprint workload', [
-    node('p', 'lab-small', 'The original lookup/validation workload retains its output contract and copy-mode restrictions. Fingerprint generation runs inside these query timers. Timings include worker scheduling and reply transport; only the independent reference comparison is untimed.'),
-    ...Object.entries(LEGACY_PHASES).map(([phase, title]) => timingGroup(value.legacy, casesForPhase(phase), phase, title, 'Original catalog control · owner elapsed time · raw v3 workload preserved in this export.', true)),
-  ]));
-  $('feature-benchmark-results').replaceChildren(fragment);
+  // Create every fragment before publishing any of it, so a rendering failure
+  // cannot mix the old source label with new or incomplete charts.
+  const bars = benchmarkBars(value), origin = benchmarkOrigin(value, false);
+  const details = benchmarkRecordingDetails(value);
+  $('feature-benchmark-results').innerHTML = bars;
+  if ($('feature-result-origin')) {
+    $('feature-result-origin').innerHTML = origin;
+    $('feature-result-origin').dataset.resultOrigin = 'device';
+  }
+  if ($('feature-recording-details')) $('feature-recording-details').innerHTML = details;
+  if ($('feature-recorded-export')) $('feature-recorded-export').hidden = true;
+}
+function restoreRecordedPresentation() {
+  $('feature-benchmark-results').innerHTML = recordedPresentation.results;
+  if ($('feature-result-origin')) {
+    $('feature-result-origin').innerHTML = recordedPresentation.origin;
+    $('feature-result-origin').dataset.resultOrigin = 'recorded';
+  }
+  if ($('feature-recording-details')) $('feature-recording-details').innerHTML = recordedPresentation.details;
+  if ($('feature-recorded-export')) $('feature-recorded-export').hidden = false;
 }
 
 // Original catalog sampler: measurement boundaries and fingerprints stay intact.
@@ -213,7 +181,7 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
   const token = ++generation, count = Number($('feature-count').value);
   const run = result = createResult(count); controller = new AbortController();
   run.buildIdentity = run.assetVerification = null; run.identityStatus = 'checking'; activeAttempt = { phase: 'build-verification' };
-  running = true; controls(); $('feature-benchmark-results').replaceChildren();
+  running = true; controls();
   $('feature-benchmark-progress').max = TOTAL_SAMPLES; $('feature-benchmark-progress').value = 0; $('feature-benchmark-progress').hidden = false;
   let attempt;
   try {
@@ -247,7 +215,7 @@ $('feature-benchmark-form').addEventListener('submit', async event => {
       run.summary = run.legacy.summary = null;
       run.failures.push({ ...(attempt ?? activeAttempt), message: error.message, partialSample: error.sample ?? null });
       run.execution.push({ ...(attempt ?? activeAttempt), status: 'failed' });
-      $('feature-benchmark-status').textContent = `Run failed: ${error.message}. Export keeps ${run.raw.length + run.legacy.raw.length} completed samples and the failure. No incomplete medians are shown.`;
+      $('feature-benchmark-status').textContent = `Run failed: ${error.message}. Export keeps ${run.raw.length + run.legacy.raw.length} completed samples and the failure. The previous completed charts are unchanged.`;
     }
   } finally {
     if (token === generation) { running = false; controller = undefined; activeAttempt = undefined; $('feature-benchmark-progress').hidden = true; controls(); }
@@ -259,7 +227,7 @@ $('feature-cancel').addEventListener('click', () => {
   generation++; identityGeneration++; identityController?.abort(); identityController = undefined; identityLoading = false;
   controller?.abort(); controller = undefined; current?.close(); current = undefined; activeAttempt = undefined; running = false;
   $('feature-benchmark-progress').hidden = true; controls();
-  $('feature-benchmark-status').textContent = 'Stopped. Export keeps partial samples and cancellation details. No incomplete medians are shown.';
+  $('feature-benchmark-status').textContent = 'Stopped. The previous completed charts are unchanged. Download the stopped run for partial samples and cancellation details.';
   if (!buildIdentity) void loadIdentity();
 });
 $('feature-export').addEventListener('click', () => {
@@ -272,7 +240,7 @@ window.addEventListener('pagehide', () => {
   generation++; identityGeneration++; identityController?.abort(); identityController = undefined; identityLoading = false; buildIdentity = assetVerification = undefined;
   controller?.abort(); controller = undefined; current?.close(); current = undefined; activeAttempt = undefined; running = false; result = undefined; controls();
   $('feature-benchmark-status').textContent = 'Session released after navigation. Run a new benchmark to continue.';
-  $('feature-benchmark-progress').hidden = true; $('feature-benchmark-results').replaceChildren();
+  $('feature-benchmark-progress').hidden = true; restoreRecordedPresentation();
 });
 
 window.addEventListener('pageshow', event => { if (event.persisted) void loadIdentity(); });

@@ -1,17 +1,17 @@
 # Shared product catalog
 
-Use a string-keyed `SharedMap` when several workers need selected records from a large, changing catalog. The live comparison stores generated product records as JSON objects. Workers look up selected IDs and validate prices, stock and availability.
+Use a string-keyed `SharedMap` when several workers need selected records from a large, changing catalog. The benchmark stores generated product records as JSON objects. Workers look up selected IDs and validate prices, stock and availability.
 
 ## Try the replacement
 
-Open the [live comparison](../README.md#product-catalog-comparison), load the sample and inspect `product/000000`.
+Open [Benchmarks](../README.md#catalog-benchmark) and select **Run on my device**. It builds the catalog, replaces 100 products, and checks current and retained revisions automatically:
 
 1. Revision 0 has a zero price. The validation worker reports an invalid record.
-2. Select **Replace 100 products**. The product gets a price of 2,500 cents, unavailable status and zero stock.
-3. Select **Initial · retained**. Both workers read the original revision, including the invalid price.
-4. Return to **Current**. The changed attributes are still present.
+2. After replacement, the product gets a price of 2,500 cents, unavailable status and zero stock.
+3. Both workers check the retained initial revision, including the invalid price.
+4. The current revision keeps the changed attributes.
 
-The same controls work across SharedMap, native Map, Immutable.js Map and Immer Map. Each path has a real owning worker and two real reader workers. Every result is checked against a separate generated reference. The UI receives at most 12 product records and 12 validation issues, plus counts and fingerprints.
+The same workload runs across SharedMap, native Map, Immutable.js Map and Immer Map. Each path has a real owning worker and two real reader workers. Every result is checked against a separate generated reference. For hands-on editing and independent snapshot pins, use [Snapshot Studio](../README.md#playground).
 
 ## Store objects at stable keys
 
@@ -65,7 +65,7 @@ Each `.get(id)` is a local read. JSON values decode into deeply frozen JavaScrip
 
 ## Give every design equivalent work
 
-The live comparison generates the same ID/object pairs for all four implementations and uses **incremental copy** for native Map, Immutable.js Map and Immer Map. Initial publication clones a native Map to each native or Immer reader, and entry pairs to each Immutable.js reader. Later publications clone only the 100 changed pairs. SharedMap sends new root descriptors backed by existing shared memory.
+The four baseline cases generate the same ID/object pairs and use **incremental copy** for native Map, Immutable.js Map and Immer Map. Initial publication clones a native Map to each native or Immer reader, and entry pairs to each Immutable.js reader. Later incremental publications clone only the 100 changed pairs. SharedMap sends new root descriptors backed by existing shared memory.
 
 Every owner and reader keeps initial and current revisions. Native makes one shallow `new Map(initial)` when the first edit must preserve the initial collection. It then mutates its exclusively owned current Map on later edits. Changed objects are replaced, never mutated. Immutable.js uses `withMutations`; Immer uses one `produce` batch. These local update mechanisms are separate from data copying between workers. Sharing unchanged objects or collection structure within one worker does not share that worker’s JavaScript heap with another worker.
 
@@ -92,12 +92,12 @@ The separate [recorded memory report](../../docs/feature-map-memory.md) preserve
 
 ## Keep the limits visible
 
-The sample accepts no uploads. It has at most 100,000 products and 12 sparse edit revisions per session. Stop and navigation terminate the owner and reader workers. Releasing references permits collection; it does not promise immediate GC or per-node arena reclamation.
+The benchmark accepts no uploads. Choose 1,000, 10,000, or 100,000 generated products under **Run options**. Each sample uses fresh workers and retains its initial and edited revision. Stop and navigation terminate the owner and reader workers. Releasing references permits collection; it does not promise immediate GC or per-node arena reclamation.
 
 One allocating owner writes each arena. Compare a single native owner first if the UI only needs small answers and other workers do not need local data access.
 
 ## Read the live timings
 
-The live comparison uses incremental copy and highlights milliseconds for one selected phase: the latest read and validation, collection construction, initial handoff, or replacing 100 products and handing the revision to readers. Each relative result compares that phase with native Map in the same operation. “Less time” and “more time” describe this observation only; all four implementations run concurrently. Initial-load values remain labeled revision 0 after later edits.
+The page opens with clearly labelled recorded results. **Run on my device** measures the explicit read workloads and preserved catalog control locally, then replaces the performance charts after all cases complete. The result label shows the actual environment, source and dataset size; the default is 10,000 products. Cancellation or failure keeps the previous completed charts and their label; the interrupted run remains separately downloadable with its partial samples and failure reason.
 
-Worker startup and module loading are excluded. Build and handoff have separate timers. The combined replace-and-handoff value comes from its own direct timer; it does not add parallel worker times. Reads include the lookup and validation replies, but exclude the owner’s reference check and UI rendering. Matching counts and fingerprints appear under the verification details. Use the separate benchmark for repeated samples.
+The charts distinguish cold and cached full-object reads, selective queries, explicit object materialization, and construction through the first answer. The legacy catalog control retains all nine original phases, including replacement plus publication, in a separate disclosure on the same page. Download the v4 JSON for all read and legacy samples, exact APIs, correctness checks, source hashes and environment. The legacy combined replacement-and-publication duration still comes from its own direct timer; it does not add parallel worker times.

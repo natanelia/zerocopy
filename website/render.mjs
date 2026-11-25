@@ -74,13 +74,13 @@ export function renderMarkdown(source, file, routes, base) {
       '#build-from-source': 'docs/getting-started/#install-the-source-package',
       '#read-shared-state-directly': 'docs/getting-started/',
       '#run-a-typed-task': 'docs/tasks/',
-      '#performance': 'docs/benchmarks/',
-      '#memory-shared-vs-immutablejs-vs-native': 'docs/benchmarks/#memory-shared-vs-immutablejs-vs-native',
-      '#reproduce-the-timing-and-memory-comparisons': 'docs/benchmarks/#reproduce-the-timing-and-memory-comparisons',
+      '#performance': 'benchmarks/#performance',
+      '#memory-shared-vs-immutablejs-vs-native': 'benchmarks/#memory',
+      '#reproduce-the-timing-and-memory-comparisons': 'benchmarks/#sources',
     }[fragment] : undefined;
-    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'lab/', '#product-catalog-comparison': 'compare/', '#feature-attribute-example': 'compare/', '#catalog-benchmark': 'investigation-benchmark/', '#feature-map-benchmark': 'investigation-benchmark/', '#log-explorer': 'historical/log-explorer/', '#investigation-benchmark': 'historical/log-benchmark/', '#side-by-side-comparison': 'historical/log-compare/' }[fragment] : undefined;
+    const demo = resolved === 'website/README.md' ? { '#playground': 'playground/', '#benchmark-lab': 'benchmarks/#performance', '#product-catalog-comparison': 'benchmarks/#performance', '#feature-attribute-example': 'benchmarks/#performance', '#catalog-benchmark': 'benchmarks/#performance', '#feature-map-benchmark': 'benchmarks/#performance', '#log-explorer': 'benchmarks/#sources', '#investigation-benchmark': 'benchmarks/#sources', '#side-by-side-comparison': 'benchmarks/#sources' }[fragment] : undefined;
     const route = routes.get(resolved);
-    const target = demo ? base + demo : legacy ? base + legacy : route !== undefined ? base + route + fragment : repository + '/blob/main/' + resolved + fragment;
+    const target = demo ? base + demo : legacy ? base + legacy : route !== undefined ? base + route + (route.includes('#') ? '' : fragment) : repository + '/blob/main/' + resolved + fragment;
     return `href="${escape(target)}"`;
   });
   html = html.replace(/<pre><code(?: class="language-([^"]+)")?>([\s\S]*?)<\/code><\/pre>/g,

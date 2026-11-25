@@ -55,6 +55,8 @@ test('invalid, old, or nonlocal search indexes fail before links are rendered', 
     assert.throws(() => validateSearchIndex(value), /unsupported format/);
   }
   validateSearchIndex([entry({ route: 'docs/example/#日本語' })]);
+  for (const anchor of ['memory', 'performance', 'sources']) validateSearchIndex([entry({ route: `benchmarks/#${anchor}` })]);
+  for (const route of ['compare/', 'lab/', 'benchmarks/#unregistered', 'benchmarks/?external=https://example.org']) assert.throws(() => validateSearchIndex([entry({ route })]), /unsupported format/);
 });
 
 for (const base of ['/', '/zerocopy/', '/zerocopy/previews/pr-99/8a9075aa530f4cc65c577ed665389ba440d5d156/']) {

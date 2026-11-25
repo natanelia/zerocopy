@@ -6,7 +6,7 @@
 
 zerocopy uses SharedArrayBuffer and WebAssembly to share persistent maps, lists, and sets across Web Workers and Node.js worker threads. Each thread reads locally; updates create immutable snapshots.
 
-**[Documentation website](https://natanelia.github.io/zerocopy/)** · [Online quickstart](https://natanelia.github.io/zerocopy/docs/getting-started/) · [Live comparison](https://natanelia.github.io/zerocopy/compare/)
+**[Documentation website](https://natanelia.github.io/zerocopy/)** · [Online quickstart](https://natanelia.github.io/zerocopy/docs/getting-started/) · [Benchmarks](https://natanelia.github.io/zerocopy/benchmarks/)
 
 Install the [npm package](https://www.npmjs.com/package/zerocopy):
 
@@ -59,7 +59,7 @@ Built for applications where several threads need the same large, changing datas
 
 The **[live product catalog](website/README.md#product-catalog-comparison)** stores product records in a string-keyed SharedMap of objects. Lookup and validation workers read selected IDs. Replace 100 records, then read the retained initial revision to see the earlier values.
 
-[Read the catalog design](website/content/catalog.md), [compare four implementations](website/README.md#product-catalog-comparison), or [run the worker benchmark](website/README.md#catalog-benchmark). The [SharedMap memory report](docs/feature-map-memory.md) keeps heap, arena use, backing capacity and RSS separate. The [earlier SharedList example](website/content/log-explorer.md) and its recordings remain historical references.
+[Read the catalog design](website/content/catalog.md) or open [Benchmarks](https://natanelia.github.io/zerocopy/benchmarks/) for memory charts and one-click performance comparisons. Original memory and collection reports remain available in the page's source-data section and in this repository.
 
 ## New version. Same simple API.
 

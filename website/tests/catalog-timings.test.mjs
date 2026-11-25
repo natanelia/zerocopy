@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { regressionHTML } from './regression-preview.mjs';
 import { formatMilliseconds, compareElapsed } from '../assets/catalog-timings.mjs';
 
 test('elapsed milliseconds use two decimals and identify readings below display resolution', () => {
@@ -53,9 +54,8 @@ test('percentage rounding preserves small differences without claiming zero elap
   assert.equal(compareElapsed(Number.MAX_VALUE, 0.01), '—');
 });
 
-test('the comparison leads with measured timing phases and keeps verification secondary', async () => {
-  const { readFileSync } = await import('node:fs');
-  const html = readFileSync(new URL('../_site/compare/index.html', import.meta.url), 'utf8');
+test('retained catalog fixture leads with timing phases and keeps verification secondary', async () => {
+  const html = regressionHTML('compare/');
   assert.match(html, /Compare product-catalog/);
   for (const label of ['Latest read + validate', 'Build collection', 'Initial handoff', 'Replace + handoff']) assert.ok(html.includes(label));
   assert.ok(html.indexOf('data-timing>') < html.indexOf('data-found>'));

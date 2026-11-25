@@ -52,4 +52,4 @@ Connections send messages and attach views. Publications send descriptors and ma
 
 The benefit is avoiding a full copy of collection storage for every compatible reader—not eliminating every cost of multithreading.
 
-Read [memory and ownership](../../docs/architecture.md) before keeping a large history. Use the [live benchmark](../README.md#benchmark-lab) to inspect one workload, not to predict all application behavior.
+Read [memory and ownership](../../docs/architecture.md) before keeping a large history. Use [Benchmarks](../README.md#catalog-benchmark) to inspect one workload, not to predict all application behavior.

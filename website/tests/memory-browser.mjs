@@ -3,7 +3,7 @@ import { once } from 'node:events';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright';
-import { createPreview } from '../serve.mjs';
+import { createRegressionPreview as createPreview } from './regression-preview.mjs';
 import { INVESTIGATION_CASES } from '../assets/explorer-benchmark-cases.mjs';
 
 // A mobile viewport in Chromium is not a WebKit memory test.
