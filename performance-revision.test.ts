@@ -81,6 +81,25 @@ describe('maps, journals and raw live-data compaction', () => {
     expect(a.used).toBe(used); unchanged(map, bytes); expect(copy.get('latest')).toEqual(map.get('latest'));
     expect(arenaOf(copy).used - HEAP_START).toBeLessThan((used - HEAP_START) / 100);
   });
+  test('compaction of map revisions copies each shared live leaf once', async () => {
+    const a = new Arena();
+    const original = new S.SharedMap('object', 0, 0, a).setMany(numbers(3000).map(i =>
+      [`row/${i}`, { text: `商品 · ${i}`, values: [i, null] }] as const));
+    const edited = original.set('row/9', { text: 'edited', values: [] }).delete('row/10');
+    const before = payload(edited);
+    const input = await S.initWorker(S.getWorkerData({ original, edited }, { copy: false }));
+    const copies = S.compactMany(input), target = arenaOf(copies.edited);
+    expect(target).toBe(arenaOf(copies.original));
+    expect(target).not.toBe(a);
+    const retained = target.find(copies.original.root, 'row/2999');
+    expect(retained).toBeGreaterThan(0);
+    expect(target.find(copies.edited.root, 'row/2999')).toBe(retained);
+    expect(target.find(copies.edited.root, 'row/9')).not.toBe(target.find(copies.original.root, 'row/9'));
+    expect([...copies.original.entries()]).toEqual([...original.entries()]);
+    expect([...copies.edited.entries()]).toEqual([...edited.entries()]);
+    expect(copies.edited.set('row/new', { text: 'new', values: [] }).has('row/new')).toBe(true);
+    unchanged(edited, before);
+  });
   test('compaction shares repeated live nested snapshots and releases obsolete dependencies', async () => {
     let inner = new S.SharedList('string').pushMany(['old', 'value']);
     const outer = new S.SharedMap('SharedList<string>').set('a', inner).set('b', inner);

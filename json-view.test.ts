@@ -96,6 +96,22 @@ describe('JSON shared-byte views', () => {
     expect(view.byteLength).toBe(encoder.encode(text.trim()).length);
   });
 
+  test('finds nearby, earlier and distant fields after skipping a large value', () => {
+    const detail = JSON.stringify('倉庫🙂'.repeat(100));
+    const text = `{"row":{"early":1,"detail":${detail},"longDuration":12, "sta\\u0074us":"failed",
+      "large":{"early":99,"text":${detail}},"tail":true},"sibling":false}`;
+    const { view } = fromText(text);
+    const row = view.get('row') as JsonView;
+    expect(row.get('longDuration')).toBe(12);
+    expect(row.equals('status', 'failed')).toBe(true);
+    expect(row.get('early')).toBe(1);
+    expect(row.has('longDuration')).toBe(true);
+    expect(row.get('tail')).toBe(true);
+    expect(row.get('sibling')).toBeUndefined();
+    expect(row.get('status')).toBe('failed');
+    expect(row.toObject()).toEqual(JSON.parse(text).row);
+  });
+
   test('preserves exact JS number rounding and negative zero', () => {
     const tokens = ['0', '-0', '9007199254740991', '-9007199254740991', '9007199254740992', '9007199254740993',
       '18446744073709551615', '1.234567890123456789', '-0.0', '1e+308', '1e309', '-1e309', '5e-324', '1e-400', '-1e-400'];

@@ -83,9 +83,11 @@ interface ArrayCursor {
  */
 export class JsonView {
   readonly #arena: Arena;
+  readonly #bytes: Uint8Array;
   readonly #start: number;
   readonly #bound: number;
   #end: number | undefined;
+  #lastField = 0;
   #arrayCursor: ArrayCursor | undefined;
 
   /** @internal A retained arena keeps the published record alive. */
@@ -96,6 +98,8 @@ export class JsonView {
       throw new RangeError('Invalid JSON view range');
     }
     this.#arena = arena;
+    // This published range remains readable through shared memory growth.
+    this.#bytes = bytes;
     this.#bound = pointer + length;
     this.#start = space(bytes, pointer, this.#bound);
     if (this.#start === this.#bound) throw new SyntaxError('Empty JSON view');
@@ -111,7 +115,7 @@ export class JsonView {
   }
 
   get type(): JsonViewType {
-    switch (this.#arena.buf[this.#start]) {
+    switch (this.#bytes[this.#start]) {
       case 123: return 'object';
       case 91: return 'array';
       case 34: return 'string';
@@ -141,7 +145,7 @@ export class JsonView {
     if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) return undefined;
     const cursor = this.#arrayCursor;
     // A successful cursor already establishes that this immutable value is an array.
-    if (!cursor && this.#arena.buf[this.#start] !== 91) return undefined;
+    if (!cursor && this.#bytes[this.#start] !== 91) return undefined;
     // Published JSON never moves. Forward reads can resume from the previous
     // element instead of scanning every earlier element again. The cursor is
     // local to this view. Build sparse offsets only after an expensive rewind.
@@ -189,7 +193,7 @@ export class JsonView {
   equals(key: string, expected: JsonScalar): boolean {
     const pointer = this.#field(key);
     if (!pointer) return false;
-    const bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     if (typeof expected === 'string') return stringEquals(bytes, pointer, this.#bound, expected);
     if (expected === null) return bytes[pointer] === 110;
     if (typeof expected === 'boolean') return bytes[pointer] === (expected ? 116 : 102);
@@ -203,7 +207,7 @@ export class JsonView {
    * changing it cannot affect the shared record or subsequent reads. No cache.
    */
   toObject(options: { freeze?: boolean } = {}): any {
-    const bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     const value = JSON.parse(decodeUtf8(decoder, bytes.subarray(this.#start, this.#valueEnd())));
     return options.freeze === true ? freezeJSON(value) : value;
   }
@@ -220,7 +224,7 @@ export class JsonView {
 
   #field(key: string): number {
     if (typeof key !== 'string') throw new TypeError('JSON field names must be strings');
-    let bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     if (bytes[this.#start] !== 123) return 0;
     const wasm = this.#arena.wasm;
     if (key.length <= 8) {
@@ -230,7 +234,11 @@ export class JsonView {
         if (c > 127) { ascii = false; break; }
         if (i < 4) lo |= c << (i * 8); else hi |= c << ((i - 4) * 8);
       }
-      if (ascii) return wasm.jsonFieldAscii8(this.#start, this.#bound, key.length, lo, hi) >>> 0;
+      if (ascii) {
+        const pointer = wasm.jsonFieldAscii8(this.#start, this.#bound, key.length, lo, hi, this.#lastField) >>> 0;
+        if (pointer) this.#lastField = pointer;
+        return pointer;
+      }
     }
     let hash = 2166136261;
     for (let i = 0; i < key.length; i++) hash = Math.imul(hash ^ key.charCodeAt(i), 16777619);
@@ -240,12 +248,14 @@ export class JsonView {
       if (!candidate) return 0;
       const keyEnd = wasm.jsonValueEnd(candidate, this.#bound) >>> 0;
       if (keyEnd <= candidate || keyEnd > this.#bound) throw new SyntaxError('Invalid JSON key');
-      bytes = this.#arena.buf;
       let value = space(bytes, keyEnd, this.#bound);
       if (bytes[value] !== 58) throw new SyntaxError('Invalid JSON member');
       value = space(bytes, value + 1, this.#bound);
       if (value >= this.#bound) throw new SyntaxError('Missing JSON value');
-      if (stringEquals(bytes, candidate, keyEnd, key)) return value;
+      if (stringEquals(bytes, candidate, keyEnd, key)) {
+        this.#lastField = value;
+        return value;
+      }
       // A matching hash is only a candidate, never an equality decision.
       cursor = wasm.jsonValueEnd(value, this.#bound) >>> 0;
       if (cursor <= value || cursor > this.#bound) throw new SyntaxError('Invalid JSON member');
@@ -263,11 +273,11 @@ export class JsonView {
     if (end <= pointer || end > this.#bound) throw new SyntaxError('Invalid JSON number');
     // Only the requested number token is converted. Native Number supplies
     // exact JS rounding for decimals, exponents, overflow and unsafe integers.
-    return Number(decodeUtf8(decoder, this.#arena.buf.subarray(pointer, end)));
+    return Number(decodeUtf8(decoder, this.#bytes.subarray(pointer, end)));
   }
 
   #read(pointer: number, root = false): JsonViewValue {
-    const bytes = this.#arena.buf;
+    const bytes = this.#bytes;
     switch (bytes[pointer]) {
       case 123: case 91: {
         if (root) return this;

@@ -220,12 +220,8 @@ unsafe fn after_key(key_end: u32, end: u32) -> u32 {
     if value < end { value } else { 0 }
 }
 
-/// Exact matching for the common <=8-ASCII-code-unit field names. The key is
-/// carried in scalar arguments, with no encoded key allocation or shared copy.
-#[no_mangle]
-pub unsafe extern "C" fn jsonFieldAscii8(start: u32, end: u32, length: u32, lo: u32, hi: u32) -> u32 {
-    if length > 8 || start >= end || load_u8(start) != 123 { return 0; }
-    let mut p = space(start + 1, end);
+#[inline(always)]
+unsafe fn field_ascii8(mut p: u32, end: u32, length: u32, lo: u32, hi: u32) -> u32 {
     while p < end && load_u8(p) == 34 {
         let key_end = string_end(p, end);
         let value = after_key(key_end, end);
@@ -238,6 +234,27 @@ pub unsafe extern "C" fn jsonFieldAscii8(start: u32, end: u32, length: u32, lo: 
         p = space(p + 1, end);
     }
     0
+}
+
+/// Exact matching for the common <=8-ASCII-code-unit field names. The key is
+/// carried in scalar arguments, with no encoded key allocation or shared copy.
+#[no_mangle]
+pub unsafe extern "C" fn jsonFieldAscii8(start: u32, end: u32, length: u32, lo: u32, hi: u32, previous: u32) -> u32 {
+    if length > 8 || start >= end || load_u8(start) != 123 { return 0; }
+    // Try nearby fields after a successful lookup deep into this object.
+    // Bound the extra work on out-of-order reads, misses and large values.
+    if previous >= start + 128 && previous < end {
+        let limit = previous + (end - previous).min(64);
+        let next = jsonValueEnd(previous, limit);
+        if next != 0 {
+            let separator = space(next, limit);
+            if separator < limit && load_u8(separator) == 44 {
+                let found = field_ascii8(space(separator + 1, limit), limit, length, lo, hi);
+                if found != 0 { return found; }
+            }
+        }
+    }
+    field_ascii8(space(start + 1, end), end, length, lo, hi)
 }
 
 /// Locate a hash candidate; caller MUST compare the actual key. `start` may
