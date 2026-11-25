@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'proofs/snapshot-diff-screen-20261125.mjs'
+      - 'proofs/snapshot-diff-sequential-20261125.mjs'
       - '.github/workflows/snapshot-diff-screen.yml'
 permissions:
   contents: read
@@ -50,7 +51,7 @@ jobs:
             rustc --version
             uname -a
             lscpu
-            sha256sum proofs/snapshot-diff-screen-20261125.mjs
+            sha256sum proofs/snapshot-diff-sequential-20261125.mjs
             if [ -f bun.lock ]; then sha256sum bun.lock; fi
           } > "$out/environment.txt"
           if [ -f bun.lock ]; then cp bun.lock "$out/"; fi
@@ -63,9 +64,28 @@ jobs:
             sha256sum dist/*.js *.wasm website/node_modules/marked/lib/marked.esm.js
           ) 2>&1 | tee "$out/build.log"
       - name: Install browsers
-        run: bunx playwright install --with-deps chromium firefox
+        run: bunx playwright install --with-deps chromium firefox webkit
       - name: Verify and measure two actual shared-memory readers
-        run: timeout --signal=TERM --kill-after=15s 1500s node proofs/snapshot-diff-screen-20261125.mjs _baseline "$RUNNER_TEMP/snapshot-diff-screen/raw.json" 11
+        run: timeout --signal=TERM --kill-after=15s 1500s node proofs/snapshot-diff-sequential-20261125.mjs _baseline "$RUNNER_TEMP/snapshot-diff-screen/sequential.json" 11
+      - name: Pinned-main WebKit documentation smoke
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/snapshot-diff-screen"
+          cd _baseline
+          cp website/tests/feature-browser.mjs website/tests/feature-browser-diagnostic.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('website/tests/feature-browser-diagnostic.mjs')
+          s=p.read_text()
+          old="observed.on('response', response => { if (response.status() >= 400) record({ type: 'response', url: response.url(), status: response.status() }, observed); });"
+          new="observed.on('response', response => { record({ type: 'response-headers', url: response.url(), status: response.status(), headers: response.headers() }, observed); });"
+          assert s.count(old)==1
+          p.write_text(s.replace(old,new))
+          PY
+          mkdir -p "$out/webkit"
+          FEATURE_BROWSERS=webkit BROWSER_ARTIFACTS_DIR="$out/webkit" timeout 360s node website/tests/feature-browser-diagnostic.mjs 2>&1 | tee "$out/webkit-smoke.log"
       - name: Retain raw proof and environment
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
