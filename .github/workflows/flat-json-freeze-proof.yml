@@ -1,0 +1,132 @@
+name: Flat JSON read proof (experimental)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'proofs/flat-json-freeze.mjs'
+      - '.github/workflows/flat-json-freeze-proof.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flat-json-freeze-proof-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  paired:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/flat-json-freeze-20261125'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      BASELINE: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+      CANDIDATE: da2cca61f34911525a9303cd81e366ea9d4969ac
+      PAIRS: '11'
+      WARMUPS: '3'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+          path: _baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: da2cca61f34911525a9303cd81e366ea9d4969ac
+          path: _candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Verify identities and install one shared dependency tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/flat-json-freeze-proof"
+          test "$(git -C _baseline rev-parse HEAD)" = "$BASELINE"
+          test "$(git -C _candidate rev-parse HEAD)" = "$CANDIDATE"
+          cmp package.json _baseline/package.json
+          cmp _baseline/package.json _candidate/package.json
+          cmp rust-toolchain.toml _baseline/rust-toolchain.toml
+          cmp _baseline/rust-toolchain.toml _candidate/rust-toolchain.toml
+          bun install
+          ln -s "$GITHUB_WORKSPACE/node_modules" _baseline/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" _candidate/node_modules
+          {
+            echo "harness=$(git rev-parse HEAD)"
+            echo "baseline=$BASELINE"
+            echo "candidate=$CANDIDATE"
+            node --version
+            bun --version
+            rustc --version
+            uname -a
+            lscpu
+            sha256sum proofs/flat-json-freeze.mjs
+            if [ -f bun.lock ]; then sha256sum bun.lock; fi
+          } > "$RUNNER_TEMP/flat-json-freeze-proof/environment.txt"
+          if [ -f bun.lock ]; then cp bun.lock "$RUNNER_TEMP/flat-json-freeze-proof/"; fi
+      - name: Build both exact source revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for build in _baseline _candidate; do
+            (
+              cd "$build"
+              bun run build:wasm
+              bun run build:browser
+              sha256sum dist/*.js *.wasm
+            ) 2>&1 | tee "$RUNNER_TEMP/flat-json-freeze-proof/$build-build.log"
+          done
+          cp -a _baseline/dist _baseline/dist-control
+          diff -qr _baseline/dist _baseline/dist-control
+      - name: Candidate correctness gate
+        working-directory: _candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            node --test scripts/rust-wasm.node.mjs
+            bun run typecheck
+            bun run test freeze-json.test.ts json-view.test.ts
+            node proofs/node-worker.mjs
+          } 2>&1 | tee "$RUNNER_TEMP/flat-json-freeze-proof/correctness.log"
+      - name: Install browsers
+        run: bunx playwright install --with-deps chromium firefox
+      - name: Run identical-build controls and paired comparisons sequentially
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/flat-json-freeze-proof"
+          failed=0
+          for engine in node bun chromium firefox; do
+            driver=node
+            if [ "$engine" = bun ]; then driver=bun; fi
+            for variant in aa ab; do
+              other=_baseline/dist-control
+              if [ "$variant" = ab ]; then other=_candidate/dist; fi
+              status=0
+              timeout --signal=TERM --kill-after=15s 480s "$driver" proofs/flat-json-freeze.mjs \
+                _baseline/dist "$other" "$engine" "$PAIRS" "$WARMUPS" \
+                > "$out/$engine-$variant.json" 2> "$out/$engine-$variant.stderr" || status=$?
+              echo "$engine $variant exit=$status" | tee -a "$out/exit-status.txt"
+              if [ "$status" -ne 0 ]; then failed=1; fi
+            done
+          done
+          exit "$failed"
+      - name: Retain raw evidence and logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: flat-json-freeze-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/flat-json-freeze-proof/
+          retention-days: 30
+          if-no-files-found: warn
