@@ -24,4 +24,11 @@ const tabs = [...document.querySelectorAll('[data-code-tab]')];
 function select(tab) {
   for (const item of tabs) { const active = item === tab; item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1; document.getElementById(item.getAttribute('aria-controls')).hidden = !active; }
 }
+for (const tab of tabs) {
+  const panel = document.getElementById(tab.getAttribute('aria-controls'));
+  panel.setAttribute('role', 'tabpanel');
+  panel.setAttribute('aria-labelledby', tab.id);
+}
+select(tabs[0]);
+document.querySelector('.code-tabs').hidden = false;
 tabs.forEach(tab => { tab.addEventListener('click', () => select(tab)); tab.addEventListener('keydown', event => { if (['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) { event.preventDefault(); const next = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs.at(-1) : tabs[1 - tabs.indexOf(tab)]; select(next); next.focus(); } }); });

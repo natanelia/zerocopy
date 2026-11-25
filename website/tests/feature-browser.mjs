@@ -119,8 +119,8 @@ try {
       observe(page);
       page.setDefaultTimeout(20000);
       await page.goto(origin + meta.base);
-      assert.equal(await page.locator('.hero-buttons a').last().getAttribute('href'), meta.base + 'compare/');
-      await page.locator('.hero-buttons a').last().click();
+      assert.equal(await page.getByRole('link', { name: 'Try the product catalog' }).getAttribute('href'), meta.base + 'compare/');
+      await page.getByRole('link', { name: 'Try the product catalog' }).click();
       await page.locator('#feature-load:not([disabled])').waitFor();
       assert.equal(new URL(page.url()).pathname, meta.base + 'compare/');
       await page.goto(origin + meta.base + 'explorer/?source=legacy#main');

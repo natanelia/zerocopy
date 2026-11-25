@@ -37,28 +37,58 @@ export function shell({ title, description, body, base, route = '', script, vers
   <header class="site-header">${wordmark}<nav class="desktop-nav" aria-label="Main">${navigation}</nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg></button><a class="github-link" href="${repository}">GitHub</a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden>${navigation}<a href="${href('compare/')}">Live comparison</a><a href="${href('playground/')}">Small snapshot example</a><a href="${repository}">GitHub</a></nav>
   ${body}
-  <footer class="site-footer"><div>${wordmark}<p>Immutable collections for JavaScript workers.</p></div><div class="footer-links"><a href="${href('docs/getting-started/')}">Get started</a><a href="${href('docs/memory/')}">Know the trade-offs</a><a href="${repository}/issues">Feedback ${arrow}</a><a href="${npmPackage}">npm package ${arrow}</a><a href="${repository}/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v${escape(version)} · <a href="${repository}/commit/${sha}">${sha.slice(0, 7)}</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <footer class="site-footer"><div>${wordmark}<p><a href="${repository}">${projectName}</a></p></div><div class="footer-links"><a href="${href('docs/getting-started/')}">Get started</a><a href="${href('docs/memory/')}">Know the trade-offs</a><a href="${repository}/issues">Feedback ${arrow}</a><a href="${npmPackage}">npm package ${arrow}</a><a href="${repository}/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v${escape(version)} · <a href="${repository}/commit/${sha}">${sha.slice(0, 7)}</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
   <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off" aria-describedby="search-status search-help" aria-controls="search-results"><p id="search-status" role="status">Type a topic to find a guide.</p><button id="search-retry" class="text-button" type="button" hidden>Retry search</button><nav aria-label="Search results"><ol id="search-results"></ol></nav><p id="search-help">↓ ↑ to move · Enter to open · Esc to close</p><a class="search-browse" href="${href('docs/getting-started/')}">Browse documentation →</a></dialog><div class="toast" role="status" aria-live="polite"></div>
   </body></html>`;
 }
 
 export function home(base) {
+  const main = `import { Worker } from 'node:worker_threads';
+import { SharedMap } from 'zerocopy';
+import { createState } from 'zerocopy/state';
+
+const stock = new SharedMap('number').set('pens', 12);
+const state = createState({ stock });
+const worker = new Worker(new URL('./worker.mjs', import.meta.url));
+worker.once('exit', () => state.dispose());
+
+await state.connect(worker);
+state.update('stock', map => map.set('pens', 8));`;
+  const reader = `import { parentPort } from 'node:worker_threads';
+import { connectSharedSession } from 'zerocopy/worker';
+
+const state = await connectSharedSession({ endpoint: parentPort });
+const before = state.current;
+
+state.subscribe(after => {
+  console.log(before.stock.get('pens'), after.stock.get('pens'));
+  state.dispose();
+});`;
   return `<main id="main">${cityHero(base)}
-  <section class="promise-strip wrap" aria-label="Core benefits"><div><strong>Shared storage</strong><span>One dataset for connected workers.</span></div><div><strong>Local reads</strong><span>Read values directly on each thread.</span></div><div><strong>Immutable versions</strong><span>Keep earlier snapshots as data changes.</span></div></section>
-  <section class="hero wrap storage-example"><div class="hero-copy"><h2>How workers share storage</h2><p class="hero-description">zerocopy is a JavaScript and TypeScript library for shared, immutable collections. One writer on the main thread or in a worker publishes snapshots for connected readers.</p><p>Node.js and cross-origin-isolated browsers can share backing storage. Bun uses copy transport by default.</p><div class="hero-buttons"><a class="button primary" href="${base}docs/getting-started/">Start building ${arrow}</a><a class="button secondary" href="${base}compare/">Compare it live <span aria-hidden="true">→</span></a></div><p class="hero-note"><a href="${repository}">${projectName}</a> · Tasks optional.</p></div>
-  <div class="sharing-card" aria-label="Interactive conceptual view of shared and cloned storage"><div class="diagram-toolbar"><span class="diagram-title">Storage model</span><div class="segmented" role="group" aria-label="Storage model"><button data-storage="shared" aria-pressed="true">Shared</button><button data-storage="cloned" aria-pressed="false">Cloned</button></div></div><div class="diagram"><div class="owner-node"><span class="node-icon">1W</span><span>Writer<small>Main thread or worker</small></span><span class="node-live">●</span></div><div class="wire wire-top"></div><div class="arena"><div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div><div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => `<i></i>`).join('')}</div><div class="arena-footer"><span class="mono">Map · List · Set</span><span>Immutable snapshots</span></div></div><div class="wire wire-bottom"></div><div class="reader-nodes" id="reader-nodes"></div></div><div class="diagram-controls"><label for="worker-count">Readers <output id="worker-count-value">3</output></label><input id="worker-count" type="range" min="1" max="4" value="3"><span id="storage-count" role="status">1 backing store</span></div><p class="diagram-caption">Conceptual storage model. Not a memory measurement.</p></div></section>
-  <section class="section wrap split-section" id="how-it-works"><div><h2>Read a snapshot locally</h2><p class="section-lead">Look up a product on the main thread while a worker checks its price and stock.</p><p>Connect a worker once. The session delivers snapshots, and each thread can call <code>.get()</code> synchronously on its attached version.</p><a class="text-link" href="${base}docs/mental-model/">Read the mental model <span>→</span></a><div class="inline-note">Collections hold data. Sessions share snapshots. Tasks schedule work.</div></div><div class="code-demo"><p class="code-label">Example: main-thread writer</p><div class="code-tabs" role="tablist" aria-label="Thread example"><button role="tab" aria-selected="true" id="tab-owner" aria-controls="panel-owner" data-code-tab="owner">main.ts</button><button role="tab" aria-selected="false" id="tab-reader" aria-controls="panel-reader" tabindex="-1" data-code-tab="reader">worker.ts</button></div><div role="tabpanel" id="panel-owner" aria-labelledby="tab-owner">${codeBlock(`// With your existing state and worker\nawait state.connect(worker);\n\n// Read directly on the main thread.\nstate.current.products.get('product/000042');\n\n// A replacement creates a new snapshot.\nstate.update('products', products =>\n  products.set('product/000042', updatedProduct)\n);`, 'Main thread · API excerpt')}</div><div role="tabpanel" id="panel-reader" aria-labelledby="tab-reader" hidden>${codeBlock(`import { connectSharedSession }\n  from 'zerocopy/worker';\n\nconst shared = await connectSharedSession<Model>();\n\n// No task. No per-read message.\nconst snapshot = shared.current;\nconst product = snapshot.products.get('product/000042');\n\n// This snapshot stays fixed across later updates.`, 'Worker · API excerpt')}</div><div class="code-demo-bottom"><span class="status-dot"></span> Synchronous local read<a href="${base}docs/getting-started/">Complete setup →</a></div></div></section>
-  <section class="catalog-chapter" id="worker-architecture" aria-labelledby="worker-architecture-heading"><div class="wrap section">
-    <div class="catalog-intro"><div><h2 id="worker-architecture-heading">Inside the live product catalog</h2><p>A dedicated worker updates products while two reader workers look up IDs and validate attributes. Replace 100 objects and inspect an earlier revision alongside the new one.</p></div><a class="button primary" href="${base}compare/">Open the live comparison ${arrow}</a></div>
-    <ol class="writer-topology" aria-label="Product catalog worker architecture"><li><strong>UI · main thread</strong><span>Sends control requests to the writer and displays the answers.</span></li><li><strong>Writer worker</strong><span>Each arena has one allocating writer. It replaces products and publishes snapshot descriptors.</span></li><li><strong>Reader workers</strong><span>Attach shared snapshots and read locally. Each can finish work on the version it started with.</span></li></ol>
-    <p class="catalog-note">In this example, snapshot delivery runs from the writer worker to reader workers. The UI can also attach a read-only snapshot. <a class="text-link" href="${base}docs/catalog/">Read the catalog design →</a></p>
-  </div></section>
-  <section class="section wrap"><div class="section-heading"><h2>Patterns for shared data</h2><a class="text-link" href="${base}use-cases/">All use cases →</a></div>${useCaseCards(base)}</section>
-  <section class="benchmark-chapter"><div class="wrap benchmark-inner"><div><h2>Measure your workload</h2><p>Compare SharedMap, native Map, Immutable.js Map and Immer Map on the same product objects. Run the benchmark in your browser and export every raw sample.</p><a class="button primary" href="${base}investigation-benchmark/">Run a live benchmark ${arrow}</a></div>
-    <dl class="benchmark-stages"><div><dt>First reads</dt><dd>Look up products after the snapshot arrives.</dd></div><div><dt>Repeated reads</dt><dd>Revisit the same IDs on each reader.</dd></div><div><dt>Sparse edits</dt><dd>Replace a subset of products and publish a revision.</dd></div></dl>
-  </div></section>
-  <section class="section wrap fit-section"><div><h2>When to use zerocopy</h2><p>Start with a collection. Bring your existing workers, Redux store, or message protocol. Add a task pool when you need one.</p><a class="text-link" href="${base}docs/getting-started/">Find your starting point →</a></div><div class="fit-details"><details open><summary>Where zerocopy fits</summary><p>Large, versioned collections that multiple threads need to read. Feature explorers, editors, large tables, catalogs, graph tools, and simulations with a changing dataset.</p></details><details><summary>What you need to know</summary><p>Browsers need cross-origin isolation. Each arena has one allocating writer. Worker snapshots arrive asynchronously. Long-lived data needs an explicit compaction strategy.</p><a href="${base}docs/memory/">Read the memory guide →</a></details><details><summary>When native collections are better</summary><p>Small data that stays on one thread. Sharing avoids dataset copies; it does not make every collection operation faster or remove all allocations.</p><a href="${base}docs/benchmarks/">See the full recorded results →</a></details></div></section>
-  <section class="closing wrap"><h2>Connect your first worker</h2><a class="button primary" href="${base}docs/getting-started/">Open the quickstart ${arrow}</a><a class="text-link" href="${repository}">View source on GitHub ${arrow}</a></section></main>`;
+    <section class="section wrap split-section" id="how-it-works">
+      <div><h2>Read a map in a worker</h2>
+        <p>The main thread changes a stock count from 12 to 8. The worker can read both values because it kept the first snapshot.</p>
+        <p>After installing zerocopy, save both files in one directory and run <code>node main.mjs</code>. It prints <samp>12 8</samp>.</p>
+        <a class="text-link" href="${base}docs/getting-started/">Browser quickstart →</a>
+      </div>
+      <div class="code-demo">
+        <div class="code-tabs" role="tablist" aria-label="Node.js example files" hidden>
+          <button role="tab" aria-selected="true" id="tab-reader" aria-controls="panel-reader" data-code-tab="reader">worker.mjs</button>
+          <button role="tab" aria-selected="false" id="tab-owner" aria-controls="panel-owner" tabindex="-1" data-code-tab="owner">main.mjs</button>
+        </div>
+        <div id="panel-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
+        <div id="panel-owner">${codeBlock(main, 'main.mjs', 'js')}</div>
+      </div>
+    </section>
+    <section class="wrap storage-example" id="worker-architecture">
+      <div><h2>When shared storage helps</h2>
+        <p>Use zerocopy when several workers need to read a large, changing dataset. One thread writes updates. The readers share the backing storage and read their snapshots locally.</p>
+        <p>Node.js supports shared storage. Browsers require cross-origin isolation. Bun copies snapshots by default.</p>
+        <div class="model-links"><a href="${base}compare/">Try the product catalog</a><a href="${base}investigation-benchmark/">Run benchmarks</a><a href="${base}docs/mental-model/">How sharing works</a></div>
+      </div>
+      <div class="sharing-card" aria-label="Shared and cloned storage"><div class="diagram-toolbar"><span class="diagram-title">Storage model</span><div class="segmented" role="group" aria-label="Storage model"><button data-storage="shared" aria-pressed="true">Shared</button><button data-storage="cloned" aria-pressed="false">Cloned</button></div></div><div class="diagram"><div class="owner-node"><span class="node-icon">W</span><span>Writer<small>Main thread or worker</small></span></div><div class="wire wire-top"></div><div class="arena"><div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div><div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => `<i></i>`).join('')}</div><div class="arena-footer"><span class="mono">Map · List · Set</span></div></div><div class="wire wire-bottom"></div><div class="reader-nodes" id="reader-nodes"></div></div><div class="diagram-controls"><label for="worker-count">Readers <output id="worker-count-value">3</output></label><input id="worker-count" type="range" min="1" max="4" value="3"><span id="storage-count" role="status">1 backing store</span></div></div>
+    </section>
+  </main>`;
 }
 
 export function useCaseCards(base) {

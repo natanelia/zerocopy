@@ -11,9 +11,9 @@ function icon(name) {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${symbols[name]}</svg>`;
 }
 const jobs = [
-  { key: 'school', label: 'School demand', slot: 'W01' },
-  { key: 'train', label: 'Train capacity', slot: 'W03' },
-  { key: 'utility', label: 'Utility load', slot: 'W06' },
+  { key: 'school', label: 'School demand' },
+  { key: 'train', label: 'Train capacity' },
+  { key: 'utility', label: 'Utility load' },
 ];
 
 // Each folded-paper tower scales up from its own footprint on the same island.
@@ -40,23 +40,25 @@ function mapLayers() {
 
 export function cityHero(base) {
   const pins = jobs.map(({ key, label }) => `<div class="city-pin" data-job="${key}" data-state="done">${icon(key)} ${label}<i class="job-mark"></i></div>`).join('');
-  const slots = jobs.map(({ key, label, slot }) => `<li class="worker-slot" data-job="${key}" data-state="done">${icon(key)}<span><small>${slot}</small> ${label}</span><i class="job-mark" aria-hidden="true"></i><span class="city-sr job-status">Complete</span></li>`).join('');
-  const idle = ['W02', 'W04', 'W05', 'W07', 'W08'].map(slot => `<li class="idle-slot">${slot}<span class="city-sr"> idle</span></li>`).join('');
-  return `<section class="city-hero" aria-labelledby="city-title">
+  const slots = jobs.map(({ key, label }) => `<li class="worker-slot" title="${label}" data-job="${key}" data-state="done">${icon(key)}<i class="job-mark" aria-hidden="true"></i><span class="city-sr">${label} · <span class="job-status">Complete</span></span></li>`).join('');
+  const idle = '<li class="idle-slot" aria-label="Five idle workers"><i></i><i></i><i></i><i></i><i></i></li>';
+  return `<section class="city-hero wrap" aria-labelledby="city-title">
     <div class="city-intro">
       <h1 id="city-title"><span class="city-sr">Immutable collections for Node.js workers, Web Workers in the browser, and Bun workers.</span><span aria-hidden="true">Immutable collections<br>for <span class="runtime-slot"><span class="runtime-word">Node.js</span></span> workers.</span></h1>
-      <p>Share immutable maps, lists, and sets across workers.</p>
+      <p>A JavaScript and TypeScript library for sharing maps, lists, and sets across workers. With shared memory, workers read snapshots without copying the whole collection.</p>
       <div class="city-actions"><a class="quickstart" href="${base}docs/getting-started/">Quickstart <span aria-hidden="true">→</span></a><div class="install-command"><code>npm i zerocopy</code><button type="button" class="copy-install" aria-label="Copy npm install command" hidden>${icon('copy')}</button></div></div>
     </div>
+    <figure class="city-example">
     <div class="city-window" aria-hidden="true"><div class="city-model">
-      <img class="city-relief" width="1672" height="941" src="${base}assets/singapore-relief.webp" srcset="${base}assets/singapore-relief-900.webp 900w, ${base}assets/singapore-relief.webp 1672w" sizes="(max-width: 600px) 177vw, (max-width: 980px) 122vw, 100vw" fetchpriority="high" alt="">
+      <img class="city-relief" width="1672" height="941" src="${base}assets/singapore-relief.webp" srcset="${base}assets/singapore-relief-900.webp 900w, ${base}assets/singapore-relief.webp 1672w" sizes="(max-width: 700px) 100vw, (max-width: 1320px) 56vw, 700px" fetchpriority="high" alt="">
       ${mapLayers()}
       <span class="district-pin">30,000 new homes</span>${pins}
     </div></div>
     <p class="city-sr">A proposed district of 30,000 new homes rises in western Singapore. Three workers read the same city snapshot to estimate school demand, train capacity, and utility load beyond the district.</p>
-    <div class="worker-strip"><div class="snapshot-key">${icon('snapshot')}<span>1 shared city snapshot</span></div>
+    <figcaption class="worker-strip"><div class="snapshot-key">${icon('snapshot')}<span>Three workers, one snapshot</span></div>
       <ul class="worker-list" aria-label="Workers reading the city snapshot">${slots}${idle}</ul>
       <button class="city-playback" type="button" aria-label="Pause animation" hidden><span class="pause-icon">${icon('pause')}</span><span class="play-icon" hidden>${icon('play')}</span></button>
-    </div>
+    </figcaption>
+    </figure>
   </section>`;
 }

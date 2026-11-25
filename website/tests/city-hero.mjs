@@ -74,6 +74,9 @@ export async function checkCityHero(browser, url, screenshots) {
       await page.setViewportSize({ width, height: 844 });
       const pins = await page.locator('.city-pin,.district-pin').evaluateAll(items => items.map(item => item.getBoundingClientRect().toJSON()));
       for (const pin of pins) assert.ok(pin.left >= 0 && pin.right <= width, 'Pin visible at ' + width);
+      const [intro, example, quickstart] = await Promise.all(['.city-intro', '.city-example', '.quickstart'].map(documentBox));
+      assert.ok(intro.x + intro.width <= example.x + 1 || intro.y + intro.height <= example.y + 1, 'Product copy has its own space at ' + width);
+      assert.ok(quickstart.y + quickstart.height < 844, 'Quickstart fits first viewport at ' + width);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     }
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);

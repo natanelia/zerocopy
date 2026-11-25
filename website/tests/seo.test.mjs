@@ -18,7 +18,7 @@ test('the homepage identifies the library, not only its slogan', () => {
   assert.match(html, /<title>natanelia\/zerocopy: Immutable collections for JavaScript and TypeScript<\/title>/);
   const body = html.split('<body')[1];
   assert.ok(body.includes(`<a href="${repository}">${projectName}</a>`));
-  assert.match(body, /zerocopy is a JavaScript and TypeScript library/);
+  assert.match(body, /A JavaScript and TypeScript library for sharing maps, lists, and sets/);
   assert.ok(body.includes(`href="${npmPackage}"`));
   assert.match(read('index.html'), /SharedArrayBuffer/);
 });

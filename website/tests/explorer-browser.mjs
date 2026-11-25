@@ -25,7 +25,7 @@ try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1080 }, reducedMotion: 'reduce' });
   page = await context.newPage(); page.setDefaultTimeout(60_000); page.on('pageerror', error => errors.push(error.message));
   await page.goto(origin + base);
-  assert.equal(await page.locator('.use-case-card').count(), 6);
+  assert.equal(await page.getByRole('navigation', { name: 'Main', exact: true }).getByRole('link', { name: 'Use cases' }).getAttribute('href'), base + 'use-cases/');
   assert.equal(await page.getByRole('heading', { level: 1, name: /^Immutable collections for Node\.js workers/ }).isVisible(), true);
   await page.goto(origin + base + 'historical/log-explorer/');
   assert.equal(await page.locator('#log-size').inputValue(), '100000');

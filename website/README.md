@@ -26,7 +26,7 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 `render.mjs` rewrites source links to site routes, creates heading links, and highlights code at build time with the project's TypeScript scanner. It renders only checked-in Markdown; do not pass user-supplied text to it. Search uses DOM text nodes, not HTML from a query.
 
-The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
+The homepage includes a two-file Node.js example. Its browser test copies the rendered files, runs them against the built package, and checks the original and updated map values. Real-world guides describe implementation patterns, not unverified customer deployments.
 
 > The current primary demos use the product-catalog workload described under [Product catalog comparison](#product-catalog-comparison). The log-column sections below describe the preserved historical routes.
 
