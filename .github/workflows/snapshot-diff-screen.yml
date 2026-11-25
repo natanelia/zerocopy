@@ -1,0 +1,76 @@
+name: Snapshot diff screen (experimental)
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'proofs/snapshot-diff-screen-20261125.mjs'
+      - '.github/workflows/snapshot-diff-screen.yml'
+permissions:
+  contents: read
+concurrency:
+  group: snapshot-diff-screen-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  screen:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'experiment/snapshot-diff-20261125'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+          path: _baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build pinned baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/snapshot-diff-screen"
+          mkdir -p "$out"
+          test "$(git -C _baseline rev-parse HEAD)" = "76ab6b53aa0d3b40202720ca12d9fcc904716cf2"
+          cmp package.json _baseline/package.json
+          bun install
+          ln -s "$GITHUB_WORKSPACE/node_modules" _baseline/node_modules
+          {
+            echo "harness=$(git rev-parse HEAD)"
+            node --version
+            bun --version
+            rustc --version
+            uname -a
+            lscpu
+            sha256sum proofs/snapshot-diff-screen-20261125.mjs
+            if [ -f bun.lock ]; then sha256sum bun.lock; fi
+          } > "$out/environment.txt"
+          if [ -f bun.lock ]; then cp bun.lock "$out/"; fi
+          (
+            cd _baseline
+            bun run build:wasm
+            bun run build:browser
+            npm --prefix website install --ignore-scripts --no-package-lock
+            SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs
+            sha256sum dist/*.js *.wasm website/node_modules/marked/lib/marked.esm.js
+          ) 2>&1 | tee "$out/build.log"
+      - name: Install browsers
+        run: bunx playwright install --with-deps chromium firefox
+      - name: Verify and measure two actual shared-memory readers
+        run: timeout --signal=TERM --kill-after=15s 1500s node proofs/snapshot-diff-screen-20261125.mjs _baseline "$RUNNER_TEMP/snapshot-diff-screen/raw.json" 11
+      - name: Retain raw proof and environment
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-diff-screen-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/snapshot-diff-screen/
+          retention-days: 30
+          if-no-files-found: warn
