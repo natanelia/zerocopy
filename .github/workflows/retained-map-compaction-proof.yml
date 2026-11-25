@@ -2,7 +2,7 @@ name: Retained map compaction edge qualification (temporary proof)
 on:
   push:
     branches: [proof/retained-map-compaction-20261125]
-    paths: ['.github/workflows/retained-map-compaction-proof.yml', 'compaction.ts']
+    paths: ['.github/workflows/retained-map-compaction-proof.yml', 'compaction.ts', 'arena.ts', 'shared-map.ts']
 permissions:
   contents: read
 jobs:
@@ -25,7 +25,10 @@ jobs:
       - run: bun run build:wasm
       - name: Verify pinned runtime and typecheck
         run: |
-          git diff --exit-code 3f8f0d89fb4fa95fec87bcce52ff21c44652fd3d -- compaction.ts
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code HEAD -- compaction.ts arena.ts shared-map.ts
+          git rev-parse HEAD
+          git hash-object compaction.ts arena.ts shared-map.ts
           bun run typecheck
       - name: Test collision, fork, Unicode, allocation failure and custom traversal
         shell: bash
@@ -35,8 +38,16 @@ jobs:
           cat > retained-compaction-edge.ts <<'EOF'
           import assert from 'node:assert/strict';
           import { createHash } from 'node:crypto';
-          import { SharedMap, resetMap, getWorkerData, initWorker, compactMany } from './shared';
           import { Arena, arenaOf, hashBytes, HEAP_START } from './arena';
+          import { SharedMap } from './shared-map';
+          // Install pass-through hooks before compaction is imported, then restore.
+          // Capturing identities in the late-loaded compaction module would poison the gate.
+          const initialLeaves=Arena.prototype.leaves, initialDescriptor=SharedMap.prototype.toWorkerData;
+          Arena.prototype.leaves=function*(root:number){yield* initialLeaves.call(this,root);};
+          SharedMap.prototype.toWorkerData=function(){return initialDescriptor.call(this);};
+          const { resetMap, getWorkerData, initWorker, compactMany }=await import('./shared');
+          Arena.prototype.leaves=initialLeaves;
+          SharedMap.prototype.toWorkerData=initialDescriptor;
           const hash = (data: Uint8Array) => createHash('sha256').update(data).digest('hex');
           function collision() {
             const seen = new Map<number,string>(), enc = new TextEncoder();
@@ -117,14 +128,22 @@ jobs:
             customUsed=arenaOf(custom.root).used;customDigest=summarize(custom,oracle);
           } finally {Arena.prototype.leaves=leaves;}
           assert.equal(hash(a.buf.subarray(HEAP_START,before)),originalBytes);
-          console.log(JSON.stringify({collision:[c1,c2],original,packedDigest,packedUsed,sourceUsed:before,customCalls,customUsed,customDigest,allocationFailureVerified:true,transportVerified:true}));
+          let descriptorCalls=0, descriptorUsed:number, descriptorDigest:ReturnType<typeof summarize>;
+          try {
+            SharedMap.prototype.toWorkerData=function(){descriptorCalls++;return initialDescriptor.call(this);};
+            const custom=compactMany(input);
+            descriptorUsed=arenaOf(custom.root).used;descriptorDigest=summarize(custom,oracle);
+          } finally {SharedMap.prototype.toWorkerData=initialDescriptor;}
+          console.log(JSON.stringify({collision:[c1,c2],original,packedDigest,packedUsed,sourceUsed:before,customCalls,customUsed,customDigest,descriptorCalls,descriptorUsed,descriptorDigest,allocationFailureVerified:true,transportVerified:true}));
           EOF
-          cp compaction.ts /tmp/retained-candidate.ts
-          git show 76ab6b53aa0d3b40202720ca12d9fcc904716cf2:compaction.ts > compaction.ts
+          for file in compaction.ts arena.ts shared-map.ts; do
+            cp "$file" "/tmp/retained-$file"
+            git show "76ab6b53aa0d3b40202720ca12d9fcc904716cf2:$file" > "$file"
+          done
           bun retained-compaction-edge.ts | tee retained-compaction-results/base.json
-          cp /tmp/retained-candidate.ts compaction.ts
+          for file in compaction.ts arena.ts shared-map.ts; do cp "/tmp/retained-$file" "$file"; done
           bun retained-compaction-edge.ts | tee retained-compaction-results/candidate.json
-          git diff --exit-code -- compaction.ts
+          git diff --exit-code -- compaction.ts arena.ts shared-map.ts
           node --input-type=module <<'EOF'
           import assert from 'node:assert/strict';
           import {readFileSync} from 'node:fs';
@@ -136,6 +155,9 @@ jobs:
           assert(candidate.packedUsed<base.packedUsed,'fixture must actually take optimized path');
           assert.equal(candidate.customCalls,base.customCalls,'custom traversal was bypassed');
           assert.equal(candidate.customUsed,base.customUsed,'custom traversal must use existing rebuild');
+          assert.deepEqual(candidate.descriptorDigest,base.descriptorDigest);
+          assert.equal(candidate.descriptorCalls,base.descriptorCalls,'custom descriptor call count changed');
+          assert.equal(candidate.descriptorUsed,base.descriptorUsed,'custom descriptor must use existing rebuild');
           console.log('Edge and fallback qualification passed');
           EOF
       - name: Existing unit tests (no publication)

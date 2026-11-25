@@ -1,7 +1,7 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, primitiveReadProtocol, popcount } from './arena';
 import { parseNestedType } from './types';
 import { structureRegistry } from './codec';
-import { SharedMap } from './shared-map';
+import { SharedMap, mapCompactionProtocol } from './shared-map';
 import { SharedList, listCompactionProtocol } from './shared-list';
 import { SharedSet } from './shared-set';
 import { SharedStack } from './shared-stack';
@@ -352,7 +352,6 @@ function mostlyShared(a: Arena, before: number, after: number, required: number)
   }
   return false;
 }
-const nativeMapDescriptor = SharedMap.prototype.toWorkerData;
 
 /** Compact a group together, retaining shared live blobs and nested snapshots. */
 export function compactMany<T extends Record<keyof T, Compactable> & Record<Extract<keyof T, symbol>, never>>(snapshots: T): Readonly<T> {
@@ -361,17 +360,19 @@ export function compactMany<T extends Record<keyof T, Compactable> & Record<Extr
   let retainedArena: Arena | undefined;
   // Small and two-root histories stay on the packed rebuild path.
   if (entries.length >= 4 && entries.length <= 64
-    && SharedMap.prototype.toWorkerData === nativeMapDescriptor
-    && entries.every(([, s]) => s instanceof SharedMap && Object.getPrototypeOf(s) === SharedMap.prototype && s.valueType === 'object')) {
+    && Object.getOwnPropertyDescriptor(SharedMap.prototype, 'toWorkerData')?.value === mapCompactionProtocol.descriptor
+    && entries.every(([, s]) => s instanceof SharedMap && Object.getPrototypeOf(s) === SharedMap.prototype
+      && s.valueType === 'object' && Number.isSafeInteger(s.size) && s.size >= 50000 && !Object.hasOwn(s, 'toWorkerData'))) {
     const maps = entries.map(([, s]) => s as SharedMap<'object'>);
     const a = arenaOf(maps[0]);
     if (Object.getPrototypeOf(a) === Arena.prototype && primitiveReadProtocol.hasNativeWasm(a)
       && !Object.hasOwn(a, 'buf') && !Object.hasOwn(a, 'dv') && !Object.hasOwn(a, 'refresh') && !Object.hasOwn(a, 'leaves')
       && Object.getOwnPropertyDescriptor(Arena.prototype, 'buf')?.get === primitiveReadProtocol.bytes
       && Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')?.get === primitiveReadProtocol.view
-      && Arena.prototype.refresh === primitiveReadProtocol.refresh
+      && Object.getOwnPropertyDescriptor(Arena.prototype, 'refresh')?.value === primitiveReadProtocol.refresh
+      && Object.getOwnPropertyDescriptor(Arena.prototype, 'leaves')?.value === primitiveReadProtocol.leaves
       && maps.every(m => arenaOf(m) === a && Number.isSafeInteger(m.root) && m.root >= 65536
-        && m.root + 16 <= a.buf.length && m.size >= 50000 && m.size === (a.wasm.mapSize(m.root) >>> 0)
+        && m.root + 16 <= a.buf.length && m.size === (a.wasm.mapSize(m.root) >>> 0)
         && a.dv.getUint32(m.root, true) !== 0xffffffff)) {
       const distinct = [...new Map(maps.map(m => [m.root, m])).values()];
       if (distinct.length >= 4 && distinct.every((m, i) => !i || mostlyShared(a, distinct[i - 1].root, m.root,
