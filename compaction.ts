@@ -328,17 +328,55 @@ class Compactor {
 /** Copy one snapshot's live data into a fresh writable arena. */
 export function compact<T extends Compactable>(snapshot: T): T { return new Compactor().snapshot(snapshot); }
 
+// Bounded lower bound on shared live leaves: identical immutable addresses
+// only, with mismatched tree shapes ignored. False negatives are harmless.
+function mostlyShared(a: Arena, before: number, after: number, required: number): boolean {
+  const dv = a.dv, pending = [before, after];
+  let shared = 0, budget = 4096;
+  while (pending.length && budget-- > 0) {
+    const y = pending.pop()!, x = pending.pop()!;
+    if (!x || !y) continue;
+    if (x === y) {
+      shared += a.wasm.mapSize(x) >>> 0;
+      if (shared >= required) return true;
+      continue;
+    }
+    const xt = dv.getUint32(x, true), yt = dv.getUint32(y, true);
+    if (!xt || !yt || xt === 2 || yt === 2 || xt === 0xffffffff || yt === 0xffffffff) continue;
+    const xb = xt & 0x80000000 ? dv.getUint32(x + 8, true) >>> 16 : dv.getUint32(x + 4, true);
+    const yb = yt & 0x80000000 ? dv.getUint32(y + 8, true) >>> 16 : dv.getUint32(y + 4, true);
+    const common = xb & yb;
+    for (let d = 0; d < 16; d++) if (common & (1 << d)) {
+      pending.push(a.wasm.mapChild(x, d) >>> 0, a.wasm.mapChild(y, d) >>> 0);
+    }
+  }
+  return false;
+}
+const nativeMapDescriptor = SharedMap.prototype.toWorkerData;
+
 /** Compact a group together, retaining shared live blobs and nested snapshots. */
 export function compactMany<T extends Record<keyof T, Compactable> & Record<Extract<keyof T, symbol>, never>>(snapshots: T): Readonly<T> {
   if (Object.getOwnPropertySymbols(snapshots).length) throw new TypeError('Snapshot names must be strings');
   const entries = Object.entries(snapshots) as [string, Compactable][];
   let retainedArena: Arena | undefined;
-  if (entries.length > 1 && entries.every(([, s]) => s instanceof SharedMap && Object.getPrototypeOf(s) === SharedMap.prototype && s.valueType === 'object')) {
+  // Small and two-root histories stay on the packed rebuild path.
+  if (entries.length >= 4 && entries.length <= 64
+    && SharedMap.prototype.toWorkerData === nativeMapDescriptor
+    && entries.every(([, s]) => s instanceof SharedMap && Object.getPrototypeOf(s) === SharedMap.prototype && s.valueType === 'object')) {
     const maps = entries.map(([, s]) => s as SharedMap<'object'>);
     const a = arenaOf(maps[0]);
     if (Object.getPrototypeOf(a) === Arena.prototype && primitiveReadProtocol.hasNativeWasm(a)
-      && maps.every(m => arenaOf(m) === a && (!m.root || a.dv.getUint32(m.root, true) !== 0xffffffff))
-      && new Set(maps.map(m => m.root)).size > 1) retainedArena = a;
+      && !Object.hasOwn(a, 'buf') && !Object.hasOwn(a, 'dv') && !Object.hasOwn(a, 'refresh') && !Object.hasOwn(a, 'leaves')
+      && Object.getOwnPropertyDescriptor(Arena.prototype, 'buf')?.get === primitiveReadProtocol.bytes
+      && Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')?.get === primitiveReadProtocol.view
+      && Arena.prototype.refresh === primitiveReadProtocol.refresh
+      && maps.every(m => arenaOf(m) === a && Number.isSafeInteger(m.root) && m.root >= 65536
+        && m.root + 16 <= a.buf.length && m.size >= 50000 && m.size === (a.wasm.mapSize(m.root) >>> 0)
+        && a.dv.getUint32(m.root, true) !== 0xffffffff)) {
+      const distinct = [...new Map(maps.map(m => [m.root, m])).values()];
+      if (distinct.length >= 4 && distinct.every((m, i) => !i || mostlyShared(a, distinct[i - 1].root, m.root,
+        Math.ceil(Math.max(distinct[i - 1].size, m.size) * .9)))) retainedArena = a;
+    }
   }
   const compactor = new Compactor(retainedArena), result: Record<string, Compactable> = Object.create(null);
   for (const [name, snapshot] of entries) result[name] = compactor.snapshot(snapshot);

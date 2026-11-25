@@ -20,7 +20,7 @@ function prepare(api,n,mode){
  const initial=entriesFor(n);
  let current=new api.SharedMap('object').setMany(initial), expected=new Map(initial.map(([k,v])=>[k,JSON.stringify(v)]));
  const maps=[current], oracle=[expected];
- const revisions=mode==='dense'?1:7;
+ const revisions=mode==='dense'?1:mode==='dense-four'?3:7;
  for(let rev=1;rev<=revisions;rev++){
    expected=new Map(expected);
    let edits=editsFor(n,rev);
@@ -28,13 +28,13 @@ function prepare(api,n,mode){
      const gone=Array.from({length:150},(_,i)=>productId((rev-1)*150+i));
      current=current.deleteMany(gone); for(const k of gone)expected.delete(k);
      edits=Array.from({length:150},(_,i)=>['new/'+rev+'/'+i,product(i,rev)]);
-   }else if(mode==='dense'){
+   }else if(mode==='dense'||mode==='dense-four'){
      edits=Array.from({length:n/2},(_,i)=>[productId(i),product(i,rev)]);
    }
    current=current.setMany(edits); for(const [k,v] of edits)expected.set(k,JSON.stringify(v));
    maps.push(current);oracle.push(expected);
  }
- const revs=mode==='one'?[7]:mode==='two'?[0,7]:mode==='alias-eight'?Array(8).fill(7):mode==='dense'?[0,1]:Array.from({length:8},(_,i)=>i);
+ const revs=mode==='one'?[7]:mode==='two'?[0,7]:mode==='alias-eight'?Array(8).fill(7):mode==='dense'?[0,1]:mode==='dense-four'?[0,1,2,3]:Array.from({length:8},(_,i)=>i);
  return {input:Object.fromEntries(revs.map((r,i)=>['r'+i,maps[r]])),expected:revs.map(r=>oracle[r]),revs};
 }
 function verify(result,owner){
@@ -67,7 +67,7 @@ async function sample(api,n,mode,cohort,pair,arm){
   heapBefore:before.heapUsed,heapAfter:after.heapUsed,rssBefore:before.rss,rssAfter:after.rss,records,verified:true,transportVerified:pair===0};
 }
 for(const n of [10000,100000]){
- for(const mode of ['one','two','eight','alias-eight','churn','dense']){
+ for(const mode of ['one','two','eight','alias-eight','churn','dense','dense-four']){
    for(const cohort of ['AB','AA']){
      const arms=cohort==='AB'?[['base',baseline],['candidate',candidate]]:[['base',baseline],['control',control]];
      for(let pair=-1;pair<(cohort==='AB'?7:3);pair++){
