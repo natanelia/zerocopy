@@ -4,7 +4,7 @@ import { decodeUtf8, encodeUtf8ForWrite } from './utf8';
 import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
-import { freezeParsedJSON } from './freeze-json';
+import { freezeJSON } from './freeze-json';
 export { freezeJSON } from './freeze-json';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
@@ -328,7 +328,15 @@ export class Arena {
       const source = parsed.__a === this.id ? this : this.dependencyLookup.get(parsed.__a);
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
-    } else result = freezeParsedJSON(parsed, text);
+    // A second literal opening delimiter is necessary for any nested JSON
+    // container. Quoted delimiters and whitespace only cause a safe fallback.
+    // Keep short records and common container-ending records on the original
+    // freeze path without a text scan or additional function call.
+    } else if (text.length >= 96 && parsed !== null && typeof parsed === 'object' &&
+      text.charCodeAt(text.length - 2) !== 93 && text.charCodeAt(text.length - 2) !== 125 &&
+      text.indexOf('{', 1) === -1 && text.indexOf('[', 1) === -1) {
+      result = Object.freeze(parsed);
+    } else result = freezeJSON(parsed);
     if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
       this.objectBytes += len;

@@ -18,6 +18,9 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
     { name: 'wide-attributes', size: 1000, queries: 256, shape: 'wide' },
     { name: 'very-wide-control', size: 32, queries: 32, shape: 'very-wide' },
     { name: 'nested-route', size: 10000, queries: 1000, shape: 'route' },
+    { name: 'nested-first-field', size: 10000, queries: 1000, shape: 'route-first' },
+    { name: 'nested-middle-field', size: 10000, queries: 1000, shape: 'route-middle' },
+    { name: 'mixed-map-10k', size: 10000, queries: 1000, shape: 'mixed' },
     { name: 'quoted-brackets', size: 10000, queries: 1000, shape: 'quoted' },
     { name: 'flat-long-message', size: 10000, queries: 1000, shape: 'long' },
     ...['short','feature','route','quoted','long'].flatMap(shape => [
@@ -30,12 +33,18 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
       x: 103.85 + i / 1e6, y: 1.29 + i / 1e6, heading: i % 360, speed: i % 80,
       elevation: i / 17, width: 3.5, revision: 3, active: i % 5 !== 0, name: '道路 ' + i,
       turn: 'none', source: 'survey', verified: true, parent: null, region: 'SG' };
+    if (shape === 'mixed') shape = ['short','feature','route','route-first','route-middle','quoted','long'][i % 7];
     if (shape === 'short') return { id: i, speed: i % 80, active: i % 5 !== 0 };
     if (shape === 'wide' || shape === 'very-wide') {
       for (let k = 0; k < (shape === 'wide' ? 256 : 4096); k++) feature['attr' + k] = i + k;
       return feature;
     }
-    if (shape === 'route') return { ...feature, geometry: { coordinates: Array.from({length: 32}, (_, k) => [feature.x + k / 1e5, feature.y - k / 1e5]) }, tags: ['route', 'mapped'] };
+    if (shape === 'route' || shape === 'route-first' || shape === 'route-middle') {
+      const geometry = { coordinates: Array.from({length: 32}, (_, k) => [feature.x + k / 1e5, feature.y - k / 1e5]) };
+      if (shape === 'route-first') return { geometry, tags: ['route', 'mapped'], ...feature };
+      if (shape === 'route-middle') return { ...feature, geometry, tags: ['route', 'mapped'], tail: 'mapped' };
+      return { ...feature, geometry, tags: ['route', 'mapped'] };
+    }
     if (shape === 'quoted') return { ...feature, name: 'lane [left] {survey} ' + i };
     if (shape === 'long') return { ...feature, description: ('Survey update · 東京 · confirmed speed and lane geometry ').repeat(20) };
     return feature;
@@ -84,7 +93,7 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
       }
     }
     if (map && map.get('missing/record') !== undefined) throw Error('Incorrect missing key');
-    return { attachMs, firstMs, repeatMs, checked: keys.length * 2 };
+    return { attachMs, firstMs, attachAndFirstMs: attachMs + firstMs, repeatMs, checked: keys.length * 2 };
   }
   const browser = typeof window !== 'undefined';
   async function readInWorker(url, payload, workload) {
@@ -134,7 +143,7 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
     }
     const measured = samples.filter(s => s.round >= 0);
     const metrics = {};
-    for (const metric of workload.mode === 'codec' ? ['firstMs','repeatMs'] : ['attachMs','firstMs','repeatMs']) {
+    for (const metric of workload.mode === 'codec' ? ['firstMs','repeatMs'] : ['attachMs','firstMs','attachAndFirstMs','repeatMs']) {
       const a = measured.map(s => s.baseline[metric]), b = measured.map(s => s.candidate[metric]);
       metrics[metric] = { baseline: median(a), candidate: median(b), baselineP95: p95(a), candidateP95: p95(b),
         pairedSpeedup: median(a.map((x,i) => b[i] > 0 ? x/b[i] : 1)),

@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 75
     env:
       BASELINE: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
-      CANDIDATE: da2cca61f34911525a9303cd81e366ea9d4969ac
+      CANDIDATE: ${{ github.event.pull_request.head.sha }}
       PAIRS: '11'
       WARMUPS: '3'
     steps:
@@ -37,7 +37,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@v4
         with:
-          ref: da2cca61f34911525a9303cd81e366ea9d4969ac
+          ref: ${{ github.event.pull_request.head.sha }}
           path: _candidate
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -122,6 +122,20 @@ jobs:
             done
           done
           exit "$failed"
+      - name: Existing website application benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/flat-json-freeze-proof"
+          for build in _baseline _candidate; do
+            (cd "$build"; SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs) 2>&1 | tee "$out/$build-site.log"
+          done
+          for engine in chromium firefox; do
+            BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
+              _baseline _candidate "$out/website-$engine-10k.json" 10000 11 full-shared-get,selective-shared-get,selective-shared-view
+            BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
+              _baseline _candidate "$out/website-$engine-100k.json" 100000 11 full-shared-get
+          done
       - name: Retain raw evidence and logs
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4

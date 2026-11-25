@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { freezeJSON, freezeParsedJSON } from './freeze-json';
+import { freezeJSON } from './freeze-json';
+import { Arena } from './arena';
 import { getCodec } from './codec';
 
 // Inspect descriptors rather than using the production traversal algorithm.
@@ -100,7 +101,7 @@ describe('JSON freezing', () => {
   });
 });
 
-test('freezes every container in parsed text with whitespace, nesting and quoted delimiters', () => {
+test('arena freezes every container in parsed text with whitespace, nesting and quoted delimiters', () => {
   for (const text of [
     '{"x":1,"text":"plain","flag":false,"n":null}', '[-0,null,false,"a"]',
     '[{"nested":[{}]}]', '  {"a":[1]}  ', '{"x":"{","[":[{"y":true}]}',
@@ -108,11 +109,17 @@ test('freezes every container in parsed text with whitespace, nesting and quoted
     JSON.stringify({ text: 'x'.repeat(128), flat: 1 }),
     JSON.stringify({ text: '['.repeat(128), nested: { values: [1, 2] } }),
     JSON.stringify([{ text: 'x'.repeat(128) }]),
+    JSON.stringify({ nested: [1, { x: 2 }], text: 'x'.repeat(128) }),
+    JSON.stringify({ text: 'x'.repeat(128), nested: [1, 2] }),
+    JSON.stringify({ text: '界🙂'.repeat(64), flat: true }),
+    JSON.stringify(['x'.repeat(128), 'y', null]),
     ' '.repeat(100) + '{"__proto__":{"deep":[]}}',
   ]) {
-    const parsed = JSON.parse(text);
-    expect(Object.is(freezeParsedJSON(parsed, text), parsed)).toBe(true);
-    expectDeeplyFrozen(parsed);
-    expect(parsed).toEqual(JSON.parse(text));
+    const arena = new Arena(), bytes = new TextEncoder().encode(text);
+    const ptr = arena.alloc(bytes.length);
+    arena.buf.set(bytes, ptr);
+    const decoded = arena.decodeAt('object', ptr, bytes.length);
+    expectDeeplyFrozen(decoded);
+    expect(decoded).toEqual(JSON.parse(text));
   }
 });

@@ -1,6 +1,6 @@
 import type { Arena } from './arena';
 import { decodeUtf8 } from './utf8';
-import { freezeParsedJSON } from './freeze-json';
+import { freezeJSON } from './freeze-json';
 
 export type JsonScalar = string | number | boolean | null;
 export type JsonViewValue = JsonScalar | JsonView;
@@ -208,9 +208,8 @@ export class JsonView {
    */
   toObject(options: { freeze?: boolean } = {}): any {
     const bytes = this.#bytes;
-    const text = decodeUtf8(decoder, bytes.subarray(this.#start, this.#valueEnd()));
-    const value = JSON.parse(text);
-    return options.freeze === true ? freezeParsedJSON(value, text) : value;
+    const value = JSON.parse(decodeUtf8(decoder, bytes.subarray(this.#start, this.#valueEnd())));
+    return options.freeze === true ? freezeJSON(value) : value;
   }
 
   /** JSON.stringify(view) explicitly materializes the selected value. */

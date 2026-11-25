@@ -1,5 +1,5 @@
 import { decodeUtf8 } from './utf8';
-import { freezeParsedJSON } from './freeze-json';
+import { freezeJSON } from './freeze-json';
 // Shared codec utilities for encoding/decoding values
 import type { ValueOf, PrimitiveType } from './types.ts';
 import { parseNestedType } from './types.ts';
@@ -44,10 +44,7 @@ export const codecs: Record<PrimitiveType, Codec<any>> = {
   object: {
     size: (v: object) => strLen(JSON.stringify(v)),
     encode: (v: object, buf: Uint8Array, ptr: number) => encoder.encodeInto(JSON.stringify(v), buf.subarray(ptr)).written!,
-    decode: (buf: Uint8Array, ptr: number, len: number) => {
-      const text = decodeUtf8(decoder, buf.subarray(ptr, ptr + len));
-      return freezeParsedJSON(JSON.parse(text), text);
-    },
+    decode: (buf: Uint8Array, ptr: number, len: number) => freezeJSON(JSON.parse(decodeUtf8(decoder, buf.subarray(ptr, ptr + len)))),
   },
 };
 
