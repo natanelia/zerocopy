@@ -1007,5 +1007,6 @@ export class Arena {
 export const primitiveReadProtocol = Object.freeze({
   decode: Arena.prototype.decode, view: Object.getOwnPropertyDescriptor(Arena.prototype, 'dv')!.get,
   bytes: Object.getOwnPropertyDescriptor(Arena.prototype, 'buf')!.get, hasNativeWasm: Arena.hasNativeWasm,
+  leaves: Arena.prototype.leaves,
   refresh: Arena.prototype.refresh, owner: Object.getOwnPropertyDescriptor(Snapshot.prototype, 'arena')!.get,
 });
