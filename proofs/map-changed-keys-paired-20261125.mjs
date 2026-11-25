@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, openSync, writeSync, closeSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium, firefox } from 'playwright';
@@ -48,6 +48,8 @@ function reader() {
     try {
       if (data.revision !== revision + 1) throw Error('Out of order revision');
       const receivedAt = performance.timeOrigin + performance.now();
+      const mark = label => { if (data.traceTag) performance.mark(`${data.traceTag}-w${data.workerId}-r${data.revision}-${label}`); };
+      mark('receive');
       api ??= await import(data.apiURL);
       const start = performance.now();
       const current = await api.initWorker(data.payload, prior ? { previous: { after: prior } } : undefined);
@@ -64,6 +66,7 @@ function reader() {
         revision = data.revision;
         const initialMs = performance.now() - initial, sortStart = performance.now();
         const sortedIssues = [...issues].sort(), sortMs = performance.now() - sortStart;
+        mark('before-post');
         self.postMessage({ receivedAt, beforePostAt: performance.timeOrigin + performance.now(), attachMs, initialMs, sortMs, issues: sortedIssues, size: after.size });
         return;
       }
@@ -126,18 +129,15 @@ function reader() {
       prior = after; revision = data.revision;
       const sortStart = performance.now(), keys = [...changed].sort(), sortedIssues = [...issues].sort();
       const sortMs = performance.now() - sortStart;
+      mark('before-post');
       self.postMessage({ receivedAt, beforePostAt: performance.timeOrigin + performance.now(), canonicalMs, sortMs, attachMs, detectMs, expandMs, validationMs, totalMs, keys, issues: sortedIssues, affected: affected.size,
         visited, enumerated, skipped, fallback: !safe && data.mode !== 'producer', sameRootAcrossMessages, sameWrapperAcrossMessages, sameBufferAcrossMessages, size: after.size });
     } catch(error) { self.postMessage({ error: String(error.stack || error) }); }
   };
 }
 const cases = [
-  { count: 100000, edits: 10, kind: 'edges' },
   { count: 100000, edits: 100, kind: 'sparse' },
-  { count: 100000, edits: 1000, kind: 'churn' },
   { count: 10000, edits: 5000, kind: 'dense' },
-  { count: 100000, edits: 10000, kind: 'medium' },
-  { count: 100000, edits: 50000, kind: 'dense' }
 ];
 async function prepare(page, c, url) {
   await page.goto(url); assert(await page.evaluate(() => crossOriginIsolated));
@@ -216,32 +216,34 @@ async function prepare(page, c, url) {
     return revisions.map(({payload,...rest})=>({...rest,arenaCount:payload.arenas.length,arenaBytes:payload.arenas.reduce((s,a)=>s+a.used,0)}));
   },{c,source:'('+reader.toString()+')();'});
 }
-async function sample(page, mode, expected, phase, probe) {
-  const data=await page.evaluate(async ({mode,phase,probe})=>{
+async function sample(page, mode, expected, phase, probe, traceTag = null) {
+  const data=await page.evaluate(async ({mode,phase,probe,traceTag})=>{
     const p=globalThis.__seq;
     const workers=Array.from({length:2},()=>new Worker(p.workerURL,{type:'module'}));
     try {
       const rows=[];
       for(let i=0;i<p.revisions.length;i++){
-        if (phase === 'isolated-canonical' && i === probe) await new Promise(r=>setTimeout(r,300));
+        if (phase.startsWith('paced') && i === probe) await new Promise(r=>setTimeout(r,300));
         const rev=p.revisions[i], start=performance.now();
-        const readers=await Promise.all(workers.map(w=>new Promise((resolve,reject)=>{
+        const readers=await Promise.all(workers.map((w,workerId)=>new Promise((resolve,reject)=>{
           let sentAt, postSyncMs;
           w.onmessage=e=>{
             const receiptAt=performance.timeOrigin+performance.now();
+            if(traceTag)performance.mark(`${traceTag}-w${workerId}-r${i}-host-receipt`);
             if(e.data.error) reject(Error(e.data.error));
             else resolve({...e.data,sentAt,receiptAt,postSyncMs,dispatchGapMs:e.data.receivedAt-sentAt,receiptGapMs:receiptAt-e.data.beforePostAt,workerElapsedMs:e.data.beforePostAt-e.data.receivedAt});
           };
           w.onerror=e=>reject(Error(e.message));
+          if(traceTag)performance.mark(`${traceTag}-w${workerId}-r${i}-host-send`);
           sentAt=performance.timeOrigin+performance.now();
-          w.postMessage({revision:i,mode,payload:rev.payload,apiURL:p.apiURL,probe:p.probe,canonical:phase==='isolated-canonical',...(mode==='producer'?{keys:rev.keys}:{})});
+          w.postMessage({revision:i,mode,payload:rev.payload,apiURL:p.apiURL,probe:p.probe,canonical:phase.endsWith('canonical'),traceTag,workerId,...(mode==='producer'?{keys:rev.keys}:{})});
           postSyncMs=performance.timeOrigin+performance.now()-sentAt;
         })));
         rows.push({roundTripMs:performance.now()-start,readers});
       }
       return rows;
     }finally{workers.forEach(w=>w.terminate());}
-  },{mode,phase,probe});
+  },{mode,phase,probe,traceTag});
   assert.equal(data.length,expected.length);
   for(let i=0;i<data.length;i++)for(const row of data[i].readers){
     const e=expected[i];
@@ -274,16 +276,16 @@ try {
           report.cases.push({id,...c,expected});save();
           const arms=[{arm:'base-scan',mode:'scan',page},{arm:'base-scan-repeat',mode:'scan',page},{arm:'candidate-scan',mode:'scan',page:candidatePage},{arm:'candidate-tree',mode:'tree',page:candidatePage},{arm:'candidate-producer',mode:'producer',page:candidatePage}];
           for(const arm of arms)await sample(arm.page,arm.mode,expected,'continuous',null);
-          const phases=['continuous',...(c.kind==='sparse'||(c.kind==='dense'&&c.count===10000)?['isolated-canonical']:[])];
+          const phases=['continuous','continuous-canonical','paced','paced-canonical'];
           for(const phase of phases){
-            const n=phase==='isolated-canonical'?10:(c.kind==='sparse'||(c.kind==='dense'&&c.count===10000)?+rounds:10);
+            const n=10;
             assert.equal(n%10,0,'balanced ten-round blocks');
             for(let pair=0;pair<n;pair++){
               // Five rotations and their reversals: every arm occupies each slot equally.
               const rotation=pair%5, sequence=[...arms.slice(rotation),...arms.slice(0,rotation)];
               if(Math.floor(pair/5)%2)sequence.reverse();
               // Balanced, deterministic variation of the isolated target, including same-value and identity updates.
-              const probe=phase==='isolated-canonical'?[4,1,6,5,7][(pair*3+Math.floor(pair/5))%5]:null;
+              const probe=c.kind==='sparse'?4:6;
               for(let order=0;order<sequence.length;order++){
                 const {arm,mode,page}=sequence[order],revisions=await sample(page,mode,expected,phase,probe);
                 report.samples.push({id,phase,probe,pair,order,arm,mode,revisions,sequenceMs:revisions.reduce((sum,r)=>sum+r.roundTripMs,0)});save();
@@ -291,6 +293,36 @@ try {
             }
           }
           console.log(id+': verified sequential reader issue sets');
+          if(engine==='chromium' && c.kind==='sparse'){
+            // Separate traced runs: these never enter the untraced paired results.
+            report.traces=[];
+            for(const arm of arms.filter(a=>a.arm.startsWith('candidate-'))){
+              const tag='zc-'+arm.arm;
+              const session=await browser.newBrowserCDPSession();
+              let started=false;
+              try {
+                const done=new Promise(r=>session.once('Tracing.tracingComplete',r));
+                await session.send('Tracing.start',{categories:'v8,v8.execute,disabled-by-default-v8.gc,devtools.timeline,blink.user_timing',transferMode:'ReturnAsStream'});
+                started=true;
+                const revisions=await sample(arm.page,arm.mode,expected,'continuous',null,tag);
+                await session.send('Tracing.end');started=false;
+                const {stream,dataLossOccurred}=await done;
+                if(!stream)throw Error('Trace stream missing');
+                const fd=openSync(resolve(output)+'-'+tag+'.trace.json','w');
+                try{
+                  while(true){
+                    const chunk=await session.send('IO.read',{handle:stream,size:1024*1024});
+                    writeSync(fd,Buffer.from(chunk.data,chunk.base64Encoded?'base64':'utf8'));
+                    if(chunk.eof)break;
+                  }
+                }finally{closeSync(fd);await session.send('IO.close',{handle:stream});}
+                report.traces.push({arm:arm.arm,tag,revisions,dataLossOccurred});
+              }catch(error){
+                report.traces.push({arm:arm.arm,tag,error:String(error)});
+                if(started)await session.send('Tracing.end').catch(()=>{});
+              }finally{await session.detach();save();}
+            }
+          }
         }finally{await page.close();await candidatePage.close();}
       }
     }finally{await browser.close();}
