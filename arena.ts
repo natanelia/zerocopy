@@ -338,7 +338,8 @@ export class Arena {
     if (!len) return '';
     const cached = this.strings.get(ptr);
     if (cached !== undefined) return cached;
-    this.refresh();
+    // Published bytes remain readable in the old shared view after growth.
+    if (ptr + len > this.bytes.length) this.refresh();
     let value = '';
     if (len <= 32) {
       for (let i = 0; i < len; i++) {
@@ -538,7 +539,7 @@ export class Arena {
     else if (token.ptr === undefined) token.ptr = this.view.getUint32(0, true) + 16;
     return next;
   }
-  leafKey(p: number): string { return this.string(p + 16, this.dv.getUint32(p + 8, true)); }
+  leafKey(p: number, dv: DataView = this.dv): string { return this.string(p + 16, dv.getUint32(p + 8, true)); }
   leafValue(type: string, p: number, prefix = 0, dv: DataView = this.dv): any {
     const ptr = p + 16 + dv.getUint32(p + 8, true) + prefix;
     if (type === 'number') return dv.getFloat64(ptr, true);
@@ -800,21 +801,22 @@ export class Arena {
   }
 
   *leaves(root: number): Generator<number> {
-    // Each iterator owns its continuation. No shared stack or scratch survives yield.
-    if (root && this.dv.getUint32(root, true) === 0xffffffff) {
-      const n = this.dv.getUint32(root + 12, true), base = this.dv.getUint32(root + 4, true);
-      for (let i = 0; i < n; i++) yield this.dv.getUint32(root + 16 + i * 4, true);
+    if (!root) return;
+    // Published nodes fit this view even if the arena grows between yields.
+    const dv = this.dv;
+    if (dv.getUint32(root, true) === 0xffffffff) {
+      const n = dv.getUint32(root + 12, true), base = dv.getUint32(root + 4, true);
+      for (let i = 0; i < n; i++) yield dv.getUint32(root + 16 + i * 4, true);
       for (const leaf of this.leaves(base)) {
-        const dv = this.dv;
         if (!this.wasm.journalFind(root, leaf + 16, dv.getUint32(leaf + 8, true), dv.getUint32(leaf + 4, true))) yield leaf;
       }
       return;
     }
-    const stack = root ? [root] : [];
+    const stack = [root];
     // These two small work arrays belong to this iterator, not shared memory.
     const lanes = new Uint32Array(16), patches: number[] = [];
     while (stack.length) {
-      const p = stack.pop()!, dv = this.dv, tag = dv.getUint32(p, true);
+      const p = stack.pop()!, tag = dv.getUint32(p, true);
       if (tag === 0) { yield p; continue; }
       if (tag & 0x80000000) {
         const bitmap = dv.getUint32(p + 8, true) >>> 16;

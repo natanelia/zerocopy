@@ -73,10 +73,15 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     return root === this.root ? this : new SharedMap(this.valueType, root, undefined, a);
   }
   *entries(): Generator<[string, ValueOf<T>]> {
-    const a = this.arena;
-    for (const leaf of a.leaves(this.root)) yield [a.leafKey(leaf), a.leafValue(this.valueType, leaf)];
+    if (!this.root) return;
+    const a = this.arena, view = a.dv;
+    for (const leaf of a.leaves(this.root)) yield [a.leafKey(leaf, view), a.leafValue(this.valueType, leaf, 0, view)];
   }
-  *keys(): Generator<string> { const a = this.arena; for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf); }
+  *keys(): Generator<string> {
+    if (!this.root) return;
+    const a = this.arena, view = a.dv;
+    for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf, view);
+  }
   *values(): Generator<ValueOf<T>> {
     if (!this.root) return;
     const a = this.arena, view = a.dv;
@@ -84,7 +89,11 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     // even when a consumer pauses iteration to create another snapshot.
     for (const leaf of a.leaves(this.root)) yield a.leafValue(this.valueType, leaf, 0, view);
   }
-  forEach(fn: (value: ValueOf<T>, key: string) => void): void { const a = this.arena; for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf), a.leafKey(leaf)); }
+  forEach(fn: (value: ValueOf<T>, key: string) => void): void {
+    if (!this.root) return;
+    const a = this.arena, view = a.dv;
+    for (const leaf of a.leaves(this.root)) fn(a.leafValue(this.valueType, leaf, 0, view), a.leafKey(leaf, view));
+  }
   toWorkerData() { return Object.freeze({ root: this.root, valueType: this.valueType, size: this.size }); }
   static fromWorkerData<T extends string>(root: number, valueType: T, size?: number, source: Arena = defaultArena()): SharedMap<T> {
     return new SharedMap(valueType, root, size, source);

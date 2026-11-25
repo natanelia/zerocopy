@@ -41,6 +41,7 @@ class Compactor {
   readonly target = new Arena();
   private readonly snapshots = new Map<string, Compactable>();
   private readonly pointers = new Map<string, number>();
+  declare private mapLeafPointers?: Map<string, Map<number, number>>;
   declare private heapPointers?: Map<string, Map<number, number>>;
   private key(a: Arena, kind: string, p: number): string { return `${a.id}:${kind}:${p}`; }
   private bytes(a: Arena, start: number, length: number): number {
@@ -70,6 +71,42 @@ class Compactor {
     if (prefix) this.target.dv.setUint32(p + 16 + keyLen, ordinal, true);
     this.target.buf.set(value, p + 16 + keyLen + prefix);
     this.pointers.set(key, p); return p;
+  }
+  private rawMapLeaves(a: Arena, type: string, sourceLeaves: Iterable<number>): number[] | undefined {
+    const identity = this.key(a, `map/${type}`, 0), groups = this.mapLeafPointers ??= new Map();
+    let moved = groups.get(identity);
+    if (!moved) groups.set(identity, moved = new Map());
+    const source = a.buf, view = a.dv;
+    const leaves: number[] = [], lengths: number[] = [];
+    let total = 0;
+    for (const leaf of sourceLeaves) {
+      const saved = moved.get(leaf);
+      if (saved !== undefined) {
+        leaves.push(saved); lengths.push(0);
+        continue;
+      }
+      const length = 16 + view.getUint32(leaf + 8, true) + view.getUint32(leaf + 12, true);
+      // Typed-array subarray clamps to the buffer. Check the entire record
+      // before using its header and bytes directly.
+      if (leaf + length > source.length) return undefined;
+      leaves.push(leaf); lengths.push(length);
+      total += Math.ceil(length / 4) * 4;
+    }
+    if (total) {
+      // Reserve one span with the same four-byte alignment as individual leaves.
+      let destination = this.target.wasm.mapLeaf(0, total - 16) >>> 0;
+      const target = this.target.buf;
+      for (let i = 0; i < leaves.length; i++) {
+        const length = lengths[i];
+        if (!length) continue; // An earlier snapshot already copied this leaf.
+        const leaf = leaves[i];
+        target.set(source.subarray(leaf, leaf + length), destination);
+        moved.set(leaf, destination);
+        leaves[i] = destination;
+        destination += Math.ceil(length / 4) * 4;
+      }
+    }
+    return leaves;
   }
   private index(leaves: number[], sorted: boolean): number {
     if (!leaves.length) return 0;
@@ -185,8 +222,13 @@ class Compactor {
     const type = d.valueType ?? d.type ?? 'number';
     let next: any;
     if (kind === 'SharedMap' || kind === 'SharedSet' || kind === 'SharedSortedMap' || kind === 'SharedSortedSet') {
-      const sorted = kind === 'SharedSortedMap' || kind === 'SharedSortedSet', leaves: number[] = [];
-      for (const leaf of sorted ? a.radixLeaves(d.root) : a.leaves(d.root)) leaves.push(this.leaf(a, type, leaf));
+      const sorted = kind === 'SharedSortedMap' || kind === 'SharedSortedSet';
+      const sourceLeaves = () => sorted ? a.radixLeaves(d.root) : a.leaves(d.root);
+      let leaves = d.root && !parseNestedType(type) ? this.rawMapLeaves(a, type, sourceLeaves()) : undefined;
+      if (!leaves) {
+        leaves = [];
+        for (const leaf of sourceLeaves()) leaves.push(this.leaf(a, type, leaf));
+      }
       next = { ...d, root: this.index(leaves, sorted), size: leaves.length };
     } else if (kind === 'SharedOrderedMap' || kind === 'SharedOrderedSet') {
       const order: number[] = [], leaves: number[] = []; let p = d.head, head = 0;
