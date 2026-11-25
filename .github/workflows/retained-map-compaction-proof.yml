@@ -1,0 +1,45 @@
+name: Retained map compaction baseline (temporary proof)
+on:
+  push:
+    branches: [proof/retained-map-compaction-20261125]
+permissions:
+  contents: read
+jobs:
+  baseline:
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - run: bun run build:wasm && bun run build:browser
+      - name: Measure unchanged runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p retained-compaction-results
+          if [ "${{ matrix.runtime }}" = node ]; then
+            node --expose-gc proofs/retained-map-compaction-20261125.mjs retained-compaction-results/node.json | tee retained-compaction-results/run.log
+          else
+            bun proofs/retained-map-compaction-20261125.mjs retained-compaction-results/bun.json | tee retained-compaction-results/run.log
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: retained-compaction-${{ matrix.runtime }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: retained-compaction-results/
+          retention-days: 14
+          if-no-files-found: error
