@@ -1,0 +1,98 @@
+name: Catalog construction profile (experimental)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'proofs/catalog-build-profile-20261125.mjs'
+      - '.github/workflows/catalog-build-profile.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-build-profile-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  profile:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'experiment/catalog-build-profile-20261125'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASELINE: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+          path: _baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build pinned baseline and record environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/catalog-build-profile"
+          mkdir -p "$out"
+          test "$(git -C _baseline rev-parse HEAD)" = "$BASELINE"
+          cmp package.json _baseline/package.json
+          cmp rust-toolchain.toml _baseline/rust-toolchain.toml
+          bun install
+          ln -s "$GITHUB_WORKSPACE/node_modules" _baseline/node_modules
+          {
+            echo "harness=$(git rev-parse HEAD)"
+            echo "baseline=$BASELINE"
+            node --version
+            bun --version
+            rustc --version
+            uname -a
+            lscpu
+            sha256sum proofs/catalog-build-profile-20261125.mjs
+            if [ -f bun.lock ]; then sha256sum bun.lock; fi
+          } > "$out/environment.txt"
+          if [ -f bun.lock ]; then cp bun.lock "$out/"; fi
+          (
+            cd _baseline
+            bun run build:wasm
+            bun run build:browser
+            npm --prefix website install --ignore-scripts --no-package-lock
+            SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs
+            sha256sum dist/*.js *.wasm website/node_modules/marked/lib/marked.esm.js
+          ) 2>&1 | tee "$out/build.log"
+      - name: Install browsers
+        run: bunx playwright install --with-deps chromium firefox
+      - name: Diagnostic stage timings and construction CPU profiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-build-profile-20261125.mjs _baseline "$RUNNER_TEMP/catalog-build-profile/stages" 7
+      - name: Unmodified two-worker application timing controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/catalog-build-profile"
+          for engine in chromium firefox; do
+            for count in 1000 10000 100000; do
+              BROWSER="$engine" timeout --signal=TERM --kill-after=15s 360s node proofs/catalog-perf-20261121/website.mjs \
+                _baseline _baseline "$out/website-$engine-$count-aa.json" "$count" 7 full-shared-get
+            done
+          done
+      - name: Retain raw profiles, timings and build logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-build-profile-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/catalog-build-profile/
+          retention-days: 30
+          if-no-files-found: warn
