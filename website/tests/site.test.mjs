@@ -78,7 +78,7 @@ test('docs are prerendered and search points to generated pages', () => {
 });
 test('the introduction identifies the library and leads into a two-file worker example', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  const intro = home.slice(home.indexOf('<div class="city-intro">'), home.indexOf('<figure class="city-example">'));
+  const intro = home.slice(home.indexOf('<div class="product-intro">'), home.indexOf('<figure class="worker-example"'));
   assert.match(intro, /Immutable collections for Node\.js workers/);
   assert.match(intro, /JavaScript and TypeScript library for sharing maps, lists, and sets across workers/);
   assert.ok(intro.includes('npm i zerocopy'));

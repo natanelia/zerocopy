@@ -2,7 +2,7 @@
 
 A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
 
-The Singapore homepage animation models a proposed western housing district and three independent reads of one city snapshot. Its timeline, housing layers, and worker states are simulated in the DOM. The catalog comparison and benchmark pages run actual workers. The hero uses the completed scene with JavaScript disabled or reduced motion enabled. Bun defaults to copy transport.
+The homepage leads with a runnable two-file Node.js example. A disclosure below the storage model opens a separate Singapore simulation. The illustration loads on opening, and each press of “Next step” advances a worker job. Without JavaScript, the disclosure links to the static island model. The catalog comparison and benchmark pages run actual workers.
 
 ## Local development
 

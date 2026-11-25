@@ -1,4 +1,58 @@
-import "./city-motion.mjs";
+import { notify } from './main.mjs';
+import { setupCityDemo } from './city-demo.mjs';
+
+setupCityDemo(document.querySelector('.city-demo'));
+
+const intro = document.querySelector('.product-intro');
+const copy = intro.querySelector('.copy-install');
+copy.hidden = false;
+copy.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(intro.querySelector('.install-command code').textContent);
+    notify('Install command copied.');
+  } catch {
+    notify('Select the install command to copy it.');
+  }
+});
+
+// Keep the headline independent of the opt-in demo and pause it offscreen.
+const word = intro.querySelector('.runtime-word');
+const control = intro.querySelector('.runtime-control');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const names = ['Node.js', 'Browser', 'Bun'];
+let runtime = 0;
+let timer;
+let visible = false;
+let paused = false;
+function syncRuntime() {
+  clearInterval(timer);
+  control.hidden = reduced.matches;
+  if (reduced.matches) {
+    runtime = 0;
+    word.textContent = names[runtime];
+  } else if (visible && !document.hidden && !paused) {
+    timer = setInterval(() => {
+      runtime = (runtime + 1) % names.length;
+      word.textContent = names[runtime];
+    }, 6500);
+  }
+}
+control.addEventListener('click', () => {
+  paused = !paused;
+  control.setAttribute('aria-label', paused ? 'Resume rotating runtime name' : 'Pause rotating runtime name');
+  control.title = control.getAttribute('aria-label');
+  control.querySelector('.pause-icon').toggleAttribute('hidden', paused);
+  control.querySelector('.play-icon').toggleAttribute('hidden', !paused);
+  syncRuntime();
+});
+new IntersectionObserver(([entry]) => {
+  visible = entry.isIntersecting;
+  syncRuntime();
+}).observe(intro);
+reduced.addEventListener('change', syncRuntime);
+document.addEventListener('visibilitychange', syncRuntime);
+syncRuntime();
+
 const card = document.querySelector('.sharing-card');
 const range = document.querySelector('#worker-count');
 let mode = 'shared';
