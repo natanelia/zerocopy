@@ -8,10 +8,10 @@ import { pathToFileURL } from 'node:url';
 
 // The same public API and fixtures run in both builds and all engines.
 // Setup and result validation are outside local read timings.
-async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }) {
-  const urls = [baseline, candidate];
+async function benchmark({ baseline, candidate, control, selected, pairs, warmups, copyAttachment }) {
+  const urls = control ? [baseline, candidate, control] : [baseline, candidate];
   const builds = await Promise.all(urls.map(path => import(path + 'shared.js')));
-  const cases = [
+  const allCases = [
     { name: 'flat-short', size: 1000, queries: 1000, shape: 'short' },
     { name: 'flat-feature-10k', size: 10000, queries: 1000, shape: 'feature' },
     { name: 'flat-feature-100k', size: 100000, queries: 10000, shape: 'feature' },
@@ -28,6 +28,8 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
       { name: 'direct-codec-' + shape, size: 1000, queries: 1000, shape, mode: 'codec' },
     ]),
   ];
+  const cases = selected ? allCases.filter(c => selected.includes(c.name)) : allCases;
+  if (selected && cases.length !== selected.length) throw Error('Unknown or duplicate proof case');
   function row(shape, i) {
     const feature = { id: i, tile: 'tile/' + Math.floor(i / 1000), kind: i % 2 ? 'lane' : 'boundary',
       x: 103.85 + i / 1e6, y: 1.29 + i / 1e6, heading: i % 360, speed: i % 80,
@@ -119,28 +121,36 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
   const median = values => { const a = [...values].sort((x,y) => x-y); return (a[(a.length-1)>>1] + a[a.length>>1])/2; };
   const p95 = values => [...values].sort((a,b) => a-b)[Math.ceil(values.length*.95)-1];
   const rows = [];
-  for (const workload of cases) {
+  for (const [caseIndex, workload] of cases.entries()) {
     const { size, shape } = workload;
     const entries = Array.from({length: size}, (_, i) => ['feature/' + i, row(shape,i)]);
-    const payloads = workload.mode === 'codec' ? [null, null] : builds.map(api => {
+    const payloads = workload.mode === 'codec' ? urls.map(() => null) : builds.map(api => {
       api.resetMap();
       const map = new api.SharedMap('object').setMany(entries);
       return api.getWorkerData({ map }, { copy: copyAttachment });
     });
-    const samples = [];
+    const comparisons = control ? [{ variant: 'aa', other: 2, samples: [] }, { variant: 'ab', other: 1, samples: [] }] : [{ variant: 'ab', other: 1, samples: [] }];
     // Larger, balanced samples for the suspected regressions and new callers.
     const casePairs = workload.name === 'flat-feature-100k' || workload.name === 'flat-feature-10k' || workload.name === 'very-wide-control'
       ? pairs : Math.max(pairs, 22);
     for (let round = -warmups; round < casePairs; round++) {
-      const order = ((round + warmups + rows.length) & 1) ? [1,0] : [0,1];
-      const sample = { round, order: order.map(i => i ? 'candidate' : 'baseline') };
-      for (const i of order) {
-        sample[i ? 'candidate' : 'baseline'] = browser
-          ? await readInWorker(urls[i], payloads[i], workload)
-          : await measure(builds[i], payloads[i], workload, urls[i]);
+      // Interleave independent A/A and A/B pairs on the same process/runner.
+      // Four-round blocks balance both comparison order and within-pair order.
+      const phase = (round + warmups + caseIndex) & 3;
+      const ordered = (phase & 1) ? [...comparisons].reverse() : comparisons;
+      for (const comparison of ordered) {
+        const order = ((phase >> 1) ^ (comparison.variant === 'aa' ? 1 : 0))
+          ? [comparison.other, 0] : [0, comparison.other];
+        const sample = { round, comparisonOrder: ordered.map(c => c.variant), order: order.map(i => i ? 'candidate' : 'baseline') };
+        for (const i of order) {
+          sample[i ? 'candidate' : 'baseline'] = browser
+            ? await readInWorker(urls[i], payloads[i], workload)
+            : await measure(builds[i], payloads[i], workload, urls[i]);
+        }
+        comparison.samples.push(sample);
       }
-      samples.push(sample);
     }
+    for (const { variant, samples } of comparisons) {
     const measured = samples.filter(s => s.round >= 0);
     const metrics = {};
     for (const metric of workload.mode === 'codec' ? ['firstMs','repeatMs'] : ['attachMs','firstMs','attachAndFirstMs','repeatMs']) {
@@ -149,7 +159,8 @@ async function benchmark({ baseline, candidate, pairs, warmups, copyAttachment }
         pairedSpeedup: median(a.map((x,i) => b[i] > 0 ? x/b[i] : 1)),
         fasterPairs: a.filter((x,i) => x > b[i]).length };
     }
-    rows.push({ ...workload, pairs: casePairs, metrics, samples });
+    rows.push({ ...workload, variant, pairs: casePairs, metrics, samples });
+    }
   }
   return { pairs, warmups, attachment: copyAttachment ? 'copied' : 'shared', execution: browser ? 'fresh worker' : 'fresh local reader', rows };
 }
@@ -164,6 +175,8 @@ if ((engine === 'bun') !== Boolean(process.versions.bun)) {
   throw new Error('Use the requested Node or Bun runtime to invoke the driver');
 }
 const roots = { baseline: resolve(baselinePath), candidate: resolve(candidatePath) };
+if (process.env.CONTROL_DIST) roots.control = resolve(process.env.CONTROL_DIST);
+const selected = process.env.PROOF_CASES?.split(',');
 // Bundle the internal codec independently with the same installed Bun version.
 // Both A/A directories resolve the same source; each A/B directory resolves its pinned checkout.
 for (const root of Object.values(roots)) {
@@ -179,7 +192,8 @@ const meta = { cpu: cpus()[0].model, architecture: process.arch, platform: proce
 if (engine === 'node' || engine === 'bun') {
   const result = await benchmark({
     baseline: pathToFileURL(roots.baseline + '/').href,
-    candidate: pathToFileURL(roots.candidate + '/').href, pairs, warmups,
+    candidate: pathToFileURL(roots.candidate + '/').href,
+    control: roots.control ? pathToFileURL(roots.control + '/').href : undefined, selected, pairs, warmups,
     copyAttachment: engine === 'bun',
   });
   console.log(JSON.stringify({ runtime: engine + ' ' + (process.versions.bun ?? process.versions.node), ...meta, ...result }, null, 2));
@@ -191,7 +205,7 @@ if (engine === 'node' || engine === 'bun') {
     if (req.url === '/') {
       res.setHeader('Content-Type', 'text/html'); res.end('<!doctype html><title>Flat JSON read benchmark</title>'); return;
     }
-    const match = /^\/(baseline|candidate)\/([\w.-]+\.js)$/.exec(req.url);
+    const match = /^\/(baseline|candidate|control)\/([\w.-]+\.js)$/.exec(req.url);
     try {
       if (!match) throw new Error('Unknown module');
       res.setHeader('Content-Type', 'application/javascript');
@@ -207,7 +221,8 @@ if (engine === 'node' || engine === 'bun') {
       await page.goto(origin);
       if (!await page.evaluate(() => crossOriginIsolated)) throw new Error('Shared memory requires an isolated page');
       const result = await page.evaluate(benchmark, {
-        baseline: origin + '/baseline/', candidate: origin + '/candidate/', pairs, warmups, copyAttachment: false,
+        baseline: origin + '/baseline/', candidate: origin + '/candidate/',
+        control: roots.control ? origin + '/control/' : undefined, selected, pairs, warmups, copyAttachment: false,
       });
       console.log(JSON.stringify({ runtime: engine + ' ' + browser.version(), ...meta, ...result }, null, 2));
     } finally { await browser.close(); }

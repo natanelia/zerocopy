@@ -101,25 +101,21 @@ jobs:
           } 2>&1 | tee "$RUNNER_TEMP/flat-json-freeze-proof/correctness.log"
       - name: Install browsers
         run: bunx playwright install --with-deps chromium firefox
-      - name: Run identical-build controls and paired comparisons sequentially
+      - name: Interleaved targeted A/A and A/B controls
         shell: bash
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/flat-json-freeze-proof"
           failed=0
-          for engine in node bun chromium firefox; do
-            driver=node
-            if [ "$engine" = bun ]; then driver=bun; fi
-            for variant in aa ab; do
-              other=_baseline/dist-control
-              if [ "$variant" = ab ]; then other=_candidate/dist; fi
-              status=0
-              timeout --signal=TERM --kill-after=15s 480s "$driver" proofs/flat-json-freeze.mjs \
-                _baseline/dist "$other" "$engine" "$PAIRS" "$WARMUPS" \
-                > "$out/$engine-$variant.json" 2> "$out/$engine-$variant.stderr" || status=$?
-              echo "$engine $variant exit=$status" | tee -a "$out/exit-status.txt"
-              if [ "$status" -ne 0 ]; then failed=1; fi
-            done
+          for engine in node chromium firefox; do
+            status=0
+            CONTROL_DIST=_baseline/dist-control \
+            PROOF_CASES=flat-feature-100k,nested-first-field,quoted-brackets,view-frozen-route,mixed-map-10k \
+              timeout --signal=TERM --kill-after=15s 600s node proofs/flat-json-freeze.mjs \
+                _baseline/dist _candidate/dist "$engine" 32 4 \
+                > "$out/$engine-interleaved.json" 2> "$out/$engine-interleaved.stderr" || status=$?
+            echo "$engine interleaved exit=$status" | tee -a "$out/exit-status.txt"
+            if [ "$status" -ne 0 ]; then failed=1; fi
           done
           exit "$failed"
       - name: Existing website application benchmark
@@ -127,14 +123,22 @@ jobs:
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/flat-json-freeze-proof"
+          cmp _baseline/website/package.json _candidate/website/package.json
           for build in _baseline _candidate; do
+            npm --prefix "$build/website" install --ignore-scripts --no-package-lock 2>&1 | tee "$out/$build-site-install.log"
             (cd "$build"; SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs) 2>&1 | tee "$out/$build-site.log"
           done
+          diff -qr _baseline/website/node_modules/marked _candidate/website/node_modules/marked
+          sha256sum _baseline/website/node_modules/marked/lib/marked.esm.js _candidate/website/node_modules/marked/lib/marked.esm.js > "$out/website-dependency-fingerprint.txt"
           for engine in chromium firefox; do
             BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
               _baseline _candidate "$out/website-$engine-10k.json" 10000 11 full-shared-get,selective-shared-get,selective-shared-view
             BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
               _baseline _candidate "$out/website-$engine-100k.json" 100000 11 full-shared-get
+            BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
+              _baseline _baseline "$out/website-$engine-10k-aa.json" 10000 11 full-shared-get,selective-shared-get,selective-shared-view
+            BROWSER="$engine" timeout --signal=TERM --kill-after=15s 600s node proofs/catalog-perf-20261121/website.mjs \
+              _baseline _baseline "$out/website-$engine-100k-aa.json" 100000 11 full-shared-get
           done
       - name: Retain raw evidence and logs
         if: ${{ !cancelled() }}
