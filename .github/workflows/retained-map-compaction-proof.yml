@@ -1,21 +1,21 @@
-name: Retained map compaction baseline (temporary proof)
+name: Retained map compaction paired screen (temporary proof)
 on:
   push:
     branches: [proof/retained-map-compaction-20261125]
 permissions:
   contents: read
 jobs:
-  baseline:
+  paired:
     strategy:
       fail-fast: false
       matrix:
         runtime: [node, bun]
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 3
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -25,16 +25,28 @@ jobs:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
       - run: bun install --frozen-lockfile
-      - run: bun run build:wasm && bun run build:browser
-      - name: Measure unchanged runtime
+      - name: Build pinned baseline and candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only 76ab6b53aa0d3b40202720ca12d9fcc904716cf2 HEAD
+          cp compaction.ts /tmp/retained-candidate.ts
+          git show 76ab6b53aa0d3b40202720ca12d9fcc904716cf2:compaction.ts > compaction.ts
+          bun run build:wasm && bun run build:browser
+          cp -a dist baseline-dist
+          cp -a dist control-dist
+          cp /tmp/retained-candidate.ts compaction.ts
+          bun run build:browser
+          git diff --exit-code -- compaction.ts
+      - name: Measure paired retained revisions
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p retained-compaction-results
           if [ "${{ matrix.runtime }}" = node ]; then
-            node --expose-gc proofs/retained-map-compaction-20261125.mjs retained-compaction-results/node.json | tee retained-compaction-results/run.log
+            node --expose-gc proofs/retained-map-compaction-paired-20261125.mjs retained-compaction-results/node.json | tee retained-compaction-results/run.log
           else
-            bun proofs/retained-map-compaction-20261125.mjs retained-compaction-results/bun.json | tee retained-compaction-results/run.log
+            bun proofs/retained-map-compaction-paired-20261125.mjs retained-compaction-results/bun.json | tee retained-compaction-results/run.log
           fi
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

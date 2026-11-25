@@ -1,4 +1,4 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, primitiveReadProtocol } from './arena';
+import { Arena, Snapshot, arenaOf, vectorDepth, primitiveReadProtocol, popcount } from './arena';
 import { parseNestedType } from './types';
 import { structureRegistry } from './codec';
 import { SharedMap } from './shared-map';
@@ -39,6 +39,10 @@ export type Compactable = InstanceType<(typeof classes)[keyof typeof classes]>;
  */
 class Compactor {
   readonly target = new Arena();
+  // Experimental proof only: restrict to same-arena, non-journal object maps
+  // with distinct retained roots. Single/alias/nested/sorted paths stay unchanged.
+  constructor(private readonly retainedArena?: Arena) {}
+  private retainedNodes?: Map<number, number>;
   private readonly snapshots = new Map<string, Compactable>();
   private readonly pointers = new Map<string, number>();
   declare private mapLeafPointers?: Map<string, Map<number, number>>;
@@ -107,6 +111,55 @@ class Compactor {
       }
     }
     return leaves;
+  }
+  private retainedMapRoot(a: Arena, root: number): number {
+    if (!root) return 0;
+    const identity = this.key(a, 'map/object', 0);
+    if (!this.retainedNodes) {
+      // Keep the existing packed leaf relocation for the first retained root.
+      if (!this.rawMapLeaves(a, 'object', a.leaves(root))) throw new Error('Invalid retained map leaf');
+      this.retainedNodes = new Map();
+    }
+    const nodes = this.retainedNodes, leaves = this.mapLeafPointers!.get(identity)!;
+    const dv = a.dv, source = a.buf;
+    const move = (p: number): number => {
+      const tag = dv.getUint32(p, true);
+      if (!tag) {
+        const saved = leaves.get(p);
+        if (saved !== undefined) return saved;
+        const k = dv.getUint32(p + 8, true), v = dv.getUint32(p + 12, true);
+        if (p + 16 + k + v > source.length) throw new Error('Invalid retained map leaf');
+        const dest = this.target.wasm.mapLeaf(k, v) >>> 0;
+        this.target.buf.set(source.subarray(p, p + 16 + k + v), dest);
+        leaves.set(p, dest); return dest;
+      }
+      const saved = nodes.get(p);
+      if (saved !== undefined) return saved;
+      if (tag === 0xffffffff) throw new Error('Unexpected journal in retained tree');
+      const overlay = !!(tag & 0x80000000);
+      const bucket = tag === 2;
+      const bitmap = bucket ? 0 : overlay ? dv.getUint32(p + 8, true) >>> 16 : dv.getUint32(p + 4, true);
+      const count = bucket ? dv.getUint32(p + 8, true) : popcount(bitmap);
+      const children: number[] = [];
+      if (overlay) {
+        for (let digit = 0; digit < 16; digit++) if (bitmap & (1 << digit)) children.push(move(a.wasm.mapChild(p, digit) >>> 0));
+      } else {
+        const offset = bucket ? 16 : 8;
+        for (let i = 0; i < count; i++) children.push(move(dv.getUint32(p + offset + i * 4, true)));
+      }
+      const offset = bucket ? 16 : 8;
+      const dest = this.target.alloc(offset + count * 4), out = this.target.dv;
+      if (bucket) {
+        out.setUint32(dest, 2, true); out.setUint32(dest + 4, dv.getUint32(p + 4, true), true);
+        out.setUint32(dest + 8, count, true); out.setUint32(dest + 12, 0, true);
+      } else {
+        const size = overlay ? a.wasm.mapSize(p) >>> 0 : tag >>> 2;
+        out.setUint32(dest, (size << 2) | 1, true); out.setUint32(dest + 4, bitmap, true);
+      }
+      for (let i = 0; i < count; i++) out.setUint32(dest + offset + i * 4, children[i], true);
+      nodes.set(p, dest); return dest;
+    };
+    return move(root);
   }
   private index(leaves: number[], sorted: boolean): number {
     if (!leaves.length) return 0;
@@ -221,7 +274,9 @@ class Compactor {
     if (saved) return saved as T;
     const type = d.valueType ?? d.type ?? 'number';
     let next: any;
-    if (kind === 'SharedMap' || kind === 'SharedSet' || kind === 'SharedSortedMap' || kind === 'SharedSortedSet') {
+    if (kind === 'SharedMap' && type === 'object' && a === this.retainedArena) {
+      next = { ...d, root: this.retainedMapRoot(a, d.root) };
+    } else if (kind === 'SharedMap' || kind === 'SharedSet' || kind === 'SharedSortedMap' || kind === 'SharedSortedSet') {
       const sorted = kind === 'SharedSortedMap' || kind === 'SharedSortedSet';
       const sourceLeaves = () => sorted ? a.radixLeaves(d.root) : a.leaves(d.root);
       let leaves = d.root && !parseNestedType(type) ? this.rawMapLeaves(a, type, sourceLeaves()) : undefined;
@@ -276,7 +331,16 @@ export function compact<T extends Compactable>(snapshot: T): T { return new Comp
 /** Compact a group together, retaining shared live blobs and nested snapshots. */
 export function compactMany<T extends Record<keyof T, Compactable> & Record<Extract<keyof T, symbol>, never>>(snapshots: T): Readonly<T> {
   if (Object.getOwnPropertySymbols(snapshots).length) throw new TypeError('Snapshot names must be strings');
-  const compactor = new Compactor(), result: Record<string, Compactable> = Object.create(null);
-  for (const [name, snapshot] of Object.entries(snapshots) as [string, Compactable][]) result[name] = compactor.snapshot(snapshot);
+  const entries = Object.entries(snapshots) as [string, Compactable][];
+  let retainedArena: Arena | undefined;
+  if (entries.length > 1 && entries.every(([, s]) => s instanceof SharedMap && Object.getPrototypeOf(s) === SharedMap.prototype && s.valueType === 'object')) {
+    const maps = entries.map(([, s]) => s as SharedMap<'object'>);
+    const a = arenaOf(maps[0]);
+    if (Object.getPrototypeOf(a) === Arena.prototype && primitiveReadProtocol.hasNativeWasm(a)
+      && maps.every(m => arenaOf(m) === a && (!m.root || a.dv.getUint32(m.root, true) !== 0xffffffff))
+      && new Set(maps.map(m => m.root)).size > 1) retainedArena = a;
+  }
+  const compactor = new Compactor(retainedArena), result: Record<string, Compactable> = Object.create(null);
+  for (const [name, snapshot] of entries) result[name] = compactor.snapshot(snapshot);
   return Object.freeze(result) as Readonly<T>;
 }
