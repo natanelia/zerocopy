@@ -57,7 +57,28 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
   assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
     getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
   }));
-  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.`);
+  // Run against the declared peer floor in the installed app. Its mutation
+  // proxy requires mutable rows, including nested metadata, on every sync.
+  run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@0.5.0']);
+  writeFileSync(join(temporary, 'minimum-peer.mjs'), `
+import assert from 'node:assert/strict';
+import { createCollection } from '@tanstack/db';
+import { sharedCollectionConfig } from 'zerocopy/tanstack';
+const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', style: { width: 2 } }] });
+const lanes = createCollection(options);
+try {
+  await lanes.preload();
+  const initial = options.getSnapshot();
+  await lanes.update('n', draft => { draft.style.width = 4; }).isPersisted.promise;
+  await lanes.update('n', draft => { draft.style.width = 6; }).isPersisted.promise;
+  assert.equal(initial.get('n').style.width, 2);
+  assert.equal(options.getSnapshot().get('n').style.width, 6);
+  await lanes.delete('n').isPersisted.promise;
+  assert.equal(options.getSnapshot().size, 0);
+} finally { await lanes.cleanup(); }
+`);
+  run(process.execPath, ['minimum-peer.mjs']);
+  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, TypeScript consumer, and TanStack DB 0.5.0 passed.`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

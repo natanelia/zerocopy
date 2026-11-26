@@ -105,7 +105,12 @@ async function rejectSyncWrite<T>(sync: SyncParams<T>, error: unknown): Promise<
 function writeSyncRows<T>(sync: SyncParams<T>, messages: Iterable<Write<T>>): Receipt {
   sync.begin();
   try {
-    for (const message of messages) sync.write(message);
+    for (const message of messages) {
+      // TanStack DB 0.5 uses the row itself as its writable draft proxy target.
+      // Shared reads are deeply frozen, including nested fields.
+      if ('value' in message) sync.write({ type: message.type, value: structuredClone(message.value) });
+      else sync.write(message);
+    }
   } catch (error) { return rejectSyncWrite(sync, error); }
   return sync.commit();
 }

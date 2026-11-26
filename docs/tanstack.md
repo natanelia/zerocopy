@@ -46,7 +46,10 @@ rows. The initial snapshot is available after `await collection.preload()`.
 During a pending edit TanStack can show an optimistic row while a worker
 continues reading the previous snapshot. After
 `await transaction.isPersisted.promise`, capture a new snapshot. Old handles
-stay readable. The adapter has integration coverage against TanStack DB 0.15.2.
+stay readable. The adapter has transaction and live-query coverage against TanStack DB
+0.15.2. The packed-package check also edits nested metadata using the minimum
+supported peer, 0.5.0. TanStack receives its own mutable metadata rows while
+worker snapshots retain immutable values.
 
 ### Confirm a group of edits
 
