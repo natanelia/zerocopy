@@ -29,7 +29,7 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session' }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed' }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
   const shared = mode === 'shared';
   const peers = Array.from({ length: readers }, reader);
@@ -76,10 +76,10 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
     for (let step = -1; step < steps + warmup; step++) {
       const started = performance.now();
       const cmd = step < 0 ? { box: west } : edit(step, vertices);
-      let newBase, patch, rebuiltChanges;
-      if (step >= 0 && step % 16 === 0) rebuilding = peers[0].send({ rebuild: true, revision });
+      let newBase, patch, rebuiltChanges, rebuildMs;
+      if (step >= 0 && step % 16 === 0) rebuilding = peers[0].send({ rebuild, revision });
       if (step >= 0 && step % 16 === 2) {
-        newBase = (await rebuilding).base;
+        ({ base: newBase, rebuildMs } = await rebuilding);
         // Edits newer than the worker's input revision survive the swap.
         if (shared) changes = pruneSpatialEdits(changes, newBase.revision);
         else for (const [id, change] of changes) if (change.revision <= newBase.revision) changes.delete(id);
@@ -176,7 +176,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         assertEqual([result.visible, result.revision, result.generation], [expected, revision, base.revision], `worker result for ${mode} at command ${step}`);
       }
       if (step < 10) view.check(expected, id => editedPaths.get(id) ?? lane(Number(id), vertices), cmd.moveY);
-      if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, ...draw });
+      if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, rebuildMs, ...draw });
     }
     return samples;
   } finally {

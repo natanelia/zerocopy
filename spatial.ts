@@ -35,6 +35,13 @@ function checkBounds(box: BoundsXY, finite: boolean): void {
 
 const trees = new WeakMap<SpatialIndex, Flatbush>();
 
+function finishIndex(tree: Flatbush | undefined, ids: Uint32Array<SharedArrayBuffer>, revision: number): SpatialIndex {
+  tree?.finish();
+  const base: SpatialIndex = Object.freeze({ format: 1, revision, ids, buffer: tree ? tree.data as SharedArrayBuffer : null });
+  if (tree) trees.set(base, tree);
+  return base;
+}
+
 /** Build a packed, read-only base over finite planar bounding boxes. */
 export function buildSpatialIndex(features: readonly SpatialFeature[], revision = 0): SpatialIndex {
   checkRevision(revision);
@@ -48,10 +55,7 @@ export function buildSpatialIndex(features: readonly SpatialFeature[], revision 
     seen.add(id);
     ids[tree!.add(...bounds)] = id;
   }
-  tree?.finish();
-  const base: SpatialIndex = Object.freeze({ format: 1, revision, ids, buffer: tree ? tree.data as SharedArrayBuffer : null });
-  if (tree) trees.set(base, tree);
-  return base;
+  return finishIndex(tree, ids, revision);
 }
 
 /** Stage one edit batch. A null box deletes a feature, and the last edit to an ID in a batch wins. */
@@ -77,9 +81,7 @@ export function applySpatialEdits(previous: SpatialChanges | undefined, revision
   return changes.setMany(writes);
 }
 
-/** Return candidate feature IDs in ascending order. Touching edges intersect. */
-export function querySpatialIndex(base: SpatialIndex, box: BoundsXY, changes?: SpatialChanges): number[] {
-  checkBounds(box, false);
+function treeFor(base: SpatialIndex): Flatbush | undefined {
   let tree = trees.get(base);
   if (!tree) {
     checkRevision(base.revision);
@@ -93,6 +95,54 @@ export function querySpatialIndex(base: SpatialIndex, box: BoundsXY, changes?: S
       trees.set(base, tree);
     } else if (base.ids.length) throw new RangeError('Missing spatial index for feature IDs');
   }
+  return tree;
+}
+
+/** Build a replacement from a captured base and overlay without decoding feature metadata. */
+export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges, revision: number): SpatialIndex {
+  checkRevision(revision);
+  const tree = treeFor(base);
+  if (revision < base.revision) throw new RangeError('Cannot rebuild before the base revision');
+  const edits = new Map<number, BoundsXY | null>();
+  let count = base.ids.length;
+  for (const [key, change] of changes.entries()) {
+    checkRevision(change.revision);
+    if (change.revision > revision) throw new RangeError('Spatial overlay is newer than the requested revision');
+    if (change.revision <= base.revision) continue;
+    const id = Number(key);
+    checkId(id);
+    if (String(id) !== key) throw new TypeError('Expected a canonical spatial feature ID');
+    if (change.bounds !== null) {
+      checkBounds(change.bounds, true);
+      count++;
+    }
+    edits.set(id, change.bounds);
+  }
+  if (!edits.size) {
+    if (revision === base.revision) return base;
+    const next = Object.freeze({ ...base, revision });
+    if (tree) trees.set(next, tree);
+    return next;
+  }
+  // Replaced base entries are omitted. Each live edit contributes one entry.
+  for (const id of base.ids) if (edits.has(id)) count--;
+  const ids = new Uint32Array(new SharedArrayBuffer(count * 4));
+  const next = count ? new Flatbush(count, 16, Float64Array, SharedArrayBuffer) : undefined;
+  if (next) {
+    tree?.search(-Infinity, -Infinity, Infinity, Infinity, (slot, x0, y0, x1, y1) => {
+      const id = base.ids[slot];
+      if (!edits.has(id)) ids[next.add(x0, y0, x1, y1)] = id;
+      return false; // Consume each leaf without also collecting a result array.
+    });
+    for (const [id, bounds] of edits) if (bounds) ids[next.add(...bounds)] = id;
+  }
+  return finishIndex(next, ids, revision);
+}
+
+/** Return candidate feature IDs in ascending order. Touching edges intersect. */
+export function querySpatialIndex(base: SpatialIndex, box: BoundsXY, changes?: SpatialChanges): number[] {
+  checkBounds(box, false);
+  const tree = treeFor(base);
   const result: number[] = [];
   if (tree) {
     for (const slot of tree.search(...box)) {

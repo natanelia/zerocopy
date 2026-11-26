@@ -15,6 +15,8 @@ const option = name => process.argv.slice(2).find(arg => arg.startsWith('--' + n
 const selectedReaders = option('readers'), selectedTrial = option('trial'), output = option('output');
 const transport = option('transport') ?? 'session';
 if (!['session', 'manual'].includes(transport)) throw new Error('Expected --transport=session|manual');
+const rebuild = option('rebuild') ?? 'packed';
+if (!['packed', 'rows'].includes(rebuild)) throw new Error('Expected --rebuild=packed|rows');
 const readerCounts = selectedReaders === undefined ? (smoke ? [1] : [1, 4, 8]) : [Number(selectedReaders)];
 const selectedMode = option('mode');
 if (selectedMode !== undefined && !['copy','shared'].includes(selectedMode)) throw new Error('Expected --mode=copy|shared');
@@ -22,8 +24,8 @@ const trials = selectedTrial === undefined ? (smoke ? [0] : [0, 1, 2]) : [Number
 if (readerCounts.some(n => ![1, 4, 8].includes(n)) || trials.some(n => ![0, 1, 2].includes(n))) {
   throw new Error('Expected --readers=1|4|8 and --trial=0|1|2');
 }
-const config = smoke ? { count: 128, vertices: 24, steps: 40, warmup: 0, transport } :
-  { count: 4096, vertices: 256, steps: soak ? 1024 : 64, warmup: 16, transport };
+const config = smoke ? { count: 128, vertices: 24, steps: 40, warmup: 0, transport, rebuild } :
+  { count: 4096, vertices: 256, steps: soak ? 1024 : 64, warmup: 16, transport, rebuild };
 
 // Sample proportional set size across the entire fresh browser process tree.
 // Every Chromium thread can fork children, including the zygote and GPU process.

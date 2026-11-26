@@ -45,6 +45,13 @@ candidates when an application needs line or polygon intersection.
   recent changes. An updated feature suppresses its old index hit even when
   its new bounds are outside the viewport. Changes at or before the base
   revision have already been incorporated and are skipped.
+- `rebuildSpatialIndex(base, changes, revision)` creates a replacement index
+  directly from packed bounds and the captured change map. A reader can build
+  it using just those two inputs and the revision of their publication.
+  It accepts a revision at or after the base and rejects changes newer than
+  that revision. Capture the overlay when scheduling the job, since later
+  edits may overwrite an earlier change for the same ID. If the overlay
+  has no newer entries, the result reuses the base's buffers.
 - `pruneSpatialEdits(changes, baseRevision)` removes entries incorporated by
   a replacement index. If a worker builds a base from revision 10 while the
   owner advances to 12, install that base with the current change map pruned
@@ -52,6 +59,18 @@ candidates when an application needs line or polygon intersection.
   Capture the replacement pair together before sending it to a reader.
   Pruning reduces future query work. The [arena lifetime rules](architecture.md)
   determine when old backing memory can be reclaimed.
+
+```ts
+// In a reader, after attaching the change map for this publication.
+import { rebuildSpatialIndex } from 'zerocopy/spatial';
+
+const rebuilt = rebuildSpatialIndex(base, capturedChanges, capturedRevision);
+postMessage(rebuilt);
+```
+
+On the owner, install a returned base only if its tile is still active and its
+revision is at least as recent as the installed base. Pair it with the latest
+overlay pruned through the returned revision. An older job can finish last.
 
 A query scans every unpruned change. Choose a rebuild threshold from measured
 edit density and viewport latency. The [browser replay](../proofs/spatial-editor/README.md)

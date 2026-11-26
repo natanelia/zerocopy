@@ -19,6 +19,9 @@ undoes the deletion, rejects an optimistic edit, pans back, drags a vertex
 within a visible lane, and undoes that drag. A worker rebuilds the base index
 every 16 steps. Edits to a feature suppress its old base entry. The owner
 installs the new base together with changes newer than the rebuild input.
+The shared reader rebuilds from packed bounds and captured edits. To
+benchmark rebuilding from shared metadata rows on the same executable, pass
+`--rebuild=rows`. The copy control always uses its native metadata rows.
 Feature IDs in this fixture are stable decimal strings representing uint32
 slots. A search returns bounding-box candidates in the tile coordinate system.
 
@@ -70,6 +73,9 @@ completeness and calculate medians of the three per-trial p95s.
   excludes physical display presentation and device input delivery.
 - **Validation latency** ends after every dedicated reader replies. Timing
   includes worker attachment, messaging and viewport geometry checks.
+- **Rebuild time** measures the index construction call inside the first
+  reader. Each `rebuildMs` sample belongs to the build started two commands
+  before the command that installs its result.
 - **Packing** measures CPU work preparing binary path attributes. A change
   of membership or vertex count repacks the visible paths. A same-length
   edit copies the dirty path into its existing span.

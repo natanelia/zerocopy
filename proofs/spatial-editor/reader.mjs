@@ -1,6 +1,7 @@
 import { connectSharedSession } from '../../dist/worker.js';
 import { initWorker } from '../../dist/shared.js';
 import { bboxXY } from '../../dist/geometry.js';
+import { rebuildSpatialIndex } from '../../dist/spatial.js';
 import { bounds } from './workload.mjs';
 import { baseFor, viewportFor } from './spatial.mjs';
 
@@ -48,14 +49,17 @@ self.onmessage = async ({ data }) => {
       native.changes.set(id, change);
     }
     const { rows, paths, changes } = snapshot ?? native;
-    // Index construction uses exactly the rows in this immutable input revision.
     if (data.hold) {
       held = { path: paths.get(data.id), row: rows.get(data.id), revision: data.revision, request: data.request };
       self.postMessage({ held: true });
       return;
     }
     if (data.rebuild) {
-      self.postMessage({ base: baseFor(!!snapshot, rows, data.revision) });
+      const started = performance.now();
+      const replacement = snapshot && data.rebuild === 'packed'
+        ? rebuildSpatialIndex(base, changes, data.revision)
+        : baseFor(!!snapshot, rows, data.revision);
+      self.postMessage({ base: replacement, rebuildMs: performance.now() - started });
       return;
     }
     first ??= { path: paths.get('5'), row: rows.get('5') };

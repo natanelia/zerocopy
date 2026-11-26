@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex, applySpatialEdits, pruneSpatialEdits } from './spatial.ts';
+import { buildSpatialIndex, querySpatialIndex, applySpatialEdits, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
@@ -24,7 +24,29 @@ it('queries historical and rebuilt snapshots by stable ID, including boundary to
   const wire = structuredClone({ base: replacement, roots: getWorkerData({ changes: pruned }, { copy: false }) });
   const { changes } = await initWorker<{ changes: typeof pruned }>(wire.roots);
   expect(querySpatialIndex(wire.base, [-Infinity, -Infinity, Infinity, Infinity], changes)).toEqual([0, 42]);
+  const compacted = rebuildSpatialIndex(wire.base, changes, 6);
+  expect(querySpatialIndex(compacted, box)).toEqual([0]);
+  expect(querySpatialIndex(wire.base, box)).toEqual([0, 0xffffffff]);
   expect(querySpatialIndex(base, box, moved)).toEqual([0, 0xffffffff]);
+});
+
+it('rebuilds an empty or fully deleted tile and reuses packed buffers for absorbed edits', () => {
+  const base = buildSpatialIndex([]);
+  const add = applySpatialEdits(undefined, 2, [{ id: 0xffffffff, bounds: box }]);
+  expect(() => rebuildSpatialIndex(base, add, 1)).toThrow(/newer/);
+  const added = rebuildSpatialIndex(base, add, 2);
+  expect(querySpatialIndex(added, box)).toEqual([0xffffffff]);
+  expect(rebuildSpatialIndex(added, add, 2)).toBe(added);
+  const later = rebuildSpatialIndex(added, add, 3);
+  expect(later.revision).toBe(3);
+  expect(later.buffer).toBe(added.buffer);
+  expect(later.ids).toBe(added.ids);
+  expect(() => rebuildSpatialIndex(later, add, 2)).toThrow(/before/);
+  const gone = applySpatialEdits(add, 4, [{ id: 0xffffffff, bounds: null }, { id: 123, bounds: null }]);
+  const removed = rebuildSpatialIndex(later, gone, 4);
+  expect(removed.buffer).toBeNull();
+  expect(querySpatialIndex(removed, box)).toEqual([]);
+  expect(querySpatialIndex(added, box)).toEqual([0xffffffff]);
 });
 
 it('handles an empty base, empty overlay, repeated edits, and conflicting retries', () => {
@@ -65,7 +87,7 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
     const id = random(250), bounds = r % 7 ? rect() : null;
     if (bounds) rows.set(id, bounds); else rows.delete(id);
     changes = applySpatialEdits(changes, r, [{ id, bounds }]);
-    if (r % 43 === 0) { base = build(r); changes = pruneSpatialEdits(changes, r); }
+    if (r % 43 === 0) { base = rebuildSpatialIndex(base, changes, r); changes = pruneSpatialEdits(changes, r); }
     const box = rect();
     const expected = [...rows].filter(([, b]) => Math.max(b[0], box[0]) <= Math.min(b[2], box[2]) &&
       Math.max(b[1], box[1]) <= Math.min(b[3], box[3])).map(([id]) => id).sort((a,b) => a-b);
