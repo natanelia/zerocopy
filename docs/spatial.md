@@ -75,9 +75,9 @@ overlay pruned through the returned revision. An older job can finish last.
 A query scans every unpruned change. Choose a rebuild threshold from measured
 edit density and viewport latency. The [browser replay](../proofs/spatial-editor/README.md)
 includes deletes, retained readers, an index rebuilt while edits continue,
-and binary deck.gl paths. At four readers the TanStack DB 1.0.0-rc.1.5 replay
-measured 28.9% lower peak browser memory and 22.2% higher p95 time from command to completed
-frame. See the [trial results and measurement conditions](../proofs/spatial-editor/RESULTS.md).
+and binary deck.gl paths. Rebuilding from packed bounds took a median 2.6 ms
+in that four-reader replay, compared with 22.3 ms for decoding the shared
+metadata rows. See the [trial results and measurement conditions](../proofs/spatial-editor/RESULTS.md).
 
 ## Dedicated worker transport
 

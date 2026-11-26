@@ -1,12 +1,48 @@
 # Shared-memory editor replay results
 
-With TanStack DB **1.0.0-rc.1.5**, shared storage reduced four-reader peak
-browser memory by **28.9%**. Its median trial p95 frame took **35.8 ms
-longer**. The memory target is at least a 25% reduction and the frame target
-requires matching or beating the copy control. Both tested TanStack versions
-met the memory target and missed the frame target.
+Rebuilding from packed bounds shortened median worker index construction from
+**22.3 to 2.6 ms** on TanStack DB 1.0.0-rc.1.5. Four-reader validation on
+commands that started a rebuild fell from **26.2 to 11.3 ms**. The adoption
+targets are a 25% reduction in peak browser memory and a median trial p95
+frame time at least as fast as the copy control. No recorded comparison has
+met both targets in the same run.
 
-## Four-reader check on 1.0.0-rc.1.5
+## Four-reader packed rebuild comparison on 1.0.0-rc.1.5
+
+Nine fresh Chromium trials rotated the order of the three editors across
+three rounds. All used the same bundles, tile, commands, validators and
+renderer. The shared editors differed only in how the worker rebuilt the
+index. The copy control rebuilt from native JavaScript rows in every trial.
+
+| Four-reader metric | Copy, native rows | Shared, decoded rows | Shared, packed bounds |
+| --- | ---: | ---: | ---: |
+| Median worker rebuild (ms) | 2.3 | 22.3 | 2.6 |
+| Median validation on commands starting a rebuild (ms) | 6.8 | 26.2 | 11.3 |
+| Median trial p95 validation, all commands (ms) | 15.8 | 24.0 | 17.5 |
+| Median trial p95 frame (ms) | 587.3 | 193.3 | 269.0 |
+| Median peak browser PSS (MiB) | 429.7 | 339.1 | 338.8 |
+
+The first two rows pool 12 measured rebuilds or rebuild-start commands per
+editor. The other rows use three trial summaries each. The packed editor used
+21.1% less peak browser memory than the copy control and passed the frame
+target in this run. Individual trial frame p95s ranged from 235.8 to 1540.8 ms
+for copy, 180.7 to 629.1 ms for shared rows, and 113.2 to 1163.8 ms for packed
+bounds. Worker timing isolates the rebuild improvement. The observed frame
+variation limits conclusions about rendering speed.
+
+One additional four-reader packed run completed 1,024 measured commands
+and 65 rebuild requests including warmup. It reached revision 728 with
+zero viewport, revision or retained-geometry mismatches and peaked at
+339.6 MiB PSS. [Long-run samples](results/rebuild-packed-soak.json.gz)
+
+Verify the recorded comparisons with the following commands. [Measured source](https://github.com/natanelia/zerocopy/commit/9c44dcadd510776a10ed6271b11e515912803c97) · [Packed and copy samples](results/rebuild-packed-readers-4.json.gz) · [Shared row samples](results/rebuild-rows-readers-4.json.gz)
+
+```sh
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/rebuild-packed-readers-4.json.gz
+node proofs/spatial-editor/summarize.mjs --readers=4 --mode=shared proofs/spatial-editor/results/rebuild-rows-readers-4.json.gz
+```
+
+## Earlier four-reader row rebuild check on 1.0.0-rc.1.5
 
 The upgraded editor completed three paired trials of the same synthetic
 workload. Every command passed the worker revision and viewport checks.
@@ -59,7 +95,7 @@ checks viewport membership against a full scan and checks the row and
 geometry revision seen by readers. The opening cycle also checks GPU picking
 through a vertex drag and undo.
 
-Both versions ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
+The replays ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
 Chromium 156.0.8078.4 using SwiftShader. Frame timing starts at command
 dispatch and ends when WebGL finishes the first updated draw. Display
 presentation and hardware GPU timing require separate measurements. PSS
