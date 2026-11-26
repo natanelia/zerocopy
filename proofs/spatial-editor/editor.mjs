@@ -1,7 +1,7 @@
-import { createCollection, createLiveQueryCollection, createTransaction, eq, localOnlyCollectionOptions } from '@tanstack/db';
+import { BTreeIndex, createCollection, createLiveQueryCollection, createTransaction, eq, localOnlyCollectionOptions } from '@tanstack/db';
 import { createSharedSession } from '../../dist/worker.js';
 import { SharedList, SharedMap, getWorkerData, list } from '../../dist/shared.js';
-import { sharedCollectionConfig } from '../../dist/tanstack-db-collection.js';
+import { sharedCollectionConfig, viewportCollectionConfig } from '../../dist/tanstack-db-collection.js';
 import { bboxXY } from '../../dist/geometry.js';
 import { applySpatialEdits, pruneSpatialEdits } from '../../dist/spatial.js';
 import { baseFor, viewportFor } from './spatial.mjs';
@@ -47,12 +47,13 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
   const local = (id, initialData = []) => localOnlyCollectionOptions({ id, initialData, getKey: row => row.id });
   const options = shared ? sharedCollectionConfig({ id: 'lanes', initialData }) : local('lanes', initialData);
   const lanes = createCollection(options);
-  const visible = createCollection(local('viewport'));
+  lanes.createIndex(row => row.id, { indexType: BTreeIndex });
+  const visible = createCollection(viewportCollectionConfig({ id: 'viewport' }));
   const query = createLiveQueryCollection(q => q.from({ v: visible })
     .innerJoin({ lane: lanes }, ({ v, lane }) => eq(v.id, lane.id))
     .select(({ lane }) => ({ id: lane.id, revision: lane.revision })));
   const sub = query.subscribeChanges(() => {});
-  let revision = 0, box = west, membership = new Set(), rebuilding;
+  let revision = 0, box = west, rebuilding;
   const samples = [];
   const nativeRows = shared ? undefined : new Map(initialData.map(row => [row.id, row]));
   const rows = () => shared ? options.getSnapshot() : nativeRows;
@@ -136,18 +137,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         }
       }
       const ids = viewportFor(shared, base, changes, box);
-      const nextMembership = new Set(ids);
-      const entered = ids.filter(id => !membership.has(id)).map(id => ({ id }));
-      const exited = [...membership].filter(id => !nextMembership.has(id));
-      if (entered.length || exited.length) {
-        const update = createTransaction({ mutationFn: async ({ transaction }) => visible.utils.acceptMutations(transaction) });
-        update.mutate(() => {
-          if (exited.length) visible.delete(exited);
-          if (entered.length) visible.insert(entered);
-        });
-        await update.when('settled');
-      }
-      membership = nextMembership;
+      await visible.utils.setVisibleIds(ids);
       const liveRows = [...query.values()];
       const liveIds = liveRows.map(v => v.id).sort((a, b) => Number(a) - Number(b));
       const frame = { box, revision, request: step, base: newBase, rebuiltChanges,

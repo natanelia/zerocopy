@@ -1,5 +1,5 @@
 import { createCollection, createTransaction } from '@tanstack/db';
-import { sharedCollectionConfig } from 'zerocopy/tanstack';
+import { sharedCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
 import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 
@@ -25,6 +25,12 @@ const base = buildSpatialIndex([{ id: 17, bounds: [0, 0, 2, 3] }]);
 const edits = applySpatialEdits(undefined, 1, [{ id: 17, bounds: null }]);
 const roots = await initWorker<{ edits: typeof edits }>(getWorkerData({ edits }));
 const candidates: number[] = querySpatialIndex(structuredClone(base), [0, 0, 2, 3], roots.edits);
+const visible = createCollection(viewportCollectionConfig({ id: 'visible' }));
+const published: boolean = await visible.utils.setVisibleIds(Promise.resolve(candidates));
+const featureId: number | undefined = visible.get(17)?.id;
+void published; void featureId;
+// @ts-expect-error The default viewport collection accepts numeric feature handles.
+visible.utils.setVisibleIds(['lane']);
 const rebuilt: typeof base = rebuildSpatialIndex(base, roots.edits, 1);
 const prepared = prepareSpatialQuery(base, roots.edits, 1);
 querySpatialIndex(structuredClone(prepared), [0, 0, 2, 3]);

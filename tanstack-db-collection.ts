@@ -55,14 +55,14 @@ export class SharedCollection<T extends CollectionItem> {
   }
 }
 
-type Write<T> =
+type Write<T, K extends string | number = string> =
   | { type: 'insert' | 'update' | 'delete'; value: T; key?: never }
-  | { type: 'delete'; key: string; value?: never };
-type SyncWrite<T> = (message: Write<T>) => void;
+  | { type: 'delete'; key: K; value?: never };
+type SyncWrite<T, K extends string | number = string> = (message: Write<T, K>) => void;
 type Receipt = void | true | Promise<void>;
-type SyncParams<T> = {
+type SyncParams<T, K extends string | number = string> = {
   begin: () => void;
-  write: SyncWrite<T>;
+  write: SyncWrite<T, K>;
   commit: (signal?: AbortSignal) => Receipt;
   markReady: () => void;
   markError?: (error: unknown) => void;
@@ -89,7 +89,7 @@ async function accepted(receipt: Promise<void>): Promise<void> {
 
 // The current TanStack sync API discards uncommitted writes with an aborted
 // signal. Older cores discard pending writes when their sync run is cleaned up.
-async function rejectSyncWrite<T>(sync: SyncParams<T>, error: unknown): Promise<never> {
+async function rejectSyncWrite<T, K extends string | number>(sync: SyncParams<T, K>, error: unknown): Promise<never> {
   if (sync.collection) {
     const db = await import('@tanstack/db');
     if (typeof db.whenSyncAccepted === 'function') {
@@ -102,17 +102,107 @@ async function rejectSyncWrite<T>(sync: SyncParams<T>, error: unknown): Promise<
   throw error;
 }
 
-function writeSyncRows<T>(sync: SyncParams<T>, messages: Iterable<Write<T>>): Receipt {
+function writeSyncBatch<T, K extends string | number>(sync: SyncParams<T, K>, write: () => void): Receipt {
   sync.begin();
-  try {
+  try { write(); } catch (error) { return rejectSyncWrite(sync, error); }
+  return sync.commit();
+}
+
+function writeSyncRows<T>(sync: SyncParams<T>, messages: Iterable<Write<T>>): Receipt {
+  return writeSyncBatch(sync, () => {
     for (const message of messages) {
       // TanStack DB 0.5 uses the row itself as its writable draft proxy target.
       // Shared reads are deeply frozen, including nested fields.
       if ('value' in message) sync.write({ type: message.type, value: structuredClone(message.value) });
       else sync.write(message);
     }
-  } catch (error) { return rejectSyncWrite(sync, error); }
-  return sync.commit();
+  });
+}
+
+type ViewportSync<K extends string | number> = SyncParams<{ id: K }, K> & {
+  collection: { keys(): Iterable<K> };
+};
+
+/** Read-only TanStack membership rows for a spatial query, including worker-produced results. */
+export function viewportCollectionConfig<K extends string | number = number>({ id }: { id: string }) {
+  let membership = new Set<K>();
+  let active: { params: ViewportSync<K>; pending: Promise<void> } | undefined;
+  let latest: object | undefined;
+
+  function reconcile(params: ViewportSync<K>, previous: Set<K>, next: Set<K>): Receipt {
+    const writes: Write<{ id: K }, K>[] = [];
+    for (const id of previous) {
+      if (!next.has(id)) writes.push({ type: 'delete', value: { id } });
+    }
+    for (const id of next) {
+      if (!previous.has(id)) writes.push({ type: 'insert', value: { id } });
+    }
+    if (!writes.length) return;
+    return writeSyncBatch(params, () => {
+      for (const message of writes) params.write(message);
+    });
+  }
+
+  async function setVisibleIds(input: readonly K[] | PromiseLike<readonly K[]>): Promise<boolean> {
+    // Supersede at dispatch. An unresolved worker search never holds the write queue.
+    const request = {};
+    latest = request;
+    let ids: readonly K[];
+    try {
+      ids = Array.isArray(input) ? input : await input;
+    } catch (error) {
+      if (request !== latest) return false;
+      throw error;
+    }
+    if (request !== latest) return false;
+    if (!Array.isArray(ids)) throw new TypeError('Expected an array of viewport IDs');
+    const next = new Set(ids);
+    for (const key of next) {
+      if (typeof key !== 'string' && !Number.isFinite(key)) throw new TypeError('Viewport IDs must be strings or finite numbers');
+    }
+    const run = active;
+    if (!run) {
+      membership = next;
+      return true;
+    }
+    const publication = run.pending.then(async () => {
+      if (request !== latest || active !== run) return false;
+      const receipt = reconcile(run.params, membership, next);
+      if (receipt && receipt !== true) await receipt;
+      if (active !== run) return false;
+      membership = next;
+      return true;
+    });
+    run.pending = publication.then(() => {}, () => {});
+    return publication;
+  }
+
+  return {
+    id, getKey: (row: { id: K }) => row.id, startSync: true, gcTime: 0,
+    utils: { setVisibleIds },
+    sync: {
+      sync(params: ViewportSync<K>) {
+        if (active) throw new Error('Viewport sync is already active');
+        const run = { params, pending: Promise.resolve() };
+        active = run;
+        const close = () => {
+          if (active !== run) return;
+          active = undefined;
+          latest = undefined;
+        };
+        try {
+          // Reload can retain rows while cleanup starts a new, empty collection.
+          const seed = reconcile(params, new Set(params.collection.keys()), membership);
+          if (seed && seed !== true) {
+            run.pending = seed.then(() => { if (active === run) params.markReady(); }, error => {
+              if (active === run) { close(); params.markError?.(error); }
+            });
+          } else params.markReady();
+        } catch (error) { close(); throw error; }
+        return close;
+      },
+    },
+  };
 }
 
 /** Local collection options with an immutable snapshot of confirmed rows. */

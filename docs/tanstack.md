@@ -2,7 +2,7 @@
 
 [Documentation](README.md) · [API](api.md) · [Worker sharing](worker-sharing.md)
 
-`zerocopy/tanstack` exports `SharedCollection`, `sharedCollectionConfig`, and `withSharedCache`. These are small adapters around shared collection storage. They do not replace TanStack DB or configure a complete database application.
+`zerocopy/tanstack` connects shared storage and spatial query results to TanStack DB collections.
 
 ## SharedCollection
 
@@ -95,6 +95,49 @@ edit discards the staged handles. Include the application revision and viewport
 request ID in worker jobs so the UI can discard obsolete results. Configure
 one adapter per collection and serialize application commands that replace the
 same geometry. [State sessions](worker-sessions.md).
+
+## Live viewport membership
+
+Use `viewportCollectionConfig` to join spatial candidates to a TanStack
+metadata collection. Each membership row holds one stable ID. Publishing a
+new viewport sends inserts and deletes together in a sync batch. A pan that
+returns the same IDs produces no writes. Metadata changes for a visible
+feature still propagate through TanStack's live join.
+
+```ts
+import { BTreeIndex, createCollection, createLiveQueryCollection, eq } from '@tanstack/db';
+import { buildSpatialIndex, querySpatialIndex } from 'zerocopy/spatial';
+import { sharedCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+
+const lanes = createCollection(sharedCollectionConfig({
+  id: 'lanes', initialData: [{ id: 'north', handle: 7, direction: 'northbound' }],
+}));
+lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
+const visible = createCollection(viewportCollectionConfig({ id: 'visible-handles' }));
+const visibleLanes = createLiveQueryCollection(q => q.from({ hit: visible })
+  .innerJoin({ lane: lanes }, ({ hit, lane }) => eq(hit.id, lane.handle))
+  .select(({ lane }) => ({ id: lane.id, direction: lane.direction })));
+
+const index = buildSpatialIndex([{ id: 7, bounds: [0, 0, 4, 4] }]);
+await visibleLanes.preload();
+await visible.utils.setVisibleIds(querySpatialIndex(index, [1, 1, 2, 2]));
+// visibleLanes now contains the northbound lane.
+```
+
+For an asynchronous search, call `visible.utils.setVisibleIds(searchPromise)`
+when dispatching each request. The most recently dispatched request supersedes
+older searches that have yet to publish. The promise resolves to `true` when
+applied, including identical results, or `false`
+when superseded. A current search failure rejects and preserves the previous
+membership. Pass a new request for each viewport or map revision. Writes
+already in progress finish before the next batch.
+
+Pass an empty array to clear the viewport. Duplicate IDs collapse to one row.
+Numeric handles are the default. Use `viewportCollectionConfig<string>` for
+string keys. Treat the membership collection as read-only and write feature
+properties through the metadata collection. You can seed the IDs before creating
+the collection. The options instance retains its last successful membership
+across cleanup and reconnect.
 
 ## withSharedCache
 

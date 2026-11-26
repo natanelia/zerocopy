@@ -78,23 +78,34 @@ if (isMainThread) {
   // Exercise both transaction APIs with the published archive and real npm peer resolution.
   writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
-import { createCollection } from '@tanstack/db';
-import { sharedCollectionConfig } from 'zerocopy/tanstack';
-const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', style: { width: 2 } }] });
+import { BTreeIndex, createCollection, createLiveQueryCollection, eq } from '@tanstack/db';
+import { sharedCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2 } }] });
 const lanes = createCollection(options);
+lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
+const viewport = createCollection(viewportCollectionConfig({ id: 'visible' }));
+const joined = createLiveQueryCollection(q => q.from({ hit: viewport })
+  .innerJoin({ lane: lanes }, ({ hit, lane }) => eq(hit.id, lane.handle))
+  .select(({ lane }) => ({ id: lane.id, style: lane.style })));
 const settled = process.argv[2] === '0.5.0'
   ? tx => tx.isPersisted.promise
   : tx => tx.when('settled');
 try {
-  await lanes.preload();
+  await joined.preload();
+  await viewport.utils.setVisibleIds([1, 2]);
+  await viewport.utils.setVisibleIds(Promise.resolve([2, 3]));
+  assert.deepEqual([...viewport.keys()].sort(), [2, 3]);
+  assert.equal([...joined.values()][0].id, 'n');
   const initial = options.getSnapshot();
   await settled(lanes.update('n', draft => { draft.style.width = 4; }));
   await settled(lanes.update('n', draft => { draft.style.width = 6; }));
   assert.equal(initial.get('n').style.width, 2);
   assert.equal(options.getSnapshot().get('n').style.width, 6);
+  assert.equal([...joined.values()][0].style.width, 6);
   await settled(lanes.delete('n'));
   assert.equal(options.getSnapshot().size, 0);
-} finally { await lanes.cleanup(); }
+  assert.equal(joined.size, 0);
+} finally { await joined.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
 `);
   const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
   for (const version of peers) {

@@ -30,6 +30,9 @@ system. Edges are inclusive. Indexed boxes require finite coordinates.
 Query boxes allow infinite extents. Run an exact geometry predicate on the
 candidates when an application needs line or polygon intersection.
 
+To keep UI rows in sync with these results, publish the IDs or a worker
+search promise into a [TanStack viewport collection](tanstack.md#live-viewport-membership).
+
 ## Edit and rebuild
 
 - `buildSpatialIndex(features, revision = 0)` creates a base for a complete

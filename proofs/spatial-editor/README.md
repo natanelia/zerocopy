@@ -24,6 +24,8 @@ benchmark rebuilding from shared metadata rows on the same executable, pass
 `--rebuild=rows`. The copy control always uses its native metadata rows.
 Feature IDs in this fixture are stable decimal strings representing uint32
 slots. A search returns bounding-box candidates in the tile coordinate system.
+Both editors pass their candidate IDs to `viewportCollectionConfig`. The
+resulting TanStack membership collection drives the live join to lane rows.
 
 Each reader validates the geometry and row bounds in the same publication.
 The harness compares the spatial result and the TanStack live join against a
