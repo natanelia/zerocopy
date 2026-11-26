@@ -26,6 +26,10 @@ const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 if (!readdirSync(join(root, 'dist')).includes('shared.js')) throw new Error('Build the library with build:wasm and build:browser first');
 rmSync(out, { recursive: true, force: true }); mkdirSync(out, { recursive: true });
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
+const catalogRoutes = new Set(['compare/', 'investigation-benchmark/']);
+// These routes need all three stylesheets at first paint. Serve them in one request.
+writeFileSync(join(out, 'assets', 'catalog.css'), ['site.css', 'memory-charts.css', 'feature.css']
+  .map(file => readFileSync(join(here, 'assets', file), 'utf8')).join('\n'));
 writeMemoryChartAssets(join(out, 'assets'));
 writeFeatureMemoryAssets(join(out, 'assets'));
 mkdirSync(join(out, 'library'));
@@ -71,10 +75,14 @@ const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
   let html = shell({ title, description, body, script, base, route, version, sha, origin, noindex: !!preview });
-  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
-    html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
+  if (catalogRoutes.has(route)) {
+    html = html.replace(`href="${base}assets/site.css"`, `href="${base}assets/catalog.css"`);
+  } else {
+    if (['docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
+      html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
+    }
+    if (route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
   }
-  if (['compare/', 'explorer/', 'investigation-benchmark/'].includes(route) || route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
   if (route === 'historical/log-compare/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
   if (preview) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);

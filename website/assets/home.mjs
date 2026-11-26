@@ -5,7 +5,7 @@ setupCityDemo(document.querySelector('.city-demo'));
 
 const intro = document.querySelector('.product-intro');
 const copy = intro.querySelector('.copy-install');
-copy.hidden = false;
+copy.disabled = false;
 copy.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(intro.querySelector('.install-command code').textContent);
@@ -18,6 +18,7 @@ copy.addEventListener('click', async () => {
 // Keep the headline independent of the opt-in demo and pause it offscreen.
 const word = intro.querySelector('.runtime-word');
 const control = intro.querySelector('.runtime-control');
+control.disabled = false;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const names = ['Node.js', 'Browser', 'Bun'];
 let runtime = 0;
@@ -83,13 +84,11 @@ document.querySelectorAll('[data-storage]').forEach(button => button.addEventLis
 render();
 const tabs = [...document.querySelectorAll('[data-code-tab]')];
 function select(tab) {
-  for (const item of tabs) { const active = item === tab; item.setAttribute('aria-selected', String(active)); item.tabIndex = active ? 0 : -1; document.getElementById(item.getAttribute('aria-controls')).hidden = !active; }
+  for (const item of tabs) {
+    const active = item === tab;
+    item.setAttribute('aria-selected', String(active));
+    item.tabIndex = active ? 0 : -1;
+    document.getElementById(item.getAttribute('aria-controls')).toggleAttribute('data-inactive', !active);
+  }
 }
-for (const tab of tabs) {
-  const panel = document.getElementById(tab.getAttribute('aria-controls'));
-  panel.setAttribute('role', 'tabpanel');
-  panel.setAttribute('aria-labelledby', tab.id);
-}
-select(tabs[0]);
-document.querySelector('.code-tabs').hidden = false;
 tabs.forEach(tab => { tab.addEventListener('click', () => select(tab)); tab.addEventListener('keydown', event => { if (['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) { event.preventDefault(); const next = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs.at(-1) : tabs[1 - tabs.indexOf(tab)]; select(next); next.focus(); } }); });

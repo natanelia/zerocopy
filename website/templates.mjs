@@ -33,7 +33,7 @@ export function shell({ title, description, body, base, route = '', script, vers
   // JSON-LD is raw script text: HTML entities are not decoded here.
   const structuredData = project ? `<script type="application/ld+json">${JSON.stringify(project).replaceAll('<', '\\u003c')}</script>` : '';
   const metadata = `<meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ''}`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f8f5ed"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="preload" as="font" type="font/woff2" crossorigin href="${href('assets/bricolage-grotesque-latin.woff2')}"><link rel="stylesheet" href="${href('assets/site.css')}">${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}"></script>${script ? `<script type="module" src="${href('assets/' + script)}"></script>` : ''}${route ? '' : `<link rel="stylesheet" href="${href('assets/home.css')}">`}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f8f5ed"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="preload" as="font" type="font/woff2" crossorigin href="${href('assets/bricolage-grotesque-latin.woff2')}"><link rel="stylesheet" href="${href('assets/site.css')}">${route ? '' : `<link rel="preload" as="image" type="image/webp" fetchpriority="high" href="${href('assets/snapshot-monotype.webp')}">`}${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}" fetchpriority="low"></script>${script ? `<script type="module" src="${href('assets/' + script)}" fetchpriority="low"></script>` : ''}${route ? '' : `<link rel="stylesheet" href="${href('assets/home.css')}">`}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
   <header class="site-header">${wordmark}<nav class="desktop-nav" aria-label="Main">${navigation}</nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg></button><a class="github-link" href="${repository}">GitHub</a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden>${navigation}<a href="${href('compare/')}">Live comparison</a><a href="${href('playground/')}">Small snapshot example</a><a href="${repository}">GitHub</a></nav>
   ${body}
@@ -73,19 +73,19 @@ state.subscribe(({ stock }) => {
         <p>A JavaScript and TypeScript library for sharing maps, lists, and sets across workers. With shared memory, workers read snapshots without copying the whole collection.</p>
         <div class="product-actions">
           <a class="quickstart" href="${base}docs/getting-started/">Quickstart <span aria-hidden="true">→</span></a>
-          <div class="install-command"><code>npm i zerocopy</code><button type="button" class="copy-install" aria-label="Copy npm install command" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 7V4h11v13h-3"/><rect x="4" y="8" width="11" height="13" rx="1.5"/></svg></button></div>
-          <button class="runtime-control" type="button" aria-label="Pause rotating runtime name" title="Pause rotating runtime name" hidden><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path class="pause-icon" d="M5 3v10m6-10v10" fill="none" stroke="currentColor" stroke-width="2"/><path class="play-icon" d="m5 3 8 5-8 5z" fill="currentColor" hidden/></svg></button>
+          <div class="install-command"><code>npm i zerocopy</code><button type="button" class="copy-install" aria-label="Copy npm install command" disabled><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 7V4h11v13h-3"/><rect x="4" y="8" width="11" height="13" rx="1.5"/></svg></button></div>
+          <button class="runtime-control" type="button" aria-label="Pause rotating runtime name" title="Pause rotating runtime name" disabled><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path class="pause-icon" d="M5 3v10m6-10v10" fill="none" stroke="currentColor" stroke-width="2"/><path class="play-icon" d="m5 3 8 5-8 5z" fill="currentColor" hidden/></svg></button>
         </div>
       </div>
       <figure class="worker-example" aria-label="Runnable Node.js worker example">
         <div class="example-mat">
           <div class="code-demo">
-            <div class="code-tabs" role="tablist" aria-label="Node.js example files" hidden>
+            <div class="code-tabs" role="tablist" aria-label="Node.js example files">
               <button role="tab" aria-selected="true" id="tab-reader" aria-controls="panel-reader" data-code-tab="reader">worker.mjs</button>
               <button role="tab" aria-selected="false" id="tab-owner" aria-controls="panel-owner" tabindex="-1" data-code-tab="owner">main.mjs</button>
             </div>
-            <div id="panel-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
-            <div id="panel-owner">${codeBlock(main, 'main.mjs', 'js')}</div>
+            <div id="panel-reader" role="tabpanel" aria-labelledby="tab-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
+            <div id="panel-owner" role="tabpanel" aria-labelledby="tab-owner" data-inactive>${codeBlock(main, 'main.mjs', 'js')}</div>
           </div>
         </div>
         <figcaption><span>Save both files, then run <code>node main.mjs</code>.</span><span class="example-result"><samp>12 8</samp> Original and updated counts</span></figcaption>
@@ -117,7 +117,8 @@ state.subscribe(({ stock }) => {
             <div class="arena-footer"><span class="mono">Map · List · Set</span></div>
           </div>
           <div class="wire wire-bottom"></div>
-          <div class="reader-nodes" id="reader-nodes"></div>
+          <div class="reader-nodes" id="reader-nodes">${Array.from({ length: 3 }, (_, index) =>
+            `<div class="reader-node">Worker ${index + 1}<small>READ-ONLY VIEW</small></div>`).join('')}</div>
         </div>
         <div class="diagram-controls">
           <label for="worker-count">Readers <output id="worker-count-value">3</output></label>

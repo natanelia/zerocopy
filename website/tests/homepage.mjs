@@ -18,9 +18,29 @@ export async function checkHomepage(browser, url, screenshots) {
   const states = () => demo.locator('.worker-slot').evaluateAll(items => items.map(item => item.dataset.state));
   try {
     await page.clock.install();
-    await page.goto(url);
-    await page.evaluate(() => document.fonts.ready);
-    await hero.getByRole('tab', { name: 'worker.mjs' }).waitFor();
+    // Delay the homepage module and check the initial paint before it can run.
+    await page.setViewportSize({ width: 390, height: 844 });
+    let releaseModule;
+    const moduleReady = new Promise(resolve => { releaseModule = resolve; });
+    await page.route('**/assets/home.mjs', async route => {
+      await moduleReady;
+      await route.continue();
+    });
+    try {
+      await page.goto(url, { waitUntil: 'commit' });
+      await hero.getByRole('tab', { name: 'worker.mjs' }).waitFor();
+      await page.evaluate(() => document.fonts.ready);
+      assert.equal(await hero.locator('#panel-owner').isVisible(), false);
+      assert.equal(await page.locator('.reader-node').count(), 3);
+      const example = hero.locator('.worker-example');
+      const firstPaint = await example.boundingBox();
+      releaseModule();
+      await page.waitForFunction(() => !document.querySelector('.copy-install').disabled);
+      assert.deepEqual(await example.boundingBox(), firstPaint);
+    } finally {
+      releaseModule();
+    }
+    await page.setViewportSize({ width: 1440, height: 810 });
     assert.equal(await hero.locator('img,.city-example,.city-traces,.city-pin').count(), 0);
     assert.equal(await page.locator('.city-relief').count(), 0);
     assert.equal(await word.innerText(), 'Node.js');
@@ -38,6 +58,8 @@ export async function checkHomepage(browser, url, screenshots) {
       } else {
         assert.ok(example.x >= intro.x + intro.width - 1, 'Example beside the intro at ' + width);
       }
+      const runtimeLine = await hero.locator('.runtime-slot').boundingBox();
+      assert.ok(runtimeLine.x + runtimeLine.width <= intro.x + intro.width + .1, 'Longest runtime fits at ' + width);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Horizontal overflow at ' + width);
       const source = hero.locator('[role="tabpanel"]:visible pre');
       assert.equal(await source.evaluate(el => el.scrollWidth > el.clientWidth + 1), false, 'Readable example at ' + width);
