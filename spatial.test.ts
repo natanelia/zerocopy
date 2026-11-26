@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex, applySpatialEdits, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
+import { buildSpatialIndex, querySpatialIndex, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
@@ -61,6 +61,30 @@ it('handles an empty base, empty overlay, repeated edits, and conflicting retrie
   expect(() => applySpatialEdits(add, 1, [{ id: 1, bounds: null }])).toThrow(RangeError);
 });
 
+it('prepares moved, inserted and deleted bounds once per captured revision', () => {
+  const base = buildSpatialIndex([{ id: 0, bounds: box }, { id: 7, bounds: far }, { id: 0xffffffff, bounds: box }], 2);
+  const absorbed = applySpatialEdits(undefined, 2, [{ id: 7, bounds: null }]);
+  const changes = applySpatialEdits(absorbed, 3, [
+    { id: 0, bounds: far }, { id: 0xffffffff, bounds: null }, { id: 21, bounds: box },
+  ]);
+  const view = prepareSpatialQuery(base, changes, 3);
+  expect(view.base).toBe(base);
+  expect(view.revision).toBe(3);
+  expect([...view.changedIds]).toEqual([0, 21, 0xffffffff]);
+  expect(view.changedIds.buffer).toBeInstanceOf(SharedArrayBuffer);
+  expect(view.updates.buffer).toBeInstanceOf(SharedArrayBuffer);
+  const clone = structuredClone(view);
+  expect(querySpatialIndex(clone, box)).toEqual([21]);
+  expect(querySpatialIndex(clone, far)).toEqual([0, 7]);
+  expect(querySpatialIndex(clone, [-Infinity, -Infinity, Infinity, Infinity])).toEqual([0, 7, 21]);
+  const deleted = applySpatialEdits(changes, 4, [{ id: 21, bounds: null }, { id: 0, bounds: null }]);
+  expect(querySpatialIndex(prepareSpatialQuery(base, deleted, 4), box)).toEqual([]);
+  expect(querySpatialIndex(view, box)).toEqual([21]);
+  expect(() => prepareSpatialQuery(base, deleted, 3)).toThrow(/newer/);
+  expect(() => prepareSpatialQuery(base, absorbed, 1)).toThrow(/before/);
+  expect(querySpatialIndex(prepareSpatialQuery(buildSpatialIndex([]), absorbed, 2), far)).toEqual([]);
+});
+
 it('rejects duplicate IDs, invalid revisions and invalid boxes before publishing', () => {
   const feature = { id: 3, bounds: box };
   expect(() => buildSpatialIndex([feature, feature])).toThrow(/Duplicate/);
@@ -92,5 +116,6 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
     const expected = [...rows].filter(([, b]) => Math.max(b[0], box[0]) <= Math.min(b[2], box[2]) &&
       Math.max(b[1], box[1]) <= Math.min(b[3], box[3])).map(([id]) => id).sort((a,b) => a-b);
     expect(querySpatialIndex(base, box, changes)).toEqual(expected);
+    expect(querySpatialIndex(prepareSpatialQuery(base, changes, r), box)).toEqual(expected);
   }
 });

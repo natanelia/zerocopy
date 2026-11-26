@@ -16,6 +16,17 @@ export interface SpatialIndex {
   readonly buffer: SharedArrayBuffer | null;
 }
 
+/** Immutable sidecar for repeated viewport searches of one edited tile snapshot. */
+export interface PreparedSpatialQuery {
+  readonly format: 'spatial-query-v1';
+  readonly revision: number;
+  readonly base: SpatialIndex;
+  /** Sorted stable IDs of all features that shadow an entry in the base, including deletions. */
+  readonly changedIds: Uint32Array<SharedArrayBuffer>;
+  /** Bounds of live changes at the captured revision. */
+  readonly updates: SpatialIndex;
+}
+
 function checkRevision(revision: number): void {
   if (!Number.isSafeInteger(revision) || revision < 0) throw new RangeError('Expected a nonnegative safe spatial revision');
 }
@@ -98,13 +109,11 @@ function treeFor(base: SpatialIndex): Flatbush | undefined {
   return tree;
 }
 
-/** Build a replacement from a captured base and overlay without decoding feature metadata. */
-export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges, revision: number): SpatialIndex {
+function collectChanges(base: SpatialIndex, changes: SpatialChanges, revision: number) {
   checkRevision(revision);
-  const tree = treeFor(base);
-  if (revision < base.revision) throw new RangeError('Cannot rebuild before the base revision');
+  if (revision < base.revision) throw new RangeError('Cannot capture changes before the base revision');
   const edits = new Map<number, BoundsXY | null>();
-  let count = base.ids.length;
+  let liveCount = 0;
   for (const [key, change] of changes.entries()) {
     checkRevision(change.revision);
     if (change.revision > revision) throw new RangeError('Spatial overlay is newer than the requested revision');
@@ -114,10 +123,43 @@ export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges,
     if (String(id) !== key) throw new TypeError('Expected a canonical spatial feature ID');
     if (change.bounds !== null) {
       checkBounds(change.bounds, true);
-      count++;
+      liveCount++;
     }
     edits.set(id, change.bounds);
   }
+  return { edits, liveCount };
+}
+
+/** Index just the edits for repeated queries. The packed base buffers are reused. */
+export function prepareSpatialQuery(base: SpatialIndex, changes: SpatialChanges, revision: number): PreparedSpatialQuery {
+  treeFor(base);
+  const { edits, liveCount } = collectChanges(base, changes, revision);
+  const changedIds = new Uint32Array(new SharedArrayBuffer(edits.size * 4));
+  const liveIds = new Uint32Array(new SharedArrayBuffer(liveCount * 4));
+  const tree = liveCount ? new Flatbush(liveCount, 16, Float64Array, SharedArrayBuffer) : undefined;
+  let i = 0;
+  for (const [id, bounds] of edits) {
+    changedIds[i++] = id;
+    if (bounds) liveIds[tree!.add(...bounds)] = id;
+  }
+  changedIds.sort();
+  return Object.freeze({ format: 'spatial-query-v1', revision, base, changedIds, updates: finishIndex(tree, liveIds, revision) });
+}
+
+function containsId(ids: Uint32Array, id: number): boolean {
+  let low = 0, high = ids.length;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (ids[mid] < id) low = mid + 1;
+    else high = mid;
+  }
+  return ids[low] === id;
+}
+
+/** Build a replacement from a captured base and overlay without decoding feature metadata. */
+export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges, revision: number): SpatialIndex {
+  const tree = treeFor(base);
+  const { edits, liveCount } = collectChanges(base, changes, revision);
   if (!edits.size) {
     if (revision === base.revision) return base;
     const next = Object.freeze({ ...base, revision });
@@ -125,6 +167,7 @@ export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges,
     return next;
   }
   // Replaced base entries are omitted. Each live edit contributes one entry.
+  let count = base.ids.length + liveCount;
   for (const id of base.ids) if (edits.has(id)) count--;
   const ids = new Uint32Array(new SharedArrayBuffer(count * 4));
   const next = count ? new Flatbush(count, 16, Float64Array, SharedArrayBuffer) : undefined;
@@ -140,8 +183,25 @@ export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges,
 }
 
 /** Return candidate feature IDs in ascending order. Touching edges intersect. */
-export function querySpatialIndex(base: SpatialIndex, box: BoundsXY, changes?: SpatialChanges): number[] {
+export function querySpatialIndex(snapshot: SpatialIndex | PreparedSpatialQuery, box: BoundsXY): number[];
+export function querySpatialIndex(base: SpatialIndex, box: BoundsXY, changes?: SpatialChanges): number[];
+export function querySpatialIndex(index: SpatialIndex | PreparedSpatialQuery, box: BoundsXY, changes?: SpatialChanges): number[] {
   checkBounds(box, false);
+  if (index.format === 'spatial-query-v1') {
+    if (changes !== undefined) throw new TypeError('A prepared spatial query already includes its changes');
+    const { base, updates, changedIds } = index;
+    if (!(changedIds instanceof Uint32Array) || !(changedIds.buffer instanceof SharedArrayBuffer)) {
+      throw new TypeError('Expected shared spatial change IDs');
+    }
+    const result: number[] = [];
+    for (const slot of treeFor(base)?.search(...box) ?? []) {
+      const id = base.ids[slot];
+      if (!containsId(changedIds, id)) result.push(id);
+    }
+    for (const slot of treeFor(updates)?.search(...box) ?? []) result.push(updates.ids[slot]);
+    return result.sort((a, b) => a - b);
+  }
+  const base = index;
   const tree = treeFor(base);
   const result: number[] = [];
   if (tree) {

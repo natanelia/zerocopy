@@ -1,7 +1,7 @@
 import { createCollection, createTransaction } from '@tanstack/db';
 import { sharedCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
-import { applySpatialEdits, buildSpatialIndex, pruneSpatialEdits, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
+import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
 const options = sharedCollectionConfig<Lane>({ id: 'lanes' });
@@ -26,6 +26,10 @@ const edits = applySpatialEdits(undefined, 1, [{ id: 17, bounds: null }]);
 const roots = await initWorker<{ edits: typeof edits }>(getWorkerData({ edits }));
 const candidates: number[] = querySpatialIndex(structuredClone(base), [0, 0, 2, 3], roots.edits);
 const rebuilt: typeof base = rebuildSpatialIndex(base, roots.edits, 1);
+const prepared = prepareSpatialQuery(base, roots.edits, 1);
+querySpatialIndex(structuredClone(prepared), [0, 0, 2, 3]);
+// @ts-expect-error Prepared snapshots already capture the edit revision.
+querySpatialIndex(prepared, [0, 0, 2, 3], edits);
 void rebuilt;
 pruneSpatialEdits(edits, 1);
 void candidates;

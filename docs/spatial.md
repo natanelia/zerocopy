@@ -45,6 +45,12 @@ candidates when an application needs line or polygon intersection.
   recent changes. An updated feature suppresses its old index hit even when
   its new bounds are outside the viewport. Changes at or before the base
   revision have already been incorporated and are skipped.
+- `prepareSpatialQuery(base, changes, revision)` captures the base and builds
+  a small packed index for live edits plus a sorted table of changed IDs.
+  Use `querySpatialIndex(prepared, box)` for repeated pans or independent
+  workers searching the same revision. Moves and deletions suppress old base
+  hits. Preparation reads only the change map and reuses the base buffers.
+  Pass a captured revision at or after both the base and its changes.
 - `rebuildSpatialIndex(base, changes, revision)` creates a replacement index
   directly from packed bounds and the captured change map. A reader can build
   it using just those two inputs and the revision of their publication.
@@ -72,14 +78,30 @@ On the owner, install a returned base only if its tile is still active and its
 revision is at least as recent as the installed base. Pair it with the latest
 overlay pruned through the returned revision. An older job can finish last.
 
-A query scans every unpruned change. Choose a rebuild threshold from measured
-edit density and viewport latency. The [browser replay](../proofs/spatial-editor/README.md)
+The direct map query scans every unpruned change. Preparing the edits moves
+that work to publication time. A full rebuild folds them into a single tree
+and removes the per-hit changed-ID check. Choose between the three using
+edit frequency, query frequency, and viewport size. The [browser replay](../proofs/spatial-editor/README.md)
 includes deletes, retained readers, an index rebuilt while edits continue,
 and binary deck.gl paths. Rebuilding from packed bounds took a median 2.6 ms
 in that four-reader replay, compared with 22.3 ms for decoding the shared
 metadata rows. See the [trial results and measurement conditions](../proofs/spatial-editor/RESULTS.md).
 
 ## Dedicated worker transport
+
+A prepared snapshot contains only structured-cloneable descriptors and shared
+typed-array storage. Build it once and send it to all readers with ordinary
+`postMessage`. A worker that only searches this snapshot can call
+`querySpatialIndex` immediately. Keep the handle to finish queries at its
+captured revision. Prepare another snapshot to include later edits.
+
+```ts
+import { prepareSpatialQuery, querySpatialIndex } from 'zerocopy/spatial';
+
+const prepared = prepareSpatialQuery(base, edits, revision);
+worker.postMessage({ prepared }); // Shared backing buffers need no transfer list.
+const visible = querySpatialIndex(prepared, viewport); // The owner can also query it.
+```
 
 Send the base once per generation using ordinary structured clone, without a
 transfer list. Treat the shared buffers as immutable in every realm. Send the

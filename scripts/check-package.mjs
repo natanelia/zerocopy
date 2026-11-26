@@ -27,12 +27,13 @@ try {
   const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
 import { SharedList } from 'zerocopy';
-import { buildSpatialIndex, applySpatialEdits, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
+import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
 const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }]);
 assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3]), [7]);
 assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3], edits), []);
 assert.deepEqual(querySpatialIndex(rebuildSpatialIndex(base, edits, 1), [0, 0, 2, 3]), []);
+assert.deepEqual(querySpatialIndex(structuredClone(prepareSpatialQuery(base, edits, 1)), [0, 0, 2, 3]), []);
 ${imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; assert.ok(Object.keys(entry${index}).length > 0);`).join('\n')}
 const before = new SharedList('number').pushMany([1, 2]);
 const after = before.push(3);
@@ -47,6 +48,22 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
   const workerProof = readFileSync(join(root, 'proofs/node-worker.mjs'), 'utf8').replace("'../dist/shared.js'", "'zerocopy'");
   writeFileSync(join(temporary, 'worker.mjs'), workerProof);
   run(process.execPath, ['worker.mjs']);
+
+  writeFileSync(join(temporary, 'spatial-reader.mjs'), `
+import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex } from 'zerocopy/spatial';
+const box = [0, 0, 1, 1];
+if (isMainThread) {
+  const base = buildSpatialIndex([{ id: 7, bounds: box }]);
+  const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }, { id: 19, bounds: box }]);
+  const reader = new Worker(new URL(import.meta.url), { workerData: prepareSpatialQuery(base, edits, 1) });
+  try { assert.deepEqual(await once(reader, 'message'), [[19]]); }
+  finally { await reader.terminate(); }
+} else parentPort.postMessage(querySpatialIndex(workerData, box));
+`);
+  run(process.execPath, ['spatial-reader.mjs']);
 
   const consumer = join(temporary, 'consumer.ts');
   writeFileSync(consumer, imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; void entry${index};`).join('\n') + "\nimport { SharedList } from 'zerocopy';\nconst list: SharedList<'number'> = new SharedList('number');\nconst value: number | undefined = list.get(0);\n");
