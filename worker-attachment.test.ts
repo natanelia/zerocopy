@@ -268,10 +268,11 @@ for (const copy of [false, true]) describe(`worker attachment registry (copy=${c
 describe('experimental repeated shared attachment kernel deferral', () => {
   it('materializes only the requested frame-local kernels and preserves old heap bounds', async () => {
     const child = numberMap(1), parent = nestedMap(child), spare = numberMap(99);
-    const initial = getWorkerData({parent, child, spare}, {copy:false});
+    const padding = Object.fromEntries(Array.from({length:5}, (_,i)=>['padding'+i, numberMap(i)]));
+    const initial = getWorkerData({parent, child, spare, ...padding}, {copy:false});
     const old = await initWorker(initial);
     const nextChild = child.set('value',2), nextParent = parent.set('child',nextChild);
-    const updated = getWorkerData({parent:nextParent,child:nextChild,spare},{copy:false});
+    const updated = getWorkerData({parent:nextParent,child:nextChild,spare,...padding},{copy:false});
     const next = await initWorker(updated,{previous:old});
     const oldArena=arenaOf(old.child), newArena=arenaOf(next.child), spareArena=arenaOf(next.spare);
     assert.notEqual(newArena,oldArena);
@@ -295,7 +296,7 @@ describe('experimental repeated shared attachment kernel deferral', () => {
     assert.throws(()=>next.child.set('value',9),/read-only/);
     // Grow the writer after the older read-only frame has been retained.
     const grown=nextChild.setMany(Array.from({length:12000},(_,i)=>['道路/'+i,i] as [string,number]));
-    const after=await initWorker(getWorkerData({parent:nextParent,child:grown,spare},{copy:false}),{previous:next});
+    const after=await initWorker(getWorkerData({parent:nextParent,child:grown,spare,...padding},{copy:false}),{previous:next});
     assert.equal(after.child.get('道路/11999'),11999);
     assert.equal(next.child.get('道路/11999'),undefined);
     assert.equal(old.child.get('value'),1);
@@ -306,8 +307,11 @@ describe('experimental repeated shared attachment kernel deferral', () => {
   });
   it('does not defer copies or a different backing memory with the same id', async () => {
     const source=numberMap(1,new Arena({id:'repeated'}));
-    const old=await initWorker(getWorkerData({source},{copy:false}));
-    for(const data of [getWorkerData({source},{copy:true}),getWorkerData({source:numberMap(2,new Arena({id:'repeated'}))},{copy:false})]){
+    const padding=Object.fromEntries(Array.from({length:7},(_,i)=>['padding'+i,numberMap(i)]));
+    const old=await initWorker(getWorkerData({source,...padding},{copy:false}));
+    const small=await initWorker(getWorkerData({source},{copy:false}),{previous:old});
+    assert(Object.hasOwn(Object.getOwnPropertyDescriptor(arenaOf(small.source),'wasm')!,'value'));
+    for(const data of [getWorkerData({source,...padding},{copy:true}),getWorkerData({source:numberMap(2,new Arena({id:'repeated'})),...padding},{copy:false})]){
       const next=await initWorker(data,{previous:old});
       assert(Object.hasOwn(Object.getOwnPropertyDescriptor(arenaOf(next.source),'wasm')!,'value'));
       assert.notEqual(arenaOf(next.source).memory,arenaOf(old.source).memory);

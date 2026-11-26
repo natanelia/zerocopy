@@ -1,10 +1,19 @@
 import { escape, codeBlock } from './render.mjs';
+import { cityDemo } from './city-demo.mjs';
 import { projectName, repository, npmPackage } from './config.mjs';
 
-const arrow = '<span aria-hidden="true">↗</span>';
-const logo = '<svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><path d="M3 4h22v5L10 19h15v5H3v-5L18 9H3z" fill="currentColor"/></svg>';
+const arrow = '<svg class="link-arrow" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 13 13 3M4 3h9v9"/></svg>';
 export function shell({ title, description, body, base, route = '', script, version, sha, origin, noindex = false }) {
   const href = path => base + path;
+  const wordmark = `<a class="wordmark" href="${href('')}" aria-label="zerocopy home"><span class="brand-symbol" aria-hidden="true"></span>zerocopy</a>`;
+  const navigation = [
+    ['Docs', 'docs/getting-started/', route.startsWith('docs/')],
+    ['Use cases', 'use-cases/', route === 'use-cases/'],
+    ['Benchmarks', 'investigation-benchmark/', route === 'investigation-benchmark/'],
+  ].map(([label, path, active]) => {
+    const current = active ? ` aria-current="${route === path ? 'page' : 'location'}"` : '';
+    return `<a href="${href(path)}"${current}>${label}</a>`;
+  }).join('');
   const canonical = origin ? `<link rel="canonical" href="${escape(origin + href(route))}"><meta property="og:url" content="${escape(origin + href(route))}">` : '';
   const pageTitle = route ? `${title} · zerocopy` : title;
   // Describe the source project once, on the indexable canonical homepage.
@@ -24,45 +33,118 @@ export function shell({ title, description, body, base, route = '', script, vers
   // JSON-LD is raw script text: HTML entities are not decoded here.
   const structuredData = project ? `<script type="application/ld+json">${JSON.stringify(project).replaceAll('<', '\\u003c')}</script>` : '';
   const metadata = `<meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ''}`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8f2"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="stylesheet" href="${href('assets/site.css')}">${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}"></script>${script ? `<script type="module" src="${href('assets/' + script)}"></script>` : ''}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
-  <header class="site-header"><a class="wordmark" href="${href('')}" aria-label="zerocopy home">${logo}<span>zerocopy<span class="wordmark-dot">.</span></span></a><nav class="desktop-nav" aria-label="Main"><a href="${href('docs/getting-started/')}" ${route.startsWith('docs/') ? 'aria-current="page"' : ''}>Documentation</a><a href="${href('use-cases/')}" ${route === 'use-cases/' ? 'aria-current="page"' : ''}>Use cases</a><a href="${href('investigation-benchmark/')}" ${route === 'investigation-benchmark/' ? 'aria-current="page"' : ''}>Catalog benchmark</a></nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg><span>Search</span><kbd>⌘ K</kbd></button><a class="github-link" href="${repository}">GitHub ${arrow}</a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
-  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden><a href="${href('docs/getting-started/')}">Documentation</a><a href="${href('use-cases/')}">Use cases</a><a href="${href('compare/')}">Live comparison</a><a href="${href('playground/')}">Small snapshot example</a><a href="${href('investigation-benchmark/')}">Catalog benchmark</a><a href="${repository}">GitHub</a></nav>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f8f5ed"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="preload" as="font" type="font/woff2" crossorigin href="${href('assets/bricolage-grotesque-latin.woff2')}"><link rel="stylesheet" href="${href('assets/site.css')}">${route ? '' : `<link rel="preload" as="image" type="image/webp" fetchpriority="high" href="${href('assets/snapshot-monotype.webp')}">`}${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}" fetchpriority="low"></script>${script ? `<script type="module" src="${href('assets/' + script)}" fetchpriority="low"></script>` : ''}${route ? '' : `<link rel="stylesheet" href="${href('assets/home.css')}">`}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">${wordmark}<nav class="desktop-nav" aria-label="Main">${navigation}</nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg></button><a class="github-link" href="${repository}">GitHub</a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden>${navigation}<a href="${href('compare/')}">Live comparison</a><a href="${href('playground/')}">Small snapshot example</a><a href="${repository}">GitHub</a></nav>
   ${body}
-  <footer class="site-footer"><div><a class="wordmark" href="${href('')}">${logo}<span>zerocopy.</span></a><p>Share your data. Keep your options.</p></div><div class="footer-links"><a href="${href('docs/getting-started/')}">Get started</a><a href="${href('docs/memory/')}">Know the trade-offs</a><a href="${repository}/issues">Feedback ${arrow}</a><a href="${npmPackage}">npm package ${arrow}</a><a href="${repository}/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v${escape(version)} · <a href="${repository}/commit/${sha}">${sha.slice(0, 7)}</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
+  <footer class="site-footer"><div>${wordmark}<p><a href="${repository}">${projectName}</a></p></div><div class="footer-links"><a href="${href('docs/getting-started/')}">Get started</a><a href="${href('docs/memory/')}">Know the trade-offs</a><a href="${repository}/issues">Feedback ${arrow}</a><a href="${npmPackage}">npm package ${arrow}</a><a href="${repository}/blob/main/LICENSE">MIT license</a></div><p class="build-info">Source build v${escape(version)} · <a href="${repository}/commit/${sha}">${sha.slice(0, 7)}</a><br>No analytics. Benchmarks stay in your browser.</p></footer>
   <dialog class="search-dialog" aria-labelledby="search-title"><div class="search-top"><label id="search-title" for="search-input">Search the docs</label><button class="search-close" aria-label="Close search">Esc</button></div><input id="search-input" type="search" placeholder="Try “worker”, “typed object”, or “compaction”…" autocomplete="off" aria-describedby="search-status search-help" aria-controls="search-results"><p id="search-status" role="status">Type a topic to find a guide.</p><button id="search-retry" class="text-button" type="button" hidden>Retry search</button><nav aria-label="Search results"><ol id="search-results"></ol></nav><p id="search-help">↓ ↑ to move · Enter to open · Esc to close</p><a class="search-browse" href="${href('docs/getting-started/')}">Browse documentation →</a></dialog><div class="toast" role="status" aria-live="polite"></div>
   </body></html>`;
 }
 
 export function home(base) {
-  return `<main id="main"><section class="hero wrap"><div class="hero-copy"><div class="eyebrow"><span class="status-dot"></span> <a href="${repository}">${projectName}</a> / TYPESCRIPT + WEBASSEMBLY</div><h1>Share your data.<br><span>Not copies.</span></h1><p class="hero-description">zerocopy is a JavaScript and TypeScript library for shared, immutable collections. One writer on the main thread or in a worker. Your UI and other workers read immutable snapshots from the same backing storage.</p><div class="hero-buttons"><a class="button primary" href="${base}docs/getting-started/">Start building ${arrow}</a><a class="button secondary" href="${base}compare/">Compare it live <span aria-hidden="true">→</span></a></div><p class="hero-note">Direct reads. Familiar collections. Tasks optional.</p></div>
-  <div class="sharing-card" aria-label="Interactive conceptual view of shared and cloned storage"><div class="diagram-toolbar"><span class="diagram-title">A DIFFERENT WAY TO SHARE</span><div class="segmented" role="group" aria-label="Storage model"><button data-storage="shared" aria-pressed="true">Shared</button><button data-storage="cloned" aria-pressed="false">Cloned</button></div></div><div class="diagram"><div class="owner-node"><span class="node-icon">1W</span><span>Writer<small>Main thread or worker</small></span><span class="node-live">●</span></div><div class="wire wire-top"></div><div class="arena"><div class="arena-header"><span>YOUR DATASET</span><span id="arena-label">Shared backing storage</span></div><div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div><div class="arena-footer"><span class="mono">Map · List · Set</span><span>Immutable snapshots</span></div></div><div class="wire wire-bottom"></div><div class="reader-nodes" id="reader-nodes"></div></div><div class="diagram-controls"><label for="worker-count">Readers <output id="worker-count-value">3</output></label><input id="worker-count" type="range" min="1" max="4" value="3"><span id="storage-count" role="status">1 backing store</span></div><p class="diagram-caption">Readers can be the UI or workers. One writer per arena.<br>Conceptual storage model. Not a memory measurement.</p></div></section>
-  <section class="promise-strip wrap" aria-label="Core benefits"><div><span class="small-index">01</span><strong>Shared storage</strong><span>Not a full dataset per worker.</span></div><div><span class="small-index">02</span><strong>Local reads</strong><span>No round trip for every value.</span></div><div><span class="small-index">03</span><strong>Immutable versions</strong><span>New edits. Stable earlier snapshots.</span></div></section>
-  <section class="section wrap split-section" id="how-it-works"><div><div class="eyebrow">THE GOOD PART</div><h2>Move the work.<br>Not the whole dataset.</h2><p class="section-lead">Look up a product. Validate its price and stock. Read locally on each connected thread.</p><p>Connect a worker once. A session delivers snapshots. After attachment, <code>.get()</code> is a synchronous local read. It does not ask the writer for a value.</p><a class="text-link" href="${base}docs/mental-model/">Understand the model <span>→</span></a><div class="inline-note">Collections hold data. Sessions share snapshots.<br><strong>Tasks only schedule work.</strong></div></div><div class="code-demo"><p class="code-label">Example: main-thread writer</p><div class="code-tabs" role="tablist" aria-label="Thread example"><button role="tab" aria-selected="true" id="tab-owner" aria-controls="panel-owner" data-code-tab="owner">main.ts</button><button role="tab" aria-selected="false" id="tab-reader" aria-controls="panel-reader" tabindex="-1" data-code-tab="reader">worker.ts</button></div><div role="tabpanel" id="panel-owner" aria-labelledby="tab-owner">${codeBlock(`// With your existing state and worker\nawait state.connect(worker);\n\n// Read directly on the main thread.\nstate.current.products.get('product/000042');\n\n// A replacement creates a new snapshot.\nstate.update('products', products =>\n  products.set('product/000042', updatedProduct)\n);`, 'Main thread · API excerpt')}</div><div role="tabpanel" id="panel-reader" aria-labelledby="tab-reader" hidden>${codeBlock(`import { connectSharedSession }\n  from 'zerocopy/worker';\n\nconst shared = await connectSharedSession<Model>();\n\n// No task. No per-read message.\nconst snapshot = shared.current;\nconst product = snapshot.products.get('product/000042');\n\n// This snapshot stays fixed across later updates.`, 'Worker · API excerpt')}</div><div class="code-demo-bottom"><span class="status-dot"></span> Local read. Not RPC.<a href="${base}docs/getting-started/">Complete setup →</a></div></div></section>
-  <section class="section wrap" id="worker-architecture" aria-labelledby="worker-architecture-heading"><div class="section-heading"><div><div class="eyebrow">THE LIVE PRODUCT CATALOG</div><h2 id="worker-architecture-heading">Write in a worker.<br>Read across your app.</h2></div><a class="text-link" href="${base}compare/">Open the live comparison →</a></div><p>A dedicated worker can own and update a SharedMap. Each arena has one allocating writer; new snapshots reach readers asynchronously.</p><ol class="writer-topology" aria-label="Product catalog worker architecture"><li><strong>UI · main thread</strong><span>Sends control requests to the writer and displays bounded answers.</span></li><li><strong>Writer worker</strong><span>Owns the arena, replaces products and publishes snapshot descriptors directly to its reader workers.</span></li><li><strong>Reader workers</strong><span>Attach shared snapshots and read locally. One looks up IDs; another validates attributes.</span></li></ol><p>The UI controls this example; snapshot delivery runs from the writer worker to reader workers. Other applications can attach read-only snapshots on the UI thread too. <a href="${base}docs/catalog/">Read the catalog design →</a></p></section>
-  <section class="snapshot-promo"><div class="wrap snapshot-promo-inner"><div><div class="eyebrow">ONE LIVE COMPARISON / PRODUCT CATALOG</div><h2>Find a product.<br>Keep its earlier revision.</h2><p>A writer worker owns the product catalog. It publishes shared snapshots directly to two reader workers for lookup and validation. Replace 100 objects while readers keep the original revision.</p><a class="button primary" href="${base}compare/">Compare the live catalog ${arrow}</a><p class="lab-small">Generated attributes, real workers, independently checked answers.</p></div><div class="code-demo">${codeBlock(`// Share products by stable ID.
-const snapshot = shared.current;
+  const main = `import { Worker } from 'node:worker_threads';
+import { SharedMap } from 'zerocopy';
+import { createState } from 'zerocopy/state';
 
-// Read locally during a calculation.
-const product = snapshot.products.get('product/000042');
+const stock = new SharedMap('number').set('pens', 12);
+const state = createState({ stock });
+const worker = new Worker(new URL('./worker.mjs', import.meta.url));
+worker.once('exit', () => state.dispose());
 
-// Keep this snapshot while new data arrives.
-// Publish new versions. Leave old reads intact.`, 'Shared snapshots · API excerpt')}<div class="code-demo-bottom"><span>Editors · Tables · Catalogs · Graphs</span><a href="${base}use-cases/">Explore use cases →</a></div></div></div></section>
-  <section class="section wrap"><div class="section-heading"><div><div class="eyebrow">BUILT FOR SHARED WORK</div><h2>Big data. Busy interfaces.</h2></div><a class="text-link" href="${base}use-cases/">Explore the patterns →</a></div>${useCaseCards(base)}</section>
-  <section class="lab-promo wrap"><div><div class="eyebrow">YOUR BROWSER. YOUR RESULTS.</div><h2>Don't benchmark<br>the marketing.</h2><p>Compare SharedMap, native Map, Immutable.js Map and Immer Map over product objects. Measure first reads, repeated reads and sparse edits, then keep every raw sample.</p><a class="button primary" href="${base}investigation-benchmark/">Run a live benchmark ${arrow}</a><p class="lab-small">No prefilled winner. No result sent to a server.</p></div><div class="lab-preview"><div class="code-label"><span>BENCHMARK LAB</span><span>Ready when you are</span></div><div class="preview-metric"><span>Shared snapshot</span><div class="empty-bar"></div><strong>— ms</strong></div><div class="preview-metric"><span>Immutable.js Map</span><div class="empty-bar"></div><strong>— ms</strong></div><div class="preview-metric"><span>Immer Map</span><div class="empty-bar"></div><strong>— ms</strong></div><div class="lab-preview-foot"><span>Same inputs</span><span>Rotated order</span><span>Checked results</span></div><p>Real timings appear only after you run it.</p></div></section>
-  <section class="section wrap fit-section"><div><div class="eyebrow">THE RIGHT TOOL, NOT EVERY TOOL</div><h2>Keep your stack.<br>Know the trade-offs.</h2><p>Start with a collection. Bring your existing workers, Redux store, or message protocol. Add a task pool when you need one.</p><a class="text-link" href="${base}docs/getting-started/">Find your starting point →</a></div><div class="fit-details"><details open><summary>Where zerocopy fits</summary><p>Large, versioned collections that multiple threads need to read. Feature explorers, editors, large tables, catalogs, graph tools, and simulations with a changing dataset.</p></details><details><summary>What you need to know</summary><p>Browsers need cross-origin isolation. Each arena has one allocating writer. Worker snapshots arrive asynchronously. Long-lived data needs an explicit compaction strategy.</p><a href="${base}docs/memory/">Read the memory guide →</a></details><details><summary>When native collections are better</summary><p>Small data that stays on one thread. Sharing avoids dataset copies; it does not make every collection operation faster or remove all allocations.</p><a href="${base}docs/benchmarks/">See the full recorded results →</a></details></div></section>
-  <section class="closing wrap"><span class="eyebrow">LESS COPYING. MORE BUILDING.</span><h2>Your next worker<br>can read the same data.</h2><a class="button primary" href="${base}docs/getting-started/">Connect your first worker ${arrow}</a><a class="text-link" href="${repository}">Explore the source ↗</a></section></main>`;
+await state.connect(worker);
+state.update('stock', map => map.set('pens', 8));`;
+  const reader = `import { parentPort } from 'node:worker_threads';
+import { connectSharedSession } from 'zerocopy/worker';
+
+const state = await connectSharedSession({
+  endpoint: parentPort,
+});
+const before = state.current.stock;
+
+state.subscribe(({ stock }) => {
+  console.log(before.get('pens'), stock.get('pens'));
+  state.dispose();
+});`;
+  return `<main id="main">
+    <section class="product-hero wrap" id="how-it-works" aria-labelledby="product-title">
+      <div class="product-intro">
+        <h1 id="product-title"><span class="sr-only">Immutable collections for Node.js workers, Web Workers in the browser, and Bun workers.</span><span aria-hidden="true">Immutable<br>collections for<br><span class="runtime-slot"><span class="runtime-phrase"><span class="runtime-word">Node.js</span> workers.</span></span></span></h1>
+        <p>A JavaScript and TypeScript library for sharing maps, lists, and sets across workers. With shared memory, workers read snapshots without copying the whole collection.</p>
+        <div class="product-actions">
+          <a class="quickstart" href="${base}docs/getting-started/">Quickstart <span aria-hidden="true">→</span></a>
+          <div class="install-command"><code>npm i zerocopy</code><button type="button" class="copy-install" aria-label="Copy npm install command" disabled><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 7V4h11v13h-3"/><rect x="4" y="8" width="11" height="13" rx="1.5"/></svg></button></div>
+          <button class="runtime-control" type="button" aria-label="Pause rotating runtime name" title="Pause rotating runtime name" disabled><svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16"><path class="pause-icon" d="M5 3v10m6-10v10" fill="none" stroke="currentColor" stroke-width="2"/><path class="play-icon" d="m5 3 8 5-8 5z" fill="currentColor" hidden/></svg></button>
+        </div>
+      </div>
+      <figure class="worker-example" aria-label="Runnable Node.js worker example">
+        <div class="example-mat">
+          <div class="code-demo">
+            <div class="code-tabs" role="tablist" aria-label="Node.js example files">
+              <button role="tab" aria-selected="true" id="tab-reader" aria-controls="panel-reader" data-code-tab="reader">worker.mjs</button>
+              <button role="tab" aria-selected="false" id="tab-owner" aria-controls="panel-owner" tabindex="-1" data-code-tab="owner">main.mjs</button>
+            </div>
+            <div id="panel-reader" role="tabpanel" aria-labelledby="tab-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
+            <div id="panel-owner" role="tabpanel" aria-labelledby="tab-owner" data-inactive>${codeBlock(main, 'main.mjs', 'js')}</div>
+          </div>
+        </div>
+        <figcaption><span>Save both files, then run <code>node main.mjs</code>.</span><span class="example-result"><samp>12 8</samp> Original and updated counts</span></figcaption>
+      </figure>
+    </section>
+    <section class="wrap storage-example" id="worker-architecture">
+      <div data-scroll-reveal><h2>One writer.<br>Many readers.</h2>
+        <p>A writer publishes immutable snapshots. Readers can keep an earlier version while updates arrive. Use the storage model to see what each worker holds when sharing or cloning.</p>
+        <p>Node.js supports shared storage. Browsers require cross-origin isolation. Bun copies snapshots by default.</p>
+        <a class="model-link" href="${base}docs/mental-model/">How sharing works ${arrow}</a>
+      </div>
+      <div class="sharing-card" data-scroll-reveal role="group" aria-label="Shared and cloned storage">
+        <div class="diagram-toolbar"><span class="diagram-title">Storage model</span>
+          <div class="segmented" role="group" aria-label="Storage model">
+            <button data-storage="shared" aria-pressed="true">Shared</button>
+            <button data-storage="cloned" aria-pressed="false">Cloned</button>
+          </div>
+        </div>
+        <div class="writer-controls">
+          <label for="writer-thread">Writer location</label>
+          <select id="writer-thread"><option value="worker">Dedicated worker</option><option value="main">Main thread</option></select>
+        </div>
+        <div class="diagram">
+          <div class="owner-node"><span id="owner-thread">Dedicated worker</span><strong class="writer-role">Writer</strong></div>
+          <div class="wire wire-top" aria-hidden="true"><i class="snapshot-pulse"></i></div>
+          <div class="arena">
+            <div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div>
+            <div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => '<i></i>').join('')}</div>
+            <div class="arena-footer"><span class="mono">Map · List · Set</span></div>
+          </div>
+          <div class="wire wire-bottom" aria-hidden="true"><i class="snapshot-pulse"></i></div>
+          <div class="reader-nodes" id="reader-nodes">${Array.from({ length: 3 }, (_, index) =>
+            `<div class="reader-node">Worker ${index + 1}<small>READ-ONLY VIEW</small></div>`).join('')}</div>
+        </div>
+        <div class="diagram-controls">
+          <label for="worker-count">Readers <output id="worker-count-value">3</output></label>
+          <input id="worker-count" type="range" min="1" max="4" value="3">
+          <span id="storage-count" role="status">1 backing store</span>
+        </div>
+      </div>
+    </section>
+    <section class="wrap product-links" aria-label="Try the library">
+      <article data-scroll-reveal><h2><a href="${base}compare/">Try the product catalog</a></h2><p>Look up records with real workers, publish an update, and read the earlier revision.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
+      <article data-scroll-reveal><h2><a href="${base}investigation-benchmark/">Run benchmarks</a></h2><p>Measure reads and updates on your device and inspect the recorded memory results.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
+    </section>
+    ${cityDemo(base)}
+  </main>`;
 }
 
 export function useCaseCards(base) {
   const cards = [
-    ['catalog', '01 / PRODUCT CATALOGS', 'Inspect a product by ID.', 'Look up products and validate prices and stock in workers. Replace objects while retaining an earlier revision.', '<path d="M10 70h180M10 40h180M30 80V55m20 25V40m20 40V48m20 32V25m20 55V10m20 70V20m20 60V45m20 35V58"/>'],
-    ['editors', '02 / CREATIVE TOOLS', 'Keep editing. Keep context.', 'Run validation, layout, or export against an earlier document snapshot while the UI accepts new edits.', '<rect x="20" y="10" width="100" height="80" rx="5"/><path d="M40 30h55M40 44h30M40 58h60M40 72h40"/><rect x="110" y="38" width="70" height="54" rx="4"/>'],
-    ['data-tables', '03 / DATA EXPLORATION', 'One table. Several views.', 'Filter, group, and chart the same rows in independent workers. Keep the UI focused on visible results.', '<rect x="15" y="10" width="170" height="80" rx="4"/><path d="M15 30h170M15 50h170M15 70h170M55 10v80M115 10v80"/>'],
-    ['analytics', '04 / LARGE CATALOGS', 'Keep a large catalog shared.', 'Build facets, filters, and availability views over a large changing catalog—not a shared cart counter.', '<rect x="15" y="15" width="46" height="70" rx="5"/><rect x="77" y="15" width="46" height="70" rx="5"/><rect x="139" y="15" width="46" height="70" rx="5"/><path d="M25 64h26M87 64h26M149 64h26"/>'],
-    ['graphs', '05 / GRAPHS & DEV TOOLS', 'Traverse a stable graph.', 'Share nodes and edges with dependency analysis, layout, and diagnostics workers while the graph changes.', '<path d="M40 50 100 20 165 50 100 85zM40 50h125M100 20v65"/><circle cx="40" cy="50" r="10"/><circle cx="100" cy="20" r="10"/><circle cx="165" cy="50" r="10"/><circle cx="100" cy="85" r="10"/>'],
-    ['simulations', '06 / SIMULATION TOOLS', 'Inspect a world in motion.', 'Let analysis and visualization read published world snapshots. Keep one writer per arena.', '<path d="M10 85h180M20 85V60h25v25M65 85V40h25v45M110 85V20h25v65M155 85V50h25v35"/>'],
+    ['catalog', 'Product catalogs', 'Look up a product by ID', 'Look up products and validate prices and stock in workers. Replace objects while retaining an earlier revision.', '<path d="M10 70h180M10 40h180M30 80V55m20 25V40m20 40V48m20 32V25m20 55V10m20 70V20m20 60V45m20 35V58"/>'],
+    ['editors', 'Creative tools', 'Validate while editing', 'Run validation, layout, or export against an earlier document snapshot while the UI accepts new edits.', '<rect x="20" y="10" width="100" height="80" rx="5"/><path d="M40 30h55M40 44h30M40 58h60M40 72h40"/><rect x="110" y="38" width="70" height="54" rx="4"/>'],
+    ['data-tables', 'Data exploration', 'Read a table several ways', 'Filter, group, and chart the same rows in independent workers. Keep the UI focused on visible results.', '<rect x="15" y="10" width="170" height="80" rx="4"/><path d="M15 30h170M15 50h170M15 70h170M55 10v80M115 10v80"/>'],
+    ['analytics', 'Retail analytics', 'Build facets and filters', 'Build facets, filters, and availability views over the same changing catalog.', '<rect x="15" y="15" width="46" height="70" rx="5"/><rect x="77" y="15" width="46" height="70" rx="5"/><rect x="139" y="15" width="46" height="70" rx="5"/><path d="M25 64h26M87 64h26M149 64h26"/>'],
+    ['graphs', 'Developer tools', 'Traverse a stable graph', 'Share nodes and edges with dependency analysis, layout, and diagnostics workers while the graph changes.', '<path d="M40 50 100 20 165 50 100 85zM40 50h125M100 20v65"/><circle cx="40" cy="50" r="10"/><circle cx="100" cy="20" r="10"/><circle cx="165" cy="50" r="10"/><circle cx="100" cy="85" r="10"/>'],
+    ['simulations', 'Simulations', 'Inspect a changing world', 'Let analysis and visualization read published world snapshots. Keep one writer per arena.', '<path d="M10 85h180M20 85V60h25v25M65 85V40h25v45M110 85V20h25v65M155 85V50h25v35"/>'],
   ];
-  return `<div class="use-case-grid">${cards.map(([slug, label, title, text, art]) => `<a class="use-case-card" href="${base}docs/${slug}/"><div class="case-art ${slug}"><svg viewBox="0 0 200 100" aria-hidden="true">${art}</svg><span class="case-arrow">↗</span></div><div class="case-copy"><span class="eyebrow">${label}</span><h3>${title}</h3><p>${text}</p><span class="text-link">Read the pattern →</span></div></a>`).join('')}</div>`;
+  return `<div class="use-case-grid">${cards.map(([slug, label, title, text, art]) => `<a class="use-case-card" href="${base}docs/${slug}/"><div class="case-art ${slug}"><svg viewBox="0 0 200 100" aria-hidden="true">${art}</svg></div><div class="case-copy"><span class="eyebrow">${label}</span><h3>${title}${arrow}</h3><p>${text}</p></div></a>`).join('')}</div>`;
 }
 
 export function docsLayout(page, html, toc, pages, base, sha) {

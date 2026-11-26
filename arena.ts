@@ -190,14 +190,14 @@ export class Arena {
   private readonly scalar = new Uint8Array(8);
   private readonly scalarView = new DataView(this.scalar.buffer);
 
-  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; previous?: Arena } = {}) {
+  constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; previous?: Arena; deferKernel?: boolean } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
     const previous = options.previous;
     // Only defer repeated read-only attachments to an already validated memory
     // object. New memories, copies, legacy attachments and writers remain eager.
     // Each frame still owns its own registry, caches and immutable heap bound.
-    if (options.readOnly && !options.copy && options.used !== undefined &&
+    if (options.deferKernel && options.readOnly && !options.copy && options.used !== undefined &&
         previous?.readOnly && previous.id === options.id && previous.memory === options.memory) {
       const used = options.used;
       const materialize = () => {

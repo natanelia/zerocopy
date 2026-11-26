@@ -137,7 +137,9 @@ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    const arena = new Arena({ ...source, readOnly: true, registry, previous: previous?.get(source.id) });
+    // Small attachments remain eager: deferring their only useful kernel adds latency.
+    const arena = new Arena({ ...source, readOnly: true, registry, previous: previous?.get(source.id),
+      deferKernel: data.arenas.length >= 8 });
     arenas.set(source.id, arena);
     registry?.members.push(arena);
   }

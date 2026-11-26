@@ -1,8 +1,8 @@
-name: Shared session lazy kernel candidate screen (proof only)
+name: Shared session narrowed lazy kernel screen (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]
-    paths: ['.github/workflows/shared-session-shards-proof.yml', 'arena.ts', 'proofs/shared-session-shards-20261126.mjs', 'worker-attachment.test.ts']
+    paths: ['.github/workflows/shared-session-shards-proof.yml', 'arena.ts', 'shared.ts', 'proofs/shared-session-shards-20261126.mjs', 'worker-attachment.test.ts']
 permissions:
   contents: read
 jobs:
@@ -26,9 +26,9 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code 50b06167909ff1398d293948c4a82c5f7bea5863 HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md' ':(exclude)arena.ts' ':(exclude)worker-attachment.test.ts'
+          git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md' ':(exclude)arena.ts' ':(exclude)shared.ts' ':(exclude)worker-attachment.test.ts'
           mkdir -p shared-session-shards-results
-          git worktree add --detach "$RUNNER_TEMP/baseline" 50b06167909ff1398d293948c4a82c5f7bea5863
+          git worktree add --detach "$RUNNER_TEMP/baseline" 84ad23a76ee197f45cbc7316017f28b5bbe93d6c
           cp proofs/shared-session-shards-20261126.mjs "$RUNNER_TEMP/baseline/proofs/"
           node --version
           bun --version
