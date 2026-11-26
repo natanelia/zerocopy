@@ -1,0 +1,59 @@
+name: Selective JSON view setup paired screen (proof only)
+on:
+  push:
+    branches: [proof/json-field-baseline-20261127]
+    paths: ['.github/workflows/json-view-setup-proof.yml', 'arena.ts', 'shared-map.ts', 'json-view.ts', 'json-view.test.ts']
+permissions:
+  contents: read
+jobs:
+  screen:
+    strategy:
+      fail-fast: false
+      matrix:
+        count: [1000, 10000, 100000]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build exact baseline and candidate
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git worktree add --detach "$RUNNER_TEMP/base" 84ad23a76ee197f45cbc7316017f28b5bbe93d6c
+          for repo in "$RUNNER_TEMP/base" "$PWD"; do
+            (
+              cd "$repo"
+              bun install --frozen-lockfile
+              bun run build:wasm && bun run build:browser && bun run build:types
+              npm --prefix website install --ignore-scripts --no-package-lock
+              SITE_BASE=/ node website/build.mjs
+            )
+          done
+      - name: Focused correctness (Bun)
+        if: matrix.count == 1000
+        run: |
+          bun run typecheck
+          bun run test json-view.test.ts json-view-cursor.test.ts json-read-cache.test.ts map-values-view.test.ts
+      - name: Alternating paired worker queries and same-run controls
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/json-view-setup"
+          cases=selective-shared-view,selective-shared-get,materialize-shared-frozen
+          node proofs/json-field-baseline-20261127.mjs "$RUNNER_TEMP/base" "$RUNNER_TEMP/base" "$RUNNER_TEMP/json-view-setup/aa.json" ${{ matrix.count }} 6 "$cases" | tee "$RUNNER_TEMP/json-view-setup/aa.log"
+          node proofs/json-field-baseline-20261127.mjs "$RUNNER_TEMP/base" "$PWD" "$RUNNER_TEMP/json-view-setup/ab.json" ${{ matrix.count }} 12 "$cases" | tee "$RUNNER_TEMP/json-view-setup/ab.log"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: json-view-setup-${{ matrix.count }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/json-view-setup/
+          retention-days: 14

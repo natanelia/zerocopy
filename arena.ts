@@ -5,6 +5,7 @@ import { loadWasm } from './wasm-utils';
 import { structureRegistry } from './codec';
 import { parseNestedType } from './types';
 import { freezeJSON } from './freeze-json';
+import { jsonViewFromBytes, type JsonView } from './json-view';
 export { freezeJSON } from './freeze-json';
 
 const module = new WebAssembly.Module(loadWasm('persistent-core.wasm') as BufferSource);
@@ -212,6 +213,12 @@ export class Arena {
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }
+  /** @internal Header and range bytes come from the same refreshed buffer. */
+  mapLeafJsonView(leaf: number): JsonView {
+    this.refresh();
+    const view = this.view;
+    return jsonViewFromBytes(this, leaf + 16 + view.getUint32(leaf + 8, true), view.getUint32(leaf + 12, true), this.bytes);
+  }
   private get wordView(): Uint32Array { return this.words ??= new Uint32Array(this.buffer); }
   refresh(): void {
     if (this.buffer !== this.memory.buffer) {

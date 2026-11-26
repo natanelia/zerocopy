@@ -211,6 +211,23 @@ describe('JSON shared-byte views', () => {
     expect(list.getView(2)).toBeUndefined();
   });
 
+  test('fresh map views remain independent and nested ranges survive old/new reader growth', async () => {
+    const owner = new SharedMap('object').set('row', { first: { text: '道路🙂', n: 1 }, last: [2, 3], sibling: true });
+    const arena = arenaOf(owner);
+    const { map: attached } = await initWorker(getWorkerData({ map: owner }, { copy: false }));
+    const first = attached.getView('row')!, independent = attached.getView('row')!;
+    expect(first).not.toBe(independent);
+    const retained = first.get('first') as JsonView;
+    const grown = owner.set('large', { text: 'x'.repeat(arena.buf.byteLength) }).set('row', { first: { text: 'new', n: 9 }, last: [4], sibling: false });
+    expect((independent.get('first') as JsonView).toObject()).toEqual({ text: '道路🙂', n: 1 });
+    expect(retained.get('sibling')).toBeUndefined();
+    expect(retained.byteLength).toBe(encoder.encode(JSON.stringify({ text: '道路🙂', n: 1 })).length);
+    expect(retained.toObject()).toEqual({ text: '道路🙂', n: 1 });
+    expect((first.get('last') as JsonView).at(1)).toBe(3);
+    expect((grown.getView('row')!.get('first') as JsonView).get('n')).toBe(9);
+    expect((attached.getView('row')!.get('first') as JsonView).get('n')).toBe(1);
+  });
+
   test('reads list views across leaf/tree boundaries and retains them through writer growth', async () => {
     const records = Array.from({ length: 1100 }, (_, index) => ({ index, text: `record ${index}`, nested: [index] }));
     const list = new SharedList('object').pushMany(records);

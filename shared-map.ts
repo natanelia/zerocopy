@@ -1,7 +1,7 @@
 import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
-import { JsonView } from './json-view';
+import type { JsonView } from './json-view';
 // Registering a collection must not allocate an unused writer in every reader.
 let current: Arena | undefined;
 /** Legacy live bindings are populated on first use, explicit reset, or attachment. */
@@ -53,8 +53,7 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     if (this.valueType !== 'object') throw new TypeError('JSON views require an object map');
     const a = this.arena, leaf = a.find(this.root, key);
     if (!leaf) return undefined;
-    const view = a.dv, start = leaf + 16 + view.getUint32(leaf + 8, true);
-    return new JsonView(a, start, view.getUint32(leaf + 12, true));
+    return a.mapLeafJsonView(leaf);
   }
   has(key: string): boolean { return this.arena.contains(this.root, key); }
   delete(key: string): SharedMap<T> {

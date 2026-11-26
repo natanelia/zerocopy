@@ -6,6 +6,12 @@ export type JsonScalar = string | number | boolean | null;
 export type JsonViewValue = JsonScalar | JsonView;
 export type JsonViewType = 'object' | 'array' | 'string' | 'number' | 'boolean' | 'null';
 const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
+const internalBytes = Symbol('internal JSON view bytes');
+
+/** @internal The arena supplies its already-refreshed byte view. */
+export function jsonViewFromBytes(arena: Arena, pointer: number, length: number, bytes: Uint8Array): JsonView {
+  return new JsonView(arena, pointer, length, internalBytes, bytes);
+}
 
 function space(bytes: Uint8Array, ptr: number, end: number): number {
   while (ptr < end) {
@@ -91,8 +97,12 @@ export class JsonView {
   #arrayCursor: ArrayCursor | undefined;
 
   /** @internal A retained arena keeps the published record alive. */
-  constructor(arena: Arena, pointer: number, length: number) {
-    const bytes = arena.buf;
+  constructor(arena: Arena, pointer: number, length: number);
+  /** @internal Only this module can supply the token. */
+  constructor(arena: Arena, pointer: number, length: number, token: typeof internalBytes, source: Uint8Array, nested?: boolean);
+  constructor(arena: Arena, pointer: number, length: number, token?: typeof internalBytes, source?: Uint8Array, nested = false) {
+    const trusted = token === internalBytes && source !== undefined;
+    const bytes = trusted ? source! : arena.buf;
     if (!Number.isSafeInteger(pointer) || !Number.isSafeInteger(length) || pointer < 65536 || length <= 0
       || pointer + length > bytes.byteLength || pointer + length > 0x7fff0000) {
       throw new RangeError('Invalid JSON view range');
@@ -103,6 +113,9 @@ export class JsonView {
     this.#bound = pointer + length;
     this.#start = space(bytes, pointer, this.#bound);
     if (this.#start === this.#bound) throw new SyntaxError('Empty JSON view');
+    // A nested range's enclosing bound can include siblings. Its actual end
+    // is deliberately unknown; do not calculate and then discard a root end.
+    if (trusted && nested) return;
     // A complete record already carries its exact byte length. Avoid scanning
     // its JSON again for byteLength or explicit whole-record materialization.
     let end = this.#bound;
@@ -281,12 +294,9 @@ export class JsonView {
     switch (bytes[pointer]) {
       case 123: case 91: {
         if (root) return this;
-        const nested = new JsonView(this.#arena, pointer, this.#bound - pointer);
-        // Field selection returns a start without rescanning the subtree. Its
-        // enclosing bound can include siblings; find the actual end only when
-        // byteLength or materialization needs it.
-        nested.#end = undefined;
-        return nested;
+        // The parent's published range remains readable across memory growth.
+        // Use that same byte view; no second arena refresh or root-end trim.
+        return new JsonView(this.#arena, pointer, this.#bound - pointer, internalBytes, bytes, true);
       }
       case 116: return true;
       case 102: return false;

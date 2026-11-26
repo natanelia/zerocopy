@@ -17,3 +17,18 @@ Use the existing website owner and two real Node worker readers, identical-build
 All 108 measured cases passed the website's complete projected-result verification, plus 36 warmups. Each queries 1,000 IDs in two real readers, including updated and retained snapshots. Native Map pays clone/attachment costs; ordinary shared get can reuse decoded objects; getView deliberately avoids a decoded-value cache. These are API tradeoffs, not candidate gains. A/A median repeat-query ratios for view were 0.966, 0.833 and 1.025 respectively: do not interpret small changes as improvements. Separate runners may differ across sizes.
 
 Code inspection: each selected ID constructs a view, the per-view last-field cursor is lost on the next query, long fields use hash/candidate/verification, and decimals/strings may decode. The website query selects category/status, then name, nested attributes.priceCents and revision. No attribution yet; do not assume a shared index is the best fix. Profile the unchanged 100k website workload in real reader threads with Node inspector at 100 µs interval, four measured pairs plus two warmups, capture all four phases in both readers and compare getView vs get. Profiles are diagnostic only, not performance timings; separate self/inclusive stacks and check sample counts. Preserve raw profiles, per-phase outputs and hashes. Only after attribution choose a minimal independent candidate. No production changes; no preview or deployment.
+
+## CPU attribution and bounded candidate (unverified)
+
+[Profile run 45898325054](https://github.com/natanelia/zerocopy/actions/runs/45898325054), [192 raw profiles](https://github.com/natanelia/zerocopy/actions/runs/45898325054/artifacts/15154532968). Aggregate `timeDeltas` of samples with `runReadQuery` in the ancestor chain, excluding inspector start/stop, dispatch, and other non-query stacks; 24 profiles per API/phase (warmups and measured, both labels/readers). The raw profiles contain substantial inspector overhead; no wall-time or GC inference from these stacks.
+
+| getView phase | in-query samples | sampled query ms | self-time share getView + JsonView constructor | find + findUncached | #field |
+|---|---:|---:|---:|---:|---:|
+| first | 724 | 206.4 | 9.9% | 24.9% | 5.5% |
+| repeat | 267 | 55.7 | 27.7% | 2.8% | 4.3% |
+| updated | 561 | 176.7 | 8.2% | 24.8% | 12.6% |
+| retained | 125 | 29.1 | 14.6% | 4.4% | 4.6% |
+
+Ordinary cold get instead shows decodeAt 25%, readObject 20%, freezeJSON 15.4% and findUncached 10.9% of sampled in-query time (716 samples). The profile does not support reviving #86's broad per-record index. Candidate targets avoidable view setup work: map header and bytes use one refresh; nested views use the parent's immutable range and do not calculate a root end only to discard it. Same public constructor, distinct views, range validation, no record cache, no format or WASM changes. Not a claim that all sampled view creation cost disappears.
+
+Screen against pinned main with original website verification, 12 alternating pairs and independent same-run A/A controls, three sizes, ordinary get and explicit frozen materialization controls. Gate: meaningful repeat or updated query gain (at least ~15% paired median in larger relevant sizes, consistent across pairs and outside A/A noise), no material adverse cold/control or p95 results. If no clear gain, retire rather than tune. If positive, qualify random/scatter, more realistic query sequences, Bun/Chromium/Firefox, retained memory and exact-head CI before PR. No deployment or merge.
