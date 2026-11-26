@@ -79,6 +79,20 @@ describe('JSON freezing', () => {
     expect(Object.isFrozen(node)).toBe(true);
   });
 
+  test('handles 20,000 nested objects without recursive calls', () => {
+    const depth = 20000;
+    const decoded = JSON.parse('{"child":'.repeat(depth) + '{"value":1}' + '}'.repeat(depth));
+    expect(freezeJSON(decoded)).toBe(decoded);
+    let node = decoded;
+    for (let i = 0; i < depth; i++) {
+      expect(Object.isFrozen(node)).toBe(true);
+      expect(Object.hasOwn(node, 'child')).toBe(true);
+      node = node.child;
+    }
+    expect(node).toEqual({ value: 1 });
+    expect(Object.isFrozen(node)).toBe(true);
+  });
+
   test('handles a wide array without a function-argument limit', () => {
     const decoded = JSON.parse(JSON.stringify(Array.from({ length: 100000 }, (_, i) => i % 997 ? i : { coordinates: [[i, -i]] })));
     freezeJSON(decoded);
