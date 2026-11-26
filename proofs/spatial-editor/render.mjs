@@ -32,7 +32,10 @@ export async function renderer() {
     onAfterRender: () => {
       if (pendingFrame) {
         gl.finish();
-        pendingFrame.resolve(performance.now() - renderStarted);
+        pendingFrame.resolve({
+          beforeScreenDrawMs: renderStarted - pendingFrame.propsSet,
+          drawAndFinishMs: performance.now() - renderStarted,
+        });
         pendingFrame = undefined;
       }
     },
@@ -40,7 +43,7 @@ export async function renderer() {
   await ready;
   let ids = [], starts = new Uint32Array(), positions = new Float64Array(), indexById = new Map();
   return {
-    async draw(nextIds, paths, box, dirty) {
+    async draw(nextIds, paths, box, dirty, commandStarted) {
       const begin = performance.now(), bytesBefore = uploadBytes, uploadBefore = uploadCallMs;
       const length = path => path.length ?? path.size;
       const repack = nextIds.length !== ids.length || nextIds.some((id, i) =>
@@ -67,8 +70,9 @@ export async function renderer() {
       }
       deck.setProps({ viewState: { target: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2, 0], zoom: 2.5 } });
       if (error) throw error;
-      const drawAndFinishMs = await new Promise((resolve, reject) => { pendingFrame = { resolve, reject }; });
-      return { packMs: packed - begin, drawAndFinishMs,
+      const propsSet = performance.now();
+      const draw = await new Promise((resolve, reject) => { pendingFrame = { propsSet, resolve, reject }; });
+      return { commandBeforePackMs: begin - commandStarted, packMs: packed - begin, setPropsMs: propsSet - packed, ...draw,
         uploadBytes: uploadBytes - bytesBefore, uploadCallMs: uploadCallMs - uploadBefore };
 
     },

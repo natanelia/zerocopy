@@ -71,6 +71,15 @@ completeness and calculate medians of the three per-trial p95s.
   the first screen draw after the update and WebGL finishes it. Headless
   Chromium uses SwiftShader. This measures a completed headless frame and
   excludes physical display presentation and device input delivery.
+- **Frame phases** use the same main-thread clock. They cover command
+  processing through entry into the renderer, packing binary paths, setting
+  deck.gl props, the interval until `onBeforeRender`, and the draw through
+  `gl.finish()`. The interval before the screen draw includes browser
+  scheduling and deck.gl layer updates. Time remaining after the draw covers
+  returning to the command handler. Worker validation runs concurrently.
+  In timing-version 1 reports the summary selects the slowest 5% of commands
+  in each trial (rounded up) and reports each phase's share of their combined
+  frame time.
 - **Validation latency** ends after every dedicated reader replies. Timing
   includes worker attachment, messaging and viewport geometry checks.
 - **Rebuild time** measures the index construction call inside the first

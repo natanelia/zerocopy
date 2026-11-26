@@ -15,7 +15,7 @@ const reports = inputs.map(path => {
 });
 const first = reports[0];
 for (const report of reports) {
-  for (const key of ['bundleSHA256', 'config', 'chromium', 'hardware', 'platform']) {
+  for (const key of ['bundleSHA256', 'config', 'chromium', 'hardware', 'platform', 'frameTimingVersion']) {
     assert.deepEqual(report[key], first[key], 'Mixed benchmark inputs: ' + key);
   }
 }
@@ -26,6 +26,8 @@ function median(values) {
   return (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.floor(sorted.length / 2)]) / 2;
 }
 const summary = [];
+const framePhases = ['commandBeforePackMs', 'packMs', 'setPropsMs', 'beforeScreenDrawMs', 'drawAndFinishMs'];
+assert([undefined, 1].includes(first.frameTimingVersion), 'Unsupported frame timing version');
 for (const readers of readerCounts) {
   const row = { readers };
   for (const mode of modes) {
@@ -41,6 +43,11 @@ for (const readers of readerCounts) {
         for (const key of ['frameMs', 'validationMs', 'drawAndFinishMs', 'packMs', 'uploadBytes', 'uploadCallMs']) {
           assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
         }
+        if (first.frameTimingVersion === 1) {
+          for (const key of framePhases) assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
+          const measured = framePhases.reduce((ms, key) => ms + s[key], 0);
+          assert(measured <= s.frameMs + 1e-6, 'Frame phases overlap or exceed total latency');
+        }
       }
       for (const [metric, key] of [['p95FrameMs', 'frameMs'], ['p95ValidationMs', 'validationMs']]) {
         const sorted = c.samples.map(s => s[key]).sort((a,b) => a-b);
@@ -54,6 +61,17 @@ for (const readers of readerCounts) {
       p95FrameMs: median(matching.map(c => c.p95FrameMs)),
       p95ValidationMs: median(matching.map(c => c.p95ValidationMs)),
     };
+    if (first.frameTimingVersion === 1) {
+      // Select whole commands by total frame latency before attributing their time.
+      const slow = matching.flatMap(c => c.samples.toSorted((a, b) => b.frameMs - a.frameMs)
+        .slice(0, Math.ceil(c.samples.length * 0.05)));
+      const frameTotal = slow.reduce((ms, s) => ms + s.frameMs, 0);
+      assert(frameTotal > 0, 'Expected positive frame time');
+      const phaseShare = Object.fromEntries(framePhases.map(key =>
+        [key, slow.reduce((ms, s) => ms + s[key], 0) / frameTotal]));
+      row[mode].slowFrameTimeShare = { count: slow.length, ...phaseShare,
+        afterDraw: 1 - Object.values(phaseShare).reduce((a, b) => a + b, 0) };
+    }
     if (first.config.rebuild) {
       const samples = matching.flatMap(c => c.samples);
       row[mode].medianRebuildMs = median(samples.filter(s => s.step % 16 === 2).map(s => s.rebuildMs));

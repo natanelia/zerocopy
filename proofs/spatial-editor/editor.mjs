@@ -156,7 +156,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       const validation = Promise.all(peers.map(p => p.send(frame))).then(results => ({
         results, validationMs: performance.now() - started,
       }));
-      const draw = await view.draw(liveIds, paths, box, cmd.reject ? undefined : cmd.id);
+      const draw = await view.draw(liveIds, paths, box, cmd.reject ? undefined : cmd.id, started);
       const frameMs = performance.now() - started;
       const { results, validationMs } = await validation;
       const isCurrent = response => response.revision === revision && response.request === step;

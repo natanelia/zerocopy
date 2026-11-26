@@ -59,7 +59,7 @@ try {
   await build({ entryPoints: [join(here, 'editor.mjs'), join(here, 'reader.mjs')], outdir: dir,
     bundle: true, format: 'esm', platform: 'browser', define: { 'process.env.NODE_ENV': '"production"' } });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-  const report = { config, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
+  const report = { frameTimingVersion: 1, config, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
     bundleSHA256: {}, cases: [] };
   for (const name of ['editor', 'reader']) {
     report.bundleSHA256[name] = createHash('sha256').update(await readFile(join(dir, name + '.js'))).digest('hex');
