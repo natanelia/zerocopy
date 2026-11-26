@@ -35,17 +35,73 @@ const config = sharedCollectionConfig({
 });
 ```
 
-The returned object provides sync callbacks, mutation hooks, `getSharedState()`, and `fromSharedState()`. Its sync callback inserts `initialData` and calls `markReady()`.
+Pass the options to TanStack DB's `createCollection(config)`. The collection
+uses the configured string key for both TanStack and ZeroCopy. The default is
+`id`. Automatic inserts, updates and deletes update the shared map on
+confirmation. A new sync connection loads the current confirmed rows, including
+deletions made since the initial import.
 
-**Current limits:** mutation hooks forward transaction messages to the registered sync callbacks, but do not update this adapter's internal `SharedCollection`. Its shared-state descriptor must not be treated as an always-current mirror of later mutations. The optional `primaryKey` field does not remove the requirement for each inserted item to have a string `id`.
+`config.getSnapshot()` returns the immutable core `SharedMap` of confirmed
+rows. The initial snapshot is available after `await collection.preload()`.
+During a pending edit TanStack can show an optimistic row while a worker
+continues reading the previous snapshot. After
+`await transaction.isPersisted.promise`, capture a new snapshot. Old handles
+stay readable. The adapter has integration coverage against TanStack DB 0.15.2.
 
-The adapter's configuration shape is defined in [the source](../tanstack-db-collection.ts). Check it against the TanStack DB version used by your application. The repository's [adapter tests](../tanstack-db-collection.test.ts) exercise callbacks; they are not a complete integration test of every TanStack DB version or sync provider.
+### Confirm a group of edits
+
+For a manual TanStack transaction, call the adapter's acceptance helper once
+inside the mutation function, after validation or persistence succeeds. The
+helper processes the transaction's mutations for this collection in order.
+It applies updated fields to the confirmed row, which keeps an unrelated
+optimistic edit out of the worker snapshot. Await the helper as the final
+step in a successful mutation function. A downstream write failure discards
+the pending sync batch on TanStack DB 0.15.2.
+
+```ts
+import { createCollection, createTransaction } from '@tanstack/db';
+import { sharedCollectionConfig } from 'zerocopy/tanstack';
+
+type Lane = { id: string; geometryId: string; revision: number };
+const options = sharedCollectionConfig<Lane>({
+  id: 'lanes',
+  initialData: [{ id: 'north', geometryId: 'path/1', revision: 0 }],
+});
+const lanes = createCollection(options);
+await lanes.preload();
+const before = options.getSnapshot();
+
+const tx = createTransaction<Lane>({
+  autoCommit: false,
+  mutationFn: async ({ transaction }) => {
+    // Run application validation or persistence here. Throw to reject.
+    await options.utils.acceptMutations(transaction);
+  },
+});
+tx.mutate(() => lanes.update('north', row => { row.revision++; }));
+await tx.commit();
+const after = options.getSnapshot();
+before.get('north')?.revision; // 0
+after.get('north')?.revision;  // 1
+```
+
+Stage changed geometry before confirming an edit. After success, publish the row
+map and its matching geometry together, for example with one
+`state.update(() => ({ rows: after, geometry: stagedGeometry }))`. A failed
+edit discards the staged handles. Include the application revision and viewport
+request ID in worker jobs so the UI can discard obsolete results. Configure
+one adapter per collection and serialize application commands that replace the
+same geometry. [State sessions](worker-sessions.md).
 
 ## withSharedCache
 
 `withSharedCache<T>(upstreamSync, options?)` wraps an object with a `sync(params)` function. It intercepts upstream insert, update, and delete messages before forwarding them to the caller. It returns a wrapped `sync` object plus `getCache()`, `get(key)`, `toArray()`, `getSharedState()`, and `fromSharedState()`.
 
-Upstream insert messages supply `value`; update messages supply a value with the configured primary-key field; delete messages supply `key`. Inserts still use `value.id`. Keep these keys consistent. Persistence, reconnection, and transaction semantics belong to the upstream provider and application, not this cache wrapper.
+Upstream inserts and updates supply a value with the configured string key.
+Deletes can supply the key or the row. This wrapper mirrors each upstream write
+as it arrives, so a reader can observe intermediate rows in an open batch. Use
+the confirmed snapshot from `sharedCollectionConfig` for transactional worker
+reads. The upstream provider owns persistence and reconnection.
 
 ## Pointer descriptors are not worker transport
 
@@ -53,4 +109,8 @@ Upstream insert messages supply `value`; update messages supply a value with the
 
 Do not post these descriptors to an unrelated worker and expect a valid collection. A root offset alone cannot identify its backing bytes. It is also not a reload-safe persistence format.
 
-For worker data today, keep application data in exported core collections and use `getWorkerData()` with `initWorker()`, as shown in [Worker sharing](worker-sharing.md). `SharedCollection` itself is not one of the built-in classes accepted by that transport. No complete zero-copy worker transport for the TanStack wrapper is claimed here.
+For worker reads, pass `config.getSnapshot()` or
+`sharedCollection.getSnapshot()` through the existing
+[`getWorkerData()` and `initWorker()` transport](worker-sharing.md).
+The transport includes the matching memory and arena information. For
+successive publications, use a [worker session](worker-sessions.md).

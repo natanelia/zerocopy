@@ -27,6 +27,11 @@ try {
   const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
 import { SharedList } from 'zerocopy';
+import { buildSpatialIndex, applySpatialEdits, querySpatialIndex } from 'zerocopy/spatial';
+const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
+const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }]);
+assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3]), [7]);
+assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3], edits), []);
 ${imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; assert.ok(Object.keys(entry${index}).length > 0);`).join('\n')}
 const before = new SharedList('number').pushMany([1, 2]);
 const after = before.push(3);

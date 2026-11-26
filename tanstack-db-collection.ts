@@ -1,12 +1,7 @@
-/**
- * TanStack DB Collection backed by SharedArrayBuffer
- * 
- * Enables zero-copy sharing of collection data across Web Workers.
- */
-
 import { SharedMap } from './shared-map.ts';
+import type { JsonType } from './types.ts';
 
-type CollectionItem = { id: string; [key: string]: unknown };
+type CollectionItem = { id: string };
 
 /**
  * SharedCollection - A TanStack DB compatible collection using SharedArrayBuffer
@@ -25,8 +20,8 @@ export class SharedCollection<T extends CollectionItem> {
     return this.data.get(key) as T | undefined;
   }
 
-  insert(item: T): SharedCollection<T> {
-    return new SharedCollection<T>(this.id, this.data.set(item.id, item));
+  insert(item: T, key = item.id): SharedCollection<T> {
+    return new SharedCollection<T>(this.id, this.data.set(key, item));
   }
 
   update(key: string, changes: Partial<T>): SharedCollection<T> {
@@ -49,73 +44,182 @@ export class SharedCollection<T extends CollectionItem> {
     for (const [key, value] of this.data.entries()) yield [key, value as T];
   }
 
+  // JsonType is an erased descriptor for the existing 'object' encoding.
+  getSnapshot(): SharedMap<JsonType<T>> { return this.data as unknown as SharedMap<JsonType<T>>; }
+
   get size(): number { return this.data.size; }
-  getRoot(): number { return (this.data as any).root; }
+  getRoot(): number { return this.data.root; }
 
   static fromRoot<T extends CollectionItem>(id: string, root: number, size: number): SharedCollection<T> {
     return new SharedCollection<T>(id, new SharedMap('object', root, size));
   }
 }
 
-type SyncWrite<T> = (msg: { type: 'insert' | 'update' | 'delete'; value?: T; key?: string }) => void;
-type SyncParams<T> = { begin: () => void; write: SyncWrite<T>; commit: () => void; markReady: () => void };
+type Write<T> =
+  | { type: 'insert' | 'update' | 'delete'; value: T; key?: never }
+  | { type: 'delete'; key: string; value?: never };
+type SyncWrite<T> = (message: Write<T>) => void;
+type Receipt = void | true | Promise<void>;
+type SyncParams<T> = {
+  begin: () => void;
+  write: SyncWrite<T>;
+  commit: (signal?: AbortSignal) => Receipt;
+  markReady: () => void;
+  markError?: (error: unknown) => void;
+  collection?: { cleanup?: () => Promise<void> };
+};
+type Mutation<T> = { type: 'insert' | 'update' | 'delete'; modified: T; changes?: Partial<T>; collection?: object };
+type Transaction<T> = { mutations: readonly Mutation<T>[] };
 
-/**
- * Create TanStack DB collection config backed by SharedArrayBuffer
- */
+function stringKey<T>(item: T, field: keyof T): string {
+  const key = item[field];
+  if (typeof key !== 'string') throw new TypeError(`Expected a string collection key in ${String(field)}`);
+  return key;
+}
+
+// Some TanStack versions defer visibility until the optimistic handler settles.
+// Its acceptance receipt can safely be awaited inside that same handler.
+async function accepted(receipt: Promise<void>): Promise<void> {
+  // Attach a rejection handler before loading the peer. A visibility receipt
+  // can also reject on cleanup after its underlying commit was accepted.
+  void receipt.catch(() => {});
+  const db = await import('@tanstack/db');
+  await (db.whenSyncAccepted?.(receipt) ?? receipt);
+}
+
+// The current TanStack sync API discards uncommitted writes with an aborted
+// signal. Older cores discard pending writes when their sync run is cleaned up.
+async function rejectSyncWrite<T>(sync: SyncParams<T>, error: unknown): Promise<never> {
+  if (sync.collection) {
+    const db = await import('@tanstack/db');
+    if (typeof db.whenSyncAccepted === 'function') {
+      const receipt = sync.commit(AbortSignal.abort());
+      if (receipt && receipt !== true) await receipt.catch(() => {});
+    } else {
+      await sync.collection.cleanup?.();
+    }
+  }
+  throw error;
+}
+
+function writeSyncRows<T>(sync: SyncParams<T>, messages: Iterable<Write<T>>): Receipt {
+  sync.begin();
+  try {
+    for (const message of messages) sync.write(message);
+  } catch (error) { return rejectSyncWrite(sync, error); }
+  return sync.commit();
+}
+
+/** Local collection options with an immutable snapshot of confirmed rows. */
 export function sharedCollectionConfig<T extends CollectionItem>(config: {
   id: string;
   primaryKey?: keyof T & string;
   initialData?: T[];
 }) {
-  const { id, primaryKey = 'id' as keyof T & string, initialData } = config;
+  const { id, primaryKey = 'id' as keyof T & string } = config;
+  let initialRows = config.initialData;
+  const getKey = (row: T) => stringKey(row, primaryKey);
   let collection = new SharedCollection<T>(id);
-  let syncWrite: SyncWrite<T> | null = null;
-  let syncBegin: (() => void) | null = null;
-  let syncCommit: (() => void) | null = null;
+  let active: SyncParams<T> | undefined;
+  let pending: Promise<void> = Promise.resolve();
+  const confirmations = new WeakMap<Transaction<T>, Promise<void>>();
 
-  const confirmMutations = (mutations: Array<{ type: 'insert' | 'update' | 'delete'; modified: T }>) => {
-    if (!syncBegin || !syncWrite || !syncCommit) return;
-    syncBegin();
-    for (const m of mutations) syncWrite({ type: m.type, value: m.modified });
-    syncCommit();
-  };
-
-  return {
-    id,
-    primaryKey,
-    sync: {
-      sync: (params: SyncParams<T>) => {
-        syncBegin = params.begin;
-        syncWrite = params.write;
-        syncCommit = params.commit;
-        if (initialData?.length) {
-          params.begin();
-          for (const item of initialData) {
-            params.write({ type: 'insert', value: item });
-            collection = collection.insert(item);
+  function acceptMutations(transaction: Transaction<T>): Promise<void> {
+    const prior = confirmations.get(transaction);
+    if (prior) return prior;
+    const sync = active;
+    const apply = async () => {
+      if (!sync || active !== sync) throw new Error('Collection sync is inactive');
+      const mutations = transaction.mutations.filter(m => !m.collection || m.collection === sync.collection);
+      if (!mutations.length) return;
+      // Encode every row before opening the sync transaction. A failed write
+      // must leave both the old root and the TanStack collection readable.
+      let next = collection;
+      const writes: Write<T>[] = [];
+      for (const { type, modified, changes } of mutations) {
+        const key = getKey(modified);
+        if (type === 'delete') {
+          next = next.delete(key);
+          writes.push({ type, value: modified });
+        } else {
+          if (type === 'insert' && next.getSnapshot().has(key)) throw new Error(`Duplicate collection key: ${key}`);
+          let value = modified;
+          if (type === 'update' && changes) {
+            const confirmed = next.get(key);
+            if (!confirmed) throw new Error(`Cannot update missing confirmed row: ${key}`);
+            value = { ...confirmed, ...changes };
           }
-          params.commit();
+          next = next.insert(value, key);
+          writes.push({ type, value: next.get(key)! });
         }
-        params.markReady();
-        return () => {};
+      }
+      const receipt = writeSyncRows(sync, writes);
+      if (receipt && receipt !== true) await accepted(receipt);
+      if (active !== sync) throw new Error('Collection sync ended during confirmation');
+      collection = next;
+    };
+    const result = pending.then(apply);
+    confirmations.set(transaction, result);
+    pending = result.catch(() => { confirmations.delete(transaction); });
+    return result;
+  }
+
+  const confirm = ({ transaction }: { transaction: Transaction<T> }) => acceptMutations(transaction);
+  return {
+    id, primaryKey, getKey,
+    sync: {
+      rowUpdateMode: 'full' as const,
+      sync: (params: SyncParams<T>) => {
+        if (active) throw new Error('Collection sync is already active');
+        let next = collection;
+        if (initialRows?.length) {
+          const entries = initialRows.map(row => [getKey(row), row] as const);
+          const data = new SharedMap('object').setMany(entries);
+          if (data.size !== entries.length) throw new Error('Duplicate initial collection key');
+          next = new SharedCollection<T>(id, data);
+        }
+        const ready = () => {
+          if (active !== params) return;
+          collection = next;
+          initialRows = undefined;
+          params.markReady();
+        };
+        active = params;
+        try {
+          let receipt: Receipt = undefined;
+          if (next.size) {
+            function* seedRows(): Generator<Write<T>> {
+              for (const [, value] of next.entries()) yield { type: 'insert', value };
+            }
+            receipt = writeSyncRows(params, seedRows());
+          }
+          if (receipt && receipt !== true) {
+            pending = accepted(receipt).then(ready, error => {
+              if (active === params) {
+                active = undefined;
+                params.markError?.(error);
+              }
+            });
+          } else ready();
+        } catch (error) {
+          active = undefined;
+          throw error;
+        }
+        return () => { if (active === params) active = undefined; };
       },
       getSyncMetadata: () => ({}),
     },
-    onInsert: async ({ transaction }: { transaction: { mutations: Array<{ type: 'insert' | 'update' | 'delete'; modified: T }> } }) => {
-      confirmMutations(transaction.mutations);
-    },
-    onUpdate: async ({ transaction }: { transaction: { mutations: Array<{ type: 'insert' | 'update' | 'delete'; modified: T }> } }) => {
-      confirmMutations(transaction.mutations);
-    },
-    onDelete: async ({ transaction }: { transaction: { mutations: Array<{ type: 'insert' | 'update' | 'delete'; modified: T }> } }) => {
-      confirmMutations(transaction.mutations);
-    },
+    onInsert: confirm,
+    onUpdate: confirm,
+    onDelete: confirm,
+    utils: { acceptMutations },
     startSync: true,
     gcTime: 0,
+    getSnapshot: () => collection.getSnapshot(),
     getSharedState: () => ({ id, root: collection.getRoot(), size: collection.size }),
     fromSharedState: (state: { root: number; size: number }) => {
       collection = SharedCollection.fromRoot<T>(id, state.root, state.size);
+      initialRows = undefined;
     },
   };
 }
@@ -137,11 +241,11 @@ export function withSharedCache<T extends CollectionItem>(
         // Intercept writes to mirror into SharedArrayBuffer
         const wrappedWrite: SyncWrite<T> = (msg) => {
           if (msg.type === 'insert' && msg.value) {
-            cache = cache.insert(msg.value);
+            cache = cache.insert(msg.value, stringKey(msg.value, pk));
           } else if (msg.type === 'update' && msg.value) {
             cache = cache.update(msg.value[pk] as string, msg.value);
-          } else if (msg.type === 'delete' && msg.key) {
-            cache = cache.delete(msg.key);
+          } else if (msg.type === 'delete') {
+            cache = cache.delete(msg.key ?? stringKey(msg.value, pk));
           }
           params.write(msg);
         };

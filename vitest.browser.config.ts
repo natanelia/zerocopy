@@ -11,6 +11,7 @@ export default defineConfig({
     },
     include: ['demo/**/*.browser.test.ts'],
   },
+  optimizeDeps: { include: ['@tanstack/db'] },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',

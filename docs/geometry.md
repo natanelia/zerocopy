@@ -118,3 +118,12 @@ edited-tile median rose from 1,518 to 1,786 µs, while the same-build control
 ranged from 1,677 to 2,068 µs across its two arms. The benchmark above also
 emits all control workloads and SHA-256 digests of the measured builds.
 [Raw paired samples and same-build controls](../proofs/results/hd-map-lane-ranges).
+
+### Spatial editing with dedicated workers
+
+The [spatial entry point](spatial.md) adds indexed bounding-box searches to these geometry operations.
+The [spatial editor replay](../proofs/spatial-editor/README.md) combines
+immutable geometry, confirmed TanStack rows, a shared Flatbush base, and
+deck.gl binary paths. It exercises viewport changes, edits during index
+rebuilds, and workers finishing a prior revision. Its copy-based comparison
+receives sparse edits after the initial load.

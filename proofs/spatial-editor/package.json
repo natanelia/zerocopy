@@ -1,0 +1,13 @@
+{
+  "name": "zerocopy-spatial-editor-replay",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@deck.gl/core": "9.4.2",
+    "@deck.gl/layers": "9.4.2",
+    "flatbush": "4.9.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.27.2"
+  }
+}
