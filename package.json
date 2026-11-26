@@ -46,7 +46,7 @@
   "engines": { "bun": ">=1.0.0" },
   "dependencies": { "flatbush": "4.9.0" },
   "devDependencies": {
-    "@tanstack/db": "0.15.2",
+    "@tanstack/db": "1.0.0-rc.1.5",
     "@turf/bbox": "7.4.0",
     "@reduxjs/toolkit": "2.12.0",
     "@redux-devtools/instrument": "3.0.0",
@@ -64,6 +64,6 @@
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   },
-  "peerDependencies": { "@tanstack/db": ">=0.5.0", "@reduxjs/toolkit": "^2.0.0" },
+  "peerDependencies": { "@tanstack/db": ">=0.5.0 || >=1.0.0-rc.1.5 <1.0.0", "@reduxjs/toolkit": "^2.0.0" },
   "peerDependenciesMeta": { "@tanstack/db": { "optional": true }, "@reduxjs/toolkit": { "optional": true } }
 }

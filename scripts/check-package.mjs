@@ -57,28 +57,33 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
   assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
     getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
   }));
-  // Run against the declared peer floor in the installed app. Its mutation
-  // proxy requires mutable rows, including nested metadata, on every sync.
-  run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@0.5.0']);
-  writeFileSync(join(temporary, 'minimum-peer.mjs'), `
+  // Exercise both transaction APIs with the published archive and real npm peer resolution.
+  writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
 import { createCollection } from '@tanstack/db';
 import { sharedCollectionConfig } from 'zerocopy/tanstack';
 const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', style: { width: 2 } }] });
 const lanes = createCollection(options);
+const settled = process.argv[2] === '0.5.0'
+  ? tx => tx.isPersisted.promise
+  : tx => tx.when('settled');
 try {
   await lanes.preload();
   const initial = options.getSnapshot();
-  await lanes.update('n', draft => { draft.style.width = 4; }).isPersisted.promise;
-  await lanes.update('n', draft => { draft.style.width = 6; }).isPersisted.promise;
+  await settled(lanes.update('n', draft => { draft.style.width = 4; }));
+  await settled(lanes.update('n', draft => { draft.style.width = 6; }));
   assert.equal(initial.get('n').style.width, 2);
   assert.equal(options.getSnapshot().get('n').style.width, 6);
-  await lanes.delete('n').isPersisted.promise;
+  await settled(lanes.delete('n'));
   assert.equal(options.getSnapshot().size, 0);
 } finally { await lanes.cleanup(); }
 `);
-  run(process.execPath, ['minimum-peer.mjs']);
-  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, TypeScript consumer, and TanStack DB 0.5.0 passed.`);
+  const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
+  for (const version of peers) {
+    run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@' + version]);
+    run(process.execPath, ['tanstack-peer.mjs', version]);
+  }
+  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, TypeScript consumer, and TanStack DB ${peers.join(' and ')} passed.`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

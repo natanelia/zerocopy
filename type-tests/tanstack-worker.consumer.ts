@@ -10,6 +10,7 @@ const tx = createTransaction<Lane>({
   mutationFn: ({ transaction }) => options.utils.acceptMutations(transaction),
 });
 tx.mutate(() => lanes.insert({ id: 'north', revision: 1 }));
+await tx.when('settled');
 const rows = options.getSnapshot();
 const worker = await initWorker<{ rows: typeof rows }>(getWorkerData({ rows }));
 const row = worker.rows.get('north');

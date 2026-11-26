@@ -44,12 +44,12 @@ deletions made since the initial import.
 `config.getSnapshot()` returns the immutable core `SharedMap` of confirmed
 rows. The initial snapshot is available after `await collection.preload()`.
 During a pending edit TanStack can show an optimistic row while a worker
-continues reading the previous snapshot. After
-`await transaction.isPersisted.promise`, capture a new snapshot. Old handles
-stay readable. The adapter has transaction and live-query coverage against TanStack DB
-0.15.2. The packed-package check also edits nested metadata using the minimum
-supported peer, 0.5.0. TanStack receives its own mutable metadata rows while
-worker snapshots retain immutable values.
+continues reading the previous snapshot. With TanStack DB 1.0.0-rc.1.5,
+capture a new snapshot after `await transaction.when('settled')`. On 0.5.0
+and 0.15.2, use `await transaction.isPersisted.promise`. Old handles stay
+readable. The packed-package check edits nested metadata on both the minimum
+supported peer (0.5.0) and the pinned release candidate. TanStack receives its
+own mutable metadata rows while worker snapshots retain immutable values.
 
 ### Confirm a group of edits
 
@@ -59,7 +59,7 @@ helper processes the transaction's mutations for this collection in order.
 It applies updated fields to the confirmed row, which keeps an unrelated
 optimistic edit out of the worker snapshot. Await the helper as the final
 step in a successful mutation function. A downstream write failure discards
-the pending sync batch on TanStack DB 0.15.2.
+the pending sync batch on TanStack DB 1.0.0-rc.1.5.
 
 ```ts
 import { createCollection, createTransaction } from '@tanstack/db';

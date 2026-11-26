@@ -145,7 +145,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
           if (exited.length) visible.delete(exited);
           if (entered.length) visible.insert(entered);
         });
-        await update.isPersisted.promise;
+        await update.when('settled');
       }
       membership = nextMembership;
       const liveRows = [...query.values()];

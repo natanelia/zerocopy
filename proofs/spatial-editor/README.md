@@ -1,6 +1,6 @@
 # Shared-memory lane editor replay
 
-The replay exercises public ZeroCopy APIs with TanStack DB 0.15.2, Flatbush
+The replay exercises public ZeroCopy APIs with TanStack DB 1.0.0-rc.1.5, Flatbush
 4.9.0, and deck.gl 9.4.2. It generates a tile in projected XY metres and
 runs identical commands against two browser editors. All data is synthetic.
 The [recorded results](RESULTS.md) include all trials and the four-reader

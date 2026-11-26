@@ -39,7 +39,7 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     expect(lanes.has('south')).toBe(true);
     expect(options.getSnapshot()).toBe(committed);
 
-    await lanes.delete('south').isPersisted.promise;
+    await lanes.delete('south').when('settled');
     expect(options.getSnapshot().has('south')).toBe(false);
     await lanes.cleanup();
     await lanes.preload();
@@ -56,10 +56,10 @@ it('uses the same custom string key for automatic writes and worker reads', asyn
   const lanes = createCollection(config);
   try {
     await lanes.preload();
-    await lanes.insert({ ...first, slug: '' }).isPersisted.promise;
-    await lanes.update('', row => { row.revision = 2; }).isPersisted.promise;
+    await lanes.insert({ ...first, slug: '' }).when('settled');
+    await lanes.update('', row => { row.revision = 2; }).when('settled');
     expect(config.getSnapshot().get('')).toEqual({ ...first, slug: '', revision: 2 });
-    await lanes.delete('').isPersisted.promise;
+    await lanes.delete('').when('settled');
     expect(config.getSnapshot().size).toBe(0);
   } finally { await lanes.cleanup(); }
 });
@@ -120,7 +120,7 @@ it('confirms changed fields without copying another optimistic edit into shared 
     await lanes.preload();
     const draft = createTransaction({ autoCommit: false, mutationFn: async () => {} });
     draft.mutate(() => lanes.update('north', row => { row.direction = 'west'; }));
-    await lanes.update('north', row => { row.revision++; }).isPersisted.promise;
+    await lanes.update('north', row => { row.revision++; }).when('settled');
     expect(config.getSnapshot().get('north')).toEqual({ ...original, revision: 1 });
     draft.rollback();
     expect(lanes.get('north')).toMatchObject({ ...original, revision: 1 });
@@ -161,10 +161,10 @@ it('recovers when a sync write throws halfway through a multi-row transaction', 
   });
   try {
     await lanes.preload();
-    await expect(lanes.insert([first, { id: 'bad', revision: 0 }]).isPersisted.promise).rejects.toThrow();
-    await lanes.insert({ id: 'good', revision: 1 }).isPersisted.promise;
+    await expect(lanes.insert([first, { id: 'bad', revision: 0 }]).when('settled')).rejects.toThrow();
+    await lanes.insert({ id: 'good', revision: 1 }).when('settled');
     expect([...lanes.keys()]).toEqual(['good']);
-    await lanes.insert({ ...first, revision: 2 }).isPersisted.promise;
+    await lanes.insert({ ...first, revision: 2 }).when('settled');
     expect(lanes.get('north')?.revision).toBe(2);
     expect(options.getSnapshot().get('north')?.revision).toBe(2);
   } finally { await lanes.cleanup(); }

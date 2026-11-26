@@ -43,7 +43,7 @@ checks viewport membership against a full scan and checks the row and
 geometry revision seen by readers. The opening cycle also checks GPU picking
 through a vertex drag and undo.
 
-The replay ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
+The recorded replay used TanStack DB 0.15.2. It ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
 Chromium 156.0.8078.4 using SwiftShader. Frame timing starts at command
 dispatch and ends when WebGL finishes the first updated draw. Display
 presentation and hardware GPU timing require separate measurements. PSS
