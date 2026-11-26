@@ -6,9 +6,9 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
-const dir = await mkdtemp(join(tmpdir(), 'zerocopy-spatial-editor-'));
 const soak = process.argv.includes('--soak');
 const smoke = process.argv.includes('--smoke');
 const option = name => process.argv.slice(2).find(arg => arg.startsWith('--' + name + '='))?.split('=').slice(1).join('=');
@@ -17,6 +17,8 @@ const transport = option('transport') ?? 'session';
 if (!['session', 'manual'].includes(transport)) throw new Error('Expected --transport=session|manual');
 const rebuild = option('rebuild') ?? 'packed';
 if (!['packed', 'rows'].includes(rebuild)) throw new Error('Expected --rebuild=packed|rows');
+const graphicsMode = option('renderer') ?? 'swiftshader';
+if (!['hardware', 'swiftshader'].includes(graphicsMode)) throw new Error('Expected --renderer=hardware|swiftshader');
 const readerCounts = selectedReaders === undefined ? (smoke ? [1] : [1, 4, 8]) : [Number(selectedReaders)];
 const selectedMode = option('mode');
 if (selectedMode !== undefined && !['copy','shared'].includes(selectedMode)) throw new Error('Expected --mode=copy|shared');
@@ -47,6 +49,7 @@ async function browserPss(pid) {
 }
 
 const html = '<!doctype html><canvas width="320" height="200"></canvas>';
+const dir = await mkdtemp(join(tmpdir(), 'zerocopy-spatial-editor-'));
 const server = createServer(async (req, res) => {
   const js = ['/editor.js', '/reader.js'].includes(req.url);
   res.writeHead(js || req.url === '/' ? 200 : 404, {
@@ -59,7 +62,7 @@ try {
   await build({ entryPoints: [join(here, 'editor.mjs'), join(here, 'reader.mjs')], outdir: dir,
     bundle: true, format: 'esm', platform: 'browser', define: { 'process.env.NODE_ENV': '"production"' } });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-  const report = { frameTimingVersion: 1, config, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
+  const report = { frameTimingVersion: 2, config, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
     bundleSHA256: {}, cases: [] };
   for (const name of ['editor', 'reader']) {
     report.bundleSHA256[name] = createHash('sha256').update(await readFile(join(dir, name + '.js'))).digest('hex');
@@ -68,7 +71,9 @@ try {
     for (const trial of trials) {
       for (const mode of selectedMode ? [selectedMode] : trial % 2 ? ['shared', 'copy'] : ['copy', 'shared']) {
         const instance = await chromium.launchServer({ executablePath: process.env.CHROMIUM_PATH || undefined,
-          args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'] });
+          ignoreDefaultArgs: ['--enable-unsafe-swiftshader'],
+          args: graphicsMode === 'hardware' ? ['--enable-gpu', '--disable-software-rasterizer'] :
+            ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'] });
         let timer, sampling, memoryError;
         const pss = [];
         try {
@@ -83,11 +88,13 @@ try {
               if (!sampling) sampling = collect().catch(error => { memoryError = error; }).finally(() => sampling = undefined);
             }, 100);
           }
-          const run = page.evaluate(async args => (await import('/editor.js')).replay(args), { ...config, readers, mode });
+          const run = page.evaluate(async args => (await import('/editor.js')).replay(args), { ...config, readers, mode, graphicsMode });
           let timeout;
-          const samples = await Promise.race([run, new Promise((_, reject) => {
+          const { samples, graphics } = await Promise.race([run, new Promise((_, reject) => {
             timeout = setTimeout(() => reject(new Error('Replay timed out')), Math.max(180000, config.steps * 1000));
           })]).finally(() => clearTimeout(timeout));
+          if (report.graphics) assert.deepEqual(graphics, report.graphics, 'WebGL renderer changed between cases');
+          report.graphics = graphics;
           clearInterval(timer); await sampling;
           if (platform() === 'linux') await collect();
           if (memoryError) throw memoryError;

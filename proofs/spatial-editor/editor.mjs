@@ -29,11 +29,11 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed' }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader' }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
   const shared = mode === 'shared';
+  const view = await renderer(graphicsMode);
   const peers = Array.from({ length: readers }, reader);
-  const view = await renderer();
   const initialData = [], expectedBounds = new Map(), editedPaths = new Map();
   const toPath = xy => shared ? new SharedList('number').pushMany(xy) : xy;
   let paths = shared ? new SharedMap(list('number')) : new Map();
@@ -168,7 +168,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       if (step < 10) view.check(expected, id => editedPaths.get(id) ?? lane(Number(id), vertices), cmd.moveY);
       if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, rebuildMs, ...draw });
     }
-    return samples;
+    return { samples, graphics: view.graphics };
   } finally {
     sub.unsubscribe();
     await Promise.all([query.cleanup(), visible.cleanup(), lanes.cleanup()]);

@@ -1,10 +1,23 @@
 import { COORDINATE_SYSTEM, Deck, OrthographicView } from '@deck.gl/core';
 import { PathLayer } from '@deck.gl/layers';
 
-export async function renderer() {
+export async function renderer(graphicsMode) {
   const canvas = document.querySelector('canvas');
-  const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true });
-  if (!gl) throw new Error('WebGL2 is required');
+  const gl = canvas.getContext('webgl2', {
+    preserveDrawingBuffer: true, failIfMajorPerformanceCaveat: graphicsMode === 'hardware',
+  });
+  if (!gl) throw new Error('WebGL2 unavailable for requested renderer: ' + graphicsMode);
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  if (!info) throw new Error('WebGL renderer identification is required for this replay');
+  const graphics = { mode: graphicsMode, vendor: gl.getParameter(info.UNMASKED_VENDOR_WEBGL),
+    renderer: gl.getParameter(info.UNMASKED_RENDERER_WEBGL) };
+  if (graphicsMode === 'swiftshader' && !/swiftshader/i.test(graphics.renderer)) {
+    throw new Error('Expected SwiftShader, got ' + graphics.renderer);
+  }
+  if (graphicsMode === 'hardware' && (!graphics.renderer ||
+    /swiftshader|llvmpipe|softpipe|software|lavapipe|basic render|\bwarp\b/i.test(graphics.renderer))) {
+    throw new Error('Hardware mode rejected WebGL renderer: ' + graphics.renderer);
+  }
   let loaded, failed, pendingFrame, renderStarted;
   let uploadBytes = 0, uploadCallMs = 0;
   // Count WebGL client buffer uploads on this context. Allocating GPU storage
@@ -27,13 +40,29 @@ export async function renderer() {
   let error;
   const deck = new Deck({ canvas, gl, width: 320, height: 200, useDevicePixels: false,
     views: new OrthographicView({ flipY: false }), initialViewState: { target: [16, 7, 0], zoom: 2.5 },
+    // The pinned deck.gl forwards this provider to luma.gl's animation loop.
+    // Timestamp the actual callback that draws the update on the native rAF cadence.
+    animationFrameProvider: {
+      requestAnimationFrame: callback => window.requestAnimationFrame(time => {
+        if (pendingFrame) pendingFrame.callbackStarted = performance.now();
+        callback(time);
+      }),
+      cancelAnimationFrame: handle => window.cancelAnimationFrame(handle),
+    },
     controller: false, _animate: true, onLoad: loaded,
     onBeforeRender: () => { renderStarted = performance.now(); },
     onAfterRender: () => {
       if (pendingFrame) {
+        const { propsSet, callbackStarted } = pendingFrame;
+        if (!(propsSet <= callbackStarted && callbackStarted <= renderStarted)) {
+          pendingFrame.reject(new Error('Screen draw did not follow the measured animation callback'));
+          pendingFrame = undefined;
+          return;
+        }
         gl.finish();
         pendingFrame.resolve({
-          beforeScreenDrawMs: renderStarted - pendingFrame.propsSet,
+          waitForAnimationFrameMs: callbackStarted - propsSet,
+          prepareScreenDrawMs: renderStarted - callbackStarted,
           drawAndFinishMs: performance.now() - renderStarted,
         });
         pendingFrame = undefined;
@@ -43,6 +72,7 @@ export async function renderer() {
   await ready;
   let ids = [], starts = new Uint32Array(), positions = new Float64Array(), indexById = new Map();
   return {
+    graphics,
     async draw(nextIds, paths, box, dirty, commandStarted) {
       const begin = performance.now(), bytesBefore = uploadBytes, uploadBefore = uploadCallMs;
       const length = path => path.length ?? path.size;

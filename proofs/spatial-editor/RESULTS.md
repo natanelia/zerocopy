@@ -4,9 +4,42 @@ Rebuilding from packed bounds shortened median worker index construction from
 **22.3 to 2.6 ms** on TanStack DB 1.0.0-rc.1.5. Four-reader validation on
 commands that started a rebuild fell from **26.2 to 11.3 ms**. The adoption
 targets are a 25% reduction in peak browser memory and a median trial p95
-frame time at least as fast as the copy control. The four-reader run with
-frame-phase instrumentation met both targets. Earlier trials missed one of
-them. Keep the spatial path opt-in while hardware-GPU measurements are pending.
+frame time at least as fast as the copy control. The four-reader run that
+timed the animation callback met the memory target and missed the frame
+target. The previous frame-phase run met both. Keep the spatial path opt-in
+while hardware-GPU measurements are pending.
+
+## Waiting for the animation callback
+
+The editor using the public TanStack viewport collection replayed 4,096
+lanes with four workers in six fresh Chromium processes. Across the four
+slowest frames of each trial, almost all elapsed time accumulated after
+setting props and before the browser entered the animation callback that
+drew the update. Viewport and revision checks passed on all 384 measured
+commands across both editors.
+
+| Four-reader measurement | Copy | Shared |
+| --- | ---: | ---: |
+| Median peak browser PSS (MiB) | 477.6 | 342.5 |
+| Median trial p95 dispatch to completed frame (ms) | 159.5 | 195.7 |
+| Median trial p95 dispatch to all validation replies (ms) | 7.5 | 12.6 |
+| Waiting for the callback, share of slow-frame time | 97.89% | 97.44% |
+| Callback entry to start of draw, share of slow-frame time | 0.43% | 0.28% |
+| Draw through WebGL completion, share of slow-frame time | 0.52% | 0.29% |
+
+Each percentage uses the combined duration of the 12 selected frames in
+its editor. This locates the delay in the frame lifecycle. It leaves open
+which browser tasks or graphics backpressure caused the callback to arrive
+late. Shared storage saved 28.3% peak PSS and its median trial p95 frame
+took 22.7% longer. Individual trial p95s ranged from 141.3 to 198.4 ms
+for copy and from 162.6 to 203.8 ms for shared. These trials used the
+SwiftShader Vulkan backend on Linux. The same replay now accepts
+`--renderer=hardware` for a comparison on a physical GPU.
+[Raw measurements](results/animation-callback-readers-4.json.gz)
+
+```sh
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/animation-callback-readers-4.json.gz
+```
 
 ## Where the slowest frames spent their time
 

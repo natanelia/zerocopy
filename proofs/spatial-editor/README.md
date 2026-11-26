@@ -62,6 +62,20 @@ CI runs the small copy and shared replays and archives their samples with
 the other browser regression evidence. Performance targets use the full
 trials above.
 
+SwiftShader is the default for repeatable headless runs. On a machine with
+a physical GPU, select hardware rendering and use the same four-reader workload.
+
+```sh
+node proofs/spatial-editor/run.mjs --renderer=hardware --readers=4 --output=/tmp/editor-hardware.json
+node proofs/spatial-editor/summarize.mjs --readers=4 /tmp/editor-hardware.json
+```
+
+Hardware mode disables Chromium's software fallback and requires an identified
+WebGL2 renderer. Each report records the WebGL vendor and renderer from the
+context that drew the paths. The summary requires matching graphics and host
+metadata across trials. On macOS and Windows it reports frame and validation
+times with the Linux-only memory measurement and target set to `null`.
+
 The shared editor uses a ZeroCopy worker session by default. It sends the
 memory handle on first attachment and publishes grouped roots on later edits.
 Each validator waits for its exact requested publication. `--transport=manual`
@@ -74,17 +88,19 @@ completeness and calculate medians of the three per-trial p95s.
 
 - **Frame latency** begins at command dispatch and ends when deck.gl issues
   the first screen draw after the update and WebGL finishes it. Headless
-  Chromium uses SwiftShader. This measures a completed headless frame and
-  excludes physical display presentation and device input delivery.
+  Chromium uses the selected renderer. This measures a completed headless
+  frame and excludes physical display presentation and device input delivery.
 - **Frame phases** use the same main-thread clock. They cover command
   processing through entry into the renderer, packing binary paths, setting
-  deck.gl props, the interval until `onBeforeRender`, and the draw through
-  `gl.finish()`. The interval before the screen draw includes browser
-  scheduling and deck.gl layer updates. Time remaining after the draw covers
-  returning to the command handler. Worker validation runs concurrently.
-  In timing-version 1 reports the summary selects the slowest 5% of commands
-  in each trial (rounded up) and reports each phase's share of their combined
-  frame time.
+  deck.gl props, waiting for the browser to enter the drawing animation
+  callback, work within that callback up to `onBeforeRender`, and the draw
+  through `gl.finish()`. The wait can include browser scheduling, other
+  tasks and graphics backpressure. Callback preparation includes luma.gl and
+  deck.gl layer updates. Time remaining after the draw covers returning to
+  the command handler. Worker validation runs concurrently. The summary
+  selects the slowest 5% of commands in each trial (rounded up) and reports
+  each phase's share of their combined frame time. Timing version 1 combined
+  the callback wait and preparation. Version 2 measures them separately.
 - **Validation latency** ends after every dedicated reader replies. Timing
   includes worker attachment, messaging and viewport geometry checks.
 - **Rebuild time** measures the index construction call inside the first

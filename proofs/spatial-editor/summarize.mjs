@@ -15,7 +15,7 @@ const reports = inputs.map(path => {
 });
 const first = reports[0];
 for (const report of reports) {
-  for (const key of ['bundleSHA256', 'config', 'chromium', 'hardware', 'platform', 'frameTimingVersion']) {
+  for (const key of ['bundleSHA256', 'config', 'chromium', 'hardware', 'platform', 'frameTimingVersion', 'graphics']) {
     assert.deepEqual(report[key], first[key], 'Mixed benchmark inputs: ' + key);
   }
 }
@@ -26,8 +26,15 @@ function median(values) {
   return (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.floor(sorted.length / 2)]) / 2;
 }
 const summary = [];
-const framePhases = ['commandBeforePackMs', 'packMs', 'setPropsMs', 'beforeScreenDrawMs', 'drawAndFinishMs'];
-assert([undefined, 1].includes(first.frameTimingVersion), 'Unsupported frame timing version');
+const version = first.frameTimingVersion;
+assert([undefined, 1, 2].includes(version), 'Unsupported frame timing version');
+const beforeDraw = version === 2 ? ['waitForAnimationFrameMs', 'prepareScreenDrawMs'] : ['beforeScreenDrawMs'];
+const framePhases = ['commandBeforePackMs', 'packMs', 'setPropsMs', ...beforeDraw, 'drawAndFinishMs'];
+if (version === 2) {
+  assert(['hardware', 'swiftshader'].includes(first.graphics?.mode) && first.graphics.renderer && first.graphics.vendor,
+    'Missing measured WebGL renderer');
+}
+const hasPss = first.platform === 'linux';
 for (const readers of readerCounts) {
   const row = { readers };
   for (const mode of modes) {
@@ -43,7 +50,7 @@ for (const readers of readerCounts) {
         for (const key of ['frameMs', 'validationMs', 'drawAndFinishMs', 'packMs', 'uploadBytes', 'uploadCallMs']) {
           assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
         }
-        if (first.frameTimingVersion === 1) {
+        if (version) {
           for (const key of framePhases) assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
           const measured = framePhases.reduce((ms, key) => ms + s[key], 0);
           assert(measured <= s.frameMs + 1e-6, 'Frame phases overlap or exceed total latency');
@@ -53,15 +60,20 @@ for (const readers of readerCounts) {
         const sorted = c.samples.map(s => s[key]).sort((a,b) => a-b);
         assert.equal(c[metric], sorted[Math.ceil(sorted.length * .95) - 1]);
       }
-      assert(c.pss.length > 1 && c.pss.every(([, kib]) => kib > 0), 'Linux PSS samples required');
-      assert.equal(c.peakSampledPssKiB, Math.max(...c.pss.map(s => s[1])));
+      if (hasPss) {
+        assert(c.pss.length > 1 && c.pss.every(([, kib]) => kib > 0), 'Linux PSS samples required');
+        assert.equal(c.peakSampledPssKiB, Math.max(...c.pss.map(s => s[1])));
+      } else {
+        assert.equal(c.pss.length, 0);
+        assert.equal(c.peakSampledPssKiB, null);
+      }
     }
     row[mode] = {
-      peakPssMiB: median(matching.map(c => c.peakSampledPssKiB)) / 1024,
+      peakPssMiB: hasPss ? median(matching.map(c => c.peakSampledPssKiB)) / 1024 : null,
       p95FrameMs: median(matching.map(c => c.p95FrameMs)),
       p95ValidationMs: median(matching.map(c => c.p95ValidationMs)),
     };
-    if (first.frameTimingVersion === 1) {
+    if (version) {
       // Select whole commands by total frame latency before attributing their time.
       const slow = matching.flatMap(c => c.samples.toSorted((a, b) => b.frameMs - a.frameMs)
         .slice(0, Math.ceil(c.samples.length * 0.05)));
@@ -79,12 +91,12 @@ for (const readers of readerCounts) {
     }
   }
   if (row.copy) {
-    row.memoryReduction = 1 - row.shared.peakPssMiB / row.copy.peakPssMiB;
+    row.memoryReduction = hasPss ? 1 - row.shared.peakPssMiB / row.copy.peakPssMiB : null;
     row.frameRatio = row.shared.p95FrameMs / row.copy.p95FrameMs;
   }
   summary.push(row);
 }
 const four = summary.find(row => row.readers === 4);
-console.log(JSON.stringify({ summary, fourReaderTargets: sharedOnly ? undefined : {
-  memory: four.memoryReduction >= .25, frame: four.frameRatio <= 1,
+console.log(JSON.stringify({ graphics: first.graphics, summary, fourReaderTargets: sharedOnly ? undefined : {
+  memory: hasPss ? four.memoryReduction >= .25 : null, frame: four.frameRatio <= 1,
 } }, null, 2));
