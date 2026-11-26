@@ -1,0 +1,46 @@
+name: Selective JSON reader CPU attribution (proof only)
+on:
+  push:
+    branches: [proof/json-field-baseline-20261127]
+    paths: ['.github/workflows/json-field-profile-proof.yml', 'proofs/json-field-profile-20261127.mjs']
+permissions:
+  contents: read
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build unchanged current-main runtime and website
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- . ':(exclude).github/workflows/json-field-baseline-proof.yml' ':(exclude)proofs/json-field-baseline-20261127.mjs' ':(exclude)proofs/json-field-baseline-20261127.md' ':(exclude).github/workflows/json-field-profile-proof.yml' ':(exclude)proofs/json-field-profile-20261127.mjs'
+          bun install --frozen-lockfile
+          bun run build:wasm && bun run build:browser && bun run build:types
+          npm --prefix website install --ignore-scripts --no-package-lock
+          SITE_BASE=/ node website/build.mjs
+      - name: Collect sampled CPU stacks in both actual readers
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/json-field-profile/stacks"
+          export JSON_FIELD_PROFILE_DIR="$RUNNER_TEMP/json-field-profile/stacks"
+          node proofs/json-field-profile-20261127.mjs "$PWD" "$PWD" "$RUNNER_TEMP/json-field-profile/raw.json" 100000 4 selective-shared-view,selective-shared-get | tee "$RUNNER_TEMP/json-field-profile/run.log"
+          test "$(find "$JSON_FIELD_PROFILE_DIR" -name '*.cpuprofile' | wc -l)" -eq 192
+          cp website/_site/build.json "$RUNNER_TEMP/json-field-profile/build.json"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: json-field-profile-${{ github.run_id }}
+          path: ${{ runner.temp }}/json-field-profile/
+          retention-days: 14
