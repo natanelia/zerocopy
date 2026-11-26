@@ -1,14 +1,18 @@
-name: Copied session transferable publication screen (proof only)
+name: Copied session transfer portability and protocol qualification (proof only)
 on:
   push:
     branches: [proof/copied-session-publication-20261126]
-    paths: ['worker.ts', 'worker-protocol.ts', 'proofs/copied-session-transfer-paired-20261126.mjs', '.github/workflows/copied-session-publication-proof.yml']
+    paths: ['.github/workflows/copied-session-publication-proof.yml', 'proofs/copied-session-browser-case-20261126.mjs', 'proofs/copied-session-browser-run-20261126.mjs', 'proofs/copied-session-transfer-edge-20261126.mjs']
 permissions:
   contents: read
 jobs:
-  paired:
+  qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [bun, chromium, firefox, edge]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts shared.ts shared-map.ts persistent-core
+          git diff --exit-code 8a442515a358500c30d25c2f4f63fc3b703f4323 HEAD -- worker.ts worker-protocol.ts arena.ts shared.ts shared-map.ts persistent-core
           for file in worker.ts worker-protocol.ts; do
             cp "$file" "/tmp/copy-$file"
             git show "d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341:$file" > "$file"
@@ -36,23 +40,39 @@ jobs:
           cp -a dist baseline-dist
           cp -a dist control-dist
           for file in worker.ts worker-protocol.ts; do cp "/tmp/copy-$file" "$file"; done
-          git diff --exit-code -- worker.ts worker-protocol.ts
+          git diff --exit-code 8a442515a358500c30d25c2f4f63fc3b703f4323 -- worker.ts worker-protocol.ts
           bun run build:browser && bun run build:types
-          bun run typecheck
-          node --version
+          node --version && bun --version
           sha256sum worker.ts worker-protocol.ts persistent-core.wasm baseline-dist/*.js control-dist/*.js dist/*.js
-      - name: Measure copied, transferable, and unchanged session paths
+      - name: Bun real worker screen
+        if: matrix.runtime == 'bun'
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p copied-session-results
-          node proofs/copied-session-transfer-paired-20261126.mjs copied-session-results/raw.json | tee copied-session-results/run.log
-      - name: Existing tests
-        run: bun run test
+          bun proofs/copied-session-transfer-paired-20261126.mjs copied-session-results/raw.json | tee copied-session-results/run.log
+      - name: Install browser
+        if: matrix.runtime == 'chromium' || matrix.runtime == 'firefox'
+        run: bunx playwright install --with-deps ${{ matrix.runtime }}
+      - name: Browser real worker publication screen
+        if: matrix.runtime == 'chromium' || matrix.runtime == 'firefox'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p copied-session-results
+          node proofs/copied-session-browser-run-20261126.mjs ${{ matrix.runtime }} copied-session-results/raw.json | tee copied-session-results/run.log
+      - name: Mixed peer and queue protocol checks
+        if: matrix.runtime == 'edge'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p copied-session-results
+          node proofs/copied-session-transfer-edge-20261126.mjs | tee copied-session-results/edge-node.log
+          bun proofs/copied-session-transfer-edge-20261126.mjs | tee copied-session-results/edge-bun.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: copied-session-paired-${{ github.run_id }}-${{ github.run_attempt }}
+          name: copied-session-${{ matrix.runtime }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: copied-session-results/
           retention-days: 14
           if-no-files-found: error
