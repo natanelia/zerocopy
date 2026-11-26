@@ -1,12 +1,12 @@
-name: Shared session sharded publication attribution (proof only)
+name: Shared session lazy kernel candidate screen (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]
-    paths: ['.github/workflows/shared-session-shards-proof.yml', 'proofs/shared-session-shards-20261126.mjs']
+    paths: ['.github/workflows/shared-session-shards-proof.yml', 'arena.ts', 'proofs/shared-session-shards-20261126.mjs', 'worker-attachment.test.ts']
 permissions:
   contents: read
 jobs:
-  baseline:
+  paired:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -21,27 +21,36 @@ jobs:
         with:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
-      - name: Build pinned unmodified runtime
+      - name: Build pinned baseline and exact candidate
         shell: bash
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code 50b06167909ff1398d293948c4a82c5f7bea5863 HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md'
+          git diff --exit-code 50b06167909ff1398d293948c4a82c5f7bea5863 HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md' ':(exclude)arena.ts' ':(exclude)worker-attachment.test.ts'
           mkdir -p shared-session-shards-results
+          git worktree add --detach "$RUNNER_TEMP/baseline" 50b06167909ff1398d293948c4a82c5f7bea5863
+          cp proofs/shared-session-shards-20261126.mjs "$RUNNER_TEMP/baseline/proofs/"
           node --version
           bun --version
+          (cd "$RUNNER_TEMP/baseline" && bun install --frozen-lockfile && bun run build:wasm && bun run build:browser)
           bun install --frozen-lockfile
-          bun run build:wasm && bun run build:browser
-          sha256sum dist/*.js persistent-core.wasm > shared-session-shards-results/hashes.txt
-      - name: Attribute reader-side WebAssembly instantiation in real worker publications
+          bun run build:wasm && bun run build:browser && bun run build:types
+      - name: Run correctness and compatibility checks
         shell: bash
         run: |
           set -euo pipefail
-          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results | tee shared-session-shards-results/run.log
+          bun run typecheck
+          bunx vitest run worker-attachment.test.ts worker.test.ts workers.test.ts object-read-cache.test.ts primitive-scan-portability.test.ts
+          node proofs/worker-sessions.mjs
+      - name: Pair actual worker publications with identical-build controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" | tee shared-session-shards-results/run.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: shared-session-shards-${{ github.run_id }}-${{ github.run_attempt }}
           path: shared-session-shards-results/
           retention-days: 14
-          if-no-files-found: error
+          if-no-files-found: warn

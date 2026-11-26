@@ -102,7 +102,7 @@ function sameRecordBytes(bytes: Uint8Array, oldBytes: Uint8Array, words: Uint32A
 export class Arena {
   readonly memory: WebAssembly.Memory;
   readonly wasm: any;
-  readonly #nativeWasm: any;
+  #nativeWasm: any;
   readonly id: string;
   readonly readOnly: boolean;
   private dependencyLookup = new Map<string, Arena>();
@@ -193,8 +193,33 @@ export class Arena {
   constructor(options: { memory?: WebAssembly.Memory; copy?: Uint8Array; used?: number; id?: string; readOnly?: boolean; registry?: ArenaRegistry; previous?: Arena } = {}) {
     this.memory = options.memory ?? new WebAssembly.Memory(memoryDescriptor(options.copy?.byteLength, options.readOnly));
     if (options.copy) new Uint8Array(this.memory.buffer).set(options.copy);
-    this.wasm = this.#nativeWasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
-    if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+    const previous = options.previous;
+    // Only defer repeated read-only attachments to an already validated memory
+    // object. New memories, copies, legacy attachments and writers remain eager.
+    // Each frame still owns its own registry, caches and immutable heap bound.
+    if (options.readOnly && !options.copy && options.used !== undefined &&
+        previous?.readOnly && previous.id === options.id && previous.memory === options.memory) {
+      const used = options.used;
+      const materialize = () => {
+        const wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+        wasm.setHeapEnd(used);
+        Object.defineProperty(this, 'wasm', { value: wasm, writable: true, enumerable: true, configurable: true });
+        this.#nativeWasm = wasm;
+        return wasm;
+      };
+      // Use the getter itself as the identity until its native exports exist.
+      // Assignment preserves the original writable own-property contract.
+      this.#nativeWasm = materialize;
+      Object.defineProperty(this, 'wasm', { enumerable: true, configurable: true, get: materialize,
+        set: value => {
+          materialize();
+          Object.defineProperty(this, 'wasm', { value, writable: true, enumerable: true, configurable: true });
+        },
+      });
+    } else {
+      this.wasm = this.#nativeWasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
+      if (options.used !== undefined) this.wasm.setHeapEnd(options.used);
+    }
     this.readOnly = options.readOnly ?? false;
     if (this.readOnly && options.registry) this.dependencyLookup = options.registry.arenas;
     this.id = options.id ?? `${realmId}-${++nextId}`;
@@ -208,7 +233,13 @@ export class Arena {
   }
   /** Internal: specialized readers must not bypass replaced WASM kernels. */
   static hasNativeWasm(arena: Arena): boolean {
-    return #nativeWasm in arena && Object.getOwnPropertyDescriptor(arena, 'wasm')?.value === arena.#nativeWasm;
+    if (!(#nativeWasm in arena)) return false;
+    const descriptor = Object.getOwnPropertyDescriptor(arena, 'wasm');
+    if (descriptor?.get && descriptor.get === arena.#nativeWasm) {
+      // Only materialize our own getter, never a replaced accessor.
+      return descriptor.get.call(arena) === arena.#nativeWasm;
+    }
+    return descriptor?.value === arena.#nativeWasm;
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }

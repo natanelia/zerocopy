@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { cpus } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import * as z from 'zerocopy';
 import { createSharedSession, connectSharedSession } from 'zerocopy/worker';
 import { productId, product } from '../website/assets/catalog-core.mjs';
@@ -127,7 +128,7 @@ if (!isMainThread) {
     return data.arenas.reduce((sum,a)=>sum+a.used,0);
   };
   const initialUsed=arenaBytes(initial);
-  const workers=Array.from({length:2},()=>new Worker(new URL(import.meta.url),{workerData:{n,count,layout,instrument:arm==='profile'}}));
+  const workers=Array.from({length:2},()=>new Worker(new URL(import.meta.url),{workerData:{n,count,layout,instrument:arm.startsWith('profile-')}}));
   const session=createSharedSession(initial,{copy:false,channel:'shards',delivery:'all',timeoutMs:60000,onError:e=>errors.push(String(e))});
   const rows=[];
   function wait(worker,match,description){
@@ -175,30 +176,44 @@ if (!isMainThread) {
     console.log(JSON.stringify({n,count,layout,pair,arm,constructionMs,initialMs,initialUsed,initialReaders:initialReaders.map(({received,...r})=>({...r,roundTripMs:received-start})),rows,verified:true}));
   }finally{session.dispose();await Promise.all(workers.map(w=>w.terminate()));}
 } else {
-  const out=process.argv[2];assert(out,'usage: node proofs/shared-session-shards-20261126.mjs RESULTS_DIRECTORY');
+  const out=resolve(process.argv[2]), baseline=resolve(process.argv[3]), candidate=resolve('.'); assert(process.argv[2]&&process.argv[3]&&baseline!==candidate,'usage: node proofs/shared-session-shards-20261126.mjs RESULTS BASELINE_WORKTREE');
   mkdirSync(out,{recursive:true});
-  const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const sha=cwd=>execFileSync('git',['rev-parse','HEAD'],{cwd,encoding:'utf8'}).trim();
+  assert.equal(sha(baseline),BASE);
   const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
-  const cases=[[10000,64,'distinct'],[100000,1,'one'],[100000,64,'one'],[100000,64,'distinct']];
-  const data={base:BASE,head:sha,runtime:process.versions,cpu:cpus()[0]?.model,hashes:Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',fileURLToPath(import.meta.url),...readdirSync('dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(p)])),cases,updates,measuredPairs:4,diagnostic:'unmodified runtime, proxied WebAssembly.Instance only inside profiled workers',samples:[],complete:false};
-  const file=out+'/raw.json',script=fileURLToPath(import.meta.url);
-  writeFileSync(file,JSON.stringify(data));
-  for(let pair=-1;pair<4;pair++) for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
-    for(const arm of (pair%2===0?['plain','profile']:['profile','plain'])){
-      const args=[script,'--sample',String(n),String(count),layout,String(pair),arm];
-      const result=spawnSync(process.execPath,args,{encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
+  const scriptRel='proofs/shared-session-shards-20261126.mjs';
+  function hashes(root){return Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel,...readdirSync(root+'/dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(root+'/'+p)]));}
+  const cases=[[1000,1,'one'],[10000,64,'distinct'],[100000,1,'one'],[100000,64,'one'],[100000,64,'distinct']];
+  const baseHashes=hashes(baseline),candidateHashes=hashes(candidate);
+  for(const p of ['worker.ts','worker-protocol.ts','shared.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel])assert.equal(baseHashes[p],candidateHashes[p],p);
+  assert.notEqual(baseHashes['arena.ts'],candidateHashes['arena.ts']);
+  const data={base:BASE,head:sha(candidate),runtime:process.versions,cpu:cpus()[0]?.model,baseHashes,candidateHashes,cases,updates,measuredPairs:6,samples:[],complete:false};
+  const file=out+'/raw.json';writeFileSync(file,JSON.stringify(data));
+  function sample(n,count,layout,pair,arm){
+      const root=arm==='candidate'||arm==='profile-candidate'?candidate:baseline;
+      const args=[root+'/'+scriptRel,'--sample',String(n),String(count),layout,String(pair),arm];
+      const result=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
       const prefix=out+'/'+[n,count,layout,pair,arm].join('-');
       writeFileSync(prefix+'.stdout',result.stdout??'');writeFileSync(prefix+'.stderr',result.stderr??'');
-      if(result.status!==0) throw Error('Failed sample '+prefix+': '+(result.error?.message??result.status));
-      const row=JSON.parse(result.stdout.trim());
-      assert(row.verified&&row.rows.length===updates&&row.arm===arm&&row.pair===pair);
-      for(const sample of [row.initialReaders,...row.rows.map(r=>r.readers)]) for(const reader of sample){
+      if(result.status!==0)throw Error('Failed sample '+prefix+': '+(result.error?.message??result.status));
+      const row=JSON.parse(result.stdout.trim());assert(row.verified&&row.rows.length===updates&&row.arm===arm&&row.pair===pair);
+      for(const reads of [row.initialReaders,...row.rows.map(r=>r.readers)])for(const reader of reads){
         assert(Number.isSafeInteger(reader.attachmentInstances)&&reader.attachmentInstances>=0);
         assert(Number.isFinite(reader.attachmentInstanceMs)&&reader.attachmentInstanceMs>=0);
-        if(arm==='plain')assert.equal(reader.attachmentInstances,0);
+        if(!arm.startsWith('profile-'))assert.equal(reader.attachmentInstances,0);
       }
-      data.samples.push(row); console.log(JSON.stringify(row));writeFileSync(file,JSON.stringify(data));
-    }
+      data.samples.push(row);console.log(JSON.stringify(row));writeFileSync(file,JSON.stringify(data));return row;
+  }
+  // AB and identical-build AA, interleaved and alternated. Each arm is a
+  // fresh process; no GC forcing. All fixtures and verification are identical.
+  for(let pair=-1;pair<6;pair++)for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
+    const cohorts=pair%2===0?[['base','candidate'],['aa-base','aa-control']]:[['aa-control','aa-base'],['candidate','base']];
+    for(const arms of cohorts)for(const arm of arms)sample(n,count,layout,pair,arm);
+  }
+  // Separate attribution samples are not included in latency results.
+  for(const [n,count,layout] of [[100000,64,'distinct'],[100000,1,'one']]){
+    sample(n,count,layout,-2,'profile-base');
+    sample(n,count,layout,-2,'profile-candidate');
   }
   data.complete=true;writeFileSync(file,JSON.stringify(data));
 }

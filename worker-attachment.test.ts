@@ -264,3 +264,53 @@ for (const copy of [false, true]) describe(`worker attachment registry (copy=${c
     await assert.rejects(initWorker({ ...data, structures: { parent: { ...structure, type: 'unknown' } } }), /Invalid structure: parent/);
   });
 });
+
+describe('experimental repeated shared attachment kernel deferral', () => {
+  it('materializes only the requested frame-local kernels and preserves old heap bounds', async () => {
+    const child = numberMap(1), parent = nestedMap(child), spare = numberMap(99);
+    const initial = getWorkerData({parent, child, spare}, {copy:false});
+    const old = await initWorker(initial);
+    const nextChild = child.set('value',2), nextParent = parent.set('child',nextChild);
+    const updated = getWorkerData({parent:nextParent,child:nextChild,spare},{copy:false});
+    const next = await initWorker(updated,{previous:old});
+    const oldArena=arenaOf(old.child), newArena=arenaOf(next.child), spareArena=arenaOf(next.spare);
+    assert.notEqual(newArena,oldArena);
+    assert.equal(newArena.memory,oldArena.memory);
+    assert.notEqual(newArena.transportDependencies,oldArena.transportDependencies);
+    assert.equal(typeof Object.getOwnPropertyDescriptor(spareArena,'wasm')!.get,'function');
+    assert.equal(next.parent.get('child')!.get('value'),2);
+    assert.equal(old.parent.get('child')!.get('value'),1);
+    assert.equal(oldArena.used,initial.arenas.find(a=>a.id===oldArena.id)!.used);
+    assert.equal(newArena.used,updated.arenas.find(a=>a.id===newArena.id)!.used);
+    assert.notEqual(newArena.wasm,oldArena.wasm);
+    assert.equal(typeof Object.getOwnPropertyDescriptor(spareArena,'wasm')!.get,'function');
+    assert(Arena.hasNativeWasm(spareArena));
+    assert.equal(Object.getOwnPropertyDescriptor(spareArena,'wasm')!.value,spareArena.wasm);
+    assert.equal(next.spare.get('value'),99);
+    const native=spareArena.wasm;
+    Object.defineProperty(spareArena,'wasm',{value:{},configurable:true,writable:true});
+    assert.equal(Arena.hasNativeWasm(spareArena),false);
+    Object.defineProperty(spareArena,'wasm',{value:native,configurable:true,writable:true});
+    assert(Arena.hasNativeWasm(spareArena));
+    assert.throws(()=>next.child.set('value',9),/read-only/);
+    // Grow the writer after the older read-only frame has been retained.
+    const grown=nextChild.setMany(Array.from({length:12000},(_,i)=>['道路/'+i,i] as [string,number]));
+    const after=await initWorker(getWorkerData({parent:nextParent,child:grown,spare},{copy:false}),{previous:next});
+    assert.equal(after.child.get('道路/11999'),11999);
+    assert.equal(next.child.get('道路/11999'),undefined);
+    assert.equal(old.child.get('value'),1);
+    assert.equal(arenaOf(next.child).used,newArena.used);
+    const reexport=await initWorker(getWorkerData({parent:after.parent,child:after.child,spare:after.spare},{copy:true}));
+    assert.equal(reexport.parent.get('child')!.get('value'),2);
+    assert.equal(reexport.child.get('道路/11999'),11999);
+  });
+  it('does not defer copies or a different backing memory with the same id', async () => {
+    const source=numberMap(1,new Arena({id:'repeated'}));
+    const old=await initWorker(getWorkerData({source},{copy:false}));
+    for(const data of [getWorkerData({source},{copy:true}),getWorkerData({source:numberMap(2,new Arena({id:'repeated'}))},{copy:false})]){
+      const next=await initWorker(data,{previous:old});
+      assert(Object.hasOwn(Object.getOwnPropertyDescriptor(arenaOf(next.source),'wasm')!,'value'));
+      assert.notEqual(arenaOf(next.source).memory,arenaOf(old.source).memory);
+    }
+  });
+});
