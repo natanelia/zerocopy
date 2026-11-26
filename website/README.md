@@ -2,7 +2,7 @@
 
 A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
 
-The homepage leads with a runnable two-file Node.js example. A disclosure below the storage model opens a separate Singapore simulation. The illustration loads on opening, and each press of “Next step” advances a worker job. Without JavaScript, the disclosure links to the static island model. The catalog comparison and benchmark pages run actual workers.
+The homepage leads with a runnable two-file Node.js example. Its code frame uses the original print texture in `assets/snapshot-monotype.webp`. Bricolage Grotesque is self-hosted, with its SIL Open Font License in `assets/`. A disclosure below the storage model opens a separate Singapore simulation. The illustration loads on opening, and each press of “Next step” advances a worker job. Without JavaScript, the disclosure links to the static island model. The catalog comparison and benchmark pages run actual workers.
 
 ## Local development
 

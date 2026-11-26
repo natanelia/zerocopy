@@ -37,7 +37,7 @@ test('checked-in WebP and font assets keep their source bytes in the Pages tree'
     writeFileSync(join(dir, 'index.html'), '<h1>Home</h1>');
     writeFileSync(join(dir, 'build.json'), '{}');
     mkdirSync(join(dir, 'assets'));
-    for (const name of ['singapore-relief.webp', 'dm-serif-text-latin-400-normal.woff2']) {
+    for (const name of ['singapore-relief.webp', 'snapshot-monotype.webp', 'bricolage-grotesque-latin.woff2']) {
       const source = readFileSync(new URL('../assets/' + name, import.meta.url));
       const path = 'assets/' + name;
       writeFileSync(join(dir, path), source);

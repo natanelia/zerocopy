@@ -5,7 +5,7 @@ import { projectName, repository, npmPackage } from './config.mjs';
 const arrow = '<svg class="link-arrow" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 13 13 3M4 3h9v9"/></svg>';
 export function shell({ title, description, body, base, route = '', script, version, sha, origin, noindex = false }) {
   const href = path => base + path;
-  const wordmark = `<a class="wordmark" href="${href('')}" aria-label="zerocopy home">zerocopy</a>`;
+  const wordmark = `<a class="wordmark" href="${href('')}" aria-label="zerocopy home"><span class="brand-symbol" aria-hidden="true"></span>zerocopy</a>`;
   const navigation = [
     ['Docs', 'docs/getting-started/', route.startsWith('docs/')],
     ['Use cases', 'use-cases/', route === 'use-cases/'],
@@ -33,7 +33,7 @@ export function shell({ title, description, body, base, route = '', script, vers
   // JSON-LD is raw script text: HTML entities are not decoded here.
   const structuredData = project ? `<script type="application/ld+json">${JSON.stringify(project).replaceAll('<', '\\u003c')}</script>` : '';
   const metadata = `<meta property="og:site_name" content="zerocopy"><meta name="twitter:card" content="summary">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ''}`;
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#faf7ef"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="preload" as="font" type="font/woff2" crossorigin href="${href('assets/dm-serif-text-latin-400-normal.woff2')}"><link rel="stylesheet" href="${href('assets/site.css')}">${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}"></script>${script ? `<script type="module" src="${href('assets/' + script)}"></script>` : ''}${route ? '' : `<link rel="stylesheet" href="${href('assets/home.css')}">`}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f8f5ed"><title>${escape(pageTitle)}</title><meta name="description" content="${escape(description)}"><meta property="og:title" content="${escape(pageTitle)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website">${canonical}${metadata}${structuredData}<link rel="icon" href="${href('assets/icon.svg')}" type="image/svg+xml"><link rel="preload" as="font" type="font/woff2" crossorigin href="${href('assets/bricolage-grotesque-latin.woff2')}"><link rel="stylesheet" href="${href('assets/site.css')}">${['historical/log-explorer/', 'historical/log-benchmark/'].includes(route) ? `<link rel="stylesheet" href="${href('assets/explorer.css')}">` : ''}<script type="module" src="${href('assets/main.mjs')}"></script>${script ? `<script type="module" src="${href('assets/' + script)}"></script>` : ''}${route ? '' : `<link rel="stylesheet" href="${href('assets/home.css')}">`}</head><body data-base="${base}" data-source="${sha}"><a class="skip" href="#main">Skip to content</a>
   <header class="site-header">${wordmark}<nav class="desktop-nav" aria-label="Main">${navigation}</nav><div class="header-actions"><button class="search-open" aria-label="Search documentation"><svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m12 12 5 5" stroke="currentColor" stroke-width="1.5"/></svg></button><a class="github-link" href="${repository}">GitHub</a><button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav">Menu</button></div></header>
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden>${navigation}<a href="${href('compare/')}">Live comparison</a><a href="${href('playground/')}">Small snapshot example</a><a href="${repository}">GitHub</a></nav>
   ${body}
@@ -69,7 +69,7 @@ state.subscribe(({ stock }) => {
   return `<main id="main">
     <section class="product-hero wrap" id="how-it-works" aria-labelledby="product-title">
       <div class="product-intro">
-        <h1 id="product-title"><span class="sr-only">Immutable collections for Node.js workers, Web Workers in the browser, and Bun workers.</span><span aria-hidden="true">Immutable collections<br>for <span class="runtime-slot"><span class="runtime-word">Node.js</span></span> workers.</span></h1>
+        <h1 id="product-title"><span class="sr-only">Immutable collections for Node.js workers, Web Workers in the browser, and Bun workers.</span><span aria-hidden="true">Immutable<br>collections for<br><span class="runtime-slot"><span class="runtime-phrase"><span class="runtime-word">Node.js</span> workers.</span></span></span></h1>
         <p>A JavaScript and TypeScript library for sharing maps, lists, and sets across workers. With shared memory, workers read snapshots without copying the whole collection.</p>
         <div class="product-actions">
           <a class="quickstart" href="${base}docs/getting-started/">Quickstart <span aria-hidden="true">→</span></a>
@@ -78,24 +78,30 @@ state.subscribe(({ stock }) => {
         </div>
       </div>
       <figure class="worker-example" aria-label="Runnable Node.js worker example">
-      <div class="code-demo">
-        <div class="code-tabs" role="tablist" aria-label="Node.js example files" hidden>
-          <button role="tab" aria-selected="true" id="tab-reader" aria-controls="panel-reader" data-code-tab="reader">worker.mjs</button>
-          <button role="tab" aria-selected="false" id="tab-owner" aria-controls="panel-owner" tabindex="-1" data-code-tab="owner">main.mjs</button>
+        <div class="example-mat">
+          <div class="code-demo">
+            <div class="code-tabs" role="tablist" aria-label="Node.js example files" hidden>
+              <button role="tab" aria-selected="true" id="tab-reader" aria-controls="panel-reader" data-code-tab="reader">worker.mjs</button>
+              <button role="tab" aria-selected="false" id="tab-owner" aria-controls="panel-owner" tabindex="-1" data-code-tab="owner">main.mjs</button>
+            </div>
+            <div id="panel-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
+            <div id="panel-owner">${codeBlock(main, 'main.mjs', 'js')}</div>
+          </div>
         </div>
-        <div id="panel-reader">${codeBlock(reader, 'worker.mjs', 'js')}</div>
-        <div id="panel-owner">${codeBlock(main, 'main.mjs', 'js')}</div>
-      </div>
-        <figcaption>Save both files together and run <code>node main.mjs</code>. The worker prints <samp>12 8</samp>, the original and updated stock counts.</figcaption>
+        <figcaption><span>Save both files, then run <code>node main.mjs</code>.</span><span class="example-result"><samp>12 8</samp> Original and updated counts</span></figcaption>
       </figure>
     </section>
     <section class="wrap storage-example" id="worker-architecture">
-      <div><h2>When shared storage helps</h2>
-        <p>Use zerocopy when several workers need to read a large, changing dataset. One thread writes updates. The readers share the backing storage and read their snapshots locally.</p>
+      <div><h2>One writer.<br>Many readers.</h2>
+        <p>A writer publishes immutable snapshots. Readers can keep an earlier version while updates arrive. Use the storage model to see what each worker holds when sharing or cloning.</p>
         <p>Node.js supports shared storage. Browsers require cross-origin isolation. Bun copies snapshots by default.</p>
-        <div class="model-links"><a href="${base}compare/">Try the product catalog</a><a href="${base}investigation-benchmark/">Run benchmarks</a><a href="${base}docs/mental-model/">How sharing works</a></div>
+        <a class="model-link" href="${base}docs/mental-model/">How sharing works ${arrow}</a>
       </div>
       <div class="sharing-card" aria-label="Shared and cloned storage"><div class="diagram-toolbar"><span class="diagram-title">Storage model</span><div class="segmented" role="group" aria-label="Storage model"><button data-storage="shared" aria-pressed="true">Shared</button><button data-storage="cloned" aria-pressed="false">Cloned</button></div></div><div class="diagram"><div class="owner-node"><span class="node-icon">W</span><span>Writer<small>Main thread or worker</small></span></div><div class="wire wire-top"></div><div class="arena"><div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div><div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => `<i></i>`).join('')}</div><div class="arena-footer"><span class="mono">Map · List · Set</span></div></div><div class="wire wire-bottom"></div><div class="reader-nodes" id="reader-nodes"></div></div><div class="diagram-controls"><label for="worker-count">Readers <output id="worker-count-value">3</output></label><input id="worker-count" type="range" min="1" max="4" value="3"><span id="storage-count" role="status">1 backing store</span></div></div>
+    </section>
+    <section class="wrap product-links" aria-label="Try the library">
+      <article><h2><a href="${base}compare/">Try the product catalog</a></h2><p>Look up records with real workers, publish an update, and read the earlier revision.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
+      <article><h2><a href="${base}investigation-benchmark/">Run benchmarks</a></h2><p>Measure reads and updates on your device and inspect the recorded memory results.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
     </section>
     ${cityDemo(base)}
   </main>`;

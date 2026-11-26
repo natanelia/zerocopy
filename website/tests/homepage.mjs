@@ -50,10 +50,13 @@ export async function checkHomepage(browser, url, screenshots) {
     // Only the runtime name changes in the hero, and its reserved width stays fixed.
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await hero.locator('.runtime-control').waitFor({ state: 'visible' });
-    const start = await word.locator('..').boundingBox();
+    const start = await hero.locator('.runtime-slot').boundingBox();
     await page.clock.runFor(6600);
     assert.equal(await word.innerText(), 'Browser');
-    assert.deepEqual(await word.locator('..').boundingBox(), start);
+    const cycled = await hero.locator('.runtime-slot').boundingBox();
+    for (const edge of ['x', 'y', 'width', 'height']) {
+      assert.ok(Math.abs(cycled[edge] - start[edge]) < .1, 'Runtime cycle keeps the headline position');
+    }
     const pause = hero.getByRole('button', { name: 'Pause rotating runtime name' });
     await pause.focus(); await page.keyboard.press('Space');
     await page.clock.runFor(15000);

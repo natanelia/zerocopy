@@ -229,7 +229,7 @@ try {
       const baselineIds = ['shared', 'native-incremental', 'immutable-incremental', 'immer-incremental'];
       const editedPhases = ['editPublicationMs', 'updatePublicationMs'];
       const allPhases = ['generationMs', 'constructionMs', 'publicationMs', 'firstQueryMs', 'repeatQueryMs', 'updateMs', ...editedPhases, 'updatedQueryMs'];
-      assert.equal((await page.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'Memory. Reads. The complete cost.');
+      assert.equal((await page.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'Worker benchmarks');
       assert.equal(await page.locator('.feature-benchmark-preview, [data-preview-case], #feature-preview-status').count(), 0, 'No preview panel or placeholder bars');
       assert.equal(await page.locator('#feature-benchmark-results').innerText(), '', 'Charts appear only after a completed run');
       await page.locator('#feature-count').selectOption('1000'); await page.locator('#feature-run').click();
@@ -400,7 +400,7 @@ try {
       await plain.goto(origin + meta.base + 'explorer/'); await plain.waitForURL(origin + meta.base + 'compare/');
       assert.match(await plain.locator('h1').innerText(), /product/i);
       await plain.goto(origin + meta.base + 'investigation-benchmark/');
-      assert.equal((await plain.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'Memory. Reads. The complete cost.');
+      assert.equal((await plain.locator('h1').innerText()).replace(/\s+/g, ' ').trim(), 'Worker benchmarks');
       assert.equal(await plain.locator('.feature-benchmark-preview, [data-preview-case]').count(), 0);
       assert.equal(await plain.locator('#feature-benchmark-results').innerText(), '');
       await plain.goto(origin + meta.base + 'docs/memory-comparison/');
