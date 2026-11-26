@@ -14,6 +14,17 @@ export interface LineStringBuffersXY<B extends ArrayBufferLike = ArrayBufferLike
   readonly validity: Uint8Array<B> | null;
 }
 
+/** Borrow one row of a packed column. Treat the returned coordinate view as read-only. */
+export function lineStringViewXY<B extends ArrayBufferLike>(
+  { offsets, coordinates, validity }: LineStringBuffersXY<B>, row: number,
+): Float64Array<B> | null {
+  if (!Number.isSafeInteger(row) || row < 0 || row >= offsets.length - 1) {
+    throw new RangeError('LineString row is outside the batch');
+  }
+  if (validity && !(validity[Math.floor(row / 8)] & (1 << (row % 8)))) return null;
+  return coordinates.subarray(offsets[row] * 2, offsets[row + 1] * 2);
+}
+
 /** Pack immutable paths into independently owned buffers for Arrow or worker readers. */
 export function packLineStringsXY(paths: Iterable<SharedList<'number'> | null>): LineStringBuffersXY<SharedArrayBuffer> {
   const rows = Array.from(paths);

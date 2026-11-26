@@ -4,13 +4,16 @@ import { isMainThread, parentPort, Worker, workerData } from 'node:worker_thread
 import { tableFromIPC, tableToIPC } from 'apache-arrow';
 import { algorithm } from '@geoarrow/geoarrow-js';
 import { SharedList } from 'zerocopy';
-import { packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
+import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
+import { lineStringViewXY } from 'zerocopy/geometry';
 
 if (isMainThread) {
   const path = new SharedList('number').pushMany([0, 1, 2, 3]);
   const original = packLineStringsXY([path, null, new SharedList('number')]);
   const edited = packLineStringsXY([path.set(2, 7), null, new SharedList('number')]);
-  const worker = new Worker(new URL(import.meta.url), { workerData: [original, edited] });
+  const ipc = tableToIPC(toGeoArrowTable(edited));
+  const imported = fromGeoArrowTable(tableFromIPC(ipc)).batches[0];
+  const worker = new Worker(new URL(import.meta.url), { workerData: { exports: [original, edited], imported } });
   let views;
   try {
     [views] = await once(worker, 'message');
@@ -26,8 +29,15 @@ if (isMainThread) {
   assert.equal(edited.validity[0], 0);
   assert.equal(original.coordinates[2], 2);
   assert.equal(path.get(2), 2);
+  assert.deepEqual([...views.importedLane], [0, 1, 7, 3]);
+  views.importedLane[0] = 55;
+  assert.equal(imported.coordinates[0], 55);
 } else {
-  for (const [index, packed] of workerData.entries()) {
+  const importedLane = lineStringViewXY(workerData.imported, 0);
+  assert.equal(lineStringViewXY(workerData.imported, 1), null);
+  assert.deepEqual([...lineStringViewXY(workerData.imported, 2)], []);
+  assert.equal(new SharedList('number').pushMany(importedLane).set(2, 8).get(2), 8);
+  for (const [index, packed] of workerData.exports.entries()) {
     const table = toGeoArrowTable(packed);
     const decoded = tableFromIPC(tableToIPC(table, 'stream'));
     for (const input of [table, decoded]) {
@@ -38,7 +48,8 @@ if (isMainThread) {
       [[[0, 1], [index === 0 ? 2 : 7, 3]], null, []]);
     if (index === 1) {
       const data = table.getChild('geometry').data[0];
-      parentPort.postMessage({ coordinates: data.children[0].children[0].values, offsets: data.valueOffsets, validity: data.nullBitmap });
+      parentPort.postMessage({ importedLane, coordinates: data.children[0].children[0].values,
+        offsets: data.valueOffsets, validity: data.nullBitmap });
     }
   }
 }

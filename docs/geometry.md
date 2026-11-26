@@ -69,6 +69,55 @@ a separate byte stream. The `bun run check:package` test also runs GeoArrow JS's
 `totalBounds` on both the shared table and its IPC round trip.
 [GeoArrow memory layout](https://geoarrow.org/format.html) · [GeoArrow field metadata](https://geoarrow.org/extension-types.html)
 
+### Open a tile and edit one lane
+
+`fromGeoArrowTable` imports a planar XY LineString column from an Apache Arrow
+table. Each returned batch corresponds to one input record batch. Row indexes
+within that batch also index its sibling feature-ID and attribute columns.
+Table slices preserve this alignment. The column name defaults to `geometry`.
+
+```ts
+import { tableFromIPC } from 'apache-arrow';
+import { SharedList } from 'zerocopy';
+import { fromGeoArrowTable } from 'zerocopy/geoarrow';
+import { lineStringViewXY } from 'zerocopy/geometry';
+
+const table = tableFromIPC(tileBytes);
+const { batches, metadata } = fromGeoArrowTable(table, { column: 'lanes' });
+worker.postMessage({ batches, metadata });
+
+// The selection identifies a row in this revision of the tile.
+const batch = batches[selection.batchIndex]!;
+const xy = lineStringViewXY(batch, selection.rowIndex);
+if (xy && xy.length >= 2) {
+  const lane = new SharedList('number').pushMany(xy);
+  const edited = lane.setMany([[0, newX], [1, newY]]);
+  // Publish edited with the feature's ID and next revision.
+}
+```
+
+`lineStringViewXY` returns a borrowed Float64 view in constant time. A missing
+lane returns `null`, an empty lane returns a zero-length view, and an invalid
+row index throws. Workers can use this function through `zerocopy/geometry`
+without installing Arrow. Creating the editable list copies only the selected
+lane. Its edits leave the imported tile available to existing readers.
+
+Both GeoArrow coordinate layouts are supported. Separate X and Y columns are
+interleaved once on import. Ordinary interleaved buffers from Arrow IPC are
+copied once into shared memory. An interleaved shared buffer can be reused
+when its selected vertices occupy a contiguous range. The borrowed view then
+keeps the source allocation alive, including when importing a small slice.
+Pass `{ copy: true }` to give the tile its own coordinate storage. Keep source
+buffers stable during import and treat published batches as read-only.
+
+The importer rebuilds row offsets and the validity bitmap for each batch,
+removes unused vertices under null rows, and accepts both 32-bit `List` and
+64-bit `LargeList` input. Each output batch supports up to 2³¹ − 1 visible
+vertices. It requires the `geoarrow.linestring` extension and rejects nonplanar
+edges, extra dimensions, and null coordinates inside a present lane. Pass
+the returned extension metadata to `toGeoArrowTable(batch, metadata)` to
+carry the original CRS and other extension fields through export.
+
 ## XY bounds
 
 `bboxXY` recomputes `[minX, minY, maxX, maxY]` from interleaved 2D coordinates. It reads the supplied snapshot directly and returns a fresh readonly tuple. It does not parse GeoJSON, transform coordinates, use cached bounds, or change existing collection methods. A caller must use this new API to benefit from it. Reuse previously calculated bounds when a snapshot has not changed.
