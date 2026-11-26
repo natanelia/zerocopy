@@ -25,6 +25,18 @@ export function notify(text) {
   toast.textContent = text; toast.classList.add('visible');
   clearTimeout(notifyTimer); notifyTimer = setTimeout(() => toast.classList.remove('visible'), 2300);
 }
+let copiedButton, copyFeedbackTimer;
+export function confirmCopy(button, message = 'Copied.') {
+  copiedButton?.removeAttribute('data-copy-success');
+  clearTimeout(copyFeedbackTimer);
+  button.setAttribute('data-copy-success', '');
+  copiedButton = button;
+  copyFeedbackTimer = setTimeout(() => {
+    button.removeAttribute('data-copy-success');
+    copiedButton = undefined;
+  }, 1600);
+  notify(message);
+}
 async function openSearch() {
   if (dialog.open) return;
   searchOpener = document.activeElement;
@@ -98,10 +110,12 @@ resetDesktopMenu();
 document.addEventListener('click', async event => {
   const button = event.target.closest('.copy-code, .copy-page');
   if (!button) return;
+  button.removeAttribute('data-copy-success');
   try {
     let text;
     if (button.matches('.copy-code')) text = button.closest('.code-block').querySelector('code').textContent;
     else { const response = await fetch(button.dataset.markdown); if (!response.ok) throw new Error('Unavailable'); text = await response.text(); }
-    await navigator.clipboard.writeText(text); notify('Copied.');
+    await navigator.clipboard.writeText(text);
+    confirmCopy(button);
   } catch { notify('Copy was blocked. Select the code and copy it manually.'); }
 });
