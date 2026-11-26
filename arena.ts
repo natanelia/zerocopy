@@ -202,7 +202,7 @@ export class Arena {
       const used = options.used;
       const materialize = () => {
         const wasm = new WebAssembly.Instance(module, { env: { memory: this.memory } }).exports;
-        wasm.setHeapEnd(used);
+        (wasm.setHeapEnd as (end: number) => void)(used);
         Object.defineProperty(this, 'wasm', { value: wasm, writable: true, enumerable: true, configurable: true });
         this.#nativeWasm = wasm;
         return wasm;
