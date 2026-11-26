@@ -2,6 +2,8 @@
 
 A static product site, source-backed documentation, and real browser experiments. The homepage leads with shared collection storage and direct reads. Tasks remain optional.
 
+The homepage leads with a runnable two-file Node.js example. Its code frame uses the original print texture in `assets/snapshot-monotype.webp`. Bricolage Grotesque is self-hosted, with its SIL Open Font License in `assets/`. A disclosure below the storage model opens a separate Singapore simulation. The illustration loads on opening, and each press of “Next step” advances a worker job. Without JavaScript, the disclosure links to the static island model. The catalog comparison and benchmark pages run actual workers.
+
 ## Local development
 
 Use the repository's [Bun, Node, and Rust setup](../CONTRIBUTING.md#set-up-and-test). Build the library first, then the website:
@@ -24,7 +26,7 @@ Most guides are rendered from the existing files in `docs/`. Do not maintain a s
 
 `render.mjs` rewrites source links to site routes, creates heading links, and highlights code at build time with the project's TypeScript scanner. It renders only checked-in Markdown; do not pass user-supplied text to it. Search uses DOM text nodes, not HTML from a query.
 
-The shared-read example appears before optional task execution. Hero diagrams are explicitly conceptual. Real-world guides describe implementation patterns, not unverified customer deployments.
+The homepage includes a two-file Node.js example. Its browser test copies the rendered files, runs them against the built package, and checks the original and updated map values. Real-world guides describe implementation patterns, not unverified customer deployments.
 
 > The current primary demos use the product-catalog workload described under [Product catalog comparison](#product-catalog-comparison). The log-column sections below describe the preserved historical routes.
 
@@ -105,6 +107,8 @@ CI uploads the static output, test logs, and desktop/mobile screenshots. Existin
 The hosted workflow separately runs `scripts/check-vite-quickstart.mjs` once. It extracts the quickstart's four marked files into a temporary application, installs the documented npm versions with lifecycle scripts disabled, and checks Vite development and production preview in Chromium and WebKit. It records isolation headers, visible snapshot counts, package versions, screenshots, and the resolved lockfile. This is distinct from checking Markdown worker examples against the repository's own bundles.
 
 ## Automatic PR previews
+
+Include `<!-- no-pages-preview -->` in the PR body to run the checks and retain screenshot artifacts without publishing that PR to Pages.
 
 The `Documentation website` workflow now publishes tested **same-repository PRs** to GitHub Pages. Each preview has its own path:
 

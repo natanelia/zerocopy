@@ -4,7 +4,7 @@ import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { basePath } from './config.mjs';
 const root = fileURLToPath(new URL('_site/', import.meta.url));
-const types = { '.html': 'text/html', '.css': 'text/css', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.md': 'text/plain', '.txt': 'text/plain', '.xml': 'application/xml' };
+const types = { '.html': 'text/html', '.css': 'text/css', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.woff2': 'font/woff2', '.md': 'text/plain', '.txt': 'text/plain', '.xml': 'application/xml' };
 /** Serve the production output, including optional subpath and no-header tests. */
 export function createPreview({ base = '/', isolated = true } = {}) {
   basePath(base);

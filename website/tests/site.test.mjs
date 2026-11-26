@@ -76,12 +76,15 @@ test('docs are prerendered and search points to generated pages', () => {
   }
   assert.ok(readFileSync(join(out, 'docs/collections/index.html'), 'utf8').includes('SharedMap'));
 });
-test('the first screen sells direct reads, not mandatory tasks or invented results', () => {
+test('the introduction identifies the library and leads into a two-file worker example', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  assert.ok(home.includes('Share your data.')); assert.ok(home.includes('Tasks optional.'));
-  assert.ok(home.includes('Conceptual storage model. Not a memory measurement.'));
-  for (const text of ['One writer on the main thread or in a worker', 'Main thread or worker', 'one allocating writer', 'Writer worker', 'Reader workers', 'snapshot delivery runs from the writer worker to reader workers', 'Example: main-thread writer']) assert.ok(home.includes(text), text);
-  assert.ok(home.includes('id="worker-architecture"'));
+  const intro = home.slice(home.indexOf('<div class="product-intro">'), home.indexOf('<figure class="worker-example"'));
+  assert.match(intro, /Immutable collections for Node\.js workers/);
+  assert.match(intro, /JavaScript and TypeScript library for sharing maps, lists, and sets across workers/);
+  assert.ok(intro.includes('npm i zerocopy'));
+  assert.ok(intro.includes(`href="${meta.base}docs/getting-started/"`));
+  assert.match(home, /node main\.mjs/);
+  assert.match(home, /Bun copies snapshots by default/);
   assert.ok(home.includes(`href="${meta.base}compare/"`));
   const lab = readFileSync(join(out, 'lab/index.html'), 'utf8');
   assert.ok(lab.includes('No stored scores.')); assert.ok(lab.includes('Not a memory benchmark.'));
@@ -121,7 +124,9 @@ test('product catalog and small snapshot tutorial have clear scopes', () => {
 
 test('the catalog is the sole live comparison and old workloads stay historical', () => {
   const home = readFileSync(join(out, 'index.html'), 'utf8');
-  for (const slug of ['catalog', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) assert.ok(home.includes(`docs/${slug}/`));
+  assert.ok(home.includes(`href="${meta.base}use-cases/"`));
+  const useCases = readFileSync(join(out, 'use-cases/index.html'), 'utf8');
+  for (const slug of ['catalog', 'editors', 'data-tables', 'analytics', 'graphs', 'simulations']) assert.ok(useCases.includes(`docs/${slug}/`));
   for (const route of ['compare']) {
     const html = readFileSync(join(out, route, 'index.html'), 'utf8');
     assert.match(html, /Replace 100 products/); assert.match(html, /Initial · retained/);
@@ -138,7 +143,7 @@ test('the catalog is the sole live comparison and old workloads stay historical'
 test('benchmark page separates read contracts and preserves historical memory and legacy copy strategies', () => {
   const catalog = readFileSync(join(out, 'investigation-benchmark/index.html'), 'utf8');
   for (const text of ['Incremental-copy replicas publish only changed pairs', 'full-copy replicas publish the entire updated catalog', 'Publish the edited revision', 'Replace and publish 100 products', 'immediately below SharedMap', 'fresh owner and reader workers', 'first query', 'repeat query', 'revision 0', 'independent reference']) assert.ok(catalog.includes(text), text);
-  assert.match(catalog, /<h1>Memory\. Reads\.<br>The complete cost\.<\/h1>/);
+  assert.match(catalog, /<h1>Worker benchmarks<\/h1>/);
   assert.ok(catalog.indexOf('id="memory"') < catalog.indexOf('id="performance"'), 'historical memory appears before live timing controls');
   for (const text of ['Full-object .get()', 'Selective query', 'Construction through first answer', 'Legacy catalog control', 'fingerprint generation inside the query timer', 'No validation pass runs between them']) {
     assert.ok(catalog.includes(text), text);
