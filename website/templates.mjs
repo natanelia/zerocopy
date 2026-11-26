@@ -92,12 +92,12 @@ state.subscribe(({ stock }) => {
       </figure>
     </section>
     <section class="wrap storage-example" id="worker-architecture">
-      <div><h2>One writer.<br>Many readers.</h2>
+      <div data-scroll-reveal><h2>One writer.<br>Many readers.</h2>
         <p>A writer publishes immutable snapshots. Readers can keep an earlier version while updates arrive. Use the storage model to see what each worker holds when sharing or cloning.</p>
         <p>Node.js supports shared storage. Browsers require cross-origin isolation. Bun copies snapshots by default.</p>
         <a class="model-link" href="${base}docs/mental-model/">How sharing works ${arrow}</a>
       </div>
-      <div class="sharing-card" role="group" aria-label="Shared and cloned storage">
+      <div class="sharing-card" data-scroll-reveal role="group" aria-label="Shared and cloned storage">
         <div class="diagram-toolbar"><span class="diagram-title">Storage model</span>
           <div class="segmented" role="group" aria-label="Storage model">
             <button data-storage="shared" aria-pressed="true">Shared</button>
@@ -110,13 +110,13 @@ state.subscribe(({ stock }) => {
         </div>
         <div class="diagram">
           <div class="owner-node"><span id="owner-thread">Dedicated worker</span><strong class="writer-role">Writer</strong></div>
-          <div class="wire wire-top"></div>
+          <div class="wire wire-top" aria-hidden="true"><i class="snapshot-pulse"></i></div>
           <div class="arena">
             <div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div>
             <div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => '<i></i>').join('')}</div>
             <div class="arena-footer"><span class="mono">Map · List · Set</span></div>
           </div>
-          <div class="wire wire-bottom"></div>
+          <div class="wire wire-bottom" aria-hidden="true"><i class="snapshot-pulse"></i></div>
           <div class="reader-nodes" id="reader-nodes">${Array.from({ length: 3 }, (_, index) =>
             `<div class="reader-node">Worker ${index + 1}<small>READ-ONLY VIEW</small></div>`).join('')}</div>
         </div>
@@ -128,8 +128,8 @@ state.subscribe(({ stock }) => {
       </div>
     </section>
     <section class="wrap product-links" aria-label="Try the library">
-      <article><h2><a href="${base}compare/">Try the product catalog</a></h2><p>Look up records with real workers, publish an update, and read the earlier revision.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
-      <article><h2><a href="${base}investigation-benchmark/">Run benchmarks</a></h2><p>Measure reads and updates on your device and inspect the recorded memory results.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
+      <article data-scroll-reveal><h2><a href="${base}compare/">Try the product catalog</a></h2><p>Look up records with real workers, publish an update, and read the earlier revision.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
+      <article data-scroll-reveal><h2><a href="${base}investigation-benchmark/">Run benchmarks</a></h2><p>Measure reads and updates on your device and inspect the recorded memory results.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>
     </section>
     ${cityDemo(base)}
   </main>`;

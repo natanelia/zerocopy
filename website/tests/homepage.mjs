@@ -72,6 +72,11 @@ export async function checkHomepage(browser, url, screenshots) {
     // Only the runtime name changes in the hero, and its reserved width stays fixed.
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await hero.locator('.runtime-control').waitFor({ state: 'visible' });
+    const mainTab = hero.getByRole('tab', { name: 'main.mjs' });
+    await hero.getByRole('tab', { name: 'worker.mjs' }).press('ArrowRight');
+    assert.equal(await mainTab.getAttribute('aria-selected'), 'true');
+    assert.equal(await mainTab.evaluate(node => node === document.activeElement), true);
+    await mainTab.press('ArrowLeft');
     const start = await hero.locator('.runtime-slot').boundingBox();
     await page.clock.runFor(6600);
     assert.equal(await word.innerText(), 'Browser');
@@ -119,6 +124,15 @@ export async function checkHomepage(browser, url, screenshots) {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await hero.getByRole('button', { name: 'Copy npm install command' }).press('Enter');
     assert.equal(await page.evaluate(() => navigator.clipboard.readText()), 'npm i zerocopy');
+    const installCopy = hero.getByRole('button', { name: 'Copy npm install command' });
+    assert.equal(await installCopy.getAttribute('data-copy-success'), '');
+    assert.equal(await installCopy.evaluate(node => node.getAnimations({ subtree: true }).length), 0);
+    await page.clock.runFor(1601);
+    assert.equal(await installCopy.getAttribute('data-copy-success'), null);
+
+    await hero.getByRole('tab', { name: 'worker.mjs' }).press('ArrowRight');
+    assert.equal(await hero.locator('#panel-owner').isVisible(), true);
+    assert.equal(await hero.locator('#panel-owner').evaluate(node => node.getAnimations({ subtree: true }).length), 0);
     await hero.getByRole('link', { name: 'Quickstart', exact: true }).press('Enter');
     await page.waitForURL(new URL('docs/getting-started/', url).href);
     assert.match(await page.locator('article').innerText(), /connectSharedSession/);

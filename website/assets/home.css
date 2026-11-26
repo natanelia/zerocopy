@@ -315,3 +315,143 @@
 @media (prefers-reduced-motion: reduce) {
   .city-demo *, .product-hero * { transition: none; animation: none; }
 }
+
+/* Keep feedback in the same footprint as the controls it replaces. */
+.worker-example .copy-code { position: relative; min-width: 63px; }
+.worker-example pre code { display: block; }
+.runtime-word { display: inline-block; }
+.copy-install { position: relative; }
+.copy-install[data-copy-success] svg { visibility: hidden; }
+.copy-install[data-copy-success]::after,
+.worker-example .copy-code[data-copy-success]::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-weight: 650;
+}
+.copy-install[data-copy-success]::after { content: '✓'; font-size: 17px; }
+.worker-example .code-demo .copy-code[data-copy-success] {
+  color: transparent;
+  background: var(--tint);
+  border-color: #bbacc6;
+}
+.worker-example .copy-code[data-copy-success]::after { content: '✓ Copied'; }
+.snapshot-pulse {
+  position: absolute;
+  inset: 0 auto auto 50%;
+  translate: -50% 0;
+  width: 7px;
+  height: 6px;
+  border: 1px solid #f5eaf9;
+  border-radius: 3px;
+  background: #795c9d;
+  opacity: 0;
+  pointer-events: none;
+}
+.sharing-card .wire { position: relative; }
+.city-demo summary { list-style: none; }
+.city-demo summary::-webkit-details-marker { display: none; }
+.city-demo summary::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 10px 2px 1px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  rotate: -45deg;
+}
+.city-demo[open] summary::before { rotate: 45deg; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .example-mat {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .example-mat::before {
+    content: '';
+    position: absolute;
+    top: -28%;
+    left: -49%;
+    width: 43%;
+    height: 156%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, #fff6dc65 50%, transparent);
+    transform: skewX(-18deg);
+    transition: transform 690ms cubic-bezier(.2,.65,.3,1);
+  }
+  .example-mat::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 11px;
+    aspect-ratio: 1;
+    pointer-events: none;
+    background: #fff5df;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    opacity: 0;
+    transform: scale(.35) rotate(-18deg);
+  }
+  .example-mat:focus-within::before { transform: translateX(355%) skewX(-18deg); }
+  .example-mat:focus-within::after { animation: frame-glint 620ms ease-out 140ms; }
+  .quickstart, .product-links article {
+    transition: background-color 160ms ease, border-color 160ms ease, transform 180ms ease;
+  }
+  .quickstart span, .model-link .link-arrow, .destination-arrow {
+    display: inline-block;
+    transition: transform 200ms cubic-bezier(.2,.7,.2,1);
+  }
+  .quickstart:focus-visible span, .model-link:focus-visible .link-arrow,
+  .product-links article:focus-within .destination-arrow { transform: translate(3px,-2px); }
+  .quickstart:active, .copy-install:active { transform: scale(.97); }
+  .sharing-card .segmented button, .sharing-card .arena,
+  .sharing-card .memory-grid i {
+    transition: background-color 220ms ease, color 160ms ease, border-color 160ms ease;
+  }
+  .worker-example .code-tabs button { transition: color 160ms ease, border-color 180ms ease; }
+  .city-demo summary::before { transition: rotate 190ms ease; }
+  .copy-install[data-copy-success]::after,
+  .worker-example .copy-code[data-copy-success]::after { animation: copy-feedback 240ms cubic-bezier(.2,.7,.2,1); }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .example-mat:hover::before { transform: translateX(355%) skewX(-18deg); }
+  .example-mat:hover::after { animation: frame-glint 620ms ease-out 140ms; }
+  .quickstart:hover:not(:active), .product-links article:hover { transform: translateY(-2px); }
+  .quickstart:hover span, .model-link:hover .link-arrow,
+  .product-links article:hover .destination-arrow { transform: translate(3px,-2px); }
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 -1px;
+      height: 2px;
+      pointer-events: none;
+      transform-origin: left;
+      background: linear-gradient(90deg, #9a7dd1, #cd8d6a);
+      animation: reading-progress auto linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0% 100%;
+    }
+  }
+}
+
+@keyframes frame-glint {
+  30% { opacity: .92; transform: scale(1) rotate(7deg); }
+  to { opacity: 0; transform: scale(.62) rotate(19deg); }
+}
+@keyframes copy-feedback {
+  from { opacity: .42; transform: translateY(3px) scale(.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes reading-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
