@@ -85,6 +85,11 @@ jobs:
       - name: Run all real Chromium integration tests
         shell: bash
         run: bun run test:browser 2>&1 | tee browser.log
+      - name: Replay spatial edits in Chromium
+        run: |
+          npm ci --prefix proofs/spatial-editor --no-audit --no-fund
+          mkdir -p proofs/results/ci-regressions
+          node proofs/spatial-editor/run.mjs --smoke --output=proofs/results/ci-regressions/spatial-editor.json
       - name: Check checkpoint, heap, and batched-list browser workers
         shell: bash
         env:

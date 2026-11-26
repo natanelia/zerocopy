@@ -4,8 +4,41 @@ Rebuilding from packed bounds shortened median worker index construction from
 **22.3 to 2.6 ms** on TanStack DB 1.0.0-rc.1.5. Four-reader validation on
 commands that started a rebuild fell from **26.2 to 11.3 ms**. The adoption
 targets are a 25% reduction in peak browser memory and a median trial p95
-frame time at least as fast as the copy control. No recorded comparison has
-met both targets in the same run.
+frame time at least as fast as the copy control. The four-reader run with
+frame-phase instrumentation met both targets. Earlier trials missed one of
+them. Keep the spatial path opt-in while hardware-GPU measurements are pending.
+
+## Where the slowest frames spent their time
+
+Six fresh browser trials used TanStack DB 1.0.0-rc.1.5, the packed rebuild,
+and the same 4,096-lane tile. Shared storage used **28.4% less peak PSS**
+(474.7 → 339.9 MiB, copy → shared). Median trial p95 frame time was
+**228.2 → 118.8 ms** and validation p95 was **9.8 → 9.9 ms**. Individual
+frame p95s ranged from 110.2 to 261.3 ms for copy and 107.4 to 194.7 ms for
+shared. All 384 measured commands passed the viewport and revision checks.
+
+For each editor, select the four longest frames from each 64-command trial.
+The percentages below divide cumulative time in each phase by the combined
+duration of those 12 frames per editor.
+
+| Phase within a slow frame | Copy | Shared |
+| --- | ---: | ---: |
+| Command dispatch to start of packing | 1.42% | 2.15% |
+| Binary path packing | 0.24% | 0.13% |
+| Setting deck.gl props | 0.10% | 0.07% |
+| Props set to start of the screen draw | 97.73% | 96.99% |
+| Screen draw through WebGL completion | 0.48% | 0.46% |
+| Return to command handler | 0.03% | 0.20% |
+
+The dominant interval includes browser scheduling and deck.gl's pre-draw
+layer work. These measurements cannot separate the two. Worker validation
+can overlap it. A hardware-GPU trace of that interval would be more
+informative for frame latency than further tuning binary path packing.
+[Measured source](https://github.com/natanelia/zerocopy/commit/450c3c0301ba6b33eafa28315c8a07503d8b3673) · [Raw samples](results/frame-phases-readers-4.json.gz)
+
+```sh
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/frame-phases-readers-4.json.gz
+```
 
 ## Four-reader packed rebuild comparison on 1.0.0-rc.1.5
 

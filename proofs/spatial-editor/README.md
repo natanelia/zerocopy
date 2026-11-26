@@ -56,6 +56,9 @@ and 64 measured commands. To run a subset, use `--readers=4` and optionally
 `--trial=0`, `1`, or `2`. Add `--soak` for 1,024 measured commands. Use
 `CHROMIUM_PATH` to select an installed headless Chromium executable. The
 server binds to loopback and serves cross-origin isolation headers.
+CI runs the small copy and shared replays and archives their samples with
+the other browser regression evidence. Performance targets use the full
+trials above.
 
 The shared editor uses a ZeroCopy worker session by default. It sends the
 memory handle on first attachment and publishes grouped roots on later edits.
