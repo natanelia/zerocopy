@@ -1,0 +1,47 @@
+name: Shared session sharded publication baseline (proof only)
+on:
+  push:
+    branches: [proof/shared-session-shard-publication-20261126]
+    paths: ['.github/workflows/shared-session-shards-proof.yml', 'proofs/shared-session-shards-20261126.mjs']
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build pinned unmodified runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code 50b06167909ff1398d293948c4a82c5f7bea5863 HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md'
+          mkdir -p shared-session-shards-results
+          node --version
+          bun --version
+          bun install --frozen-lockfile
+          bun run build:wasm && bun run build:browser
+          sha256sum dist/*.js persistent-core.wasm > shared-session-shards-results/hashes.txt
+      - name: Measure actual shared-memory worker publications
+        shell: bash
+        run: |
+          set -euo pipefail
+          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results | tee shared-session-shards-results/run.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: shared-session-shards-${{ github.run_id }}-${{ github.run_attempt }}
+          path: shared-session-shards-results/
+          retention-days: 14
+          if-no-files-found: error
