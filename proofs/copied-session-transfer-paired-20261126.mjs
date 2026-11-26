@@ -130,9 +130,10 @@ if(!isMainThread){
    return {n,cohort,pair,arm,bundle,copy,transfer,initialMs,firstUsed,rows,verified:true};
   }finally{session.dispose();await Promise.all(workers.map(w=>w.terminate()));}
  }
- for(const n of [1000,10000,100000]){
-  for(let pair=-1;pair<4;pair++){
-   const cohorts=['AB','AA','default','shared'];
+ const focused=process.argv[3]==='focused-bun';
+ for(const n of (focused?[10000]:[1000,10000,100000])){
+  for(let pair=-1;pair<(focused?15:4);pair++){
+   const cohorts=focused?['AA','default']:['AB','AA','default','shared'];
    for(const cohort of (pair%2===0?cohorts:cohorts.slice().reverse())){
     const arms=cohort==='AB'?[['base-copy','baseline-dist'],['candidate-transfer','dist']]
       :cohort==='AA'?[['base-copy','baseline-dist'],['control-copy','control-dist']]
