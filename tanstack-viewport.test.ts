@@ -39,7 +39,9 @@ it('publishes pair deltas and follows metadata on both sides of a live spatial j
     expect(invalid.size).toBe(0);
     const late = Promise.withResolvers<readonly SpatialPair[]>();
     const obsolete = pairs.utils.setPairs(late.promise);
-    await pairs.utils.setPairs([[12, 3], [1, 3], [12, 3]]);
+    const version = pairs.utils.getVersion();
+    expect(await pairs.utils.applyPairChanges({ added: [[1, 3], [1, 3], [12, 3]], removed: [[1, 23]] }, version)).toBe(true);
+    expect(pairs.utils.getVersion()).toBe(version + 1);
     late.resolve([[1, 23]]);
     expect(await obsolete).toBe(false);
     expect([...invalid.values()].map(row => row.id)).toEqual(['1:3']);
@@ -52,6 +54,53 @@ it('publishes pair deltas and follows metadata on both sides of a live spatial j
     sub.unsubscribe();
     await invalid.cleanup(); await pairs.cleanup(); await boundaries.cleanup(); await roads.cleanup();
   }
+});
+
+it('applies worker deltas only to their confirmed version, including while a previous commit is in flight', async () => {
+  const config = spatialJoinCollectionConfig({ id: 'pair-receipts' });
+  const { setPairs, getVersion, applyPairChanges } = config.utils;
+  const entered = Promise.withResolvers<void>(), first = Promise.withResolvers<void>();
+  const writes: string[] = [];
+  let commits = 0;
+  const close = config.sync.sync({
+    collection: { keys: () => [] }, begin() {}, markReady() {},
+    write(msg) { writes.push(msg.type + ':' + msg.value!.id); },
+    commit() {
+      commits++;
+      if (commits === 1) { entered.resolve(); return first.promise; }
+      if (commits === 2) return Promise.reject(new Error('Commit failed'));
+    },
+  });
+  try {
+    const seed = setPairs([[1, 2]]);
+    await entered.promise;
+    const add = { added: [[3, 4]], removed: [] } as const;
+    const stale = applyPairChanges(add, getVersion());
+    first.resolve();
+    expect(await seed).toBe(true);
+    expect(await stale).toBe(false);
+    expect(writes).toEqual(['insert:1:2']);
+    await expect(applyPairChanges(add, 1)).rejects.toThrow('Commit failed');
+    expect(getVersion()).toBe(1);
+    const worker = Promise.withResolvers<typeof add>();
+    const pending = applyPairChanges(worker.promise, 1);
+    expect(await applyPairChanges(Promise.reject(new Error('stale')), 0)).toBe(false);
+    worker.resolve(add);
+    expect(await pending).toBe(true);
+    await expect(applyPairChanges({ added: [[3, 4]], removed: [[3, 4]] }, 2)).rejects.toThrow(/both/);
+    const late = Promise.withResolvers<typeof add>();
+    const replaced = applyPairChanges(late.promise, 2);
+    expect(await setPairs([[1, 2], [3, 4]])).toBe(true);
+    late.reject(new Error('superseded'));
+    expect(await replaced).toBe(false);
+    expect(getVersion()).toBe(3);
+    expect(writes).toEqual(['insert:1:2', 'insert:3:4', 'insert:3:4']);
+    const removed: [number, number][] = [[3, 4]];
+    const captured = applyPairChanges({ added: [], removed }, 3);
+    removed[0][0] = 7;
+    expect(await captured).toBe(true);
+    expect(writes.at(-1)).toBe('delete:3:4');
+  } finally { close(); }
 });
 
 it('publishes only membership changes and keeps a real metadata join live', async () => {

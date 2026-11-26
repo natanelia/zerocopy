@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex, querySpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
+import { buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
@@ -48,20 +48,53 @@ it('matches an all-pairs scan for both input orders and self joins across succes
     return pairs.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
   }
   const left = layer(55), right = layer(30);
+  let previous = { left: prepareSpatialQuery(left.base, left.changes, 0), right: prepareSpatialQuery(right.base, right.changes, 0) };
   for (let revision = 1; revision <= 64; revision++) {
-    for (const layer of [left, right]) {
+    const bounds: Box = revision % 3 ? rect() : [-Infinity, -Infinity, Infinity, Infinity];
+    const before = scan(left.rows, right.rows, bounds);
+    function edit(layer: typeof left): SpatialBoundsChange {
       const id = random(70), bounds = random(5) ? rect() : null;
+      const before = layer.rows.get(id) ?? null;
       layer.changes = applySpatialEdits(layer.changes, revision, [{ id, bounds }]);
       if (bounds) layer.rows.set(id, bounds); else layer.rows.delete(id);
       if (revision % 11 === 0) layer.base = rebuildSpatialIndex(layer.base, layer.changes, revision);
+      return { id, before, after: bounds };
     }
+    const changes = { bounds, left: [edit(left)], right: [edit(right)] };
     const a = prepareSpatialQuery(left.base, left.changes, revision);
     const b = prepareSpatialQuery(right.base, right.changes, revision);
-    const bounds: Box = revision % 3 ? rect() : [-Infinity, -Infinity, Infinity, Infinity];
-    expect(querySpatialJoin(a, b, { bounds })).toEqual(scan(left.rows, right.rows, bounds));
+    const after = scan(left.rows, right.rows, bounds);
+    expect(querySpatialJoin(a, b, { bounds })).toEqual(after);
+    const next = { left: a, right: b };
+    const oldKeys = new Set(before.map(String)), newKeys = new Set(after.map(String));
+    expect(diffSpatialJoin(previous, next, changes)).toEqual({
+      added: after.filter(pair => !oldKeys.has(String(pair))), removed: before.filter(pair => !newKeys.has(String(pair))),
+    });
+    previous = next;
     expect(querySpatialJoin(b, a, { bounds })).toEqual(scan(right.rows, left.rows, bounds));
     expect(querySpatialJoin(a, a, { bounds })).toEqual(scan(left.rows, left.rows, bounds));
   }
+});
+
+it('refines only pairs incident to an edit and compares retained geometry even with unchanged bounds', () => {
+  const features = Array.from({ length: 4096 }, (_, id) => ({ id, bounds: [id, 0, id, 0] as const }));
+  const index = buildSpatialIndex(features);
+  const frame = { left: index, right: index };
+  const edit = { id: 12, before: features[12].bounds, after: features[12].bounds };
+  let candidates = 0;
+  const oldFrame = { ...frame, filter: () => { candidates++; return true; } };
+  const newFrame = { ...frame, filter: (a: number) => { candidates++; return a !== 12; } };
+  expect(querySpatialJoin(index, index, newFrame)).toHaveLength(4095);
+  expect(candidates).toBe(4096);
+  candidates = 0;
+  expect(diffSpatialJoin(oldFrame, newFrame, { left: [edit], right: [edit] })).toEqual({ added: [], removed: [[12, 12]] });
+  expect(candidates).toBe(2);
+  const inserted = { id: 77, before: null, after: box }, deleted = { id: 77, before: box, after: null };
+  expect(diffSpatialJoin(frame, frame, { left: [inserted, deleted] })).toEqual({ added: [], removed: [] });
+  expect(diffSpatialJoin(oldFrame, newFrame, { left: [edit], bounds: far })).toEqual({ added: [], removed: [] });
+  expect(() => diffSpatialJoin(frame, frame, { right: [{ ...edit, before: [NaN, 0, 0, 0] }] })).toThrow(RangeError);
+  expect(() => diffSpatialJoin(frame, frame, { left: [{ ...edit, id: -1 }] })).toThrow(RangeError);
+  expect(() => diffSpatialJoin(frame, { ...frame, filter: (() => 1) as never }, { left: [edit] })).toThrow(TypeError);
 });
 
 it('queries historical and rebuilt snapshots by stable ID, including boundary touches', async () => {

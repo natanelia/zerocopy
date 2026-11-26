@@ -214,6 +214,39 @@ export function querySpatialIndex(index: SpatialIndex | PreparedSpatialQuery, bo
 type SpatialSnapshot = SpatialIndex | PreparedSpatialQuery;
 type JoinPart = { tree: Flatbush; ids: Uint32Array; hidden: Uint32Array | undefined };
 export type SpatialPair = readonly [leftId: number, rightId: number];
+type JoinFilter = (leftId: number, rightId: number) => boolean;
+
+export interface SpatialJoinFrame {
+  readonly left: SpatialSnapshot;
+  readonly right: SpatialSnapshot;
+  readonly filter?: JoinFilter;
+}
+
+export interface SpatialBoundsChange {
+  readonly id: number;
+  readonly before: BoundsXY | null;
+  readonly after: BoundsXY | null;
+}
+
+export interface SpatialJoinDelta {
+  readonly added: readonly SpatialPair[];
+  readonly removed: readonly SpatialPair[];
+}
+
+function pairOrder(a: SpatialPair, b: SpatialPair): number {
+  return a[0] - b[0] || a[1] - b[1];
+}
+
+function included(filter: JoinFilter | undefined, left: number, right: number): boolean {
+  if (!filter) return true;
+  const result = filter(left, right);
+  if (typeof result !== 'boolean') throw new TypeError('Spatial join filters must return a boolean');
+  return result;
+}
+
+function checkFilter(filter: JoinFilter | undefined): void {
+  if (filter !== undefined && typeof filter !== 'function') throw new TypeError('Expected a spatial join filter function');
+}
 
 function joinParts(snapshot: SpatialSnapshot): JoinPart[] {
   const parts: JoinPart[] = [];
@@ -232,12 +265,12 @@ function joinParts(snapshot: SpatialSnapshot): JoinPart[] {
 /** Return overlapping bounds as ordered (left ID, right ID) pairs, sorted by both IDs. */
 export function querySpatialJoin(left: SpatialSnapshot, right: SpatialSnapshot, options: {
   bounds?: BoundsXY;
-  filter?: (leftId: number, rightId: number) => boolean;
+  filter?: JoinFilter;
 } = {}): SpatialPair[] {
   const { bounds = [-Infinity, -Infinity, Infinity, Infinity], filter } = options;
   checkBounds(bounds, false);
   const [xMin, yMin, xMax, yMax] = bounds;
-  if (filter !== undefined && typeof filter !== 'function') throw new TypeError('Expected a spatial join filter function');
+  checkFilter(filter);
   const result: SpatialPair[] = [];
   const leftParts = joinParts(left), rightParts = joinParts(right);
   for (const l of leftParts) for (const r of rightParts) {
@@ -257,18 +290,62 @@ export function querySpatialJoin(left: SpatialSnapshot, right: SpatialSnapshot, 
         const innerId = inner.ids[innerSlot];
         if (inner.hidden && containsId(inner.hidden, innerId)) return false;
         const leftId = reverse ? innerId : outerId, rightId = reverse ? outerId : innerId;
-        if (filter) {
-          const include = filter(leftId, rightId);
-          if (typeof include !== 'boolean') throw new TypeError('Spatial join filters must return a boolean');
-          if (!include) return false;
-        }
-        result.push([leftId, rightId]);
+        if (included(filter, leftId, rightId)) result.push([leftId, rightId]);
         return false;
       });
       return false;
     });
   }
-  return result.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  return result.sort(pairOrder);
+}
+
+function changedBounds(edits: readonly SpatialBoundsChange[] = []): Map<number, SpatialBoundsChange> {
+  const changes = new Map<number, SpatialBoundsChange>();
+  for (const { id, before, after } of edits) {
+    checkSpatialId(id);
+    if (before !== null) checkBounds(before, true);
+    if (after !== null) checkBounds(after, true);
+    const first = changes.get(id);
+    changes.set(id, { id, before: first ? first.before : before, after });
+  }
+  return changes;
+}
+
+/** Changes to a fixed join, given every edited feature's bounds in the two frames. */
+export function diffSpatialJoin(previous: SpatialJoinFrame, next: SpatialJoinFrame, changes: {
+  readonly left?: readonly SpatialBoundsChange[];
+  readonly right?: readonly SpatialBoundsChange[];
+  readonly bounds?: BoundsXY;
+}): SpatialJoinDelta {
+  const { bounds = [-Infinity, -Infinity, Infinity, Infinity] } = changes;
+  checkBounds(bounds, false);
+  const [x0, y0, x1, y1] = bounds;
+  checkFilter(previous.filter);
+  checkFilter(next.filter);
+  const left = changedBounds(changes.left), right = changedBounds(changes.right);
+  const added: SpatialPair[] = [], removed: SpatialPair[] = [];
+
+  function neighbors(frame: SpatialJoinFrame, id: number, box: BoundsXY | null, fromLeft: boolean) {
+    const matches = new Set<number>();
+    if (!box) return matches;
+    const clipped: BoundsXY = [Math.max(x0, box[0]), Math.max(y0, box[1]), Math.min(x1, box[2]), Math.min(y1, box[3])];
+    if (clipped[0] > clipped[2] || clipped[1] > clipped[3]) return matches;
+    for (const other of querySpatialIndex(fromLeft ? frame.right : frame.left, clipped)) {
+      // If both endpoints changed, the left endpoint owns the pair in both frames.
+      if (!fromLeft && left.has(other)) continue;
+      if (included(frame.filter, fromLeft ? id : other, fromLeft ? other : id)) matches.add(other);
+    }
+    return matches;
+  }
+  function compare(edit: SpatialBoundsChange, fromLeft: boolean) {
+    const before = neighbors(previous, edit.id, edit.before, fromLeft);
+    const after = neighbors(next, edit.id, edit.after, fromLeft);
+    for (const id of before) if (!after.has(id)) removed.push(fromLeft ? [edit.id, id] : [id, edit.id]);
+    for (const id of after) if (!before.has(id)) added.push(fromLeft ? [edit.id, id] : [id, edit.id]);
+  }
+  for (const edit of left.values()) compare(edit, true);
+  for (const edit of right.values()) compare(edit, false);
+  return { added: added.sort(pairOrder), removed: removed.sort(pairOrder) };
 }
 
 /** Drop overlay entries already incorporated into the replacement base from the same tile history. */

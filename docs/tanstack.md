@@ -177,12 +177,34 @@ await pairs.utils.setPairs(querySpatialJoin(left, right));
 // invalid contains { id: '7:23', boundary: 'lane-7', road: 'road-23' }.
 ```
 
-Recompute pairs after spatial edits and pass the array or worker promise to
-`setPairs` at dispatch. Each publication emits only entering and leaving
-pairs. Reordered or duplicate pairs produce no writes. The promise follows
-the same supersession and failure rules as `setVisibleIds`. Edits to either
-direction field update the live query through TanStack. Geometry refinement
-belongs in the spatial query's filter. [Spatial join API](spatial.md#join-two-spatial-layers)
+Use `setPairs` for the initial view or a new viewport. It accepts the full
+array or a worker promise and emits only entering and leaving pairs. Edits to
+either direction field update the live query through TanStack.
+
+For a geometry edit with known before and after bounds, pass the result of
+`diffSpatialJoin` to `applyPairChanges`. This reads and writes only the listed
+pair keys. In the example above, moving boundary 7 away from road 23 removes
+one validation row.
+
+```ts
+import { applySpatialEdits, diffSpatialJoin, prepareSpatialQuery } from 'zerocopy/spatial';
+
+// Capture the version alongside the frame that produced the confirmed pair set.
+const version = pairs.utils.getVersion();
+const edit = { id: 7, before: [0, 0, 4, 0], after: [10, 0, 14, 0] } as const;
+const edits = applySpatialEdits(undefined, 1, [{ id: edit.id, bounds: edit.after }]);
+const nextLeft = prepareSpatialQuery(left, edits, 1);
+const delta = diffSpatialJoin({ left, right }, { left: nextLeft, right }, { left: [edit] });
+const applied = await pairs.utils.applyPairChanges(delta, version); // true
+```
+
+The version starts at zero and advances after each successful publication,
+including an empty delta. Capture it **before dispatching a worker** and pass
+the worker promise directly to `applyPairChanges(promise, version)`. A stale
+or superseded result resolves to `false`. A failed current publication rejects
+and preserves the confirmed version. If an edit still needs publishing,
+compute a fresh delta from the confirmed frame or call `setPairs` with a full
+query of the newest frame. [Incremental spatial join API](spatial.md#update-a-join-after-an-edit)
 
 ## withSharedCache
 

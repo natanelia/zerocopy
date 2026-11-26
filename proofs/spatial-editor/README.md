@@ -6,6 +6,17 @@ runs identical commands against two browser editors. All data is synthetic.
 The [recorded results](RESULTS.md) include all trials and the four-reader
 memory and frame-time targets used to evaluate this design.
 
+For a CPU-only comparison of incremental and full two-layer joins, run
+`bun run build:browser` and `node proofs/spatial-editor/join-edits.mjs`.
+The driver moves 1, 32, and 4,096 points across 2,048 rectangular road
+bounds. It checks the patched pair set against full recomputation, then
+times both queries over prepared snapshots. Output includes all measured
+trials in milliseconds per call. Index preparation, worker messaging, and
+TanStack publication are outside the timed region. On Node 26.13.1, moving
+one point took a median 0.0074 ms incrementally and 2.95 ms for a full join.
+Moving all 4,096 points took 8.90 ms incrementally and 3.24 ms for a full
+join. [Environment, source checksums and raw samples](results/join-edits-node26.json)
+
 | Component | Shared editor | Copy-based editor |
 | --- | --- | --- |
 | UI metadata | TanStack collection with confirmed ZeroCopy row map | TanStack local-only collection |

@@ -1,7 +1,7 @@
 import { createCollection, createTransaction } from '@tanstack/db';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
-import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
+import { applySpatialEdits, buildSpatialIndex, diffSpatialJoin, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
 const options = sharedCollectionConfig<Lane>({ id: 'lanes' });
@@ -34,7 +34,14 @@ visible.utils.setVisibleIds(['lane']);
 const rebuilt: typeof base = rebuildSpatialIndex(base, roots.edits, 1);
 const prepared = prepareSpatialQuery(base, roots.edits, 1);
 const overlaps = createCollection(spatialJoinCollectionConfig({ id: 'overlaps' }));
-await overlaps.utils.setPairs(Promise.resolve(querySpatialJoin(prepared, base)));
+await overlaps.utils.setPairs(Promise.resolve(querySpatialJoin(base, base)));
+const delta = diffSpatialJoin({ left: base, right: base }, { left: prepared, right: base }, {
+  left: [{ id: 17, before: [0, 0, 2, 3], after: null }],
+});
+const applied: boolean = await overlaps.utils.applyPairChanges(Promise.resolve(delta), overlaps.utils.getVersion());
+void applied;
+// @ts-expect-error An incremental result requires the version of its published base.
+overlaps.utils.applyPairChanges(delta);
 const rightId: number | undefined = overlaps.get('17:17')?.rightId;
 // @ts-expect-error A spatial pair requires two numeric handles.
 overlaps.utils.setPairs([[17, 'road']]);

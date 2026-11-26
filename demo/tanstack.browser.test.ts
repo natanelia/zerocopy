@@ -14,7 +14,8 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
   const roadIndex = buildSpatialIndex([{ id: 23, bounds: [0, 2.5, 0, 2.75] }]);
   const initialChanges = applySpatialEdits(undefined, 0, []);
   type WorkerRead = { narrowPairs: [number, number][] };
-  const read = (geometry, changes = initialChanges) => new Promise<{ first: WorkerRead; current: WorkerRead }>((resolve, reject) => {
+  type Delta = { added: [number, number][]; removed: [number, number][] };
+  const read = (geometry, changes = initialChanges) => new Promise<{ first: WorkerRead; current: WorkerRead; delta: Delta }>((resolve, reject) => {
     reader.onerror = reject;
     reader.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
     const rows = options.getSnapshot();
@@ -25,7 +26,11 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
     await lanes.preload();
     const before = { row: { id: 'lane', revision: 0 }, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [],
       preparedCandidates: [], narrowCandidates: [7], intersectsNarrow: false, narrowPairs: [] };
-    expect(await read(initial)).toEqual({ first: before, current: before });
+    const empty = { added: [], removed: [] };
+    const seed = await read(initial);
+    expect(seed).toEqual({ first: before, current: before, delta: empty });
+    await overlaps.utils.setPairs(seed.current.narrowPairs);
+    const version = overlaps.utils.getVersion();
 
     const geometry = initial.set(0, -12);
     const edits = applySpatialEdits(initialChanges, 1, [{ id: 7, bounds: [-12, 0, 2, 3] }]);
@@ -33,13 +38,13 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
       mutationFn: ({ transaction }) => options.utils.acceptMutations(transaction) });
     tx.mutate(() => lanes.update('lane', lane => { lane.revision = 1; }));
     expect(lanes.get('lane')?.revision).toBe(1);
-    expect(await read(initial)).toEqual({ first: before, current: before });
+    expect(await read(initial)).toEqual({ first: before, current: before, delta: empty });
     await tx.commit();
     const after = { row: { id: 'lane', revision: 1 }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
       preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true, narrowPairs: [[7, 23]] };
     const reply = read(geometry, edits);
-    const published = overlaps.utils.setPairs(reply.then(({ current }) => current.narrowPairs));
-    expect(await reply).toEqual({ first: before, current: after });
+    const published = overlaps.utils.applyPairChanges(reply.then(({ delta }) => delta), version);
+    expect(await reply).toEqual({ first: before, current: after, delta: { added: [[7, 23]], removed: [] } });
     expect(await published).toBe(true);
     expect(overlaps.get('7:23')).toMatchObject({ leftId: 7, rightId: 23 });
   } finally {

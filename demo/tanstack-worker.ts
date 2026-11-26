@@ -1,7 +1,7 @@
 import { initWorker } from '../dist/shared.js';
 import { bboxXY, pathIntersectsBoxXY } from '../dist/geometry.js';
 
-import { querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from '../dist/spatial.js';
+import { diffSpatialJoin, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from '../dist/spatial.js';
 
 let first, current, firstPrepared;
 self.onmessage = async ({ data }) => {
@@ -9,11 +9,13 @@ self.onmessage = async ({ data }) => {
     current = await initWorker(data.roots, { previous: current });
     first ??= current;
     firstPrepared ??= data.prepared;
+    // Both generations have overlapping bounds here. Only the edited segment crosses it.
+    const narrow = [0, 2.5, 0, 2.75] as const;
+    const frame = (state, prepared) => ({ left: prepared, right: data.roadIndex,
+      filter: () => pathIntersectsBoxXY(state.geometry, narrow) });
     const read = (state, prepared) => {
       const row = state.rows.get('lane');
       const viewport = [-12, 0, -8, 3] as const;
-      // Both generations have overlapping bounds here. Only the edited segment crosses it.
-      const narrow = [0, 2.5, 0, 2.75] as const;
       const rebuilt = rebuildSpatialIndex(data.base, state.changes, row.revision);
       return {
         row, bounds: bboxXY(state.geometry),
@@ -22,9 +24,12 @@ self.onmessage = async ({ data }) => {
         preparedCandidates: querySpatialIndex(prepared, viewport),
         narrowCandidates: querySpatialIndex(prepared, narrow),
         intersectsNarrow: pathIntersectsBoxXY(state.geometry, narrow),
-        narrowPairs: querySpatialJoin(prepared, data.roadIndex, { filter: () => pathIntersectsBoxXY(state.geometry, narrow) }),
+        narrowPairs: querySpatialJoin(prepared, data.roadIndex, frame(state, prepared)),
       };
     };
-    self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared) });
+    const delta = diffSpatialJoin(frame(first, firstPrepared), frame(current, data.prepared), {
+      left: [{ id: 7, before: bboxXY(first.geometry), after: bboxXY(current.geometry) }],
+    });
+    self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared), delta });
   } catch (error) { self.postMessage({ error: String(error) }); }
 };

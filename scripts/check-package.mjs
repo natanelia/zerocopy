@@ -58,15 +58,21 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
-import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, querySpatialJoin } from 'zerocopy/spatial';
+import { buildSpatialIndex, applySpatialEdits, diffSpatialJoin, prepareSpatialQuery, querySpatialIndex, querySpatialJoin } from 'zerocopy/spatial';
 const box = [0, 0, 1, 1];
 if (isMainThread) {
   const base = buildSpatialIndex([{ id: 7, bounds: box }]);
   const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }, { id: 19, bounds: box }]);
   const reader = new Worker(new URL(import.meta.url), { workerData: { left: prepareSpatialQuery(base, edits, 1), right: base } });
-  try { assert.deepEqual(await once(reader, 'message'), [{ ids: [19], pairs: [[19, 7]] }]); }
+  try { assert.deepEqual(await once(reader, 'message'), [{ ids: [19], pairs: [[19, 7]], delta: { added: [[19, 7]], removed: [[7, 7]] } }]); }
   finally { await reader.terminate(); }
-} else parentPort.postMessage({ ids: querySpatialIndex(workerData.left, box), pairs: querySpatialJoin(workerData.left, workerData.right) });
+} else {
+  const { left, right } = workerData;
+  const delta = diffSpatialJoin({ left: right, right }, { left, right }, {
+    left: [{ id: 7, before: box, after: null }, { id: 19, before: null, after: box }],
+  });
+  parentPort.postMessage({ ids: querySpatialIndex(left, box), pairs: querySpatialJoin(left, right), delta });
+}
 `);
   run(process.execPath, ['spatial-reader.mjs']);
 
@@ -109,6 +115,10 @@ try {
   assert.equal([...matches.values()][0].id, '2:1');
   await viewport.utils.setVisibleIds(Promise.resolve([2, 3]));
   assert.equal([...matches.values()][0].id, '2:3');
+  const version = pairs.utils.getVersion();
+  assert.equal(await pairs.utils.applyPairChanges({ added: [[2, 2]], removed: [[2, 3]] }, version), true);
+  assert.equal(await pairs.utils.applyPairChanges({ added: [], removed: [[2, 2]] }, version), false);
+  assert.equal([...matches.values()][0].id, '2:2');
   assert.deepEqual([...viewport.keys()].sort(), [2, 3]);
   assert.equal([...joined.values()][0].id, 'n');
   const initial = options.getSnapshot();

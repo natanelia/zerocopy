@@ -1,7 +1,7 @@
 import { SharedMap } from './shared-map.ts';
 import type { JsonType } from './types.ts';
 import { checkSpatialId } from './spatial-id.ts';
-import type { SpatialPair } from './spatial.ts';
+import type { SpatialPair, SpatialJoinDelta } from './spatial.ts';
 
 type CollectionItem = { id: string };
 
@@ -125,61 +125,95 @@ type MembershipSync<Row, K extends string | number> = SyncParams<Row, K> & {
   collection: { keys(): Iterable<K> };
 };
 
+type MemberChanges<T> = { readonly added: readonly T[]; readonly removed: readonly T[] };
+type MemberInput<T> = T | PromiseLike<T>;
+function isPending<T>(input: MemberInput<T>): input is PromiseLike<T> {
+  return typeof (input as PromiseLike<T> | null)?.then === 'function';
+}
+
 function membershipOptions<Item, K extends string | number, Row extends { id: K }>(
   id: string, memberKey: (item: Item) => K, rowForKey: (key: K) => Row,
 ) {
-  let membership = new Set<K>();
+  const membership = new Set<K>();
+  let version = 0;
   let active: { params: MembershipSync<Row, K>; pending: Promise<void> } | undefined;
   let latest: object | undefined;
 
-  function reconcile(params: MembershipSync<Row, K>, previous: Set<K>, next: Set<K>): Receipt {
-    const writes: Write<Row, K>[] = [];
-    for (const id of previous) {
-      if (!next.has(id)) writes.push({ type: 'delete', value: rowForKey(id) });
-    }
-    for (const id of next) {
-      if (!previous.has(id)) writes.push({ type: 'insert', value: rowForKey(id) });
-    }
-    if (!writes.length) return;
+  function difference(keys: Set<K>, excluded: Set<K>): K[] {
+    const result: K[] = [];
+    for (const key of keys) if (!excluded.has(key)) result.push(key);
+    return result;
+  }
+  function writeChanges(params: MembershipSync<Row, K>, { added, removed }: MemberChanges<K>): Receipt {
+    if (!added.length && !removed.length) return;
     return writeSyncBatch(params, () => {
-      for (const message of writes) params.write(message);
+      for (const key of removed) params.write({ type: 'delete', value: rowForKey(key) });
+      for (const key of added) params.write({ type: 'insert', value: rowForKey(key) });
     });
   }
-
-  async function setMembers(input: readonly Item[] | PromiseLike<readonly Item[]>): Promise<boolean> {
+  function keys(items: readonly Item[]): Set<K> {
+    if (!Array.isArray(items)) throw new TypeError('Expected an array of spatial query results');
+    const result = new Set<K>();
+    for (const item of items) result.add(memberKey(item));
+    return result;
+  }
+  function accept({ added, removed }: MemberChanges<K>) {
+    for (const key of removed) membership.delete(key);
+    for (const key of added) membership.add(key);
+    version++;
+    return true;
+  }
+  async function publish<T>(input: MemberInput<T>, capture: (value: T) => () => MemberChanges<K>,
+    current = () => true): Promise<boolean> {
+    if (!current()) {
+      if (isPending(input)) void Promise.resolve(input).catch(() => {});
+      return false;
+    }
     // Supersede at dispatch. An unresolved worker search never holds the write queue.
     const request = {};
     latest = request;
-    let items: readonly Item[];
+    let value: T;
     try {
-      items = Array.isArray(input) ? input : await input;
+      value = isPending(input) ? await input : input;
     } catch (error) {
-      if (request !== latest) return false;
+      if (request !== latest || !current()) return false;
       throw error;
     }
-    if (request !== latest) return false;
-    if (!Array.isArray(items)) throw new TypeError('Expected an array of spatial query results');
-    const next = new Set<K>();
-    for (const item of items) next.add(memberKey(item));
+    if (request !== latest || !current()) return false;
+    const changes = capture(value);
     const run = active;
-    if (!run) {
-      membership = next;
-      return true;
-    }
+    if (!run) return accept(changes());
     const publication = run.pending.then(async () => {
-      if (request !== latest || active !== run) return false;
-      const receipt = reconcile(run.params, membership, next);
+      if (request !== latest || active !== run || !current()) return false;
+      const delta = changes();
+      const receipt = writeChanges(run.params, delta);
       if (receipt && receipt !== true) await receipt;
       if (active !== run) return false;
-      membership = next;
-      return true;
+      return accept(delta);
     });
     run.pending = publication.then(() => {}, () => {});
     return publication;
   }
 
-  return {
-    id, getKey: (row: Row) => row.id, startSync: true, gcTime: 0, setMembers,
+  function setMembers(input: MemberInput<readonly Item[]>) {
+    return publish(input, items => {
+      const next = keys(items);
+      return () => ({ added: difference(next, membership), removed: difference(membership, next) });
+    });
+  }
+  function applyChanges(input: MemberInput<MemberChanges<Item>>, expectedVersion: number) {
+    return publish(input, delta => {
+      const added = keys(delta.added), removed = keys(delta.removed);
+      for (const key of added) if (removed.has(key)) throw new RangeError('A membership key cannot be both added and removed');
+      return () => ({
+        added: difference(added, membership),
+        removed: Array.from(removed).filter(key => membership.has(key)),
+      });
+    }, () => version === expectedVersion);
+  }
+
+  const options = {
+    id, getKey: (row: Row) => row.id, startSync: true, gcTime: 0,
     sync: {
       sync(params: MembershipSync<Row, K>) {
         if (active) throw new Error('Membership sync is already active');
@@ -192,7 +226,8 @@ function membershipOptions<Item, K extends string | number, Row extends { id: K 
         };
         try {
           // Reload can retain rows while cleanup starts a new, empty collection.
-          const seed = reconcile(params, new Set(params.collection.keys()), membership);
+          const existing = new Set(params.collection.keys());
+          const seed = writeChanges(params, { added: difference(membership, existing), removed: difference(existing, membership) });
           if (seed && seed !== true) {
             run.pending = seed.then(() => { if (active === run) params.markReady(); }, error => {
               if (active === run) { close(); params.markError?.(error); }
@@ -203,11 +238,12 @@ function membershipOptions<Item, K extends string | number, Row extends { id: K 
       },
     },
   };
+  return { options, setMembers, applyChanges, getVersion: () => version };
 }
 
 /** Read-only TanStack membership rows for a spatial query, including worker-produced results. */
 export function viewportCollectionConfig<K extends string | number = number>({ id }: { id: string }) {
-  const { setMembers, ...options } = membershipOptions(id, (key: K) => {
+  const { setMembers, options } = membershipOptions(id, (key: K) => {
     if (typeof key !== 'string' && !Number.isFinite(key)) throw new TypeError('Viewport IDs must be strings or finite numbers');
     return key;
   }, (id: K) => ({ id }));
@@ -216,7 +252,7 @@ export function viewportCollectionConfig<K extends string | number = number>({ i
 
 /** Read-only TanStack rows keyed by ordered feature-ID pairs from a spatial join. */
 export function spatialJoinCollectionConfig({ id }: { id: string }) {
-  const { setMembers, ...options } = membershipOptions(id, (pair: SpatialPair) => {
+  const { setMembers, applyChanges, getVersion, options } = membershipOptions(id, (pair: SpatialPair) => {
     if (!Array.isArray(pair) || pair.length !== 2) throw new TypeError('Expected a pair of spatial feature IDs');
     checkSpatialId(pair[0]);
     checkSpatialId(pair[1]);
@@ -225,7 +261,10 @@ export function spatialJoinCollectionConfig({ id }: { id: string }) {
     const separator = id.indexOf(':');
     return { id, leftId: Number(id.slice(0, separator)), rightId: Number(id.slice(separator + 1)) };
   });
-  return { ...options, utils: { setPairs: setMembers } };
+  return { ...options, utils: {
+    setPairs: setMembers, getVersion,
+    applyPairChanges: (delta: MemberInput<SpatialJoinDelta>, expectedVersion: number) => applyChanges(delta, expectedVersion),
+  } };
 }
 
 /** Local collection options with an immutable snapshot of confirmed rows. */

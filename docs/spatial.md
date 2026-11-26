@@ -88,6 +88,36 @@ pair once and can check geometry from the same publications. Each call computes
 the result for the supplied snapshots. Dense layers can produce one result for
 every pair of features. [Publish live pair membership to TanStack](tanstack.md#live-spatial-joins)
 
+### Update a join after an edit
+
+`diffSpatialJoin(previous, next, changes)` returns sorted `added` and
+`removed` pairs. It searches the opposite index using each edited feature's
+old and new boxes. If both endpoints changed, it refines their pair once per
+frame. This is useful when a drag changes one boundary in a tile containing
+thousands of otherwise unchanged features.
+
+```ts
+import { applySpatialEdits, diffSpatialJoin, prepareSpatialQuery } from 'zerocopy/spatial';
+
+const before = { left: index, right: roads };
+const moved = applySpatialEdits(undefined, 1, [{ id: 1, bounds: [10, 10, 12, 12] }]);
+const after = { left: prepareSpatialQuery(index, moved, 1), right: roads };
+const delta = diffSpatialJoin(before, after, {
+  left: [{ id: 1, before: bboxXY(paths[1]!), after: [10, 10, 12, 12] }],
+}); // { added: [], removed: [[1, 23]] }
+```
+
+Supply the actual before and after bounds for **every** feature edited between
+the two frames. Use `null` for an absent feature. Repeated edits to an ID use
+the first before box and the last after box in input order. For a self join,
+report edits on both sides. Include IDs whose exact geometry or filter inputs
+changed even when their boxes stayed the same. Each frame's optional `filter`
+must read that frame's geometry and metadata.
+
+Pass `{ bounds: viewport }` in the changes object to use one viewport for both
+frames. Run a full query when the viewport changes, the edit history is
+incomplete, or a filter change can affect pairs outside the listed IDs.
+
 ## Edit and rebuild
 
 - `buildSpatialIndex(features, revision = 0)` creates a base for a complete
