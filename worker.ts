@@ -212,7 +212,10 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const send = (fields: Omit<Message, 'protocol' | 'version' | 'channel'>, transfers?: ArrayBuffer[]) => {
       const payload = message(this.config.channel, { owner: this.owner, reader: peer.reader, ...fields });
-      if (transfers) target.postMessage(payload, transfers);
+      // Only the opt-in contract requires a native transfer-list endpoint.
+      // Keep the public SharedEndpoint type compatible with one-argument
+      // and options-object custom endpoints and DOM overloads.
+      if (transfers) (target as SharedEndpoint & { postMessage(message: any, transferList: ArrayBuffer[]): void }).postMessage(payload, transfers);
       else target.postMessage(payload);
     };
     const arm = () => {

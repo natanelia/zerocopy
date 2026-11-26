@@ -58,3 +58,14 @@ localTasks.run.count();
 // @ts-expect-error Wrong task input shape.
 localTasks.run.count({ key: 1 });
 localTasks.dispose(); dxState.dispose();
+
+// Transfer-list capability is opt-in; existing endpoint shapes remain assignable.
+import type { SharedEndpoint } from 'zerocopy/worker';
+function copiedConsumers(browser: Worker, node: NodeWorker, port: MessagePort, nodePort: NodeChannel['port1']) {
+  const copied = createSharedSession(initial, { copy: true });
+  void copied.connect([browser, node, port, nodePort], { transferCopies: true });
+  const custom: SharedEndpoint = { postMessage(_message: unknown, _options?: { priority: number }) {} };
+  void copied.connect(custom);
+  copied.dispose();
+}
+void copiedConsumers;

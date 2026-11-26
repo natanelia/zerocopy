@@ -1,0 +1,16 @@
+# Transferable copied-session publications
+
+Copy-mode sessions still allocate a separate copy of the used arena per peer. With `transferCopies: true` an explicitly compatible native endpoint transfers that copy instead of structured-cloning it again. Shared transport, default endpoint behavior, the arena format and reader isolation are unchanged. A reader still attaches an independent WASM arena. This is not a SharedArrayBuffer speedup, incremental transport, a payload-size reduction, or a measured peak-memory saving.
+
+Baseline [d57fc413](https://github.com/natanelia/zerocopy/commit/d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341), measured runtime [8a442515](https://github.com/natanelia/zerocopy/commit/8a442515a358500c30d25c2f4f63fc3b703f4323). Two actual workers, 100k catalog records, eight successive 25-record publications, 100 ordinary reads per worker; paired alternating session order with an identical-build control. Speedups use medians of per-session paired ratios, not the ratio of pooled arm medians.
+
+| Runtime | Both readers responding: before | After | Paired speedup |
+| --- | ---: | ---: | ---: |
+| Node | 85.370 ms | 30.297 ms | 2.346x |
+| Bun | 100.836 ms | 49.551 ms | 2.313x |
+| Chromium | 70.915 ms | 34.647 ms | 2.027x |
+| Firefox | 84.960 ms | 45.720 ms | 1.853x |
+
+Node synchronous publisher blocking fell from 26.924 to 6.760 ms, 4.022x paired. All measured 100k opt-in pairs improved. The Node and cross-platform screens verified 4,224 publications including warmups. At 1k, Bun was near neutral, so there is no universal speedup guarantee. See [full investigation, methodology and reproduction sources](https://github.com/natanelia/zerocopy/blob/26ba4623d67ad34c43765814fc1a11aed7d1decb/proofs/copied-session-publication-20261126.md), [Node proof](https://github.com/natanelia/zerocopy/actions/runs/45768285806), [cross-platform proof](https://github.com/natanelia/zerocopy/actions/runs/45774903159), [targeted Chromium and corrected protocol edge proof](https://github.com/natanelia/zerocopy/actions/runs/45783650143), and [final Bun control](https://github.com/natanelia/zerocopy/actions/runs/45792851152/artifacts/15103336818). The last control's 15 measured pairs per cohort at 10k gave unchanged default 0.9894x round trip versus identical baseline A/A 1.0156x. All 64 sessions including warmups verified. The prior consistent Chromium slowdown did not recur materially in focused controls. The corrected edge exercise verifies multiple arenas, mixed transfer/default peers, queued all/latest delivery, per-peer detachment, failure/reconnect, and historical values on Node and Bun.
+
+The final permanent-proof job in run 45792851152 failed before execution: changing the public endpoint's postMessage declaration to an optional ArrayBuffer-list parameter excluded DOM Worker and MessagePort overloads. Restore the original public declaration and use a local type assertion only at the explicit transfer send; add compile-only consumers for browser, Node and a legacy options-object endpoint. The emitted send path is unchanged; confirm full CI including declaration checks, permanent regression proof and package build before merge. The production diff excludes the temporary proof workflow. No manual release or deployment.
