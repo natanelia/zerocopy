@@ -91,6 +91,8 @@ jobs:
           mkdir -p proofs/results/ci-regressions
           node proofs/spatial-editor/run.mjs --smoke --output=proofs/results/ci-regressions/spatial-editor.json
           node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/animation-callback-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-full-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-range-readers-4.json.gz
       - name: Check checkpoint, heap, and batched-list browser workers
         shell: bash
         env:

@@ -9,6 +9,47 @@ timed the animation callback met the memory target and missed the frame
 target. The previous frame-phase run met both. Keep the spatial path opt-in
 while hardware-GPU measurements are pending.
 
+## Updating one vertex on the GPU
+
+Moving a vertex in a visible 256-vertex lane took **16 bytes of source
+geometry and 16 bytes of WebGL uploads** with the range renderer. The
+full-upload renderer copied 4,096 source bytes and submitted 56,320 bytes
+to WebGL for the same edit. Undo produced the same counts. Each strategy
+recorded 84 such commands across its copy and shared editors. Layout
+changes, including inserting a vertex or adding a visible lane, still
+repacked every visible path.
+
+| Four readers, median of three trials | Full upload, copy | Full upload, shared | Range upload, copy | Range upload, shared |
+| --- | ---: | ---: | ---: | ---: |
+| Peak browser PSS (MiB) | 477.9 | 342.0 | 477.2 | 342.4 |
+| Dispatch to completed frame, p95 (ms) | 165.7 | 187.0 | 133.1 | 190.2 |
+| Dispatch to all validation replies, p95 (ms) | 7.2 | 13.1 | 7.8 | 11.8 |
+
+Both strategies used the same bundles, with 4,096 lanes, 16 warmup commands
+and 64 measured commands per fresh browser. The trials alternated strategy
+order and editor order. All 768 measured commands passed the viewport and
+revision checks. The opening cycles verified picks after a drag and undo.
+For range uploads they also read the GPU buffer back and compared each
+visible XY coordinate's high and low parts against the CPU positions.
+
+Frame times varied widely on SwiftShader. With full uploads the copy p95
+ranged from 141.9 to 1,014.9 ms and shared from 183.7 to 425.6 ms. With
+range uploads the ranges were 111.4–154.8 ms and 157.3–207.3 ms. The
+range renderer reduced transfer volume for both editors. Shared storage
+saved 28.3% peak PSS with this renderer and missed the frame-time target.
+The measurements support the range update for upload bandwidth. They leave
+its frame-latency effect on a physical GPU open.
+[Full-upload raw trials](results/webgl-uploads-full-readers-4.json.gz) · [Range-upload raw trials](results/webgl-uploads-range-readers-4.json.gz)
+
+Repeat each strategy with `node proofs/spatial-editor/run.mjs --readers=4 --uploads=full`
+or `--uploads=range`. To summarize the recordings, run the following for
+each strategy separately.
+
+```sh
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-full-readers-4.json.gz
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-range-readers-4.json.gz
+```
+
 ## Waiting for the animation callback
 
 The editor using the public TanStack viewport collection replayed 4,096

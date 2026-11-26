@@ -53,6 +53,20 @@ const laneBounds = bboxXY(edited, lane); // [-3, -5, 4, 5]
 edited.copyToFloat64Array(renderBuffer, { ...lane, offset: lane.start });
 ```
 
+If the edit moved just one XY vertex and all path offsets still match the
+previous draw, copy the two coordinate elements into their existing slot.
+Here the changed vertex occupies coordinates 2 and 3 of the packed list.
+
+```ts
+edited.copyToFloat64Array(renderBuffer, { start: 2, end: 4, offset: 2 });
+```
+
+The renderer controls what happens after this CPU copy. A renderer that
+owns its GPU position buffer can write the matching vertex range. A change
+to visible feature order or vertex counts requires refreshing the offsets
+and affected geometry together. The WebGL2 replay exercises both cases and
+checks picking against the edited path. [Renderer implementation](../proofs/spatial-editor/render.mjs)
+
 `start` and `end` count individual coordinates. `bboxXY` requires both
 indexes to be even and treats `end` as exclusive. A viewport can also pack
 several visible lanes into a smaller buffer by assigning each lane its own

@@ -1,7 +1,52 @@
 import { COORDINATE_SYSTEM, Deck, OrthographicView } from '@deck.gl/core';
 import { PathLayer } from '@deck.gl/layers';
 
-export async function renderer(graphicsMode) {
+// WebGL PathLayer reads the previous, current and next XY positions from one
+// buffer. The pinned layer uses one leading and two trailing padding vertices.
+const stride = 4 * Float32Array.BYTES_PER_ELEMENT;
+function pathBuffer(device) {
+  let gpu, retired, packed = new Float32Array();
+  return {
+    pack(positions, start, end) {
+      if (packed.length < positions.length * 2) packed = new Float32Array(positions.length * 2);
+      for (let i = start; i < end; i++) {
+        const x = positions[i * 2], y = positions[i * 2 + 1];
+        packed[i * 4] = x;
+        packed[i * 4 + 1] = y;
+        packed[i * 4 + 2] = x - packed[i * 4];
+        packed[i * 4 + 3] = y - packed[i * 4 + 1];
+      }
+    },
+    write(positions, start, end) {
+      const capacity = (positions.length / 2 + 3) * stride;
+      if (!gpu || gpu.byteLength < capacity) {
+        retired = gpu;
+        gpu = device.createBuffer({ byteLength: capacity });
+      }
+      if (end > start) gpu.write(packed.subarray(start * 4, end * 4), (start + 1) * stride);
+    },
+    attribute(value) {
+      // The Float64 CPU value signals deck.gl to bind both high and low parts.
+      return { buffer: gpu, value, size: 2, stride, type: 'float32' };
+    },
+    check(positions) {
+      if (!positions.length) return;
+      const bytes = gpu.readSyncWebGL(stride, positions.byteLength);
+      const values = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4);
+      for (let i = 0; i < positions.length; i++) {
+        const index = Math.floor(i / 2) * 4 + i % 2;
+        const high = Math.fround(positions[i]);
+        if (values[index] !== high || values[index + 2] !== Math.fround(positions[i] - high)) {
+          throw new Error('GPU position differs from the visible snapshot at coordinate ' + i);
+        }
+      }
+    },
+    afterDraw() { retired?.destroy(); retired = undefined; },
+    dispose() { retired?.destroy(); gpu?.destroy(); },
+  };
+}
+
+export async function renderer(graphicsMode, uploads) {
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl2', {
     preserveDrawingBuffer: true, failIfMajorPerformanceCaveat: graphicsMode === 'hardware',
@@ -18,7 +63,7 @@ export async function renderer(graphicsMode) {
     /swiftshader|llvmpipe|softpipe|software|lavapipe|basic render|\bwarp\b/i.test(graphics.renderer))) {
     throw new Error('Hardware mode rejected WebGL renderer: ' + graphics.renderer);
   }
-  let loaded, failed, pendingFrame, renderStarted;
+  let loaded, failed, pendingFrame, renderStarted, device;
   let uploadBytes = 0, uploadCallMs = 0;
   // Count WebGL client buffer uploads on this context. Allocating GPU storage
   // by size alone transfers no client bytes. Call time excludes GPU completion.
@@ -49,7 +94,7 @@ export async function renderer(graphicsMode) {
       }),
       cancelAnimationFrame: handle => window.cancelAnimationFrame(handle),
     },
-    controller: false, _animate: true, onLoad: loaded,
+    controller: false, _animate: true, onLoad: loaded, onDeviceInitialized: value => { device = value; },
     onBeforeRender: () => { renderStarted = performance.now(); },
     onAfterRender: () => {
       if (pendingFrame) {
@@ -70,10 +115,11 @@ export async function renderer(graphicsMode) {
     },
     onError: cause => { error = cause; failed(cause); pendingFrame?.reject(cause); } });
   await ready;
+  const binary = uploads === 'range' ? pathBuffer(device) : null;
   let ids = [], starts = new Uint32Array(), positions = new Float64Array(), indexById = new Map();
   return {
     graphics,
-    async draw(nextIds, paths, box, dirty, commandStarted) {
+    async draw(nextIds, paths, box, patch, commandStarted) {
       const begin = performance.now(), bytesBefore = uploadBytes, uploadBefore = uploadCallMs;
       const length = path => path.length ?? path.size;
       const repack = nextIds.length !== ids.length || nextIds.some((id, i) =>
@@ -85,15 +131,26 @@ export async function renderer(graphicsMode) {
         for (let i = 0; i < ids.length; i++) starts[i + 1] = starts[i] + length(paths.get(ids[i])) / 2;
         positions = new Float64Array(starts.at(-1) * 2);
       }
-      const writes = repack ? ids : dirty !== undefined && indexById.has(dirty) ? [dirty] : [];
+      const writes = repack ? ids : patch && indexById.has(patch.id) ? [patch.id] : [];
+      let packedBytes = 0, startVertex = 0, endVertex = 0;
       for (const id of writes) {
         const path = paths.get(id), offset = starts[indexById.get(id)] * 2;
-        if (path instanceof Float64Array) positions.set(path, offset);
-        else path.copyToFloat64Array(positions, { offset });
+        const oneVertex = binary && !repack && patch.axis !== undefined;
+        const start = oneVertex ? patch.axis - patch.axis % 2 : 0;
+        const end = oneVertex ? start + 2 : length(path);
+        if (path instanceof Float64Array) positions.set(oneVertex ? path.subarray(start, end) : path, offset + start);
+        else path.copyToFloat64Array(positions, { start, end, offset: offset + start });
+        packedBytes += (end - start) * 8;
+        startVertex = repack ? 0 : (offset + start) / 2;
+        endVertex = (offset + end) / 2;
       }
+      binary?.pack(positions, startVertex, endVertex);
       const packed = performance.now();
-      if (writes.length || repack) {
-        const data = { length: ids.length, startIndices: starts, attributes: { getPath: { value: positions, size: 2 } } };
+      if (binary && (writes.length || repack)) binary.write(positions, startVertex, endVertex);
+      const positionUploadBytes = binary ? uploadBytes - bytesBefore : undefined;
+      if (repack || (!binary && writes.length)) {
+        const getPath = binary ? binary.attribute(positions) : { value: positions, size: 2 };
+        const data = { length: ids.length, startIndices: starts, attributes: { getPath } };
         deck.setProps({ layers: [new PathLayer({ id: 'lanes', data, positionFormat: 'XY', _pathType: 'open',
           coordinateSystem: COORDINATE_SYSTEM.CARTESIAN, getColor: [40, 170, 85], getWidth: 2,
           widthUnits: 'pixels', pickable: true })] });
@@ -102,11 +159,13 @@ export async function renderer(graphicsMode) {
       if (error) throw error;
       const propsSet = performance.now();
       const draw = await new Promise((resolve, reject) => { pendingFrame = { propsSet, resolve, reject }; });
+      binary?.afterDraw();
       return { commandBeforePackMs: begin - commandStarted, packMs: packed - begin, setPropsMs: propsSet - packed, ...draw,
-        uploadBytes: uploadBytes - bytesBefore, uploadCallMs: uploadCallMs - uploadBefore };
+        packedBytes, positionUploadBytes, uploadBytes: uploadBytes - bytesBefore, uploadCallMs: uploadCallMs - uploadBefore };
 
     },
     check(idsToCheck, expectedPath, movedY) {
+      binary?.check(positions);
       for (const id of idsToCheck) {
         const i = indexById.get(id);
         const actual = positions.subarray(2 * starts[i], 2 * starts[i + 1]);
@@ -136,6 +195,6 @@ export async function renderer(graphicsMode) {
         if (!near.some(pick => ids[pick.index] === stableId)) throw new Error('Wrong lane picked at known XY');
       }
     },
-    dispose() { deck.finalize(); },
+    dispose() { try { deck.finalize(); } finally { binary?.dispose(); } },
   };
 }

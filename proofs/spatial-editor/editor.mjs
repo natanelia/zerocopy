@@ -29,10 +29,10 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader' }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range' }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
   const shared = mode === 'shared';
-  const view = await renderer(graphicsMode);
+  const view = await renderer(graphicsMode, uploads);
   const peers = Array.from({ length: readers }, reader);
   const initialData = [], expectedBounds = new Map(), editedPaths = new Map();
   const toPath = xy => shared ? new SharedList('number').pushMany(xy) : xy;
@@ -146,8 +146,13 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       const validation = Promise.all(peers.map(p => p.send(frame))).then(results => ({
         results, validationMs: performance.now() - started,
       }));
-      const draw = await view.draw(liveIds, paths, box, cmd.reject ? undefined : cmd.id, started);
+      const draw = await view.draw(liveIds, paths, box, patch, started);
       const frameMs = performance.now() - started;
+      if (uploads === 'range') {
+        if (draw.positionUploadBytes !== draw.packedBytes) throw new Error('Unexpected WebGL position upload size');
+        if (cmd.moveY !== undefined && draw.packedBytes !== 16) throw new Error('A single vertex drag must pack exactly one XY pair');
+        if (cmd.reject && draw.packedBytes !== 0) throw new Error('Rejected geometry reached the renderer');
+      }
       const { results, validationMs } = await validation;
       const isCurrent = response => response.revision === revision && response.request === step;
       if (!results.every(isCurrent)) throw new Error('Validation used the wrong revision or viewport');

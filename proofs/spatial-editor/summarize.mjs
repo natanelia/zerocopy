@@ -50,6 +50,13 @@ for (const readers of readerCounts) {
         for (const key of ['frameMs', 'validationMs', 'drawAndFinishMs', 'packMs', 'uploadBytes', 'uploadCallMs']) {
           assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
         }
+        if (first.config.uploads) {
+          assert(Number.isSafeInteger(s.packedBytes) && s.packedBytes >= 0);
+          if (first.config.uploads === 'range') {
+            assert.equal(s.positionUploadBytes, s.packedBytes);
+            assert(s.positionUploadBytes <= s.uploadBytes);
+          }
+        }
         if (version) {
           for (const key of framePhases) assert(Number.isFinite(s[key]) && s[key] >= 0, 'Invalid ' + key);
           const measured = framePhases.reduce((ms, key) => ms + s[key], 0);
@@ -73,6 +80,13 @@ for (const readers of readerCounts) {
       p95FrameMs: median(matching.map(c => c.p95FrameMs)),
       p95ValidationMs: median(matching.map(c => c.p95ValidationMs)),
     };
+    if (first.config.uploads) {
+      const drags = matching.flatMap(c => c.samples.filter(s => [7, 8].includes(s.step % 10)));
+      assert(drags.length > 0);
+      row[mode].dragAndUndo = { count: drags.length, medianPackedBytes: median(drags.map(s => s.packedBytes)),
+        medianAllUploadBytes: median(drags.map(s => s.uploadBytes)) };
+      if (first.config.uploads === 'range') assert(drags.every(s => s.positionUploadBytes === 16));
+    }
     if (version) {
       // Select whole commands by total frame latency before attributing their time.
       const slow = matching.flatMap(c => c.samples.toSorted((a, b) => b.frameMs - a.frameMs)

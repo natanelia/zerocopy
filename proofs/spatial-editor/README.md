@@ -23,7 +23,7 @@ join. [Environment, source checksums and raw samples](results/join-edits-node26.
 | Geometry | One immutable numeric list per path, keyed by feature ID | One Float64Array per path, keyed by feature ID |
 | Worker input | Immutable collection roots with shared Wasm backing | Initial tile copied once per reader, then changed rows and coordinates |
 | Spatial queries | Shared immutable Flatbush base and snapshot of recent bounds | Same shared Flatbush base and a reader-local map of recent bounds |
-| Drawing | Binary PathLayer with reusable positions and vertex start indices | Same renderer |
+| Drawing | Binary PathLayer with reusable CPU positions, GPU positions and vertex start indices | Same renderer |
 
 Each cycle pulls a vertex into view, pans, inserts a vertex, deletes a lane,
 undoes the deletion, rejects an optimistic edit, pans back, drags a vertex
@@ -73,6 +73,15 @@ CI runs the small copy and shared replays and archives their samples with
 the other browser regression evidence. Performance targets use the full
 trials above.
 
+Select `--uploads=range` to update an existing WebGL position buffer for
+a drag. Select `--uploads=full` to hand the updated CPU attribute to deck.gl
+for upload, as in the earlier recordings. Both modes draw the same paths.
+The range implementation is specific to WebGL2 and the pinned deck.gl
+PathLayer. The positions buffer stores the high and low float32 parts of
+each XY pair. It includes padding for PathLayer's neighboring vertex reads
+and stays alive until the draw using its replacement completes. The first
+cycle checks the uploaded values by GPU readback and checks actual picks.
+
 SwiftShader is the default for repeatable headless runs. On a machine with
 a physical GPU, select hardware rendering and use the same four-reader workload.
 
@@ -118,11 +127,17 @@ completeness and calculate medians of the three per-trial p95s.
   reader. Each `rebuildMs` sample belongs to the build started two commands
   before the command that installs its result.
 - **Packing** measures CPU work preparing binary path attributes. A change
-  of membership or vertex count repacks the visible paths. A same-length
-  edit copies the dirty path into its existing span.
+  of membership or vertex count repacks the visible paths. In range mode a
+  single-vertex edit copies the XY pair from the new snapshot and encodes
+  its two float32 parts per coordinate. Full mode repacks that feature.
+  `packedBytes` counts Float64 source bytes copied into the CPU positions
+  array. It excludes subsequent conversion of those values.
 - **Uploads** count client bytes submitted to WebGL buffer upload calls and
   time spent inside those calls. Draw time includes `gl.finish()`. Upload
   call duration measures CPU submission and can include driver stalls.
+  In range mode, `positionUploadBytes` counts the bytes observed in WebGL
+  calls during the explicit position-buffer write. `uploadBytes` also
+  includes other attributes and uniforms submitted for the draw.
 - **Memory** is the highest sampled sum of proportional set size (PSS) over
   the fresh Linux Chromium process tree, sampled approximately every 100 ms
   through initialization, retained geometry, edits, rebuilds and teardown.
