@@ -36,7 +36,7 @@ jobs:
               bun install --frozen-lockfile
               bun run build:wasm && bun run build:browser && bun run build:types
               npm --prefix website install --ignore-scripts --no-package-lock
-              SITE_BASE=/ node website/build.mjs
+              SITE_BASE=/ SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs
             )
           done
       - name: Focused correctness (Bun)
