@@ -2,8 +2,43 @@ import { arenaOf, validListRange } from './arena';
 import { SharedList } from './shared-list';
 import { assertXY, geometryKernel } from './geometry-runtime';
 import { checkBounds, type BoundsXY } from './xy-bounds';
+import { copyFloat64Range } from './list-float64';
 
 export type { BoundsXY } from './xy-bounds';
+
+/** One native GeoArrow LineString column with interleaved Float64 XY vertices. */
+export interface LineStringBuffersXY<B extends ArrayBufferLike = ArrayBufferLike> {
+  readonly offsets: Int32Array<B>;
+  readonly coordinates: Float64Array<B>;
+  /** Arrow's least-significant-bit-first row validity, or null when all rows exist. */
+  readonly validity: Uint8Array<B> | null;
+}
+
+/** Pack immutable paths into independently owned buffers for Arrow or worker readers. */
+export function packLineStringsXY(paths: Iterable<SharedList<'number'> | null>): LineStringBuffersXY<SharedArrayBuffer> {
+  const rows = Array.from(paths);
+  let vertices = 0, hasNull = false;
+  for (const path of rows) {
+    if (path === null) { hasNull = true; continue; }
+    assertXY(path);
+    vertices += path.size / 2;
+    if (vertices > 0x7fffffff) throw new RangeError('Too many vertices for signed 32-bit LineString offsets');
+  }
+  const offsets = new Int32Array(new SharedArrayBuffer((rows.length + 1) * 4));
+  const coordinates = new Float64Array(new SharedArrayBuffer(vertices * 16));
+  const validity = hasNull ? new Uint8Array(new SharedArrayBuffer(Math.ceil(rows.length / 8))) : null;
+  let offset = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const path = rows[i];
+    if (path !== null) {
+      if (validity) validity[i >>> 3] |= 1 << (i & 7);
+      copyFloat64Range(path, coordinates, 0, path.size, offset * 2);
+      offset += path.size / 2;
+    }
+    offsets[i + 1] = offset;
+  }
+  return Object.freeze({ offsets, coordinates, validity });
+}
 
 function assertPairRange(start: number, end: number, size: number): void {
   if (!validListRange(start, end, size) || ((start | end) & 1)) {

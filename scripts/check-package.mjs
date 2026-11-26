@@ -24,13 +24,17 @@ try {
   writeFileSync(join(temporary, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', join(temporary, archive.filename)]);
 
-  const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
+  // The GeoArrow table adapter requires its optional peer. Exercise that entry
+  // in a second installation below, after verifying the peer-free entry points.
+  const imports = Object.keys(pkg.exports).filter(path => path !== './geoarrow').map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
 import { SharedList } from 'zerocopy';
-import { pathIntersectsBoxXY } from 'zerocopy/geometry';
+import { packLineStringsXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
 import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
 const path = new SharedList('number').pushMany([0, 0, 2, 3]);
+assert.deepEqual([...packLineStringsXY([null, path]).offsets], [0, 0, 2]);
+await assert.rejects(import('apache-arrow'), { code: 'ERR_MODULE_NOT_FOUND' });
 assert.deepEqual(querySpatialIndex(base, [0, 2, 0, 3]), [7]);
 assert.equal(pathIntersectsBoxXY(path, [0, 2, 0, 3]), false);
 assert.equal(pathIntersectsBoxXY(path, [1, 1, 1, 2]), true);
@@ -78,14 +82,17 @@ if (isMainThread) {
 
   const consumer = join(temporary, 'consumer.ts');
   writeFileSync(consumer, imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; void entry${index};`).join('\n') + "\nimport { SharedList } from 'zerocopy';\nconst list: SharedList<'number'> = new SharedList('number');\nconst value: number | undefined = list.get(0);\n");
-  const program = ts.createProgram([consumer], {
-    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-    strict: true, noEmit: true, skipLibCheck: false, types: [], lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
-  });
-  const diagnostics = ts.getPreEmitDiagnostics(program);
-  assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
-    getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
-  }));
+  function checkConsumer() {
+    const program = ts.createProgram([consumer], {
+      target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
+      strict: true, noEmit: true, skipLibCheck: false, types: [], lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
+    });
+    const diagnostics = ts.getPreEmitDiagnostics(program);
+    assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
+      getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
+    }));
+  }
+  checkConsumer();
   // Exercise both transaction APIs with the published archive and real npm peer resolution.
   writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
@@ -139,7 +146,15 @@ try {
     run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@' + version]);
     run(process.execPath, ['tanstack-peer.mjs', version]);
   }
-  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, TypeScript consumer, and TanStack DB ${peers.join(' and ')} passed.`);
+  const arrow = pkg.devDependencies['apache-arrow'];
+  run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save',
+    'apache-arrow@' + arrow, '@geoarrow/geoarrow-js@0.3.3']);
+  writeFileSync(consumer, readFileSync(join(root, 'type-tests/geometry-public.ts')));
+  checkConsumer();
+  writeFileSync(join(temporary, 'geoarrow-worker.mjs'), readFileSync(join(root, 'proofs/geoarrow-worker.mjs')));
+  run(process.execPath, ['geoarrow-worker.mjs']);
+  run('bun', ['geoarrow-worker.mjs']);
+  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, worker sharing, TypeScript consumer, Apache Arrow ${arrow}, and TanStack DB ${peers.join(' and ')} passed.`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

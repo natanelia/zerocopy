@@ -16,6 +16,61 @@ lane or tile data. Use `toFloat64Array()` when handing a numeric snapshot to
 a renderer or transferring a coordinate buffer out of a worker. The returned
 array owns its buffer.
 
+## Share a GeoArrow LineString column
+
+Use `packLineStringsXY` to export a set of retained lane paths to a shared
+column. It reads each numeric snapshot into a fresh interleaved Float64
+coordinate buffer. The signed 32-bit offsets count **vertices**. An empty
+path has zero vertices, and a missing path has a cleared validity bit. Row
+order follows the input iterable, so an application can keep the same order
+in a separate feature-ID column.
+
+```ts
+import { SharedList } from 'zerocopy';
+import { packLineStringsXY } from 'zerocopy/geometry';
+
+const lane = new SharedList('number').pushMany([10, 20, 12, 22]);
+const batch = packLineStringsXY([lane, null, new SharedList('number')]);
+// batch.offsets contains [0, 2, 2, 2]. The validity byte is 0b101.
+const worker = new Worker(new URL('./arrow-reader.ts', import.meta.url), { type: 'module' });
+worker.postMessage(batch);
+```
+
+Packing is the copy from the editable trie into contiguous storage. Posting
+the result to additional workers shares the coordinate, offset, and validity
+buffers. Treat these buffers and all Arrow views of them as read-only after
+publication. A later export owns separate buffers. Export small tile batches
+when readers need only part of a map. Each batch supports up to 2³¹ − 1
+vertices, subject to the runtime's memory limits.
+
+To consume the result with Apache Arrow JS, install its optional peer with
+`npm install apache-arrow@^21.2.0`. A worker can construct a native
+`geoarrow.linestring` column directly over the received buffers.
+
+```ts
+import { toGeoArrowTable } from 'zerocopy/geoarrow';
+
+self.onmessage = ({ data }) => {
+  const table = toGeoArrowTable(data);
+  const lines = table.getChild('geometry')!;
+  self.postMessage(lines.get(0)?.get(1)?.get(0)); // 12, the second vertex's x
+};
+```
+
+The adapter validates the offsets and bitmap length and wraps the buffers
+as `List<FixedSizeList<Float64>[2]>`. It accepts typed-array subviews whose
+offset values start at zero and span the supplied coordinates. By default
+the field has planar edges and an unspecified CRS. Pass a PROJJSON object
+with `toGeoArrowTable(batch, { crs })` when the input CRS is known. Use the
+same resolved Apache Arrow module for the adapter and the IPC writer. A writer
+from a second installed copy can misinterpret the first copy's nested table.
+For a file or remote consumer, Arrow's `tableToIPC(table, 'stream')` creates
+a separate byte stream. The `bun run check:package` test also runs GeoArrow JS's
+`totalBounds` on both the shared table and its IPC round trip.
+[GeoArrow memory layout](https://geoarrow.org/format.html) · [GeoArrow field metadata](https://geoarrow.org/extension-types.html)
+
+## XY bounds
+
 `bboxXY` recomputes `[minX, minY, maxX, maxY]` from interleaved 2D coordinates. It reads the supplied snapshot directly and returns a fresh readonly tuple. It does not parse GeoJSON, transform coordinates, use cached bounds, or change existing collection methods. A caller must use this new API to benefit from it. Reuse previously calculated bounds when a snapshot has not changed.
 
 An odd coordinate count throws `RangeError`. A non-numeric collection throws `TypeError`. NaN axes are ignored. Equal extrema retain the first sign of zero. Infinite coordinates are supported. Empty input returns `[Infinity, Infinity, -Infinity, -Infinity]`. These rules match Turf bbox recomputation for the corresponding flat MultiPoint; this is not the full Turf GeoJSON API.

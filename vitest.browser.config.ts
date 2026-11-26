@@ -11,7 +11,7 @@ export default defineConfig({
     },
     include: ['demo/**/*.browser.test.ts'],
   },
-  optimizeDeps: { include: ['@tanstack/db'] },
+  optimizeDeps: { include: ['@tanstack/db', 'apache-arrow'] },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
