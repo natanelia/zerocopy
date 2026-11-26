@@ -1,0 +1,48 @@
+name: Current-main selective JSON read baseline (proof only)
+on:
+  push:
+    branches: [proof/json-field-baseline-20261127]
+    paths: ['.github/workflows/json-field-baseline-proof.yml', 'proofs/json-field-baseline-20261127.mjs']
+permissions:
+  contents: read
+jobs:
+  baseline:
+    strategy:
+      fail-fast: false
+      matrix:
+        count: [1000, 10000, 100000]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build unchanged pinned runtime and website
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- . ':(exclude).github/workflows/json-field-baseline-proof.yml' ':(exclude)proofs/json-field-baseline-20261127.mjs' ':(exclude)proofs/json-field-baseline-20261127.md'
+          bun install --frozen-lockfile
+          bun run build:wasm && bun run build:browser && bun run build:types
+          npm --prefix website install --ignore-scripts --no-package-lock
+          SITE_BASE=/ node website/build.mjs
+      - name: Alternate identical-build controls in real Node workers
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/json-field-baseline"
+          node proofs/json-field-baseline-20261127.mjs "$PWD" "$PWD" "$RUNNER_TEMP/json-field-baseline/raw.json" ${{ matrix.count }} 6 selective-shared-view,selective-shared-get,selective-native-get | tee "$RUNNER_TEMP/json-field-baseline/run.log"
+          cp website/_site/build.json "$RUNNER_TEMP/json-field-baseline/build.json"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: json-field-baseline-${{ matrix.count }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/json-field-baseline/
+          retention-days: 14
