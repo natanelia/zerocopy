@@ -1,10 +1,10 @@
 import {
   validListRange,
   arenaOf
-} from "./chunk-wdgdtd4t.js";
+} from "./chunk-vb4t84x1.js";
 import {
   SharedList2
-} from "./chunk-8mrq14k5.js";
+} from "./chunk-213snpg2.js";
 
 // geometry-wasm.ts
 function loadGeometryWasm() {

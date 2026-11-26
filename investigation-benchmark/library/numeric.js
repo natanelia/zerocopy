@@ -1,9 +1,9 @@
 import {
   arenaOf
-} from "./chunk-wdgdtd4t.js";
+} from "./chunk-vb4t84x1.js";
 import {
   SharedList2
-} from "./chunk-8mrq14k5.js";
+} from "./chunk-213snpg2.js";
 
 // numeric-wasm.ts
 function loadNumericWasm(simd) {
