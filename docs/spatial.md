@@ -87,6 +87,11 @@ and binary deck.gl paths. Rebuilding from packed bounds took a median 2.6 ms
 in that four-reader replay, compared with 22.3 ms for decoding the shared
 metadata rows. See the [trial results and measurement conditions](../proofs/spatial-editor/RESULTS.md).
 
+On a 16,384-feature tile with 2,048 edited IDs, preparing took 1.944 ms
+and reduced subsequent small pan queries from 1.020 to 0.021 ms each.
+The full rebuild took 4.392 ms and yielded 0.009 ms queries.
+[Viewport workload and measurements](../proofs/spatial-editor/RESULTS.md#repeated-viewport-queries-over-accumulated-edits)
+
 ## Dedicated worker transport
 
 A prepared snapshot contains only structured-cloneable descriptors and shared

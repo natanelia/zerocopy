@@ -157,3 +157,32 @@ recalculate the table with the following command.
 ```sh
 node proofs/spatial-editor/summarize.mjs proofs/spatial-editor/results/readers-{1,4,8}.json.gz
 ```
+
+## Repeated viewport queries over accumulated edits
+
+This CPU-only comparison used a 16,384-feature tile on Linux, Node 26.13.1
+and an AMD EPYC-Milan Processor. Every five edited IDs include three moves,
+one insertion and one deletion. Each trial ran 96 small pans and four wide
+viewports on a fixed revision. The initial pass checked every result against
+an independent feature map. The three strategies rotated execution order.
+Times are medians over seven measured trials after two warmups. Query time is
+the mean time per viewport within each trial.
+
+| Edited IDs | Direct scan per small pan (ms) | Prepared per small pan (ms) | Rebuilt per small pan (ms) | Prepare edits (ms) | Rebuild entire tile (ms) |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 16 | 0.029 | 0.011 | 0.009 | 0.136 | 2.861 |
+| 256 | 0.075 | 0.015 | 0.014 | 0.375 | 2.842 |
+| 2,048 | 1.020 | 0.021 | 0.009 | 1.944 | 4.392 |
+
+With 2,048 edited IDs the prepared snapshot added 74,218 bytes of shared
+index storage while retaining the original base. A complete replacement
+index occupied 694,716 bytes. These counts cover index buffers and ID
+tables. They exclude transient build allocations, the existing edit map
+and JavaScript wrappers. Preparation paid for itself after about two small
+pans at the measured rates. For the four wide viewports, mean query times
+at that edit count were 7.595 ms scanning, 3.267 ms prepared and 2.265 ms
+rebuilt. A full rebuild yielded the fastest subsequent queries in this fixture.
+
+Run `node proofs/spatial-editor/viewport-queries.mjs` after building the
+portable library to repeat the comparison. Rendering, transport and worker
+scheduling are outside the timed operations. [Measured source](https://github.com/natanelia/zerocopy/commit/1e38c7bdd9e8d50d9f1943e3a4880409ba6d6eab) · [All trial timings](results/prepared-viewport-queries.json)
