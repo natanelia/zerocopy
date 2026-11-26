@@ -188,14 +188,34 @@ export class Arena {
     if (!this.readOnly || this.objects.size || this.objectKeys) throw new Error('Expected a fresh read-only arena');
     this.experimentalWindowCache = true;
   }
+  // Delay the adaptive path until the first real admission failure. Small
+  // readers and freshly attached readers keep the original direct key hits.
+  private windowEviction?: { slots: Uint32Array; head: number; count: number };
+  private rememberWindowRecord(ptr: number): void {
+    const q = this.windowEviction;
+    if (!q) return;
+    q.slots[(q.head + q.count) % MAX_DECODED_RECORDS] = ptr;
+    q.count++;
+  }
   private makeExperimentalRoom(len: number): void {
     if (len > MAX_DECODED_BYTES) return;
-    while (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES) {
-      const oldest = this.objects.entries().next().value;
-      // Never evict a nested handle (its accounting/identity differs).
-      if (!oldest || oldest[1].jsonLength < 0) return;
-      this.objects.delete(oldest[0]);
-      this.objectBytes -= oldest[1].jsonLength;
+    if (!this.windowEviction) {
+      this.windowEviction = { slots: new Uint32Array(MAX_DECODED_RECORDS), head: 0, count: 0 };
+      for (const [ptr, record] of this.objects) {
+        if (record.jsonLength >= 0) this.rememberWindowRecord(ptr);
+      }
+      // Existing key hits hold strong references to address-cache entries.
+      // Drop them before the first eviction; readObject checks map identity.
+      this.objectKeys = undefined;
+      this.objectKeyChars = 0;
+    }
+    const q = this.windowEviction;
+    while (q.count && (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES)) {
+      const ptr = q.slots[q.head], record = this.objects.get(ptr)!;
+      q.head = (q.head + 1) % MAX_DECODED_RECORDS;
+      q.count--;
+      this.objects.delete(ptr);
+      this.objectBytes -= record.jsonLength;
     }
   }
   private stringBytes = 0;
@@ -332,6 +352,7 @@ export class Arena {
       if (prior && record?.jsonLength === len && (this.memory === prior.memory || sameRecordBytes(this.bytes, prior.bytes, this.wordView, prior.wordView, ptr, len))) {
         this.objects.set(ptr, record);
         this.objectBytes += len;
+        if (this.windowEviction) this.rememberWindowRecord(ptr);
         return record.value;
       }
     }
@@ -345,10 +366,12 @@ export class Arena {
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
-    if (this.experimentalWindowCache && type === 'object') this.makeExperimentalRoom(len);
+    if (this.experimentalWindowCache && type === 'object' &&
+      (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES)) this.makeExperimentalRoom(len);
     if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
       this.objectBytes += len;
+      if (this.windowEviction && type === 'object') this.rememberWindowRecord(ptr);
     }
     return result;
   }
@@ -585,7 +608,7 @@ export class Arena {
     if (code === 0 || code === 4) {
       // Don't create a second strong key-to-object reference that would outlive
       // eviction. Existing bounded address lookup can still serve these reads.
-      if (this.experimentalWindowCache && type === 'object') {
+      if (this.windowEviction && type === 'object') {
         const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
         return leaf ? this.leafValue(type, leaf, prefix) : undefined;
       }

@@ -23,7 +23,16 @@ function check(values,keys,oracle){
 function bounds(map){
  const a=map.arena;
  assert(a.objects.size<=2048&&a.objectBytes>=0&&a.objectBytes<=2097152);
- return {entries:a.objects.size,jsonBytes:a.objectBytes,keyEntries:a.objectKeys?.size??0,heapUsed:process.memoryUsage().heapUsed};
+ const q=a.windowEviction;
+ if(q){
+  assert(q.count>=0&&q.count<=2048&&q.count<=a.objects.size);
+  assert.equal(q.slots.length,2048);
+  // FIFO metadata must represent exactly the live ordinary JSON records.
+  const queued=new Set(Array.from({length:q.count},(_,i)=>q.slots[(q.head+i)%2048]));
+  assert.equal(queued.size,q.count);
+  assert.deepEqual(queued,new Set([...a.objects].filter(([,v])=>v.jsonLength>=0).map(([p])=>p)));
+ }
+ return {entries:a.objects.size,jsonBytes:a.objectBytes,keyEntries:a.objectKeys?.size??0,adaptiveActive:!!q,heapUsed:process.memoryUsage().heapUsed};
 }
 if(!isMainThread){
  parentPort.once('message',async m=>{
@@ -70,7 +79,11 @@ if(!isMainThread){
    for(let i=0;i<4;i++)query(next.map,hot,'publication-repeat',changed);
    query(map,hot,'old-after-publication',original);
    assert.throws(()=>next.map.set(hot[0],{}),/read-only/);
-   if(adaptive)assert.equal(next.map.arena.objectKeys,undefined,'eviction retained a second key-to-object reference');
+   if(adaptive){
+    assert.equal(!!map.arena.windowEviction,n>=10000,'unexpected activation history');
+    if(map.arena.windowEviction)assert.equal(map.arena.objectKeys,undefined,'eviction retained a second key-to-object reference');
+    assert.equal(next.map.arena.windowEviction,undefined,'fresh reader should keep fast admitted hits');
+   }
    parentPort.postMessage({kind:'done',measurements,memory,reattachMs,verified:true});
   }catch(error){parentPort.postMessage({kind:'error',error:String(error?.stack??error)});}
  });
@@ -112,4 +125,35 @@ if(!isMainThread){
   }
   writeFileSync(out,JSON.stringify(report));
  }
+
+ // Untimed mixed/nested/oversized control; separate from paired measurements.
+ const candidate=await import('../dist/shared.js');
+ for(const copy of [false,true]){
+  candidate.resetMap();
+  const owner=new candidate.SharedMap('object');
+  const a=owner.arena;
+  const child=new candidate.SharedList('number').push(42);
+  const nested=new candidate.SharedMap('SharedList<number>',0,0,a).set('child',child);
+  const data=owner.setMany(Array.from({length:5000},(_,i)=>['key/'+i,{i,nested:[i]}]))
+    .set('large',{pad:'x'.repeat(2097152)}).set('道路/🚗',{value:1}).set('null',null);
+  const attached=await candidate.initWorker(candidate.getWorkerData({data,nested},{copy}));
+  const reader=attached.data.arena;
+  assert.equal(reader,attached.nested.arena);
+  reader.enableExperimentalWindowCache();
+  const held=attached.nested.get('child');
+  const old=attached.data.get('key/0');
+  const oversized=attached.data.get('large');
+  assert.equal(reader.windowEviction,undefined,'oversized miss must not trigger eviction');
+  assert.notEqual(oversized,attached.data.get('large'));
+  for(let i=1;i<5000;i++)assert.deepEqual(attached.data.get('key/'+i),{i,nested:[i]});
+  assert(reader.windowEviction);
+  assert.equal(attached.nested.get('child'),held);
+  assert.equal(held.get(0),42);
+  assert.deepEqual(old,{i:0,nested:[0]});
+  assert.notEqual(attached.data.get('key/0'),old);
+  assert.equal(attached.data.get('null'),null);
+  assert.deepEqual(attached.data.get('道路/🚗'),{value:1});
+  bounds(attached.data);
+ }
+ console.error('Mixed/nested/oversized cache qualification passed');
 }
