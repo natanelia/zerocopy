@@ -91,6 +91,9 @@ async function checkBrowsers(phase) {
         assert.equal(await plain.evaluate(() => globalThis.__starterWorkers), 0);
         assert.match(await plain.locator('pre[role="status"]').textContent(), /Shared memory is unavailable/);
         result.checks.push({ phase, browser: name, isolationGuard: 'passed', workers: 0 });
+        // Release the routed Vite page and its implicit context before browser shutdown.
+        await bounded(plain.unrouteAll({ behavior: 'wait' }), 'isolation guard route cleanup');
+        await bounded(plain.close(), 'isolation guard page cleanup');
       }
     } catch (error) { browserFailure = error; throw error; }
     finally {
