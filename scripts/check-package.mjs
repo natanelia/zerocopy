@@ -27,8 +27,13 @@ try {
   const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
 import { SharedList } from 'zerocopy';
+import { pathIntersectsBoxXY } from 'zerocopy/geometry';
 import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
+const path = new SharedList('number').pushMany([0, 0, 2, 3]);
+assert.deepEqual(querySpatialIndex(base, [0, 2, 0, 3]), [7]);
+assert.equal(pathIntersectsBoxXY(path, [0, 2, 0, 3]), false);
+assert.equal(pathIntersectsBoxXY(path, [1, 1, 1, 2]), true);
 const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }]);
 assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3]), [7]);
 assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3], edits), []);

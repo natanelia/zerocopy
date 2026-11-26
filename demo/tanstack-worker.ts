@@ -1,5 +1,5 @@
 import { initWorker } from '../dist/shared.js';
-import { bboxXY } from '../dist/geometry.js';
+import { bboxXY, pathIntersectsBoxXY } from '../dist/geometry.js';
 
 import { querySpatialIndex, rebuildSpatialIndex } from '../dist/spatial.js';
 
@@ -12,12 +12,16 @@ self.onmessage = async ({ data }) => {
     const read = (state, prepared) => {
       const row = state.rows.get('lane');
       const viewport = [-12, 0, -8, 3] as const;
+      // Both generations have overlapping bounds here. Only the edited segment crosses it.
+      const narrow = [0, 2.5, 0, 2.75] as const;
       const rebuilt = rebuildSpatialIndex(data.base, state.changes, row.revision);
       return {
         row, bounds: bboxXY(state.geometry),
         candidates: querySpatialIndex(data.base, viewport, state.changes),
         rebuiltCandidates: querySpatialIndex(rebuilt, viewport),
         preparedCandidates: querySpatialIndex(prepared, viewport),
+        narrowCandidates: querySpatialIndex(prepared, narrow),
+        intersectsNarrow: pathIntersectsBoxXY(state.geometry, narrow),
       };
     };
     self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared) });

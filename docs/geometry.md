@@ -22,6 +22,21 @@ An odd coordinate count throws `RangeError`. A non-numeric collection throws `Ty
 
 The accepted kernel is scalar Wasm. SIMD implementations remain rejected experiments because they did not consistently beat the best scalar control on x64 and ARM64 across Node and Bun. Bulk traversal is a separate optimization: it removes per-value JavaScript callbacks and nested GeoJSON traversal. It must pass a separate full-API benchmark before release. No claim of a SIMD speedup applies to this function.
 
+## Path intersection
+
+`pathIntersectsBoxXY(points, box, range?)` returns whether any vertex or
+straight segment of an open planar path touches the inclusive XY box. A
+single vertex can match, and an empty path returns `false`. Coordinates and
+bounds use the same units. Boxes can have zero width, zero height or infinite
+extents. Reversed bounds and NaN bounds throw.
+
+The optional `{ start, end }` selects coordinate elements in a half-open
+range. Both ends must align to XY pairs. A vertex with either axis nonfinite
+breaks the path, so the finite vertices on either side remain disconnected.
+The predicate reads the immutable list directly and can stop at the first hit.
+Corner and edge touches count, including when a floating-point determinant
+needs an exact sign calculation. [Spatial index example](spatial.md#select-intersecting-paths)
+
 Attached read-only snapshots and historical versions are supported. The kernel uses neither an allocator nor shared scratch. Results use instance-local globals and are copied to a new tuple before the synchronous call returns. There are no imported callbacks or asynchronous steps during the transfer. Workers have separate instances. Non-empty calls compile the module lazily and cache one instance per memory; empty input does not compile a module.
 
 ## Refresh an edited lane

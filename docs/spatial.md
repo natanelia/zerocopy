@@ -27,11 +27,38 @@ keep the handle on a TanStack metadata row. Handles must stay unique for the
 lifetime of a retained tile history. The result lists matching handles in
 ascending order. Bounds use `[minX, minY, maxX, maxY]` in one planar coordinate
 system. Edges are inclusive. Indexed boxes require finite coordinates.
-Query boxes allow infinite extents. Run an exact geometry predicate on the
-candidates when an application needs line or polygon intersection.
+Query boxes allow infinite extents. For lane centerlines and boundaries, filter
+the candidates with `pathIntersectsBoxXY` to select paths touching the viewport.
+Applications selecting polygon interiors need a polygon predicate.
 
 To keep UI rows in sync with these results, publish the IDs or a worker
 search promise into a [TanStack viewport collection](tanstack.md#live-viewport-membership).
+
+## Select intersecting paths
+
+Both lanes below have bounds that overlap the viewport. The first follows
+the left and top edges of its own bounds and misses the viewport entirely.
+Use the index and the path snapshots from the same map revision.
+
+```ts
+import { SharedList } from 'zerocopy';
+import { bboxXY, pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
+import { buildSpatialIndex, querySpatialIndex } from 'zerocopy/spatial';
+
+const paths = [
+  new SharedList('number').pushMany([0, 0, 0, 4, 4, 4]),
+  new SharedList('number').pushMany([0, 2, 4, 2]),
+];
+const index = buildSpatialIndex(paths.map((path, id) => ({ id, bounds: bboxXY(path) })));
+const viewport: BoundsXY = [1, 1, 3, 3];
+const candidates = querySpatialIndex(index, viewport); // [0, 1]
+const visible = candidates.filter(id => pathIntersectsBoxXY(paths[id]!, viewport)); // [1]
+```
+
+The same filter works on a prepared index and inside a worker attached to
+the coordinates. Recheck an edited candidate even when its bounds stay the
+same. An interior vertex can move into view. For a tile storing many paths
+in one numeric list, pass the path's coordinate range. [Geometry API](geometry.md#path-intersection)
 
 ## Edit and rebuild
 

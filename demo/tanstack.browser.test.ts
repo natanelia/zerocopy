@@ -20,7 +20,8 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
   });
   try {
     await lanes.preload();
-    const before = { row: { id: 'lane', revision: 0 }, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [], preparedCandidates: [] };
+    const before = { row: { id: 'lane', revision: 0 }, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [],
+      preparedCandidates: [], narrowCandidates: [7], intersectsNarrow: false };
     expect(await read(initial)).toEqual({ first: before, current: before });
 
     const geometry = initial.set(0, -12);
@@ -31,7 +32,8 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
     expect(lanes.get('lane')?.revision).toBe(1);
     expect(await read(initial)).toEqual({ first: before, current: before });
     await tx.commit();
-    const after = { row: { id: 'lane', revision: 1 }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7], preparedCandidates: [7] };
+    const after = { row: { id: 'lane', revision: 1 }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
+      preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true };
     expect(await read(geometry, edits)).toEqual({ first: before, current: after });
   } finally {
     reader.terminate();

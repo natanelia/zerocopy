@@ -1,7 +1,7 @@
 import Flatbush from 'flatbush';
 import { SharedMap } from './shared-map.ts';
 import { json, type JsonType } from './types.ts';
-import type { BoundsXY } from './geometry.ts';
+import { checkBounds, type BoundsXY } from './xy-bounds.ts';
 
 export interface SpatialFeature { readonly id: number; readonly bounds: BoundsXY }
 export interface SpatialEdit { readonly id: number; readonly bounds: BoundsXY | null }
@@ -33,15 +33,6 @@ function checkRevision(revision: number): void {
 
 function checkId(id: number): void {
   if (!Number.isInteger(id) || id < 0 || id > 0xffffffff) throw new RangeError('Expected a uint32 feature ID');
-}
-
-function checkBounds(box: BoundsXY, finite: boolean): void {
-  if (!Array.isArray(box) || box.length !== 4) throw new TypeError('Expected four XY bounds');
-  for (const value of box) {
-    if (typeof value !== 'number') throw new TypeError('Expected numeric XY bounds');
-    if (Number.isNaN(value) || (finite && !Number.isFinite(value))) throw new RangeError('Invalid XY bounds');
-  }
-  if (box[0] > box[2] || box[1] > box[3]) throw new RangeError('Reversed XY bounds');
 }
 
 const trees = new WeakMap<SpatialIndex, Flatbush>();
