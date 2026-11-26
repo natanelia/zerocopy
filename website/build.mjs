@@ -26,6 +26,10 @@ const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 if (!readdirSync(join(root, 'dist')).includes('shared.js')) throw new Error('Build the library with build:wasm and build:browser first');
 rmSync(out, { recursive: true, force: true }); mkdirSync(out, { recursive: true });
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
+const catalogRoutes = new Set(['compare/', 'investigation-benchmark/']);
+// These routes need all three stylesheets at first paint. Serve them in one request.
+writeFileSync(join(out, 'assets', 'catalog.css'), ['site.css', 'memory-charts.css', 'feature.css']
+  .map(file => readFileSync(join(here, 'assets', file), 'utf8')).join('\n'));
 writeMemoryChartAssets(join(out, 'assets'));
 writeFeatureMemoryAssets(join(out, 'assets'));
 mkdirSync(join(out, 'library'));
@@ -71,10 +75,14 @@ const search = [], siteRoutes = [];
 function writePage(route, title, description, body, script) {
   const destination = join(out, route); mkdirSync(destination, { recursive: true });
   let html = shell({ title, description, body, script, base, route, version, sha, origin, noindex: !!preview });
-  if (['compare/', 'investigation-benchmark/', 'docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
-    html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
+  if (catalogRoutes.has(route)) {
+    html = html.replace(`href="${base}assets/site.css"`, `href="${base}assets/catalog.css"`);
+  } else {
+    if (['docs/memory-comparison/', 'docs/historical-sharedlist-memory/', 'historical/log-compare/', 'historical/log-benchmark/'].includes(route)) {
+      html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/memory-charts.css"></head>`);
+    }
+    if (route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
   }
-  if (['compare/', 'explorer/', 'investigation-benchmark/'].includes(route) || route.startsWith('historical/')) html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/feature.css"></head>`);
   if (route === 'historical/log-compare/') html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
   if (preview) {
     html = html.replace('</head>', `<link rel="stylesheet" href="${base}assets/comparison.css"></head>`);
@@ -108,7 +116,7 @@ writePage('historical/log-explorer/', 'Historical SharedList log explorer', 'The
 writePage('historical/log-benchmark/', 'Historical SharedList investigation benchmark', 'The original log-column timing workload, retained as a historical reference.', historical(investigationBenchmark(base)), 'explorer-benchmark.mjs');
 writePage('lab/', 'Map benchmark: zerocopy vs Immutable.js vs Immer', 'Compare zerocopy, Immutable.js Map, and Immer Map across workers in your browser. Checked outputs, raw samples, and no assumed winner.', lab(base), 'lab.mjs');
 writePage('playground/', 'Snapshot playground', 'Mark headphones as sold out and watch a real worker keep the earlier in-stock snapshot.', playground(base), 'playground.mjs');
-writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><span class="eyebrow">APPLICATION PATTERNS</span><h1>Same data.<br>More possibilities.</h1><p>Product records, document nodes, table rows and graph edges can share the same versioned collection pattern.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
+writePage('use-cases/', 'Built for shared work', 'Use shared collections for observability, editors, large tables, product catalogs, graphs, and simulations.', `<main id="main" class="wrap use-case-page"><div class="page-intro"><h1>Use cases</h1><p>See how workers can share product records, document nodes, table rows, and graph edges.</p></div>${useCaseCards(base)}<p><a class="text-link" href="${base}docs/use-cases/">Compare the use cases and alternatives →</a></p><p class="case-footnote">These are implementation patterns, not customer testimonials or measured production case studies.</p></main>`);
 for (const page of pages) {
   const source = readFileSync(join(root, page.source), 'utf8');
   const rendered = renderMarkdown(source, page.source, routes, base);
