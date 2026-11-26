@@ -97,7 +97,34 @@ state.subscribe(({ stock }) => {
         <p>Node.js supports shared storage. Browsers require cross-origin isolation. Bun copies snapshots by default.</p>
         <a class="model-link" href="${base}docs/mental-model/">How sharing works ${arrow}</a>
       </div>
-      <div class="sharing-card" aria-label="Shared and cloned storage"><div class="diagram-toolbar"><span class="diagram-title">Storage model</span><div class="segmented" role="group" aria-label="Storage model"><button data-storage="shared" aria-pressed="true">Shared</button><button data-storage="cloned" aria-pressed="false">Cloned</button></div></div><div class="diagram"><div class="owner-node"><span class="node-icon">W</span><span>Writer<small>Main thread or worker</small></span></div><div class="wire wire-top"></div><div class="arena"><div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div><div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => `<i></i>`).join('')}</div><div class="arena-footer"><span class="mono">Map · List · Set</span></div></div><div class="wire wire-bottom"></div><div class="reader-nodes" id="reader-nodes"></div></div><div class="diagram-controls"><label for="worker-count">Readers <output id="worker-count-value">3</output></label><input id="worker-count" type="range" min="1" max="4" value="3"><span id="storage-count" role="status">1 backing store</span></div></div>
+      <div class="sharing-card" role="group" aria-label="Shared and cloned storage">
+        <div class="diagram-toolbar"><span class="diagram-title">Storage model</span>
+          <div class="segmented" role="group" aria-label="Storage model">
+            <button data-storage="shared" aria-pressed="true">Shared</button>
+            <button data-storage="cloned" aria-pressed="false">Cloned</button>
+          </div>
+        </div>
+        <div class="writer-controls">
+          <label for="writer-thread">Writer location</label>
+          <select id="writer-thread"><option value="worker">Dedicated worker</option><option value="main">Main thread</option></select>
+        </div>
+        <div class="diagram">
+          <div class="owner-node"><span id="owner-thread">Dedicated worker</span><strong class="writer-role">Writer</strong></div>
+          <div class="wire wire-top"></div>
+          <div class="arena">
+            <div class="arena-header"><span>Dataset</span><span id="arena-label">Shared backing storage</span></div>
+            <div class="memory-grid" aria-hidden="true">${Array.from({ length: 32 }, () => '<i></i>').join('')}</div>
+            <div class="arena-footer"><span class="mono">Map · List · Set</span></div>
+          </div>
+          <div class="wire wire-bottom"></div>
+          <div class="reader-nodes" id="reader-nodes"></div>
+        </div>
+        <div class="diagram-controls">
+          <label for="worker-count">Readers <output id="worker-count-value">3</output></label>
+          <input id="worker-count" type="range" min="1" max="4" value="3">
+          <span id="storage-count" role="status">1 backing store</span>
+        </div>
+      </div>
     </section>
     <section class="wrap product-links" aria-label="Try the library">
       <article><h2><a href="${base}compare/">Try the product catalog</a></h2><p>Look up records with real workers, publish an update, and read the earlier revision.</p><span class="destination-arrow" aria-hidden="true">${arrow}</span></article>

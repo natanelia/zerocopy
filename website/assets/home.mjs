@@ -55,6 +55,13 @@ syncRuntime();
 
 const card = document.querySelector('.sharing-card');
 const range = document.querySelector('#worker-count');
+const writerThread = document.querySelector('#writer-thread');
+const ownerThread = document.querySelector('#owner-thread');
+function renderWriterThread() {
+  ownerThread.textContent = writerThread.selectedOptions[0].text;
+}
+writerThread.addEventListener('change', renderWriterThread);
+renderWriterThread();
 let mode = 'shared';
 function render() {
   const count = Number(range.value); card.dataset.model = mode;
@@ -64,7 +71,7 @@ function render() {
   const list = document.querySelector('#reader-nodes'); list.replaceChildren();
   for (let i = 0; i < count; i++) {
     const node = document.createElement('div'); node.className = 'reader-node';
-    node.append(`Reader ${i + 1}`);
+    node.append(`Worker ${i + 1}`);
     const label = document.createElement('small'); label.textContent = mode === 'shared' ? 'READ-ONLY VIEW' : 'LOCAL COPY'; node.append(label);
     if (mode === 'cloned') { const memory = document.createElement('div'); memory.className = 'mini-memory'; memory.setAttribute('aria-hidden', 'true'); for (let j = 0; j < 4; j++) memory.append(document.createElement('i')); node.append(memory); }
     list.append(node);
