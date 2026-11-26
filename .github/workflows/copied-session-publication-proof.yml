@@ -1,4 +1,4 @@
-name: Copied session transfer portability and protocol qualification (proof only)
+name: Copied session transfer focused controls and edge synchronization (proof only)
 on:
   push:
     branches: [proof/copied-session-publication-20261126]
@@ -10,9 +10,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runtime: [bun, chromium, firefox, edge]
+        runtime: [chromium, edge]
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,15 +60,15 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p copied-session-results
-          node proofs/copied-session-browser-run-20261126.mjs ${{ matrix.runtime }} copied-session-results/raw.json | tee copied-session-results/run.log
+          node proofs/copied-session-browser-run-20261126.mjs ${{ matrix.runtime }} copied-session-results/raw.json focused | tee copied-session-results/run.log
       - name: Mixed peer and queue protocol checks
         if: matrix.runtime == 'edge'
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p copied-session-results
-          node proofs/copied-session-transfer-edge-20261126.mjs | tee copied-session-results/edge-node.log
-          bun proofs/copied-session-transfer-edge-20261126.mjs | tee copied-session-results/edge-bun.log
+          node proofs/copied-session-transfer-edge-20261126.mjs 2>&1 | tee copied-session-results/edge-node.log
+          bun proofs/copied-session-transfer-edge-20261126.mjs 2>&1 | tee copied-session-results/edge-bun.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

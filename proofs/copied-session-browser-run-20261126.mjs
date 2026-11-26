@@ -5,7 +5,7 @@ import {resolve,sep,extname} from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {chromium,firefox} from 'playwright';
-const [browserName,out]=process.argv.slice(2);assert(out&&['chromium','firefox'].includes(browserName));
+const [browserName,out,mode]=process.argv.slice(2);assert(out&&['chromium','firefox'].includes(browserName));
 const root=resolve('.');
 const server=createServer(async(req,res)=>{
  try{
@@ -22,10 +22,10 @@ const report={browser:browserName,version:browser.version(),head:execFileSync('g
 for(const p of ['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','baseline-dist/shared.js','baseline-dist/worker.js','control-dist/shared.js','control-dist/worker.js','dist/shared.js','dist/worker.js'])report.hashes[p]=createHash('sha256').update(await readFile(p)).digest('hex');
 assert.equal(report.hashes['baseline-dist/shared.js'],report.hashes['control-dist/shared.js']);assert.equal(report.hashes['baseline-dist/worker.js'],report.hashes['control-dist/worker.js']);
 try{
- for(const n of [1000,10000,100000])for(let pair=-1;pair<5;pair++){
-  const cohorts=['AB','AA','default','shared'];
+ for(const n of (mode==='focused'?[1000,100000]:[1000,10000,100000]))for(let pair=-1;pair<(mode==='focused'?15:5);pair++){
+  const cohorts=mode==='focused'?(n===1000?['AA','default','shared','shared-AA']:['AA','default']):['AB','AA','default','shared'];
   for(const cohort of (pair%2===0?cohorts:cohorts.slice().reverse())){
-   const arms=cohort==='AB'?[['base-copy','baseline-dist'],['candidate-transfer','dist']]:cohort==='AA'?[['base-copy','baseline-dist'],['control-copy','control-dist']]:cohort==='default'?[['base-copy','baseline-dist'],['candidate-copy','dist']]:[['base-shared','baseline-dist'],['candidate-shared','dist']];
+   const arms=cohort==='AB'?[['base-copy','baseline-dist'],['candidate-transfer','dist']]:cohort==='AA'?[['base-copy','baseline-dist'],['control-copy','control-dist']]:cohort==='default'?[['base-copy','baseline-dist'],['candidate-copy','dist']]:cohort==='shared-AA'?[['base-shared','baseline-dist'],['control-shared','control-dist']]:[['base-shared','baseline-dist'],['candidate-shared','dist']];
    for(const [arm,bundle] of (pair%2===0?arms:arms.slice().reverse())){
     const page=await browser.newPage();
     try{

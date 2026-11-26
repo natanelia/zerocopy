@@ -13,7 +13,11 @@ for(const delivery of ['all','latest']){
  const initial={parent,alias:parent,child};
  assert.equal(getWorkerData(initial,{copy:false}).arenas.length,2);
  const channels=[new MessageChannel(),new MessageChannel()],seen=new WeakSet(),frames=[[],[]],errors=[];
- const session=createSharedSession(initial,{copy:true,delivery,onError:e=>errors.push(String(e)),timeoutMs:15000});
+ let signalFailure;
+ const transferFailure=new Promise(resolve=>{signalFailure=resolve;});
+ const session=createSharedSession(initial,{copy:true,delivery,onError:e=>{
+  errors.push(String(e));if(String(e).includes('injected transfer send failure'))signalFailure();
+ },timeoutMs:15000});
  let fail=false;
  for(const [i,{port1}] of channels.entries()){
   const native=port1.postMessage;
@@ -58,10 +62,21 @@ for(const delivery of ['all','latest']){
   assert.equal(child.get('道路'),1);assert.equal(c.get('道路'),4);
   off.forEach(f=>f());
   fail=true;
-  const other=waitVersion(readers[1],4);publish(4);await other;
-  assert(errors.some(s=>s.includes('injected transfer send failure')));
+  const other=waitVersion(readers[1],4);
+  // The healthy peer can respond before the failing peer's previous ACK
+  // reaches the publisher. Await the observed failure independently.
+  let failureTimer;
+  try {
+   const failureTimeout=new Promise((_,reject)=>{failureTimer=setTimeout(()=>reject(Error('Missing injected transfer failure')),15000);});
+   publish(4);
+   await Promise.all([other,Promise.race([transferFailure,failureTimeout])]);
+  } finally {clearTimeout(failureTimer);}
+  assert.deepEqual(errors.filter(s=>s.includes('injected transfer send failure')).length,1);
+  assert.equal(frames[0].includes(4),false);
+  assert.equal(frames[1].at(-1),4);
   assert.equal(readers[1].current.child.get('道路'),5);
   assert.equal(retained[0].child.get('道路'),1);
+  assert.equal(c.get('道路'),5);
   // A new endpoint can connect to the latest owner version after the failed peer.
   const replacement=new MessageChannel();
   try{
