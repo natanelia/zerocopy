@@ -1,0 +1,43 @@
+name: Moving-window reader baseline (proof only)
+on:
+  push:
+    branches: [proof/moving-window-reader-20261126]
+    paths: ['proofs/moving-window-reader-20261126.mjs', '.github/workflows/moving-window-reader-proof.yml']
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - name: Verify pinned runtime and build
+        run: |
+          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts read-cache.ts shared-map.ts shared.ts persistent-core
+          bun run build:wasm && bun run build:browser
+          node --version
+          sha256sum dist/shared.js
+      - name: Real worker access-history baseline
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p moving-window-results
+          node proofs/moving-window-reader-20261126.mjs moving-window-results/raw.json | tee moving-window-results/run.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: moving-window-baseline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: moving-window-results/
+          retention-days: 14
+          if-no-files-found: error
