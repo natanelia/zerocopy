@@ -9,7 +9,13 @@ import {
 } from './worker-protocol';
 export type { SharedCollection, SharedValue, SharedShape, SharedSource, SharedEndpoint, SessionOptions, StateOptions, PublishStrategy } from './worker-protocol';
 
-export interface ConnectOptions { signal?: AbortSignal }
+export interface ConnectOptions {
+  signal?: AbortSignal;
+  /** In copy mode only, transfer each fresh per-peer copy instead of cloning it.
+   * Enable only for endpoints supporting postMessage(message, transferList).
+   * The owner and other peers retain independent storage. */
+  transferCopies?: boolean;
+}
 export interface SharedSession<T extends SharedShape<T>> {
   readonly current: T;
   /** Last published version. Local auto-state updates become visible before publication. */
@@ -193,6 +199,9 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
     const target = endpoint as SharedEndpoint;
     const existing = this.peers.get(target);
     if (existing) return existing.ready;
+    if (options.transferCopies !== undefined && typeof options.transferCopies !== 'boolean') throw new TypeError('transferCopies must be boolean');
+    const transferCopies = options.transferCopies === true;
+    if (transferCopies && !this.config.copy) throw new TypeError('transferCopies requires copy mode');
     if (options.signal?.aborted) return Promise.reject(errorOf(options.signal.reason ?? 'Connection aborted'));
     this.flush();
     const release = reserve(target, `owner:${this.config.channel}`);
@@ -201,7 +210,14 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
     ready.catch(() => {});
     let settled = false, closed = false, remove = () => {};
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const send = (fields: Omit<Message, 'protocol' | 'version' | 'channel'>) => target.postMessage(message(this.config.channel, { owner: this.owner, reader: peer.reader, ...fields }));
+    const send = (fields: Omit<Message, 'protocol' | 'version' | 'channel'>, transfers?: ArrayBuffer[]) => {
+      const payload = message(this.config.channel, { owner: this.owner, reader: peer.reader, ...fields });
+      // Only the opt-in contract requires a native transfer-list endpoint.
+      // Keep the public SharedEndpoint type compatible with one-argument
+      // and options-object custom endpoints and DOM overloads.
+      if (transfers) (target as SharedEndpoint & { postMessage(message: any, transferList: ArrayBuffer[]): void }).postMessage(payload, transfers);
+      else target.postMessage(payload);
+    };
     const arm = () => {
       clearTimeout(timer);
       timer = setTimeout(() => peer.close(new Error('Shared session timed out waiting for worker acknowledgement')), this.config.timeoutMs);
@@ -218,13 +234,18 @@ class Publisher<T extends SharedShape<T>> implements SharedState<T> {
           return;
         }
         try {
+          const transfers: ArrayBuffer[] | undefined = transferCopies ? [] : undefined;
           const arenas = frame.data.arenas.map(source => {
-            if (this.config.copy) return { id: source.id, used: source.used, copy: new Uint8Array(source.memory!.buffer, 0, source.used).slice() };
+            if (this.config.copy) {
+              const copy = new Uint8Array(source.memory!.buffer, 0, source.used).slice();
+              if (transfers) transfers.push(copy.buffer);
+              return { id: source.id, used: source.used, copy };
+            }
             return peer.known.has(source.id) ? { id: source.id, used: source.used } : source;
           });
           peer.flight = frame;
           arm();
-          send({ kind: 'snapshot', sequence: frame.sequence, single: frame.single, data: { ...frame.data, arenas } });
+          send({ kind: 'snapshot', sequence: frame.sequence, single: frame.single, data: { ...frame.data, arenas } }, transfers);
         } catch (error) { peer.close(errorOf(error)); }
       },
       close: (error, remote = false) => {
