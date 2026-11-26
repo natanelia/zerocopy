@@ -40,8 +40,11 @@ jobs:
         run: |
           set -euo pipefail
           bun run typecheck
-          bunx vitest run worker-attachment.test.ts worker.test.ts workers.test.ts object-read-cache.test.ts primitive-scan-portability.test.ts
-          node proofs/worker-sessions.mjs
+          # Match the normal CI runner: bunx vitest uses Node, which cannot resolve
+          # the existing extensionless TS imports inside eval workers.
+          (cd "$RUNNER_TEMP/baseline" && bun run test workers.test.ts) 2>&1 | tee shared-session-shards-results/baseline-worker-tests.log
+          bun run test worker-attachment.test.ts worker.test.ts workers.test.ts object-read-cache.test.ts primitive-scan-portability.test.ts 2>&1 | tee shared-session-shards-results/candidate-tests.log
+          node proofs/worker-sessions.mjs 2>&1 | tee shared-session-shards-results/node-session-proof.log
       - name: Pair actual worker publications with identical-build controls
         shell: bash
         run: |
