@@ -12,7 +12,7 @@ export interface SharedSource<T extends SharedShape<T>> {
 }
 /** Browser Worker/MessagePort/worker global, or Node Worker/MessagePort. */
 export interface SharedEndpoint {
-  postMessage(message: any): void;
+  postMessage(message: any, transferList?: ArrayBuffer[]): void;
   addEventListener?: (...args: any[]) => any;
   removeEventListener?: (...args: any[]) => any;
   on?: (...args: any[]) => any;

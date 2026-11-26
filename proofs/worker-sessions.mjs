@@ -103,5 +103,6 @@ if (!isMainThread) {
     store.dispatch({ type: 'value', payload: 1 }); store.dispatch({ type: 'value', payload: 2 });
     await next; assert.equal(reader.current.map.get('x'), 2); assert.equal(reader.version, 1);
   } finally { bound.dispose(); reader.dispose(); port1.close(); port2.close(); }
+  await import('./worker-session-transfers.mjs');
   console.log('Worker sessions proof passed: 2 real workers, all 12 types, nested data, memory growth, descriptor-only updates, retained snapshots, compaction, and real Toolkit auto-publication.');
 }
