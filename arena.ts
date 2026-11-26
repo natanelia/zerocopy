@@ -181,6 +181,23 @@ export class Arena {
   private readonly keys = new Map<string, KeyToken>();
   private keyBytes = 0;
   private objectBytes = 0;
+  // PROOF ONLY: explicitly enabled on a new, plain-object reader. This is not
+  // a proposed public API. Default admission and identity stay unchanged.
+  private experimentalWindowCache = false;
+  enableExperimentalWindowCache(): void {
+    if (!this.readOnly || this.objects.size || this.objectKeys) throw new Error('Expected a fresh read-only arena');
+    this.experimentalWindowCache = true;
+  }
+  private makeExperimentalRoom(len: number): void {
+    if (len > MAX_DECODED_BYTES) return;
+    while (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES) {
+      const oldest = this.objects.entries().next().value;
+      // Never evict a nested handle (its accounting/identity differs).
+      if (!oldest || oldest[1].jsonLength < 0) return;
+      this.objects.delete(oldest[0]);
+      this.objectBytes -= oldest[1].jsonLength;
+    }
+  }
   private stringBytes = 0;
   private readonly strings = new Map<number, string>();
   // Arena-local interning shares immutable string bytes, not writable state.
@@ -328,6 +345,7 @@ export class Arena {
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
+    if (this.experimentalWindowCache && type === 'object') this.makeExperimentalRoom(len);
     if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
       this.objectBytes += len;
@@ -565,6 +583,12 @@ export class Arena {
     if (!root) return undefined;
     const code = (type === 'string' ? 1 : type === 'number' ? 2 : type === 'boolean' ? 3 : 0) + (prefix ? 4 : 0);
     if (code === 0 || code === 4) {
+      // Don't create a second strong key-to-object reference that would outlive
+      // eviction. Existing bounded address lookup can still serve these reads.
+      if (this.experimentalWindowCache && type === 'object') {
+        const leaf = sorted ? this.radixFind(root, key) : this.find(root, key);
+        return leaf ? this.leafValue(type, leaf, prefix) : undefined;
+      }
       if (!sorted && (root === this.objectRoot || !this.objectRoot)) {
         if (!this.objectRoot) { this.objectRoot = root; this.objectCode = code; }
         if (code === this.objectCode) {

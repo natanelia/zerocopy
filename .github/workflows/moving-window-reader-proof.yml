@@ -1,14 +1,14 @@
-name: Moving-window reader attribution (proof only)
+name: Moving-window opt-in cache screen (proof only)
 on:
   push:
     branches: [proof/moving-window-reader-20261126]
-    paths: ['proofs/moving-window-reader-profile-20261126.mjs', '.github/workflows/moving-window-reader-proof.yml']
+    paths: ['arena.ts', 'proofs/moving-window-reader-adaptive-20261126.mjs', '.github/workflows/moving-window-reader-proof.yml']
 permissions:
   contents: read
 jobs:
-  attribution:
+  screen:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,22 +22,37 @@ jobs:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
       - run: bun install --frozen-lockfile
-      - name: Verify pinned runtime and build
-        run: |
-          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts freeze-json.ts utf8.ts read-cache.ts shared-map.ts shared.ts persistent-core
-          bun run build:wasm && bun run build:browser
-          node --version
-          sha256sum dist/shared.js
-      - name: Real worker lookup/decode attribution
+      - name: Build independent baseline and candidate
         shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- freeze-json.ts utf8.ts read-cache.ts shared-map.ts shared.ts persistent-core
+          cp arena.ts /tmp/adaptive-arena.ts
+          git show d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341:arena.ts > arena.ts
+          bun run build:wasm && bun run build:browser
+          cp -a dist baseline-dist
+          cp /tmp/adaptive-arena.ts arena.ts
+          bun run build:browser && bun run build:types
+          git diff --exit-code -- arena.ts
+          bun run typecheck
+          node --version
+          sha256sum arena.ts baseline-dist/shared.js dist/shared.js
+      - name: Screen repeated and moving windows with a real reader
+        shell: bash
+        run: |
+          set -euo pipefail
           mkdir -p moving-window-results
-          node proofs/moving-window-reader-profile-20261126.mjs moving-window-results | tee moving-window-results/run.log
+          node proofs/moving-window-reader-adaptive-20261126.mjs moving-window-results/raw.json | tee moving-window-results/run.log
+      - name: Default contract and worker package tests
+        run: |
+          set -o pipefail
+          node proofs/node-worker.mjs
+          bun run test 2>&1 | tee moving-window-results/vitest.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: moving-window-attribution-${{ github.run_id }}-${{ github.run_attempt }}
+          name: moving-window-adaptive-${{ github.run_id }}-${{ github.run_attempt }}
           path: moving-window-results/
           retention-days: 14
           if-no-files-found: error
