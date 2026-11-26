@@ -23,7 +23,7 @@ function revision(i, v, count, layout) {
   return 0;
 }
 function queryIndices(n, count, v, layout) {
-  if (layout === 'dense') return [...Array.from({length:count},(_,s)=>s), ...Array.from({length:100-count},(_,j)=>(j*7919+101)%n)];
+  if (layout === 'dense' || layout === 'sparse-all') return [...Array.from({length:count},(_,s)=>s), ...Array.from({length:100-count},(_,j)=>(j*7919+101)%n)];
   const s = changedShard(v || 1, count);
   return [...Array.from({length: Math.min(edits, sizeOf(s, n, count))}, (_, j) => s+j*count),
     ...Array.from({length:75}, (_, j) => (j * 7919 + 101) % n)];
@@ -110,7 +110,7 @@ if (!isMainThread) {
   });
 } else if (process.argv[2]==='--sample') {
   const [n,count]=process.argv.slice(3,5).map(Number), layout=process.argv[5], pair=Number(process.argv[6]), arm=process.argv[7];
-  assert(['one','distinct','dense'].includes(layout)); assert(count>0&&count<=n);
+  assert(['one','distinct','dense','sparse-all'].includes(layout)); assert(count>0&&count<=n);
   z.configureMemory({maximumBytes:64*1024*1024});
   z.resetMap();
   const state={};
@@ -186,12 +186,14 @@ if (!isMainThread) {
   const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
   const scriptRel='proofs/shared-session-shards-20261126.mjs';
   function hashes(root){return Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel,...readdirSync(root+'/dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(root+'/'+p)]));}
-  const cases=[[1000,1,'one'],[10000,8,'distinct'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense']];
+  const focused=process.argv[4]==='focused';
+  const cases=focused?[[100000,64,'dense'],[100000,64,'sparse-all']]:[[1000,1,'one'],[10000,8,'distinct'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense'],[100000,64,'sparse-all']];
+  const measuredPairs=focused?12:8;
   const baseHashes=hashes(baseline),candidateHashes=hashes(candidate);
   for(const p of ['worker.ts','worker-protocol.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel])assert.equal(baseHashes[p],candidateHashes[p],p);
   assert.notEqual(baseHashes['arena.ts'],candidateHashes['arena.ts']);
   assert.notEqual(baseHashes['shared.ts'],candidateHashes['shared.ts']);
-  const data={base:BASE,head:sha(candidate),runtime:process.versions,cpu:cpus()[0]?.model,baseHashes,candidateHashes,cases,updates,measuredPairs:12,samples:[],complete:false};
+  const data={base:BASE,head:sha(candidate),runtime:process.versions,cpu:cpus()[0]?.model,baseHashes,candidateHashes,cases,updates,measuredPairs,samples:[],complete:false};
   const file=out+'/raw.json';writeFileSync(file,JSON.stringify(data));
   function sample(n,count,layout,pair,arm){
       const root=arm==='candidate'||arm==='profile-candidate'?candidate:baseline;
@@ -210,12 +212,12 @@ if (!isMainThread) {
   }
   // AB and identical-build AA, interleaved and alternated. Each arm is a
   // fresh process; no GC forcing. All fixtures and verification are identical.
-  for(let pair=-1;pair<12;pair++)for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
+  for(let pair=-1;pair<measuredPairs;pair++)for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
     const cohorts=pair%2===0?[['base','candidate'],['aa-base','aa-control']]:[['aa-control','aa-base'],['candidate','base']];
     for(const arms of cohorts)for(const arm of arms)sample(n,count,layout,pair,arm);
   }
   // Separate attribution samples are not included in latency results.
-  for(const [n,count,layout] of [[100000,64,'distinct'],[100000,64,'dense'],[100000,1,'one']]){
+  for(const [n,count,layout] of cases.filter(([n,count,layout])=>n===100000&&count===64&&layout!=='one')){
     sample(n,count,layout,-2,'profile-base');
     sample(n,count,layout,-2,'profile-candidate');
   }

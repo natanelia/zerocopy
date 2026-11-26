@@ -1,4 +1,4 @@
-name: Shared session unchanged-length admission and control screen (proof only)
+name: Shared session cross-runtime and all-read qualification (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]
@@ -7,8 +7,12 @@ permissions:
   contents: read
 jobs:
   paired:
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [node-focused, bun, chromium, firefox]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,7 +30,8 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md' ':(exclude)arena.ts' ':(exclude)shared.ts' ':(exclude)worker-attachment.test.ts'
+          git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- . ':(exclude).github/workflows/shared-session-shards-proof.yml' ':(exclude)proofs/shared-session-shards-20261126.mjs' ':(exclude)proofs/shared-session-shards-20261126.md' ':(exclude)arena.ts' ':(exclude)shared.ts' ':(exclude)worker-attachment.test.ts' ':(exclude)proofs/shared-session-shards-browser-case-20261126.mjs' ':(exclude)proofs/shared-session-shards-browser-run-20261126.mjs'
+          git diff --exit-code 26e39645f69904ab7976758b7370334a8ead3e99 HEAD -- arena.ts shared.ts worker.ts worker-protocol.ts worker-attachment.test.ts
           mkdir -p shared-session-shards-results
           git worktree add --detach "$RUNNER_TEMP/baseline" 84ad23a76ee197f45cbc7316017f28b5bbe93d6c
           cp proofs/shared-session-shards-20261126.mjs "$RUNNER_TEMP/baseline/proofs/"
@@ -36,6 +41,7 @@ jobs:
           bun install --frozen-lockfile
           bun run build:wasm && bun run build:browser && bun run build:types
       - name: Run correctness and compatibility checks
+        if: matrix.mode == 'node-focused' || matrix.mode == 'bun'
         shell: bash
         run: |
           set -euo pipefail
@@ -45,15 +51,31 @@ jobs:
           (cd "$RUNNER_TEMP/baseline" && bun run test workers.test.ts) 2>&1 | tee shared-session-shards-results/baseline-worker-tests.log
           bun run test worker-attachment.test.ts worker.test.ts workers.test.ts object-read-cache.test.ts primitive-scan-portability.test.ts 2>&1 | tee shared-session-shards-results/candidate-tests.log
           node proofs/worker-sessions.mjs 2>&1 | tee shared-session-shards-results/node-session-proof.log
-      - name: Pair actual worker publications with identical-build controls
+      - name: Pair Node dense and sparse all-read controls
+        if: matrix.mode == 'node-focused'
         shell: bash
         run: |
           set -euo pipefail
-          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" | tee shared-session-shards-results/run.log
+          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" focused | tee shared-session-shards-results/run.log
+      - name: Pair real Bun workers
+        if: matrix.mode == 'bun'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bun proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" | tee shared-session-shards-results/run.log
+      - name: Pair real browser workers
+        if: matrix.mode == 'chromium' || matrix.mode == 'firefox'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -a "$RUNNER_TEMP/baseline/dist" baseline-dist
+          cp -a baseline-dist control-dist
+          bunx playwright install --with-deps "${{ matrix.mode }}"
+          node proofs/shared-session-shards-browser-run-20261126.mjs "${{ matrix.mode }}" shared-session-shards-results/raw.json | tee shared-session-shards-results/run.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: shared-session-shards-${{ github.run_id }}-${{ github.run_attempt }}
+          name: shared-session-shards-${{ matrix.mode }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: shared-session-shards-results/
           retention-days: 14
           if-no-files-found: warn
