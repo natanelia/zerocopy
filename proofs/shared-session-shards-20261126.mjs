@@ -4,6 +4,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { cpus } from 'node:os';
+import { PerformanceObserver } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import * as z from 'zerocopy';
@@ -28,12 +29,14 @@ function queryIndices(n, count, v, layout) {
   return [...Array.from({length: Math.min(edits, sizeOf(s, n, count))}, (_, j) => s+j*count),
     ...Array.from({length:75}, (_, j) => (j * 7919 + 101) % n)];
 }
-function query(state, n, count, v, layout) {
+function query(state, n, count, v, layout, timing) {
   const ids = queryIndices(n, count, v, layout);
   const keys = ids.map(productId);
   const start = performance.now();
   const values = ids.map((i, j) => state[field(shardOf(i,count))].get(keys[j]));
-  const queryMs = performance.now() - start;
+  const end = performance.now();
+  const queryMs = end - start;
+  if (timing) { timing.start = start; timing.end = end; }
   for (let j = 0; j < ids.length; j++) {
     equal(values[j], product(ids[j], revision(ids[j], v, count, layout)));
     assert(Object.isFrozen(values[j]));
@@ -66,6 +69,12 @@ if (!isMainThread) {
       finally{instanceCount++;instanceMs+=performance.now()-t;}
     }});
   }
+  const gcDiagnostic = process.env.ZEROCOPY_GC_DIAGNOSTIC === '1';
+  const gcEvents = [];
+  const observer = gcDiagnostic ? new PerformanceObserver(list => {
+    for (const entry of list.getEntries()) gcEvents.push({start:entry.startTime,duration:entry.duration,kind:entry.detail?.kind,flags:entry.detail?.flags});
+  }) : undefined;
+  observer?.observe({entryTypes:['gc']});
   let frame;
   parentPort.on('message', m => {
     if(m?.protocol==='zerocopy/session' && m.kind==='snapshot'){
@@ -88,7 +97,8 @@ if (!isMainThread) {
         if(layout==='dense'||s===changedShard(v,count)) assert.notEqual(state[field(s)],previous[field(s)]);
         else assert.equal(state[field(s)],previous[field(s)]);
       }
-      const queryMs=query(state,n,count,v,layout);
+      const queryWindow=gcDiagnostic?{}:undefined;
+      const queryMs=query(state,n,count,v,layout,queryWindow);
       if(v>0){
         const s=changedShard(v,count);
         equal(original[field(s)].get(productId(s)),product(s,0));
@@ -96,16 +106,23 @@ if (!isMainThread) {
       }
       if(v===4) middle=state;
       previous=state;
-      parentPort.postMessage({proof:'probe',sequence:v,readerAcceptMs,queryMs,attachmentInstances,attachmentInstanceMs,queryInstances:instanceCount-attachmentInstances,queryInstanceMs:instanceMs-attachmentInstanceMs,arenas:frame.arenas,handles:frame.handles,copyBytes:frame.copyBytes,memory:memory()});
+      parentPort.postMessage({proof:'probe',sequence:v,readerAcceptMs,queryMs,...(queryWindow?{queryWindow,receiptTime:frame.received}:{}),attachmentInstances,attachmentInstanceMs,queryInstances:instanceCount-attachmentInstances,queryInstanceMs:instanceMs-attachmentInstanceMs,arenas:frame.arenas,handles:frame.handles,copyBytes:frame.copyBytes,memory:memory()});
     } catch(e){ error(e); }
   }
   report(reader.current,reader.version); reader.subscribe(report);
-  parentPort.on('message',m=>{
+  parentPort.on('message',async m=>{
     if(m?.proof!=='verify')return;
     try{
+      // Flush asynchronous GC entries outside all timed publications. No forced GC.
+      // Stop observation before expensive full verification.
+      if(observer){
+        await new Promise(resolve=>setTimeout(resolve,20));
+        for(const entry of observer.takeRecords())gcEvents.push({start:entry.startTime,duration:entry.duration,kind:entry.detail?.kind,flags:entry.detail?.flags});
+        observer.disconnect();
+      }
       assert.equal(reader.version,updates);
       verify(original,n,count,0,layout); verify(middle,n,count,4,layout); verify(reader.current,n,count,updates,layout);
-      parentPort.postMessage({proof:'verified',sequence:updates});
+      parentPort.postMessage({proof:'verified',sequence:updates,...(gcDiagnostic?{gcEvents}:{})});
     }catch(e){error(e);}
   });
 } else if (process.argv[2]==='--sample') {
@@ -173,10 +190,10 @@ if (!isMainThread) {
         readers:replies.map(({received,...r})=>({...r,roundTripMs:received-t})),used:arenaBytes(current),ownerMemory:memory()});
     }
     const verified=workers.map(w=>wait(w,m=>m?.proof==='verified'&&m.sequence===updates,'verified'));
-    workers.forEach(w=>w.postMessage({proof:'verify'}));await Promise.all(verified);
+    workers.forEach(w=>w.postMessage({proof:'verify'}));const verification=await Promise.all(verified);
     verify(initial,n,count,0,layout);verify(middle,n,count,4,layout);verify(current,n,count,updates,layout);
     assert.deepEqual(errors,[]);
-    console.log(JSON.stringify({n,count,layout,pair,arm,constructionMs,initialMs,initialUsed,initialReaders:initialReaders.map(({received,...r})=>({...r,roundTripMs:received-start})),rows,verified:true}));
+    console.log(JSON.stringify({n,count,layout,pair,arm,constructionMs,initialMs,initialUsed,...(process.env.ZEROCOPY_GC_DIAGNOSTIC==='1'?{gcEvents:verification.map(r=>r.gcEvents)}:{}),initialReaders:initialReaders.map(({received,...r})=>({...r,roundTripMs:received-start})),rows,verified:true}));
   }finally{session.dispose();await Promise.all(workers.map(w=>w.terminate()));}
 } else {
   const out=resolve(process.argv[2]), baseline=resolve(process.argv[3]), candidate=resolve('.'); assert(process.argv[2]&&process.argv[3]&&baseline!==candidate,'usage: node proofs/shared-session-shards-20261126.mjs RESULTS BASELINE_WORKTREE');
@@ -186,9 +203,10 @@ if (!isMainThread) {
   const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
   const scriptRel='proofs/shared-session-shards-20261126.mjs';
   function hashes(root){return Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel,...readdirSync(root+'/dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(root+'/'+p)]));}
+  const gcDense=process.argv[4]==='gc-dense';
   const focused=process.argv[4]==='focused';
-  const cases=focused?[[100000,64,'dense'],[100000,64,'sparse-all']]:[[1000,1,'one'],[10000,8,'distinct'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense'],[100000,64,'sparse-all']];
-  const measuredPairs=focused?12:8;
+  const cases=gcDense?[[100000,64,'dense']]:focused?[[100000,64,'dense'],[100000,64,'sparse-all']]:[[1000,1,'one'],[10000,8,'distinct'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense'],[100000,64,'sparse-all']];
+  const measuredPairs=gcDense?6:focused?12:8;
   const baseHashes=hashes(baseline),candidateHashes=hashes(candidate);
   for(const p of ['worker.ts','worker-protocol.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel])assert.equal(baseHashes[p],candidateHashes[p],p);
   assert.notEqual(baseHashes['arena.ts'],candidateHashes['arena.ts']);
@@ -198,7 +216,7 @@ if (!isMainThread) {
   function sample(n,count,layout,pair,arm){
       const root=arm==='candidate'||arm==='profile-candidate'?candidate:baseline;
       const args=[root+'/'+scriptRel,'--sample',String(n),String(count),layout,String(pair),arm];
-      const result=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
+      const result=spawnSync(process.execPath,args,{cwd:root,env:{...process.env,...(gcDense?{ZEROCOPY_GC_DIAGNOSTIC:'1'}:{})},encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
       const prefix=out+'/'+[n,count,layout,pair,arm].join('-');
       writeFileSync(prefix+'.stdout',result.stdout??'');writeFileSync(prefix+'.stderr',result.stderr??'');
       if(result.status!==0)throw Error('Failed sample '+prefix+': '+(result.error?.message??result.status));
@@ -208,6 +226,7 @@ if (!isMainThread) {
         assert(Number.isFinite(reader.attachmentInstanceMs)&&reader.attachmentInstanceMs>=0);
         if(!arm.startsWith('profile-'))assert.equal(reader.attachmentInstances,0);
       }
+      if(gcDense){assert.equal(row.gcEvents.length,2);assert(row.gcEvents.every(Array.isArray));for(const pub of row.rows)for(const reader of pub.readers)assert(reader.queryWindow&&Number.isFinite(reader.receiptTime));}
       data.samples.push(row);console.log(JSON.stringify(row));writeFileSync(file,JSON.stringify(data));return row;
   }
   // AB and identical-build AA, interleaved and alternated. Each arm is a
@@ -217,7 +236,7 @@ if (!isMainThread) {
     for(const arms of cohorts)for(const arm of arms)sample(n,count,layout,pair,arm);
   }
   // Separate attribution samples are not included in latency results.
-  for(const [n,count,layout] of cases.filter(([n,count,layout])=>n===100000&&count===64&&layout!=='one')){
+  if(!gcDense)for(const [n,count,layout] of cases.filter(([n,count,layout])=>n===100000&&count===64&&layout!=='one')){
     sample(n,count,layout,-2,'profile-base');
     sample(n,count,layout,-2,'profile-candidate');
   }

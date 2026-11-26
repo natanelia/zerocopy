@@ -1,4 +1,4 @@
-name: Shared session cross-runtime and all-read qualification (proof only)
+name: Shared session dense-tail GC attribution (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [node-focused, bun, chromium, firefox]
+        mode: [node-focused]
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -51,12 +51,12 @@ jobs:
           (cd "$RUNNER_TEMP/baseline" && bun run test workers.test.ts) 2>&1 | tee shared-session-shards-results/baseline-worker-tests.log
           bun run test worker-attachment.test.ts worker.test.ts workers.test.ts object-read-cache.test.ts primitive-scan-portability.test.ts 2>&1 | tee shared-session-shards-results/candidate-tests.log
           node proofs/worker-sessions.mjs 2>&1 | tee shared-session-shards-results/node-session-proof.log
-      - name: Pair Node dense and sparse all-read controls
+      - name: Attribute Node dense query tail (diagnostic only)
         if: matrix.mode == 'node-focused'
         shell: bash
         run: |
           set -euo pipefail
-          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" focused | tee shared-session-shards-results/run.log
+          node proofs/shared-session-shards-20261126.mjs shared-session-shards-results "$RUNNER_TEMP/baseline" gc-dense | tee shared-session-shards-results/run.log
       - name: Pair real Bun workers
         if: matrix.mode == 'bun'
         shell: bash
