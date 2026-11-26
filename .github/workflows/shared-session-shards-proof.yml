@@ -1,4 +1,4 @@
-name: Shared session sharded publication baseline (proof only)
+name: Shared session sharded publication attribution (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]
@@ -33,7 +33,7 @@ jobs:
           bun install --frozen-lockfile
           bun run build:wasm && bun run build:browser
           sha256sum dist/*.js persistent-core.wasm > shared-session-shards-results/hashes.txt
-      - name: Measure actual shared-memory worker publications
+      - name: Attribute reader-side WebAssembly instantiation in real worker publications
         shell: bash
         run: |
           set -euo pipefail

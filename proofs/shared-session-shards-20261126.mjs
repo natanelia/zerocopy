@@ -50,9 +50,23 @@ const memory = () => { const m=process.memoryUsage(); return {heapUsed:m.heapUse
 if (!isMainThread) {
   const {n,count,layout} = workerData;
   const expectedArenas=layout==='distinct'?count:1;
+  // Diagnostic-only: count and time synchronous native instance construction in
+  // each reader. Preserve the original native constructor and prototype.
+  // Do not use instrumented timings as an unperturbed performance baseline.
+  const instrument = workerData.instrument === true;
+  let instanceCount=0, instanceMs=0;
+  if(instrument) {
+    const NativeInstance=WebAssembly.Instance;
+    WebAssembly.Instance=new Proxy(NativeInstance,{construct(target,args,newTarget){
+      const t=performance.now();
+      try{return Reflect.construct(target,args,newTarget);}
+      finally{instanceCount++;instanceMs+=performance.now()-t;}
+    }});
+  }
   let frame;
   parentPort.on('message', m => {
     if(m?.protocol==='zerocopy/session' && m.kind==='snapshot'){
+      instanceCount=0;instanceMs=0;
       frame={sequence:m.sequence,received:performance.now(),arenas:m.data.arenas.length,
         handles:m.data.arenas.filter(a=>a.memory).length,copyBytes:m.data.arenas.reduce((sum,a)=>sum+(a.copy?.byteLength??0),0)};
     }
@@ -64,6 +78,7 @@ if (!isMainThread) {
   function report(state,v){
     try {
       const readerAcceptMs=performance.now()-frame.received;
+      const attachmentInstances=instanceCount,attachmentInstanceMs=instanceMs;
       assert.equal(frame.sequence,v); assert.equal(frame.arenas,expectedArenas);
       assert.equal(frame.handles,v===0?expectedArenas:0); assert.equal(frame.copyBytes,0);
       if(v>0) for(let s=0;s<count;s++) {
@@ -78,7 +93,7 @@ if (!isMainThread) {
       }
       if(v===4) middle=state;
       previous=state;
-      parentPort.postMessage({proof:'probe',sequence:v,readerAcceptMs,queryMs,arenas:frame.arenas,handles:frame.handles,copyBytes:frame.copyBytes,memory:memory()});
+      parentPort.postMessage({proof:'probe',sequence:v,readerAcceptMs,queryMs,attachmentInstances,attachmentInstanceMs,queryInstances:instanceCount-attachmentInstances,queryInstanceMs:instanceMs-attachmentInstanceMs,arenas:frame.arenas,handles:frame.handles,copyBytes:frame.copyBytes,memory:memory()});
     } catch(e){ error(e); }
   }
   report(reader.current,reader.version); reader.subscribe(report);
@@ -112,7 +127,7 @@ if (!isMainThread) {
     return data.arenas.reduce((sum,a)=>sum+a.used,0);
   };
   const initialUsed=arenaBytes(initial);
-  const workers=Array.from({length:2},()=>new Worker(new URL(import.meta.url),{workerData:{n,count,layout}}));
+  const workers=Array.from({length:2},()=>new Worker(new URL(import.meta.url),{workerData:{n,count,layout,instrument:arm==='profile'}}));
   const session=createSharedSession(initial,{copy:false,channel:'shards',delivery:'all',timeoutMs:60000,onError:e=>errors.push(String(e))});
   const rows=[];
   function wait(worker,match,description){
@@ -164,12 +179,12 @@ if (!isMainThread) {
   mkdirSync(out,{recursive:true});
   const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
   const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
-  const cases=[[1000,1,'one'],[1000,16,'distinct'],[10000,64,'one'],[10000,64,'distinct'],[100000,1,'one'],[100000,64,'one'],[100000,64,'distinct']];
-  const data={base:BASE,head:sha,runtime:process.versions,cpu:cpus()[0]?.model,hashes:Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',fileURLToPath(import.meta.url),...readdirSync('dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(p)])),cases,updates,measuredPairs:4,samples:[],complete:false};
+  const cases=[[10000,64,'distinct'],[100000,1,'one'],[100000,64,'one'],[100000,64,'distinct']];
+  const data={base:BASE,head:sha,runtime:process.versions,cpu:cpus()[0]?.model,hashes:Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',fileURLToPath(import.meta.url),...readdirSync('dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(p)])),cases,updates,measuredPairs:4,diagnostic:'unmodified runtime, proxied WebAssembly.Instance only inside profiled workers',samples:[],complete:false};
   const file=out+'/raw.json',script=fileURLToPath(import.meta.url);
   writeFileSync(file,JSON.stringify(data));
   for(let pair=-1;pair<4;pair++) for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
-    for(const arm of (pair%2===0?['A1','A2']:['A2','A1'])){
+    for(const arm of (pair%2===0?['plain','profile']:['profile','plain'])){
       const args=[script,'--sample',String(n),String(count),layout,String(pair),arm];
       const result=spawnSync(process.execPath,args,{encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
       const prefix=out+'/'+[n,count,layout,pair,arm].join('-');
@@ -177,6 +192,11 @@ if (!isMainThread) {
       if(result.status!==0) throw Error('Failed sample '+prefix+': '+(result.error?.message??result.status));
       const row=JSON.parse(result.stdout.trim());
       assert(row.verified&&row.rows.length===updates&&row.arm===arm&&row.pair===pair);
+      for(const sample of [row.initialReaders,...row.rows.map(r=>r.readers)]) for(const reader of sample){
+        assert(Number.isSafeInteger(reader.attachmentInstances)&&reader.attachmentInstances>=0);
+        assert(Number.isFinite(reader.attachmentInstanceMs)&&reader.attachmentInstanceMs>=0);
+        if(arm==='plain')assert.equal(reader.attachmentInstances,0);
+      }
       data.samples.push(row); console.log(JSON.stringify(row));writeFileSync(file,JSON.stringify(data));
     }
   }
