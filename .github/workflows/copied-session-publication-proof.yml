@@ -1,14 +1,14 @@
-name: Copied session publication baseline (proof only)
+name: Copied session transferable publication screen (proof only)
 on:
   push:
     branches: [proof/copied-session-publication-20261126]
-    paths: ['proofs/copied-session-publication-20261126.mjs', '.github/workflows/copied-session-publication-proof.yml']
+    paths: ['worker.ts', 'worker-protocol.ts', 'proofs/copied-session-transfer-paired-20261126.mjs', '.github/workflows/copied-session-publication-proof.yml']
 permissions:
   contents: read
 jobs:
-  baseline:
+  paired:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,23 +22,37 @@ jobs:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
       - run: bun install --frozen-lockfile
-      - name: Build unchanged pinned main
+      - name: Build exact pinned baseline and candidate
+        shell: bash
         run: |
+          set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts worker.ts worker-protocol.ts shared.ts shared-map.ts persistent-core
+          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts shared.ts shared-map.ts persistent-core
+          for file in worker.ts worker-protocol.ts; do
+            cp "$file" "/tmp/copy-$file"
+            git show "d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341:$file" > "$file"
+          done
           bun run build:wasm && bun run build:browser
+          cp -a dist baseline-dist
+          cp -a dist control-dist
+          for file in worker.ts worker-protocol.ts; do cp "/tmp/copy-$file" "$file"; done
+          git diff --exit-code -- worker.ts worker-protocol.ts
+          bun run build:browser && bun run build:types
+          bun run typecheck
           node --version
-          sha256sum worker.ts worker-protocol.ts shared.ts arena.ts dist/shared.js dist/worker.js persistent-core.wasm
-      - name: Measure real two-reader session updates
+          sha256sum worker.ts worker-protocol.ts persistent-core.wasm baseline-dist/*.js control-dist/*.js dist/*.js
+      - name: Measure copied, transferable, and unchanged session paths
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p copied-session-results
-          node proofs/copied-session-publication-20261126.mjs copied-session-results/raw.json | tee copied-session-results/run.log
+          node proofs/copied-session-transfer-paired-20261126.mjs copied-session-results/raw.json | tee copied-session-results/run.log
+      - name: Existing tests
+        run: bun run test
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: copied-session-baseline-${{ github.run_id }}-${{ github.run_attempt }}
+          name: copied-session-paired-${{ github.run_id }}-${{ github.run_attempt }}
           path: copied-session-results/
           retention-days: 14
           if-no-files-found: error
