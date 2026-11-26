@@ -1,0 +1,44 @@
+name: Copied session publication baseline (proof only)
+on:
+  push:
+    branches: [proof/copied-session-publication-20261126]
+    paths: ['proofs/copied-session-publication-20261126.mjs', '.github/workflows/copied-session-publication-proof.yml']
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - name: Build unchanged pinned main
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code d57fc413ee5f67d0839f5a3a8ff36f4a51fb0341 HEAD -- arena.ts worker.ts worker-protocol.ts shared.ts shared-map.ts persistent-core
+          bun run build:wasm && bun run build:browser
+          node --version
+          sha256sum worker.ts worker-protocol.ts shared.ts arena.ts dist/shared.js dist/worker.js persistent-core.wasm
+      - name: Measure real two-reader session updates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p copied-session-results
+          node proofs/copied-session-publication-20261126.mjs copied-session-results/raw.json | tee copied-session-results/run.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: copied-session-baseline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: copied-session-results/
+          retention-days: 14
+          if-no-files-found: error
