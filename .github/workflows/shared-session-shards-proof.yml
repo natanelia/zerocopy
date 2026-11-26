@@ -1,4 +1,4 @@
-name: Shared session narrowed lazy kernel screen (proof only)
+name: Shared session unchanged-length admission and control screen (proof only)
 on:
   push:
     branches: [proof/shared-session-shard-publication-20261126]

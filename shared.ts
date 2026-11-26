@@ -115,6 +115,11 @@ export function getWorkerData<T extends StructureRecord<T>>(structures: T, optio
   return Object.freeze({ __shared: true, version: FORMAT_VERSION, arenas: Object.freeze(arenas), structures: Object.freeze(serialized) }) as WorkerData<T>;
 }
 
+// Transport lengths are immutable per frame. Remember only large shared
+// attachments, without retaining old arenas or materializing their kernels.
+// Equal lengths are an admission hint, not proof of equal snapshot roots.
+const attachedSharedLengths = new WeakMap<Arena, number>();
+
 /** A preceding read-only attachment from the same stream of immutable publications. */
 interface WorkerReadOptions<T> { readonly previous?: Readonly<Partial<NoInfer<T>>> }
 export function initWorker<T extends StructureRecord<T>>(data: WorkerData<T>, options?: WorkerReadOptions<T>): Promise<Readonly<T>>;
@@ -134,12 +139,17 @@ export async function initWorker<T extends StructureRecord<T>>(data: WorkerData<
   const arenas = new Map<string, Arena>();
   // A solitary reader needs only its original empty owned dependency Map.
   const registry = data.arenas?.length < 2 ? undefined : createArenaRegistry(arenas);
+  const manyArenas = data.arenas.length >= 8;
   for (const source of data.arenas) {
     if ((!source.memory && !source.copy) || arenas.has(source.id)) throw new Error('Invalid arena transport');
     if (!Number.isSafeInteger(source.used) || source.used < 65536 || source.used > (source.memory?.buffer.byteLength ?? source.copy!.byteLength)) throw new Error('Invalid arena length');
-    // Small attachments remain eager: deferring their only useful kernel adds latency.
-    const arena = new Arena({ ...source, readOnly: true, registry, previous: previous?.get(source.id),
-      deferKernel: data.arenas.length >= 8 });
+    const prior = previous?.get(source.id);
+    const trackLength = manyArenas && !!source.memory && !source.copy;
+    // Growing arenas are likely to be queried in this publication. Keep
+    // them eager; unchanged lengths can defer without touching prior.wasm.
+    const deferKernel = trackLength && prior !== undefined && attachedSharedLengths.get(prior) === source.used;
+    const arena = new Arena({ ...source, readOnly: true, registry, previous: prior, deferKernel });
+    if (trackLength) attachedSharedLengths.set(arena, source.used);
     arenas.set(source.id, arena);
     registry?.members.push(arena);
   }

@@ -235,11 +235,11 @@ export class Arena {
   static hasNativeWasm(arena: Arena): boolean {
     if (!(#nativeWasm in arena)) return false;
     const descriptor = Object.getOwnPropertyDescriptor(arena, 'wasm');
-    if (descriptor?.get && descriptor.get === arena.#nativeWasm) {
-      // Only materialize our own getter, never a replaced accessor.
-      return descriptor.get.call(arena) === arena.#nativeWasm;
-    }
-    return descriptor?.value === arena.#nativeWasm;
+    // Keep the normal eager data-property guard first. The deferred slow
+    // path is relevant only when the descriptor did not match native exports.
+    if (descriptor?.value === arena.#nativeWasm) return true;
+    const get = descriptor?.get;
+    return typeof get === 'function' && get === arena.#nativeWasm && get.call(arena) === arena.#nativeWasm;
   }
   get buf(): Uint8Array { this.refresh(); return this.bytes; }
   get dv(): DataView { this.refresh(); return this.view; }

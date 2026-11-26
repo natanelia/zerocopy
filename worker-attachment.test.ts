@@ -279,6 +279,12 @@ describe('experimental repeated shared attachment kernel deferral', () => {
     assert.equal(newArena.memory,oldArena.memory);
     assert.notEqual(newArena.transportDependencies,oldArena.transportDependencies);
     assert.equal(typeof Object.getOwnPropertyDescriptor(spareArena,'wasm')!.get,'function');
+    assert(Object.hasOwn(Object.getOwnPropertyDescriptor(newArena,'wasm')!,'value'));
+    assert(Object.hasOwn(Object.getOwnPropertyDescriptor(arenaOf(next.parent),'wasm')!,'value'));
+    // Repeated admission must not materialize an earlier lazy frame.
+    const repeated=await initWorker(updated,{previous:next});
+    assert.equal(typeof Object.getOwnPropertyDescriptor(spareArena,'wasm')!.get,'function');
+    assert.equal(typeof Object.getOwnPropertyDescriptor(arenaOf(repeated.spare),'wasm')!.get,'function');
     assert.equal(next.parent.get('child')!.get('value'),2);
     assert.equal(old.parent.get('child')!.get('value'),1);
     assert.equal(oldArena.used,initial.arenas.find(a=>a.id===oldArena.id)!.used);

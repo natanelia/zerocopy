@@ -186,12 +186,12 @@ if (!isMainThread) {
   const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
   const scriptRel='proofs/shared-session-shards-20261126.mjs';
   function hashes(root){return Object.fromEntries(['worker.ts','worker-protocol.ts','shared.ts','arena.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel,...readdirSync(root+'/dist').filter(p=>p.endsWith('.js')).map(p=>'dist/'+p)].map(p=>[p,hash(root+'/'+p)]));}
-  const cases=[[1000,1,'one'],[10000,4,'distinct'],[10000,8,'distinct'],[100000,1,'one'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense']];
+  const cases=[[1000,1,'one'],[10000,8,'distinct'],[100000,64,'one'],[100000,64,'distinct'],[100000,64,'dense']];
   const baseHashes=hashes(baseline),candidateHashes=hashes(candidate);
   for(const p of ['worker.ts','worker-protocol.ts','persistent-core.wasm','website/assets/catalog-core.mjs',scriptRel])assert.equal(baseHashes[p],candidateHashes[p],p);
   assert.notEqual(baseHashes['arena.ts'],candidateHashes['arena.ts']);
   assert.notEqual(baseHashes['shared.ts'],candidateHashes['shared.ts']);
-  const data={base:BASE,head:sha(candidate),runtime:process.versions,cpu:cpus()[0]?.model,baseHashes,candidateHashes,cases,updates,measuredPairs:6,samples:[],complete:false};
+  const data={base:BASE,head:sha(candidate),runtime:process.versions,cpu:cpus()[0]?.model,baseHashes,candidateHashes,cases,updates,measuredPairs:12,samples:[],complete:false};
   const file=out+'/raw.json';writeFileSync(file,JSON.stringify(data));
   function sample(n,count,layout,pair,arm){
       const root=arm==='candidate'||arm==='profile-candidate'?candidate:baseline;
@@ -210,7 +210,7 @@ if (!isMainThread) {
   }
   // AB and identical-build AA, interleaved and alternated. Each arm is a
   // fresh process; no GC forcing. All fixtures and verification are identical.
-  for(let pair=-1;pair<6;pair++)for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
+  for(let pair=-1;pair<12;pair++)for(const [n,count,layout] of (pair%2===0?cases:cases.slice().reverse())){
     const cohorts=pair%2===0?[['base','candidate'],['aa-base','aa-control']]:[['aa-control','aa-base'],['candidate','base']];
     for(const arms of cohorts)for(const arm of arms)sample(n,count,layout,pair,arm);
   }
