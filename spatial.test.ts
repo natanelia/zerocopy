@@ -1,9 +1,68 @@
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
+import { buildSpatialIndex, querySpatialIndex, querySpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex } from './spatial.ts';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
+
+it('joins ordered pairs after edits on both layers, with inclusive bounds and exact filtering', () => {
+  const leftBase = buildSpatialIndex([{ id: 9, bounds: far }, { id: 2, bounds: box }]);
+  const rightBase = buildSpatialIndex([{ id: 2, bounds: far }, { id: 11, bounds: box }]);
+  const left = prepareSpatialQuery(leftBase, applySpatialEdits(undefined, 1, [
+    { id: 9, bounds: box }, { id: 2, bounds: null }, { id: 0xffffffff, bounds: far },
+  ]), 1);
+  const right = prepareSpatialQuery(rightBase, applySpatialEdits(undefined, 3, [
+    { id: 2, bounds: [2, 2, 12, 12] }, { id: 11, bounds: null }, { id: 9, bounds: box },
+  ]), 3);
+  expect(querySpatialJoin(structuredClone(left), structuredClone(right))).toEqual([[9, 2], [9, 9], [0xffffffff, 2]]);
+  const calls: string[] = [];
+  expect(querySpatialJoin(left, right, { bounds: [2, 2, 2, 2], filter(a, b) {
+    calls.push(a + ':' + b);
+    return a !== b;
+  } })).toEqual([[9, 2]]);
+  expect(calls.sort()).toEqual(['9:2', '9:9']);
+  expect(querySpatialJoin(leftBase, rightBase)).toEqual([[2, 11], [9, 2]]);
+  expect(querySpatialJoin(rightBase, left)).toEqual([[2, 0xffffffff], [11, 9]]);
+  expect(querySpatialJoin(left, buildSpatialIndex([]))).toEqual([]);
+  expect(() => querySpatialJoin(left, right, { bounds: [0, 1, 0, 0] })).toThrow(RangeError);
+  expect(() => querySpatialJoin(left, right, { filter() { throw new Error('refinement failed'); } })).toThrow('refinement failed');
+  expect(() => querySpatialJoin(left, right, { filter: (async () => true) as never })).toThrow(TypeError);
+});
+
+it('matches an all-pairs scan for both input orders and self joins across successive publications', () => {
+  type Box = readonly [number, number, number, number];
+  let seed = 673;
+  const random = (n: number) => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) % n;
+  const rect = (): Box => { const x = random(61), y = random(67); return [x, y, x + random(14), y + random(14)]; };
+  function layer(count: number) {
+    const rows = new Map(Array.from({ length: count }, (_, id) => [id, rect()] as const));
+    const base = buildSpatialIndex(Array.from(rows, ([id, bounds]) => ({ id, bounds })));
+    return { rows, base, changes: applySpatialEdits(undefined, 0, []) };
+  }
+  function scan(left: Map<number, Box>, right: Map<number, Box>, q: Box) {
+    const pairs: number[][] = [];
+    for (const [a, l] of left) for (const [b, r] of right) {
+      if (Math.max(l[0], r[0], q[0]) <= Math.min(l[2], r[2], q[2]) &&
+          Math.max(l[1], r[1], q[1]) <= Math.min(l[3], r[3], q[3])) pairs.push([a, b]);
+    }
+    return pairs.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  }
+  const left = layer(55), right = layer(30);
+  for (let revision = 1; revision <= 64; revision++) {
+    for (const layer of [left, right]) {
+      const id = random(70), bounds = random(5) ? rect() : null;
+      layer.changes = applySpatialEdits(layer.changes, revision, [{ id, bounds }]);
+      if (bounds) layer.rows.set(id, bounds); else layer.rows.delete(id);
+      if (revision % 11 === 0) layer.base = rebuildSpatialIndex(layer.base, layer.changes, revision);
+    }
+    const a = prepareSpatialQuery(left.base, left.changes, revision);
+    const b = prepareSpatialQuery(right.base, right.changes, revision);
+    const bounds: Box = revision % 3 ? rect() : [-Infinity, -Infinity, Infinity, Infinity];
+    expect(querySpatialJoin(a, b, { bounds })).toEqual(scan(left.rows, right.rows, bounds));
+    expect(querySpatialJoin(b, a, { bounds })).toEqual(scan(right.rows, left.rows, bounds));
+    expect(querySpatialJoin(a, a, { bounds })).toEqual(scan(left.rows, left.rows, bounds));
+  }
+});
 
 it('queries historical and rebuilt snapshots by stable ID, including boundary touches', async () => {
   const base = buildSpatialIndex([{ id: 42, bounds: box }, { id: 0xffffffff, bounds: far }], 4);

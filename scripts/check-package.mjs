@@ -58,15 +58,15 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
-import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex } from 'zerocopy/spatial';
+import { buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, querySpatialJoin } from 'zerocopy/spatial';
 const box = [0, 0, 1, 1];
 if (isMainThread) {
   const base = buildSpatialIndex([{ id: 7, bounds: box }]);
   const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }, { id: 19, bounds: box }]);
-  const reader = new Worker(new URL(import.meta.url), { workerData: prepareSpatialQuery(base, edits, 1) });
-  try { assert.deepEqual(await once(reader, 'message'), [[19]]); }
+  const reader = new Worker(new URL(import.meta.url), { workerData: { left: prepareSpatialQuery(base, edits, 1), right: base } });
+  try { assert.deepEqual(await once(reader, 'message'), [{ ids: [19], pairs: [[19, 7]] }]); }
   finally { await reader.terminate(); }
-} else parentPort.postMessage(querySpatialIndex(workerData, box));
+} else parentPort.postMessage({ ids: querySpatialIndex(workerData.left, box), pairs: querySpatialJoin(workerData.left, workerData.right) });
 `);
   run(process.execPath, ['spatial-reader.mjs']);
 
@@ -84,11 +84,18 @@ if (isMainThread) {
   writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
 import { BTreeIndex, createCollection, createLiveQueryCollection, eq } from '@tanstack/db';
-import { sharedCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2 } }] });
 const lanes = createCollection(options);
 lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
 const viewport = createCollection(viewportCollectionConfig({ id: 'visible' }));
+const pairs = createCollection(spatialJoinCollectionConfig({ id: 'overlaps' }));
+pairs.createIndex(row => row.leftId, { indexType: BTreeIndex });
+pairs.createIndex(row => row.rightId, { indexType: BTreeIndex });
+const matches = createLiveQueryCollection(q => q.from({ p: pairs })
+  .innerJoin({ lane: lanes }, ({ p, lane }) => eq(p.leftId, lane.handle))
+  .innerJoin({ v: viewport }, ({ p, v }) => eq(p.rightId, v.id))
+  .select(({ p, lane }) => ({ id: p.id, style: lane.style })));
 const joined = createLiveQueryCollection(q => q.from({ hit: viewport })
   .innerJoin({ lane: lanes }, ({ hit, lane }) => eq(hit.id, lane.handle))
   .select(({ lane }) => ({ id: lane.id, style: lane.style })));
@@ -96,9 +103,12 @@ const settled = process.argv[2] === '0.5.0'
   ? tx => tx.isPersisted.promise
   : tx => tx.when('settled');
 try {
-  await joined.preload();
+  await Promise.all([matches.preload(), joined.preload()]);
+  await pairs.utils.setPairs(Promise.resolve([[2, 1], [2, 3]]));
   await viewport.utils.setVisibleIds([1, 2]);
+  assert.equal([...matches.values()][0].id, '2:1');
   await viewport.utils.setVisibleIds(Promise.resolve([2, 3]));
+  assert.equal([...matches.values()][0].id, '2:3');
   assert.deepEqual([...viewport.keys()].sort(), [2, 3]);
   assert.equal([...joined.values()][0].id, 'n');
   const initial = options.getSnapshot();
@@ -107,10 +117,12 @@ try {
   assert.equal(initial.get('n').style.width, 2);
   assert.equal(options.getSnapshot().get('n').style.width, 6);
   assert.equal([...joined.values()][0].style.width, 6);
+  assert.equal([...matches.values()][0].style.width, 6);
   await settled(lanes.delete('n'));
   assert.equal(options.getSnapshot().size, 0);
   assert.equal(joined.size, 0);
-} finally { await joined.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
+  assert.equal(matches.size, 0);
+} finally { await matches.cleanup(); await joined.cleanup(); await pairs.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
 `);
   const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
   for (const version of peers) {

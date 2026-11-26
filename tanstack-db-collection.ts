@@ -1,5 +1,7 @@
 import { SharedMap } from './shared-map.ts';
 import type { JsonType } from './types.ts';
+import { checkSpatialId } from './spatial-id.ts';
+import type { SpatialPair } from './spatial.ts';
 
 type CollectionItem = { id: string };
 
@@ -119,23 +121,24 @@ function writeSyncRows<T>(sync: SyncParams<T>, messages: Iterable<Write<T>>): Re
   });
 }
 
-type ViewportSync<K extends string | number> = SyncParams<{ id: K }, K> & {
+type MembershipSync<Row, K extends string | number> = SyncParams<Row, K> & {
   collection: { keys(): Iterable<K> };
 };
 
-/** Read-only TanStack membership rows for a spatial query, including worker-produced results. */
-export function viewportCollectionConfig<K extends string | number = number>({ id }: { id: string }) {
+function membershipOptions<Item, K extends string | number, Row extends { id: K }>(
+  id: string, memberKey: (item: Item) => K, rowForKey: (key: K) => Row,
+) {
   let membership = new Set<K>();
-  let active: { params: ViewportSync<K>; pending: Promise<void> } | undefined;
+  let active: { params: MembershipSync<Row, K>; pending: Promise<void> } | undefined;
   let latest: object | undefined;
 
-  function reconcile(params: ViewportSync<K>, previous: Set<K>, next: Set<K>): Receipt {
-    const writes: Write<{ id: K }, K>[] = [];
+  function reconcile(params: MembershipSync<Row, K>, previous: Set<K>, next: Set<K>): Receipt {
+    const writes: Write<Row, K>[] = [];
     for (const id of previous) {
-      if (!next.has(id)) writes.push({ type: 'delete', value: { id } });
+      if (!next.has(id)) writes.push({ type: 'delete', value: rowForKey(id) });
     }
     for (const id of next) {
-      if (!previous.has(id)) writes.push({ type: 'insert', value: { id } });
+      if (!previous.has(id)) writes.push({ type: 'insert', value: rowForKey(id) });
     }
     if (!writes.length) return;
     return writeSyncBatch(params, () => {
@@ -143,23 +146,21 @@ export function viewportCollectionConfig<K extends string | number = number>({ i
     });
   }
 
-  async function setVisibleIds(input: readonly K[] | PromiseLike<readonly K[]>): Promise<boolean> {
+  async function setMembers(input: readonly Item[] | PromiseLike<readonly Item[]>): Promise<boolean> {
     // Supersede at dispatch. An unresolved worker search never holds the write queue.
     const request = {};
     latest = request;
-    let ids: readonly K[];
+    let items: readonly Item[];
     try {
-      ids = Array.isArray(input) ? input : await input;
+      items = Array.isArray(input) ? input : await input;
     } catch (error) {
       if (request !== latest) return false;
       throw error;
     }
     if (request !== latest) return false;
-    if (!Array.isArray(ids)) throw new TypeError('Expected an array of viewport IDs');
-    const next = new Set(ids);
-    for (const key of next) {
-      if (typeof key !== 'string' && !Number.isFinite(key)) throw new TypeError('Viewport IDs must be strings or finite numbers');
-    }
+    if (!Array.isArray(items)) throw new TypeError('Expected an array of spatial query results');
+    const next = new Set<K>();
+    for (const item of items) next.add(memberKey(item));
     const run = active;
     if (!run) {
       membership = next;
@@ -178,11 +179,10 @@ export function viewportCollectionConfig<K extends string | number = number>({ i
   }
 
   return {
-    id, getKey: (row: { id: K }) => row.id, startSync: true, gcTime: 0,
-    utils: { setVisibleIds },
+    id, getKey: (row: Row) => row.id, startSync: true, gcTime: 0, setMembers,
     sync: {
-      sync(params: ViewportSync<K>) {
-        if (active) throw new Error('Viewport sync is already active');
+      sync(params: MembershipSync<Row, K>) {
+        if (active) throw new Error('Membership sync is already active');
         const run = { params, pending: Promise.resolve() };
         active = run;
         const close = () => {
@@ -203,6 +203,29 @@ export function viewportCollectionConfig<K extends string | number = number>({ i
       },
     },
   };
+}
+
+/** Read-only TanStack membership rows for a spatial query, including worker-produced results. */
+export function viewportCollectionConfig<K extends string | number = number>({ id }: { id: string }) {
+  const { setMembers, ...options } = membershipOptions(id, (key: K) => {
+    if (typeof key !== 'string' && !Number.isFinite(key)) throw new TypeError('Viewport IDs must be strings or finite numbers');
+    return key;
+  }, (id: K) => ({ id }));
+  return { ...options, utils: { setVisibleIds: setMembers } };
+}
+
+/** Read-only TanStack rows keyed by ordered feature-ID pairs from a spatial join. */
+export function spatialJoinCollectionConfig({ id }: { id: string }) {
+  const { setMembers, ...options } = membershipOptions(id, (pair: SpatialPair) => {
+    if (!Array.isArray(pair) || pair.length !== 2) throw new TypeError('Expected a pair of spatial feature IDs');
+    checkSpatialId(pair[0]);
+    checkSpatialId(pair[1]);
+    return pair[0] + ':' + pair[1];
+  }, (id: string) => {
+    const separator = id.indexOf(':');
+    return { id, leftId: Number(id.slice(0, separator)), rightId: Number(id.slice(separator + 1)) };
+  });
+  return { ...options, utils: { setPairs: setMembers } };
 }
 
 /** Local collection options with an immutable snapshot of confirmed rows. */

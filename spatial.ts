@@ -2,6 +2,7 @@ import Flatbush from 'flatbush';
 import { SharedMap } from './shared-map.ts';
 import { json, type JsonType } from './types.ts';
 import { checkBounds, type BoundsXY } from './xy-bounds.ts';
+import { checkSpatialId } from './spatial-id.ts';
 
 export interface SpatialFeature { readonly id: number; readonly bounds: BoundsXY }
 export interface SpatialEdit { readonly id: number; readonly bounds: BoundsXY | null }
@@ -31,10 +32,6 @@ function checkRevision(revision: number): void {
   if (!Number.isSafeInteger(revision) || revision < 0) throw new RangeError('Expected a nonnegative safe spatial revision');
 }
 
-function checkId(id: number): void {
-  if (!Number.isInteger(id) || id < 0 || id > 0xffffffff) throw new RangeError('Expected a uint32 feature ID');
-}
-
 const trees = new WeakMap<SpatialIndex, Flatbush>();
 
 function finishIndex(tree: Flatbush | undefined, ids: Uint32Array<SharedArrayBuffer>, revision: number): SpatialIndex {
@@ -51,7 +48,7 @@ export function buildSpatialIndex(features: readonly SpatialFeature[], revision 
   const tree = features.length ? new Flatbush(features.length, 16, Float64Array, SharedArrayBuffer) : undefined;
   const seen = new Set<number>();
   for (const { id, bounds } of features) {
-    checkId(id);
+    checkSpatialId(id);
     checkBounds(bounds, true);
     if (seen.has(id)) throw new RangeError('Duplicate spatial feature ID: ' + id);
     seen.add(id);
@@ -66,7 +63,7 @@ export function applySpatialEdits(previous: SpatialChanges | undefined, revision
   const changes = previous ?? new SharedMap(json<SpatialChange>());
   const batch = new Map<string, SpatialChange>();
   for (const { id, bounds } of edits) {
-    checkId(id);
+    checkSpatialId(id);
     if (bounds !== null) checkBounds(bounds, true);
     batch.set(String(id), { revision, bounds });
   }
@@ -110,7 +107,7 @@ function collectChanges(base: SpatialIndex, changes: SpatialChanges, revision: n
     if (change.revision > revision) throw new RangeError('Spatial overlay is newer than the requested revision');
     if (change.revision <= base.revision) continue;
     const id = Number(key);
-    checkId(id);
+    checkSpatialId(id);
     if (String(id) !== key) throw new TypeError('Expected a canonical spatial feature ID');
     if (change.bounds !== null) {
       checkBounds(change.bounds, true);
@@ -147,6 +144,12 @@ function containsId(ids: Uint32Array, id: number): boolean {
   return ids[low] === id;
 }
 
+function checkChangedIds(ids: Uint32Array): void {
+  if (!(ids instanceof Uint32Array) || !(ids.buffer instanceof SharedArrayBuffer)) {
+    throw new TypeError('Expected shared spatial change IDs');
+  }
+}
+
 /** Build a replacement from a captured base and overlay without decoding feature metadata. */
 export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges, revision: number): SpatialIndex {
   const tree = treeFor(base);
@@ -181,9 +184,7 @@ export function querySpatialIndex(index: SpatialIndex | PreparedSpatialQuery, bo
   if (index.format === 'spatial-query-v1') {
     if (changes !== undefined) throw new TypeError('A prepared spatial query already includes its changes');
     const { base, updates, changedIds } = index;
-    if (!(changedIds instanceof Uint32Array) || !(changedIds.buffer instanceof SharedArrayBuffer)) {
-      throw new TypeError('Expected shared spatial change IDs');
-    }
+    checkChangedIds(changedIds);
     const result: number[] = [];
     for (const slot of treeFor(base)?.search(...box) ?? []) {
       const id = base.ids[slot];
@@ -208,6 +209,66 @@ export function querySpatialIndex(index: SpatialIndex | PreparedSpatialQuery, bo
     }
   }
   return result.sort((a, b) => a - b);
+}
+
+type SpatialSnapshot = SpatialIndex | PreparedSpatialQuery;
+type JoinPart = { tree: Flatbush; ids: Uint32Array; hidden: Uint32Array | undefined };
+export type SpatialPair = readonly [leftId: number, rightId: number];
+
+function joinParts(snapshot: SpatialSnapshot): JoinPart[] {
+  const parts: JoinPart[] = [];
+  const add = (index: SpatialIndex, hidden?: Uint32Array) => {
+    const tree = treeFor(index);
+    if (tree) parts.push({ tree, ids: index.ids, hidden });
+  };
+  if (snapshot.format === 'spatial-query-v1') {
+    checkChangedIds(snapshot.changedIds);
+    add(snapshot.base, snapshot.changedIds);
+    add(snapshot.updates);
+  } else add(snapshot);
+  return parts;
+}
+
+/** Return overlapping bounds as ordered (left ID, right ID) pairs, sorted by both IDs. */
+export function querySpatialJoin(left: SpatialSnapshot, right: SpatialSnapshot, options: {
+  bounds?: BoundsXY;
+  filter?: (leftId: number, rightId: number) => boolean;
+} = {}): SpatialPair[] {
+  const { bounds = [-Infinity, -Infinity, Infinity, Infinity], filter } = options;
+  checkBounds(bounds, false);
+  const [xMin, yMin, xMax, yMax] = bounds;
+  if (filter !== undefined && typeof filter !== 'function') throw new TypeError('Expected a spatial join filter function');
+  const result: SpatialPair[] = [];
+  const leftParts = joinParts(left), rightParts = joinParts(right);
+  for (const l of leftParts) for (const r of rightParts) {
+    const reverse = r.tree.numItems < l.tree.numItems;
+    const outer = reverse ? r : l, inner = reverse ? l : r;
+    const minX = Math.max(xMin, outer.tree.minX, inner.tree.minX);
+    const minY = Math.max(yMin, outer.tree.minY, inner.tree.minY);
+    const maxX = Math.min(xMax, outer.tree.maxX, inner.tree.maxX);
+    const maxY = Math.min(yMax, outer.tree.maxY, inner.tree.maxY);
+    if (minX > maxX || minY > maxY) continue;
+    // Probe the larger tree with each live outer leaf clipped to the query region.
+    // Returning false from Flatbush's filters avoids retaining arrays of tree slots.
+    outer.tree.search(minX, minY, maxX, maxY, (slot, x0, y0, x1, y1) => {
+      const outerId = outer.ids[slot];
+      if (outer.hidden && containsId(outer.hidden, outerId)) return false;
+      inner.tree.search(Math.max(x0, minX), Math.max(y0, minY), Math.min(x1, maxX), Math.min(y1, maxY), innerSlot => {
+        const innerId = inner.ids[innerSlot];
+        if (inner.hidden && containsId(inner.hidden, innerId)) return false;
+        const leftId = reverse ? innerId : outerId, rightId = reverse ? outerId : innerId;
+        if (filter) {
+          const include = filter(leftId, rightId);
+          if (typeof include !== 'boolean') throw new TypeError('Spatial join filters must return a boolean');
+          if (!include) return false;
+        }
+        result.push([leftId, rightId]);
+        return false;
+      });
+      return false;
+    });
+  }
+  return result.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
 }
 
 /** Drop overlay entries already incorporated into the replacement base from the same tile history. */

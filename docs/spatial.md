@@ -60,6 +60,34 @@ the coordinates. Recheck an edited candidate even when its bounds stay the
 same. An interior vertex can move into view. For a tile storing many paths
 in one numeric list, pass the path's coordinate range. [Geometry API](geometry.md#path-intersection)
 
+## Join two spatial layers
+
+`querySpatialJoin(left, right)` returns `[leftId, rightId]` pairs whose
+bounding boxes overlap or touch. Each side accepts a packed index or a
+prepared snapshot with its own revision. The result is sorted by left ID
+then right ID. Joining a layer to itself includes matching features paired
+with themselves and both orders of every overlapping pair.
+
+Using the two paths and their `index` from the preceding example, select the
+lanes that touch a rectangular road area.
+
+```ts
+import { querySpatialJoin } from 'zerocopy/spatial';
+
+const roadAreas = new Map<number, BoundsXY>([[23, [1, 1, 3, 3]]]);
+const roads = buildSpatialIndex(Array.from(roadAreas, ([id, bounds]) => ({ id, bounds })));
+const candidatesByRoad = querySpatialJoin(index, roads); // [[0, 23], [1, 23]]
+const intersecting = querySpatialJoin(index, roads, {
+  filter: (laneId, roadId) => pathIntersectsBoxXY(paths[laneId]!, roadAreas.get(roadId)!),
+}); // [[1, 23]]
+```
+
+Use `{ bounds: viewport }` to limit candidate pairs to boxes whose overlap
+touches the viewport. The optional synchronous `filter` receives each candidate
+pair once and can check geometry from the same publications. Each call computes
+the result for the supplied snapshots. Dense layers can produce one result for
+every pair of features. [Publish live pair membership to TanStack](tanstack.md#live-spatial-joins)
+
 ## Edit and rebuild
 
 - `buildSpatialIndex(features, revision = 0)` creates a base for a complete

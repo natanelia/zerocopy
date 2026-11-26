@@ -2,26 +2,29 @@ import { createCollection, createTransaction } from '@tanstack/db';
 import { expect, it } from 'vitest';
 import { SharedList, getWorkerData } from '../dist/shared.js';
 import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery } from '../dist/spatial.js';
-import { sharedCollectionConfig } from '../dist/tanstack-db-collection.js';
+import { sharedCollectionConfig, spatialJoinCollectionConfig } from '../dist/tanstack-db-collection.js';
 
 it('attaches confirmed rows and geometry from the same edit in a browser worker', async () => {
   const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'lane', revision: 0 }] });
   const lanes = createCollection(options);
+  const overlaps = createCollection(spatialJoinCollectionConfig({ id: 'lane-road-overlaps' }));
   const reader = new Worker(new URL('./tanstack-worker.ts', import.meta.url), { type: 'module' });
   const initial = new SharedList('number').pushMany([0, 0, 2, 3]);
   const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
+  const roadIndex = buildSpatialIndex([{ id: 23, bounds: [0, 2.5, 0, 2.75] }]);
   const initialChanges = applySpatialEdits(undefined, 0, []);
-  const read = (geometry, changes = initialChanges) => new Promise((resolve, reject) => {
+  type WorkerRead = { narrowPairs: [number, number][] };
+  const read = (geometry, changes = initialChanges) => new Promise<{ first: WorkerRead; current: WorkerRead }>((resolve, reject) => {
     reader.onerror = reject;
     reader.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
     const rows = options.getSnapshot();
     const prepared = prepareSpatialQuery(base, changes, rows.get('lane')!.revision);
-    reader.postMessage({ base, prepared, roots: getWorkerData({ rows, geometry, changes }, { copy: false }) });
+    reader.postMessage({ base, prepared, roadIndex, roots: getWorkerData({ rows, geometry, changes }, { copy: false }) });
   });
   try {
     await lanes.preload();
     const before = { row: { id: 'lane', revision: 0 }, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [],
-      preparedCandidates: [], narrowCandidates: [7], intersectsNarrow: false };
+      preparedCandidates: [], narrowCandidates: [7], intersectsNarrow: false, narrowPairs: [] };
     expect(await read(initial)).toEqual({ first: before, current: before });
 
     const geometry = initial.set(0, -12);
@@ -33,10 +36,15 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
     expect(await read(initial)).toEqual({ first: before, current: before });
     await tx.commit();
     const after = { row: { id: 'lane', revision: 1 }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
-      preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true };
-    expect(await read(geometry, edits)).toEqual({ first: before, current: after });
+      preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true, narrowPairs: [[7, 23]] };
+    const reply = read(geometry, edits);
+    const published = overlaps.utils.setPairs(reply.then(({ current }) => current.narrowPairs));
+    expect(await reply).toEqual({ first: before, current: after });
+    expect(await published).toBe(true);
+    expect(overlaps.get('7:23')).toMatchObject({ leftId: 7, rightId: 23 });
   } finally {
     reader.terminate();
+    await overlaps.cleanup();
     await lanes.cleanup();
   }
 });

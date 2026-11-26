@@ -1,7 +1,7 @@
 import { createCollection, createTransaction } from '@tanstack/db';
-import { sharedCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
-import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
+import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
 const options = sharedCollectionConfig<Lane>({ id: 'lanes' });
@@ -33,6 +33,12 @@ void published; void featureId;
 visible.utils.setVisibleIds(['lane']);
 const rebuilt: typeof base = rebuildSpatialIndex(base, roots.edits, 1);
 const prepared = prepareSpatialQuery(base, roots.edits, 1);
+const overlaps = createCollection(spatialJoinCollectionConfig({ id: 'overlaps' }));
+await overlaps.utils.setPairs(Promise.resolve(querySpatialJoin(prepared, base)));
+const rightId: number | undefined = overlaps.get('17:17')?.rightId;
+// @ts-expect-error A spatial pair requires two numeric handles.
+overlaps.utils.setPairs([[17, 'road']]);
+void rightId;
 querySpatialIndex(structuredClone(prepared), [0, 0, 2, 3]);
 // @ts-expect-error Prepared snapshots already capture the edit revision.
 querySpatialIndex(prepared, [0, 0, 2, 3], edits);

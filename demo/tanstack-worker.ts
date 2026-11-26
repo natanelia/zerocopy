@@ -1,7 +1,7 @@
 import { initWorker } from '../dist/shared.js';
 import { bboxXY, pathIntersectsBoxXY } from '../dist/geometry.js';
 
-import { querySpatialIndex, rebuildSpatialIndex } from '../dist/spatial.js';
+import { querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from '../dist/spatial.js';
 
 let first, current, firstPrepared;
 self.onmessage = async ({ data }) => {
@@ -22,6 +22,7 @@ self.onmessage = async ({ data }) => {
         preparedCandidates: querySpatialIndex(prepared, viewport),
         narrowCandidates: querySpatialIndex(prepared, narrow),
         intersectsNarrow: pathIntersectsBoxXY(state.geometry, narrow),
+        narrowPairs: querySpatialJoin(prepared, data.roadIndex, { filter: () => pathIntersectsBoxXY(state.geometry, narrow) }),
       };
     };
     self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared) });

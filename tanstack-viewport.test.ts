@@ -1,7 +1,58 @@
-import { BTreeIndex, createCollection, createLiveQueryCollection, eq } from '@tanstack/db';
+import { BTreeIndex, createCollection, createLiveQueryCollection, eq, not } from '@tanstack/db';
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex } from './spatial.ts';
-import { sharedCollectionConfig, viewportCollectionConfig } from './tanstack-db-collection.ts';
+import { buildSpatialIndex, querySpatialIndex, querySpatialJoin, type SpatialPair } from './spatial.ts';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from './tanstack-db-collection.ts';
+
+it('publishes pair deltas and follows metadata on both sides of a live spatial join', async () => {
+  const box = [0, 0, 1, 1] as const, far = [5, 5, 6, 6] as const;
+  const left = buildSpatialIndex([{ id: 1, bounds: box }, { id: 12, bounds: far }]);
+  const right = buildSpatialIndex([{ id: 23, bounds: box }, { id: 3, bounds: far }]);
+  const config = spatialJoinCollectionConfig({ id: 'boundary-road-overlaps' });
+  await config.utils.setPairs(querySpatialJoin(left, right));
+  const pairs = createCollection(config);
+  pairs.createIndex(row => row.leftId, { indexType: BTreeIndex });
+  pairs.createIndex(row => row.rightId, { indexType: BTreeIndex });
+  const layer = (id: string, handles: number[]) => createCollection(sharedCollectionConfig({
+    id, initialData: handles.map(handle => ({ id: String(handle), handle, direction: 'north' })),
+  }));
+  const boundaries = layer('boundaries', [1, 12]), roads = layer('roads', [3, 23]);
+  boundaries.createIndex(row => row.handle, { indexType: BTreeIndex });
+  roads.createIndex(row => row.handle, { indexType: BTreeIndex });
+  const invalid = createLiveQueryCollection(q => q.from({ p: pairs })
+    .innerJoin({ b: boundaries }, ({ p, b }) => eq(p.leftId, b.handle))
+    .innerJoin({ r: roads }, ({ p, r }) => eq(p.rightId, r.handle))
+    .where(({ b, r }) => not(eq(b.direction, r.direction)))
+    .select(({ p }) => ({ id: p.id })));
+  const batches: string[][] = [];
+  const sub = pairs.subscribeChanges(events => batches.push(events.map(e => e.type + ':' + e.key)), { includeInitialState: true });
+  try {
+    await invalid.preload();
+    expect([...pairs.keys()].sort()).toEqual(['12:3', '1:23']);
+    expect(batches.flat().sort()).toEqual(['insert:12:3', 'insert:1:23']);
+    batches.length = 0;
+    await pairs.utils.setPairs([[12, 3], [1, 23], [1, 23]]);
+    expect(batches).toEqual([]);
+    expect(invalid.size).toBe(0);
+    await roads.update('23', row => { row.direction = 'south'; }).when('settled');
+    expect([...invalid.values()].map(row => row.id)).toEqual(['1:23']);
+    await boundaries.update('1', row => { row.direction = 'south'; }).when('settled');
+    expect(invalid.size).toBe(0);
+    const late = Promise.withResolvers<readonly SpatialPair[]>();
+    const obsolete = pairs.utils.setPairs(late.promise);
+    await pairs.utils.setPairs([[12, 3], [1, 3], [12, 3]]);
+    late.resolve([[1, 23]]);
+    expect(await obsolete).toBe(false);
+    expect([...invalid.values()].map(row => row.id)).toEqual(['1:3']);
+    expect(batches).toEqual([['delete:1:23', 'insert:1:3']]);
+    await expect(pairs.utils.setPairs([[1, 0xffffffff], [-1, 3]])).rejects.toThrow(RangeError);
+    expect([...pairs.keys()].sort()).toEqual(['12:3', '1:3']);
+    await pairs.reload();
+    expect(pairs.get('1:3')).toMatchObject({ id: '1:3', leftId: 1, rightId: 3 });
+  } finally {
+    sub.unsubscribe();
+    await invalid.cleanup(); await pairs.cleanup(); await boundaries.cleanup(); await roads.cleanup();
+  }
+});
 
 it('publishes only membership changes and keeps a real metadata join live', async () => {
   const index = buildSpatialIndex([1, 2, 3].map(handle => ({ id: handle, bounds: [handle, 0, handle, 0] })));

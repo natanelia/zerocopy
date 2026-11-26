@@ -139,6 +139,51 @@ properties through the metadata collection. You can seed the IDs before creating
 the collection. The options instance retains its last successful membership
 across cleanup and reconnect.
 
+## Live spatial joins
+
+Use `spatialJoinCollectionConfig` when a validation depends on **which two
+features overlap**. Each result row contains `leftId`, `rightId`, and a stable
+string key such as `"7:23"`. TanStack can join either handle to an indexed
+metadata field. This example reports a boundary and road with opposing
+directions where their bounds overlap.
+
+```ts
+import { BTreeIndex, createCollection, createLiveQueryCollection, eq, not } from '@tanstack/db';
+import { buildSpatialIndex, querySpatialJoin } from 'zerocopy/spatial';
+import { sharedCollectionConfig, spatialJoinCollectionConfig } from 'zerocopy/tanstack';
+
+const boundaries = createCollection(sharedCollectionConfig({
+  id: 'boundaries', initialData: [{ id: 'lane-7', handle: 7, direction: 'north' }],
+}));
+const roads = createCollection(sharedCollectionConfig({
+  id: 'roads', initialData: [{ id: 'road-23', handle: 23, direction: 'south' }],
+}));
+const pairs = createCollection(spatialJoinCollectionConfig({ id: 'boundary-road-pairs' }));
+boundaries.createIndex(row => row.handle, { indexType: BTreeIndex });
+roads.createIndex(row => row.handle, { indexType: BTreeIndex });
+pairs.createIndex(row => row.leftId, { indexType: BTreeIndex });
+pairs.createIndex(row => row.rightId, { indexType: BTreeIndex });
+
+const invalid = createLiveQueryCollection(q => q.from({ p: pairs })
+  .innerJoin({ b: boundaries }, ({ p, b }) => eq(p.leftId, b.handle))
+  .innerJoin({ r: roads }, ({ p, r }) => eq(p.rightId, r.handle))
+  .where(({ b, r }) => not(eq(b.direction, r.direction)))
+  .select(({ p, b, r }) => ({ id: p.id, boundary: b.id, road: r.id })));
+await invalid.preload();
+
+const left = buildSpatialIndex([{ id: 7, bounds: [0, 0, 4, 0] }]);
+const right = buildSpatialIndex([{ id: 23, bounds: [1, -1, 3, 1] }]);
+await pairs.utils.setPairs(querySpatialJoin(left, right));
+// invalid contains { id: '7:23', boundary: 'lane-7', road: 'road-23' }.
+```
+
+Recompute pairs after spatial edits and pass the array or worker promise to
+`setPairs` at dispatch. Each publication emits only entering and leaving
+pairs. Reordered or duplicate pairs produce no writes. The promise follows
+the same supersession and failure rules as `setVisibleIds`. Edits to either
+direction field update the live query through TanStack. Geometry refinement
+belongs in the spatial query's filter. [Spatial join API](spatial.md#join-two-spatial-layers)
+
 ## withSharedCache
 
 `withSharedCache<T>(upstreamSync, options?)` wraps an object with a `sync(params)` function. It intercepts upstream insert, update, and delete messages before forwarding them to the caller. It returns a wrapped `sync` object plus `getCache()`, `get(key)`, `toArray()`, `getSharedState()`, and `fromSharedState()`.
