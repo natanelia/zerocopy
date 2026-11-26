@@ -32,7 +32,10 @@ function bounds(map){
   assert.equal(queued.size,q.count);
   assert.deepEqual(queued,new Set([...a.objects].filter(([,v])=>v.jsonLength>=0).map(([p])=>p)));
  }
- return {entries:a.objects.size,jsonBytes:a.objectBytes,keyEntries:a.objectKeys?.size??0,adaptiveActive:!!q,heapUsed:process.memoryUsage().heapUsed};
+ assert(!a.windowMisses||a.windowMisses.length===16384);
+ return {entries:a.objects.size,jsonBytes:a.objectBytes,keyEntries:a.objectKeys?.size??0,adaptiveActive:!!q,
+  admissionBytes:a.windowMisses?.byteLength??0,evictionBytes:q?.slots.byteLength??0,heapUsed:process.memoryUsage().heapUsed,
+  arrayBuffers:process.memoryUsage().arrayBuffers};
 }
 if(!isMainThread){
  parentPort.once('message',async m=>{
@@ -56,10 +59,15 @@ if(!isMainThread){
    parentPort.postMessage({kind:'first',attachMs,firstQueryMs:measurements[0].ms});
    const saved=map.get(prefill[0]),hot=ids(n-size,size);
    const first=query(map,hot,'first-hot',original);
+   let previous=first;
    for(let i=0;i<6;i++){
     const values=query(map,hot,'repeat-hot',original);
     if(!adaptive&&n>=10000)assert(values.every((v,j)=>v!==first[j]&&v.metadata!==first[j].metadata));
-    if(adaptive||n===1000)assert(values.every((v,j)=>v===first[j]));
+    if(n===1000)assert(values.every((v,j)=>v===first[j]));
+    // Admission on the second observation intentionally does not preserve
+    // identity for the first miss. Established hot records should stabilize.
+    if(adaptive&&n>=10000&&i===5)assert(values.filter((v,j)=>v===previous[j]).length>=size*.9);
+    previous=values;
    }
    // Moving viewport, overlapping by 50%, then a return to the original window.
    for(let step=1;step<=5;step++){
@@ -71,6 +79,15 @@ if(!isMainThread){
    // Uniform scatter, including misses, to expose overhead outside local reads.
    const scatter=Array.from({length:Math.min(n,4000)},(_,i)=>i%13===0?'missing/'+i:productId((i*7919)%n));
    query(map,scatter,'scatter',original);
+   // A stream of previously unseen records should not flush the retained
+   // viewport. Use a disjoint scan for the large real catalog.
+   if(n===100000){
+    const scan=ids(20000,4000), recent=ids(n-size-Math.floor(size/2)*5,size);
+    const beforeScan=query(map,recent,'scan-probe-before',original);
+    query(map,scan,'disjoint-scan',original);
+    const afterScan=query(map,recent,'scan-probe-after',original);
+    if(adaptive)assert(afterScan.filter((v,j)=>v===beforeScan[j]).length>=size*.8);
+   }
    if(!adaptive)assert.equal(map.get(prefill[0]),saved,'default admitted identity changed');
    const start=performance.now(),next=await z.initWorker(m.updated,{previous:initial});
    if(adaptive)next.map.arena.enableExperimentalWindowCache();
@@ -146,6 +163,10 @@ if(!isMainThread){
   assert.equal(reader.windowEviction,undefined,'oversized miss must not trigger eviction');
   assert.notEqual(oversized,attached.data.get('large'));
   for(let i=1;i<5000;i++)assert.deepEqual(attached.data.get('key/'+i),{i,nested:[i]});
+  assert(reader.windowMisses);
+  assert.equal(reader.windowEviction,undefined,'one-off scan must not evict');
+  assert.equal(attached.data.get('key/0'),old);
+  for(let pass=0;pass<3;pass++)for(let i=3000;i<5000;i++)assert.deepEqual(attached.data.get('key/'+i),{i,nested:[i]});
   assert(reader.windowEviction);
   assert.equal(attached.nested.get('child'),held);
   assert.equal(held.get(0),42);

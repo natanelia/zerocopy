@@ -191,6 +191,19 @@ export class Arena {
   // Delay the adaptive path until the first real admission failure. Small
   // readers and freshly attached readers keep the original direct key hits.
   private windowEviction?: { slots: Uint32Array; head: number; count: number };
+  // Proof-only second-touch admission. Remember addresses, never decoded
+  // graphs, in a bounded direct-mapped table. One-off scans cannot evict.
+  private windowMisses?: Uint32Array;
+  private repeatedWindowMiss(ptr: number): boolean {
+    const seen = this.windowMisses ??= new Uint32Array(16384);
+    // Mix unaligned immutable record addresses before masking.
+    let h = Math.imul(ptr ^ (ptr >>> 16), 0x45d9f3b);
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+    const i = (h ^ (h >>> 16)) & (seen.length - 1);
+    const repeated = seen[i] === ptr;
+    seen[i] = ptr;
+    return repeated;
+  }
   private rememberWindowRecord(ptr: number): void {
     const q = this.windowEviction;
     if (!q) return;
@@ -366,8 +379,9 @@ export class Arena {
       if (!source) throw new Error('Missing nested arena in worker data');
       result = factory.fromWorkerData({ ...parsed.__d, valueType: parsed.__d.valueType ?? parsed.__i }, source);
     } else result = freezeJSON(parsed);
-    if (this.experimentalWindowCache && type === 'object' &&
-      (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES)) this.makeExperimentalRoom(len);
+    if (this.experimentalWindowCache && type === 'object' && len <= MAX_DECODED_BYTES &&
+      (this.objects.size >= MAX_DECODED_RECORDS || this.objectBytes + len > MAX_DECODED_BYTES) &&
+      this.repeatedWindowMiss(ptr)) this.makeExperimentalRoom(len);
     if (this.objects.size < MAX_DECODED_RECORDS && this.objectBytes + len <= MAX_DECODED_BYTES) {
       this.objects.set(ptr, { value: result, jsonLength: type === 'object' ? len : -1 });
       this.objectBytes += len;

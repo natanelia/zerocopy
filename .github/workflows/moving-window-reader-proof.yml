@@ -1,4 +1,4 @@
-name: Moving-window delayed FIFO cache screen (proof only)
+name: Moving-window second-touch admission screen (proof only)
 on:
   push:
     branches: [proof/moving-window-reader-20261126]
