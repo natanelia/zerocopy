@@ -99,6 +99,8 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     return new SharedMap(valueType, root, size, source);
   }
 }
+/** Internal identity captured before consumers can replace the descriptor method. */
+export const mapCompactionProtocol = Object.freeze({ descriptor: SharedMap.prototype.toWorkerData });
 structureRegistry.SharedMap = { fromWorkerData: (d, a) => SharedMap.fromWorkerData(d.root, d.valueType, d.size, a) };
 
 /** Compatibility wrapper for internal numeric-key users. */
