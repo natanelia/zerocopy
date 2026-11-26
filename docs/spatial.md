@@ -56,7 +56,9 @@ candidates when an application needs line or polygon intersection.
 A query scans every unpruned change. Choose a rebuild threshold from measured
 edit density and viewport latency. The [browser replay](../proofs/spatial-editor/README.md)
 includes deletes, retained readers, an index rebuilt while edits continue,
-and binary deck.gl paths.
+and binary deck.gl paths. At four readers the replay measured 28.9% lower
+peak browser memory and 6.6% higher p95 time from command to completed
+frame. See the [trial results and measurement conditions](../proofs/spatial-editor/RESULTS.md).
 
 ## Dedicated worker transport
 
