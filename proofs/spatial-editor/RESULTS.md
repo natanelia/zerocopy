@@ -1,11 +1,27 @@
 # Shared-memory editor replay results
 
-At four readers, shared storage cut sampled peak browser memory by **28.9%**.
-Its median trial p95 frame took **10.0 ms longer**. The memory target was
-at least a 25% reduction and the frame target required matching or beating
-the copy control. This run met the memory target and missed the frame target.
+With TanStack DB **1.0.0-rc.1.5**, shared storage reduced four-reader peak
+browser memory by **28.9%**. Its median trial p95 frame took **35.8 ms
+longer**. The memory target is at least a 25% reduction and the frame target
+requires matching or beating the copy control. Both tested TanStack versions
+met the memory target and missed the frame target.
 
-## Browser measurements
+## Four-reader check on 1.0.0-rc.1.5
+
+The upgraded editor completed three paired trials of the same synthetic
+workload. Every command passed the worker revision and viewport checks.
+Peak process-tree PSS was 473.5 MiB for copy and 336.5 MiB for shared.
+The median trial p95 was 161.5 → 197.2 ms for frames and 12.4 → 18.1 ms
+for validation. Individual trial frame p95s ranged from 132.1 to 182.5 ms
+for copy and from 144.9 to 244.1 ms for shared. Both editors in this
+comparison used the release candidate. The experiment compares storage
+strategies within that version. [Measured source](https://github.com/natanelia/zerocopy/commit/21dba3a6da7c21e548a8568aa05afb8b4b87c861) · [Raw samples](results/tanstack-1.0.0-rc.1.5-readers-4.json.gz)
+
+```sh
+node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/tanstack-1.0.0-rc.1.5-readers-4.json.gz
+```
+
+## Browser measurements on 0.15.2
 
 Each cell shows **copy → shared**. Memory is the median of three per-trial
 peak process-tree PSS measurements. Latencies are medians of three per-trial
@@ -23,7 +39,7 @@ determines the gate. The overlapping ranges and one host limit the conclusions
 about interactive latency. At four readers, both editors uploaded 66,848 bytes
 at p95. Their p95 CPU packing times were 0.34 and 0.51 ms respectively.
 
-## Longer editing session
+## Longer editing session on 0.15.2
 
 One additional four-reader trial per editor ran 1,024 measured commands after
 16 warmups, with 65 base-index rebuilds each. Both reached revision 728 with
@@ -43,7 +59,7 @@ checks viewport membership against a full scan and checks the row and
 geometry revision seen by readers. The opening cycle also checks GPU picking
 through a vertex drag and undo.
 
-The recorded replay used TanStack DB 0.15.2. It ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
+Both versions ran on 2026-11-26 on Linux with an AMD EPYC-Milan Processor and
 Chromium 156.0.8078.4 using SwiftShader. Frame timing starts at command
 dispatch and ends when WebGL finishes the first updated draw. Display
 presentation and hardware GPU timing require separate measurements. PSS
@@ -62,7 +78,7 @@ engine or to standardize a GeoArrow rendering adapter.
 
 ## Reproduce the comparison
 
-The measured library and replay are at
+The source for the 0.15.2 trials is at
 [`7ab181b`](https://github.com/natanelia/zerocopy/commit/7ab181b480b70cde3f683a61641dea8a42558f7a).
 The [replay instructions](README.md) describe the build and browser setup.
 The compressed reports contain the bundle hashes, per-command samples and

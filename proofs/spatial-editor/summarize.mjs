@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 
-const inputs = process.argv.slice(2);
-if (!inputs.length) throw new Error('Supply reports covering one, four, and eight readers');
+const fourReadersOnly = process.argv[2] === '--readers=4';
+const readerCounts = fourReadersOnly ? [4] : [1, 4, 8];
+const inputs = process.argv.slice(fourReadersOnly ? 3 : 2);
+if (!inputs.length) throw new Error('Supply benchmark reports for reader counts: ' + readerCounts.join(', '));
 const reports = inputs.map(path => {
   const buffer = readFileSync(path);
   return JSON.parse(path.endsWith('.gz') ? gunzipSync(buffer) : buffer);
@@ -15,10 +17,10 @@ for (const report of reports) {
   }
 }
 const cases = reports.flatMap(report => report.cases);
-assert.equal(cases.length, 18, 'Three paired trials at each of three reader counts are required');
+assert.equal(cases.length, 6 * readerCounts.length, 'Three paired trials per requested reader count are required');
 const median = values => values.toSorted((a,b) => a-b)[1];
 const summary = [];
-for (const readers of [1, 4, 8]) {
+for (const readers of readerCounts) {
   const row = { readers };
   for (const mode of ['copy', 'shared']) {
     const matching = cases.filter(c => c.mode === mode && c.readers === readers);
