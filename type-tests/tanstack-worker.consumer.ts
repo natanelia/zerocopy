@@ -1,7 +1,7 @@
 import { createCollection, createTransaction } from '@tanstack/db';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
-import { applySpatialEdits, buildSpatialIndex, diffSpatialJoin, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
+import { applySpatialEdits, buildSpatialIndex, diffSpatialJoin, diffSpatialViewport, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
 const options = sharedCollectionConfig<Lane>({ id: 'lanes' });
@@ -27,6 +27,10 @@ const roots = await initWorker<{ edits: typeof edits }>(getWorkerData({ edits })
 const candidates: number[] = querySpatialIndex(structuredClone(base), [0, 0, 2, 3], roots.edits);
 const visible = createCollection(viewportCollectionConfig({ id: 'visible' }));
 const published: boolean = await visible.utils.setVisibleIds(Promise.resolve(candidates));
+const crossings = diffSpatialViewport([0, 0, 2, 3], [{ id: 17, before: [0, 0, 2, 3], after: null }]);
+await visible.utils.applyVisibleChanges(Promise.resolve(crossings), visible.utils.getVersion());
+// @ts-expect-error A viewport delta needs the version used to compute it.
+visible.utils.applyVisibleChanges(crossings);
 const featureId: number | undefined = visible.get(17)?.id;
 void published; void featureId;
 // @ts-expect-error The default viewport collection accepts numeric feature handles.

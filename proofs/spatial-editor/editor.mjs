@@ -3,7 +3,7 @@ import { createSharedSession } from '../../dist/worker.js';
 import { SharedList, SharedMap, getWorkerData, list } from '../../dist/shared.js';
 import { sharedCollectionConfig, viewportCollectionConfig } from '../../dist/tanstack-db-collection.js';
 import { bboxXY, lineStringViewXY } from '../../dist/geometry.js';
-import { applySpatialEdits, buildLineStringIndex, buildLineStringLookup, pruneSpatialEdits } from '../../dist/spatial.js';
+import { applySpatialEdits, buildLineStringIndex, buildLineStringLookup, diffSpatialViewport, pruneSpatialEdits } from '../../dist/spatial.js';
 import { baseFor, viewportFor } from './spatial.mjs';
 import { currentPaths } from './tile-paths.mjs';
 import { loadTile } from './tile-io.mjs';
@@ -117,9 +117,13 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         base = newBase;
         if (!shared) rebuiltChanges = new Map(changes);
       }
-      if (cmd.box) box = cmd.box;
-      else {
+      if (cmd.box) {
+        box = cmd.box;
+        await visible.utils.setVisibleIds(viewportFor(shared, base, changes, box));
+      } else {
         const { id } = cmd;
+        const before = rows().get(id)?.bounds ?? null;
+        const version = visible.utils.getVersion();
         const old = currentPaths(paths, tile, rows()).get(id);
         let next, xy;
         if (!cmd.remove) {
@@ -165,10 +169,13 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
           patch = cmd.moveX !== undefined || cmd.moveY !== undefined
             ? { id, row, axis: cmd.moveY === undefined ? 0 : 1, coordinate: cmd.moveX ?? cmd.moveY, change }
             : { id, row, path: next, change };
+          const delta = diffSpatialViewport(box, [{ id: Number(id), before, after: change.bounds }]);
+          const applied = await visible.utils.applyVisibleChanges({
+            added: delta.added.map(String), removed: delta.removed.map(String),
+          }, version);
+          if (!applied) throw new Error('Viewport changed during a serialized editor command');
         }
       }
-      const ids = viewportFor(shared, base, changes, box);
-      await visible.utils.setVisibleIds(ids);
       const liveRows = [...query.values()];
       const liveIds = liveRows.map(v => v.id).sort((a, b) => Number(a) - Number(b));
       const frame = { box, revision, request: step, base: newBase, rebuiltChanges, checkId: cmd.id,

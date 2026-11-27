@@ -17,6 +17,26 @@ one point took a median 0.0074 ms incrementally and 2.95 ms for a full join.
 Moving all 4,096 points took 8.90 ms incrementally and 3.24 ms for a full
 join. [Environment, source checksums and raw samples](results/join-edits-node26.json)
 
+To measure a fixed viewport from worker dispatch through TanStack publication,
+run `node proofs/spatial-editor/viewport-edits.mjs` after the browser build.
+A Node worker either searches a complete shared index or returns the IDs that
+entered or left the viewport. Both paths update a real TanStack collection.
+Each publication is checked against a scan of the 4,096 points.
+
+| Edited points | IDs in full replies, forward / undo | IDs in each delta | Full publication | Delta publication |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 2,047 / 2,048 | 1 | 0.79 ms | 0.18 ms |
+| 32 | 2,038 / 2,048 | 32 | 0.97 ms | 0.30 ms |
+| 4,096 | 2,048 / 2,048 | 4,096 | 12.58 ms | 13.89 ms |
+
+Values are medians of three fresh-process medians on Node 26.13.1 and
+TanStack DB 1.0.0-rc.1.5. The worker starts with both indexes and the edits.
+Timers include searching or computing crossings, transferring the result and
+publishing membership. Index construction, input delivery, validation and
+rendering are outside the timer. Replacing the full result was faster in
+the dense case, where every point crossed the viewport edge.
+[Source checksums and raw timings](results/viewport-edits-node.json)
+
 To measure the owner's work after a rebuilt index arrives, run
 `node proofs/spatial-editor/prune-edits.mjs` or `bun proofs/spatial-editor/prune-edits.mjs`
 after the browser build. The worker's input contains 16,384 edits. While the
@@ -73,8 +93,10 @@ benchmark rebuilding from shared metadata rows on the same executable, pass
 `--rebuild=rows`. The copy control always uses its native metadata rows.
 Feature IDs in this fixture are stable decimal strings representing uint32
 slots. A search returns bounding-box candidates in the tile coordinate system.
-Both editors pass their candidate IDs to `viewportCollectionConfig`. The
-resulting TanStack membership collection drives the live join to lane rows.
+Both editors publish full candidate lists on a pan. For confirmed edits in the
+same viewport, they publish only membership changes. Rejected edits leave the
+viewport alone. The TanStack membership collection drives the live join to
+lane rows. Validation workers independently search the full view on every command.
 
 Each reader validates the geometry and row bounds in the same publication.
 The harness compares the spatial result and the TanStack live join against a

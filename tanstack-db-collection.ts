@@ -303,11 +303,11 @@ function membershipOptions<Item, K extends string | number, Row extends { id: K 
 
 /** Read-only TanStack membership rows for a spatial query, including worker-produced results. */
 export function viewportCollectionConfig<K extends string | number = number>({ id }: { id: string }) {
-  const { setMembers, options } = membershipOptions(id, (key: K) => {
+  const { setMembers, applyChanges, getVersion, options } = membershipOptions(id, (key: K) => {
     if (typeof key !== 'string' && !Number.isFinite(key)) throw new TypeError('Viewport IDs must be strings or finite numbers');
     return key;
   }, (id: K) => ({ id }));
-  return { ...options, utils: { setVisibleIds: setMembers } };
+  return { ...options, utils: { setVisibleIds: setMembers, applyVisibleChanges: applyChanges, getVersion } };
 }
 
 /** Read-only TanStack rows keyed by ordered feature-ID pairs from a spatial join. */

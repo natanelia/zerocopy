@@ -195,6 +195,10 @@ function checkChangedIds(ids: Uint32Array): void {
   }
 }
 
+function overlapsViewport(bounds: BoundsXY, viewport: BoundsXY): boolean {
+  return bounds[0] <= viewport[2] && bounds[1] <= viewport[3] && bounds[2] >= viewport[0] && bounds[3] >= viewport[1];
+}
+
 /** Build a replacement from a captured base and overlay without decoding feature metadata. */
 export function rebuildSpatialIndex(base: SpatialIndex, changes: SpatialChanges, revision: number): SpatialIndex {
   const tree = treeFor(base);
@@ -249,8 +253,7 @@ export function querySpatialIndex(index: SpatialIndex | PreparedSpatialQuery, bo
   }
   if (changes) {
     for (const [key, { revision, bounds }] of changes.entries()) {
-      if (revision > base.revision && bounds && bounds[0] <= box[2] && bounds[1] <= box[3] &&
-          bounds[2] >= box[0] && bounds[3] >= box[1]) result.push(Number(key));
+      if (revision > base.revision && bounds && overlapsViewport(bounds, box)) result.push(Number(key));
     }
   }
   return result.sort((a, b) => a - b);
@@ -354,6 +357,35 @@ function changedBounds(edits: readonly SpatialBoundsChange[] = []): Map<number, 
     changes.set(id, { id, before: first ? first.before : before, after });
   }
   return changes;
+}
+
+export interface SpatialViewportDelta {
+  readonly added: readonly number[];
+  readonly removed: readonly number[];
+}
+
+/** Changes in membership of a fixed viewport. Supply every edited feature, including geometry-only changes. */
+export function diffSpatialViewport(
+  viewport: BoundsXY, edits: readonly SpatialBoundsChange[],
+  filter?: (id: number, frame: 'before' | 'after') => boolean,
+): SpatialViewportDelta {
+  checkBounds(viewport, false);
+  if (filter !== undefined && typeof filter !== 'function') throw new TypeError('Expected a spatial viewport filter function');
+  const added: number[] = [], removed: number[] = [];
+  function visible(id: number, bounds: BoundsXY | null, frame: 'before' | 'after'): boolean {
+    if (!bounds || !overlapsViewport(bounds, viewport)) return false;
+    if (!filter) return true;
+    const match = filter(id, frame);
+    if (typeof match !== 'boolean') throw new TypeError('Spatial viewport filters must return a boolean');
+    return match;
+  }
+  for (const { id, before, after } of changedBounds(edits).values()) {
+    const wasVisible = visible(id, before, 'before');
+    const isVisible = visible(id, after, 'after');
+    if (isVisible && !wasVisible) added.push(id);
+    if (wasVisible && !isVisible) removed.push(id);
+  }
+  return { added: added.sort((a, b) => a - b), removed: removed.sort((a, b) => a - b) };
 }
 
 /** Changes to a fixed join, given every edited feature's bounds in the two frames. */

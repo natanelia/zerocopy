@@ -11,6 +11,7 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
+  ['docs/spatial.md', 'spatial-viewport-edits', "assert.deepEqual(delta, { added: [7], removed: [9] });"],
   ['docs/geometry.md', 'stream-lane-tile', `
 const { encodeTile } = await import('../proofs/spatial-editor/tile-io.mjs');
 const { getLineStringById } = await import('zerocopy/spatial');

@@ -1,7 +1,7 @@
 import { initWorker } from '../dist/shared.js';
 import { bboxXY, pathIntersectsBoxXY } from '../dist/geometry.js';
 
-import { diffSpatialJoin, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from '../dist/spatial.js';
+import { diffSpatialJoin, diffSpatialViewport, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from '../dist/spatial.js';
 
 let first, current, firstPrepared;
 self.onmessage = async ({ data }) => {
@@ -27,9 +27,10 @@ self.onmessage = async ({ data }) => {
         narrowPairs: querySpatialJoin(prepared, data.roadIndex, frame(state, prepared)),
       };
     };
-    const delta = diffSpatialJoin(frame(first, firstPrepared), frame(current, data.prepared), {
-      left: [{ id: 7, before: bboxXY(first.geometry), after: bboxXY(current.geometry) }],
-    });
-    self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared), delta });
+    const edits = [{ id: 7, before: bboxXY(first.geometry), after: bboxXY(current.geometry) }];
+    const delta = diffSpatialJoin(frame(first, firstPrepared), frame(current, data.prepared), { left: edits });
+    const viewportDelta = diffSpatialViewport(narrow, edits, (_, phase) =>
+      pathIntersectsBoxXY(phase === 'before' ? first.geometry : current.geometry, narrow));
+    self.postMessage({ first: read(first, firstPrepared), current: read(current, data.prepared), delta, viewportDelta });
   } catch (error) { self.postMessage({ error: String(error) }); }
 };

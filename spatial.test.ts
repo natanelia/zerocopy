@@ -1,11 +1,38 @@
 import { expect, it, vi } from 'vitest';
 import { arenaOf } from './arena.ts';
-import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
+import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, diffSpatialViewport, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
 import { lineStringViewXY, pathIntersectsBoxXY } from './geometry';
 import { getWorkerData, initWorker, resetMap } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
+
+it('reports sorted viewport crossings and refines each edited candidate once per retained frame', () => {
+  const edge = [2, 2, 3, 3] as const;
+  const edits = [
+    { id: 0xffffffff, before: null, after: far }, { id: 0xffffffff, before: far, after: edge },
+    { id: 8, before: edge, after: null }, { id: 3, before: box, after: box },
+    { id: 2, before: box, after: far }, { id: 1, before: null, after: box },
+    { id: 0, before: null, after: box }, { id: 0, before: box, after: null },
+  ];
+  const filter = vi.fn((id, frame) => id !== 3 || frame === 'after');
+  expect(diffSpatialViewport(box, edits, filter)).toEqual({ added: [1, 3, 0xffffffff], removed: [2, 8] });
+  expect(filter.mock.calls).toEqual([[0xffffffff, 'after'], [8, 'before'], [3, 'before'], [3, 'after'], [2, 'before'], [1, 'after']]);
+  expect(diffSpatialViewport([-Infinity, -Infinity, Infinity, Infinity], edits)).toEqual({ added: [1, 0xffffffff], removed: [8] });
+  expect(() => diffSpatialViewport(box, [{ id: 0, before: far, after: [1, 2, 0, 2] }])).toThrow(RangeError);
+  expect(() => diffSpatialViewport(box, [{ id: -1, before: null, after: null }])).toThrow(RangeError);
+  expect(() => diffSpatialViewport(box, edits, (() => 1) as never)).toThrow(/boolean/);
+  expect(() => diffSpatialViewport([NaN, 0, 1, 1], [])).toThrow(RangeError);
+});
+
+it('updates exact path visibility when an interior vertex moves within unchanged bounds', () => {
+  const viewport = [1, 1, 3, 3] as const, envelope = [0, 0, 4, 4] as const;
+  const paths = { before: Float64Array.of(0, 0, 0, 4, 4, 4), after: Float64Array.of(0, 0, 2, 2, 4, 4) };
+  const edits = [{ id: 7, before: envelope, after: envelope }];
+  expect(diffSpatialViewport(viewport, edits)).toEqual({ added: [], removed: [] });
+  expect(diffSpatialViewport(viewport, edits, (_, frame) => pathIntersectsBoxXY(paths[frame], viewport)))
+    .toEqual({ added: [7], removed: [] });
+});
 
 it('borrows arbitrary feature IDs across uneven packed batches, including null, empty and absent lanes', () => {
   const empty = { ids: [], paths: { offsets: Int32Array.of(0), coordinates: new Float64Array(), validity: null } };
@@ -348,8 +375,12 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
   const build = (r: number) => buildSpatialIndex(Array.from(rows, ([id, bounds]) => ({ id, bounds })), r);
   let base = build(0), changes = applySpatialEdits(undefined, 0, []);
   let captured = changes, replacement = base;
+  const fixed = [10, 20, 70, 80] as const, visible = new Set(querySpatialIndex(base, fixed));
   for (let r = 1; r <= 300; r++) {
     const id = random(250), bounds = r % 7 ? rect() : null;
+    const delta = diffSpatialViewport(fixed, [{ id, before: rows.get(id) ?? null, after: bounds }]);
+    for (const removed of delta.removed) expect(visible.delete(removed)).toBe(true);
+    for (const added of delta.added) { expect(visible.has(added)).toBe(false); visible.add(added); }
     if (bounds) rows.set(id, bounds); else rows.delete(id);
     changes = applySpatialEdits(changes, r, [{ id, bounds }]);
     if (r % 43 === 35) { captured = changes; replacement = rebuildSpatialIndex(base, captured, r); }
@@ -362,5 +393,6 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
       Math.max(b[1], box[1]) <= Math.min(b[3], box[3])).map(([id]) => id).sort((a,b) => a-b);
     expect(querySpatialIndex(base, box, changes)).toEqual(expected);
     expect(querySpatialIndex(prepareSpatialQuery(base, changes, r), box)).toEqual(expected);
+    expect(visible).toEqual(new Set(querySpatialIndex(base, fixed, changes)));
   }
 });

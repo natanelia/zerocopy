@@ -156,6 +156,30 @@ properties through the metadata collection. You can seed the IDs before creating
 the collection. The options instance retains its last successful membership
 across cleanup and reconnect.
 
+### Publish viewport edits from a worker
+
+After a pan, seed the membership with the full result. For edits under the
+same viewport, send the worker's `diffSpatialViewport` result directly to
+`applyVisibleChanges`. Capture the membership version when dispatching the
+job and register the promise immediately.
+
+```ts
+const version = visible.utils.getVersion();
+const delta = worker.computeViewportChanges(viewport, editsSincePublication);
+const applied = await visible.utils.applyVisibleChanges(delta, version);
+```
+
+Here `worker.computeViewportChanges` is the application's worker call. Its
+promise resolves to `{ added, removed }` with the same ID type as the viewport
+collection. Include every edit since the accepted membership used as the
+job's starting point. The adapter writes just the listed IDs in one sync
+batch. An accepted publication advances the version even when membership
+stays the same. A superseded job or an obsolete version returns `false`.
+Use the newer accepted result, or run a full search if the matching edit
+history is unavailable. The version belongs to the membership collection.
+Keep the corresponding map revision and viewport with the worker request.
+[Compute viewport changes](spatial.md#update-a-fixed-viewport-after-an-edit)
+
 ## Live spatial joins
 
 Use `spatialJoinCollectionConfig` when a validation depends on **which two

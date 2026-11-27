@@ -127,6 +127,12 @@ it('publishes only membership changes and keeps a real metadata join live', asyn
     await lanes.update('lane-2', lane => { lane.direction = 'south'; }).when('settled');
     expect(rows()).toEqual([['lane-2', 'south'], ['lane-3', 'north']]);
     expect(batches).toHaveLength(2);
+    const version = visible.utils.getVersion();
+    expect(await visible.utils.applyVisibleChanges({ added: [1, 1, 2], removed: [3, 4] }, version)).toBe(true);
+    expect(batches.at(-1)).toEqual(['delete:3', 'insert:1']);
+    expect(rows()).toEqual([['lane-1', 'north'], ['lane-2', 'south']]);
+    expect(await visible.utils.applyVisibleChanges({ added: [3], removed: [] }, version)).toBe(false);
+    expect(batches).toHaveLength(3);
     await visible.utils.setVisibleIds([]);
     expect(rows()).toEqual([]);
   } finally {
@@ -157,6 +163,13 @@ it('supersedes pending worker searches in dispatch order and preserves the last 
     await expect(staleFailure).resolves.toBe(false);
     await expect(visible.utils.setVisibleIds([NaN as unknown as string])).rejects.toThrow();
     expect([...visible.keys()]).toEqual(['new']);
+    const version = visible.utils.getVersion();
+    const drag = Promise.withResolvers<{ added: string[]; removed: string[] }>();
+    const oldDrag = visible.utils.applyVisibleChanges(drag.promise, version);
+    await visible.utils.setVisibleIds(['new']);
+    drag.resolve({ added: ['other'], removed: ['new'] });
+    expect(await oldDrag).toBe(false);
+    await expect(visible.utils.applyVisibleChanges({ added: ['other'], removed: ['other'] }, version + 1)).rejects.toThrow(/both/);
     const late = Promise.withResolvers<string[]>();
     const oldRun = visible.utils.setVisibleIds(late.promise);
     await visible.reload();

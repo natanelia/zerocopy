@@ -123,7 +123,9 @@ try {
   await pairs.utils.setPairs(Promise.resolve([[2, 1], [2, 3]]));
   await viewport.utils.setVisibleIds([1, 2]);
   assert.equal([...matches.values()][0].id, '2:1');
-  await viewport.utils.setVisibleIds(Promise.resolve([2, 3]));
+  const viewportVersion = viewport.utils.getVersion();
+  assert.equal(await viewport.utils.applyVisibleChanges(Promise.resolve({ added: [3], removed: [1] }), viewportVersion), true);
+  assert.equal(await viewport.utils.applyVisibleChanges({ added: [1], removed: [] }, viewportVersion), false);
   assert.equal([...matches.values()][0].id, '2:3');
   const version = pairs.utils.getVersion();
   assert.equal(await pairs.utils.applyPairChanges({ added: [[2, 2]], removed: [[2, 3]] }, version), true);

@@ -34,6 +34,31 @@ Applications selecting polygon interiors need a polygon predicate.
 To keep UI rows in sync with these results, publish the IDs or a worker
 search promise into a [TanStack viewport collection](tanstack.md#live-viewport-membership).
 
+### Update a fixed viewport after an edit
+
+Once a viewport is populated, `diffSpatialViewport(viewport, edits, filter?)`
+returns the sorted handles that entered or left it. Supply each edited feature's
+old and new bounds. Use `null` for an absent feature. For repeated edits to
+one handle, the function compares its first before box and last after box.
+Boundary touches count as visible.
+
+<!-- example: spatial-viewport-edits -->
+```ts
+import { diffSpatialViewport } from 'zerocopy/spatial';
+
+const delta = diffSpatialViewport([0, 0, 10, 10], [
+  { id: 7, before: [20, 0, 22, 1], after: [10, 0, 12, 1] },
+  { id: 9, before: [4, 4, 6, 6], after: null },
+]); // { added: [7], removed: [9] }
+```
+
+For exact path selection, pass a synchronous `(id, frame) => boolean`
+predicate. It runs only when the feature's bounds intersect the viewport in
+that frame. Read geometry from the snapshot identified by `'before'` or
+`'after'`. Include edits to interior vertices or filter properties even when
+the bounding box stays the same. A pan or a change to the selection rule
+requires a fresh search across the affected features.
+
 ## Select intersecting paths
 
 Both lanes below have bounds that overlap the viewport. The first follows
