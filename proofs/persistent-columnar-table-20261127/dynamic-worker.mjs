@@ -3,6 +3,10 @@ import {digest} from './lane-fixture.mjs';
 let current,last=-1;const retained=new Map();
 self.onmessage=async({data:m})=>{
   try{
+    if(m.release){
+      retained.clear();
+      self.postMessage({digest:await digest(m.ids.length,i=>get(m.mode,current,m.ids[i]))});return;
+    }
     if(m.verify){
       const out=[];
       for(const {rev,ids,missing} of m.history){

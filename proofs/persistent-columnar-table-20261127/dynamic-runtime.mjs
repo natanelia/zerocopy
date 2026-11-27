@@ -1,6 +1,6 @@
 // Proof-only schema integration using existing persistent vectors and key index.
 // No format or production API change. Dense slot numbers are private, never row identities.
-import {SharedMap,SharedList,getWorkerData,initWorker} from '../../dist/shared.js';
+import {SharedMap,SharedList,getWorkerData,initWorker,resetMap,resetSharedList,compact} from '../../dist/shared.js';
 import {key,schema,fields,matches,validate} from './lane-fixture.mjs';
 const names=['id','occupied','capacity',...fields];
 const isJSON=m=>m.startsWith('json'),isNative=m=>m==='native';
@@ -105,7 +105,7 @@ export async function attach(mode,p,prev){
 }
 export function scan(mode,s,q){
   const out=[];
-  if(mode==='json-direct'){
+  if(mode==='json-direct'||mode==='json-compact'){
     for(const v of s.map.valuesView()){
       if(v.get('active')!==true||v.get('kind')!==q.kind)continue;
       const r={active:true,kind:q.kind,left:v.get('left'),right:v.get('right'),bottom:v.get('bottom'),top:v.get('top')};
@@ -121,4 +121,31 @@ export function scan(mode,s,q){
     }
   }
   out.sort((a,b)=>a[0]-b[0]);return out;
+}
+
+/** Proof only: rebuild just live rows into fresh arenas. Resetting module defaults
+ * is safe only in this dedicated single-owner proof, not a production API.
+ * Published handles and attached workers keep the old arenas alive. */
+export function repack(mode,owner){
+  if(isNative(mode))throw Error('no native repack');
+  if(isJSON(mode)){
+    const map=compact(owner.map);resetMap();return {map};
+  }
+  const rows=[],slots=Array.from(owner.index.values()).sort((a,b)=>a-b);
+  for(const i of slots){
+    const m=slotMeta(owner,i);
+    if(!m.occupied||owner.index.get(key(m.id))!==i)throw Error('invalid live slot');
+    rows.push(materialize(owner,m));
+  }
+  resetMap();resetSharedList();
+  return build(mode,rows);
+}
+export function shouldRepack(mode,rev,owner){
+  if(mode==='json-compact')return rev>0&&rev%24===0;
+  return mode.startsWith('append-repack')&&owner.columns.id.size>=Math.ceil(owner.index.size*1.5);
+}
+export function arenaUsage(o,mode){
+  if(isNative(mode))return [];
+  const data=getWorkerData(isJSON(mode)?{map:o.map}:{index:o.index,coords:o.coords,...o.columns},{copy:false});
+  return data.arenas.map(a=>({id:a.id,used:a.used,capacity:a.memory.buffer.byteLength}));
 }

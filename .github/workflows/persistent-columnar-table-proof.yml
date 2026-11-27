@@ -1,4 +1,4 @@
-name: Persistent schema dynamic lane identity and geometry reuse (proof only)
+name: Persistent schema generation repacking (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -41,20 +41,20 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build:wasm && bun run build:browser
       - run: bunx playwright install --with-deps ${{ matrix.engine }}
-      - name: Dynamic schema semantics
+      - name: Dynamic schema and generation semantics
         run: node --test proofs/persistent-columnar-table-20261127/dynamic.test.mjs
-      - name: Browser dynamic geometry replay
+      - name: Browser generation repacking replay
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p columnar-results
           git rev-parse HEAD | tee columnar-results/commit.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 96 | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-dynamic-${{ matrix.engine }}-${{ matrix.size }}-${{ github.run_id }}
+          name: columnar-repack-${{ matrix.engine }}-${{ matrix.size }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn

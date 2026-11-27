@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {build,edit,get,size,payload,attach,scan} from './dynamic-runtime.mjs';
+import {build,edit,get,size,payload,attach,scan,repack,arenaUsage} from './dynamic-runtime.mjs';
 import {lane,bounds} from './lane-fixture.mjs';
 const modes=['append','reuse-slots','reuse-span','reuse-span-control','json-direct','native'];
 function shorten(r){const xy=r.xy.slice(0,4);return {...r,xy,...bounds(xy)};}
@@ -34,4 +34,24 @@ test('reused capacity and old geometry independent',()=>{
   assert.equal(payload('reuse-span',a).memory.coordinateSlots,payload('reuse-span',b).memory.coordinateSlots);
   assert.deepEqual(get('reuse-span',a,0),r);assert.deepEqual(get('reuse-span',b,500),small);
   assert.equal(get('reuse-span',b,0),undefined);
+});
+
+test('repacking live identities into fresh arenas retains old worker views and forks',async()=>{
+  for(const mode of ['append-repack','json-compact']){
+    const rows=Array.from({length:65},(_,i)=>lane(i)),a=build(mode,rows),old=await attach(mode,structuredClone(payload(mode,a).wire));
+    const b=edit(mode,a,{remove:[0,31],upsert:[[100,lane(100)],[101,lane(101)]]});
+    const before=arenaUsage(b,mode),held=await attach(mode,structuredClone(payload(mode,b).wire),old);
+    const c=repack(mode,b),after=arenaUsage(c,mode);
+    assert(after.every(x=>!before.some(y=>y.id===x.id)));
+    const current=await attach(mode,structuredClone(payload(mode,c).wire),held);
+    assert.equal(size(mode,current),65);assert.equal(get(mode,current,0),undefined);assert.deepEqual(get(mode,old,0),rows[0]);
+    assert.deepEqual(get(mode,current,100),lane(100));assert.deepEqual(get(mode,held,101),lane(101));
+    if(mode.startsWith('append'))assert.equal(payload(mode,c).memory.slots,65);
+    const fork=edit(mode,b,{remove:[100],upsert:[[102,lane(102)]]});
+    assert.equal(get(mode,fork,100),undefined);assert.deepEqual(get(mode,c,100),lane(100));
+    const d=edit(mode,c,{remove:[101],upsert:[[103,lane(103)]]});
+    assert.deepEqual(get(mode,d,103),lane(103));assert.deepEqual(get(mode,held,101),lane(101));
+    const q={left:-Infinity,right:Infinity,bottom:-Infinity,top:Infinity,kind:2};
+    assert.deepEqual(scan(mode,current,q),scan(mode,held,q));
+  }
 });
