@@ -1,0 +1,45 @@
+{
+  "results/formal-01.json.gz": {
+    "uncompressedBytes": 3454972,
+    "uncompressedSha256": "86241b0079284bdb85ba38eb69457b8b9fdadefdc69744687b1f36e8a695fd6d",
+    "compressedBytes": 307480,
+    "compressedSha256": "b6977d2a11713fa6e55e05c08aa5135297454147a8b7df2429be4fbe016b057d"
+  },
+  "results/pilot-02.json.gz": {
+    "uncompressedBytes": 627699,
+    "uncompressedSha256": "095c25855cff054a9799995b3dc4d8071372b93f2af96ece31fbe91467814b53",
+    "compressedBytes": 56847,
+    "compressedSha256": "0ea8250f631742a469e3983b86f9f3edac1b55daa2768edfcfc1c3fec04bd20b"
+  }
+}
+{
+  "ok": true,
+  "mode": "formal",
+  "pairs": 120,
+  "subjects": 240,
+  "measuredBatches": 2160,
+  "shortestMeasuredBatchMs": 0.6985710000000154,
+  "warmupTimedMsRange": [
+    500.00511899999964,
+    537.6701330000001
+  ],
+  "rawSha256": "86241b0079284bdb85ba38eb69457b8b9fdadefdc69744687b1f36e8a695fd6d",
+  "checkedSourceBuilds": true
+}
+{
+  "ok": true,
+  "mode": "pilot",
+  "pairs": 40,
+  "subjects": 80,
+  "measuredBatches": 720,
+  "shortestMeasuredBatchMs": 0.7342049999999745,
+  "warmupTimedMsRange": [
+    100.08428499999998,
+    242.10240199999996
+  ],
+  "rawSha256": "095c25855cff054a9799995b3dc4d8071372b93f2af96ece31fbe91467814b53",
+  "checkedSourceBuilds": true
+}
+Recorded benchmark rows unchanged: 72/72
+Recorded evidence files changed: 0
+Documentation links and benchmark structure passed (59 Markdown files).
