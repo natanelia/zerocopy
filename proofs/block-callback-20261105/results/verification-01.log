@@ -1,0 +1,7 @@
+results/node-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-screen-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/node-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+results/bun-formal-01.json.gz: archive hashes, all subjects, pairing, medians and summary estimates verified
+before: all 86 recorded source/bundle hashes match
+after: all 86 recorded source/bundle hashes match
+{"formalPairs":120,"screenPairs":40,"measuredBatches":2720,"allArchiveRoundTripsVerified":true}
