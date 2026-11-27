@@ -99,8 +99,10 @@ if (xy && xy.length >= 2) {
 `lineStringViewXY` returns a borrowed Float64 view in constant time. A missing
 lane returns `null`, an empty lane returns a zero-length view, and an invalid
 row index throws. Workers can use this function through `zerocopy/geometry`
-without installing Arrow. Creating the editable list copies only the selected
-lane. Its edits leave the imported tile available to existing readers.
+without installing Arrow. Pass this view directly to `bboxXY` or
+`pathIntersectsBoxXY` for read-only queries. Creating the editable list
+copies only the selected lane. Its edits leave the imported tile available
+to existing readers. [Index a GeoArrow tile](spatial.md#index-a-geoarrow-tile)
 
 Both GeoArrow coordinate layouts are supported. Separate X and Y columns are
 interleaved once on import. Ordinary interleaved buffers from Arrow IPC are
@@ -120,11 +122,18 @@ carry the original CRS and other extension fields through export.
 
 ## XY bounds
 
-`bboxXY` recomputes `[minX, minY, maxX, maxY]` from interleaved 2D coordinates. It reads the supplied snapshot directly and returns a fresh readonly tuple. It does not parse GeoJSON, transform coordinates, use cached bounds, or change existing collection methods. A caller must use this new API to benefit from it. Reuse previously calculated bounds when a snapshot has not changed.
+`bboxXY` recomputes `[minX, minY, maxX, maxY]` from a numeric `SharedList`
+or an interleaved `Float64Array`. It reads the supplied range directly and
+returns a fresh readonly tuple. Typed-array ranges are relative to the view.
+Keep the coordinates stable while a query reads them.
 
 An odd coordinate count throws `RangeError`. A non-numeric collection throws `TypeError`. NaN axes are ignored. Equal extrema retain the first sign of zero. Infinite coordinates are supported. Empty input returns `[Infinity, Infinity, -Infinity, -Infinity]`. These rules match Turf bbox recomputation for the corresponding flat MultiPoint; this is not the full Turf GeoJSON API.
 
-The accepted kernel is scalar Wasm. SIMD implementations remain rejected experiments because they did not consistently beat the best scalar control on x64 and ARM64 across Node and Bun. Bulk traversal is a separate optimization: it removes per-value JavaScript callbacks and nested GeoJSON traversal. It must pass a separate full-API benchmark before release. No claim of a SIMD speedup applies to this function.
+The numeric list uses a scalar Wasm kernel. SIMD experiments did not
+consistently beat the best scalar control on x64 and ARM64 across Node and
+Bun. Bulk list traversal removes per-value JavaScript callbacks and nested
+GeoJSON traversal and has a separate full-API benchmark gate. A packed
+Float64 view uses a direct JavaScript scan over the same XY range.
 
 ## Path intersection
 
@@ -137,11 +146,13 @@ extents. Reversed bounds and NaN bounds throw.
 The optional `{ start, end }` selects coordinate elements in a half-open
 range. Both ends must align to XY pairs. A vertex with either axis nonfinite
 breaks the path, so the finite vertices on either side remain disconnected.
-The predicate reads the immutable list directly and can stop at the first hit.
+The predicate reads a numeric list or a packed Float64 view directly and can stop at the first hit.
 Corner and edge touches count, including when a floating-point determinant
 needs an exact sign calculation. [Spatial index example](spatial.md#select-intersecting-paths)
 
-Attached read-only snapshots and historical versions are supported. The kernel uses neither an allocator nor shared scratch. Results use instance-local globals and are copied to a new tuple before the synchronous call returns. There are no imported callbacks or asynchronous steps during the transfer. Workers have separate instances. Non-empty calls compile the module lazily and cache one instance per memory; empty input does not compile a module.
+Attached read-only snapshots and historical versions are supported. For list
+bounds, each worker caches one Wasm instance per memory. The kernel stores the
+four results in instance-local globals and returns them synchronously.
 
 ## Refresh an edited lane
 

@@ -1,29 +1,13 @@
 import { arenaOf, validListRange } from './arena';
 import { SharedList } from './shared-list';
 import { assertXY, geometryKernel } from './geometry-runtime';
-import { checkBounds, type BoundsXY } from './xy-bounds';
+import { checkBounds, packedBoundsXY, type BoundsXY } from './xy-bounds';
 import { copyFloat64Range } from './list-float64';
+import type { LineStringBuffersXY } from './line-string-buffers';
+import { typedArrayLength, typedArrayTag } from './memory';
 
 export type { BoundsXY } from './xy-bounds';
-
-/** One native GeoArrow LineString column with interleaved Float64 XY vertices. */
-export interface LineStringBuffersXY<B extends ArrayBufferLike = ArrayBufferLike> {
-  readonly offsets: Int32Array<B>;
-  readonly coordinates: Float64Array<B>;
-  /** Arrow's least-significant-bit-first row validity, or null when all rows exist. */
-  readonly validity: Uint8Array<B> | null;
-}
-
-/** Borrow one row of a packed column. Treat the returned coordinate view as read-only. */
-export function lineStringViewXY<B extends ArrayBufferLike>(
-  { offsets, coordinates, validity }: LineStringBuffersXY<B>, row: number,
-): Float64Array<B> | null {
-  if (!Number.isSafeInteger(row) || row < 0 || row >= offsets.length - 1) {
-    throw new RangeError('LineString row is outside the batch');
-  }
-  if (validity && !(validity[Math.floor(row / 8)] & (1 << (row % 8)))) return null;
-  return coordinates.subarray(offsets[row] * 2, offsets[row + 1] * 2);
-}
+export { lineStringViewXY, type LineStringBuffersXY } from './line-string-buffers';
 
 /** Pack immutable paths into independently owned buffers for Arrow or worker readers. */
 export function packLineStringsXY(paths: Iterable<SharedList<'number'> | null>): LineStringBuffersXY<SharedArrayBuffer> {
@@ -51,28 +35,42 @@ export function packLineStringsXY(paths: Iterable<SharedList<'number'> | null>):
   return Object.freeze({ offsets, coordinates, validity });
 }
 
+type PathXY = SharedList<'number'> | Float64Array;
+
+function pathSize(points: PathXY): number {
+  if (points instanceof SharedList) {
+    assertXY(points);
+    return points.size;
+  }
+  if (typedArrayTag.call(points) !== 'Float64Array') throw new TypeError('Expected a numeric SharedList or Float64Array');
+  const size: number = typedArrayLength.call(points);
+  if (size & 1) throw new RangeError('Coordinates must contain complete x/y pairs');
+  // Detached and out-of-bounds views also report zero length.
+  if (!size) Float64Array.prototype.at.call(points, 0);
+  return size;
+}
+
 function assertPairRange(start: number, end: number, size: number): void {
   if (!validListRange(start, end, size) || ((start | end) & 1)) {
-    throw new RangeError('Coordinate range must be within the list and aligned to x/y pairs');
+    throw new RangeError('Coordinate range must be within the path and aligned to x/y pairs');
   }
 }
 
 /**
- * Recompute bounds from interleaved [x0, y0, x1, y1, ...] snapshot values.
+ * Recompute bounds from interleaved [x0, y0, x1, y1, ...] list or Float64 values.
  * NaN axes are ignored. Equal extrema retain the first sign of zero.
  * Empty input returns [Infinity, Infinity, -Infinity, -Infinity].
  * The optional [start, end) range uses element indexes aligned to XY pairs.
- * Reads the snapshot without an input copy or writes to shared memory.
- * Returns a fresh tuple. This does not parse GeoJSON, transform coordinates,
- * or use cached bounds. The kernel uses scalar Wasm, not SIMD.
+ * Reads the supplied range in place and returns a fresh tuple.
  */
-export function bboxXY(points: SharedList<'number'>, range?: { start?: number; end?: number }): BoundsXY {
-  assertXY(points);
-  const { size, root, depth, tail } = points;
+export function bboxXY(points: PathXY, range?: { start?: number; end?: number }): BoundsXY {
+  const size = pathSize(points);
   const { start = 0, end = size } = range ?? {};
   const full = start === 0 && end === size;
   if (!full) assertPairRange(start, end, size);
   if (start === end) return [Infinity, Infinity, -Infinity, -Infinity];
+  if (!(points instanceof SharedList)) return packedBoundsXY(points, start, end, false);
+  const { root, depth, tail } = points;
   const kernel = geometryKernel(arenaOf(points).memory);
   if (full) kernel.bboxXY(root, depth, tail, size);
   else kernel.bboxXYRange(root, depth, tail, size, start, end);
@@ -122,12 +120,24 @@ function segmentIntersectsBox(ax: number, ay: number, bx: number, by: number, bo
 }
 
 /** Intersect an open XY path with an inclusive planar box. Nonfinite vertices break the path. */
-export function pathIntersectsBoxXY(points: SharedList<'number'>, box: BoundsXY, range?: { start?: number; end?: number }): boolean {
-  assertXY(points);
+export function pathIntersectsBoxXY(points: PathXY, box: BoundsXY, range?: { start?: number; end?: number }): boolean {
+  const size = pathSize(points);
   checkBounds(box, false);
-  const { start = 0, end = points.size } = range ?? {};
-  assertPairRange(start, end, points.size);
+  const { start = 0, end = size } = range ?? {};
+  assertPairRange(start, end, size);
   if (start === end) return false;
+  if (!(points instanceof SharedList)) {
+    for (let i = start; i < end; i += 2) {
+      const x = points[i], y = points[i + 1];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      if (x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]) return true;
+      if (i > start) {
+        const ax = points[i - 2], ay = points[i - 1];
+        if (Number.isFinite(ax) && Number.isFinite(ay) && segmentIntersectsBox(ax, ay, x, y, box)) return true;
+      }
+    }
+    return false;
+  }
   const arena = arenaOf(points), view = arena.dv;
   const tailStart = (points.size - 1) & ~31;
   let previousX = NaN, previousY = NaN;

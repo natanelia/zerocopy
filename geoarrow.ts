@@ -2,6 +2,7 @@ import { DataType, Field, FixedSizeList, Float64, List, Precision, RecordBatch, 
   type Data, type LargeList } from 'apache-arrow';
 import { packLineStringsXY, type LineStringBuffersXY } from './geometry';
 import { typedArrayTag } from './memory';
+import { validateLineStringBuffersXY } from './line-string-buffers';
 
 export { lineStringViewXY, packLineStringsXY, type LineStringBuffersXY } from './geometry';
 
@@ -26,22 +27,10 @@ function planarMetadata(value: unknown): asserts value is PlanarGeoArrowMetadata
 }
 
 /** Wrap a packed XY column in an Apache Arrow table, retaining its coordinate, offset and validity buffers. */
-export function toGeoArrowTable({ offsets, coordinates, validity }: LineStringBuffersXY,
+export function toGeoArrowTable(batch: LineStringBuffersXY,
   extension: PlanarFields | PlanarGeoArrowMetadata = {}): Table<{ geometry: List<FixedSizeList<Float64>> }> {
-  if (typedArrayTag.call(coordinates) !== 'Float64Array' || typedArrayTag.call(offsets) !== 'Int32Array' ||
-      (validity !== null && typedArrayTag.call(validity) !== 'Uint8Array')) {
-    throw new TypeError('Expected Float64 coordinates, Int32 offsets and an optional Uint8 validity bitmap');
-  }
-  const length = offsets.length - 1;
-  if (length < 0 || offsets[0] !== 0 || offsets[length] * 2 !== coordinates.length) {
-    throw new RangeError('LineString offsets must span all XY vertices');
-  }
-  if (validity && validity.length < Math.ceil(length / 8)) throw new RangeError('Incomplete LineString validity bitmap');
-  let nullCount = 0;
-  for (let i = 0; i < length; i++) {
-    if (offsets[i] > offsets[i + 1]) throw new RangeError('LineString offsets must be nondecreasing');
-    if (validity && !(validity[i >>> 3] & (1 << (i & 7)))) nullCount++;
-  }
+  const nullCount = validateLineStringBuffersXY(batch);
+  const { offsets, coordinates, validity } = batch, length = offsets.length - 1;
   planarMetadata(extension);
   const metadata = new Map([['ARROW:extension:name', 'geoarrow.linestring'],
     ['ARROW:extension:metadata', JSON.stringify(extension)]]);

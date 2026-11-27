@@ -1,6 +1,7 @@
 import { SharedList } from 'zerocopy';
 import { bboxXY, lineStringViewXY, pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
 import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
+import { buildLineStringIndex, querySpatialIndex } from 'zerocopy/spatial';
 const bounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]));
 const laneBounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]), { start: 2, end: 4 });
 const minimum: number = bounds[0];
@@ -23,10 +24,15 @@ const options: ExportOptions = { crs: { name: 'test' } };
 toGeoArrowTable(batch, options);
 for (const chunk of imported.batches) {
   const row: Float64Array<SharedArrayBuffer> | null = lineStringViewXY(chunk, 0);
-  if (row) new SharedList('number').pushMany(row);
+  if (row && pathIntersectsBoxXY(row, bounds)) {
+    const index = buildLineStringIndex([{ paths: chunk, ids: Uint32Array.of(12, 14) }]);
+    querySpatialIndex(index, bboxXY(row));
+  }
   toGeoArrowTable(chunk, imported.metadata);
 }
 // @ts-expect-error The XY path adapter supports planar edges.
 toGeoArrowTable(batch, { edges: 'spherical' });
 // @ts-expect-error GeoArrow XY export requires numeric snapshots.
 packLineStringsXY([new SharedList('boolean')]);
+// @ts-expect-error Packed geometry kernels require Float64 coordinates.
+bboxXY(new Float32Array(2));

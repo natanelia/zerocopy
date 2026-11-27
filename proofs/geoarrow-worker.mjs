@@ -5,7 +5,8 @@ import { tableFromIPC, tableToIPC } from 'apache-arrow';
 import { algorithm } from '@geoarrow/geoarrow-js';
 import { SharedList } from 'zerocopy';
 import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
-import { lineStringViewXY } from 'zerocopy/geometry';
+import { bboxXY, lineStringViewXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
+import { buildLineStringIndex, querySpatialIndex } from 'zerocopy/spatial';
 
 if (isMainThread) {
   const path = new SharedList('number').pushMany([0, 1, 2, 3]);
@@ -13,7 +14,8 @@ if (isMainThread) {
   const edited = packLineStringsXY([path.set(2, 7), null, new SharedList('number')]);
   const ipc = tableToIPC(toGeoArrowTable(edited));
   const imported = fromGeoArrowTable(tableFromIPC(ipc)).batches[0];
-  const worker = new Worker(new URL(import.meta.url), { workerData: { exports: [original, edited], imported } });
+  const index = buildLineStringIndex([{ paths: imported, ids: Uint32Array.of(17, 23, 41) }], 2);
+  const worker = new Worker(new URL(import.meta.url), { workerData: { exports: [original, edited], imported, index } });
   let views;
   try {
     [views] = await once(worker, 'message');
@@ -34,6 +36,10 @@ if (isMainThread) {
   assert.equal(imported.coordinates[0], 55);
 } else {
   const importedLane = lineStringViewXY(workerData.imported, 0);
+  assert.deepEqual(querySpatialIndex(workerData.index, [0, 3, 0, 3]), [17]);
+  assert.deepEqual(bboxXY(importedLane), [0, 1, 7, 3]);
+  assert.equal(pathIntersectsBoxXY(importedLane, [0, 3, 0, 3]), false);
+  assert.equal(pathIntersectsBoxXY(importedLane, [3.5, 2, 3.5, 2]), true);
   assert.equal(lineStringViewXY(workerData.imported, 1), null);
   assert.deepEqual([...lineStringViewXY(workerData.imported, 2)], []);
   assert.equal(new SharedList('number').pushMany(importedLane).set(2, 8).get(2), 8);

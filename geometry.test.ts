@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Buffer } from 'node:buffer';
+import { runInNewContext } from 'node:vm';
 import { bboxXY, pathIntersectsBoxXY, type BoundsXY } from './geometry';
 import { buildSpatialIndex, querySpatialIndex } from './spatial';
 import { SharedList, resetSharedList } from './shared-list';
@@ -10,6 +11,28 @@ import { getWorkerData, initWorker } from './shared';
 beforeEach(() => resetSharedList());
 
 describe('bboxXY', () => {
+  it('reads Float64 views from other realms and honors buffer offsets, ranges and IEEE extrema', () => {
+    const xy: Float64Array = runInNewContext('Float64Array.of(-99, -99, -0, 0, NaN, Infinity, 0, -0, 99, 99).subarray(2, 8)');
+    const list = new SharedList('number').pushMany(xy);
+    for (let start = 0; start <= xy.length; start += 2) for (let end = start; end <= xy.length; end += 2) {
+      expect(bboxXY(xy, { start, end })).toEqual(bboxXY(list, { start, end }));
+    }
+    const shared = new Float64Array(new SharedArrayBuffer(xy.byteLength));
+    shared.set(xy);
+    expect(bboxXY(shared)).toEqual([-0, 0, -0, Infinity]);
+    expect(pathIntersectsBoxXY(xy, [1, 1, 2, 2])).toBe(false);
+    expect(pathIntersectsBoxXY(xy, [0, 0, 0, 0])).toBe(true);
+    for (const wrong of [Float32Array.of(1, 2), [1, 2], { [Symbol.toStringTag]: 'Float64Array' }]) {
+      expect(() => bboxXY(wrong as never)).toThrow(TypeError);
+      expect(() => pathIntersectsBoxXY(wrong as never, [0, 0, 1, 1])).toThrow(TypeError);
+    }
+    const detached = Float64Array.of(1, 2);
+    structuredClone(detached.buffer, { transfer: [detached.buffer] });
+    expect(() => bboxXY(detached)).toThrow(TypeError);
+    expect(() => bboxXY(Float64Array.of(1))).toThrow(RangeError);
+    expect(() => pathIntersectsBoxXY(xy, [0, 0, 1, 1], { start: 1 })).toThrow(RangeError);
+    expect(pathIntersectsBoxXY(Float64Array.of(-1, 0, 1, 0), [0, 0, 0, 0], { start: 2 })).toBe(false);
+  });
   it('returns independent bounds with exact signed-zero and NaN handling', () => {
     const p = new SharedList('number').pushMany([-0, 0, 0, -0, NaN, NaN]);
     expect(bboxXY(p)).toEqual([-0, 0, -0, 0]);
@@ -126,9 +149,11 @@ describe('pathIntersectsBoxXY', () => {
     const n = 2 ** 40;
     expect(pathIntersectsBoxXY(path(0, 0, n, n - 1), [n - 1, n - 2, n - 1, n - 2])).toBe(false);
     for (const size of [Number.MIN_VALUE * 8, 2 ** 40, Number.MAX_VALUE]) {
-      const line = path(-size, -size, size, size);
-      expect(pathIntersectsBoxXY(line, [0, 0, 0, 0])).toBe(true);
-      expect(pathIntersectsBoxXY(line, [0, Number.MIN_VALUE, 0, Number.MIN_VALUE])).toBe(false);
+      const xy = Float64Array.of(-size, -size, size, size);
+      for (const line of [xy, path(...xy)]) {
+        expect(pathIntersectsBoxXY(line, [0, 0, 0, 0])).toBe(true);
+        expect(pathIntersectsBoxXY(line, [0, Number.MIN_VALUE, 0, Number.MIN_VALUE])).toBe(false);
+      }
     }
   });
 
@@ -161,7 +186,10 @@ describe('pathIntersectsBoxXY', () => {
         const left = coord(), bottom = coord();
         const box: BoundsXY = [left, bottom, left + Math.abs(coord()), bottom + Math.abs(coord())];
         const scaled: BoundsXY = [box[0] * scale, box[1] * scale, box[2] * scale, box[3] * scale];
-        expect(pathIntersectsBoxXY(path(x * scale, y * scale, u * scale, v * scale), scaled)).toBe(clipped(x, y, u, v, box));
+        const xy = Float64Array.of(x * scale, y * scale, u * scale, v * scale);
+        const expected = clipped(x, y, u, v, box);
+        expect(pathIntersectsBoxXY(xy, scaled)).toBe(expected);
+        expect(pathIntersectsBoxXY(path(...xy), scaled)).toBe(expected);
       }
     }
   });

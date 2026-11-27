@@ -60,6 +60,39 @@ the coordinates. Recheck an edited candidate even when its bounds stay the
 same. An interior vertex can move into view. For a tile storing many paths
 in one numeric list, pass the path's coordinate range. [Geometry API](geometry.md#path-intersection)
 
+## Index a GeoArrow tile
+
+`buildLineStringIndex` builds a shared spatial index directly from packed
+planar XY batches. Supply one stable unsigned 32-bit handle for each geometry
+row. Multiple batches form a single searchable layer. Handles must be unique
+across them, including rows with missing geometry.
+
+```ts
+import { fromGeoArrowTable } from 'zerocopy/geoarrow';
+import { lineStringViewXY, pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
+import { buildLineStringIndex, querySpatialIndex } from 'zerocopy/spatial';
+
+const { batches } = fromGeoArrowTable(tile, { column: 'lanes' });
+// featureIds contains the handle column for each corresponding record batch.
+const layer = batches.map((paths, i) => ({ paths, ids: featureIds[i]! }));
+const index = buildLineStringIndex(layer, revision);
+const viewport: BoundsXY = [100, 25, 240, 90];
+const visible = querySpatialIndex(index, viewport).filter(id => {
+  const { batch, row } = featureLocations.get(id)!; // The editor's handle-to-row lookup
+  const lane = lineStringViewXY(batches[batch]!, row)!;
+  return pathIntersectsBoxXY(lane, viewport);
+});
+```
+
+The builder reads the coordinate buffers in place. It counts rows with a
+finite vertex to size Flatbush, then writes each envelope into the index.
+Null paths, empty paths, and paths with no complete finite vertex get no
+index entry. A single finite vertex gets a point envelope. For paths with
+gaps the envelope spans all finite vertices, and the exact predicate treats
+each gap as a break. Workers can read the shared index and geometry while
+the owner builds a later revision. Keep the handle lookup aligned with the
+same revision. [Import and edit packed geometry](geometry.md#open-a-tile-and-edit-one-lane)
+
 ## Join two spatial layers
 
 `querySpatialJoin(left, right)` returns `[leftId, rightId]` pairs whose

@@ -1,9 +1,53 @@
 import { expect, it } from 'vitest';
-import { buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
+import { buildLineStringIndex, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
+import { lineStringViewXY, pathIntersectsBoxXY } from './geometry';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
+
+it('indexes packed batches by stable ID and refines candidates across finite path breaks', () => {
+  const paths = { offsets: Int32Array.of(0, 3, 4, 4, 6, 7),
+    coordinates: Float64Array.of(-5, 1, NaN, 200, 5, 1, 100, 100, 2, 2, 3, 2, Infinity, 1),
+    validity: Uint8Array.of(0b11101) };
+  const second = { offsets: Int32Array.of(0, 1), coordinates: Float64Array.of(0, 1), validity: null };
+  const batches = [{ paths, ids: Uint32Array.of(31, 3, 2, 7, 5) }, { paths: second, ids: [0xffffffff] }];
+  const base = structuredClone(buildLineStringIndex(batches, 17));
+  const desired = buildSpatialIndex([{ id: 31, bounds: [-5, 1, 5, 1] }, { id: 7, bounds: [2, 2, 3, 2] },
+    { id: 0xffffffff, bounds: [0, 1, 0, 1] }], 17);
+  expect(base.revision).toBe(17);
+  expect(base.buffer).toBeInstanceOf(SharedArrayBuffer);
+  expect([...base.ids]).toEqual([...desired.ids]);
+  for (let i = -7; i < 8; i++) {
+    const viewport = [i, -10, i + 1, 201] as const;
+    expect(querySpatialIndex(base, viewport)).toEqual(querySpatialIndex(desired, viewport));
+  }
+  const viewport = [0, 1, 0, 1] as const;
+  expect(querySpatialIndex(base, viewport)).toEqual([31, 0xffffffff]);
+  expect(pathIntersectsBoxXY(lineStringViewXY(paths, 0)!, viewport)).toBe(false);
+  expect(querySpatialIndex(base, [99, 99, 101, 101])).toEqual([]);
+  expect(querySpatialIndex(base, [0, 199, 0, 201])).toEqual([]);
+  const edits = applySpatialEdits(undefined, 18, [{ id: 31, bounds: null }, { id: 3, bounds: viewport }]);
+  expect(querySpatialIndex(rebuildSpatialIndex(base, edits, 18), viewport)).toEqual([3, 0xffffffff]);
+  expect(querySpatialIndex(base, viewport)).toEqual([31, 0xffffffff]);
+});
+
+it('validates packed geometry and reserves unique handles for empty, missing and all-nonfinite lanes', () => {
+  const paths = { offsets: Int32Array.of(0, 1, 1), coordinates: Float64Array.of(NaN, NaN), validity: Uint8Array.of(1) };
+  const input = { paths, ids: [1, 2] };
+  expect(buildLineStringIndex([]).buffer).toBeNull();
+  expect(buildLineStringIndex([input]).buffer).toBeNull();
+  for (const ids of [[1, 1], [1], [1, -1], [1, 2 ** 32]]) {
+    expect(() => buildLineStringIndex([{ paths, ids }])).toThrow(RangeError);
+  }
+  expect(() => buildLineStringIndex([input, input])).toThrow(/Duplicate/);
+  for (const offsets of [Int32Array.of(1, 1, 1), Int32Array.of(0, 2, 1), Int32Array.of(0, 1, 2)]) {
+    expect(() => buildLineStringIndex([{ ...input, paths: { ...paths, offsets } }])).toThrow(RangeError);
+  }
+  expect(() => buildLineStringIndex([{ ...input, paths: { ...paths, validity: new Uint8Array() } }])).toThrow(RangeError);
+  expect(() => buildLineStringIndex([{ ...input, paths: { ...paths, coordinates: new Float32Array(2) as never } }])).toThrow(TypeError);
+  expect(() => buildLineStringIndex([input], 0.5)).toThrow(RangeError);
+});
 
 it('joins ordered pairs after edits on both layers, with inclusive bounds and exact filtering', () => {
   const leftBase = buildSpatialIndex([{ id: 9, bounds: far }, { id: 2, bounds: box }]);

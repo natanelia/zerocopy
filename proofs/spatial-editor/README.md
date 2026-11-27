@@ -17,6 +17,23 @@ one point took a median 0.0074 ms incrementally and 2.95 ms for a full join.
 Moving all 4,096 points took 8.90 ms incrementally and 3.24 ms for a full
 join. [Environment, source checksums and raw samples](results/join-edits-node26.json)
 
+To measure the initial index build for an imported tile, run
+`node proofs/spatial-editor/packed-index.mjs` or `bun proofs/spatial-editor/packed-index.mjs`
+after the browser build. The fixture has 4,096 synthetic lanes of 64 vertices
+each. Every build is checked against the same candidate IDs and exact viewport
+hits. These are milliseconds to build the index from already shared XY data,
+taking the median of three fresh-process medians per runtime.
+
+| Runtime | Direct packed index | Bounds objects from XY views | Copy each lane into a list and build from bounds |
+| --- | ---: | ---: | ---: |
+| Node 26.13.1 | 1.63 | 2.28 | 9.00 |
+| Bun 1.4.2 | 1.50 | 2.61 | 15.88 |
+
+The timer covers bounds calculation and Flatbush construction. File decoding,
+query checks, worker messaging, and rendering are outside it. The direct
+builder keeps the stable ID set and writes into the shared index as it
+processes each batch. [Source checksums and all samples](results/packed-index-load.json)
+
 | Component | Shared editor | Copy-based editor |
 | --- | --- | --- |
 | UI metadata | TanStack collection with confirmed ZeroCopy row map | TanStack local-only collection |

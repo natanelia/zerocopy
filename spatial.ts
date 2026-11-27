@@ -1,10 +1,16 @@
 import Flatbush from 'flatbush';
 import { SharedMap } from './shared-map.ts';
 import { json, type JsonType } from './types.ts';
-import { checkBounds, type BoundsXY } from './xy-bounds.ts';
+import { checkBounds, packedBoundsXY, type BoundsXY } from './xy-bounds.ts';
+import { lineStringPresent, validateLineStringBuffersXY, type LineStringBuffersXY } from './line-string-buffers.ts';
 import { checkSpatialId } from './spatial-id.ts';
 
 export interface SpatialFeature { readonly id: number; readonly bounds: BoundsXY }
+export interface SpatialLineStringBatch {
+  readonly paths: LineStringBuffersXY;
+  /** A stable uint32 feature handle for each row, including missing and empty paths. */
+  readonly ids: Uint32Array | readonly number[];
+}
 export interface SpatialEdit { readonly id: number; readonly bounds: BoundsXY | null }
 export interface SpatialChange { readonly revision: number; readonly bounds: BoundsXY | null }
 export type SpatialChanges = SharedMap<JsonType<SpatialChange>>;
@@ -55,6 +61,44 @@ export function buildSpatialIndex(features: readonly SpatialFeature[], revision 
     ids[tree!.add(...bounds)] = id;
   }
   return finishIndex(tree, ids, revision);
+}
+
+/** Build a shared base directly from packed XY batches. Only complete finite vertices contribute to each envelope. */
+export function buildLineStringIndex(batches: readonly SpatialLineStringBatch[], revision = 0): SpatialIndex {
+  checkRevision(revision);
+  // Flatbush needs the exact number of boxes. Stop counting each present row
+  // at its first finite vertex, then write its bounds directly into the tree.
+  let count = 0;
+  for (const { paths, ids } of batches) {
+    validateLineStringBuffersXY(paths);
+    const { offsets, coordinates, validity } = paths;
+    if (ids.length !== offsets.length - 1) throw new RangeError('Expected one spatial feature ID per LineString row');
+    for (let row = 0; row < ids.length; row++) {
+      if (!lineStringPresent(validity, row)) continue;
+      const end = offsets[row + 1] * 2;
+      for (let i = offsets[row] * 2; i < end; i += 2) {
+        if (Number.isFinite(coordinates[i]) && Number.isFinite(coordinates[i + 1])) {
+          count++;
+          break;
+        }
+      }
+    }
+  }
+  const handles = new Uint32Array(new SharedArrayBuffer(count * 4));
+  const tree = count ? new Flatbush(count, 16, Float64Array, SharedArrayBuffer) : undefined;
+  const seen = new Set<number>();
+  for (const { paths: { offsets, coordinates, validity }, ids } of batches) {
+    for (let row = 0; row < ids.length; row++) {
+      const id = ids[row];
+      checkSpatialId(id);
+      if (seen.has(id)) throw new RangeError('Duplicate spatial feature ID: ' + id);
+      seen.add(id);
+      if (!tree || offsets[row] === offsets[row + 1] || !lineStringPresent(validity, row)) continue;
+      const bounds = packedBoundsXY(coordinates, offsets[row] * 2, offsets[row + 1] * 2, true);
+      if (bounds[0] !== Infinity) handles[tree.add(...bounds)] = id;
+    }
+  }
+  return finishIndex(tree, handles, revision);
 }
 
 /** Stage one edit batch. A null box deletes a feature, and the last edit to an ID in a batch wins. */
