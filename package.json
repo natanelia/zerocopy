@@ -12,6 +12,8 @@
     "./tanstack": { "types": "./dist/types/tanstack-db-collection.d.ts", "browser": "./dist/tanstack-db-collection.js", "bun": "./tanstack-db-collection.ts", "import": "./dist/tanstack-db-collection.js" },
     "./numeric": { "types": "./dist/types/numeric.d.ts", "browser": "./dist/numeric.js", "bun": "./numeric.ts", "import": "./dist/numeric.js" },
     "./state": { "types": "./dist/types/state.d.ts", "browser": "./dist/state.js", "bun": "./state.ts", "import": "./dist/state.js" },
+    "./spatial": { "types": "./dist/types/spatial.d.ts", "browser": "./dist/spatial.js", "bun": "./spatial.ts", "import": "./dist/spatial.js" },
+    "./geoarrow": { "types": "./dist/types/geoarrow.d.ts", "browser": "./dist/geoarrow.js", "bun": "./geoarrow.ts", "import": "./dist/geoarrow.js" },
     "./geometry": { "types": "./dist/types/geometry.d.ts", "browser": "./dist/geometry.js", "bun": "./geometry.ts", "import": "./dist/geometry.js" }
   },
   "scripts": {
@@ -43,12 +45,16 @@
   "bugs": { "url": "https://github.com/natanelia/zerocopy/issues" },
   "homepage": "https://natanelia.github.io/zerocopy/",
   "engines": { "bun": ">=1.0.0" },
+  "dependencies": { "flatbush": "4.9.0", "rbush": "4.0.1" },
   "devDependencies": {
+    "@tanstack/db": "1.0.0-rc.1.6",
     "@turf/bbox": "7.4.0",
     "@reduxjs/toolkit": "2.12.0",
     "@redux-devtools/instrument": "3.0.0",
+    "@types/rbush": "4.0.0",
     "@vitest/browser": "4.1.11",
     "@vitest/browser-playwright": "4.1.11",
+    "apache-arrow": "21.2.0",
     "binaryen": "131.0.0-nightly.20260721",
     "bun-types": "1.4.2",
     "immutable": "5.1.9",
@@ -61,6 +67,6 @@
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   },
-  "peerDependencies": { "@tanstack/db": ">=0.5.0", "@reduxjs/toolkit": "^2.0.0" },
-  "peerDependenciesMeta": { "@tanstack/db": { "optional": true }, "@reduxjs/toolkit": { "optional": true } }
+  "peerDependencies": { "@tanstack/db": ">=0.5.0 || >=1.0.0-rc.1.5 <1.0.0", "@reduxjs/toolkit": "^2.0.0", "apache-arrow": "^21.2.0" },
+  "peerDependenciesMeta": { "@tanstack/db": { "optional": true }, "@reduxjs/toolkit": { "optional": true }, "apache-arrow": { "optional": true } }
 }

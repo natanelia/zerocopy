@@ -1,8 +1,9 @@
-import { Arena, Snapshot, arenaOf, vectorDepth, validIndex, validListRange, checkedSize } from './arena';
+import { Arena, Snapshot, vectorDepth, validIndex, validListRange, checkedSize } from './arena';
 import { structureRegistry } from './codec';
 import type { ValueOf } from './types';
 import { JsonView } from './json-view';
-import { NATIVE_LITTLE_ENDIAN, typedArrayBuffer, typedArrayLength, typedArrayOffset, typedArrayTag } from './memory';
+import { typedArrayBuffer, typedArrayLength, typedArrayTag } from './memory';
+import { copyFloat64Range } from './list-float64';
 import { compileStringSearch, type TextSearchOptions } from './text-search';
 const arrayBufferByteLength = Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, 'byteLength')!.get!;
 // Registering a collection must not allocate an unused writer in every reader.
@@ -244,7 +245,7 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
   toFloat64Array(this: SharedList<'number'>): Float64Array<ArrayBuffer> {
     if (this.type !== 'number') throw new TypeError('Float64Array output requires a numeric list');
     const result = new Float64Array(this.size);
-    this.#copyFloat64Range(result, 0, this.size, 0);
+    copyFloat64Range(this, result, 0, this.size, 0);
     return result;
   }
 
@@ -266,57 +267,9 @@ export class SharedList<T extends string = SharedListType> extends Snapshot {
     if (!Number.isInteger(offset) || offset < 0 || offset > typedArrayLength.call(target) - (end - start)) {
       throw new RangeError('Source range does not fit in the target');
     }
-    this.#copyFloat64Range(target, start, end, offset);
+    copyFloat64Range(this, target, start, end, offset);
   }
 
-  #copyFloat64Range(target: Float64Array<ArrayBuffer>, start: number, end: number, offset: number): void {
-    if (start === end) return;
-    const { size, root, depth, tail } = this;
-    const a = this.arena, view = a.dv;
-    const tailStart = (size - 1) & ~31;
-    // Scalar reads avoid temporary views for short spans and handle host byte order.
-    if (end - start <= 64 || !NATIVE_LITTLE_ENDIAN) {
-      for (let index = start; index < end;) {
-        const first = index & ~31, stop = Math.min(end, first + 32);
-        const leaf = first >= tailStart ? tail : a.wasm.vecLeaf(root, depth, index) >>> 0;
-        for (; index < stop; index++) target[offset++] = view.getFloat64(leaf + (index - first) * 8, true);
-      }
-      return;
-    }
-
-    const source = view.buffer;
-    const output = new Uint8Array(typedArrayBuffer.call(target), typedArrayOffset.call(target) + offset * 8, (end - start) * 8);
-    const firstBlock = start & ~31;
-    // A range can start in the middle of a group of 32 leaves.
-    let parent = depth && firstBlock < tailStart && (firstBlock & 1023)
-      ? a.wasm.vecLeaf(root, depth - 1, firstBlock >>> 5) >>> 0 : 0;
-    let leafOffset = (start & 31) * 8;
-    let spanStart = -1, spanEnd = -1, written = 0;
-    // Bulk appends place consecutive leaves next to each other. An edit can
-    // replace just one leaf, so copy adjacent spans together in logical order.
-    for (let first = firstBlock; first < end; first += 32) {
-      let leaf = tail;
-      if (first < tailStart) {
-        leaf = root;
-        if (depth) {
-          // One trie walk locates the parent of up to 32 consecutive leaves.
-          if ((first & 1023) === 0) parent = a.wasm.vecLeaf(root, depth - 1, first >>> 5) >>> 0;
-          leaf = view.getUint32(parent + ((first >>> 5) & 31) * 4, true);
-        }
-      }
-      if (leaf !== spanEnd) {
-        const length = spanEnd - spanStart;
-        if (length) {
-          output.set(new Uint8Array(source, spanStart, length), written);
-          written += length;
-        }
-        spanStart = leaf + leafOffset;
-        leafOffset = 0;
-      }
-      spanEnd = leaf + Math.min(32, end - first) * 8;
-    }
-    output.set(new Uint8Array(source, spanStart, spanEnd - spanStart), written);
-  }
   toWorkerData() { return Object.freeze({ root: this.root, depth: this.depth, size: this.size, type: this.type, tail: this.tail }); }
   static fromWorkerData<T extends string>(d: { root: number; depth: number; size: number; type: T; tail: number }, source: Arena = defaultArena()): SharedList<T> {
     return new SharedList(d.type, d.root, d.depth, d.size, source, d.tail);

@@ -41,7 +41,7 @@ describe('SharedCollection', () => {
     expect(arr.map(t => t.id).sort()).toEqual(['1', '2']);
   });
 
-  it('zero-copy worker transfer via root pointer', () => {
+  it('restores a root in the same default arena', () => {
     let col = new SharedCollection<Todo>('todos');
     col = col.insert({ id: '1', text: 'Test', completed: false });
     col = col.insert({ id: '2', text: 'Test2', completed: true });
@@ -89,7 +89,7 @@ describe('sharedCollectionConfig', () => {
     expect(writes).toEqual([{ type: 'insert', value: { id: '1', text: 'Test', completed: false } }]);
   });
 
-  it('supports worker state sharing', () => {
+  it('exposes the local root descriptor', () => {
     const config = sharedCollectionConfig<Todo>({
       id: 'todos',
       initialData: [{ id: '1', text: 'Test', completed: false }],
@@ -162,7 +162,7 @@ describe('withSharedCache', () => {
     expect(cached.toArray().length).toBe(0);
   });
 
-  it('provides zero-copy state for workers', () => {
+  it('restores cached rows in the same default arena', () => {
     const upstreamSync = {
       sync: (params: any) => {
         params.begin();
@@ -179,10 +179,28 @@ describe('withSharedCache', () => {
     expect(typeof state.root).toBe('number');
     expect(state.size).toBe(1);
 
-    // Worker reconstructs from state
+    // Reconstruct in the same default arena.
     const workerCached = withSharedCache<Todo>({ sync: () => {} });
     workerCached.fromSharedState(state);
     
     expect(workerCached.get('1')).toEqual({ id: '1', text: 'Test', completed: false });
   });
+});
+
+it('mirrors an upstream custom key including empty keys and value-based deletes', () => {
+  const item = { id: 'internal', slug: '', text: 'Road', completed: true };
+  const cache = withSharedCache<typeof item>({
+    sync({ begin, write, commit }) {
+      begin();
+      write({ type: 'insert', value: item });
+      commit();
+      expect(cache.get('')).toEqual(item);
+      expect(cache.get('internal')).toBeUndefined();
+      begin();
+      write({ type: 'delete', value: item });
+      commit();
+    },
+  }, { primaryKey: 'slug' });
+  cache.sync.sync({ begin() {}, write() {}, commit() {}, markReady() {} });
+  expect(cache.getCache().size).toBe(0);
 });

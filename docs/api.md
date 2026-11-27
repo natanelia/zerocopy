@@ -146,6 +146,23 @@ All three provide `set(key, value)`, `get(key)`, `has(key)`, `delete(key)`, `ent
 
 `SharedMap` also provides `setMany(entries)`, `getMany(keys)`, and `deleteMany(keys)` for batch work. Missing keys return `undefined` from `get`.
 
+### Compare map snapshots
+
+`next.changesSince(previous)` yields one net change per changed key in unspecified order. Both maps must use the same value codec. You can compare distant revisions, forks or worker snapshots. A key inserted and then deleted between the two revisions produces no change.
+
+<!-- example: map-changes -->
+```ts
+import { SharedMap } from 'zerocopy';
+
+const before = new SharedMap('number').set('lane-7', 40);
+const after = before.set('lane-7', 50).set('lane-9', 30);
+const changes = [...after.changesSince(before)];
+// lane-7 yields { type: 'update', key: 'lane-7', before: 40, after: 50 }
+// lane-9 yields { type: 'insert', key: 'lane-9', before: undefined, after: 30 }
+```
+
+The iterator skips shared immutable branches when both maps reference the same WebAssembly memory object. Independently copied maps require a scan of both snapshots. Changed values are decoded as you iterate. Numbers use `Object.is` equality. JSON uses the stored bytes, so reordering object fields counts as an update. Nested collections compare their stored snapshot handles. A delete carries the old value and `after: undefined`.
+
 <!-- example: ordered-map -->
 ```ts
 import { SharedOrderedMap } from 'zerocopy';

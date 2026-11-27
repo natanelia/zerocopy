@@ -96,6 +96,14 @@ The [collection API](docs/api.md) includes maps, sets, lists, stacks, queues, or
 <a id="run-a-typed-task"></a>
 Tasks are an optional execution layer. Use them for catalog filtering or a background calculation—not to wrap each `.get()`. The [task guide](docs/workers.md) covers existing workers, independent workers, pools, MessagePorts, SharedWorker connections, and Node.js.
 
+For map editors, `zerocopy/spatial` searches shared bounding-box indexes and
+applies sparse feature edits. `zerocopy/tanstack` exposes confirmed metadata
+snapshots for workers alongside the editor's optimistic rows. Stream a
+GeoArrow tile into shared XY buffers one batch at a time, edit individual lane paths, and
+export a revision for other Arrow readers.
+[Spatial guide](docs/spatial.md) · [TanStack integration](docs/tanstack.md) · [GeoArrow import and export](docs/geometry.md#share-a-geoarrow-linestring-column)
+
+
 <a id="performance"></a>
 <a id="memory-shared-vs-immutablejs-vs-native"></a>
 <a id="reproduce-the-timing-and-memory-comparisons"></a>

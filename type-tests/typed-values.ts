@@ -4,7 +4,7 @@ import {
   SharedSet, SharedOrderedSet, SharedSortedSet, json, list, map, stack, queue,
   linkedList, doublyLinkedList, orderedMap, sortedMap, priorityQueue,
   set, orderedSet, sortedSet, getWorkerData, initWorker, compact, compactMany,
-  type DeepReadonly, type ValueOf, type JsonType, type WorkerData, type JsonView, type JsonViewValue,
+  type DeepReadonly, type ValueOf, type JsonType, type WorkerData, type JsonView, type JsonViewValue, type SharedMapChange,
 } from '../dist/types/shared';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
@@ -25,6 +25,19 @@ const input: Lane = {
   centerline: [[103.85, 1.29]], metadata: { source: 'survey', revision: null },
 };
 const lanes = new SharedMap(LaneValue).set('lane-1', input);
+for (const change of lanes.changesSince(new SharedMap(LaneValue))) {
+  type MapChange = Assert<Equal<typeof change, SharedMapChange<DeepReadonly<Lane>>>>;
+  if (change.type === 'delete') {
+    const missing: undefined = change.after;
+    const id: string = change.before.id;
+  } else {
+    const revision: number | null = change.after.metadata.revision;
+    // @ts-expect-error A snapshot change carries deeply read-only values.
+    change.after.metadata.revision = 2;
+  }
+}
+// @ts-expect-error A number map uses a different value descriptor.
+lanes.changesSince(new SharedMap('number'));
 const lane = lanes.get('lane-1');
 const laneView = lanes.getView('lane-1');
 const viewField = laneView?.get('speedLimit');

@@ -11,6 +11,48 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
+  ['docs/tanstack.md', 'upstream-confirmed', `
+let feed;
+const { roads, mirror, session } = openRoads({ sync(p) { feed = p; p.markReady(); } });
+try {
+  await roads.preload();
+  feed.begin(); feed.write({ type: 'insert', value: { id: 'a', revision: 1 } });
+  assert.equal(mirror.getSnapshot().size, 0);
+  await feed.commit();
+  assert.equal(session.current.get('a').revision, 1);
+  const first = mirror.getSnapshot();
+  feed.begin({ snapshot: true }); await feed.commit();
+  assert.equal(session.current.size, 0); assert.equal(first.size, 1);
+} finally { session.dispose(); await roads.cleanup(); }`],
+  ['docs/tanstack.md', 'tanstack-confirmed-source', `
+const { connectSharedSession } = await import('zerocopy/worker');
+const { port1, port2 } = new MessageChannel();
+const receiving = connectSharedSession({ endpoint: port2 });
+const { lanes, session } = await shareLanes(port1);
+const reader = await receiving;
+try {
+  const first = reader.current;
+  const snapshots = reader.snapshots({ emitCurrent: false });
+  await lanes.update('north', lane => { lane.revision = 1; }).when('settled');
+  const { value: current } = await snapshots.next();
+  assert.deepEqual([...current.changesSince(first)], [{ type: 'update', key: 'north',
+    before: { id: 'north', revision: 0 }, after: { id: 'north', revision: 1 } }]);
+  await snapshots.return();
+} finally { reader.dispose(); session.dispose(); port1.close(); port2.close(); await lanes.cleanup(); }`],
+  ['docs/api.md', 'map-changes', "assert.deepEqual(changes.sort((a, b) => a.key.localeCompare(b.key)), [{ type: 'update', key: 'lane-7', before: 40, after: 50 }, { type: 'insert', key: 'lane-9', before: undefined, after: 30 }]);"],
+  ['docs/spatial.md', 'spatial-viewport-edits', "assert.deepEqual(delta, { added: [7], removed: [9] });"],
+  ['docs/spatial.md', 'spatial-query-cursor', "assert.deepEqual([before, after, visible, cursor.revision], [[7], [], [7], 1]);"],
+  ['docs/geometry.md', 'stream-lane-tile', `
+const { encodeTile } = await import('../proofs/spatial-editor/tile-io.mjs');
+const { getLineStringById } = await import('zerocopy/spatial');
+const url = 'data:application/vnd.apache.arrow.stream;base64,' + Buffer.from(encodeTile(128, 8, 'sparse')).toString('base64');
+const signal = new AbortController().signal;
+const { index, lookup } = await openLaneTile(url, 128, signal);
+assert.equal(index.ids.length, 128);
+assert.equal(getLineStringById(lookup, 0xffffffff).length, 16);
+assert.equal(getLineStringById(lookup, 9), undefined);
+await assert.rejects(openLaneTile(url, 129, signal), /Incomplete tile/);
+await assert.rejects(openLaneTile(url, 128, AbortSignal.abort()), { name: 'AbortError' });`],
   ['README.md', 'map-snapshots', "assert.equal(before.size, 1); assert.equal(after.size, 2); assert.equal(after.get(1), 'Upstream timeout'); assert.notEqual(before, after);"],
   ['website/content/log-explorer.md', 'log-columns', "assert.equal(before.message.get(1), 'Upstream timeout'); assert.equal(before.message.size, 2); assert.equal(next.message.size, 3); assert.equal(next.level.size, next.message.size);"],
   ['website/content/catalog.md', 'catalog-snapshots', "assert.equal(initial.get('product/000000').attributes.priceCents, 0); assert.equal(current.get('product/000000').attributes.priceCents, 2500); assert.equal(initial.get('product/000000').status, 'available'); assert.equal(current.get('product/000000').status, 'unavailable'); assert(Object.isFrozen(current.get('product/000000').attributes)); assert(message.arenas.every(arena => !arena.copy && arena.memory.buffer instanceof SharedArrayBuffer));"],

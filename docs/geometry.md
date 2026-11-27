@@ -16,13 +16,192 @@ lane or tile data. Use `toFloat64Array()` when handing a numeric snapshot to
 a renderer or transferring a coordinate buffer out of a worker. The returned
 array owns its buffer.
 
-`bboxXY` recomputes `[minX, minY, maxX, maxY]` from interleaved 2D coordinates. It reads the supplied snapshot directly and returns a fresh readonly tuple. It does not parse GeoJSON, transform coordinates, use cached bounds, or change existing collection methods. A caller must use this new API to benefit from it. Reuse previously calculated bounds when a snapshot has not changed.
+## Share a GeoArrow LineString column
+
+Use `packLineStringsXY` to export a set of retained lane paths to a shared
+column. It reads each numeric snapshot into a fresh interleaved Float64
+coordinate buffer. The signed 32-bit offsets count **vertices**. An empty
+path has zero vertices, and a missing path has a cleared validity bit. Row
+order follows the input iterable, so an application can keep the same order
+in a separate feature-ID column.
+
+```ts
+import { SharedList } from 'zerocopy';
+import { packLineStringsXY } from 'zerocopy/geometry';
+
+const lane = new SharedList('number').pushMany([10, 20, 12, 22]);
+const batch = packLineStringsXY([lane, null, new SharedList('number')]);
+// batch.offsets contains [0, 2, 2, 2]. The validity byte is 0b101.
+const worker = new Worker(new URL('./arrow-reader.ts', import.meta.url), { type: 'module' });
+worker.postMessage(batch);
+```
+
+Packing is the copy from the editable trie into contiguous storage. Posting
+the result to additional workers shares the coordinate, offset, and validity
+buffers. Treat these buffers and all Arrow views of them as read-only after
+publication. A later export owns separate buffers. Export small tile batches
+when readers need only part of a map. Each batch supports up to 2³¹ − 1
+vertices, subject to the runtime's memory limits.
+
+To consume the result with Apache Arrow JS, install its optional peer with
+`npm install apache-arrow@^21.2.0`. A worker can construct a native
+`geoarrow.linestring` column directly over the received buffers.
+
+```ts
+import { toGeoArrowTable } from 'zerocopy/geoarrow';
+
+self.onmessage = ({ data }) => {
+  const table = toGeoArrowTable(data);
+  const lines = table.getChild('geometry')!;
+  self.postMessage(lines.get(0)?.get(1)?.get(0)); // 12, the second vertex's x
+};
+```
+
+The adapter validates the offsets and bitmap length and wraps the buffers
+as `List<FixedSizeList<Float64>[2]>`. It accepts typed-array subviews whose
+offset values start at zero and span the supplied coordinates. By default
+the field has planar edges and an unspecified CRS. Pass a PROJJSON object
+with `toGeoArrowTable(batch, { crs })` when the input CRS is known. Use the
+same resolved Apache Arrow module for the adapter and the IPC writer. A writer
+from a second installed copy can misinterpret the first copy's nested table.
+For a file or remote consumer, Arrow's `tableToIPC(table, 'stream')` creates
+a separate byte stream. The `bun run check:package` test also runs GeoArrow JS's
+`totalBounds` on both the shared table and its IPC round trip.
+[GeoArrow memory layout](https://geoarrow.org/format.html) · [GeoArrow field metadata](https://geoarrow.org/extension-types.html)
+
+### Open a tile and edit one lane
+
+`fromGeoArrowTable` imports a planar XY LineString column from an Apache Arrow
+table. Each returned batch corresponds to one input record batch. Row indexes
+within that batch also index its sibling feature-ID and attribute columns.
+Table slices preserve this alignment. The column name defaults to `geometry`.
+
+```ts
+import { tableFromIPC } from 'apache-arrow';
+import { SharedList } from 'zerocopy';
+import { fromGeoArrowTable } from 'zerocopy/geoarrow';
+import { lineStringViewXY } from 'zerocopy/geometry';
+
+const table = tableFromIPC(tileBytes);
+const { batches, metadata } = fromGeoArrowTable(table, { column: 'lanes' });
+worker.postMessage({ batches, metadata });
+
+// The selection identifies a row in this revision of the tile.
+const batch = batches[selection.batchIndex]!;
+const xy = lineStringViewXY(batch, selection.rowIndex);
+if (xy && xy.length >= 2) {
+  const lane = new SharedList('number').pushMany(xy);
+  const edited = lane.setMany([[0, newX], [1, newY]]);
+  // Publish edited with the feature's ID and next revision.
+}
+```
+
+`lineStringViewXY` returns a borrowed Float64 view in constant time. A missing
+lane returns `null`, an empty lane returns a zero-length view, and an invalid
+row index throws. Workers can use this function through `zerocopy/geometry`
+without installing Arrow. Pass this view directly to `bboxXY` or
+`pathIntersectsBoxXY` for read-only queries. Creating the editable list
+copies only the selected lane. Its edits leave the imported tile available
+to existing readers. [Index a GeoArrow tile](spatial.md#index-a-geoarrow-tile)
+
+Both GeoArrow coordinate layouts are supported. Separate X and Y columns are
+interleaved once on import. Ordinary interleaved buffers from Arrow IPC are
+copied once into shared memory. An interleaved shared buffer can be reused
+when its selected vertices occupy a contiguous range. The borrowed view then
+keeps the source allocation alive, including when importing a small slice.
+Pass `{ copy: true }` to give the tile its own coordinate storage. Keep source
+buffers stable during import and treat published batches as read-only.
+
+The importer rebuilds row offsets and the validity bitmap for each batch,
+removes unused vertices under null rows, and accepts both 32-bit `List` and
+64-bit `LargeList` input. Each output batch supports up to 2³¹ − 1 visible
+vertices. It requires the `geoarrow.linestring` extension and rejects nonplanar
+edges, extra dimensions, and null coordinates inside a present lane. Pass
+the returned extension metadata to `toGeoArrowTable(batch, metadata)` to
+carry the original CRS and other extension fields through export.
+
+### Stream an IPC tile
+
+`fromGeoArrowRecordBatch` converts one decoded Arrow record batch. Use
+it with Arrow's `RecordBatchReader` when a server sends IPC stream
+messages. A worker can read or validate the first batch while the owner
+is still receiving the tile. The same `column` and `copy` options as
+`fromGeoArrowTable` apply.
+
+This example stages batches for a complete spatial index. Each feature
+ID belongs to the geometry at the same row of its record batch.
+
+<!-- example: stream-lane-tile -->
+```ts
+import { RecordBatchReader } from 'apache-arrow';
+import { fromGeoArrowRecordBatch } from 'zerocopy/geoarrow';
+import { buildLineStringIndex, buildLineStringLookup, type SpatialLineStringBatch } from 'zerocopy/spatial';
+
+async function openLaneTile(url: string, expectedRows: number, signal: AbortSignal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok || !response.body) throw new Error('Tile download failed');
+  const reader = await RecordBatchReader.from(response.body);
+  const layer: SpatialLineStringBatch<SharedArrayBuffer>[] = [];
+  let rows = 0;
+  try {
+    for await (const record of reader) {
+      const id = record.getChild('id');
+      const handles = id?.toArray();
+      if (!id || id.nullCount || !(handles instanceof Uint32Array)) throw new Error('Expected uint32 lane IDs');
+      const { paths } = fromGeoArrowRecordBatch(record);
+      layer.push({ paths, ids: handles.slice() });
+      rows += record.numRows;
+    }
+  } finally {
+    await reader.cancel();
+  }
+  signal.throwIfAborted();
+  if (rows !== expectedRows) throw new Error('Incomplete tile');
+  return { index: buildLineStringIndex(layer), lookup: buildLineStringLookup(layer) };
+}
+```
+
+The decoder owns the input stream. The shared output retains its packed
+geometry buffers. Copying the small ID vector lets the decoded IPC bytes
+be reclaimed after each iteration. The example returns the complete
+layer only after checking its row count. A progressive preview can send
+each converted batch to a worker inside the loop. Fetch and decoding
+may buffer ahead, and a consumer retaining all geometry still needs
+space for the full shared tile.
+
+## XY bounds
+
+`bboxXY` recomputes `[minX, minY, maxX, maxY]` from a numeric `SharedList`
+or an interleaved `Float64Array`. It reads the supplied range directly and
+returns a fresh readonly tuple. Typed-array ranges are relative to the view.
+Keep the coordinates stable while a query reads them.
 
 An odd coordinate count throws `RangeError`. A non-numeric collection throws `TypeError`. NaN axes are ignored. Equal extrema retain the first sign of zero. Infinite coordinates are supported. Empty input returns `[Infinity, Infinity, -Infinity, -Infinity]`. These rules match Turf bbox recomputation for the corresponding flat MultiPoint; this is not the full Turf GeoJSON API.
 
-The accepted kernel is scalar Wasm. SIMD implementations remain rejected experiments because they did not consistently beat the best scalar control on x64 and ARM64 across Node and Bun. Bulk traversal is a separate optimization: it removes per-value JavaScript callbacks and nested GeoJSON traversal. It must pass a separate full-API benchmark before release. No claim of a SIMD speedup applies to this function.
+The numeric list uses a scalar Wasm kernel. SIMD experiments did not
+consistently beat the best scalar control on x64 and ARM64 across Node and
+Bun. Bulk list traversal removes per-value JavaScript callbacks and nested
+GeoJSON traversal and has a separate full-API benchmark gate. A packed
+Float64 view uses a direct JavaScript scan over the same XY range.
 
-Attached read-only snapshots and historical versions are supported. The kernel uses neither an allocator nor shared scratch. Results use instance-local globals and are copied to a new tuple before the synchronous call returns. There are no imported callbacks or asynchronous steps during the transfer. Workers have separate instances. Non-empty calls compile the module lazily and cache one instance per memory; empty input does not compile a module.
+## Path intersection
+
+`pathIntersectsBoxXY(points, box, range?)` returns whether any vertex or
+straight segment of an open planar path touches the inclusive XY box. A
+single vertex can match, and an empty path returns `false`. Coordinates and
+bounds use the same units. Boxes can have zero width, zero height or infinite
+extents. Reversed bounds and NaN bounds throw.
+
+The optional `{ start, end }` selects coordinate elements in a half-open
+range. Both ends must align to XY pairs. A vertex with either axis nonfinite
+breaks the path, so the finite vertices on either side remain disconnected.
+The predicate reads a numeric list or a packed Float64 view directly and can stop at the first hit.
+Corner and edge touches count, including when a floating-point determinant
+needs an exact sign calculation. [Spatial index example](spatial.md#select-intersecting-paths)
+
+Attached read-only snapshots and historical versions are supported. For list
+bounds, each worker caches one Wasm instance per memory. The kernel stores the
+four results in instance-local globals and returns them synchronously.
 
 ## Refresh an edited lane
 
@@ -37,6 +216,20 @@ const edited = coordinates.setMany([[2, -3], [3, 5]]);
 const laneBounds = bboxXY(edited, lane); // [-3, -5, 4, 5]
 edited.copyToFloat64Array(renderBuffer, { ...lane, offset: lane.start });
 ```
+
+If the edit moved just one XY vertex and all path offsets still match the
+previous draw, copy the two coordinate elements into their existing slot.
+Here the changed vertex occupies coordinates 2 and 3 of the packed list.
+
+```ts
+edited.copyToFloat64Array(renderBuffer, { start: 2, end: 4, offset: 2 });
+```
+
+The renderer controls what happens after this CPU copy. A renderer that
+owns its GPU position buffer can write the matching vertex range. A change
+to visible feature order or vertex counts requires refreshing the offsets
+and affected geometry together. The WebGL2 replay exercises both cases and
+checks picking against the edited path. [Renderer implementation](../proofs/spatial-editor/render.mjs)
 
 `start` and `end` count individual coordinates. `bboxXY` requires both
 indexes to be even and treats `end` as exclusive. A viewport can also pack
@@ -118,3 +311,12 @@ edited-tile median rose from 1,518 to 1,786 µs, while the same-build control
 ranged from 1,677 to 2,068 µs across its two arms. The benchmark above also
 emits all control workloads and SHA-256 digests of the measured builds.
 [Raw paired samples and same-build controls](../proofs/results/hd-map-lane-ranges).
+
+### Spatial editing with dedicated workers
+
+The [spatial entry point](spatial.md) adds indexed bounding-box searches to these geometry operations.
+The [spatial editor replay](../proofs/spatial-editor/README.md) combines
+immutable geometry, confirmed TanStack rows, a shared Flatbush base, and
+deck.gl binary paths. It exercises viewport changes, edits during index
+rebuilds, and workers finishing a prior revision. Its copy-based comparison
+receives sparse edits after the initial load.

@@ -1,31 +1,160 @@
 import { arenaOf, validListRange } from './arena';
 import { SharedList } from './shared-list';
 import { assertXY, geometryKernel } from './geometry-runtime';
+import { checkBounds, packedBoundsXY, type BoundsXY } from './xy-bounds';
+import { copyFloat64Range } from './list-float64';
+import type { LineStringBuffersXY } from './line-string-buffers';
+import { typedArrayLength, typedArrayTag } from './memory';
 
-/** Bounds in the input coordinate system: [minX, minY, maxX, maxY]. */
-export type BoundsXY = readonly [number, number, number, number];
+export type { BoundsXY } from './xy-bounds';
+export { lineStringViewXY, type LineStringBuffersXY } from './line-string-buffers';
+
+/** Pack immutable paths into independently owned buffers for Arrow or worker readers. */
+export function packLineStringsXY(paths: Iterable<SharedList<'number'> | null>): LineStringBuffersXY<SharedArrayBuffer> {
+  const rows = Array.from(paths);
+  let vertices = 0, hasNull = false;
+  for (const path of rows) {
+    if (path === null) { hasNull = true; continue; }
+    assertXY(path);
+    vertices += path.size / 2;
+    if (vertices > 0x7fffffff) throw new RangeError('Too many vertices for signed 32-bit LineString offsets');
+  }
+  const offsets = new Int32Array(new SharedArrayBuffer((rows.length + 1) * 4));
+  const coordinates = new Float64Array(new SharedArrayBuffer(vertices * 16));
+  const validity = hasNull ? new Uint8Array(new SharedArrayBuffer(Math.ceil(rows.length / 8))) : null;
+  let offset = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const path = rows[i];
+    if (path !== null) {
+      if (validity) validity[i >>> 3] |= 1 << (i & 7);
+      copyFloat64Range(path, coordinates, 0, path.size, offset * 2);
+      offset += path.size / 2;
+    }
+    offsets[i + 1] = offset;
+  }
+  return Object.freeze({ offsets, coordinates, validity });
+}
+
+type PathXY = SharedList<'number'> | Float64Array;
+
+function pathSize(points: PathXY): number {
+  if (points instanceof SharedList) {
+    assertXY(points);
+    return points.size;
+  }
+  if (typedArrayTag.call(points) !== 'Float64Array') throw new TypeError('Expected a numeric SharedList or Float64Array');
+  const size: number = typedArrayLength.call(points);
+  if (size & 1) throw new RangeError('Coordinates must contain complete x/y pairs');
+  // Detached and out-of-bounds views also report zero length.
+  if (!size) Float64Array.prototype.at.call(points, 0);
+  return size;
+}
+
+function assertPairRange(start: number, end: number, size: number): void {
+  if (!validListRange(start, end, size) || ((start | end) & 1)) {
+    throw new RangeError('Coordinate range must be within the path and aligned to x/y pairs');
+  }
+}
 
 /**
- * Recompute bounds from interleaved [x0, y0, x1, y1, ...] snapshot values.
+ * Recompute bounds from interleaved [x0, y0, x1, y1, ...] list or Float64 values.
  * NaN axes are ignored. Equal extrema retain the first sign of zero.
  * Empty input returns [Infinity, Infinity, -Infinity, -Infinity].
  * The optional [start, end) range uses element indexes aligned to XY pairs.
- * Reads the snapshot without an input copy or writes to shared memory.
- * Returns a fresh tuple. This does not parse GeoJSON, transform coordinates,
- * or use cached bounds. The kernel uses scalar Wasm, not SIMD.
+ * Reads the supplied range in place and returns a fresh tuple.
  */
-export function bboxXY(points: SharedList<'number'>, range?: { start?: number; end?: number }): BoundsXY {
-  assertXY(points);
-  const { size, root, depth, tail } = points;
+export function bboxXY(points: PathXY, range?: { start?: number; end?: number }): BoundsXY {
+  const size = pathSize(points);
   const { start = 0, end = size } = range ?? {};
   const full = start === 0 && end === size;
-  if (!full && (!validListRange(start, end, size) || ((start | end) & 1))) {
-    throw new RangeError('Coordinate range must be within the list and aligned to x/y pairs');
-  }
+  if (!full) assertPairRange(start, end, size);
   if (start === end) return [Infinity, Infinity, -Infinity, -Infinity];
+  if (!(points instanceof SharedList)) return packedBoundsXY(points, start, end, false);
+  const { root, depth, tail } = points;
   const kernel = geometryKernel(arenaOf(points).memory);
   if (full) kernel.bboxXY(root, depth, tail, size);
   else kernel.bboxXYRange(root, depth, tail, size, start, end);
   // Synchronous, callback-free result transfer from instance-local globals.
   return [kernel.bboxMinX(), kernel.bboxMinY(), kernel.bboxMaxX(), kernel.bboxMaxY()];
+}
+
+// Every finite binary64 value is an integer multiple of 2^-1074. The common
+// scale cancels when comparing products. Only uncertain orientations need it.
+function exactUnits(value: number, bits: DataView): bigint {
+  bits.setFloat64(0, value);
+  const word = bits.getBigUint64(0);
+  const exponent = (word >> 52n) & 0x7ffn;
+  const fraction = word & ((1n << 52n) - 1n);
+  const units = exponent === 0n ? fraction : ((1n << 52n) | fraction) << (exponent - 1n);
+  return value < 0 ? -units : units;
+}
+
+function orientation(ax: number, ay: number, bx: number, by: number, x: number, y: number): number {
+  const left = (bx - ax) * (y - ay);
+  const right = (by - ay) * (x - ax);
+  const det = left - right;
+  // Bound roundoff in the differences, products and final subtraction.
+  // The absolute term covers underflow. Overflow also takes the exact path.
+  const error = 8 * Number.EPSILON * (Math.abs(left) + Math.abs(right)) + 8 * Number.MIN_VALUE;
+  if (Math.abs(det) > error) return Math.sign(det);
+
+  const bits = new DataView(new ArrayBuffer(8));
+  const a = exactUnits(ax, bits), b = exactUnits(ay, bits);
+  const exact = (exactUnits(bx, bits) - a) * (exactUnits(y, bits) - b)
+    - (exactUnits(by, bits) - b) * (exactUnits(x, bits) - a);
+  return exact < 0n ? -1 : exact > 0n ? 1 : 0;
+}
+
+function segmentIntersectsBox(ax: number, ay: number, bx: number, by: number, box: BoundsXY): boolean {
+  // Clip the box to the segment's extents. All remaining corners are finite,
+  // even for an unbounded viewport. Within this overlap the line is a segment.
+  const x0 = Math.max(box[0], Math.min(ax, bx)), x1 = Math.min(box[2], Math.max(ax, bx));
+  const y0 = Math.max(box[1], Math.min(ay, by)), y1 = Math.min(box[3], Math.max(ay, by));
+  if (x0 > x1 || y0 > y1) return false;
+  if (ax === bx || ay === by) return true;
+  // Orientation is linear in x and y. Its two extrema over this rectangle
+  // straddle zero exactly when the segment touches or crosses the rectangle.
+  const min = orientation(ax, ay, bx, by, by > ay ? x1 : x0, bx > ax ? y0 : y1);
+  if (min > 0) return false;
+  return orientation(ax, ay, bx, by, by > ay ? x0 : x1, bx > ax ? y1 : y0) >= 0;
+}
+
+/** Intersect an open XY path with an inclusive planar box. Nonfinite vertices break the path. */
+export function pathIntersectsBoxXY(points: PathXY, box: BoundsXY, range?: { start?: number; end?: number }): boolean {
+  const size = pathSize(points);
+  checkBounds(box, false);
+  const { start = 0, end = size } = range ?? {};
+  assertPairRange(start, end, size);
+  if (start === end) return false;
+  if (!(points instanceof SharedList)) {
+    for (let i = start; i < end; i += 2) {
+      const x = points[i], y = points[i + 1];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      if (x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]) return true;
+      if (i > start) {
+        const ax = points[i - 2], ay = points[i - 1];
+        if (Number.isFinite(ax) && Number.isFinite(ay) && segmentIntersectsBox(ax, ay, x, y, box)) return true;
+      }
+    }
+    return false;
+  }
+  const arena = arenaOf(points), view = arena.dv;
+  const tailStart = (points.size - 1) & ~31;
+  let previousX = NaN, previousY = NaN;
+  for (let first = start & ~31; first < end; first += 32) {
+    const leaf = first === tailStart ? points.tail : arena.wasm.vecLeaf(points.root, points.depth, first) >>> 0;
+    const stop = leaf + Math.min(32, end - first) * 8;
+    for (let pos = leaf + Math.max(0, start - first) * 8; pos < stop; pos += 16) {
+      const x = view.getFloat64(pos, true), y = view.getFloat64(pos + 8, true);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) {
+        previousX = NaN;
+        continue;
+      }
+      if (x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]) return true;
+      if (!Number.isNaN(previousX) && segmentIntersectsBox(previousX, previousY, x, y, box)) return true;
+      previousX = x;
+      previousY = y;
+    }
+  }
+  return false;
 }

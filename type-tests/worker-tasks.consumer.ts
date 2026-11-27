@@ -15,6 +15,12 @@ async function proof(worker: Worker, port: MessagePort) {
   const value: number | undefined = await a.run.get('lane');
   const count: number = await b.run.size();
   const values: (number | undefined)[] = await c.map.get(['lane']);
+  const fixed: Promise<(number | undefined)[]> = c.map.get(['lane'], { snapshot: 'batch', chunkSize: 1 });
+  // @ts-expect-error Unknown snapshot mode.
+  c.map.get(['lane'], { snapshot: 'latest' });
+  // @ts-expect-error The batch option applies only to pool map calls.
+  c.run.get('lane', { snapshot: 'batch' });
+  void fixed;
   const stop = await serve(tasks, { endpoint: port });
   // @ts-expect-error Task state must match the task definition.
   await spawn<typeof tasks>(() => worker, { state: { map: new SharedMap('string'), list: state.current.list } });

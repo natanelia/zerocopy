@@ -38,7 +38,7 @@ On the owner, `state.current` changes synchronously. A worker's `shared.current`
 
 Capturing `const snapshot = shared.current` keeps a stable read view. Reading `shared.current` again later can return a different snapshot.
 
-A task waits for at least its requested publication. It can use a newer revision. Pool jobs select state on assignment, so a batch does not have one automatically pinned snapshot.
+A task waits for at least its requested publication. Pool jobs read live state on assignment by default. Pass `{ snapshot: 'batch' }` to a pool map call to give every input the same collection roots captured at invocation.
 
 ## Shared storage is not shared JavaScript identity
 

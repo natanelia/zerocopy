@@ -1,0 +1,128 @@
+{
+  "command": "node proofs/spatial-editor/session-changes.mjs",
+  "method": "Three fresh processes. A worker retains the last processed map while two transactions confirm changes to eight rows. Compare separately delivered shared session snapshots and complete worker envelopes over shared memory. Rotate order, discard four warmups and record twelve timings per process. Timers cover worker-local change materialization. Validate each full change record and check memory handle identity outside the timer.",
+  "node": "v26.13.1",
+  "cpu": "AMD EPYC-Milan Processor",
+  "tanstack": "1.0.0-rc.1.5",
+  "rows": 16384,
+  "netEdits": 8,
+  "commitsPerComparison": 2,
+  "sha256": {
+    "shared-map.ts": "7d6f846ab30a8ad503d9f97caad93f40e7f2fe54b23d9de300fd4e6ea8da5589",
+    "tanstack-db-collection.ts": "df793bb93b0e94332a5990a08755525ca02efe42bd8500ae736320d61a25a173",
+    "snapshot-listeners.ts": "69334d6bf41e2b1bec8e7847c8fdea7e766858341285ddab1072f92c55c0dd28",
+    "worker.ts": "a0e2ee1042894e696d07316afe0e72ccccfdac6165f4edfc5dc8c54facf102fe",
+    "worker-protocol.ts": "c120064bcd50bf9905d7780788d693a854204c90e5002c3f1f34a67248e0d9fe",
+    "proofs/spatial-editor/session-changes.mjs": "d0a9505046bb2ad9e8cf1436a8c57242271c95c4aae26a4fe1f65be886ee9d04"
+  },
+  "trials": [
+    {
+      "samplesMs": {
+        "session": [
+          0.23725199999989854,
+          0.17679299999986142,
+          0.12026400000013382,
+          0.2381430000000364,
+          0.2140769999996337,
+          0.1683869999997114,
+          0.17055100000015955,
+          0.16276599999991959,
+          0.11940199999980905,
+          0.13197700000000623,
+          0.1257860000000619,
+          0.18712300000015603
+        ],
+        "message": [
+          23.6765640000001,
+          27.57563600000003,
+          26.719060000000127,
+          22.430117999999993,
+          24.86475500000006,
+          21.36295300000029,
+          18.19718499999999,
+          19.24619500000017,
+          19.383872999999767,
+          19.045404999999846,
+          20.068874999999935,
+          28.22882800000025
+        ]
+      },
+      "reusedMemoryHandle": {
+        "session": 12,
+        "message": 0
+      }
+    },
+    {
+      "samplesMs": {
+        "session": [
+          0.34590400000001864,
+          0.17158400000016627,
+          0.1335509999998976,
+          0.3330580000001646,
+          0.13919000000009873,
+          0.1710329999998521,
+          0.18416900000011083,
+          0.19046099999991384,
+          0.13764799999989918,
+          0.17382899999984147,
+          0.10945199999991928,
+          0.3464249999999538
+        ],
+        "message": [
+          24.999866999999995,
+          26.298093000000108,
+          24.20634499999983,
+          23.90264400000001,
+          28.288172999999915,
+          32.232515999999805,
+          24.27446699999996,
+          24.197397000000137,
+          27.88371600000005,
+          21.647375999999895,
+          23.0108180000002,
+          33.76629900000012
+        ]
+      },
+      "reusedMemoryHandle": {
+        "session": 12,
+        "message": 0
+      }
+    },
+    {
+      "samplesMs": {
+        "session": [
+          1.22309899999982,
+          0.20350600000006125,
+          0.17186399999991409,
+          0.2526100000000042,
+          0.15520199999991746,
+          0.14344899999991867,
+          0.10936199999991914,
+          0.3673949999999877,
+          0.12542499999995016,
+          0.23251100000015867,
+          0.13558400000010806,
+          0.30781900000010864
+        ],
+        "message": [
+          50.268336999999974,
+          63.97915500000022,
+          42.581584999999905,
+          26.995438999999806,
+          23.35706200000004,
+          25.074671999999964,
+          21.069402000000082,
+          31.170438999999988,
+          19.740677000000005,
+          37.191630999999916,
+          31.06988299999989,
+          35.99727800000005
+        ]
+      },
+      "reusedMemoryHandle": {
+        "session": 12,
+        "message": 0
+      }
+    }
+  ]
+}

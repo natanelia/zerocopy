@@ -124,6 +124,81 @@ test('large maps preserve ordering with a one-entry queue', { timeout: 10000 }, 
   assert.deepEqual(await executor.map.get(input, { chunkSize: 2 }), input.map(key => key === 'lane' ? 1 : 2));
 });
 
+for (const memory of ['share', 'copy']) {
+  test(`overlapping pool batches capture independent roots at invocation (${memory})`, { timeout: 5000 }, async t => {
+    const ports = [pair(), pair()], gate = deferred();
+    // This source deliberately reuses the outer record and has no change notifications.
+    const roots = { map: new SharedMap('number').set('lane', 1) };
+    const source = { getSnapshot: () => roots, subscribe: () => () => {} };
+    const stops = await Promise.all(ports.map(p => serve({
+      async check({ state }, wait) {
+        if (wait) await gate.promise;
+        return state.map.get('lane');
+      },
+    }, { endpoint: p.b })));
+    const workers = await pool(ports.map(p => p.a), { state: source, memory, maxPending: 4 });
+    t.after(() => { gate.resolve(); workers.dispose(); stops.forEach(stop => stop()); });
+    const jobs = [true, true, false, false, false, false];
+    const first = workers.map.check(jobs, { snapshot: 'batch' });
+    roots.map = roots.map.set('lane', 2);
+    const second = workers.map.check(jobs, { snapshot: 'batch' });
+    const live = workers.run.check(false);
+    roots.map = roots.map.set('lane', 3);
+    gate.resolve();
+    assert.deepEqual(await first, jobs.map(() => 1));
+    assert.deepEqual(await second, jobs.map(() => 2));
+    assert.equal(await live, 3);
+    assert.deepEqual(await workers.map.check(jobs, { snapshot: 'task' }), jobs.map(() => 3));
+    assert.ok(ports.every(p => p.a.sent.filter(m => m.kind === 'hello').length === 1));
+  });
+}
+
+test('an edit during a pinned batch resumes live publication once per worker', { timeout: 5000 }, async t => {
+  const gate = deferred();
+  let started = 0;
+  const { executor, state, ports } = await pooled(t, { async read({ state }) {
+    started++;
+    await gate.promise;
+    return state.map.get('lane');
+  } });
+  t.after(() => gate.resolve());
+  const batch = executor.map.read(Array(60).fill(null), { snapshot: 'batch' });
+  await until(() => started === 3);
+  state.update('map', map => map.set('lane', 2));
+  state.update('map', map => map.set('lane', 3));
+  state.flush();
+  const frames = p => p.a.sent.filter(m => m.kind === 'snapshot');
+  assert.ok(ports.every(p => frames(p).length === 1));
+  gate.resolve();
+  assert.deepEqual(await batch, Array(60).fill(1));
+  await until(() => ports.every(p => frames(p).length === 2));
+  assert.ok(ports.every(p => frames(p)[1].data.arenas.every(arena => !arena.memory && !arena.copy)));
+  assert.equal(await executor.run.read(), 3);
+});
+
+test('an aborted batch releases its snapshot after the active handler settles', { timeout: 3000 }, async t => {
+  const gate = deferred(), entered = deferred();
+  const state = model(), p = pair();
+  const stop = await serve({ async check({ state }, wait) {
+    if (wait) { entered.resolve(); await gate.promise; }
+    return state.map.get('lane');
+  } }, { endpoint: p.b });
+  const workers = await pool([p.a], { state, memory: 'share' });
+  t.after(() => { gate.resolve(); workers.dispose(); stop(); state.dispose(); });
+  const abort = new AbortController();
+  const batch = workers.map.check([true, false], { snapshot: 'batch', signal: abort.signal });
+  await entered.promise;
+  abort.abort(new Error('viewport cancelled'));
+  await assert.rejects(batch, /viewport cancelled/);
+  state.update('map', map => map.set('lane', 5));
+  state.flush();
+  const live = workers.run.check(false);
+  assert.equal(p.a.sent.filter(m => m.kind === 'snapshot').length, 1);
+  gate.resolve();
+  assert.equal(await live, 5);
+  assert.deepEqual(await workers.map.check([false], { snapshot: 'batch' }), [5]);
+});
+
 test('the next queued job uses the worker that actually became idle', { timeout: 3000 }, async t => {
   const state = model(), ports = [pair(), pair()];
   const gates = [deferred(), deferred()];
@@ -234,6 +309,8 @@ test('pool validates queue limits before creating workers', { timeout: 2000 }, a
 test('empty maps still validate chunk size and disposal', { timeout: 2000 }, async t => {
   const { executor } = await pooled(t);
   await assert.rejects(executor.map.get([], { chunkSize: 0 }), /chunkSize/);
+  await assert.rejects(executor.map.get([], { snapshot: 'invalid' }), /snapshot/);
+  assert.deepEqual(await executor.map.get([], { snapshot: 'batch' }), []);
   assert.deepEqual(await executor.map.get([]), []);
   executor.dispose();
   await assert.rejects(executor.map.get([]), /closed/);
@@ -271,4 +348,38 @@ test('real Node workers execute pool calls over shared WASM memory', { timeout: 
   t.after(() => { executor.dispose(); state.dispose(); });
   state.update('map', map => map.set('lane', 91));
   assert.deepEqual(await executor.map.get(Array(200).fill('lane')), Array(200).fill(91));
+});
+
+test('eight workers validate one confirmed TanStack snapshot across an optimistic edit', { timeout: 15000 }, async t => {
+  const { createCollection, createTransaction } = await import('@tanstack/db');
+  const { sharedCollectionConfig } = await import('zerocopy/tanstack');
+  const source = sharedCollectionConfig({ id: 'pool-lanes', initialData: [{ id: 'lane', revision: 1 }] });
+  const lanes = createCollection(source);
+  await lanes.preload();
+  t.after(() => lanes.cleanup());
+  const entry = new URL('../dist/worker.js', import.meta.url).href;
+  const workers = await pool(() => new Worker(`
+    const { parentPort, threadId } = require('node:worker_threads');
+    import(${JSON.stringify(entry)}).then(({ serve }) => serve({
+      check({ state }, gate) {
+        if (Atomics.wait(new Int32Array(gate), 0, 0, 10000) === 'timed-out') throw new Error('Validation gate timed out');
+        return [threadId, state.get('lane').revision];
+      }
+    }, { endpoint: parentPort }));
+  `, { eval: true }), { state: source, size: 8, memory: 'share' });
+  const gate = new Int32Array(new SharedArrayBuffer(4));
+  const release = () => { Atomics.store(gate, 0, 1); Atomics.notify(gate, 0); };
+  t.after(() => { release(); workers.dispose(); });
+  const tx = createTransaction({ autoCommit: false, mutationFn: ({ transaction }) => source.utils.acceptMutations(transaction) });
+  tx.mutate(() => lanes.update('lane', lane => { lane.revision = 2; }));
+  assert.equal(lanes.get('lane').revision, 2);
+  assert.equal(source.getSnapshot().get('lane').revision, 1);
+  const checks = workers.map.check(Array(256).fill(gate.buffer), { snapshot: 'batch' });
+  await tx.commit();
+  assert.equal(source.getSnapshot().get('lane').revision, 2);
+  release();
+  const results = await checks;
+  assert.equal(new Set(results.map(([worker]) => worker)).size, 8);
+  assert.deepEqual(results.map(([, revision]) => revision), Array(256).fill(1));
+  assert.equal((await workers.run.check(gate.buffer))[1], 2);
 });

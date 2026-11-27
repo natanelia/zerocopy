@@ -24,9 +24,35 @@ try {
   writeFileSync(join(temporary, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', join(temporary, archive.filename)]);
 
-  const imports = Object.keys(pkg.exports).map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
+  // The GeoArrow table adapter requires its optional peer. Exercise that entry
+  // in a second installation below, after verifying the peer-free entry points.
+  const imports = Object.keys(pkg.exports).filter(path => path !== './geoarrow').map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
-import { SharedList } from 'zerocopy';
+import { SharedList, SharedMap } from 'zerocopy';
+import { lineStringViewXY, packLineStringsXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
+import { buildLineStringIndex, buildSpatialIndex, applySpatialEdits, createSpatialQueryCursor, prepareSpatialQuery, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
+const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
+const path = new SharedList('number').pushMany([0, 0, 2, 3]);
+const rows = new SharedMap('number').set('lane', 1);
+assert.deepEqual([...rows.set('lane', 2).changesSince(rows)], [{ type: 'update', key: 'lane', before: 1, after: 2 }]);
+const paths = packLineStringsXY([null, path]);
+assert.deepEqual([...paths.offsets], [0, 0, 2]);
+assert.deepEqual(querySpatialIndex(buildLineStringIndex([{ paths, ids: [6, 7] }]), [0, 2, 0, 3]), [7]);
+assert.equal(pathIntersectsBoxXY(lineStringViewXY(paths, 1), [0, 2, 0, 3]), false);
+await assert.rejects(import('apache-arrow'), { code: 'ERR_MODULE_NOT_FOUND' });
+assert.deepEqual(querySpatialIndex(base, [0, 2, 0, 3]), [7]);
+assert.equal(pathIntersectsBoxXY(path, [0, 2, 0, 3]), false);
+assert.equal(pathIntersectsBoxXY(path, [1, 1, 1, 2]), true);
+const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }]);
+const cursor = createSpatialQueryCursor(base);
+cursor.advance(edits, 1);
+assert.deepEqual(cursor.search([0, 0, 2, 3]), []);
+cursor.advance(applySpatialEdits(edits, 2, [{ id: 7, bounds: [9, 0, 10, 1] }]), 2);
+assert.deepEqual(cursor.search([9, 0, 10, 1]), [7]);
+assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3]), [7]);
+assert.deepEqual(querySpatialIndex(base, [0, 0, 2, 3], edits), []);
+assert.deepEqual(querySpatialIndex(rebuildSpatialIndex(base, edits, 1), [0, 0, 2, 3]), []);
+assert.deepEqual(querySpatialIndex(structuredClone(prepareSpatialQuery(base, edits, 1)), [0, 0, 2, 3]), []);
 ${imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; assert.ok(Object.keys(entry${index}).length > 0);`).join('\n')}
 const before = new SharedList('number').pushMany([1, 2]);
 const after = before.push(3);
@@ -42,17 +68,134 @@ assert.deepEqual(after.toArray(), [1, 2, 3]);
   writeFileSync(join(temporary, 'worker.mjs'), workerProof);
   run(process.execPath, ['worker.mjs']);
 
+  writeFileSync(join(temporary, 'spatial-reader.mjs'), `
+import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { buildSpatialIndex, applySpatialEdits, diffSpatialJoin, prepareSpatialQuery, querySpatialIndex, querySpatialJoin } from 'zerocopy/spatial';
+const box = [0, 0, 1, 1];
+if (isMainThread) {
+  const base = buildSpatialIndex([{ id: 7, bounds: box }]);
+  const edits = applySpatialEdits(undefined, 1, [{ id: 7, bounds: null }, { id: 19, bounds: box }]);
+  const reader = new Worker(new URL(import.meta.url), { workerData: { left: prepareSpatialQuery(base, edits, 1), right: base } });
+  try { assert.deepEqual(await once(reader, 'message'), [{ ids: [19], pairs: [[19, 7]], delta: { added: [[19, 7]], removed: [[7, 7]] } }]); }
+  finally { await reader.terminate(); }
+} else {
+  const { left, right } = workerData;
+  const delta = diffSpatialJoin({ left: right, right }, { left, right }, {
+    left: [{ id: 7, before: box, after: null }, { id: 19, before: null, after: box }],
+  });
+  parentPort.postMessage({ ids: querySpatialIndex(left, box), pairs: querySpatialJoin(left, right), delta });
+}
+`);
+  run(process.execPath, ['spatial-reader.mjs']);
+
   const consumer = join(temporary, 'consumer.ts');
   writeFileSync(consumer, imports.map((name, index) => `import * as entry${index} from ${JSON.stringify(name)}; void entry${index};`).join('\n') + "\nimport { SharedList } from 'zerocopy';\nconst list: SharedList<'number'> = new SharedList('number');\nconst value: number | undefined = list.get(0);\n");
-  const program = ts.createProgram([consumer], {
-    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-    strict: true, noEmit: true, skipLibCheck: false, types: [], lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
-  });
-  const diagnostics = ts.getPreEmitDiagnostics(program);
-  assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
-    getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
-  }));
-  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, Node worker sharing, and TypeScript consumer passed.`);
+  function checkConsumer() {
+    const program = ts.createProgram([consumer], {
+      target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
+      strict: true, noEmit: true, skipLibCheck: false, types: [], lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
+    });
+    const diagnostics = ts.getPreEmitDiagnostics(program);
+    assert.equal(diagnostics.length, 0, ts.formatDiagnosticsWithColorAndContext(diagnostics, {
+      getCanonicalFileName: file => file, getCurrentDirectory: () => temporary, getNewLine: () => '\n',
+    }));
+  }
+  checkConsumer();
+  // Exercise both transaction APIs with the published archive and real npm peer resolution.
+  writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
+import assert from 'node:assert/strict';
+import { BTreeIndex, createCollection, createLiveQueryCollection, createTransaction, eq } from '@tanstack/db';
+import { createSharedSession } from 'zerocopy/worker';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig, withConfirmedSharedCache } from 'zerocopy/tanstack';
+const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2, color: 'black' } }] });
+const lanes = createCollection(options);
+const confirmed = createSharedSession({ source: options }, { copy: false });
+lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
+const viewport = createCollection(viewportCollectionConfig({ id: 'visible' }));
+const pairs = createCollection(spatialJoinCollectionConfig({ id: 'overlaps' }));
+pairs.createIndex(row => row.leftId, { indexType: BTreeIndex });
+pairs.createIndex(row => row.rightId, { indexType: BTreeIndex });
+const matches = createLiveQueryCollection(q => q.from({ p: pairs })
+  .innerJoin({ lane: lanes }, ({ p, lane }) => eq(p.leftId, lane.handle))
+  .innerJoin({ v: viewport }, ({ p, v }) => eq(p.rightId, v.id))
+  .select(({ p, lane }) => ({ id: p.id, style: lane.style })));
+const joined = createLiveQueryCollection(q => q.from({ hit: viewport })
+  .innerJoin({ lane: lanes }, ({ hit, lane }) => eq(hit.id, lane.handle))
+  .select(({ lane }) => ({ id: lane.id, style: lane.style })));
+const settled = process.argv[2] === '0.5.0'
+  ? tx => tx.isPersisted.promise
+  : tx => tx.when('settled');
+try {
+  await Promise.all([matches.preload(), joined.preload()]);
+  await pairs.utils.setPairs(Promise.resolve([[2, 1], [2, 3]]));
+  await viewport.utils.setVisibleIds([1, 2]);
+  assert.equal([...matches.values()][0].id, '2:1');
+  const viewportVersion = viewport.utils.getVersion();
+  assert.equal(await viewport.utils.applyVisibleChanges(Promise.resolve({ added: [3], removed: [1] }), viewportVersion), true);
+  assert.equal(await viewport.utils.applyVisibleChanges({ added: [1], removed: [] }, viewportVersion), false);
+  assert.equal([...matches.values()][0].id, '2:3');
+  const version = pairs.utils.getVersion();
+  assert.equal(await pairs.utils.applyPairChanges({ added: [[2, 2]], removed: [[2, 3]] }, version), true);
+  assert.equal(await pairs.utils.applyPairChanges({ added: [], removed: [[2, 2]] }, version), false);
+  assert.equal([...matches.values()][0].id, '2:2');
+  assert.deepEqual([...viewport.keys()].sort(), [2, 3]);
+  assert.equal([...joined.values()][0].id, 'n');
+  const initial = options.getSnapshot();
+  await settled(lanes.update('n', draft => { draft.style.width = 4; }));
+  assert.equal(confirmed.current.get('n').style.width, 4);
+  const widthVersion = confirmed.version;
+  const color = createTransaction({ autoCommit: false, mutationFn: async () => {} });
+  color.mutate(() => lanes.update('n', draft => { draft.style.color = 'red'; }));
+  assert.equal(confirmed.version, widthVersion);
+  await settled(lanes.update('n', draft => { draft.style.width = 6; }));
+  assert.equal(initial.get('n').style.width, 2);
+  assert.deepEqual(options.getSnapshot().get('n').style, { width: 6, color: 'black' });
+  assert.equal(confirmed.current, options.getSnapshot());
+  color.rollback();
+  assert.deepEqual([...joined.values()][0].style, { width: 6, color: 'black' });
+  assert.equal([...matches.values()][0].style.width, 6);
+  await settled(lanes.delete('n'));
+  assert.equal(options.getSnapshot().size, 0);
+  assert.equal(joined.size, 0);
+  assert.equal(matches.size, 0);
+} finally { confirmed.dispose(); await matches.cleanup(); await joined.cleanup(); await pairs.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
+let remote;
+const upstream = withConfirmedSharedCache({ sync(params) { remote = params; params.markReady(); } });
+const roads = createCollection({ id: 'roads', getKey: row => row.id, sync: upstream.sync });
+try {
+  await roads.preload();
+  const empty = upstream.getSnapshot();
+  remote.begin();
+  remote.write({ type: 'insert', value: { id: 'west', label: 'old' } });
+  assert.equal(upstream.getSnapshot(), empty);
+  await remote.commit();
+  const initial = upstream.getSnapshot();
+  remote.begin(); remote.truncate();
+  remote.write({ type: 'insert', value: { id: 'east', label: 'new' } });
+  assert.equal(upstream.getSnapshot(), initial);
+  await remote.commit();
+  assert.deepEqual([...upstream.getSnapshot().keys()], ['east']);
+  assert.deepEqual([...roads.keys()], ['east']);
+  assert.equal(initial.get('west').label, 'old');
+} finally { await roads.cleanup(); }
+`);
+  const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
+  for (const version of peers) {
+    run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@' + version]);
+    run(process.execPath, ['tanstack-peer.mjs', version]);
+    run('bun', ['tanstack-peer.mjs', version]);
+  }
+  const arrow = pkg.devDependencies['apache-arrow'];
+  run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save',
+    'apache-arrow@' + arrow, '@geoarrow/geoarrow-js@0.3.3']);
+  writeFileSync(consumer, readFileSync(join(root, 'type-tests/geometry-public.ts')));
+  checkConsumer();
+  writeFileSync(join(temporary, 'geoarrow-worker.mjs'), readFileSync(join(root, 'proofs/geoarrow-worker.mjs')));
+  run(process.execPath, ['geoarrow-worker.mjs']);
+  run('bun', ['geoarrow-worker.mjs']);
+  console.log(`Package ${archive.name}@${archive.version}: ${paths.size} files, ${archive.size} bytes. Node/Bun exports, immutable snapshots, worker sharing, TypeScript consumer, Apache Arrow ${arrow}, and TanStack DB ${peers.join(' and ')} passed.`);
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

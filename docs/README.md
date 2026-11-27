@@ -17,6 +17,7 @@ Start with the [two-file quickstart](getting-started.md). It shares state with a
 | Run calculations through typed task calls | [Task quickstart](task-quickstart.md) |
 | Existing workers, pools, ports, or SharedWorker connections | [Task execution guide](workers.md) |
 | Redux Toolkit, selectors, or DevTools | [Redux](redux.md) |
+| Spatial viewport queries across workers | [Spatial indexes and edits](spatial.md) |
 | TanStack collection and sync-cache helpers | [TanStack adapters](tanstack.md) |
 
 Collections provide data access. Sessions deliver new snapshots. Tasks are an optional way to schedule work; they are not required for a read.

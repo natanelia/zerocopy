@@ -85,6 +85,22 @@ jobs:
       - name: Run all real Chromium integration tests
         shell: bash
         run: bun run test:browser 2>&1 | tee browser.log
+      - name: Replay spatial edits in Chromium
+        run: |
+          npm ci --prefix proofs/spatial-editor --no-audit --no-fund
+          mkdir -p proofs/results/ci-regressions
+          node proofs/spatial-editor/run.mjs --smoke --output=proofs/results/ci-regressions/spatial-editor.json
+          node proofs/spatial-editor/run.mjs --source=geoarrow --smoke --output=proofs/results/ci-regressions/geoarrow-editor.json
+          node proofs/spatial-editor/run.mjs --mode=packed --readers=4 --reader-query=cursor --pending-import --smoke --output=proofs/results/ci-regressions/geoarrow-reader-cursor.json
+          node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/animation-callback-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-full-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-range-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs proofs/spatial-editor/results/geoarrow-editor.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed proofs/spatial-editor/results/ipc-buffered-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed proofs/spatial-editor/results/ipc-stream-readers-4.json.gz
+          for report in proofs/spatial-editor/results/reader-query-*.json.gz; do
+            node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed "$report"
+          done
       - name: Check checkpoint, heap, and batched-list browser workers
         shell: bash
         env:

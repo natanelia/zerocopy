@@ -4,6 +4,7 @@ export const pages = [
   { source: 'website/content/mental-model.md', slug: 'mental-model', title: 'How sharing works', group: 'Start here', description: 'One writer, immutable snapshots, and local reads. A model you can reason about.' },
   { source: 'docs/api.md', slug: 'collections', title: 'Immutable collections API & types', group: 'Build with it', description: 'zerocopy API reference for shared immutable maps, lists, sets, typed JSON, and nested collections in JavaScript and TypeScript.' },
   { source: 'docs/text-search.md', slug: 'text-search', title: 'Search shared text', group: 'Build with it', description: 'Match UTF-8 text locally without decoding every row. Exact literal search and stable snapshots.' },
+  { source: 'docs/spatial.md', slug: 'spatial', title: 'Spatial viewport queries', group: 'Build with it', description: 'Query shared bounding boxes in workers, apply sparse feature edits, and install rebuilt indexes while the editor keeps changing.' },
   { source: 'docs/worker-sessions.md', slug: 'sessions', title: 'State & subscriptions', group: 'Build with it', description: 'Connect workers and publish new snapshots without a task system.' },
   { source: 'docs/worker-sharing.md', slug: 'transport', title: 'Your own transport', group: 'Build with it', description: 'Use shared snapshots with an existing message protocol.' },
   { source: 'docs/task-quickstart.md', slug: 'tasks', title: 'Optional tasks', group: 'Build with it', description: 'Schedule a whole calculation. Keep individual reads local.' },

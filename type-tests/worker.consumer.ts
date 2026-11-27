@@ -30,6 +30,8 @@ void selected;
 async function consumers(browser: Worker, node: NodeWorker, port: MessagePort, nodePort: NodeChannel['port1']) {
   await shared.connect([browser, node, port, nodePort]);
   const reader = await connectSharedSession<State>({ endpoint: port });
+  const requested: State | undefined = await reader.snapshotAt(1, { signal: new AbortController().signal });
+  void requested;
   const value: number | undefined = reader.current.map.get('x');
   void value;
   for await (const snapshot of reader.snapshots()) { const list: SharedList<'string'> = snapshot.list; void list; break; }

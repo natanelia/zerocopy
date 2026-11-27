@@ -1,6 +1,7 @@
 /** Internal session protocol. Keep the existing worker-data format unchanged. */
 import { Snapshot } from './arena';
 import { getWorkerData, type WorkerData } from './shared';
+import { notifySubscribers } from './snapshot-listeners';
 
 export type SharedCollection = Parameters<typeof getWorkerData>[0][string];
 export type SharedValue = SharedCollection | Readonly<Record<string, SharedCollection>>;
@@ -62,13 +63,7 @@ export function report(handler: SessionOptions['onError'], error: unknown): void
   catch (failure) { console.error('[zerocopy/worker] onError failed', failure); }
 }
 export function notify<T>(listeners: Set<(value: T, version: number) => void>, value: T, version: number, onError?: SessionOptions['onError']): void {
-  for (const listener of [...listeners]) {
-    try {
-      // Also observe a rejected Promise from an accidentally async subscriber.
-      const result = listener(value, version) as unknown;
-      if (result && typeof (result as any).then === 'function') Promise.resolve(result).catch(error => report(onError, error));
-    } catch (error) { report(onError, error); }
-  }
+  notifySubscribers(listeners, error => report(onError, error), value, version);
 }
 let nextId = 0;
 export function uniqueId(): string { return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${++nextId}`; }
