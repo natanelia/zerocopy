@@ -30,11 +30,14 @@ function batch(rows,ids,rev,nextId){
   }
   return {remove,upsert,nextId};
 }
-export async function run(mode,n,revisions=96){
+export async function run(mode,n,revisions=96,retention=2){
+  if(!Number.isInteger(retention)||retention<1)throw Error('invalid retention');
   if(!crossOriginIsolated)throw Error('not isolated');
   const initial=Array.from({length:n},(_,i)=>lane(i)),rows=new Map(initial.map(r=>[r.id,r])),ids=initial.map(r=>r.id),dead=[],retained=new Map(),events=[];
   // Track only named retained/current arena generations, not GC or resident memory.
-  const heldArenas=new Set(),lastUsage=new Map();
+  const heldArenas=new Map(),lastUsage=new Map();
+  const heldIds=()=>[...heldArenas.values()].flat();
+  let expiredVerified=0,verificationMs=0;
   const updateUsage=items=>{for(const a of items)lastUsage.set(a.id,a);};
   const sumUsage=ids=>{const a=[...new Set(ids)].map(id=>lastUsage.get(id));return {used:a.reduce((s,x)=>s+x.used,0),capacity:a.reduce((s,x)=>s+x.capacity,0),arenas:a.length};};
   let nextId=n;const t0=performance.now();let owner=build(mode,initial);const buildMs=performance.now()-t0;
@@ -54,18 +57,28 @@ export async function run(mode,n,revisions=96){
         const start=performance.now(),before=arenaUsage(owner,mode);updateUsage(before);
         owner=repack(mode,owner);
         const after=arenaUsage(owner,mode);updateUsage(after);
-        handoff=sumUsage([...heldArenas,...before.map(a=>a.id),...after.map(a=>a.id)]);
+        handoff=sumUsage([...heldIds(),...before.map(a=>a.id),...after.map(a=>a.id)]);
         compactionMs=performance.now()-start;
       }
       const mutationMs=performance.now()-t;
       const a=performance.now(),p=payload(mode,owner),payloadMs=performance.now()-a;
       const replies=await Promise.all(workers.map((w,i)=>send(w,{mode,n,rev,wire:p.wire,query:queries[i],ids:pointIds[i],hold})));
       const replyMs=performance.now()-a;
-      const usage=arenaUsage(owner,mode);updateUsage(usage);if(hold)for(const x of usage)heldArenas.add(x.id);
-      const retainedUsage=sumUsage([...heldArenas,...usage.map(x=>x.id)]);
+      const usage=arenaUsage(owner,mode);updateUsage(usage);if(hold)heldArenas.set(rev,usage.map(x=>x.id));
+      const retainedUsage=sumUsage([...heldIds(),...usage.map(x=>x.id)]);
       for(let i=0;i<replies.length;i++){const r=replies[i];equal(r.rev,rev,'revision');equal(r.size,n,'size');equal(r.points,expected[i].points,'points');equal(r.visible,expected[i].visible,'visible');}
       events.push({rev,removed:b.remove.length,changed:b.upsert.length,mutationMs,editMs,compactionMs,handoff,retainedUsage,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,firstElapsedMs:rev===0?performance.now()-initialWorkers:null,
         scan:!!queries[0],visibleRows:replies.reduce((s,r)=>s+(r.visible?.length??0),0),attachMs:Math.max(...replies.map(r=>r.attachMs)),pointMs:Math.max(...replies.map(r=>r.pointMs)),scanMs:Math.max(...replies.map(r=>r.scanMs)),memory:p.memory});
+      // Verify each expiring root in all readers before releasing it. The same
+      // lifetime and verification policy applies to every arm. This diagnostic
+      // work is separately timed, outside edit-to-answer, as final digests are.
+      if(hold&&retained.size>retention){
+        const v=performance.now(),[oldRev,old]=retained.entries().next().value,oldIds=[...old.rows.keys()].sort((a,b)=>a-b);
+        const history=[{rev:oldRev,ids:oldIds,missing:old.missing}],expected=[[oldRev,await digest(oldIds.length,i=>old.rows.get(oldIds[i]))]];
+        for(const r of await Promise.all(workers.map(w=>send(w,{expire:true,mode,history}))))equal(r.digests,expected,'expired full rows');
+        retained.delete(oldRev);heldArenas.delete(oldRev);expiredVerified++;verificationMs+=performance.now()-v;
+      }
+      events.at(-1).afterExpiryUsage=sumUsage([...heldIds(),...usage.map(x=>x.id)]);
     }
     const history=[],expected=[];
     for(const [rev,r] of retained){const ids=[...r.rows.keys()].sort((a,b)=>a-b);history.push({rev,ids,missing:r.missing});expected.push([rev,await digest(ids.length,i=>r.rows.get(ids[i]))]);}
@@ -75,8 +88,8 @@ export async function run(mode,n,revisions=96){
     for(const r of releaseReplies)equal(r.digest,expected.at(-1)[1],'current after release');
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
-    return {mode,n,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
+    return {mode,n,retention,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
       p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
-      initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).retainedUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
+      initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
   }finally{for(const w of workers)w.terminate();}
 }

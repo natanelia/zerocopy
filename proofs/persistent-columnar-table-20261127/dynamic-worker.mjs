@@ -7,13 +7,14 @@ self.onmessage=async({data:m})=>{
       retained.clear();
       self.postMessage({digest:await digest(m.ids.length,i=>get(m.mode,current,m.ids[i]))});return;
     }
-    if(m.verify){
+    if(m.verify||m.expire){
       const out=[];
       for(const {rev,ids,missing} of m.history){
         const s=retained.get(rev);if(!s||size(m.mode,s)!==ids.length)throw Error('retained size');
         for(const id of missing)if(get(m.mode,s,id)!==undefined)throw Error('deleted identity resurrected');
         out.push([rev,await digest(ids.length,i=>get(m.mode,s,ids[i]))]);
       }
+      if(m.expire)for(const {rev} of m.history)retained.delete(rev);
       self.postMessage({digests:out});return;
     }
     if(m.rev!==last+1)throw Error('out of order revision');

@@ -131,6 +131,7 @@ export function repack(mode,owner){
   if(isJSON(mode)){
     const map=compact(owner.map);resetMap();return {map};
   }
+  if(mode.startsWith('append-repack-direct'))return repackDirect(owner);
   const rows=[],slots=Array.from(owner.index.values()).sort((a,b)=>a-b);
   for(const i of slots){
     const m=slotMeta(owner,i);
@@ -139,6 +140,30 @@ export function repack(mode,owner){
   }
   resetMap();resetSharedList();
   return build(mode,rows);
+}
+// Copy live ranges directly into one preallocated packed numeric array. Avoid
+// materializing each geometry as a JS array and re-validating its coordinates.
+// This still copies coordinates and rebuilds the key index; not zero-copy export.
+function repackDirect(owner){
+  const slots=Array.from(owner.index.values()).sort((a,b)=>a-b),n=slots.length,c=owner.columns;
+  let length=0;
+  for(const i of slots){
+    const count=c.count.get(i),start=c.start.get(i);
+    if(!c.occupied.get(i)||!Number.isSafeInteger(start)||start<0||!Number.isSafeInteger(count)||count<4||count%2||start+count>owner.coords.size)throw Error('invalid live range');
+    length+=count;
+  }
+  const packed=new Float64Array(length),metadata=Object.fromEntries(names.map(f=>[f,new Array(n)])),indexEntries=new Array(n);
+  let at=0;
+  for(let j=0;j<n;j++){
+    const i=slots[j],id=c.id.get(i),count=c.count.get(i),start=c.start.get(i);
+    if(owner.index.get(key(id))!==i)throw Error('invalid live slot');
+    owner.coords.copyToFloat64Array(packed,{start,end:start+count,offset:at});
+    for(const f of names)metadata[f][j]=f==='start'?at:f==='capacity'?count:c[f].get(i);
+    indexEntries[j]=[key(id),j];at+=count;
+  }
+  resetMap();resetSharedList();
+  return {index:new SharedMap('number').setMany(indexEntries),coords:new SharedList('number').pushMany(packed),
+    columns:Object.fromEntries(names.map(f=>[f,new SharedList(colType(f)).pushMany(metadata[f])])),free:[]};
 }
 export function shouldRepack(mode,rev,owner){
   if(mode==='json-compact')return rev>0&&rev%24===0;

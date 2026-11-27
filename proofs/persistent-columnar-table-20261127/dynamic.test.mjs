@@ -37,7 +37,7 @@ test('reused capacity and old geometry independent',()=>{
 });
 
 test('repacking live identities into fresh arenas retains old worker views and forks',async()=>{
-  for(const mode of ['append-repack','json-compact']){
+  for(const mode of ['append-repack','append-repack-direct','json-compact']){
     const rows=Array.from({length:65},(_,i)=>lane(i)),a=build(mode,rows),old=await attach(mode,structuredClone(payload(mode,a).wire));
     const b=edit(mode,a,{remove:[0,31],upsert:[[100,lane(100)],[101,lane(101)]]});
     const before=arenaUsage(b,mode),held=await attach(mode,structuredClone(payload(mode,b).wire),old);
@@ -54,4 +54,16 @@ test('repacking live identities into fresh arenas retains old worker views and f
     const q={left:-Infinity,right:Infinity,bottom:-Infinity,top:Infinity,kind:2};
     assert.deepEqual(scan(mode,current,q),scan(mode,held,q));
   }
+});
+
+test('direct generation rebuild matches materialized rebuild including deletion-only and empty roots',async()=>{
+  const mode='append-repack-direct',rows=Array.from({length:129},(_,i)=>lane(i)),a=build(mode,rows);
+  const b=edit(mode,a,{remove:[0,32,64,128],upsert:[[300,longer(lane(300))],[301,shorten(lane(301))],[31,longer(rows[31])]]});
+  const expected=repack('append-repack',b),actual=repack(mode,b),reader=await attach(mode,structuredClone(payload(mode,actual).wire));
+  assert.equal(size(mode,reader),size(mode,b));
+  for(let i=0;i<=301;i++)assert.deepEqual(get(mode,reader,i),get(mode,expected,i));
+  assert.equal(payload(mode,actual).memory.coordinateSlots,payload(mode,expected).memory.coordinateSlots);
+  const empty=edit(mode,actual,{remove:[...actual.index.keys()].map(k=>{const i=actual.index.get(k);return actual.columns.id.get(i);}),upsert:[]});
+  const compacted=repack(mode,empty);
+  assert.equal(size(mode,compacted),0);assert.equal(compacted.coords.size,0);assert.deepEqual(get(mode,a,0),rows[0]);
 });
