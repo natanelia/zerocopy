@@ -44,6 +44,14 @@ function scan(map, api, start) {
       if (y < 512 || y >= 3584 || v.equals('kind', 2)) continue;
       ids.push(v.get('id'));
     }
+  } else if (api === 'direct') {
+    for (const v of map.valuesView()) {
+      const x = v.get('x');
+      if (x >= start + 1024 || x + v.get('width') < start) continue;
+      const y = v.get('y');
+      if (y < 512 || y >= 3584 || v.equals('kind', 2)) continue;
+      ids.push(v.get('id'));
+    }
   } else map.forEach(visit);
   const ms = performance.now() - t;
   const ordered = hash(ids);
@@ -91,6 +99,17 @@ if (!isMainThread) {
         parentPort.postMessage({ms, heapUsed: process.memoryUsage().heapUsed, verified: true}); return;
       } else if (phase === 'verify') {
         verify(old, n, 0); verify(next, n, 1);
+        if (api === 'direct') for (const [snapshot, rev] of [[old, 0], [next, 1]]) {
+          const keys = snapshot.keys();
+          let count = 0;
+          for (const view of snapshot.valuesView()) {
+            const i = view.get('id');
+            assert.equal(keys.next().value, key(i));
+            assert.deepEqual(view.toObject(), row(i, rev && changed(i,n) ? 1 : 0));
+            count++;
+          }
+          assert.equal(count, n); assert(keys.next().done);
+        }
         if (shared) assert.throws(() => old.set('x', row(0)), /read-only/);
         parentPort.postMessage({ verified: true }); return;
       } else throw Error('bad phase');
@@ -117,14 +136,14 @@ if (!isMainThread) {
   assert(output && [1000,10000,100000].includes(n) && Number.isInteger(rounds) && rounds > 0);
   const profileEnabled = process.env.ZEROCOPY_SCAN_PROFILE === '1';
   const cases = [process.env.ZEROCOPY_SCAN_MODE];
-  assert(['shared-forEach','shared-view','native-forEach'].includes(cases[0]));
+  assert(['shared-forEach','shared-view','shared-direct','native-forEach'].includes(cases[0]));
   const reusePrevious = process.env.ZEROCOPY_SCAN_PREVIOUS === '1';
   const report = { source: execFileSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).trim(), node: process.version,
     cpu: cpus()[0].model, os: release(), n, shape, rounds, profileEnabled, reusePrevious, runtimeBuild: process.env.ZEROCOPY_SCAN_BUILD, samples: [] };
   const expectedDigests = new Map();
   for (const rev of [0,1]) for (const start of windows) expectedDigests.set(rev + ':' + start, expected(n, rev, start));
   async function trial(id, round) {
-    const shared = id !== 'native-forEach', api = id === 'shared-view' ? 'view' : 'forEach';
+    const shared = id !== 'native-forEach', api = id === 'shared-view' ? 'view' : id === 'shared-direct' ? 'direct' : 'forEach';
     const rows = Array.from({length:n}, (_,i) => [key(i), row(i)]);
     const edits = [];
     for (let i = 0; i < n; i++) if (changed(i,n)) edits.push([key(i),row(i,1)]);
@@ -187,8 +206,9 @@ if (!isMainThread) {
       const updated = await exchange('updated',payload,1);
       const retained = await exchange('retained',undefined,0);
       const points = await exchange('points');
+      const measuredPeakRssKiB = process.resourceUsage().maxRSS;
       await exchange('verify');
-      return {id,round,warmup:round<0,constructionMs,prepareInitialMs,prepareUpdateMs,mutationMs,edits:edits.length,first,repeat,updated,retained,points,peakProcessRssKiB:process.resourceUsage().maxRSS,verified:true};
+      return {measuredPeakRssKiB,id,round,warmup:round<0,constructionMs,prepareInitialMs,prepareUpdateMs,mutationMs,edits:edits.length,first,repeat,updated,retained,points,peakProcessRssKiB:process.resourceUsage().maxRSS,verified:true};
     } finally { await Promise.all(workers.map(w=>w.terminate())); }
   }
   for (let round = 0; round < rounds; round++) {

@@ -1,4 +1,4 @@
-name: Worker full-scan JSON projection baseline (proof only)
+name: Worker direct JSON view traversal (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
@@ -26,7 +26,7 @@ jobs:
         with:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
-      - name: Build unchanged pinned runtime
+      - name: Build pinned baseline and temporary direct-view candidate
         run: |
           set -euo pipefail
           git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- '*.ts' '*.rs' 'package.json' 'bun.lock'
@@ -34,16 +34,38 @@ jobs:
           bun run build:wasm
           bun run build:browser
           mkdir -p "$RUNNER_TEMP/projection"
-          sha256sum dist/shared.js persistent-core.wasm > "$RUNNER_TEMP/projection/build.sha256"
+          mkdir -p "$RUNNER_TEMP/view-base" "$RUNNER_TEMP/view-direct"
+          cp -r dist/. "$RUNNER_TEMP/view-base/"
+          printf '{"type":"module"}\n' > "$RUNNER_TEMP/view-base/package.json"
+          cp shared-map.ts "$RUNNER_TEMP/shared-map.base.ts"
+          trap 'cp "$RUNNER_TEMP/shared-map.base.ts" shared-map.ts' EXIT
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('shared-map.ts')
+          source = p.read_text()
+          marker = '  *values(): Generator<ValueOf<T>> {'
+          assert source.count(marker) == 1
+          method = "  /** Iterate immutable JSON values in map traversal order without decoding keys. */\n  *valuesView(this: T extends 'object' ? SharedMap<T> : never): Generator<JsonView> {\n    if (this.valueType !== 'object') throw new TypeError('JSON views require an object map');\n    if (!this.root) return;\n    const a = this.arena, view = a.dv;\n    for (const leaf of a.leaves(this.root)) {\n      const start = leaf + 16 + view.getUint32(leaf + 8, true);\n      yield new JsonView(a, start, view.getUint32(leaf + 12, true));\n    }\n  }\n"
+          p.write_text(source.replace(marker, method + marker))
+          PY
+          git diff -- shared-map.ts > "$RUNNER_TEMP/projection/direct-view.patch"
+          test -s "$RUNNER_TEMP/projection/direct-view.patch"
+          bun run build:browser
+          cp -r dist/. "$RUNNER_TEMP/view-direct/"
+          printf '{"type":"module"}\n' > "$RUNNER_TEMP/view-direct/package.json"
+          sha256sum "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" persistent-core.wasm > "$RUNNER_TEMP/projection/build.sha256"
+          if cmp -s "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js"; then exit 1; fi
+          cp "$RUNNER_TEMP/shared-map.base.ts" shared-map.ts
+          git diff --exit-code -- shared-map.ts
           git rev-parse HEAD > "$RUNNER_TEMP/projection/proof-head.txt"
           node --version > "$RUNNER_TEMP/projection/node-version.txt"
-      - name: Compare existing full object and selective view scans
+      - name: Compare keyed and direct view scans with A/A and full-object control
         run: |
           set -euo pipefail
-          node proofs/map-scan-projection-paired-20261127.mjs ${{ matrix.count }} ${{ matrix.shape }} "$PWD/dist/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
+          node proofs/map-scan-projection-paired-20261127.mjs ${{ matrix.count }} ${{ matrix.shape }} "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: projection-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
+          name: direct-view-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
           path: ${{ runner.temp }}/projection/
           retention-days: 14
