@@ -9,6 +9,59 @@ timed the animation callback met the memory target and missed the frame
 target. The previous frame-phase run met both. Keep the spatial path opt-in
 while hardware-GPU measurements are pending.
 
+## Opening an Arrow tile and editing five lanes
+
+Keep packed geometry available for editors that open a tile and change a
+small fraction of its features. Every worker could read all 4,096 lanes
+from the immutable base. The packed editor opened with zero editable paths
+and reached five entries in its current path map. The eager shared editor
+created 4,096 lists on import. Both delivered consistent geometry through
+deletion, undo, rejected transactions and index rebuilds.
+
+Three editors fetched the same Arrow IPC stream of 1,048,576 XY vertices
+(16 MiB of coordinates). Copy sent each worker its own coordinates. Shared
+lists put every path in a ZeroCopy list. Packed shared the imported
+coordinates and offsets, then created replacement lists as lanes changed.
+All used TanStack DB 1.0.0-rc.1.5, the same renderer and the same edits.
+
+| Readers | Geometry | Ready (ms) | Peak PSS (MiB) | Edit to packing, p95 (ms) | All readers replied, p95 (ms) | Completed frame, p95 (ms) |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | Copy | 446.3 | 355.2 | 6.1 | 10.7 | 691.2 |
+| 1 | Shared lists | 568.0 | 349.0 | 9.8 | 35.5 | 847.9 |
+| 1 | Packed + edited lists | 863.4 | 329.8 | 13.4 | 19.8 | 470.2 |
+| 4 | Copy | 457.8 | 475.5 | 4.3 | 6.5 | 152.9 |
+| 4 | Shared lists | 452.4 | 358.4 | 4.9 | 10.4 | 165.3 |
+| 4 | Packed + edited lists | 460.5 | 361.5 | 6.9 | 10.6 | 173.7 |
+| 8 | Copy | 646.6 | 572.3 | 8.5 | 13.7 | 612.6 |
+| 8 | Shared lists | 521.3 | 358.1 | 13.2 | 19.0 | 277.7 |
+| 8 | Packed + edited lists | 560.7 | 374.3 | 7.9 | 16.3 | 652.2 |
+
+Each cell is the median of three fresh Chromium trials. Each trial ran
+16 warmups and 64 measured commands. Ready time starts after renderer
+initialization and worker construction and ends at the first validated
+viewport. Edit-to-packing measures dispatch through transaction handling,
+viewport updates and worker dispatch, just before CPU path packing. It
+includes rejected edits and undo. Validation and completed-frame latencies
+include pans and can overlap. All 1,728 measured commands passed the
+viewport and revision checks. Opening cycles also checked WebGL picks and
+read back updated vertex positions.
+
+At four readers, packing saved **24.0%** peak process-tree PSS against copy,
+just below the 25% target. Its median trial p95 frame took **173.7 ms**
+against **152.9 ms** for copy. At eight readers the memory saving reached
+**34.6%**, although shared lists used 16.2 MiB less than packed geometry.
+Promoting fewer paths did not guarantee the smallest browser footprint.
+
+These synthetic trials used Linux, an AMD EPYC-Milan CPU and Chromium
+156.0.8078.4 with SwiftShader. At eight readers, individual packed frame
+p95s ranged from 148 to 752 ms. The host reported substantial memory
+pressure during the one-reader runs. An exploratory run timed out, and
+the measured one-reader rotation encountered a timeout and a renderer
+crash before its missing cases were rerun. The table uses only completed,
+untraced trials. PSS measures resident pages and excludes swapped pages.
+A physical GPU remains necessary to judge interactive frame latency.
+[Raw samples from all 27 browsers](results/geoarrow-editor.json.gz) · [Replay instructions](README.md#open-and-edit-a-geoarrow-tile)
+
 ## Updating one vertex on the GPU
 
 Moving a vertex in a visible 256-vertex lane took **16 bytes of source

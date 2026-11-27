@@ -3,8 +3,10 @@ import { createSharedSession } from '../../dist/worker.js';
 import { SharedList, SharedMap, getWorkerData, list } from '../../dist/shared.js';
 import { sharedCollectionConfig, viewportCollectionConfig } from '../../dist/tanstack-db-collection.js';
 import { bboxXY } from '../../dist/geometry.js';
-import { applySpatialEdits, pruneSpatialEdits } from '../../dist/spatial.js';
+import { applySpatialEdits, buildLineStringIndex, pruneSpatialEdits } from '../../dist/spatial.js';
 import { baseFor, viewportFor } from './spatial.mjs';
+import { currentPaths, tilePath } from './tile-paths.mjs';
+import { loadTile } from './tile-io.mjs';
 import { assertEqual, bounds, edit, lane, west } from './workload.mjs';
 import { renderer } from './render.mjs';
 
@@ -29,21 +31,32 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range' }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range', source = 'generated', trace = false }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
-  const shared = mode === 'shared';
+  const shared = mode !== 'copy', packed = mode === 'packed';
   const view = await renderer(graphicsMode, uploads);
+  if (trace) console.info('Renderer ready');
   const peers = Array.from({ length: readers }, reader);
+  const loadStarted = performance.now();
+  let input = source === 'geoarrow' ? await loadTile(packed, count) : undefined;
+  if (trace) console.info('Tile loaded');
+  let importedPaths = input?.map(batch => batch.paths);
+  const tile = packed ? importedPaths : undefined;
   const initialData = [], expectedBounds = new Map(), editedPaths = new Map();
   const toPath = xy => shared ? new SharedList('number').pushMany(xy) : xy;
   let paths = shared ? new SharedMap(list('number')) : new Map();
   let changes = shared ? applySpatialEdits(undefined, 0, []) : new Map();
   for (let n = 0; n < count; n++) {
-    const id = String(n), xy = lane(n, vertices), b = bounds(xy);
-    paths = paths.set(id, toPath(xy));
+    const id = String(n), xy = importedPaths ? tilePath(importedPaths, n) : lane(n, vertices), b = bounds(xy);
+    if (!packed) paths = paths.set(id, toPath(xy));
     initialData.push({ id, revision: 0, geometryId: id, kind: 'lane', bounds: b });
     expectedBounds.set(id, b);
   }
+  importedPaths = undefined;
+  if (!packed) input = undefined;
+  let peakEntries = paths.size;
+  const startup = { initialPathEntries: paths.size, loadPathsAndRowsMs: performance.now() - loadStarted };
+  if (trace) console.info('Initial paths and rows prepared');
   const local = (id, initialData = []) => localOnlyCollectionOptions({ id, initialData, getKey: row => row.id });
   const options = shared ? sharedCollectionConfig({ id: 'lanes', initialData }) : local('lanes', initialData);
   const lanes = createCollection(options);
@@ -62,7 +75,11 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
   let session;
   try {
     await Promise.all([lanes.preload(), visible.preload(), query.preload()]);
-    let base = baseFor(shared, rows(), revision);
+    if (trace) console.info('Collections ready');
+    const indexStarted = performance.now();
+    let base = packed ? buildLineStringIndex(input, revision) : baseFor(shared, rows(), revision);
+    startup.initialIndexMs = performance.now() - indexStarted;
+    input = undefined;
     let message;
     if (shared && transport === 'session') {
       session = createSharedSession(roots(), { copy: false, channel: 'editor' });
@@ -72,9 +89,12 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       await Promise.all(ready);
       message = { sequence: session.version };
     } else message = shared ? { payload: snapshot() } : { initial: { rows: rows(), paths, changes } };
-    await Promise.all(peers.map(p => p.send({ ...message, base, revision, box })));
+    await Promise.all(peers.map(p => p.send({ ...message, base, tile, revision, box })));
+    if (trace) console.info('All readers attached');
+    startup.readyMs = performance.now() - loadStarted;
     await peers[0].send({ hold: true, revision, request: -1, id: '5' });
     for (let step = -1; step < steps + warmup; step++) {
+      if (trace && step % 10 === 0) console.info('Command ' + step);
       const started = performance.now();
       const cmd = step < 0 ? { box: west } : edit(step, vertices);
       let newBase, patch, rebuiltChanges, rebuildMs;
@@ -90,7 +110,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       if (cmd.box) box = cmd.box;
       else {
         const { id } = cmd;
-        const old = paths.get(id);
+        const old = currentPaths(paths, tile, rows()).get(id);
         let next, xy;
         if (!cmd.remove) {
           if (cmd.path) { xy = cmd.path; next = toPath(xy); }
@@ -98,7 +118,8 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
             xy = (editedPaths.get(id) ?? lane(Number(id), vertices)).slice();
             const axis = cmd.moveY === undefined ? 0 : 1;
             xy[axis] = cmd.moveX ?? cmd.moveY;
-            next = shared ? old.set(axis, xy[axis]) : xy;
+            const editable = packed && old instanceof Float64Array ? toPath(old) : old;
+            next = shared ? editable.set(axis, xy[axis]) : xy;
           }
         }
         const row = !cmd.remove && { id, geometryId: id, revision: revision + 1, kind: 'lane',
@@ -140,13 +161,13 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       await visible.utils.setVisibleIds(ids);
       const liveRows = [...query.values()];
       const liveIds = liveRows.map(v => v.id).sort((a, b) => Number(a) - Number(b));
-      const frame = { box, revision, request: step, base: newBase, rebuiltChanges,
+      const frame = { box, revision, request: step, base: newBase, rebuiltChanges, checkId: cmd.id,
         ...(session ? { sequence: patch || newBase ? session.publish(roots()) : session.version } :
           shared ? { payload: patch || newBase ? snapshot() : undefined } : { patch }) };
       const validation = Promise.all(peers.map(p => p.send(frame))).then(results => ({
         results, validationMs: performance.now() - started,
       }));
-      const draw = await view.draw(liveIds, paths, box, patch, started);
+      const draw = await view.draw(liveIds, currentPaths(paths, tile, rows()), box, patch, started);
       const frameMs = performance.now() - started;
       if (uploads === 'range') {
         if (draw.positionUploadBytes !== draw.packedBytes) throw new Error('Unexpected WebGL position upload size');
@@ -154,6 +175,8 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         if (cmd.reject && draw.packedBytes !== 0) throw new Error('Rejected geometry reached the renderer');
       }
       const { results, validationMs } = await validation;
+      peakEntries = Math.max(peakEntries, paths.size);
+      if (packed && paths.size > editedPaths.size) throw new Error('Untouched geometry was promoted to an editable list');
       const isCurrent = response => response.revision === revision && response.request === step;
       if (!results.every(isCurrent)) throw new Error('Validation used the wrong revision or viewport');
       if (step === 0) {
@@ -173,7 +196,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       if (step < 10) view.check(expected, id => editedPaths.get(id) ?? lane(Number(id), vertices), cmd.moveY);
       if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, rebuildMs, ...draw });
     }
-    return { samples, graphics: view.graphics };
+    return { samples, startup, peakPathEntries: peakEntries, graphics: view.graphics };
   } finally {
     sub.unsubscribe();
     await Promise.all([query.cleanup(), visible.cleanup(), lanes.cleanup()]);

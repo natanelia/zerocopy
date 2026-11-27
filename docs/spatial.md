@@ -93,6 +93,20 @@ each gap as a break. Workers can read the shared index and geometry while
 the owner builds a later revision. Keep the handle lookup aligned with the
 same revision. [Import and edit packed geometry](geometry.md#open-a-tile-and-edit-one-lane)
 
+For sparse editing, keep the imported buffers for the lifetime of the tile
+and store edited lanes in a `SharedMap(list('number'))`. Send the immutable
+base buffers to each worker once. On a lane's first edit, copy its borrowed
+view into a numeric list. Stage that replacement together with its bounds
+change. After the TanStack transaction succeeds, publish the confirmed
+rows, replacement paths and spatial changes in one worker session update.
+
+A reader resolves the feature against the confirmed rows in its own
+publication. If the row is missing, the lane has been deleted. Otherwise
+it reads the replacement path if present, then falls back to the base
+location. This keeps deletions effective when a spatial rebuild prunes old
+bounds changes and lets an older reader finish with its original geometry.
+[Transaction example](tanstack.md#confirm-a-group-of-edits) · [Browser replay](../proofs/spatial-editor/README.md#open-and-edit-a-geoarrow-tile)
+
 ## Join two spatial layers
 
 `querySpatialJoin(left, right)` returns `[leftId, rightId]` pairs whose
@@ -101,7 +115,7 @@ prepared snapshot with its own revision. The result is sorted by left ID
 then right ID. Joining a layer to itself includes matching features paired
 with themselves and both orders of every overlapping pair.
 
-Using the two paths and their `index` from the preceding example, select the
+Using the two paths and their `index` from [Select intersecting paths](#select-intersecting-paths), select the
 lanes that touch a rectangular road area.
 
 ```ts

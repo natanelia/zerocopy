@@ -2,7 +2,7 @@
 
 The replay exercises public ZeroCopy APIs with TanStack DB 1.0.0-rc.1.5, Flatbush
 4.9.0, and deck.gl 9.4.2. It generates a tile in projected XY metres and
-runs identical commands against two browser editors. All data is synthetic.
+runs identical commands against browser editors with different geometry storage. All data is synthetic.
 The [recorded results](RESULTS.md) include all trials and the four-reader
 memory and frame-time targets used to evaluate this design.
 
@@ -63,6 +63,45 @@ and viewport request before accepting a result. The opening cycle checks
 binary path offsets, coordinates and actual WebGL picking, including a vertex
 drag that leaves the feature's ID and vertex count intact.
 
+### Open and edit a GeoArrow tile
+
+`--source=geoarrow` serves one Arrow IPC stream with a uint32 ID column and a
+planar XY LineString column in batches of 64 lanes. Every editor fetches the
+same bytes. Each trial starts a fresh browser, and the three trials rotate
+editor order. The fixture's feature handles equal their original row ordinals.
+
+| Mode | Base geometry | Editing and worker reads |
+| --- | --- | --- |
+| `copy` | Float64 row views into an ordinary decoded Arrow buffer | Each worker receives its own copy on first attachment and sparse edits thereafter. |
+| `shared` | One immutable ZeroCopy numeric list per imported row | Workers share every list from the first publication. |
+| `packed` | Shared coordinate and offset buffers from `fromGeoArrowTable` | Workers receive the base buffers once. The owner creates lists for edited lanes and publishes those with confirmed metadata. |
+
+The packed editor builds its initial Flatbush index with `buildLineStringIndex`.
+A geometry lookup checks the confirmed row and reads its replacement list or
+original packed path. Removing the row hides its original path even after the
+spatial edit log is pruned. A validator can still finish reading the older
+publication. Only the visible paths are packed for deck.gl.
+
+```sh
+node proofs/spatial-editor/run.mjs --source=geoarrow --output=/tmp/geoarrow-editor.json
+node proofs/spatial-editor/summarize.mjs /tmp/geoarrow-editor.json
+```
+
+The report records the IPC fixture hash, list or path-map entry counts, the
+time to load coordinates and create initial metadata rows, the initial
+index-build time, and the time until every reader replies to its first
+viewport validation. Startup timing begins after renderer initialization
+and worker construction and includes the fetch from the loopback server.
+Per-command frame timings start after this initial load. The Linux PSS
+samples cover the entire browser process tree throughout both phases.
+The path-entry count measures keys reachable from the current geometry map.
+Process memory also includes earlier revisions, staged edits, buffers,
+indexes, browser runtimes, and renderer allocations.
+The edit timing ends at entry into CPU path packing. It includes transaction
+work, viewport membership and dispatch to workers. The summary takes the
+median trial p95 for edit commands, including rollbacks and undo. Pan-only
+commands are excluded from that metric.
+
 ## Run
 
 Use the repository toolchain and build the portable library. The proof's
@@ -78,15 +117,19 @@ node proofs/spatial-editor/run.mjs --smoke
 node proofs/spatial-editor/run.mjs --output=/tmp/zerocopy-editor.json
 ```
 
-The full run uses fresh Chromium processes for both editors at one, four,
-and eight readers, with three trials per editor and reader count. Trial 2
-runs the editors in reverse order. Each trial uses 4,096 lanes with 256
+The full run uses a fresh Chromium process per editor at one, four,
+and eight readers, with three trials per editor and reader count. The
+generated workload alternates its two editors. The GeoArrow workload
+rotates its three editors. Each trial uses 4,096 lanes with 256
 vertices per lane (16 MiB of input coordinate values), 16 warmup commands
 and 64 measured commands. To run a subset, use `--readers=4` and optionally
 `--trial=0`, `1`, or `2`. Add `--soak` for 1,024 measured commands. Use
 `CHROMIUM_PATH` to select an installed headless Chromium executable. The
 server binds to loopback and serves cross-origin isolation headers.
-CI runs the small copy and shared replays and archives their samples with
+Use `--trace` to log startup phases and every tenth command for diagnosis.
+`--timeout-ms` sets the per-case watchdog. Samples are written after a case
+finishes, and the summary requires three completed trials per editor.
+CI runs the small generated and GeoArrow replays and archives their samples with
 the other browser regression evidence. Performance targets use the full
 trials above.
 
