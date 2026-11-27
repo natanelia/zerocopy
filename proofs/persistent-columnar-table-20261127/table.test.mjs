@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {ColumnTable} from './table.mjs';
 const schema={x:'float64',speed:'uint8',active:'boolean',height:'float32',signed:'int32',code:'uint16',flags:'uint32'};
-const make=i=>({x:i, speed:i%100,active:i%2===0,height:Math.fround(i/7),signed:-i,code:i,flags:4294967295});
+const make=i=>({x:i, speed:i%100,active:i%2===0,height:Math.fround(i/7),signed:i===0?0:-i,code:i,flags:4294967295});
 test('fixed-width values, retained forks, shared attachment and column-only copies',()=>{
   const rows=Array.from({length:513},(_,i)=>make(i)),a=ColumnTable.fromRows(schema,rows,{blockRows:256});
   const base=a.descriptor(),b=a.editMany([[0,{x:-0}],[255,{speed:99}],[256,{active:true}],[512,{height:1.1}],[0,{speed:1}],[0,{speed:2}]]);
@@ -44,4 +44,11 @@ test('empty table, special floats and duplicate edits',()=>{
   const b=ColumnTable.fromRows({x:'float64'},[{x:NaN},{x:-0},{x:Infinity}]);
   assert(Number.isNaN(b.get(0,'x')));assert(Object.is(b.get(1,'x'),-0));assert.equal(b.get(2,'x'),Infinity);
   assert.equal(b.editMany([[1,{x:1}],[1,{x:-0}]]),b);
+});
+
+test('integer zero is canonical, floating zero retains its sign',()=>{
+  const a=ColumnTable.fromRows({i:'int32',f:'float64'},[{i:-0,f:-0}]);
+  assert(Object.is(a.get(0,'i'),0));assert(Object.is(a.get(0,'f'),-0));
+  assert.equal(a.editMany([[0,{i:-0}]]),a);
+  assert(Object.is(a.editMany([[0,{f:0}]]).get(0,'f'),0));
 });

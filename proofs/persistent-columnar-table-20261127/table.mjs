@@ -15,6 +15,8 @@ function value(type,v) {
   if(typeof v!=='number')throw new TypeError('expected number');
   if(Object.hasOwn(RANGES,type)){
     const [lo,hi]=RANGES[type];if(!Number.isInteger(v)||v<lo||v>hi)throw new RangeError('integer outside column range');
+    // Integer typed arrays canonicalize signed zero; compare the stored value.
+    return v===0?0:v;
   }
   return type==='float32'?Math.fround(v):v;
 }
