@@ -1,4 +1,4 @@
-name: Worker map scan baseline (proof only)
+name: Worker map scan attribution (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        count: [1000, 10000, 100000]
+        count: [10000, 100000]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -30,14 +30,16 @@ jobs:
           bun install --frozen-lockfile
           bun run build:wasm && bun run build:browser
           git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- '*.ts' '*.rs' 'package.json' 'bun.lock'
-      - name: Measure two-reader scans (no runtime candidate)
+      - name: Profile actual two-reader scans (diagnostic, not latency evidence)
+        env:
+          ZEROCOPY_SCAN_PROFILE: '1'
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/map-scan"
-          node proofs/map-scan-baseline-20261127.mjs ${{ matrix.count }} 12 "$RUNNER_TEMP/map-scan/results.json" | tee "$RUNNER_TEMP/map-scan/results.log"
+          node proofs/map-scan-baseline-20261127.mjs ${{ matrix.count }} 3 "$RUNNER_TEMP/map-scan/results.json" | tee "$RUNNER_TEMP/map-scan/results.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: map-scan-${{ matrix.count }}-${{ github.run_id }}
+          name: map-scan-profile-${{ matrix.count }}-${{ github.run_id }}
           path: ${{ runner.temp }}/map-scan/
           retention-days: 14

@@ -5,6 +5,7 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { writeFileSync } from 'node:fs';
 import { cpus, release } from 'node:os';
 import { performance } from 'node:perf_hooks';
+import { Session } from 'node:inspector';
 import { execFileSync } from 'node:child_process';
 import * as S from '../dist/shared.js';
 
@@ -48,7 +49,7 @@ function verify(map, n, rev) {
   assert(seen.every(v => v === 1));
 }
 if (!isMainThread) {
-  const { api, n, shared } = workerData;
+  const { api, n, shared, profileEnabled } = workerData;
   let old, next;
   parentPort.on('message', async ({ phase, payload }) => {
     try {
@@ -68,16 +69,30 @@ if (!isMainThread) {
         parentPort.postMessage({ verified: true }); return;
       } else throw Error('bad phase');
       const attachmentMs = performance.now() - t;
-      const scans = starts.map(start => ({ start, ...scan(map, api, start) }));
-      parentPort.postMessage({ attachmentMs, scans, heapUsed: process.memoryUsage().heapUsed });
+      let session, profile, scans;
+      const command = (method, params = {}) => new Promise((resolve, reject) =>
+        session.post(method, params, (error, result) => error ? reject(error) : resolve(result)));
+      try {
+        if (profileEnabled) {
+          session = new Session();
+          session.connect();
+          await command('Profiler.enable');
+          await command('Profiler.setSamplingInterval', { interval: 200 });
+          await command('Profiler.start');
+        }
+        scans = starts.map(start => ({ start, ...scan(map, api, start) }));
+        if (session) ({ profile } = await command('Profiler.stop'));
+      } finally { session?.disconnect(); }
+      parentPort.postMessage({ attachmentMs, scans, heapUsed: process.memoryUsage().heapUsed, profile });
     } catch (error) { parentPort.postMessage({ error: error.stack }); }
   });
 } else {
   const n = Number(process.argv[2] ?? 10000), rounds = Number(process.argv[3] ?? 8), output = process.argv[4];
   assert(output && [1000,10000,100000].includes(n) && Number.isInteger(rounds) && rounds > 0);
-  const cases = ['shared-forEach', 'shared-entries', 'native-forEach'];
+  const profileEnabled = process.env.ZEROCOPY_SCAN_PROFILE === '1';
+  const cases = profileEnabled ? ['shared-forEach'] : ['shared-forEach', 'shared-entries', 'native-forEach'];
   const report = { source: execFileSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).trim(), node: process.version,
-    cpu: cpus()[0].model, os: release(), n, rounds, samples: [] };
+    cpu: cpus()[0].model, os: release(), n, rounds, profileEnabled, samples: [] };
   const expectedDigests = new Map();
   for (const rev of [0,1]) for (const start of windows) expectedDigests.set(rev + ':' + start, expected(n, rev, start));
   async function trial(id, round) {
@@ -89,7 +104,7 @@ if (!isMainThread) {
     let t = performance.now();
     const old = shared ? new S.SharedMap('object').setMany(rows) : new Map(rows);
     const constructionMs = performance.now() - t;
-    const workers = Array.from({length:2}, () => new Worker(new URL(import.meta.url), {workerData:{api,n,shared}}));
+    const workers = Array.from({length:2}, () => new Worker(new URL(import.meta.url), {workerData:{api,n,shared,profileEnabled:profileEnabled && round >= 0}}));
     async function exchange(phase, payload, revision) {
       const start = performance.now();
       const pending = workers.map(async worker => {
@@ -104,6 +119,26 @@ if (!isMainThread) {
       for (const reader of readers) for (const scan of reader.scans)
         assert.equal(scan.digest, expectedDigests.get(revision + ':' + scan.start));
       if (shared) assert.deepEqual(readers[0].scans.map(x=>x.ordered),readers[1].scans.map(x=>x.ordered));
+      if (profileEnabled && round >= 0) {
+        for (const [readerIndex, reader] of readers.entries()) {
+          const { profile } = reader;
+          assert(profile?.samples?.length && profile.samples.length === profile.timeDeltas.length);
+          const file = output + '.' + round + '.' + phase + '.' + readerIndex + '.cpuprofile';
+          writeFileSync(file, JSON.stringify(profile));
+          const nodes = new Map(profile.nodes.map(node => [node.id, node.callFrame]));
+          const self = new Map();
+          for (const [i, nodeId] of profile.samples.entries()) {
+            const frame = nodes.get(nodeId);
+            assert(frame);
+            const key = (frame.functionName || '(anonymous)') + ' @ ' + frame.url.split('/').slice(-2).join('/') + ':' + (frame.lineNumber + 1);
+            self.set(key, (self.get(key) ?? 0) + profile.timeDeltas[i]);
+          }
+          console.log('SCAN_PROFILE ' + JSON.stringify({ n, round, phase, readerIndex,
+            samples: profile.samples.length, totalUs: profile.timeDeltas.reduce((a,b)=>a+b,0),
+            top: [...self.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20) }));
+          delete reader.profile;
+        }
+      }
       return {roundTripMs, readers};
     }
     try {
