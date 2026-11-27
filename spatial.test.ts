@@ -1,8 +1,9 @@
 import { expect, it, vi } from 'vitest';
+import RBush from 'rbush';
 import { arenaOf } from './arena.ts';
-import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, diffSpatialViewport, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
+import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, diffSpatialViewport, applySpatialEdits, createSpatialQueryCursor, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
 import { lineStringViewXY, pathIntersectsBoxXY } from './geometry';
-import { getWorkerData, initWorker, resetMap } from './shared.ts';
+import { compact, getWorkerData, initWorker, resetMap } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
@@ -365,6 +366,71 @@ it('rejects duplicate IDs, invalid revisions and invalid boxes before publishing
   expect(querySpatialIndex(buildSpatialIndex([]), box, add)).toEqual([3]);
 });
 
+it('advances a local cursor across skipped edits, tombstones, replacement overlays and reused revisions', () => {
+  const base = buildSpatialIndex([{ id: 0, bounds: box }, { id: 7, bounds: far }], 2);
+  const cursor = createSpatialQueryCursor(structuredClone(base));
+  const edge = [2, 2, 2, 2] as const;
+  const seed = applySpatialEdits(undefined, 3, [
+    { id: 0, bounds: far }, { id: 7, bounds: null }, { id: 0xffffffff, bounds: edge },
+  ]);
+  expect(cursor.search(edge)).toEqual([0]);
+  cursor.advance(seed, 3);
+  const retained = cursor.search(edge);
+  expect(retained).toEqual([0xffffffff]);
+  const moved = applySpatialEdits(seed, 4, [{ id: 7, bounds: box }]);
+  const deleted = applySpatialEdits(moved, 5, [{ id: 0xffffffff, bounds: null }]);
+  cursor.advance(deleted, 6);
+  expect(cursor.search(edge)).toEqual([7]);
+  expect(cursor.search(far)).toEqual([0]);
+  expect(retained).toEqual([0xffffffff]);
+  // Dropping an overlay row exposes its base entry. An absorbed stale alias
+  // must never hide or reveal the canonical ID.
+  const reset = deleted.delete('0').set('7', { revision: 1, bounds: box })
+    .set('07', { revision: 2, bounds: null });
+  cursor.advance(reset, 6);
+  cursor.advance(reset.delete('07'), 7);
+  expect(cursor.search(edge)).toEqual([0]);
+  expect(cursor.search(far)).toEqual([7]);
+  expect(cursor.search([-Infinity, -Infinity, Infinity, Infinity])).toEqual([0, 7]);
+  expect(cursor.revision).toBe(7);
+});
+
+it('leaves a cursor usable when a new publication contains an invalid edit', () => {
+  const cursor = createSpatialQueryCursor(buildSpatialIndex([]));
+  const previous = applySpatialEdits(undefined, 1, [{ id: 3, bounds: box }]);
+  const valid = applySpatialEdits(previous, 2, [{ id: 3, bounds: far }, { id: 4, bounds: box }]);
+  cursor.advance(previous, 1);
+  for (const bad of [valid.set('03', { revision: 2, bounds: null }),
+    valid.set('5', { revision: 3, bounds: box }), valid.set('5', { revision: 2, bounds: [5, 4, 3, 2] })]) {
+    expect(() => cursor.advance(bad, 2)).toThrow();
+    expect(cursor.revision).toBe(1);
+    expect(cursor.search(box)).toEqual([3]);
+  }
+  expect(() => cursor.advance(previous, 0)).toThrow();
+  expect(() => cursor.search([1, 0, 0, 0])).toThrow();
+  cursor.advance(valid, 2);
+  expect(cursor.search(box)).toEqual([4]);
+  expect(cursor.search(far)).toEqual([3]);
+});
+
+it('recovers from an interrupted tree update and follows an independently compacted overlay', () => {
+  const cursor = createSpatialQueryCursor(buildSpatialIndex([{ id: 2, bounds: far }]));
+  const seed = applySpatialEdits(undefined, 1, [{ id: 2, bounds: box }]);
+  const moved = applySpatialEdits(seed, 2, [{ id: 2, bounds: far }]);
+  cursor.advance(seed, 1);
+  const insert = vi.spyOn(RBush.prototype, 'insert').mockImplementationOnce(() => { throw new Error('interrupted'); });
+  try { expect(() => cursor.advance(moved, 2)).toThrow('interrupted'); }
+  finally { insert.mockRestore(); }
+  expect(cursor.revision).toBe(1);
+  expect(cursor.search(box)).toEqual([2]);
+  expect(cursor.search(far)).toEqual([]);
+  cursor.advance(moved, 2);
+  expect(cursor.search(far)).toEqual([2]);
+  cursor.advance(applySpatialEdits(compact(moved), 3, [{ id: 2, bounds: box }]), 3);
+  expect(cursor.search(box)).toEqual([2]);
+  expect(cursor.search(far)).toEqual([]);
+});
+
 it('agrees with a scan across sparse edits, retained snapshots and repeated index rebuilds', () => {
   type Box = readonly [number, number, number, number];
   let seed = 73;
@@ -374,6 +440,7 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
   for (let id = 0; id < 200; id++) rows.set(id, rect());
   const build = (r: number) => buildSpatialIndex(Array.from(rows, ([id, bounds]) => ({ id, bounds })), r);
   let base = build(0), changes = applySpatialEdits(undefined, 0, []);
+  let cursor = createSpatialQueryCursor(base);
   let captured = changes, replacement = base;
   const fixed = [10, 20, 70, 80] as const, visible = new Set(querySpatialIndex(base, fixed));
   for (let r = 1; r <= 300; r++) {
@@ -387,12 +454,15 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
     if (r % 43 === 0) {
       base = replacement;
       changes = pruneSpatialEdits(changes, base.revision, captured);
+      cursor = createSpatialQueryCursor(base);
     }
     const box = rect();
     const expected = [...rows].filter(([, b]) => Math.max(b[0], box[0]) <= Math.min(b[2], box[2]) &&
       Math.max(b[1], box[1]) <= Math.min(b[3], box[3])).map(([id]) => id).sort((a,b) => a-b);
     expect(querySpatialIndex(base, box, changes)).toEqual(expected);
     expect(querySpatialIndex(prepareSpatialQuery(base, changes, r), box)).toEqual(expected);
+    cursor.advance(changes, r);
+    expect(cursor.search(box)).toEqual(expected);
     expect(visible).toEqual(new Set(querySpatialIndex(base, fixed, changes)));
   }
 });

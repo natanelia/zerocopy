@@ -1,4 +1,5 @@
 import Flatbush from 'flatbush';
+import RBush, { type BBox } from 'rbush';
 import { SharedMap } from './shared-map.ts';
 import { arenaOf } from './arena.ts';
 import { json, type JsonType } from './types.ts';
@@ -148,22 +149,26 @@ function treeFor(base: SpatialIndex): Flatbush | undefined {
   return tree;
 }
 
+function activeChangeId(key: string, change: SpatialChange, baseRevision: number, revision: number): number | undefined {
+  checkRevision(change.revision);
+  if (change.revision > revision) throw new RangeError('Spatial overlay is newer than the requested revision');
+  if (change.revision <= baseRevision) return undefined;
+  const id = Number(key);
+  checkSpatialId(id);
+  if (String(id) !== key) throw new TypeError('Expected a canonical spatial feature ID');
+  if (change.bounds !== null) checkBounds(change.bounds, true);
+  return id;
+}
+
 function collectChanges(base: SpatialIndex, changes: SpatialChanges, revision: number) {
   checkRevision(revision);
   if (revision < base.revision) throw new RangeError('Cannot capture changes before the base revision');
   const edits = new Map<number, BoundsXY | null>();
   let liveCount = 0;
   for (const [key, change] of changes.entries()) {
-    checkRevision(change.revision);
-    if (change.revision > revision) throw new RangeError('Spatial overlay is newer than the requested revision');
-    if (change.revision <= base.revision) continue;
-    const id = Number(key);
-    checkSpatialId(id);
-    if (String(id) !== key) throw new TypeError('Expected a canonical spatial feature ID');
-    if (change.bounds !== null) {
-      checkBounds(change.bounds, true);
-      liveCount++;
-    }
+    const id = activeChangeId(key, change, base.revision, revision);
+    if (id === undefined) continue;
+    if (change.bounds !== null) liveCount++;
     edits.set(id, change.bounds);
   }
   return { edits, liveCount };
@@ -197,6 +202,87 @@ function checkChangedIds(ids: Uint32Array): void {
 
 function overlapsViewport(bounds: BoundsXY, viewport: BoundsXY): boolean {
   return bounds[0] <= viewport[2] && bounds[1] <= viewport[3] && bounds[2] >= viewport[0] && bounds[3] >= viewport[1];
+}
+
+export interface SpatialQueryCursor {
+  readonly revision: number;
+  /** Install the complete overlay belonging to this publication of the same base. */
+  advance(changes: SpatialChanges, revision: number): void;
+  search(bounds: BoundsXY): number[];
+}
+
+function rtreeBox([minX, minY, maxX, maxY]: BoundsXY): BBox { return { minX, minY, maxX, maxY }; }
+type EditBox = BBox & { id: number };
+function editBox(id: number, bounds: BoundsXY | null): EditBox | null {
+  return bounds === null ? null : { id, ...rtreeBox(bounds) };
+}
+
+/** Reader-local index for changing viewports and sparsely edited revisions of one shared base. */
+export function createSpatialQueryCursor(base: SpatialIndex): SpatialQueryCursor {
+  const packed = treeFor(base);
+  let revision = base.revision;
+  let previous: SpatialChanges | undefined;
+  // A null entry hides a deleted ID. An absent entry exposes the original base.
+  let overlay: { tree: RBush<EditBox>; shadow: Map<number, EditBox | null> } | undefined;
+  return {
+    get revision() { return revision; },
+    advance(changes, nextRevision) {
+      checkRevision(nextRevision);
+      if (nextRevision < revision) throw new RangeError('Cannot move a spatial cursor to an older revision');
+      if (!overlay || !previous) {
+        const { edits } = collectChanges(base, changes, nextRevision);
+        const shadow = new Map<number, EditBox | null>(), tree = new RBush<EditBox>();
+        const live: EditBox[] = [];
+        for (const [id, bounds] of edits) {
+          const item = editBox(id, bounds);
+          if (item) live.push(item);
+          shadow.set(id, item);
+        }
+        tree.load(live);
+        overlay = { tree, shadow };
+      } else if (changes !== previous) {
+        // Decode and validate every changed row before modifying the working index.
+        const patches = new Map<number, EditBox | null | undefined>();
+        for (const { key, before, after } of changes.changesSince(previous)) {
+          if (after !== undefined) {
+            const id = activeChangeId(key, after, base.revision, nextRevision);
+            if (id !== undefined) {
+              patches.set(id, editBox(id, after.bounds));
+              continue;
+            }
+          }
+          if (before && before.revision > base.revision) patches.set(Number(key), undefined);
+        }
+        // If a tree operation throws, reads fall back to the last committed
+        // map and the next advance reconstructs the local tree from scratch.
+        const current = overlay;
+        overlay = undefined;
+        for (const [id, item] of patches) {
+          const old = current.shadow.get(id);
+          if (old) current.tree.remove(old);
+          if (item === undefined) current.shadow.delete(id);
+          else {
+            current.shadow.set(id, item);
+            if (item) current.tree.insert(item);
+          }
+        }
+        overlay = current;
+      }
+      previous = changes;
+      revision = nextRevision;
+    },
+    search(box) {
+      if (!overlay) return querySpatialIndex(base, box, previous);
+      checkBounds(box, false);
+      const result: number[] = [];
+      for (const slot of packed?.search(...box) ?? []) {
+        const id = base.ids[slot];
+        if (!overlay.shadow.has(id)) result.push(id);
+      }
+      for (const item of overlay.tree.search(rtreeBox(box))) result.push(item.id);
+      return result.sort((a, b) => a - b);
+    },
+  };
 }
 
 /** Build a replacement from a captured base and overlay without decoding feature metadata. */

@@ -41,6 +41,7 @@ try {
 } finally { reader.dispose(); session.dispose(); port1.close(); port2.close(); await lanes.cleanup(); }`],
   ['docs/api.md', 'map-changes', "assert.deepEqual(changes.sort((a, b) => a.key.localeCompare(b.key)), [{ type: 'update', key: 'lane-7', before: 40, after: 50 }, { type: 'insert', key: 'lane-9', before: undefined, after: 30 }]);"],
   ['docs/spatial.md', 'spatial-viewport-edits', "assert.deepEqual(delta, { added: [7], removed: [9] });"],
+  ['docs/spatial.md', 'spatial-query-cursor', "assert.deepEqual([before, after, visible, cursor.revision], [[7], [], [7], 1]);"],
   ['docs/geometry.md', 'stream-lane-tile', `
 const { encodeTile } = await import('../proofs/spatial-editor/tile-io.mjs');
 const { getLineStringById } = await import('zerocopy/spatial');

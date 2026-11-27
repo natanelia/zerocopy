@@ -355,3 +355,31 @@ rebuilt. A full rebuild yielded the fastest subsequent queries in this fixture.
 Run `node proofs/spatial-editor/viewport-queries.mjs` after building the
 portable library to repeat the comparison. Rendering, transport and worker
 scheduling are outside the timed operations. [Measured source](https://github.com/natanelia/zerocopy/commit/1e38c7bdd9e8d50d9f1943e3a4880409ba6d6eab) · [All trial timings](results/prepared-viewport-queries.json)
+
+## Viewport queries between edits
+
+A persistent cursor reduced the cost of following a changing tile once hundreds
+of edits had accumulated. All three strategies searched the same 16,384 base
+features. Between revisions, four IDs changed and the reader queried three
+small viewports. Each result was checked against a full scan throughout the run.
+
+| IDs with accumulated edits | Direct scan (ms/revision) | Rebuild the prepared edit index (ms/revision) | Advance the local cursor (ms/revision) |
+| ---: | ---: | ---: | ---: |
+| 16 | 0.110 | 0.058 | 0.059 |
+| 256 | 0.235 | 0.201 | 0.097 |
+| 2,048 | 6.558 | 3.597 | 0.146 |
+
+With 2,048 edited IDs, initializing the cursor from an existing overlay took
+4.54 ms per reader. Preparing a shareable edit index initially took 3.48 ms.
+With 16 edited IDs the steady-state times for preparation and the cursor
+differed by just 0.001 ms per revision. The cursor pays off when a reader
+can reuse its local tree across many sparse updates.
+
+Times combine updating the query index and running three searches. Each
+cell is the median of seven trial means over 64 revisions, after two warmups
+with rotating execution order. Overlay creation, messaging, rendering and
+the initial setup are outside those times. This synthetic CPU replay ran
+in one Node 26.13.1 process on Linux on an AMD EPYC-Milan processor.
+After building the portable library, run
+`node proofs/spatial-editor/cursor-queries.mjs` to repeat it.
+[Trial timings and source checksums](results/cursor-queries-node.json)

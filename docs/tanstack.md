@@ -44,7 +44,7 @@ deletions made since the initial import.
 `config.getSnapshot()` returns the immutable core `SharedMap` of confirmed
 rows. The initial snapshot is available after `await collection.preload()`.
 During a pending edit TanStack can show an optimistic row while a worker
-continues reading the previous snapshot. With TanStack DB 1.0.0-rc.1.5,
+continues reading the previous snapshot. With TanStack DB 1.0.0-rc.1.6,
 capture a new snapshot after `await transaction.when('settled')`. On 0.5.0
 and 0.15.2, use `await transaction.isPersisted.promise`. Old handles stay
 readable. The packed-package check edits nested metadata on both the minimum
@@ -131,7 +131,7 @@ the edit being confirmed.
 
 Await the helper as the final step in a successful mutation function. A
 downstream write failure discards the pending sync batch on TanStack DB
-1.0.0-rc.1.5.
+1.0.0-rc.1.6.
 
 ```ts
 import { createCollection, createTransaction } from '@tanstack/db';
@@ -352,7 +352,7 @@ export function openRoads(provider: SyncConfig<Road, string>) {
 After `await roads.preload()`, connect workers with `await session.connect(worker)`.
 Each batch can contain multiple edits. Partial updates merge supplied fields,
 full updates replace the row, and `truncate()` discards earlier writes in that
-batch and replaces the previous tile. Providers on TanStack DB 1.0.0-rc.1.5
+batch and replaces the previous tile. Providers on TanStack DB 1.0.0-rc.1.6
 can also declare a replacement with `begin({ snapshot: true })`.
 
 When `commit()` returns a promise, publication waits for its visibility

@@ -288,6 +288,42 @@ and reduced subsequent small pan queries from 1.020 to 0.021 ms each.
 The full rebuild took 4.392 ms and yielded 0.009 ms queries.
 [Viewport workload and measurements](../proofs/spatial-editor/RESULTS.md#repeated-viewport-queries-over-accumulated-edits)
 
+## Follow edits with a worker-local cursor
+
+Use `createSpatialQueryCursor(base)` when a worker pans a tile while many
+previous edits are still in its overlay. The cursor shares the packed Flatbush
+base and keeps an RBush of live edits in the worker. Its first `advance` reads
+the complete overlay. Later calls compare immutable map roots and apply the
+net changes since the last revision the worker processed.
+
+<!-- example: spatial-query-cursor -->
+```ts
+import { applySpatialEdits, buildSpatialIndex, createSpatialQueryCursor } from 'zerocopy/spatial';
+
+const west = [0, 0, 2, 2] as const, east = [10, 0, 12, 2] as const;
+const base = buildSpatialIndex([{ id: 7, bounds: west }]);
+const cursor = createSpatialQueryCursor(base);
+const before = cursor.search(west); // [7]
+const moved = applySpatialEdits(undefined, 1, [{ id: 7, bounds: east }]);
+cursor.advance(moved, 1);
+const after = cursor.search(west); // []
+const visible = cursor.search(east); // [7]
+```
+
+In a worker, pass the **complete overlay from the same publication as the
+rows and paths**. Skipped revisions are fine. The cursor accepts equal or
+increasing revision numbers. A failed advance preserves the last queryable
+revision. Searches return independent arrays of sorted IDs and include edge
+touches. Create a fresh cursor when installing a rebuilt base or switching
+tiles. For asynchronous work that needs an earlier revision, retain its
+immutable inputs or prepared query.
+
+Each cursor retains the latest overlay and a local entry per unabsorbed edit,
+including deletion markers. Shared branches allow `changesSince` to skip
+unchanged rows. Independently copied or compacted maps may require a full
+comparison. For many workers searching one fixed revision, a prepared
+snapshot shares the edit index as well. [Changing-viewport benchmark](../proofs/spatial-editor/RESULTS.md#viewport-queries-between-edits)
+
 ## Dedicated worker transport
 
 A prepared snapshot contains only structured-cloneable descriptors and shared
