@@ -1,8 +1,8 @@
-name: Worker map scan cache sensitivity (proof only)
+name: Worker map scan prior-reader reuse (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
-    paths: ['.github/workflows/map-scan-baseline-proof.yml', 'proofs/map-scan-cache-*-20261127.mjs']
+    paths: ['.github/workflows/map-scan-baseline-proof.yml', 'proofs/scan-prior-reader-*-20261127.mjs']
 permissions:
   contents: read
 jobs:
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        count: [1000, 10000, 100000]
+        count: [10000, 100000]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -36,7 +36,9 @@ jobs:
           mkdir -p "$out" "$evidence"
           cp arena.ts "$RUNNER_TEMP/arena.base.ts"
           trap 'cp "$RUNNER_TEMP/arena.base.ts" arena.ts' EXIT
-          for mode in base mid high; do
+          large=mid
+          if [ '${{ matrix.count }}' = '100000' ]; then large=high; fi
+          for mode in base "$large"; do
             cp "$RUNNER_TEMP/arena.base.ts" arena.ts
             case "$mode" in
               base) ;;
@@ -67,10 +69,10 @@ jobs:
       - name: Run balanced paired fresh-process worker scans
         run: |
           set -euo pipefail
-          node proofs/map-scan-cache-paired-20261127.mjs ${{ matrix.count }} "$RUNNER_TEMP/cache-builds" "$RUNNER_TEMP/map-scan-cache" | tee "$RUNNER_TEMP/map-scan-cache/run.log"
+          node proofs/scan-prior-reader-paired-20261127.mjs ${{ matrix.count }} "$RUNNER_TEMP/cache-builds" "$RUNNER_TEMP/map-scan-cache" | tee "$RUNNER_TEMP/map-scan-cache/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: map-scan-cache-${{ matrix.count }}-${{ github.run_id }}
+          name: scan-prior-reader-${{ matrix.count }}-${{ github.run_id }}
           path: ${{ runner.temp }}/map-scan-cache/
           retention-days: 14
