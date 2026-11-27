@@ -1,0 +1,10 @@
+{
+  "status": "launch-blocked",
+  "attempt": "first local browser correctness attempt",
+  "executable": "/usr/bin/chromium",
+  "observedBrowserLogTime": "2026-11-08T17:45:32.328361",
+  "error": "FATAL:chrome/browser/process_singleton_posix.cc:297 Check failed: . socket() failed: Operation not permitted (1)",
+  "exitSignal": "SIGABRT",
+  "completedBrowserScenarios": 0,
+  "note": "Summary of the observed launch failure; no browser correctness or timing result was produced. Full launch diagnostics were emitted by the execution tool."
+}

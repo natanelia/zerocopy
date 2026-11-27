@@ -1,0 +1,88 @@
+name: Checkpoint byte decoder verification
+
+on:
+  pull_request:
+    paths:
+      - 'redux-checkpoint.ts'
+      - 'checkpoint-base64-import.test.ts'
+      - 'proofs/checkpoint-base64-import-20261108/**'
+      - '.github/workflows/checkpoint-base64-import.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'redux-checkpoint.ts'
+      - 'checkpoint-base64-import.test.ts'
+      - 'proofs/checkpoint-base64-import-20261108/**'
+      - '.github/workflows/checkpoint-base64-import.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkpoint-byte-decoder-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: '0ca99c1da67e4d3e36e098b3f0e85d392c9c1d5e'
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - name: Install existing project dependencies
+        run: bun install
+      - name: Build native and portable modules
+        run: |
+          bun run build:wasm
+          bun run build:browser
+          bun run build:types
+          bun run typecheck
+          bun run typecheck:redux
+          ln -s ../node_modules baseline/node_modules
+          cd baseline
+          bun run build:wasm
+          bun run build:browser
+      - name: Run checkpoint regressions in Node and Bun
+        shell: bash
+        run: |
+          mkdir -p proofs/checkpoint-base64-import-20261108/ci-logs
+          node node_modules/vitest/vitest.mjs run checkpoint-base64-import.test.ts redux-checkpoint.test.ts checkpoint-descriptor-validation.test.ts checkpoint-validation-pass.test.ts --maxWorkers=1 --exclude 'baseline/**' 2>&1 | tee proofs/checkpoint-base64-import-20261108/ci-logs/node-tests.log
+          bun --bun node_modules/vitest/vitest.mjs run checkpoint-base64-import.test.ts redux-checkpoint.test.ts checkpoint-descriptor-validation.test.ts checkpoint-validation-pass.test.ts --maxWorkers=1 --exclude 'baseline/**' 2>&1 | tee proofs/checkpoint-base64-import-20261108/ci-logs/bun-tests.log
+      - name: Check native and fallback behavior against the baseline
+        shell: bash
+        run: |
+          for mode in auto buffer buffer-offset portable-missing portable-noncallable; do
+            node proofs/checkpoint-base64-import-20261108/compatibility-v3.mjs baseline . "$mode" | tee "proofs/checkpoint-base64-import-20261108/ci-logs/node-compatibility-$mode.json"
+            bun proofs/checkpoint-base64-import-20261108/compatibility-v3.mjs baseline . "$mode" | tee "proofs/checkpoint-base64-import-20261108/ci-logs/bun-compatibility-$mode.json"
+          done
+          node proofs/checkpoint-base64-import-20261108/smoke-v3.mjs | tee proofs/checkpoint-base64-import-20261108/ci-logs/node-smoke.log
+          bun proofs/checkpoint-base64-import-20261108/smoke-v3.mjs | tee proofs/checkpoint-base64-import-20261108/ci-logs/bun-smoke.log
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Check the real native API and worker attachments in Chromium
+        shell: bash
+        run: node proofs/checkpoint-base64-import-20261108/browser.mjs | tee proofs/checkpoint-base64-import-20261108/ci-logs/chromium.json
+      - name: Independently verify saved evidence without rerunning timings
+        shell: bash
+        run: python3 proofs/checkpoint-base64-import-20261108/verify.py proofs/checkpoint-base64-import-20261108/results/*.json.gz | tee proofs/checkpoint-base64-import-20261108/ci-logs/evidence.log
+      - name: Retain verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-byte-decoder-${{ github.sha }}
+          path: proofs/checkpoint-base64-import-20261108/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
