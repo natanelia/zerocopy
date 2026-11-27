@@ -1,4 +1,4 @@
-name: Persistent columnar connection-local validation (proof only)
+name: Persistent columnar contiguous span scan (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pattern: [single, clustered, spread]
+        pattern: [single, spread, burst]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,8 +40,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build:wasm && bun run build:browser
       - name: Verify persistent column semantics
-        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs proofs/persistent-columnar-table-20261127/table-paged-fast.test.mjs proofs/persistent-columnar-table-20261127/table-paged-session.test.mjs
-      - name: Paired same-memory session qualification
+        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs proofs/persistent-columnar-table-20261127/table-paged-fast.test.mjs proofs/persistent-columnar-table-20261127/table-paged-session.test.mjs proofs/persistent-columnar-table-20261127/table-paged-runs.test.mjs
+      - name: Paired moving-viewport and burst qualification
         shell: bash
         run: |
           set -euo pipefail
@@ -49,11 +49,11 @@ jobs:
           git rev-parse HEAD | tee columnar-results/commit.txt
           node --version | tee columnar-results/node.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/churn.mjs columnar-results/results.json ${{ matrix.pattern }} 7 | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/scan-churn.mjs columnar-results/results.json ${{ matrix.pattern }} 7 | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-paged-session-${{ matrix.pattern }}-${{ github.run_id }}
+          name: columnar-span-scan-${{ matrix.pattern }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn
