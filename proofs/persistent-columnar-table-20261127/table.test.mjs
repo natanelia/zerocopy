@@ -9,7 +9,12 @@ test('fixed-width values, retained forks, shared attachment and column-only copi
   const c=a.editMany([[0,{x:-42}]]);
   assert.equal(a.size,513);assert(Object.is(b.get(0,'x'),-0));assert.equal(b.get(0,'speed'),2);
   assert.equal(b.get(255,'speed'),99);assert.equal(b.get(512,'height'),Math.fround(1.1));assert.equal(c.get(0,'x'),-42);
-  for(let i=0;i<rows.length;i++)assert.deepEqual(a.row(i),rows[i]);
+  for(let i=0;i<rows.length;i++){
+    assert.deepEqual(a.row(i),rows[i]);
+    assert.deepEqual(a.rowDirect(i),rows[i]);
+    assert.deepEqual(b.rowDirect(i),b.row(i));
+    assert.deepEqual(c.rowDirect(i),c.row(i));
+  }
   assert.equal(a.row(-1),undefined);assert.throws(()=>b.editMany([[1,{speed:256}]]),RangeError);
   assert.throws(()=>b.editMany([[1,{active:1}]]),TypeError);
   assert.equal(b.editMany([[0,{speed:2}]]),b);
@@ -20,6 +25,7 @@ test('fixed-width values, retained forks, shared attachment and column-only copi
   assert.equal(changed,3);
   const old=ColumnTable.attach(structuredClone(base)),reader=ColumnTable.attach(structuredClone(b.descriptor()));
   assert.deepEqual(old.row(0),rows[0]);assert.deepEqual(reader.row(512),b.row(512));
+  assert.deepEqual(old.rowDirect(0),rows[0]);assert.deepEqual(reader.rowDirect(512),b.row(512));
   assert.throws(()=>reader.editMany([[0,{x:0}]]),/read-only/);
   const f=[{column:'x',min:100,max:300},{column:'active',eq:true}];
   const expected=rows.filter(r=>r.x>=100&&r.x<=300&&r.active);
@@ -30,9 +36,11 @@ test('old readers survive actual memory growth, invalid roots and exhausted allo
   const rows=Array.from({length:4096},(_,i)=>({x:i,y:i*2}));
   const root=ColumnTable.fromRows({x:'float64',y:'float64'},rows,{blockRows:256,maximumBytes:4*65536});
   const old=ColumnTable.attach(structuredClone(root.descriptor())),capacity=root.capacityBytes;
+  assert.deepEqual(old.rowDirect(400),rows[400]); // retain the cached view before real growth
   let next=root;for(let i=0;i<40;i++)next=next.editMany([[i*100,{x:-i-1}]]);
   assert(next.capacityBytes>capacity);assert.equal(old.get(400,'x'),400);
   assert.equal(next.get(400,'x'),-5);
+  assert.deepEqual(old.rowDirect(400),rows[400]);assert.deepEqual(next.rowDirect(400),next.row(400));
   assert.throws(()=>ColumnTable.attach({...root.descriptor(),root:root.descriptor().used}),RangeError);
   const tiny=ColumnTable.fromRows({x:'float64'},Array.from({length:4096},(_,i)=>({x:i})),{blockRows:256,maximumBytes:65536});
   assert.throws(()=>tiny.editMany(Array.from({length:4096},(_,i)=>[i,{x:-i-1}])),RangeError);
@@ -51,4 +59,16 @@ test('integer zero is canonical, floating zero retains its sign',()=>{
   assert(Object.is(a.get(0,'i'),0));assert(Object.is(a.get(0,'f'),-0));
   assert.equal(a.editMany([[0,{i:-0}]]),a);
   assert(Object.is(a.editMany([[0,{f:0}]]).get(0,'f'),0));
+});
+
+test('direct row materialization preserves exact values, schema keys and ownership',()=>{
+  const schema=Object.fromEntries([['__proto__','uint8'],['constructor','boolean'],['x','float64'],['f','float32'],['z','int32'],['𝄞','uint32']]);
+  const rows=Array.from({length:1031},(_,i)=>Object.fromEntries([['__proto__',i%256],['constructor',i%2===0],['x',i%3===0?NaN:i%3===1?-0:Infinity],['f',Math.fround(-i/13)],['z',-i||0],['𝄞',4294967295-i]]));
+  const a=ColumnTable.fromRows(schema,rows,{blockRows:257}),b=ColumnTable.attach(structuredClone(a.descriptor()));
+  for(let i=0;i<rows.length;i++){
+    assert.deepEqual(a.rowDirect(i),a.row(i));assert.deepEqual(b.rowDirect(i),rows[i]);
+    assert(Object.isFrozen(b.rowDirect(i)));assert.equal(Object.getPrototypeOf(b.rowDirect(i)),Object.prototype);
+  }
+  assert.equal(a.rowDirect(-1),undefined);assert.equal(a.rowDirect(a.size),undefined);
+  assert.equal(ColumnTable.fromRows({x:'float64'},[]).rowDirect(0),undefined);
 });

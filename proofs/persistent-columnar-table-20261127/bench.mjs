@@ -43,7 +43,7 @@ function payload(mode,owner){
 }
 function footprint(mode,p){
   if(mode==='native')return null;
-  return {used:p.data.arenas.reduce((s,a)=>s+a.used,0)+(p.table?.used??0),capacity:p.data.arenas.reduce((s,a)=>s+a.memory.buffer.byteLength,0)+(p.table?.memory.buffer.byteLength??0),arenas:p.data.arenas.length+Number(!!p.table)};
+  return {used:p.data.arenas.reduce((s,a)=>s+a.used,0)+(p.table?.used??0),capacity:p.data.arenas.reduce((s,a)=>s+a.memory.buffer.byteLength,0)+(p.table?.memory.buffer.byteLength??0),arenas:p.data.arenas.length+Number(!!p.table),tableUsed:p.table?.used??null,indexUsed:p.table?p.data.arenas.reduce((s,a)=>s+a.used,0):null};
 }
 async function attach(mode,p,previous){
   if(mode==='native'){for(const r of p.map.values())Object.freeze(r);return p;}
@@ -55,11 +55,19 @@ async function attach(mode,p,previous){
 function getRow(mode,s,i){
   if(mode==='native'||isJSON(mode))return s.map.get(key(i));
   const slot=s.index.get(key(i));assert.equal(slot,i);
-  if(isTable(mode))return s.table.row(slot);
+  if(isTable(mode))return mode.endsWith('-direct')?s.table.rowDirect(slot):s.table.row(slot);
   return Object.freeze(Object.fromEntries(fields.map(f=>[f,s.columns[f].get(slot)])));
 }
 function scan(mode,s,q,n){
   if(mode==='native'||mode==='json'||mode==='json-control')return scanRows(s.map.values(),q);
+  if(mode==='json-direct'){
+    let count=0,total=0;
+    for(const v of s.map.valuesView()){
+      if(v.get('active')!==true||v.get('kind')!==q.kind)continue;
+      const x=v.get('x'),y=v.get('y');if(x>=q.min&&x<=q.max&&y>=q.ymin&&y<=q.ymax){count++;total+=v.get('speed');}
+    }
+    return {count,total};
+  }
   if(mode==='json-view'){
     let count=0,total=0;
     for(const k of s.map.keys()){
@@ -118,17 +126,29 @@ if(!isMainThread){
       await phase(name,true,[queries[1],queries[2]]);phases.at(-1).mutationMs=mutationMs;
     }
     await phase('history',false,[queries[3],queries[4]],true);
+    const peakMixedRSSKiB=process.resourceUsage().maxRSS;
+    // Separate fresh, point-only reader attachment. No preceding scan or cache warming.
+    const fresh=[0,1].map(()=>new Worker(new URL(import.meta.url),{workerData:{mode,n},execArgv:[]}));
+    try{
+      const start=performance.now(),p=payload(mode,owner);
+      const rs=await Promise.all(fresh.map(w=>send(w,{kind:'query',payload:p,queries:[],ids})));
+      const elapsedMs=performance.now()-start;
+      const expected=point(i=>rows[i],ids);
+      for(const rr of rs){assert.equal(rr.points,expected);assert.deepEqual(rr.results,[]);}
+      phases.push({name:'fresh-point',elapsedMs,pointMs:Math.max(...rs.map(r=>r.pointMs)),attachMs:Math.max(...rs.map(r=>r.attachMs)),footprint:footprint(mode,p)});
+    }finally{await Promise.all(fresh.map(w=>w.terminate()));}
+    const peakBeforeVerificationRSSKiB=process.resourceUsage().maxRSS;
     const expectedOld=digestRows(n,i=>original[i]),expectedNew=digestRows(n,i=>rows[i]);
     const digests=await Promise.all(workers.map(w=>send(w,{kind:'verify'})));
     for(const r of digests){assert.equal(r.initial,expectedOld);assert.equal(r.latest,expectedNew);}
     // Capture measured-phase RSS separately from post-verification high-water if needed in follow-up.
-    console.log(JSON.stringify({mode,n,buildMs,phases,peakRSSKiB:process.resourceUsage().maxRSS,digests,verified:true}));
+    console.log(JSON.stringify({mode,n,buildMs,phases,peakMixedRSSKiB,peakBeforeVerificationRSSKiB,peakRSSKiB:process.resourceUsage().maxRSS,digests,verified:true}));
   }finally{await Promise.all(workers.map(w=>w.terminate()));}
 }else{
   const [output='columnar-results.json',roundArg='5',sizeArg='1000,10000,100000']=process.argv.slice(2);
   const rounds=Number(roundArg),sizes=sizeArg.split(',').map(Number);
-  const modes=['json','json-control','json-view','lists','table-256','table-1024','table-4096','native'];
-  const report={node:process.version,cpu:cpus()[0].model,rounds,sizes,modes,rows:[],base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',note:'RSS includes setup, benchmark and final exhaustive verification. Not a browser peak.'};
+  const modes=['json','json-control','json-view','json-direct','lists','table-256','table-256-direct','table-1024-direct','native'];
+  const report={node:process.version,cpu:cpus()[0].model,rounds,sizes,modes,rows:[],base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',control:'172839f20b24392d96ba21723fd300efa2e5ee8b: exact shared-map.ts runtime source, the only runtime diff from base',note:'peakMixedRSSKiB is high-water through mixed/history phases; peakBeforeVerificationRSSKiB includes extra fresh point readers; peakRSSKiB includes exhaustive verification. Not browser PSS.'};
   for(const n of sizes)for(let r=-1;r<rounds;r++){
     const offset=(r+1)%modes.length,order=[...modes.slice(offset),...modes.slice(0,offset)];
     if(r%2===1)order.reverse();

@@ -1,4 +1,4 @@
-name: Persistent columnar table feasibility (proof only)
+name: Persistent columns point path and direct JSON control (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -17,6 +17,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: '172839f20b24392d96ba21723fd300efa2e5ee8b'
+          path: .pr100-control
+          persist-credentials: false
+      - name: Install pinned direct JSON control in ephemeral build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C .pr100-control rev-parse HEAD)" = 172839f20b24392d96ba21723fd300efa2e5ee8b
+          cp .pr100-control/shared-map.ts shared-map.ts
+          rm -rf .pr100-control
+          sha256sum shared-map.ts
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -35,8 +48,8 @@ jobs:
           mkdir -p columnar-results
           git rev-parse HEAD | tee columnar-results/commit.txt
           node --version | tee columnar-results/node.txt
-          sha256sum proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/bench.mjs columnar-results/results.json 5 ${{ matrix.size }} | tee columnar-results/raw.log
+          sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
+          node proofs/persistent-columnar-table-20261127/bench.mjs columnar-results/results.json 8 ${{ matrix.size }} | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

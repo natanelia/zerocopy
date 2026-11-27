@@ -37,9 +37,20 @@ class Slab {
     this.used=end;return p;
   }
 }
+// Native-width storage is host-endian in this proof. Match the typed-array layout.
+const LITTLE_ENDIAN=new Uint8Array(new Uint16Array([1]).buffer)[0]===1;
+const READERS=Object.freeze({
+  float64:(v,p)=>v.getFloat64(p,LITTLE_ENDIAN),
+  float32:(v,p)=>v.getFloat32(p,LITTLE_ENDIAN),
+  int32:(v,p)=>v.getInt32(p,LITTLE_ENDIAN),
+  uint32:(v,p)=>v.getUint32(p,LITTLE_ENDIAN),
+  uint16:(v,p)=>v.getUint16(p,LITTLE_ENDIAN),
+  uint8:(v,p)=>v.getUint8(p),
+  boolean:(v,p)=>v.getUint8(p)!==0,
+});
 const TOKEN=Symbol('internal');
 export class ColumnTable {
-  #memory;#owner;#fields;#names;#rows;#blockRows;#blocks;#root;#used;
+  #memory;#owner;#fields;#names;#rows;#blockRows;#blocks;#root;#used;#point;
   constructor(token,{memory,owner,fields,rows,blockRows,root,used}) {
     if(token!==TOKEN)throw new TypeError('use ColumnTable.fromRows or attach');
     this.#memory=memory;this.#owner=owner;this.#fields=fields;this.#names=new Map(fields.map(([k],i)=>[k,i]));
@@ -86,6 +97,22 @@ export class ColumnTable {
     const entries=this.#fields.map(([name,type],c)=>{
       const raw=this.#block(buffer,dir,c,b)[j];return [name,type==='boolean'?raw!==0:raw];
     });
+    return Object.freeze(Object.fromEntries(entries));
+  }
+  /** Proof variant: keep one immutable byte view and directory per snapshot,
+   * instead of creating a typed-array object for each field of every row.
+   * All reachable bytes already exist; old SAB views survive memory.grow().
+   * Keep exactly the same materialization and freezing semantics as row().
+   */
+  rowDirect(i){
+    if(!this.#valid(i))return undefined;
+    if(!this.#point){
+      const buffer=this.#memory.buffer;
+      this.#point={view:new DataView(buffer,0,this.#used),directory:this.#directory(buffer),
+        fields:this.#fields.map(([name,type])=>({name,width:TYPES[type].BYTES_PER_ELEMENT,read:READERS[type]}))};
+    }
+    const {view,directory,fields}=this.#point,b=Math.floor(i/this.#blockRows),j=i%this.#blockRows;
+    const entries=fields.map(({name,width,read},c)=>[name,read(view,directory[c*this.#blocks+b]+j*width)]);
     return Object.freeze(Object.fromEntries(entries));
   }
   // Generic fixed-width range/equality filter with a numeric sum; no callbacks or row objects.
