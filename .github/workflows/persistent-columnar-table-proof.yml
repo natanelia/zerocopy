@@ -1,4 +1,4 @@
-name: Persistent columnar full validation and address lookup (proof only)
+name: Persistent columnar connection-local validation (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -40,8 +40,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build:wasm && bun run build:browser
       - name: Verify persistent column semantics
-        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs proofs/persistent-columnar-table-20261127/table-paged-fast.test.mjs
-      - name: Paired full-validation and address qualification
+        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs proofs/persistent-columnar-table-20261127/table-paged-fast.test.mjs proofs/persistent-columnar-table-20261127/table-paged-session.test.mjs
+      - name: Paired same-memory session qualification
         shell: bash
         run: |
           set -euo pipefail
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-paged-fast-${{ matrix.pattern }}-${{ github.run_id }}
+          name: columnar-paged-session-${{ matrix.pattern }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn

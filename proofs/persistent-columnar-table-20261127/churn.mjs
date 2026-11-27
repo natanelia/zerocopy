@@ -10,7 +10,9 @@ import {SharedMap,SharedList,getWorkerData,initWorker} from '../../dist/shared.j
 import {ColumnTable} from './table.mjs';
 import {ColumnTable as PagedTable} from './table-paged.mjs';
 import {ColumnTable as FastPagedTable} from './table-paged-fast.mjs';
-const tableClass=mode=>mode.includes('-fast-paged')?FastPagedTable:mode.endsWith('-paged')?PagedTable:ColumnTable;
+import {ColumnTable as SessionTable,openPublisher,openReader} from './table-paged-session.mjs';
+const isSession=mode=>mode.includes('-session');
+const tableClass=mode=>isSession(mode)?SessionTable:mode.includes('-fast-paged')?FastPagedTable:mode.endsWith('-paged')?PagedTable:ColumnTable;
 const schema={x:'float64',y:'float64',speed:'uint8',kind:'uint8',active:'boolean'};
 const fields=Object.keys(schema), widths=[8,8,1,1,1];
 const key=i=> (i%31===0?'道路/':'lane/')+((Math.imul(i,2654435761)>>>0).toString(36))+'/'+i;
@@ -70,6 +72,11 @@ function attribution(prev,next){
 async function attach(mode,p,previous){
   if(mode==='native'){for(const r of p.map.values())Object.freeze(r);return p;}
   const attached=await initWorker(p.data,{previous:previous?.attached});
+  if(isSession(mode)){
+    const reader=previous?.reader??openReader(p.tableSession,{reuse:!mode.includes('-full')});
+    const table=previous?reader.accept(p.tableSession):reader.snapshot;
+    return {attached,index:attached.index,table,reader};
+  }
   if(isTable(mode))return {attached,index:attached.index,table:tableClass(mode).attach(p.table)};
   if(isJSON(mode))return {attached,map:attached.map};
   return {attached,index:attached.index,columns:Object.fromEntries(fields.map(f=>[f,attached[f]]))};
@@ -121,6 +128,7 @@ if(!isMainThread){
   const mode=process.argv[3],n=Number(process.argv[4]),pattern=process.argv[5],revisions=96,readerCount=4;
   const rows=Array.from({length:n},(_,i)=>row(i)),retained=new Map([[0,rows.slice()]]),events=[];
   const start=performance.now();let owner=build(mode,rows);const buildMs=performance.now()-start;
+  const publisher=isSession(mode)?openPublisher(owner.table):null;
   const workers=Array.from({length:readerCount},()=>new Worker(new URL(import.meta.url),{workerData:{mode,n},execArgv:[]}));
   function send(w,m){return new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>fail(Error('worker timeout')),120000);
@@ -139,8 +147,12 @@ if(!isMainThread){
       const expected=ids.map(i=>rows[i]),expectedScan=wantsScan?scanRows(rows):null;
       if(hold&&rev)retained.set(rev,rows.slice());
       const prev=owner,t=performance.now();if(rev)owner=edit(mode,owner,edits);const mutationMs=performance.now()-t;
-      const a=performance.now(),p=payload(mode,owner),payloadMs=performance.now()-a;
-      const replies=await Promise.all(workers.map(w=>send(w,{kind:'query',revision:rev,payload:p,ids,scan:wantsScan,retain:hold})));
+      const a=performance.now(),p=payload(mode,owner);
+      // Both session modes send exactly the same protocol. Separate owner-side
+      // footprint accounting keeps the full descriptor out of the worker message.
+      const wire=publisher?{data:p.data,tableSession:rev?publisher.publish(owner.table):publisher.initial()}:p;
+      const payloadMs=performance.now()-a;
+      const replies=await Promise.all(workers.map(w=>send(w,{kind:'query',revision:rev,payload:wire,ids,scan:wantsScan,retain:hold})));
       const replyMs=performance.now()-a;
       for(const r of replies){assert.equal(r.revision,rev);assert.deepEqual(r.points,expected);assert.deepEqual(r.result,expectedScan);}
       events.push({rev,mutationMs,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,scan:wantsScan,
@@ -156,8 +168,8 @@ if(!isMainThread){
 }else{
   const [out='churn-results.json',pattern='single',roundArg='5']=process.argv.slice(2);
   assert(['single','clustered','spread'].includes(pattern));const rounds=Number(roundArg),n=100000;
-  const modes=['lists','table-32-paged','table-32-control-paged','table-256-paged','table-32-fast-paged','table-256-fast-paged','table-32','table-256'];
-  const report={previousPagedHead:'1d9383ff69410fefc523b28fd26cbe4a8ac175d8',base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',jsonControl:'172839f20b24392d96ba21723fd300efa2e5ee8b',
+  const modes=['lists','table-32-fast-paged','table-32-session-full','table-32-session','table-32-session-control','table-256-fast-paged','table-256-session-full','table-256-session'];
+  const report={previousPagedHead:'d8c2c173d52908411f233e20517b5e88b42f25ba',base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',jsonControl:'172839f20b24392d96ba21723fd300efa2e5ee8b',
     node:process.version,cpu:cpus()[0].model,pattern,rounds,n,modes,rows:[]};
   const quantile=(xs,q)=>{const a=[...xs].sort((a,b)=>a-b);return a[Math.ceil(a.length*q)-1];};
   for(let round=-1;round<rounds;round++){
