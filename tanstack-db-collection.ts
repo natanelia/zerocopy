@@ -3,6 +3,7 @@ import type { JsonObject, JsonType, JsonValue } from './types.ts';
 import { checkSpatialId } from './spatial-id.ts';
 import type { SpatialPair, SpatialJoinDelta } from './spatial.ts';
 import { notifySubscribers } from './snapshot-listeners.ts';
+export { withConfirmedSharedCache } from './confirmed-sync-cache.ts';
 
 type CollectionItem = { id: string };
 

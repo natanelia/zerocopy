@@ -1,17 +1,13 @@
-import { createCollection, createTransaction } from '@tanstack/db';
+import { createCollection, createTransaction, whenSyncAccepted } from '@tanstack/db';
 import { expect, it } from 'vitest';
 import { SharedList, getWorkerData } from '../dist/shared.js';
 import { createSharedSession } from '../dist/worker.js';
 import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery } from '../dist/spatial.js';
 import type { SpatialViewportDelta } from '../spatial.ts';
-import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from '../dist/tanstack-db-collection.js';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig, withConfirmedSharedCache } from '../dist/tanstack-db-collection.js';
 
-it('automatically publishes confirmed rows to a worker that skips intermediate revisions', async () => {
-  const first = { id: 'north', revision: 0, label: 'confirmed' };
-  const options = sharedCollectionConfig({ id: 'session-lanes', initialData: [first] });
-  const lanes = createCollection(options);
-  await lanes.preload();
-  const session = createSharedSession({ source: options }, { copy: false });
+function openRowWorker(source) {
+  const session = createSharedSession({ source }, { copy: false });
   const worker = new Worker(new URL('./tanstack-session-worker.ts', import.meta.url), { type: 'module' });
   const { port1, port2 } = new MessageChannel();
   const request = (message, transfer = []) => new Promise((resolve, reject) => {
@@ -19,10 +15,22 @@ it('automatically publishes confirmed rows to a worker that skips intermediate r
     worker.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
     worker.postMessage(message, transfer);
   });
-  try {
+  async function connect() {
     const ready = request({ port: port2 }, [port2]);
     await session.connect(port1);
     expect(await ready).toEqual({ revision: 0 });
+  }
+  return { connect, request, session, close() { session.dispose(); port1.close(); worker.terminate(); } };
+}
+
+it('automatically publishes confirmed rows to a worker that skips intermediate revisions', async () => {
+  const first = { id: 'north', revision: 0, label: 'confirmed' };
+  const options = sharedCollectionConfig({ id: 'session-lanes', initialData: [first] });
+  const lanes = createCollection(options);
+  await lanes.preload();
+  const { session, request, connect, close } = openRowWorker(options);
+  try {
+    await connect();
     const preview = createTransaction({ autoCommit: false, mutationFn: async () => {} });
     preview.mutate(() => lanes.update('north', lane => { lane.label = 'optimistic'; }));
     expect(lanes.get('north')?.label).toBe('optimistic');
@@ -40,8 +48,47 @@ it('automatically publishes confirmed rows to a worker that skips intermediate r
       changes: [{ type: 'update', key: 'north', before: first, after: { ...first, revision: 2 } }],
     });
   } finally {
-    session.dispose(); port1.close(); worker.terminate(); await lanes.cleanup();
+    close(); await lanes.cleanup();
   }
+});
+
+it('keeps deferred upstream edits out of the worker until the real sync receipt becomes visible', async () => {
+  const first = { id: 'north', revision: 0, label: 'confirmed' };
+  let feed;
+  const mirror = withConfirmedSharedCache({ sync(params) {
+    feed = params;
+    feed.begin(); feed.write({ type: 'insert', value: first }); feed.commit(); feed.markReady();
+  } });
+  const lanes = createCollection({ id: 'remote-lanes', getKey: row => row.id, sync: mirror.sync });
+  await lanes.preload();
+  const { session, request, connect, close } = openRowWorker(mirror);
+  let release;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  try {
+    await connect();
+    feed.begin(); feed.write({ type: 'delete', key: 'north' });
+    await expect(feed.commit(AbortSignal.abort())).rejects.toMatchObject({ name: 'AbortError' });
+    const preview = createTransaction({ autoCommit: false, mutationFn: () => gate });
+    preview.mutate(() => lanes.update('north', lane => { lane.label = 'preview'; }));
+    const persisting = preview.commit();
+    const after = { ...first, revision: 2 };
+    feed.begin(); feed.write({ type: 'update', value: after });
+    const receipt = feed.commit();
+    expect(receipt).toBeInstanceOf(Promise);
+    await whenSyncAccepted(receipt);
+    expect(mirror.getSnapshot().get('north')).toEqual(first);
+    expect(session.version).toBe(0);
+    release(); await persisting; await receipt;
+    expect(session.version).toBe(1);
+    expect(await request({ version: session.version })).toMatchObject({
+      version: 1, latest: true, original: first,
+      changes: [{ type: 'update', key: 'north', before: first, after }],
+    });
+    feed.begin({ snapshot: true }); await feed.commit();
+    expect(await request({ version: session.version })).toMatchObject({
+      version: 2, changes: [{ type: 'delete', key: 'north', before: first, after: undefined }],
+    });
+  } finally { release(); close(); await lanes.cleanup(); }
 });
 
 it('attaches confirmed rows and geometry from the same edit in a browser worker', async () => {

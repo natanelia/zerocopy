@@ -317,6 +317,47 @@ and preserves the confirmed version. If an edit still needs publishing,
 compute a fresh delta from the confirmed frame or call `setPairs` with a full
 query of the newest frame. [Incremental spatial join API](spatial.md#update-a-join-after-an-edit)
 
+## Mirror committed upstream batches
+
+Use `withConfirmedSharedCache` to feed a worker from an existing remote sync
+provider. Supply its sync configuration and give the wrapped configuration
+to TanStack. The mirror uses the collection's string keys and keeps one
+immutable map of JSON rows. A previously retained map stays readable through
+tile replacement, deletion and reconnection.
+
+<!-- example: upstream-confirmed -->
+```ts
+import { createCollection, type SyncConfig } from '@tanstack/db';
+import { withConfirmedSharedCache } from 'zerocopy/tanstack';
+import { createSharedSession } from 'zerocopy/worker';
+
+type Road = { id: string; revision: number };
+export function openRoads(provider: SyncConfig<Road, string>) {
+  const mirror = withConfirmedSharedCache(provider);
+  const roads = createCollection({
+    id: 'roads', getKey: (road: Road) => road.id, sync: mirror.sync,
+  });
+  const session = createSharedSession({ source: mirror }, { copy: false });
+  return { roads, mirror, session };
+}
+```
+
+After `await roads.preload()`, connect workers with `await session.connect(worker)`.
+Each batch can contain multiple edits. Partial updates merge supplied fields,
+full updates replace the row, and `truncate()` discards earlier writes in that
+batch and replaces the previous tile. Providers on TanStack DB 1.0.0-rc.1.5
+can also declare a replacement with `begin({ snapshot: true })`.
+
+When `commit()` returns a promise, publication waits for its visibility
+receipt. For example, an accepted remote batch can still be waiting for a
+persisting optimistic edit. Successful batches publish in commit order, and
+a rejected receipt leaves its rows out of the mirror. Cores that return
+`void`, including 0.5.0, provide a synchronous commit boundary. Cleanup
+retires callbacks and pending receipts from that sync run. On reconnect the
+provider can apply deltas against the retained rows or send a replacement.
+The mirror covers writes made through the wrapped sync configuration. Use
+well-formed Unicode string keys and supply a separate mirror per collection.
+
 ## withSharedCache
 
 `withSharedCache<T>(upstreamSync, options?)` wraps an object with a `sync(params)` function. It intercepts upstream insert, update, and delete messages before forwarding them to the caller. It returns a wrapped `sync` object plus `getCache()`, `get(key)`, `toArray()`, `getSharedState()`, and `fromSharedState()`.
@@ -324,8 +365,8 @@ query of the newest frame. [Incremental spatial join API](spatial.md#update-a-jo
 Upstream inserts and updates supply a value with the configured string key.
 Deletes can supply the key or the row. This wrapper mirrors each upstream write
 as it arrives, so a reader can observe intermediate rows in an open batch. Use
-the confirmed snapshot from `sharedCollectionConfig` for transactional worker
-reads. The upstream provider owns persistence and reconnection.
+[the committed upstream mirror](#mirror-committed-upstream-batches) for
+transactional worker reads. The upstream provider owns persistence and reconnection.
 
 ## Pointer descriptors are not worker transport
 

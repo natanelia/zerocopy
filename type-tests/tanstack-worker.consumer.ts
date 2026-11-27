@@ -1,10 +1,18 @@
-import { createCollection, createTransaction } from '@tanstack/db';
-import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+import { createCollection, createTransaction, type SyncConfig } from '@tanstack/db';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig, withConfirmedSharedCache } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
 import { createSharedSession } from 'zerocopy/worker';
 import { applySpatialEdits, buildSpatialIndex, diffSpatialJoin, diffSpatialViewport, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
+declare const upstream: SyncConfig<Lane, string>;
+const remote = withConfirmedSharedCache(upstream);
+const remoteRevision: number | undefined = remote.getSnapshot().get('remote')?.revision;
+const remoteLanes = createCollection({ id: 'remote', getKey: (row: Lane) => row.id, sync: remote.sync });
+const remoteSession = createSharedSession({ source: remote }, { copy: false });
+// @ts-expect-error A remote worker reads immutable lane metadata.
+remoteSession.current.get('remote')!.revision = 1;
+void remoteLanes; void remoteRevision;
 const options = sharedCollectionConfig<Lane>({ id: 'lanes' });
 const lanes = createCollection(options);
 const tx = createTransaction<Lane>({

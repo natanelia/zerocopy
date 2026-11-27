@@ -11,6 +11,19 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
+  ['docs/tanstack.md', 'upstream-confirmed', `
+let feed;
+const { roads, mirror, session } = openRoads({ sync(p) { feed = p; p.markReady(); } });
+try {
+  await roads.preload();
+  feed.begin(); feed.write({ type: 'insert', value: { id: 'a', revision: 1 } });
+  assert.equal(mirror.getSnapshot().size, 0);
+  await feed.commit();
+  assert.equal(session.current.get('a').revision, 1);
+  const first = mirror.getSnapshot();
+  feed.begin({ snapshot: true }); await feed.commit();
+  assert.equal(session.current.size, 0); assert.equal(first.size, 1);
+} finally { session.dispose(); await roads.cleanup(); }`],
   ['docs/tanstack.md', 'tanstack-confirmed-source', `
 const { connectSharedSession } = await import('zerocopy/worker');
 const { port1, port2 } = new MessageChannel();

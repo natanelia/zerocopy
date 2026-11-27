@@ -103,7 +103,7 @@ if (isMainThread) {
 import assert from 'node:assert/strict';
 import { BTreeIndex, createCollection, createLiveQueryCollection, createTransaction, eq } from '@tanstack/db';
 import { createSharedSession } from 'zerocopy/worker';
-import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
+import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig, withConfirmedSharedCache } from 'zerocopy/tanstack';
 const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2, color: 'black' } }] });
 const lanes = createCollection(options);
 const confirmed = createSharedSession({ source: options }, { copy: false });
@@ -156,6 +156,25 @@ try {
   assert.equal(joined.size, 0);
   assert.equal(matches.size, 0);
 } finally { confirmed.dispose(); await matches.cleanup(); await joined.cleanup(); await pairs.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
+let remote;
+const upstream = withConfirmedSharedCache({ sync(params) { remote = params; params.markReady(); } });
+const roads = createCollection({ id: 'roads', getKey: row => row.id, sync: upstream.sync });
+try {
+  await roads.preload();
+  const empty = upstream.getSnapshot();
+  remote.begin();
+  remote.write({ type: 'insert', value: { id: 'west', label: 'old' } });
+  assert.equal(upstream.getSnapshot(), empty);
+  await remote.commit();
+  const initial = upstream.getSnapshot();
+  remote.begin(); remote.truncate();
+  remote.write({ type: 'insert', value: { id: 'east', label: 'new' } });
+  assert.equal(upstream.getSnapshot(), initial);
+  await remote.commit();
+  assert.deepEqual([...upstream.getSnapshot().keys()], ['east']);
+  assert.deepEqual([...roads.keys()], ['east']);
+  assert.equal(initial.get('west').label, 'old');
+} finally { await roads.cleanup(); }
 `);
   const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
   for (const version of peers) {
