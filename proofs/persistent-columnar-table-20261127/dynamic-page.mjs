@@ -1,4 +1,4 @@
-import {build,edit,payload,repack,shouldRepack,arenaUsage} from './partition-runtime.mjs';
+import {build,edit,payload,repack,shouldRepack,arenaUsage} from './schema-lane-runtime.mjs';
 import {lane,bounds,queryFor,matches,validate,equal,digest} from './lane-fixture.mjs';
 const readerCount=4;
 function send(w,m){return new Promise((resolve,reject)=>{

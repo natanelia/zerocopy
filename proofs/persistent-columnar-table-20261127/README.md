@@ -234,3 +234,23 @@ Direct copying approximately halves rebuild time but still increases p95 substan
 ### Next: independently owned spatial bands (proof only)
 
 Test eight independently owned spatial bands with existing numeric vectors and persistent global ID-to-band routing map. Rebuild only bands crossing 1.5x slot threshold. Conservative vertical envelopes skip provably disjoint viewport queries, never shrink on edits. Include routing and all publications in timings/accounting. Compare unpartitioned append/A-A, direct repack, optimized JSON/compacted JSON, partition append, partition repack/A-A on identical 16k/96-revision/four-reader runs, both scattered replacements and edits localized to successive bands. Local edits concentrate 10% whole-tile replacements within a band. Stable keys, absent IDs, retained historical roots and final digests checked by every worker; two retained checkpoints. This is a feasibility screen, not a production API, general spatial index, actual map trace or memory reclamation guarantee. Global routing arena remains append-only. If overhead or concentrated rebuilds fail, stop tuning compaction and consider schema API independently. No production change or merge.
+
+
+## Spatial bands — Nov 28: not a general compaction solution
+
+[Run 46070852292](https://github.com/natanelia/zerocopy/actions/runs/46070852292), exact head `70cc5569d1f5ac1df04cf4e000641c11ca5ef073`: four successful jobs, 160 measured verified cases, 16,384 lanes, four browser workers, 96 revisions, two retained checkpoints. Warmup excluded; medians parsed from verified job-log JSON. Raw [Chromium spread](https://github.com/natanelia/zerocopy/actions/runs/46070852292/artifacts/15233271759), [Firefox spread](https://github.com/natanelia/zerocopy/actions/runs/46070852292/artifacts/15232923152), [Chromium local](https://github.com/natanelia/zerocopy/actions/runs/46070852292/artifacts/15232628234), [Firefox local](https://github.com/natanelia/zerocopy/actions/runs/46070852292/artifacts/15232663450).
+
+| Engine / edits | Append total ms | Partition append ms | Partition repack ms | Append → partition repack p95 ms |
+|---|---:|---:|---:|---:|
+| Chromium local | 838.19 | 850.07 | 917.96 | 23.38 → 32.97 |
+| Firefox local | 776.06 | 696.24 | 839.86 | 26.92 → 29.20 |
+| Chromium spread | 1170.78 | 1115.47 | 1373.71 | 31.57 → 52.98 |
+| Firefox spread | 829.42 | 768.06 | 1067.88 | 27.32 → 44.86 |
+
+Local edits: peak distinct retained+current arena bytes 46,671,568 → 26,687,908 (42.8% lower), current 20,725,212. Spread: peak 47,096,732 → 66,380,964 (41.0% higher), current 25,014,576. Paired total latency ratios partition repack/append 1.112/1.119 local and 1.173/1.267 spread. Partition append increased arena bytes to 53,174,636 local and 55,656,436 spread. Append A/A ratios 1.020/.975 local and 1.017/.999 spread. No process memory claim. Independently owned arenas can help genuinely localized changes, but global routing and multi-band rebuilds hurt spread churn and p95. Reject automatic partition compaction as a general default; preserve this implementation and do not tune compaction further in this fixture.
+
+### Next: schema API feasibility on existing vectors (proof only)
+
+Use a schema compiler that maps finite numeric, boolean, string and variable numeric array fields to persistent existing SharedLists, optional explicit null via validity columns, stable key index and append-only row identities. No JSON row encoding, new memory format, custom directory, or automatic compaction. Schema signature is metadata, not a security boundary; type/shape checks and exact old roots tested. This narrow prototype requires an explicit id, finite JSON-compatible numeric values (canonical zero), all declared fields present, and no arbitrary nested objects. No schema evolution, public contract, integrated single-buffer format, or claim of zero-copy array materialization. Numeric array get returns a fresh array.
+
+Benchmark identical lane edits against previous hand-written append and #100 direct JSON, with duplicate A/A arms, 4k/16k lanes, Chromium/Firefox, four readers, 48 revisions, five timed rounds. The generalized scan reads predicate fields first, so any scan gain is not solely schema compilation. Browser replay verifies exact historical rows and visible results; separate typed-schema tests exercise nullable strings/numbers/arrays, UTF-8, empty arrays, forks, invalid input, and schema mismatch. This benchmark uses existing numeric lane fields only; nullable/string performance is not established. Keep this as an unverified isolated proof until the run returns. No production changes, new PR, merge or publication. #100 remains held.

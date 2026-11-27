@@ -1,4 +1,4 @@
-name: Persistent schema independently owned spatial bands (proof only)
+name: Persistent schema compiler feasibility (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         engine: [chromium, firefox]
-        size: [16384]
+        size: [4096, 16384]
         retention: [2]
-        pattern: [spread, local]
+        pattern: [spread]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,19 +44,19 @@ jobs:
       - run: bun run build:wasm && bun run build:browser
       - run: bunx playwright install --with-deps ${{ matrix.engine }}
       - name: Dynamic schema and generation semantics
-        run: node --test proofs/persistent-columnar-table-20261127/dynamic.test.mjs
-      - name: Browser generation repacking replay
+        run: node --test proofs/persistent-columnar-table-20261127/schema.test.mjs
+      - name: Browser schema replay
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p columnar-results
           git rev-parse HEAD | tee columnar-results/commit.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 96 ${{ matrix.retention }} ${{ matrix.pattern }} | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 48 ${{ matrix.retention }} ${{ matrix.pattern }} | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-spatial-bands-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
+          name: columnar-schema-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn
