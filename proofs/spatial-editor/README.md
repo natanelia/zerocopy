@@ -66,9 +66,10 @@ drag that leaves the feature's ID and vertex count intact.
 ### Open and edit a GeoArrow tile
 
 `--source=geoarrow` serves one Arrow IPC stream with a uint32 ID column and a
-planar XY LineString column in batches of 64 lanes. Every editor fetches the
+planar XY LineString column in batches of up to 64 lanes. Every editor fetches the
 same bytes. Each trial starts a fresh browser, and the three trials rotate
-editor order. The fixture's feature handles equal their original row ordinals.
+editor order. Full performance trials use ordered handles. The CI smoke
+fixture uses descending sparse handles up to `0xffffffff` in uneven batches.
 
 | Mode | Base geometry | Editing and worker reads |
 | --- | --- | --- |
@@ -76,7 +77,8 @@ editor order. The fixture's feature handles equal their original row ordinals.
 | `shared` | One immutable ZeroCopy numeric list per imported row | Workers share every list from the first publication. |
 | `packed` | Shared coordinate and offset buffers from `fromGeoArrowTable` | Workers receive the base buffers once. The owner creates lists for edited lanes and publishes those with confirmed metadata. |
 
-The packed editor builds its initial Flatbush index with `buildLineStringIndex`.
+The packed editor builds its initial Flatbush index with `buildLineStringIndex`
+and resolves stable handles through `buildLineStringLookup`.
 A geometry lookup checks the confirmed row and reads its replacement list or
 original packed path. Removing the row hides its original path even after the
 spatial edit log is pruned. A validator can still finish reading the older

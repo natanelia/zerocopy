@@ -1,10 +1,49 @@
 import { expect, it } from 'vitest';
-import { buildLineStringIndex, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
+import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
 import { lineStringViewXY, pathIntersectsBoxXY } from './geometry';
 import { getWorkerData, initWorker } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
+
+it('borrows arbitrary feature IDs across uneven packed batches, including null, empty and absent lanes', () => {
+  const empty = { ids: [], paths: { offsets: Int32Array.of(0), coordinates: new Float64Array(), validity: null } };
+  const first = { offsets: Int32Array.of(0, 1, 1, 1), coordinates: Float64Array.of(10, 20), validity: Uint8Array.of(5) };
+  const last = { offsets: Int32Array.of(0, 1, 3), coordinates: Float64Array.of(1, 2, 3, 4, 5, 6), validity: null };
+  const ids = Uint32Array.of(4294967295, 0, 255);
+  const lookup = buildLineStringLookup([empty, { paths: first, ids }, empty, { paths: last, ids: [42, 1] }, empty]);
+  ids.fill(9);
+  expect([...lookup.ids]).toEqual([0, 1, 42, 255, 4294967295]);
+  expect([...lookup.batchEnds]).toEqual([0, 3, 3, 5, 5]);
+  const lane = getLineStringById(lookup, 1)!;
+  expect([...lane]).toEqual([3, 4, 5, 6]);
+  expect(lane.buffer).toBe(last.coordinates.buffer);
+  expect([...getLineStringById(lookup, 4294967295)!]).toEqual([10, 20]);
+  expect([...getLineStringById(lookup, 42)!]).toEqual([1, 2]);
+  expect(getLineStringById(lookup, 0)).toBeNull();
+  expect([...getLineStringById(lookup, 255)!]).toEqual([]);
+  expect(getLineStringById(lookup, 254)).toBeUndefined();
+  expect(getLineStringById(buildLineStringLookup([empty]), 0)).toBeUndefined();
+  const sorted = buildLineStringLookup([{ paths: first, ids: [0, 15, 399] }]);
+  expect(sorted.rows).toBeNull();
+  expect(getLineStringById(sorted, 15)).toBeNull();
+  expect(getLineStringById(sorted, 400)).toBeUndefined();
+  expect([...getLineStringById(sorted, 399)!]).toEqual([]);
+  for (const view of [lookup.ids, lookup.rows!, lookup.batchEnds]) expect(view.buffer).toBeInstanceOf(SharedArrayBuffer);
+});
+
+it('rejects duplicate or invalid handles before publishing a lookup, including handles on null rows', () => {
+  const paths = { offsets: Int32Array.of(0, 0), coordinates: new Float64Array(), validity: Uint8Array.of(0) };
+  for (const invalid of [-1, 1.5, NaN, Infinity, 2 ** 32]) {
+    expect(() => buildLineStringLookup([{ paths, ids: [invalid] }])).toThrow(RangeError);
+    expect(() => getLineStringById(buildLineStringLookup([]), invalid)).toThrow(RangeError);
+  }
+  for (const ids of [[7, 7], [7, 1, 7]]) {
+    expect(() => buildLineStringLookup(ids.map(id => ({ paths, ids: [id] })))).toThrow(/Duplicate/);
+  }
+  expect(() => buildLineStringLookup([{ paths, ids: [] }])).toThrow(/one spatial feature ID/);
+  expect(() => buildLineStringLookup([{ paths: { ...paths, offsets: Int32Array.of(0, 2) }, ids: [1] }])).toThrow(RangeError);
+});
 
 it('indexes packed batches by stable ID and refines candidates across finite path breaks', () => {
   const paths = { offsets: Int32Array.of(0, 3, 4, 4, 6, 7),

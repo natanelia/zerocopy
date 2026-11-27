@@ -2,15 +2,12 @@ import Flatbush from 'flatbush';
 import { SharedMap } from './shared-map.ts';
 import { json, type JsonType } from './types.ts';
 import { checkBounds, packedBoundsXY, type BoundsXY } from './xy-bounds.ts';
-import { lineStringPresent, validateLineStringBuffersXY, type LineStringBuffersXY } from './line-string-buffers.ts';
-import { checkSpatialId } from './spatial-id.ts';
+import { lineStringPresent } from './line-string-buffers.ts';
+import { checkSpatialId, lowerBoundUint32 } from './spatial-id.ts';
+import { checkLineStringBatch, type SpatialLineStringBatch } from './line-string-lookup.ts';
 
 export interface SpatialFeature { readonly id: number; readonly bounds: BoundsXY }
-export interface SpatialLineStringBatch {
-  readonly paths: LineStringBuffersXY;
-  /** A stable uint32 feature handle for each row, including missing and empty paths. */
-  readonly ids: Uint32Array | readonly number[];
-}
+export { buildLineStringLookup, getLineStringById, type LineStringLookup, type SpatialLineStringBatch } from './line-string-lookup.ts';
 export interface SpatialEdit { readonly id: number; readonly bounds: BoundsXY | null }
 export interface SpatialChange { readonly revision: number; readonly bounds: BoundsXY | null }
 export type SpatialChanges = SharedMap<JsonType<SpatialChange>>;
@@ -69,10 +66,10 @@ export function buildLineStringIndex(batches: readonly SpatialLineStringBatch[],
   // Flatbush needs the exact number of boxes. Stop counting each present row
   // at its first finite vertex, then write its bounds directly into the tree.
   let count = 0;
-  for (const { paths, ids } of batches) {
-    validateLineStringBuffersXY(paths);
+  for (const batch of batches) {
+    checkLineStringBatch(batch);
+    const { paths, ids } = batch;
     const { offsets, coordinates, validity } = paths;
-    if (ids.length !== offsets.length - 1) throw new RangeError('Expected one spatial feature ID per LineString row');
     for (let row = 0; row < ids.length; row++) {
       if (!lineStringPresent(validity, row)) continue;
       const end = offsets[row + 1] * 2;
@@ -179,13 +176,7 @@ export function prepareSpatialQuery(base: SpatialIndex, changes: SpatialChanges,
 }
 
 function containsId(ids: Uint32Array, id: number): boolean {
-  let low = 0, high = ids.length;
-  while (low < high) {
-    const mid = Math.floor((low + high) / 2);
-    if (ids[mid] < id) low = mid + 1;
-    else high = mid;
-  }
-  return ids[low] === id;
+  return ids[lowerBoundUint32(ids, id)] === id;
 }
 
 function checkChangedIds(ids: Uint32Array): void {

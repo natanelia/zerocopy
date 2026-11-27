@@ -2,10 +2,10 @@ import { BTreeIndex, createCollection, createLiveQueryCollection, createTransact
 import { createSharedSession } from '../../dist/worker.js';
 import { SharedList, SharedMap, getWorkerData, list } from '../../dist/shared.js';
 import { sharedCollectionConfig, viewportCollectionConfig } from '../../dist/tanstack-db-collection.js';
-import { bboxXY } from '../../dist/geometry.js';
-import { applySpatialEdits, buildLineStringIndex, pruneSpatialEdits } from '../../dist/spatial.js';
+import { bboxXY, lineStringViewXY } from '../../dist/geometry.js';
+import { applySpatialEdits, buildLineStringIndex, buildLineStringLookup, pruneSpatialEdits } from '../../dist/spatial.js';
 import { baseFor, viewportFor } from './spatial.mjs';
-import { currentPaths, tilePath } from './tile-paths.mjs';
+import { currentPaths } from './tile-paths.mjs';
 import { loadTile } from './tile-io.mjs';
 import { assertEqual, bounds, edit, lane, west } from './workload.mjs';
 import { renderer } from './render.mjs';
@@ -40,19 +40,24 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
   const loadStarted = performance.now();
   let input = source === 'geoarrow' ? await loadTile(packed, count) : undefined;
   if (trace) console.info('Tile loaded');
-  let importedPaths = input?.map(batch => batch.paths);
-  const tile = packed ? importedPaths : undefined;
+  const tile = packed ? buildLineStringLookup(input) : undefined;
   const initialData = [], expectedBounds = new Map(), editedPaths = new Map();
   const toPath = xy => shared ? new SharedList('number').pushMany(xy) : xy;
   let paths = shared ? new SharedMap(list('number')) : new Map();
   let changes = shared ? applySpatialEdits(undefined, 0, []) : new Map();
-  for (let n = 0; n < count; n++) {
-    const id = String(n), xy = importedPaths ? tilePath(importedPaths, n) : lane(n, vertices), b = bounds(xy);
+  function addLane(handle, xy) {
+    const id = String(handle), b = bounds(xy);
     if (!packed) paths = paths.set(id, toPath(xy));
     initialData.push({ id, revision: 0, geometryId: id, kind: 'lane', bounds: b });
     expectedBounds.set(id, b);
   }
-  importedPaths = undefined;
+  if (input) {
+    for (const { ids, paths: batch } of input) {
+      for (let row = 0; row < ids.length; row++) addLane(ids[row], lineStringViewXY(batch, row));
+    }
+  } else {
+    for (let id = 0; id < count; id++) addLane(id, lane(id, vertices));
+  }
   if (!packed) input = undefined;
   let peakEntries = paths.size;
   const startup = { initialPathEntries: paths.size, loadPathsAndRowsMs: performance.now() - loadStarted };

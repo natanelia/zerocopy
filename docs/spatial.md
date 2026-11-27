@@ -69,18 +69,18 @@ across them, including rows with missing geometry.
 
 ```ts
 import { fromGeoArrowTable } from 'zerocopy/geoarrow';
-import { lineStringViewXY, pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
-import { buildLineStringIndex, querySpatialIndex } from 'zerocopy/spatial';
+import { pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
+import { buildLineStringIndex, buildLineStringLookup, getLineStringById, querySpatialIndex } from 'zerocopy/spatial';
 
 const { batches } = fromGeoArrowTable(tile, { column: 'lanes' });
 // featureIds contains the handle column for each corresponding record batch.
 const layer = batches.map((paths, i) => ({ paths, ids: featureIds[i]! }));
 const index = buildLineStringIndex(layer, revision);
+const lookup = buildLineStringLookup(layer);
 const viewport: BoundsXY = [100, 25, 240, 90];
 const visible = querySpatialIndex(index, viewport).filter(id => {
-  const { batch, row } = featureLocations.get(id)!; // The editor's handle-to-row lookup
-  const lane = lineStringViewXY(batches[batch]!, row)!;
-  return pathIntersectsBoxXY(lane, viewport);
+  const lane = getLineStringById(lookup, id);
+  return lane != null && pathIntersectsBoxXY(lane, viewport);
 });
 ```
 
@@ -92,6 +92,22 @@ gaps the envelope spans all finite vertices, and the exact predicate treats
 each gap as a break. Workers can read the shared index and geometry while
 the owner builds a later revision. Keep the handle lookup aligned with the
 same revision. [Import and edit packed geometry](geometry.md#open-a-tile-and-edit-one-lane)
+
+`buildLineStringLookup` copies the handles and retains the supplied geometry
+buffers. Handles can arrive in any order across uneven or empty batches.
+Send `{ index, lookup }` to each worker once with `postMessage`. The
+directory uses shared memory. Geometry from `fromGeoArrowTable` is also
+shared, while ordinary geometry buffers follow JavaScript's structured
+clone rules. Treat all published buffers and borrowed views as read-only.
+
+`getLineStringById` returns a borrowed Float64 view, an empty view for an
+empty path, `null` for a row with null geometry, and `undefined` for an
+unknown handle. The directory allocates four bytes per row for sorted
+handles and four bytes per batch for end offsets. Unsorted input needs an
+additional four bytes per row for the original positions. The largest
+handle has no effect on allocation. If the application already stores a
+batch and row in its confirmed metadata, it can call `lineStringViewXY`
+directly and omit the directory.
 
 For sparse editing, keep the imported buffers for the lifetime of the tile
 and store edited lanes in a `SharedMap(list('number'))`. Send the immutable

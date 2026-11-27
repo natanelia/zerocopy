@@ -5,8 +5,8 @@ import { tableFromIPC, tableToIPC } from 'apache-arrow';
 import { algorithm } from '@geoarrow/geoarrow-js';
 import { SharedList } from 'zerocopy';
 import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
-import { bboxXY, lineStringViewXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
-import { buildLineStringIndex, querySpatialIndex } from 'zerocopy/spatial';
+import { bboxXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
+import { buildLineStringIndex, buildLineStringLookup, getLineStringById, querySpatialIndex } from 'zerocopy/spatial';
 
 if (isMainThread) {
   const path = new SharedList('number').pushMany([0, 1, 2, 3]);
@@ -14,8 +14,10 @@ if (isMainThread) {
   const edited = packLineStringsXY([path.set(2, 7), null, new SharedList('number')]);
   const ipc = tableToIPC(toGeoArrowTable(edited));
   const imported = fromGeoArrowTable(tableFromIPC(ipc)).batches[0];
-  const index = buildLineStringIndex([{ paths: imported, ids: Uint32Array.of(17, 23, 41) }], 2);
-  const worker = new Worker(new URL(import.meta.url), { workerData: { exports: [original, edited], imported, index } });
+  const batches = [{ paths: imported, ids: Uint32Array.of(17, 0xffffffff, 0) }];
+  const index = buildLineStringIndex(batches, 2);
+  const lookup = buildLineStringLookup(batches);
+  const worker = new Worker(new URL(import.meta.url), { workerData: { exports: [original, edited], lookup, index } });
   let views;
   try {
     [views] = await once(worker, 'message');
@@ -35,13 +37,15 @@ if (isMainThread) {
   views.importedLane[0] = 55;
   assert.equal(imported.coordinates[0], 55);
 } else {
-  const importedLane = lineStringViewXY(workerData.imported, 0);
+  const { lookup } = workerData;
+  const importedLane = getLineStringById(lookup, 17);
   assert.deepEqual(querySpatialIndex(workerData.index, [0, 3, 0, 3]), [17]);
   assert.deepEqual(bboxXY(importedLane), [0, 1, 7, 3]);
   assert.equal(pathIntersectsBoxXY(importedLane, [0, 3, 0, 3]), false);
   assert.equal(pathIntersectsBoxXY(importedLane, [3.5, 2, 3.5, 2]), true);
-  assert.equal(lineStringViewXY(workerData.imported, 1), null);
-  assert.deepEqual([...lineStringViewXY(workerData.imported, 2)], []);
+  assert.equal(getLineStringById(lookup, 0xffffffff), null);
+  assert.deepEqual([...getLineStringById(lookup, 0)], []);
+  assert.equal(getLineStringById(lookup, 41), undefined);
   assert.equal(new SharedList('number').pushMany(importedLane).set(2, 8).get(2), 8);
   for (const [index, packed] of workerData.exports.entries()) {
     const table = toGeoArrowTable(packed);

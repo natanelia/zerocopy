@@ -1,14 +1,14 @@
 import { tableFromIPC, tableToIPC } from 'apache-arrow';
 import { toGeoArrowTable } from '../dist/geoarrow.js';
-import { lineStringViewXY, pathIntersectsBoxXY } from '../dist/geometry.js';
-import { querySpatialIndex } from '../dist/spatial.js';
+import { pathIntersectsBoxXY } from '../dist/geometry.js';
+import { getLineStringById, querySpatialIndex } from '../dist/spatial.js';
 import { SharedList } from '../dist/shared.js';
 
 self.onmessage = ({ data }) => {
-  if ('row' in data) {
-    const original = lineStringViewXY(data.batch, data.row)!;
+  if ('lookup' in data) {
+    const original = getLineStringById(data.lookup, data.id)!;
     const visible = querySpatialIndex(data.index, data.box).filter(id =>
-      pathIntersectsBoxXY(lineStringViewXY(data.batch, data.ids.indexOf(id))!, data.box));
+      pathIntersectsBoxXY(getLineStringById(data.lookup, id)!, data.box));
     const edited = new SharedList('number').pushMany(original).set(2, 9);
     self.postMessage({ original, visible, edited: edited.toFloat64Array() });
     return;

@@ -35,7 +35,8 @@ self.onmessage = async ({ data }) => {
     }
     if (data.base) base = data.base;
     if (data.tile) {
-      if (tile || !data.tile.every(p => p.coordinates.buffer instanceof SharedArrayBuffer &&
+      if (tile || !(data.tile.ids.buffer instanceof SharedArrayBuffer) ||
+          !data.tile.batches.every(p => p.coordinates.buffer instanceof SharedArrayBuffer &&
           p.offsets.buffer instanceof SharedArrayBuffer)) throw new Error('Expected one shared tile attachment');
       tile = data.tile;
     }

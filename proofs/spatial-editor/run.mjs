@@ -35,6 +35,7 @@ if (readerCounts.some(n => ![1, 4, 8].includes(n)) || trials.some(n => ![0, 1, 2
 }
 const config = smoke ? { count: 128, vertices: 24, steps: 40, warmup: 0, transport, rebuild, uploads, source } :
   { count: 4096, vertices: 256, steps: soak ? 1024 : 64, warmup: 16, transport, rebuild, uploads, source };
+if (source === 'geoarrow') config.tileLayout = smoke ? 'sparse' : 'ordered';
 if (trace) config.trace = true;
 const timeoutMs = Number(option('timeout-ms') ?? Math.max(180000, config.steps * 1000));
 if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > 2147483647) throw new Error('Invalid --timeout-ms');
@@ -59,7 +60,7 @@ async function browserPss(pid) {
 }
 
 const html = '<!doctype html><canvas width="320" height="200"></canvas>';
-const tile = source === 'geoarrow' ? encodeTile(config.count, config.vertices) : undefined;
+const tile = source === 'geoarrow' ? encodeTile(config.count, config.vertices, config.tileLayout) : undefined;
 const dir = await mkdtemp(join(tmpdir(), 'zerocopy-spatial-editor-'));
 const server = createServer(async (req, res) => {
   const js = ['/editor.js', '/reader.js'].includes(req.url);

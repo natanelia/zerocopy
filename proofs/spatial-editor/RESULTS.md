@@ -60,7 +60,9 @@ the measured one-reader rotation encountered a timeout and a renderer
 crash before its missing cases were rerun. The table uses only completed,
 untraced trials. PSS measures resident pages and excludes swapped pages.
 A physical GPU remains necessary to judge interactive frame latency.
-[Raw samples from all 27 browsers](results/geoarrow-editor.json.gz) · [Replay instructions](README.md#open-and-edit-a-geoarrow-tile)
+These measurements used the ordered fixture and a direct ordinal-to-row
+lookup. The current replay uses the shared handle directory for arbitrary
+row order. [Measured source](https://github.com/natanelia/zerocopy/tree/7d04eeeb9f61e3a6656910f7d44ed1f80c1bbe45/proofs/spatial-editor) · [Raw samples from all 27 browsers](results/geoarrow-editor.json.gz) · [Replay instructions](README.md#open-and-edit-a-geoarrow-tile)
 
 ## Updating one vertex on the GPU
 
