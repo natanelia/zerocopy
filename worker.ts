@@ -48,6 +48,8 @@ export interface SharedReader<T extends SharedShape<T>> {
   readonly version: number;
   readonly closed: boolean;
   getSnapshot(): T;
+  /** Capture this exact session publication, or return undefined if it has already passed. */
+  snapshotAt(version: number, options?: { signal?: AbortSignal }): Promise<T | undefined>;
   subscribe(listener: (snapshot: T, version: number) => void): () => void;
   snapshots(options?: SnapshotStreamOptions): AsyncIterableIterator<T>;
   dispose(): void;
@@ -319,11 +321,35 @@ class Reader<T extends SharedShape<T>> implements SharedReader<T> {
   private disposed = false;
   private readonly listeners = new Set<(snapshot: T, version: number) => void>();
   private readonly endings = new Set<(error?: Error) => void>();
+  private readonly versionWaiters = new Set<{
+    version: number;
+    settle(snapshot?: T, error?: Error): void;
+  }>();
   constructor(private readonly closeTransport: () => void, private readonly onError?: SessionOptions['onError']) {}
   get current(): T { if (this.disposed || this.state === undefined) throw new Error('Shared reader is not open'); return this.state; }
   get version(): number { return this.sequence; }
   get closed(): boolean { return this.disposed; }
   getSnapshot = (): T => this.current;
+  snapshotAt(version: number, { signal }: { signal?: AbortSignal } = {}): Promise<T | undefined> {
+    if (!Number.isSafeInteger(version) || version < 0) return Promise.reject(new RangeError('Expected a nonnegative safe session version'));
+    if (signal?.aborted) return Promise.reject(errorOf(signal.reason ?? 'Snapshot wait aborted'));
+    if (this.disposed) return Promise.reject(new Error('Shared state reader closed'));
+    if (version <= this.sequence) return Promise.resolve(version === this.sequence ? this.current : undefined);
+    return new Promise<T | undefined>((resolve, reject) => {
+      const waiter = {
+        version,
+        settle: (snapshot?: T, error?: Error) => {
+          this.versionWaiters.delete(waiter);
+          signal?.removeEventListener('abort', abort);
+          if (error) reject(error);
+          else resolve(snapshot);
+        },
+      };
+      const abort = () => waiter.settle(undefined, errorOf(signal?.reason ?? 'Snapshot wait aborted'));
+      this.versionWaiters.add(waiter);
+      signal?.addEventListener('abort', abort, { once: true });
+    });
+  }
   subscribe = (listener: (snapshot: T, version: number) => void): (() => void) => {
     if (this.disposed) throw new Error('Shared reader is closed');
     this.listeners.add(listener); return () => { this.listeners.delete(listener); };
@@ -331,11 +357,19 @@ class Reader<T extends SharedShape<T>> implements SharedReader<T> {
   accept(value: T, version: number): void {
     if (this.disposed) return;
     this.state = value; this.sequence = version;
+    // Capture this publication before a subscriber can dispose the reader.
+    for (const waiter of this.versionWaiters) {
+      if (waiter.version <= version) waiter.settle(waiter.version === version ? value : undefined);
+    }
     notify(this.listeners, value, version, this.onError);
   }
   finish(error?: Error): void {
     if (this.disposed) return;
     this.disposed = true;
+    if (this.versionWaiters.size) {
+      const reason = error ?? new Error('Shared state reader closed');
+      for (const waiter of this.versionWaiters) waiter.settle(undefined, reason);
+    }
     for (const end of [...this.endings]) end(error);
     this.endings.clear(); this.listeners.clear(); this.state = undefined;
   }

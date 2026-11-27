@@ -256,6 +256,53 @@ describe('shared state and session protocol', () => {
     state.publish(state.current.set('x', 1)); state.publish(state.current.set('x', 2)); state.publish(state.current.set('x', 3));
     await drain(); expect(seen).toEqual([1, 2, 3]);
   });
+  it('pairs an exact publication with its retained row and geometry roots across coalesced edits', async () => {
+    const { state, reader } = await setup({ rows: new SharedMap('number'), xy: new SharedList('number') });
+    const initial = reader.current;
+    expect(await reader.snapshotAt(0)).toBe(initial);
+    const first = reader.snapshotAt(1), again = reader.snapshotAt(1);
+    const skipped = reader.snapshotAt(2), last = reader.snapshotAt(3);
+    for (const revision of [1, 2, 3]) {
+      state.publish({ rows: state.current.rows.set('lane', revision), xy: state.current.xy.push(revision * 10) });
+    }
+    await drain();
+    const before = (await first)!;
+    expect(await again).toBe(before);
+    expect(before.rows.get('lane')).toBe(1);
+    expect(before.xy.toArray()).toEqual([10]);
+    expect(await skipped).toBeUndefined();
+    expect(await reader.snapshotAt(1)).toBeUndefined();
+    expect(await last).toBe(reader.current);
+    expect(reader.current.xy.toArray()).toEqual([10, 20, 30]);
+    expect(initial.rows.size).toBe(0);
+  });
+  it('captures the matching roots before a subscriber can close the reader', async () => {
+    const { state, reader } = await setup(new SharedMap('number'));
+    reader.subscribe(() => reader.dispose());
+    const captured = reader.snapshotAt(1);
+    const missed = expect(reader.snapshotAt(2)).rejects.toThrow(/closed/);
+    state.publish(state.current.set('lane', 4));
+    await missed;
+    expect((await captured)!.get('lane')).toBe(4);
+    await expect(reader.snapshotAt(1)).rejects.toThrow(/closed/);
+  });
+  it('rejects invalid versions, cancels one wait and releases pending waits on remote closure', async () => {
+    const { state, reader } = await setup(new SharedMap('number'));
+    for (const version of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      await expect(reader.snapshotAt(version)).rejects.toThrow(RangeError);
+    }
+    const abort = new AbortController(), reason = new Error('obsolete viewport');
+    const cancelled = reader.snapshotAt(1, { signal: abort.signal });
+    const retained = reader.snapshotAt(1);
+    abort.abort(reason);
+    await expect(cancelled).rejects.toBe(reason);
+    await expect(reader.snapshotAt(0, { signal: abort.signal })).rejects.toBe(reason);
+    state.publish(state.current.set('lane', 8));
+    expect((await retained)!.get('lane')).toBe(8);
+    const pending = expect(reader.snapshotAt(2)).rejects.toThrow(/closed/);
+    state.dispose();
+    await pending;
+  });
   it('reports queue overflow instead of silently dropping all-mode snapshots', async () => {
     const errors: Error[] = [];
     const { state, pair } = await setup(new SharedMap('number'), { delivery: 'all', maxPending: 1, onError: error => errors.push(error) });

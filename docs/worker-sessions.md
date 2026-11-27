@@ -136,6 +136,40 @@ Here `shared` is a connected reader and `process` is application code. The strea
 
 Use `{ strategy: 'all', capacity: 32 }` for a bounded queue of every received snapshot. Iterator overflow rejects rather than silently dropping data. `signal` cancels the stream, not the source. `break`, `return()`, abort, and reader disposal release the stream subscription. Call `next()` sequentially.
 
+### Read the publication named by a job
+
+When a job carries a spatial index or other data from one edit, send the
+session version returned when the owner publishes the corresponding roots.
+
+```ts
+const version = session.publish({ rows, paths, changes });
+worker.postMessage({ version, base, viewport, requestId });
+```
+
+On the worker, `snapshotAt` captures the exact group of roots as soon as it
+arrives. Keep that value for the duration of the job. If latest delivery
+coalesces the requested version, or the reader has already advanced beyond
+it, the result is `undefined`. The caller can finish an obsolete request
+without searching the wrong tile.
+
+```ts
+const snapshot = await reader.snapshotAt(job.version);
+if (snapshot === undefined) {
+  self.postMessage({ requestId: job.requestId, skipped: true });
+} else {
+  const ids = querySpatialIndex(job.base, job.viewport, snapshot.changes);
+  self.postMessage({ requestId: job.requestId, ids });
+}
+```
+
+Here `base` is an immutable spatial index from the same tile history and
+`querySpatialIndex` comes from `zerocopy/spatial`. Session versions belong
+to a single session. Use `requestId` to distinguish pans or jobs that
+share a publication. A future version can take arbitrarily long to arrive.
+Pass `{ signal }` to cancel an individual wait. A disconnect or transport
+failure rejects outstanding waits. Only snapshots retained by the caller
+remain available after the reader advances.
+
 ## Manual and one-shot use
 
 `createSharedSession(initial)` supports manual `publish(next)`. Connect endpoints before publication. For a one-shot send, use `shareWithWorker(endpoint, value)` on the sender and `receiveShared<State>()` on the reader. Returned collection handles retain their arenas after the one-shot session closes.

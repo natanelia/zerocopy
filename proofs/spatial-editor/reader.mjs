@@ -16,15 +16,9 @@ self.onmessage = async ({ data }) => {
       return;
     }
     if (data.sequence !== undefined) {
-      if (session.version < data.sequence) {
-        await new Promise(resolve => {
-          const unsubscribe = session.subscribe((_, version) => {
-            if (version >= data.sequence) { unsubscribe(); resolve(); }
-          });
-        });
-      }
-      if (session.version !== data.sequence) throw new Error('Validation missed its requested publication');
-      snapshot = session.current;
+      const requested = await session.snapshotAt(data.sequence);
+      if (!requested) throw new Error('Validation missed its requested publication');
+      snapshot = requested;
     }
     if (data.release) {
       const { path, row, revision, request } = held;

@@ -47,6 +47,7 @@ it('automatically publishes confirmed rows to a worker that skips intermediate r
       version: 4, latest: true, sameMemory: true, original: first,
       changes: [{ type: 'update', key: 'north', before: first, after: { ...first, revision: 2 } }],
     });
+    expect(await request({ version: 2 })).toEqual({ skipped: 2 });
   } finally {
     close(); await lanes.cleanup();
   }

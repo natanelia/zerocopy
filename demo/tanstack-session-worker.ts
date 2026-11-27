@@ -11,18 +11,13 @@ self.onmessage = async ({ data }) => {
       self.postMessage({ revision: initial.get('north').revision });
       return;
     }
-    if (reader.version < data.version) {
-      await new Promise(resolve => {
-        const stop = reader.subscribe((_, version) => {
-          if (version >= data.version) { stop(); resolve(undefined); }
-        });
-      });
-    }
+    const requested = await reader.snapshotAt(data.version);
+    if (!requested) { self.postMessage({ skipped: data.version }); return; }
     // Pull once after several confirmations. Latest delivery coalesces the queue.
     const { value: rows } = await snapshots.next();
     const memory = map => getWorkerData({ map }, { copy: false }).arenas[0].memory;
     self.postMessage({
-      version: reader.version, latest: rows === reader.current, sameMemory: memory(rows) === memory(initial),
+      version: reader.version, latest: rows === requested && rows === reader.current, sameMemory: memory(rows) === memory(initial),
       changes: [...rows.changesSince(initial)], original: initial.get('north'),
     });
   } catch (error) { self.postMessage({ error: String(error) }); }

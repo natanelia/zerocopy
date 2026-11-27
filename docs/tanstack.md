@@ -157,10 +157,11 @@ after.get('north')?.revision;  // 1
 Stage changed geometry before confirming an edit. After success, publish the row
 map and its matching geometry together, for example with one
 `state.update(() => ({ rows: after, geometry: stagedGeometry }))`. A failed
-edit discards the staged handles. Include the application revision and viewport
-request ID in worker jobs so the UI can discard obsolete results. Configure
-one adapter per collection and serialize application commands that replace the
-same geometry. [State sessions](worker-sessions.md).
+edit discards the staged handles. Pass the session version to a worker that
+needs exactly those roots, and include the viewport request ID so the UI can
+discard obsolete results. [Read a specific publication](worker-sessions.md#read-the-publication-named-by-a-job).
+Configure one adapter per collection and serialize application commands that
+replace the same geometry. [State sessions](worker-sessions.md).
 
 ## Live viewport membership
 

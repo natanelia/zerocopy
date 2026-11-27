@@ -333,11 +333,8 @@ async function atRevision<S extends SharedShape<S>>(reader: SharedReader<S>, rev
         throw new Error('Shared state reader closed');
     if (revision === undefined || reader.version >= revision)
         return reader.current;
-    const snapshots = reader.snapshots({ emitCurrent: false, signal });
-    for await (const value of snapshots)
-        if (reader.version >= revision)
-            return value;
-    throw new Error('Shared state reader closed');
+    const requested = await reader.snapshotAt(revision, { signal });
+    return requested ?? reader.current;
 }
 /** Serve trusted task clients; each invocation retains one reader snapshot. */
 export async function serve<T extends TaskSet<any>, S extends SharedShape<S> = StateFor<T>>(tasks: T, options: ServeOptions = {}): Promise<() => void> {

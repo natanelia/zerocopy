@@ -39,6 +39,18 @@ describe('typed task executors',()=>{
     state.update('map',map=>map.set('lane',2));
     expect(await result).toEqual([1,1]);
   });
+  it('lets a minimum-version job run on the next delivered version when its own is skipped', async () => {
+    const { a, b } = pair(), state = createSharedState<Model>({ map: new SharedMap('number') });
+    cleanup.push(() => state.dispose());
+    cleanup.push(await serve(tasks, { endpoint: b }));
+    const executor = await connect<typeof tasks, Model>(a, { state });
+    cleanup.push(() => executor.dispose());
+    const reads = [1, 2, 3].map(version => {
+      state.update('map', map => map.set('lane', version));
+      return executor.run.get('lane');
+    });
+    expect(await Promise.all(reads)).toEqual([1, 3, 3]);
+  });
   it('schedules work across borrowed pool endpoints and keeps input order',async()=>{
     const one=pair(),two=pair(),state=createSharedState<Model>({map:new SharedMap('number').set('a',1).set('b',2)});
     cleanup.push(()=>state.dispose());
