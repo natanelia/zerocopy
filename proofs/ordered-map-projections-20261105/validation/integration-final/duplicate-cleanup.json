@@ -1,0 +1,12 @@
+[
+  {
+    "path": "proofs/ordered-map-projections-20261105/rejected-v1/source/map-projection.test.ts",
+    "sha256": "ce29b4b663e01d7eb3ed4eb567bb6711d95e15c6cc135cca337476f70b796c97",
+    "savedAs": "proofs/ordered-map-projections-20261105/rejected-v1/source/map-projection.test.ts.txt"
+  },
+  {
+    "path": "proofs/ordered-map-projections-20261105/rejected-v1/source/ordered-map-projections.test.ts",
+    "sha256": "9e25c6c3d84fec5f30ef45a2a30e0d400bf57e9abb995642a969c1e0ff367916",
+    "savedAs": "proofs/ordered-map-projections-20261105/rejected-v1/source/ordered-map-projections.test.ts.txt"
+  }
+]

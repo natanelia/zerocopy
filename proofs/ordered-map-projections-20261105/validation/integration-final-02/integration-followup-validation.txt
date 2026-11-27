@@ -1,0 +1,6 @@
+
+$ bun run test
+$ bun --bun node_modules/vitest/vitest.mjs run
+
+ RUN  v4.1.11 /workspace/scratch/83f1d4baba1f/zerocopy-r3-integration
+
