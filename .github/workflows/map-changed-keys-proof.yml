@@ -1,0 +1,90 @@
+name: Map changed keys paired proof (temporary)
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'shared-map.ts'
+      - 'map-changed-keys.test.ts'
+      - 'proofs/map-changed-keys-paired-20261125.mjs'
+      - '.github/workflows/map-changed-keys-proof.yml'
+permissions:
+  contents: read
+concurrency:
+  group: map-changed-keys-proof-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  proof:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/map-changed-keys-20261125'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 76ab6b53aa0d3b40202720ca12d9fcc904716cf2
+          path: _baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: _candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - name: Build both pinned sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/map-changed-keys"
+          mkdir -p "$out"
+          test "$(git -C _baseline rev-parse HEAD)" = "76ab6b53aa0d3b40202720ca12d9fcc904716cf2"
+          test "$(git -C _candidate rev-parse HEAD)" = "$(git rev-parse HEAD)"
+          cmp _candidate/package.json _baseline/package.json
+          bun install
+          {
+            echo "baseline=$(git -C _baseline rev-parse HEAD)"
+            echo "candidate=$(git -C _candidate rev-parse HEAD)"
+            node --version
+            bun --version
+            rustc --version
+            uname -a
+            lscpu
+            sha256sum proofs/map-changed-keys-paired-20261125.mjs
+            if [ -f bun.lock ]; then sha256sum bun.lock; fi
+          } > "$out/environment.txt"
+          if [ -f bun.lock ]; then cp bun.lock "$out/"; fi
+          for build in _baseline _candidate; do
+            ln -s "$GITHUB_WORKSPACE/node_modules" "$build/node_modules"
+            (
+              cd "$build"
+              bun run build:wasm
+              bun run build:browser
+              npm --prefix website install --ignore-scripts --no-package-lock
+              SITE_COMMIT="$(git rev-parse HEAD)" node website/build.mjs
+              sha256sum dist/*.js *.wasm website/node_modules/marked/lib/marked.esm.js
+            ) 2>&1 | tee "$out/$build.log"
+          done
+          cmp _baseline/website/node_modules/marked/lib/marked.esm.js _candidate/website/node_modules/marked/lib/marked.esm.js
+      - name: Focused runtime correctness
+        run: cd _candidate && bun run typecheck && bun run test map-changed-keys.test.ts
+      - name: Install browsers
+        run: bunx playwright install --with-deps chromium firefox
+      - name: Paired baseline scan versus candidate API with exact issue oracle
+        run: timeout --signal=TERM --kill-after=15s 2100s node proofs/map-changed-keys-paired-20261125.mjs _baseline _candidate "$RUNNER_TEMP/map-changed-keys/paired.json" 11
+      - name: Retain raw proof
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-changed-keys-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/map-changed-keys/
+          retention-days: 30
+          if-no-files-found: warn
