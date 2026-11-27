@@ -4,7 +4,7 @@ import {compileSchema} from './schema-runtime.mjs';
 import {key,matches,validate} from './lane-fixture.mjs';
 const table=compileSchema({id:'number',kind:'number',active:'boolean',left:'number',bottom:'number',right:'number',top:'number',xy:'number[]'},key);
 const typed=m=>m.startsWith('schema-');
-export const build=(m,rows)=>typed(m)?table.build(rows):base.build(m,rows);
+export const build=(m,rows)=>m==='schema-packed'?table.buildPacked(rows):typed(m)?table.build(rows):base.build(m,rows);
 export const edit=(m,o,b)=>typed(m)?table.edit(o,b):base.edit(m,o,b);
 export const get=(m,s,id)=>typed(m)?table.get(s,id):base.get(m,s,id);
 export const size=(m,s)=>typed(m)?table.size(s):base.size(m,s);

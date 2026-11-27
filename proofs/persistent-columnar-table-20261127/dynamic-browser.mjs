@@ -19,7 +19,7 @@ const server=createServer((req,res)=>{
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url='http://127.0.0.1:'+server.address().port,report={engine,n,rounds,revisions,retention,pattern,cpu:cpus()[0]?.model,rows:[]};
-const modes=['json-direct','append','append-control','schema-append','schema-append-control'];
+const modes=['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
   for(let round=-1;round<rounds;round++){
     const offset=(round+1)%modes.length,order=[...modes.slice(offset),...modes.slice(0,offset)];if(round%2===1)order.reverse();

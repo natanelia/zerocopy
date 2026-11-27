@@ -33,3 +33,18 @@ test('invalid rows and duplicate operations fail without changing existing snaps
   assert.throws(()=>schema.edit(old,{remove:['missing'],upsert:[]}),/deletion/);
   assert.deepEqual(schema.get(old,a.id),a);
 });
+
+test('packed ingestion is equivalent to original build across types, nulls, empty rows, subsequent edits and retained roots',async()=>{
+  const rows=[a,b,c],old=schema.buildPacked(rows),original=schema.build(rows);
+  const reader=await schema.attach(structuredClone(schema.wire(old)));
+  for(const row of rows){assert.deepEqual(schema.get(old,row.id),schema.get(original,row.id));assert.deepEqual(schema.get(reader,row.id),row);}
+  const change={remove:['b'],upsert:[[a.id,{...a,value:4,xy:[-0,8]}],['d',{...c,id:'d',xy:[]}]]};
+  const next=schema.edit(old,change),expected=schema.edit(original,change);
+  for(const id of [a.id,'b','c','d'])assert.deepEqual(schema.get(next,id),schema.get(expected,id));
+  assert.deepEqual(schema.get(reader,a.id),a);
+  assert.equal(schema.size(schema.buildPacked([])),0);
+  assert.throws(()=>schema.buildPacked([a,a]),/duplicate/);
+  assert.throws(()=>schema.buildPacked([a,{...b,xy:[NaN]}]),TypeError);
+  const collision=compileSchema({id:'string'},()=> 'same');
+  assert.throws(()=>collision.buildPacked([{id:'a'},{id:'b'}]),/duplicate/);
+});

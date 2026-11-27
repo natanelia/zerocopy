@@ -94,6 +94,37 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     return {index,columns};
   }
   const build=rows=>edit(empty(),{remove:[],upsert:rows.map(r=>[r.id,r])});
+  // Cold ingestion: validate before persistent allocation, pre-size numeric
+  // payloads, then construct columns directly rather than through edit plans.
+  // Keep the old build as an exact same-layout control.
+  function buildPacked(rows){
+    const n=rows.length,seen=new Set(),entries=new Array(n),lengths={};
+    for(const f of fields)if(f.kind==='number[]')lengths[f.root]=0;
+    for(let i=0;i<n;i++){
+      const row=rows[i],k=checkRow(row.id,row);
+      if(seen.has(k))throw Error('duplicate operation');seen.add(k);entries[i]=[k,i];
+      for(const f of fields)if(f.kind==='number[]'&&row[f.name]!==null){
+        const length=lengths[f.root]+row[f.name].length;
+        if(!Number.isSafeInteger(length))throw RangeError('array capacity');
+        lengths[f.root]=length;
+      }
+    }
+    const values=Object.fromEntries(roots.map(r=>[r,kinds[r]==='number'?new Float64Array(r.endsWith('a')?lengths[r.slice(0,-1)]:n):new Array(n)]));
+    values.occupied.fill(true);
+    for(const f of fields){
+      const r=f.root;let at=0;
+      for(let i=0;i<n;i++){
+        const v=rows[i][f.name],present=v!==null;
+        if(f.nullable)values[r+'p'][i]=present;
+        if(f.kind==='number[]'){
+          const a=present?v:[];values[r][i]=at;values[r+'n'][i]=a.length;
+          for(let j=0;j<a.length;j++)values[r+'a'][at++]=number(a[j]);
+        }else values[r][i]=present?(f.kind==='number'?number(v):v):f.kind==='number'?0:f.kind==='boolean'?false:'';
+      }
+    }
+    const columns=Object.fromEntries(roots.map(r=>[r,new SharedList(kinds[r]).pushMany(values[r])]));
+    return {index:new SharedMap('number').setMany(entries),columns};
+  }
   function wire(s){return {signature,data:getWorkerData({index:s.index,...s.columns},{copy:false})};}
   async function attach(p,previous){
     if(p.signature!==signature)throw TypeError('schema mismatch');
@@ -102,6 +133,6 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     for(const r of roots){if(!columns[r]||columns[r].type!==kinds[r]||(!r.endsWith('a')&&columns[r].size!==n))throw Error('column shape mismatch');}
     return {attached,index:attached.index,columns};
   }
-  return {build,edit,get,rowAt,readAt,slotCount,isLive,wire,attach,size:s=>s.index.size,
+  return {build,buildPacked,edit,get,rowAt,readAt,slotCount,isLive,wire,attach,size:s=>s.index.size,
     arenaUsage:s=>wire(s).data.arenas.map(a=>({id:a.id,used:a.used,capacity:a.memory.buffer.byteLength}))};
 }

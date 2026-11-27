@@ -90,7 +90,7 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
     return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
-      p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
+      p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
       initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
   }finally{for(const w of workers)w.terminate();}
 }

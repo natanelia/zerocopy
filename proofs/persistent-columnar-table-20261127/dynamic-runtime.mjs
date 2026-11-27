@@ -117,6 +117,7 @@ export function scan(mode,s,q){
     const c=s.columns;
     for(let i=0;i<c.id.size;i++){
       if(!c.occupied.get(i)||!c.active.get(i)||c.kind.get(i)!==q.kind)continue;
+      if(mode==='append-predicate'&&(c.left.get(i)>q.right||c.right.get(i)<q.left||c.bottom.get(i)>q.top||c.top.get(i)<q.bottom))continue;
       const m=slotMeta(s,i);if(matches(m,q))out.push(validate(materialize(s,m)));
     }
   }
