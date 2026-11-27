@@ -1,7 +1,8 @@
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
+import { arenaOf } from './arena.ts';
 import { buildLineStringIndex, buildLineStringLookup, getLineStringById, buildSpatialIndex, querySpatialIndex, querySpatialJoin, diffSpatialJoin, applySpatialEdits, prepareSpatialQuery, pruneSpatialEdits, rebuildSpatialIndex, type SpatialBoundsChange } from './spatial.ts';
 import { lineStringViewXY, pathIntersectsBoxXY } from './geometry';
-import { getWorkerData, initWorker } from './shared.ts';
+import { getWorkerData, initWorker, resetMap } from './shared.ts';
 
 const box = [0, 0, 2, 2] as const;
 const far = [10, 10, 12, 12] as const;
@@ -224,6 +225,70 @@ it('rebuilds an empty or fully deleted tile and reuses packed buffers for absorb
   expect(querySpatialIndex(added, box)).toEqual([0xffffffff]);
 });
 
+it('installs a captured rebuild while retaining later moves, reinsertions and tombstones', async () => {
+  const base = buildSpatialIndex([{ id: 1, bounds: box }, { id: 2, bounds: far }]);
+  const captured = applySpatialEdits(undefined, 10, Array.from({ length: 512 }, (_, id) => ({
+    id, bounds: id % 2 ? far : null,
+  })));
+  const rebuilt = rebuildSpatialIndex(base, captured, 10);
+  const moved = applySpatialEdits(captured, 11, [{ id: 1, bounds: box }, { id: 2, bounds: box }]);
+  const live = applySpatialEdits(moved, 12, [{ id: 1, bounds: null }, { id: 0xffffffff, bounds: far }]);
+  const arena = arenaOf(live), reads = vi.spyOn(arena, 'leafValue');
+  let pruned: typeof live;
+  try {
+    pruned = pruneSpatialEdits(live, 10, captured);
+    expect(reads.mock.calls.length).toBeLessThan(32);
+  } finally { reads.mockRestore(); }
+  expect(pruned.size).toBe(3);
+  expect(pruned.get('1')).toEqual({ revision: 12, bounds: null });
+  expect(pruned.get('2')).toEqual({ revision: 11, bounds: box });
+  expect(pruned.get('4294967295')).toEqual({ revision: 12, bounds: far });
+  for (const key of pruned.keys()) expect(arena.find(pruned.root, key)).toBe(arena.find(live.root, key));
+  for (const viewport of [box, far]) {
+    expect(querySpatialIndex(rebuilt, viewport, pruned)).toEqual(querySpatialIndex(base, viewport, live));
+  }
+  const used = () => getWorkerData({ live }, { copy: false }).arenas[0].used;
+  const before = used();
+  expect(pruneSpatialEdits(captured, 10, captured).size).toBe(0);
+  expect(used()).toBe(before);
+  expect(pruneSpatialEdits(pruned, 10, captured)).toBe(pruned);
+  expect(captured.size).toBe(512);
+  expect(captured.get('1')?.bounds).toEqual(far);
+  const wire = getWorkerData({ pruned, captured }, { copy: false });
+  expect(wire.arenas).toHaveLength(1);
+  const reader = await initWorker(wire);
+  expect(reader.pruned.get('1')).toEqual(pruned.get('1'));
+  expect(pruneSpatialEdits(reader.pruned, 10, reader.captured)).toBe(reader.pruned);
+  expect(() => pruneSpatialEdits(reader.pruned, 11, reader.captured)).toThrow(/read-only/);
+});
+
+it('keeps newer collision-bucket leaves and handles a stale minimum after overwrite', () => {
+  // The decimal keys of these two feature IDs have the same 32-bit FNV-1a hash.
+  const left = 2624876701, right = 4111686543;
+  const first = applySpatialEdits(undefined, 5, [{ id: left, bounds: box }, { id: right, bounds: far }]);
+  const second = applySpatialEdits(first, 6, [{ id: left, bounds: null }]);
+  const pruned = pruneSpatialEdits(second, 5, first);
+  expect([...pruned.entries()]).toEqual([[String(left), { revision: 6, bounds: null }]]);
+  const third = applySpatialEdits(second, 7, [{ id: right, bounds: box }]);
+  expect(pruneSpatialEdits(third, 5, first)).toBe(third);
+});
+
+it('treats an unrelated, future, untracked or foreign rebuild capture only as a hint', () => {
+  const captured = applySpatialEdits(undefined, 5, [{ id: 7, bounds: box }, { id: 99, bounds: far }]);
+  const branch = applySpatialEdits(captured, 8, [{ id: 1, bounds: far }]);
+  const future = applySpatialEdits(captured, 15, [{ id: 7, bounds: null }, { id: 8, bounds: far }]);
+  // Historical batches on distinct IDs need not be applied in revision order.
+  const current = applySpatialEdits(future, 9, [{ id: 99, bounds: box }]);
+  const untracked = current.set('44', { revision: 20, bounds: null });
+  resetMap();
+  const foreign = applySpatialEdits(undefined, 5, [{ id: 7, bounds: far }]);
+  for (const hint of [undefined, branch, future, untracked, foreign]) {
+    const actual = pruneSpatialEdits(untracked, 10, hint);
+    expect([...actual.keys()].sort()).toEqual(['44', '7', '8']);
+    expect(actual.get('7')).toEqual({ revision: 15, bounds: null });
+  }
+});
+
 it('handles an empty base, empty overlay, repeated edits, and conflicting retries', () => {
   const empty = buildSpatialIndex([]);
   expect(querySpatialIndex(structuredClone(empty), box)).toEqual([]);
@@ -282,11 +347,16 @@ it('agrees with a scan across sparse edits, retained snapshots and repeated inde
   for (let id = 0; id < 200; id++) rows.set(id, rect());
   const build = (r: number) => buildSpatialIndex(Array.from(rows, ([id, bounds]) => ({ id, bounds })), r);
   let base = build(0), changes = applySpatialEdits(undefined, 0, []);
+  let captured = changes, replacement = base;
   for (let r = 1; r <= 300; r++) {
     const id = random(250), bounds = r % 7 ? rect() : null;
     if (bounds) rows.set(id, bounds); else rows.delete(id);
     changes = applySpatialEdits(changes, r, [{ id, bounds }]);
-    if (r % 43 === 0) { base = rebuildSpatialIndex(base, changes, r); changes = pruneSpatialEdits(changes, r); }
+    if (r % 43 === 35) { captured = changes; replacement = rebuildSpatialIndex(base, captured, r); }
+    if (r % 43 === 0) {
+      base = replacement;
+      changes = pruneSpatialEdits(changes, base.revision, captured);
+    }
     const box = rect();
     const expected = [...rows].filter(([, b]) => Math.max(b[0], box[0]) <= Math.min(b[2], box[2]) &&
       Math.max(b[1], box[1]) <= Math.min(b[3], box[3])).map(([id]) => id).sort((a,b) => a-b);

@@ -1,5 +1,6 @@
 import Flatbush from 'flatbush';
 import { SharedMap } from './shared-map.ts';
+import { arenaOf } from './arena.ts';
 import { json, type JsonType } from './types.ts';
 import { checkBounds, packedBoundsXY, type BoundsXY } from './xy-bounds.ts';
 import { lineStringPresent } from './line-string-buffers.ts';
@@ -36,6 +37,9 @@ function checkRevision(revision: number): void {
 }
 
 const trees = new WeakMap<SpatialIndex, Flatbush>();
+// Bounds on every revision in this immutable owner map. An overwritten
+// minimum may stay below the true minimum, which only costs a scan.
+const revisionRanges = new WeakMap<SpatialChanges, { min: number; max: number }>();
 
 function finishIndex(tree: Flatbush | undefined, ids: Uint32Array<SharedArrayBuffer>, revision: number): SpatialIndex {
   tree?.finish();
@@ -118,7 +122,13 @@ export function applySpatialEdits(previous: SpatialChanges | undefined, revision
     }
     writes.push([key, change]);
   }
-  return changes.setMany(writes);
+  if (!writes.length) return changes;
+  const next = changes.setMany(writes);
+  const range = revisionRanges.get(changes);
+  if (!changes.size || range) revisionRanges.set(next, {
+    min: Math.min(range?.min ?? revision, revision), max: Math.max(range?.max ?? revision, revision),
+  });
+  return next;
 }
 
 function treeFor(base: SpatialIndex): Flatbush | undefined {
@@ -383,10 +393,39 @@ export function diffSpatialJoin(previous: SpatialJoinFrame, next: SpatialJoinFra
   return { added: added.sort(pairOrder), removed: removed.sort(pairOrder) };
 }
 
-/** Drop overlay entries already incorporated into the replacement base from the same tile history. */
-export function pruneSpatialEdits(changes: SpatialChanges, baseRevision: number): SpatialChanges {
+/** Drop absorbed edits. Pass the worker's captured overlay to skip identical subtrees on the owner. */
+export function pruneSpatialEdits(changes: SpatialChanges, baseRevision: number, captured?: SpatialChanges): SpatialChanges {
   checkRevision(baseRevision);
-  const obsolete: string[] = [];
-  for (const [key, edit] of changes.entries()) if (edit.revision <= baseRevision) obsolete.push(key);
-  return obsolete.length ? changes.deleteMany(obsolete) : changes;
+  if (!changes.size) return changes;
+  const range = revisionRanges.get(changes);
+  if (range && range.min > baseRevision) return changes;
+  const arena = arenaOf(changes);
+  if (range && range.max <= baseRevision) {
+    arena.assertWritable();
+    return new SharedMap(changes.valueType, 0, 0, arena);
+  }
+  // A small capture is cheaper to drop by key than rebuilding a mostly live map.
+  const covered = captured && captured.size * 2 >= changes.size && arenaOf(captured) === arena
+    && (revisionRanges.get(captured)?.max ?? Infinity) <= baseRevision
+    ? captured.root : 0;
+  const keep: number[] = [], drop: number[] = [];
+  let min = Infinity, max = 0;
+  for (const leaf of covered ? arena.uncoveredMapLeaves(changes.root, covered) : arena.leaves(changes.root)) {
+    const edit: SpatialChange = arena.leafValue(changes.valueType, leaf);
+    if (edit.revision <= baseRevision) {
+      if (!covered) drop.push(leaf);
+    } else {
+      keep.push(leaf);
+      min = Math.min(min, edit.revision);
+      max = Math.max(max, edit.revision);
+    }
+  }
+  if (keep.length === changes.size) return changes;
+  // Retain immutable leaf records. With an uncaptured overlay and few expired
+  // keys, deleting those keys shares more branches with the original map.
+  const next = !covered && drop.length < keep.length
+    ? changes.deleteMany(drop.map(leaf => arena.leafKey(leaf)))
+    : new SharedMap(changes.valueType, arena.mergeMapLeaves(0, keep), keep.length, arena);
+  if (next.size) revisionRanges.set(next, { min, max });
+  return next;
 }

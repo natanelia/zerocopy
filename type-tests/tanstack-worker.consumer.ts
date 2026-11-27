@@ -51,6 +51,8 @@ querySpatialIndex(structuredClone(prepared), [0, 0, 2, 3]);
 querySpatialIndex(prepared, [0, 0, 2, 3], edits);
 void rebuilt;
 pruneSpatialEdits(edits, 1);
+const latest = applySpatialEdits(edits, 2, [{ id: 17, bounds: [1, 1, 3, 4] }]);
+querySpatialIndex(rebuilt, [0, 0, 2, 3], pruneSpatialEdits(latest, rebuilt.revision, edits));
 void candidates;
 // @ts-expect-error Spatial feature handles are unsigned integers.
 buildSpatialIndex([{ id: 'lane', bounds: [0, 0, 2, 3] }]);

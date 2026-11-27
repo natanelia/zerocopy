@@ -17,6 +17,27 @@ one point took a median 0.0074 ms incrementally and 2.95 ms for a full join.
 Moving all 4,096 points took 8.90 ms incrementally and 3.24 ms for a full
 join. [Environment, source checksums and raw samples](results/join-edits-node26.json)
 
+To measure the owner's work after a rebuilt index arrives, run
+`node proofs/spatial-editor/prune-edits.mjs` or `bun proofs/spatial-editor/prune-edits.mjs`
+after the browser build. The worker's input contains 16,384 edits. While the
+rebuild runs, the owner can move, insert or delete more features. The benchmark
+times pruning the latest edit map through the captured revision. Each sample
+checks the surviving records and a retained snapshot.
+
+| Newer edits | Node scan and delete | Node prune with capture | Bun scan and delete | Bun prune with capture | Shared bytes allocated, scan and delete / prune with capture |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 38.54 ms | 0.015 ms | 48.43 ms | 0.011 ms | 852,560 / 0 |
+| 8 | 33.13 ms | 0.130 ms | 41.48 ms | 0.125 ms | 853,756 / 40 |
+| 8,192 | 37.87 ms | 20.89 ms | 52.32 ms | 28.72 ms | 606,068 / 93,332 |
+
+Times are the median of three fresh-process medians on Node 26.13.1 and
+Bun 1.4.2. Each process rotated the methods over two warmup and seven measured
+rounds on the same synthetic data. With eight newer edits, the two-argument
+`pruneSpatialEdits` took 22.02 ms on Node and 35.50 ms on Bun, allocating
+40 shared bytes. Passing the capture also skips reading unchanged map branches.
+The timer excludes index construction, worker messages, rendering and result
+validation. Shared bytes measure growth of the writer's arena. [Source checksums and raw trials](results/prune-edits.json)
+
 To measure the initial index build for an imported tile, run
 `node proofs/spatial-editor/packed-index.mjs` or `bun proofs/spatial-editor/packed-index.mjs`
 after the browser build. The fixture has 4,096 synthetic lanes of 64 vertices

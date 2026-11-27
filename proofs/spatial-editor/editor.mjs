@@ -72,7 +72,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
     .innerJoin({ lane: lanes }, ({ v, lane }) => eq(v.id, lane.id))
     .select(({ lane }) => ({ id: lane.id, revision: lane.revision })));
   const sub = query.subscribeChanges(() => {});
-  let revision = 0, box = west, rebuilding;
+  let revision = 0, box = west, rebuilding, capturedChanges;
   const samples = [];
   const nativeRows = shared ? undefined : new Map(initialData.map(row => [row.id, row]));
   const rows = () => shared ? options.getSnapshot() : nativeRows;
@@ -104,12 +104,16 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       const started = performance.now();
       const cmd = step < 0 ? { box: west } : edit(step, vertices);
       let newBase, patch, rebuiltChanges, rebuildMs;
-      if (step >= 0 && step % 16 === 0) rebuilding = peers[0].send({ rebuild, revision });
+      if (step >= 0 && step % 16 === 0) {
+        if (shared) capturedChanges = changes;
+        rebuilding = peers[0].send({ rebuild, revision });
+      }
       if (step >= 0 && step % 16 === 2) {
         ({ base: newBase, rebuildMs } = await rebuilding);
         // Edits newer than the worker's input revision survive the swap.
-        if (shared) changes = pruneSpatialEdits(changes, newBase.revision);
+        if (shared) changes = pruneSpatialEdits(changes, newBase.revision, capturedChanges);
         else for (const [id, change] of changes) if (change.revision <= newBase.revision) changes.delete(id);
+        capturedChanges = undefined;
         base = newBase;
         if (!shared) rebuiltChanges = new Map(changes);
       }

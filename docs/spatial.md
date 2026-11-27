@@ -209,7 +209,7 @@ incomplete, or a filter change can affect pairs outside the listed IDs.
   that revision. Capture the overlay when scheduling the job, since later
   edits may overwrite an earlier change for the same ID. If the overlay
   has no newer entries, the result reuses the base's buffers.
-- `pruneSpatialEdits(changes, baseRevision)` removes entries incorporated by
+- `pruneSpatialEdits(changes, baseRevision, capturedChanges?)` removes entries incorporated by
   a replacement index. If a worker builds a base from revision 10 while the
   owner advances to 12, install that base with the current change map pruned
   through 10. Keep revisions, base and changes from the same tile history.
@@ -228,6 +228,26 @@ postMessage(rebuilt);
 On the owner, install a returned base only if its tile is still active and its
 revision is at least as recent as the installed base. Pair it with the latest
 overlay pruned through the returned revision. An older job can finish last.
+Keep the owner's original edit-map handle alongside the job. Pass it as the
+third argument when the worker returns.
+
+```ts
+import { pruneSpatialEdits } from 'zerocopy/spatial';
+
+const remaining = pruneSpatialEdits(currentChanges, rebuilt.revision, capturedChanges);
+// Publish the pair together so that moves and tombstones stay in effect.
+const next = { base: rebuilt, changes: remaining };
+```
+
+The owner skips immutable branches shared with the captured map and retains
+the encoded records for later edits. If every edit in a tracked map has been
+absorbed, pruning returns an empty map in the same arena without allocating
+shared bytes. The two-argument call also works. When the capture is from
+another arena or its revision bound is unknown, pruning checks the live map.
+With 16,384 captured edits and eight later edits, pruning with the capture
+took a median 0.13 ms in Node and allocated 40 shared bytes. The previous
+scan and delete took 33.13 ms and allocated 853,756 shared bytes on the same
+fixture. [Pruning workload and measurements](../proofs/spatial-editor/README.md)
 
 The direct map query scans every unpruned change. Preparing the edits moves
 that work to publication time. A full rebuild folds them into a single tree

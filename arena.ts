@@ -836,6 +836,28 @@ export class Arena {
       for (let i = count - 1; i >= 0; i--) stack.push(dv.getUint32(p + (dense ? 8 : 16) + i * 4, true));
     }
   }
+  // Both roots belong to this arena. Equal pointers cover an entire immutable
+  // subtree. A change of node shape can yield extra leaves for the caller to check.
+  *uncoveredMapLeaves(root: number, covered: number): Generator<number> {
+    if (!root || root === covered) return;
+    const view = this.dv;
+    const branch = (node: number) => {
+      if (!node) return false;
+      const tag = view.getUint32(node, true);
+      return tag !== 0xffffffff && ((tag & 3) === 1 || (tag & 0x80000000) !== 0);
+    };
+    if (branch(root) && branch(covered)) {
+      for (let digit = 0; digit < 16; digit++) {
+        const child = this.wasm.mapChild(root, digit) >>> 0;
+        if (!child) continue;
+        const previous = this.wasm.mapChild(covered, digit) >>> 0;
+        if (child !== previous) yield* this.uncoveredMapLeaves(child, previous);
+      }
+    } else {
+      yield* this.leaves(root);
+    }
+  }
+
   bulk(type: string, root: number, entries: readonly (readonly [string, any])[]): number {
     this.assertWritable();
     if (!entries.length) return root;
@@ -889,8 +911,15 @@ export class Arena {
     }
     const leaves: number[] = latest.size >= 64 ? this.packedLeaves(type, latest) : [];
     if (latest.size < 64) for (const [key, value] of latest) leaves.push(this.leaf(type, key, value));
+    return this.mergeMapLeaves(root, leaves);
+  }
+
+  // Leaves are already encoded in this arena. Only new branch nodes are needed.
+  mergeMapLeaves(root: number, leaves: readonly number[]): number {
+    this.assertWritable();
+    if (!leaves.length) return root;
     // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
-    const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
+    const input = leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
   }
