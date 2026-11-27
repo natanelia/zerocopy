@@ -172,10 +172,12 @@ for (const type of ['string', 'object']) {
     const next = old.setMany(emptyIterator as any);
     expect(requests).toEqual([0]); expect(next).not.toBe(old); expect(next.root).not.toBe(old.root);
     expect(logical(next)).toEqual(oldValues); expect(payload(a, end)).toEqual(before);
+    expect([...next.changesSince(old)]).toEqual([]);
     record(`zero/journal/${type}`, a, { root: next.root, requests: [...requests] });
     const changed = old.setMany(Array.from({ length: 5 }, (_, i) => [key(i), type === 'string' ? 'changed' : { changed: true }]) as any);
     expect(rows[rows.length - 1].requests).toEqual([0]);
     expect(changed.size).toBe(17); expect(logical(old)).toEqual(oldValues); expect(payload(a, end)).toEqual(before);
+    expect([...changed.changesSince(old)].map(change => change.key).sort()).toEqual(Array.from({ length: 5 }, (_, i) => key(i)).sort());
     const b = new Arena(), base = fresh(type, b).setMany(Array.from({ length: 64 }, (_, i) => [key(i), type === 'string' ? 'v' : {}]) as any);
     const overlay = base.set(key(0), (type === 'string' ? 'w' : { w: true }) as never), tag = b.dv.getUint32(overlay.root, true);
     expect(tag).not.toBe(0xffffffff); expect(tag >>> 31).toBe(1);

@@ -165,7 +165,8 @@ job and register the promise immediately.
 
 ```ts
 const version = visible.utils.getVersion();
-const delta = worker.computeViewportChanges(viewport, editsSincePublication);
+const roots = getWorkerData({ previousRows, currentRows }, { copy: false });
+const delta = worker.computeViewportChanges(viewport, roots);
 const applied = await visible.utils.applyVisibleChanges(delta, version);
 ```
 
@@ -179,6 +180,26 @@ Use the newer accepted result, or run a full search if the matching edit
 history is unavailable. The version belongs to the membership collection.
 Keep the corresponding map revision and viewport with the worker request.
 [Compute viewport changes](spatial.md#update-a-fixed-viewport-after-an-edit)
+
+In the worker, attach the two confirmed snapshots and compare them. This also
+works when the worker skips revisions. A long-lived shared session can retain
+the snapshot for the accepted viewport and compare it with the next one it
+receives. In this example each row stores a stable numeric handle and its
+bounding box.
+
+```ts
+const { previousRows, currentRows } = await initWorker(roots);
+const edits = Array.from(currentRows.changesSince(previousRows), change => ({
+  id: change.type === 'delete' ? change.before.handle : change.after.handle,
+  before: change.before?.bounds ?? null,
+  after: change.after?.bounds ?? null,
+}));
+return diffSpatialViewport(viewport, edits);
+```
+
+If exact geometry or other filter inputs live outside the row, update the row's
+revision in the same edit. The change then reaches the filter even when its
+bounding box stays the same. [Compare map snapshots](api.md#compare-map-snapshots)
 
 ## Live spatial joins
 

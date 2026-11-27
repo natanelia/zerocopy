@@ -29,6 +29,11 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     expect(initial.get('north')).toEqual(first);
 
     const committed = options.getSnapshot();
+    const north = { type: 'update', key: 'north', before: first, after: { ...first, revision: 1 } };
+    expect([...committed.changesSince(initial)]).toHaveLength(2);
+    expect([...committed.changesSince(initial)]).toEqual(expect.arrayContaining([
+      north, { type: 'insert', key: 'south', before: undefined, after: { id: 'south', revision: 1 } },
+    ]));
     const rejected = createTransaction({
       autoCommit: false,
       mutationFn: async () => { throw new Error('Invalid geometry'); },
@@ -41,6 +46,7 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
 
     await lanes.delete('south').when('settled');
     expect(options.getSnapshot().has('south')).toBe(false);
+    expect([...options.getSnapshot().changesSince(initial)]).toEqual([north]);
     await lanes.cleanup();
     await lanes.preload();
     expect(lanes.get('north')?.revision).toBe(1);

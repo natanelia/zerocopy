@@ -6,7 +6,7 @@ import type { SpatialViewportDelta } from '../spatial.ts';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from '../dist/tanstack-db-collection.js';
 
 it('attaches confirmed rows and geometry from the same edit in a browser worker', async () => {
-  const firstRow = { id: 'lane', revision: 0, style: { color: 'black', width: 2 } };
+  const firstRow = { id: 'lane', handle: 7, bounds: [0, 0, 2, 3], revision: 0, style: { color: 'black', width: 2 } };
   const options = sharedCollectionConfig({ id: 'lanes', initialData: [firstRow] });
   const lanes = createCollection(options);
   const overlaps = createCollection(spatialJoinCollectionConfig({ id: 'lane-road-overlaps' }));
@@ -43,11 +43,11 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
     color.mutate(() => lanes.update('lane', lane => { lane.style.color = 'red'; }));
     const tx = createTransaction({ autoCommit: false,
       mutationFn: ({ transaction }) => options.utils.acceptMutations(transaction) });
-    tx.mutate(() => lanes.update('lane', lane => { lane.revision = 1; lane.style.width = 6; }));
+    tx.mutate(() => lanes.update('lane', lane => { lane.revision = 1; lane.bounds[0] = -12; lane.style.width = 6; }));
     expect(lanes.get('lane')?.revision).toBe(1);
     expect(await read(initial)).toEqual({ first: before, current: before, delta: empty, viewportDelta: empty });
     await tx.commit();
-    const after = { row: { id: 'lane', revision: 1, style: { color: 'black', width: 6 } }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
+    const after = { row: { ...firstRow, bounds: [-12, 0, 2, 3], revision: 1, style: { color: 'black', width: 6 } }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
       preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true, narrowPairs: [[7, 23]] };
     const reply = read(geometry, edits);
     const published = overlaps.utils.applyPairChanges(reply.then(({ delta }) => delta), version);

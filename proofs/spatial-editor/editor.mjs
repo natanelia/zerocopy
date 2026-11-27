@@ -122,9 +122,10 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         await visible.utils.setVisibleIds(viewportFor(shared, base, changes, box));
       } else {
         const { id } = cmd;
-        const before = rows().get(id)?.bounds ?? null;
+        const previousRows = rows();
+        const previousBounds = shared ? null : previousRows.get(id)?.bounds ?? null;
         const version = visible.utils.getVersion();
-        const old = currentPaths(paths, tile, rows()).get(id);
+        const old = currentPaths(paths, tile, previousRows).get(id);
         let next, xy;
         if (!cmd.remove) {
           if (cmd.path) { xy = cmd.path; next = toPath(xy); }
@@ -169,7 +170,10 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
           patch = cmd.moveX !== undefined || cmd.moveY !== undefined
             ? { id, row, axis: cmd.moveY === undefined ? 0 : 1, coordinate: cmd.moveX ?? cmd.moveY, change }
             : { id, row, path: next, change };
-          const delta = diffSpatialViewport(box, [{ id: Number(id), before, after: change.bounds }]);
+          const edits = shared ? Array.from(rows().changesSince(previousRows), ({ key, before, after }) => ({
+            id: Number(key), before: before?.bounds ?? null, after: after?.bounds ?? null,
+          })) : [{ id: Number(id), before: previousBounds, after: change.bounds }];
+          const delta = diffSpatialViewport(box, edits);
           const applied = await visible.utils.applyVisibleChanges({
             added: delta.added.map(String), removed: delta.removed.map(String),
           }, version);

@@ -27,7 +27,10 @@ self.onmessage = async ({ data }) => {
         narrowPairs: querySpatialJoin(prepared, data.roadIndex, frame(state, prepared)),
       };
     };
-    const edits = [{ id: 7, before: bboxXY(first.geometry), after: bboxXY(current.geometry) }];
+    const edits = [];
+    for (const { before, after } of current.rows.changesSince(first.rows)) {
+      edits.push({ id: (after ?? before).handle, before: before?.bounds ?? null, after: after?.bounds ?? null });
+    }
     const delta = diffSpatialJoin(frame(first, firstPrepared), frame(current, data.prepared), { left: edits });
     const viewportDelta = diffSpatialViewport(narrow, edits, (_, phase) =>
       pathIntersectsBoxXY(phase === 'before' ? first.geometry : current.geometry, narrow));

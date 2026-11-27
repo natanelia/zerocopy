@@ -24,6 +24,27 @@ export function attachToBufferCopy(copy: Uint8Array, state: { heapEnd: number })
 }
 
 export type ValueType = import('./types').ValueType;
+export type SharedMapChange<V> =
+  | { readonly type: 'insert'; readonly key: string; readonly before: undefined; readonly after: V }
+  | { readonly type: 'update'; readonly key: string; readonly before: V; readonly after: V }
+  | { readonly type: 'delete'; readonly key: string; readonly before: V; readonly after: undefined };
+
+function equalLeafValues(type: string, a: DataView, leafA: number, b: DataView, leafB: number): boolean {
+  const length = a.getUint32(leafA + 12, true);
+  if (length !== b.getUint32(leafB + 12, true)) return false;
+  const startA = leafA + 16 + a.getUint32(leafA + 8, true);
+  const startB = leafB + 16 + b.getUint32(leafB + 8, true);
+  if (type === 'number') return Object.is(a.getFloat64(startA, true), b.getFloat64(startB, true));
+  let i = 0;
+  for (; i + 4 <= length; i += 4) {
+    if (a.getUint32(startA + i, true) !== b.getUint32(startB + i, true)) return false;
+  }
+  for (; i < length; i++) {
+    if (a.getUint8(startA + i) !== b.getUint8(startB + i)) return false;
+  }
+  return true;
+}
+
 export function getUsedBytes(): number { return current ? current.used - 65536 : 0; }
 /** @deprecated Reachable snapshots are never disposed by update-count heuristics. */
 export function configureAutoGC(_options: { enabled?: boolean; memoryThreshold?: number; opsThreshold?: number }): void {}
@@ -76,6 +97,34 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     if (!this.root) return;
     const a = this.arena, view = a.dv;
     for (const leaf of a.leaves(this.root)) yield [a.leafKey(leaf, view), a.leafValue(this.valueType, leaf, 0, view)];
+  }
+  /** Net changes since another snapshot with the same value codec. Immutable shared branches are skipped. */
+  *changesSince(previous: SharedMap<T>): Generator<SharedMapChange<ValueOf<T>>, void> {
+    if (!(previous instanceof SharedMap) || previous.valueType !== this.valueType) {
+      throw new TypeError('Map changes require two SharedMap snapshots with the same value type');
+    }
+    const current = this.arena, prior = previous.arena;
+    // Independent copies can have the same arena ID and numeric addresses.
+    const shared = current.memory === prior.memory;
+    if (shared && this.root === previous.root) return;
+    const view = current.dv, oldView = prior.dv;
+    for (const leaf of current.uncoveredMapLeaves(this.root, shared ? previous.root : 0)) {
+      const key = current.leafKey(leaf, view);
+      const old = prior.find(previous.root, key);
+      if (!old) {
+        yield { type: 'insert', key, before: undefined, after: current.leafValue(this.valueType, leaf, 0, view) };
+      } else if (!(shared && old === leaf) && !equalLeafValues(this.valueType, view, leaf, oldView, old)) {
+        yield { type: 'update', key,
+          before: prior.leafValue(this.valueType, old, 0, oldView),
+          after: current.leafValue(this.valueType, leaf, 0, view) };
+      }
+    }
+    for (const old of prior.uncoveredMapLeaves(previous.root, shared ? this.root : 0)) {
+      const key = prior.leafKey(old, oldView);
+      if (!current.find(this.root, key)) {
+        yield { type: 'delete', key, before: prior.leafValue(this.valueType, old, 0, oldView), after: undefined };
+      }
+    }
   }
   *keys(): Generator<string> {
     if (!this.root) return;

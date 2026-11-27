@@ -37,6 +37,24 @@ rendering are outside the timer. Replacing the full result was faster in
 the dense case, where every point crossed the viewport edge.
 [Source checksums and raw timings](results/viewport-edits-node.json)
 
+To measure how a worker recovers edits from two retained row snapshots, run
+`node proofs/spatial-editor/row-changes.mjs` after the browser build. It uses
+16,384 synthetic rows with stable IDs, revisions and bounds. The edits include
+insertions, deletions and rows updated twice while the reader is behind.
+
+| Net changed rows | Shared snapshot diff | Independent copied snapshot diff | Full scan checking row revisions |
+| ---: | ---: | ---: | ---: |
+| 0 | 0.009 ms | 17.8 ms | 64.3 ms |
+| 8 | 0.075 ms | 16.0 ms | 63.4 ms |
+| 4,096 | 17.7 ms | 27.0 ms | 68.9 ms |
+
+Each cell is the median of three fresh-process medians on Node 26.13.1.
+All three methods materialize complete changes inside a worker. The full
+scan compares row revision numbers and checks for deleted keys. The copied
+snapshots must compare values across independent memories. Snapshot creation,
+transport, result validation, UI publication and drawing are outside the
+timer. [Source checksums and raw timings](results/row-changes-node.json)
+
 To measure the owner's work after a rebuilt index arrives, run
 `node proofs/spatial-editor/prune-edits.mjs` or `bun proofs/spatial-editor/prune-edits.mjs`
 after the browser build. The worker's input contains 16,384 edits. While the

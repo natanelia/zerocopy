@@ -28,11 +28,13 @@ try {
   // in a second installation below, after verifying the peer-free entry points.
   const imports = Object.keys(pkg.exports).filter(path => path !== './geoarrow').map(path => path === '.' ? pkg.name : pkg.name + path.slice(1));
   const smoke = `import assert from 'node:assert/strict';
-import { SharedList } from 'zerocopy';
+import { SharedList, SharedMap } from 'zerocopy';
 import { lineStringViewXY, packLineStringsXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
 import { buildLineStringIndex, buildSpatialIndex, applySpatialEdits, prepareSpatialQuery, querySpatialIndex, rebuildSpatialIndex } from 'zerocopy/spatial';
 const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 2, 3] }]);
 const path = new SharedList('number').pushMany([0, 0, 2, 3]);
+const rows = new SharedMap('number').set('lane', 1);
+assert.deepEqual([...rows.set('lane', 2).changesSince(rows)], [{ type: 'update', key: 'lane', before: 1, after: 2 }]);
 const paths = packLineStringsXY([null, path]);
 assert.deepEqual([...paths.offsets], [0, 0, 2]);
 assert.deepEqual(querySpatialIndex(buildLineStringIndex([{ paths, ids: [6, 7] }]), [0, 2, 0, 3]), [7]);
