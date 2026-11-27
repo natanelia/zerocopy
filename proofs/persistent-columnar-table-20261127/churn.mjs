@@ -8,6 +8,8 @@ import {performance} from 'node:perf_hooks';
 import {cpus} from 'node:os';
 import {SharedMap,SharedList,getWorkerData,initWorker} from '../../dist/shared.js';
 import {ColumnTable} from './table.mjs';
+import {ColumnTable as PagedTable} from './table-paged.mjs';
+const tableClass=mode=>mode.endsWith('-paged')?PagedTable:ColumnTable;
 const schema={x:'float64',y:'float64',speed:'uint8',kind:'uint8',active:'boolean'};
 const fields=Object.keys(schema), widths=[8,8,1,1,1];
 const key=i=> (i%31===0?'道路/':'lane/')+((Math.imul(i,2654435761)>>>0).toString(36))+'/'+i;
@@ -21,7 +23,7 @@ function build(mode,rows){
   if(isJSON(mode))return {map:new SharedMap('object').setMany(rows.map((r,i)=>[key(i),r]))};
   if(mode==='native')return {map:new Map(rows.map((r,i)=>[key(i),r]))};
   const index=new SharedMap('number').setMany(rows.map((_,i)=>[key(i),i]));
-  if(isTable(mode))return {index,table:ColumnTable.fromRows(schema,rows,{blockRows:Number(mode.split('-')[1])})};
+  if(isTable(mode))return {index,table:tableClass(mode).fromRows(schema,rows,{blockRows:Number(mode.split('-')[1])})};
   return {index,columns:Object.fromEntries(fields.map(f=>[f,new SharedList(schema[f]==='boolean'?'boolean':'number').pushMany(rows.map(r=>r[f]))]))};
 }
 function edit(mode,owner,edits){
@@ -44,18 +46,30 @@ function footprint(mode,p){
 function attribution(prev,next){
   const a=prev.table.descriptor(),b=next.table.descriptor(),blocks=Math.ceil(a.rows/a.blockRows),slots=blocks*fields.length;
   if(a.root===b.root)return {directory:0,blocks:0,changedBlocks:0,padding:0};
-  const before=new Uint32Array(a.memory.buffer,a.root,slots),after=new Uint32Array(b.memory.buffer,b.root,slots);
+  let directory=slots*4;
+  function addresses(d){
+    if(d.format==='column-proof-v0')return new Uint32Array(d.memory.buffer,d.root,slots);
+    const top=new Uint32Array(d.memory.buffer,d.root,Math.ceil(slots/64)),out=new Uint32Array(slots);
+    for(let i=0;i<top.length;i++)out.set(new Uint32Array(d.memory.buffer,top[i],Math.min(64,slots-i*64)),i*64);
+    return out;
+  }
+  if(a.format==='column-proof-paged-v0'){
+    const x=new Uint32Array(a.memory.buffer,a.root,Math.ceil(slots/64)),y=new Uint32Array(b.memory.buffer,b.root,x.length);
+    directory=y.byteLength;
+    for(let i=0;i<x.length;i++)if(x[i]!==y[i])directory+=Math.min(64,slots-i*64)*4;
+  }
+  const before=addresses(a),after=addresses(b);
   let data=0,changedBlocks=0;
   for(let j=0;j<slots;j++)if(before[j]!==after[j]){
     const c=Math.floor(j/blocks),i=j%blocks;data+=widths[c]*Math.min(a.blockRows,a.rows-i*a.blockRows);changedBlocks++;
   }
-  const directory=slots*4,padding=b.used-a.used-directory-data;
+  const padding=b.used-a.used-directory-data;
   assert(padding>=0);return {directory,blocks:data,changedBlocks,padding};
 }
 async function attach(mode,p,previous){
   if(mode==='native'){for(const r of p.map.values())Object.freeze(r);return p;}
   const attached=await initWorker(p.data,{previous:previous?.attached});
-  if(isTable(mode))return {attached,index:attached.index,table:ColumnTable.attach(p.table)};
+  if(isTable(mode))return {attached,index:attached.index,table:tableClass(mode).attach(p.table)};
   if(isJSON(mode))return {attached,map:attached.map};
   return {attached,index:attached.index,columns:Object.fromEntries(fields.map(f=>[f,attached[f]]))};
 }
@@ -141,7 +155,7 @@ if(!isMainThread){
 }else{
   const [out='churn-results.json',pattern='single',roundArg='5']=process.argv.slice(2);
   assert(['single','clustered','spread'].includes(pattern));const rounds=Number(roundArg),n=100000;
-  const modes=['json-direct','json-control','lists','table-32','table-256','table-256-control','table-1024','native'];
+  const modes=['json-direct','json-control','lists','table-32','table-32-control','table-256','table-32-paged','table-256-paged'];
   const report={base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',jsonControl:'172839f20b24392d96ba21723fd300efa2e5ee8b',
     node:process.version,cpu:cpus()[0].model,pattern,rounds,n,modes,rows:[]};
   const quantile=(xs,q)=>{const a=[...xs].sort((a,b)=>a-b);return a[Math.ceil(a.length*q)-1];};
