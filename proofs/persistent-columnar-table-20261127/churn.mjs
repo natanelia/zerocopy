@@ -9,7 +9,8 @@ import {cpus} from 'node:os';
 import {SharedMap,SharedList,getWorkerData,initWorker} from '../../dist/shared.js';
 import {ColumnTable} from './table.mjs';
 import {ColumnTable as PagedTable} from './table-paged.mjs';
-const tableClass=mode=>mode.endsWith('-paged')?PagedTable:ColumnTable;
+import {ColumnTable as FastPagedTable} from './table-paged-fast.mjs';
+const tableClass=mode=>mode.includes('-fast-paged')?FastPagedTable:mode.endsWith('-paged')?PagedTable:ColumnTable;
 const schema={x:'float64',y:'float64',speed:'uint8',kind:'uint8',active:'boolean'};
 const fields=Object.keys(schema), widths=[8,8,1,1,1];
 const key=i=> (i%31===0?'道路/':'lane/')+((Math.imul(i,2654435761)>>>0).toString(36))+'/'+i;
@@ -155,8 +156,8 @@ if(!isMainThread){
 }else{
   const [out='churn-results.json',pattern='single',roundArg='5']=process.argv.slice(2);
   assert(['single','clustered','spread'].includes(pattern));const rounds=Number(roundArg),n=100000;
-  const modes=['json-direct','json-control','lists','table-32','table-32-control','table-256','table-32-paged','table-256-paged'];
-  const report={base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',jsonControl:'172839f20b24392d96ba21723fd300efa2e5ee8b',
+  const modes=['lists','table-32-paged','table-32-control-paged','table-256-paged','table-32-fast-paged','table-256-fast-paged','table-32','table-256'];
+  const report={previousPagedHead:'1d9383ff69410fefc523b28fd26cbe4a8ac175d8',base:'84ad23a76ee197f45cbc7316017f28b5bbe93d6c',jsonControl:'172839f20b24392d96ba21723fd300efa2e5ee8b',
     node:process.version,cpu:cpus()[0].model,pattern,rounds,n,modes,rows:[]};
   const quantile=(xs,q)=>{const a=[...xs].sort((a,b)=>a-b);return a[Math.ceil(a.length*q)-1];};
   for(let round=-1;round<rounds;round++){
@@ -172,6 +173,8 @@ if(!isMainThread){
         p95EditToAnswerMs:quantile(e.map(v=>v.editToAnswerMs),.95),
         p95PointOnlyMs:quantile(e.filter(v=>!v.scan).map(v=>v.editToAnswerMs),.95),
         p95ScanMs:quantile(e.filter(v=>v.scan).map(v=>v.editToAnswerMs),.95),
+        sumAttachMs:sum('attachMs'),sumPointMs:sum('pointMs'),sumScanMs:sum('scanMs'),
+        p95AttachMs:quantile(e.map(v=>v.attachMs),.95),p95LocalPointMs:quantile(e.map(v=>v.pointMs),.95),p95LocalScanMs:quantile(e.filter(v=>v.scan).map(v=>v.scanMs),.95),
         initial,final,allocation,peakBeforeVerificationRSSKiB:run.peakBeforeVerificationRSSKiB,verified:run.verified}));
     }
   }

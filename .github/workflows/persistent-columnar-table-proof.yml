@@ -1,4 +1,4 @@
-name: Persistent columnar paged directory churn proof (proof only)
+name: Persistent columnar full validation and address lookup (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -40,8 +40,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build:wasm && bun run build:browser
       - name: Verify persistent column semantics
-        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs
-      - name: Paired paged directory qualification
+        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs proofs/persistent-columnar-table-20261127/table-paged.test.mjs proofs/persistent-columnar-table-20261127/table-paged-fast.test.mjs
+      - name: Paired full-validation and address qualification
         shell: bash
         run: |
           set -euo pipefail
@@ -49,11 +49,11 @@ jobs:
           git rev-parse HEAD | tee columnar-results/commit.txt
           node --version | tee columnar-results/node.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/churn.mjs columnar-results/results.json ${{ matrix.pattern }} 5 | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/churn.mjs columnar-results/results.json ${{ matrix.pattern }} 7 | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-paged-${{ matrix.pattern }}-${{ github.run_id }}
+          name: columnar-paged-fast-${{ matrix.pattern }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn
