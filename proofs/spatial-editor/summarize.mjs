@@ -12,14 +12,16 @@ const reports = inputs.map(path => {
   return JSON.parse(path.endsWith('.gz') ? gunzipSync(buffer) : buffer);
 });
 const first = reports[0];
+const firstRebuildStep = first.config.firstRebuildStep ?? 0;
 const fromArrow = first.config.source === 'geoarrow';
 const allModes = fromArrow ? ['copy', 'shared', 'packed'] : ['copy', 'shared'];
 if (selectedMode && !allModes.includes(selectedMode)) throw new Error('Unsupported mode: ' + selectedMode);
 const modes = selectedMode ? [selectedMode] : allModes;
 if (fromArrow) assert.match(first.tileSHA256, /^[a-f0-9]{64}$/, 'Missing IPC fixture digest');
 if (first.config.ipc !== undefined) assert(fromArrow && ['stream', 'buffered'].includes(first.config.ipc), 'Unknown IPC loader');
+if (first.config.readerQuery !== undefined) assert(['direct', 'cursor'].includes(first.config.readerQuery), 'Unknown reader query');
 for (const report of reports) {
-  for (const key of ['bundleSHA256', 'tileSHA256', 'config', 'chromium', 'hardware', 'platform', 'frameTimingVersion', 'graphics']) {
+  for (const key of ['bundleSHA256', 'tileSHA256', 'config', 'tanstack', 'chromium', 'hardware', 'platform', 'frameTimingVersion', 'graphics']) {
     assert.deepEqual(report[key], first[key], 'Mixed benchmark inputs: ' + key);
   }
 }
@@ -28,6 +30,10 @@ assert.equal(cases.length, 3 * modes.length * readerCounts.length, 'Three trials
 function median(values) {
   const sorted = values.toSorted((a, b) => a - b);
   return (sorted[Math.floor((sorted.length - 1) / 2)] + sorted[Math.floor(sorted.length / 2)]) / 2;
+}
+function p95(samples, key) {
+  const sorted = samples.map(s => s[key]).sort((a, b) => a - b);
+  return sorted[Math.ceil(sorted.length * .95) - 1];
 }
 const summary = [];
 const version = first.frameTimingVersion;
@@ -46,6 +52,12 @@ for (const readers of readerCounts) {
     assert.deepEqual(matching.map(c => c.trial).sort(), [0, 1, 2]);
     for (const c of matching) {
       assert.equal(c.samples.length, first.config.steps);
+      if (first.config.pendingImport) {
+        const { initialBaseEntries, initialOverlayRows } = c.startup;
+        assert(initialOverlayRows > 0 && initialBaseEntries > 0 && initialOverlayRows + initialBaseEntries === first.config.count);
+        assert(c.samples.some(s => s.step < firstRebuildStep && s.overlayRows >= initialOverlayRows), 'Missing pending import');
+        assert(c.samples.some(s => s.step >= firstRebuildStep + 2 && s.overlayRows < initialOverlayRows), 'Missing absorbed import');
+      }
       if (fromArrow) {
         const { readyMs, initialIndexMs, loadPathsAndRowsMs, initialPathEntries } = c.startup;
         for (const ms of [readyMs, initialIndexMs, loadPathsAndRowsMs]) assert(Number.isFinite(ms) && ms >= 0);
@@ -62,7 +74,11 @@ for (const readers of readerCounts) {
       }
       for (const [index, s] of c.samples.entries()) {
         assert.equal(s.step, index + first.config.warmup);
-        if (first.config.rebuild && s.step % 16 === 2) {
+        if (first.config.readerQuery) {
+          assert(Number.isFinite(s.maxReaderQueryMs) && s.maxReaderQueryMs >= 0, 'Missing reader query time');
+          assert(Number.isSafeInteger(s.overlayRows) && s.overlayRows >= 0, 'Invalid overlay size');
+        }
+        if (first.config.rebuild && s.step >= firstRebuildStep && s.step % 16 === 2) {
           assert(Number.isFinite(s.rebuildMs) && s.rebuildMs >= 0, 'Missing worker rebuild time');
         }
         for (const key of ['frameMs', 'validationMs', 'drawAndFinishMs', 'packMs', 'uploadBytes', 'uploadCallMs']) {
@@ -82,8 +98,7 @@ for (const readers of readerCounts) {
         }
       }
       for (const [metric, key] of [['p95FrameMs', 'frameMs'], ['p95ValidationMs', 'validationMs']]) {
-        const sorted = c.samples.map(s => s[key]).sort((a,b) => a-b);
-        assert.equal(c[metric], sorted[Math.ceil(sorted.length * .95) - 1]);
+        assert.equal(c[metric], p95(c.samples, key));
       }
       if (hasPss) {
         assert(c.pss.length > 1 && c.pss.every(([, kib]) => kib > 0), 'Linux PSS samples required');
@@ -98,6 +113,20 @@ for (const readers of readerCounts) {
       p95FrameMs: median(matching.map(c => c.p95FrameMs)),
       p95ValidationMs: median(matching.map(c => c.p95ValidationMs)),
     };
+    if (first.config.readerQuery) {
+      row[mode].p95MaxReaderQueryMs = median(matching.map(c => p95(c.samples, 'maxReaderQueryMs')));
+      row[mode].maxOverlayRows = Math.max(...matching.flatMap(c => c.samples.map(s => s.overlayRows)));
+      if (first.config.pendingImport) {
+        const installedAt = firstRebuildStep + 2;
+        for (const phase of ['beforeInstall', 'afterInstall']) {
+          const groups = matching.map(c => c.samples.filter(s => phase === 'beforeInstall' ? s.step < installedAt : s.step >= installedAt));
+          row[mode][phase] = {
+            medianQueryMs: median(groups.map(samples => median(samples.map(s => s.maxReaderQueryMs)))),
+            p95QueryMs: median(groups.map(samples => p95(samples, 'maxReaderQueryMs'))),
+          };
+        }
+      }
+    }
     if (fromArrow) {
       if (first.config.ipc) {
         row[mode].firstBatchMs = median(matching.map(c => c.startup.firstBatchMs));
@@ -134,7 +163,7 @@ for (const readers of readerCounts) {
         afterDraw: 1 - Object.values(phaseShare).reduce((a, b) => a + b, 0) };
     }
     if (first.config.rebuild) {
-      const samples = matching.flatMap(c => c.samples);
+      const samples = matching.flatMap(c => c.samples.filter(s => s.step >= firstRebuildStep));
       row[mode].medianRebuildMs = median(samples.filter(s => s.step % 16 === 2).map(s => s.rebuildMs));
       row[mode].medianValidationAtRebuildStartMs = median(samples.filter(s => s.step % 16 === 0).map(s => s.validationMs));
     }

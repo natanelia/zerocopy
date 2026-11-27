@@ -1,12 +1,12 @@
 import { connectSharedSession } from '../../dist/worker.js';
 import { initWorker } from '../../dist/shared.js';
 import { bboxXY } from '../../dist/geometry.js';
-import { rebuildSpatialIndex } from '../../dist/spatial.js';
+import { createSpatialQueryCursor, rebuildSpatialIndex } from '../../dist/spatial.js';
 import { bounds } from './workload.mjs';
 import { baseFor, viewportFor } from './spatial.mjs';
 import { currentPaths } from './tile-paths.mjs';
 
-let session, snapshot, base, native, tile, first, held;
+let session, snapshot, base, native, tile, first, held, readerQuery, cursor;
 self.onmessage = async ({ data }) => {
   if (data.protocol === 'zerocopy/session') return;
   try {
@@ -27,7 +27,11 @@ self.onmessage = async ({ data }) => {
       held = undefined;
       return;
     }
-    if (data.base) base = data.base;
+    if (data.readerQuery) readerQuery = data.readerQuery;
+    if (data.base) {
+      base = data.base;
+      cursor = undefined;
+    }
     if (data.tile) {
       if (tile || !(data.tile.ids.buffer instanceof SharedArrayBuffer) ||
           !data.tile.batches.every(p => p.coordinates.buffer instanceof SharedArrayBuffer &&
@@ -69,12 +73,19 @@ self.onmessage = async ({ data }) => {
       throw new Error('Edited path and row disagree on presence');
     }
     const getBounds = snapshot ? bboxXY : bounds;
-    const visible = viewportFor(!!snapshot, base, changes, data.box);
+    const started = performance.now();
+    let visible;
+    if (readerQuery === 'cursor') {
+      cursor ??= createSpatialQueryCursor(base);
+      cursor.advance(changes, data.revision);
+      visible = cursor.search(data.box).map(String);
+    } else visible = viewportFor(!!snapshot, base, changes, data.box);
+    const queryMs = performance.now() - started;
     for (const id of visible) {
       const b = getBounds(geometry.get(id));
       if (String(b) !== String(rows.get(id).bounds)) throw new Error('Geometry/metadata revision mismatch');
     }
     if (String(getBounds(first.path)) !== String(first.row.bounds)) throw new Error('Retained geometry changed');
-    self.postMessage({ visible, request: data.request, revision: data.revision, generation: base.revision });
+    self.postMessage({ visible, queryMs, request: data.request, revision: data.revision, generation: base.revision });
   } catch (e) { self.postMessage({ error: String(e.stack ?? e) }); }
 };

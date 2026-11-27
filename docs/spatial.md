@@ -324,6 +324,12 @@ unchanged rows. Independently copied or compacted maps may require a full
 comparison. For many workers searching one fixed revision, a prepared
 snapshot shares the edit index as well. [Changing-viewport benchmark](../proofs/spatial-editor/RESULTS.md#viewport-queries-between-edits)
 
+In a four-worker Chromium replay, the median query time of the slowest
+worker fell from 1.71 ms to 0.13 ms while 1,024 imported lanes awaited a
+rebuild. After installing the new base, a direct search took 0.07 ms and
+the cursor took 0.11 ms. Use direct searches for tiles whose edit overlays
+stay small. [Browser workload and raw trials](../proofs/spatial-editor/RESULTS.md#four-workers-querying-an-edited-tile)
+
 ## Dedicated worker transport
 
 A prepared snapshot contains only structured-cloneable descriptors and shared

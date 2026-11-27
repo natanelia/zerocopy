@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdtemp, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
+import peer from '@tanstack/db/package.json' with { type: 'json' };
 import { encodeTile } from './tile-io.mjs';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -19,6 +20,8 @@ const transport = option('transport') ?? 'session';
 if (!['session', 'manual'].includes(transport)) throw new Error('Expected --transport=session|manual');
 const rebuild = option('rebuild') ?? 'packed';
 if (!['packed', 'rows'].includes(rebuild)) throw new Error('Expected --rebuild=packed|rows');
+const readerQuery = option('reader-query') ?? 'direct';
+if (!['direct', 'cursor'].includes(readerQuery)) throw new Error('Expected --reader-query=direct|cursor');
 const graphicsMode = option('renderer') ?? 'swiftshader';
 if (!['hardware', 'swiftshader'].includes(graphicsMode)) throw new Error('Expected --renderer=hardware|swiftshader');
 const uploads = option('uploads') ?? 'range';
@@ -35,6 +38,12 @@ if (readerCounts.some(n => ![1, 4, 8].includes(n)) || trials.some(n => ![0, 1, 2
 }
 const config = smoke ? { count: 128, vertices: 24, steps: 40, warmup: 0, transport, rebuild, uploads, source } :
   { count: 4096, vertices: 256, steps: soak ? 1024 : 64, warmup: 16, transport, rebuild, uploads, source };
+config.readerQuery = readerQuery;
+if (process.argv.includes('--pending-import')) {
+  if (source !== 'geoarrow') throw new Error('--pending-import requires a GeoArrow source');
+  config.pendingImport = true;
+  config.firstRebuildStep = config.warmup + 16 * Math.floor(config.steps / 32);
+}
 if (source === 'geoarrow') {
   config.tileLayout = smoke ? 'sparse' : 'ordered';
   config.ipc = option('ipc') ?? 'stream';
@@ -80,7 +89,7 @@ try {
     bundle: true, format: 'esm', platform: 'browser', define: { 'process.env.NODE_ENV': '"production"' } });
   await stop();
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
-  const report = { frameTimingVersion: 2, config, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
+  const report = { frameTimingVersion: 2, config, tanstack: peer.version, hardware: cpus()[0].model, platform: platform(), created: new Date().toISOString(),
     bundleSHA256: {}, cases: [] };
   if (tile) report.tileSHA256 = createHash('sha256').update(tile).digest('hex');
   for (const name of ['editor', 'reader']) {
@@ -90,6 +99,7 @@ try {
     for (const trial of trials) {
       const rotation = trial % modes.length;
       for (const mode of selectedMode ? [selectedMode] : modes.slice(rotation).concat(modes.slice(0, rotation))) {
+        const startedAt = new Date().toISOString();
         const instance = await chromium.launchServer({ executablePath: process.env.CHROMIUM_PATH || undefined,
           ignoreDefaultArgs: ['--enable-unsafe-swiftshader'],
           args: graphicsMode === 'hardware' ? ['--enable-gpu', '--disable-software-rasterizer'] :
@@ -120,7 +130,7 @@ try {
           if (platform() === 'linux') await collect();
           if (memoryError) throw memoryError;
           const p95 = key => samples.map(s => s[key]).sort((a,b) => a-b)[Math.ceil(samples.length * .95) - 1];
-          report.cases.push({ readers, mode, trial, timeoutMs, startup, peakPathEntries, p95FrameMs: p95('frameMs'), p95ValidationMs: p95('validationMs'),
+          report.cases.push({ readers, mode, trial, startedAt, timeoutMs, startup, peakPathEntries, p95FrameMs: p95('frameMs'), p95ValidationMs: p95('validationMs'),
             peakSampledPssKiB: pss.length ? Math.max(...pss.map(s => s[1])) : null, samples, pss });
           if (output) {
             await writeFile(output + '.partial', JSON.stringify(report) + '\n');

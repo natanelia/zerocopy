@@ -31,7 +31,9 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range', source = 'generated', ipc = 'stream', trace = false }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session',
+  rebuild = 'packed', readerQuery = 'direct', graphicsMode = 'swiftshader', uploads = 'range',
+  source = 'generated', ipc = 'stream', pendingImport = false, firstRebuildStep = 0, trace = false }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
   const shared = mode !== 'copy', packed = mode === 'packed';
   const view = await renderer(graphicsMode, uploads);
@@ -46,20 +48,26 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
   const toPath = xy => shared ? new SharedList('number').pushMany(xy) : xy;
   let paths = shared ? new SharedMap(list('number')) : new Map();
   let changes = shared ? applySpatialEdits(undefined, 0, []) : new Map();
-  function addLane(handle, xy) {
+  function addLane(handle, xy, rowRevision = 0) {
     const id = String(handle), b = bounds(xy);
     if (!packed) paths = paths.set(id, toPath(xy));
-    initialData.push({ id, revision: 0, geometryId: id, kind: 'lane', bounds: b });
+    initialData.push({ id, revision: rowRevision, geometryId: id, kind: 'lane', bounds: b });
     expectedBounds.set(id, b);
   }
   if (input) {
-    for (const { ids, paths: batch } of input) {
-      for (let row = 0; row < ids.length; row++) addLane(ids[row], lineStringViewXY(batch, row));
+    for (const [i, { ids, paths: batch }] of input.entries()) {
+      const rowRevision = pendingImport && i % 4 === 0 ? 1 : 0;
+      for (let row = 0; row < ids.length; row++) addLane(ids[row], lineStringViewXY(batch, row), rowRevision);
     }
   } else {
     for (let id = 0; id < count; id++) addLane(id, lane(id, vertices));
   }
   if (!packed) input = undefined;
+  if (pendingImport) {
+    const added = initialData.filter(row => row.revision === 1);
+    changes = shared ? applySpatialEdits(changes, 1, added.map(row => ({ id: Number(row.id), bounds: row.bounds }))) :
+      new Map(added.map(row => [row.id, { revision: 1, bounds: row.bounds }]));
+  }
   let peakEntries = paths.size;
   const startup = { ...importTiming, initialPathEntries: paths.size, loadPathsAndRowsMs: performance.now() - loadStarted };
   if (trace) console.info('Initial paths and rows prepared');
@@ -72,7 +80,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
     .innerJoin({ lane: lanes }, ({ v, lane }) => eq(v.id, lane.id))
     .select(({ lane }) => ({ id: lane.id, revision: lane.revision })));
   const sub = query.subscribeChanges(() => {});
-  let revision = 0, box = west, rebuilding, capturedChanges;
+  let revision = pendingImport ? 1 : 0, box = west, rebuilding, capturedChanges;
   const samples = [];
   const nativeRows = shared ? undefined : new Map(initialData.map(row => [row.id, row]));
   const rows = () => shared ? options.getSnapshot() : nativeRows;
@@ -83,8 +91,16 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
     await Promise.all([lanes.preload(), visible.preload(), query.preload()]);
     if (trace) console.info('Collections ready');
     const indexStarted = performance.now();
-    let base = packed ? buildLineStringIndex(input, revision) : baseFor(shared, rows(), revision);
+    let base;
+    if (packed) base = buildLineStringIndex(pendingImport ? input.filter((_, i) => i % 4 !== 0) : input, 0);
+    else {
+      const indexed = pendingImport ? new Map(initialData.filter(row => row.revision === 0).map(row => [row.id, row])) : rows();
+      base = baseFor(shared, indexed, 0);
+    }
     startup.initialIndexMs = performance.now() - indexStarted;
+    startup.initialOverlayRows = changes.size;
+    startup.initialBaseEntries = base.ids.length;
+    if (startup.initialBaseEntries + changes.size !== count) throw new Error('Imported lanes missing from the initial index and overlay');
     input = undefined;
     let message;
     if (shared && transport === 'session') {
@@ -95,20 +111,21 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       await Promise.all(ready);
       message = { sequence: session.version };
     } else message = shared ? { payload: snapshot() } : { initial: { rows: rows(), paths, changes } };
-    await Promise.all(peers.map(p => p.send({ ...message, base, tile, revision, box })));
+    await Promise.all(peers.map(p => p.send({ ...message, base, tile, revision, box, readerQuery: shared ? readerQuery : 'direct' })));
     if (trace) console.info('All readers attached');
     startup.readyMs = performance.now() - loadStarted;
+    const heldRevision = rows().get('5').revision;
     await peers[0].send({ hold: true, revision, request: -1, id: '5' });
     for (let step = -1; step < steps + warmup; step++) {
       if (trace && step % 10 === 0) console.info('Command ' + step);
       const started = performance.now();
       const cmd = step < 0 ? { box: west } : edit(step, vertices);
       let newBase, patch, rebuiltChanges, rebuildMs;
-      if (step >= 0 && step % 16 === 0) {
+      if (step >= firstRebuildStep && step % 16 === 0) {
         if (shared) capturedChanges = changes;
         rebuilding = peers[0].send({ rebuild, revision });
       }
-      if (step >= 0 && step % 16 === 2) {
+      if (step >= firstRebuildStep && step % 16 === 2) {
         ({ base: newBase, rebuildMs } = await rebuilding);
         // Edits newer than the worker's input revision survive the swap.
         if (shared) changes = pruneSpatialEdits(changes, newBase.revision, capturedChanges);
@@ -203,7 +220,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
       if (step === 0) {
         // Complete a job begun before the vertex moved, after readers attached the edit.
         const old = await peers[0].send({ release: true });
-        assertEqual([old.bounds, old.rowRevision], [bounds(lane(5, vertices)), 0], 'held validation');
+        assertEqual([old.bounds, old.rowRevision], [bounds(lane(5, vertices)), heldRevision], 'held validation');
         if (isCurrent(old)) throw new Error('Stale validation replaced the current result');
       }
       const expected = [...expectedBounds.entries()].filter(([, [x0, y0, x1, y1]]) =>
@@ -215,7 +232,8 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
         assertEqual([result.visible, result.revision, result.generation], [expected, revision, base.revision], `worker result for ${mode} at command ${step}`);
       }
       if (step < 10) view.check(expected, id => editedPaths.get(id) ?? lane(Number(id), vertices), cmd.moveY);
-      if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, rebuildMs, ...draw });
+      if (step >= warmup) samples.push({ step, revision, frameMs, validationMs, rebuildMs,
+        maxReaderQueryMs: Math.max(...results.map(result => result.queryMs)), overlayRows: changes.size, ...draw });
     }
     return { samples, startup, peakPathEntries: peakEntries, graphics: view.graphics };
   } finally {

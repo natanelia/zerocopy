@@ -244,6 +244,19 @@ memory handle on first attachment and publishes grouped roots on later edits.
 Each validator waits for its exact requested publication. `--transport=manual`
 uses a full `getWorkerData` envelope per edit for comparison. `--mode=copy`
 or `--mode=shared` selects a single arm, for example during a soak run.
+With `--reader-query=cursor`, each shared validator advances a local spatial
+cursor across publications and creates a fresh cursor when the rebuilt base
+arrives. The default `--reader-query=direct` scans the current edits. The
+owner's TanStack viewport and the native copy control use the same query
+strategy in both runs.
+Add `--pending-import` to a GeoArrow run to open a tile with every fourth
+batch represented by insertions in the overlay. All row and path data have
+already arrived. On the full fixture the initial base contains 3,072 lanes
+and the overlay contains 1,024. The first background rebuild starts at
+command 48 and the readers install its replacement at command 50. This
+exercises lookup, editing and validation both before and after those pending
+rows move into the base. [Four-reader comparison](RESULTS.md#four-workers-querying-an-edited-tile)
+
 Use `node proofs/spatial-editor/summarize.mjs` with the output files to check
 completeness and calculate medians of the three per-trial p95s.
 
@@ -266,6 +279,11 @@ completeness and calculate medians of the three per-trial p95s.
   the callback wait and preparation. Version 2 measures them separately.
 - **Validation latency** ends after every dedicated reader replies. Timing
   includes worker attachment, messaging and viewport geometry checks.
+- **Reader query time** includes updating the local query index, if needed,
+  looking up viewport candidates and converting the returned handles to row
+  keys. Each command records the longest duration reported by any reader,
+  before geometry validation or reply messaging. The summary takes the median
+  of the three per-trial p95s. Each command also records the overlay row count.
 - **Rebuild time** measures the index construction call inside the first
   reader. Each `rebuildMs` sample belongs to the build started two commands
   before the command that installs its result.

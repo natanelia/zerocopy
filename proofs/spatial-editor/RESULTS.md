@@ -383,3 +383,52 @@ in one Node 26.13.1 process on Linux on an AMD EPYC-Milan processor.
 After building the portable library, run
 `node proofs/spatial-editor/cursor-queries.mjs` to repeat it.
 [Trial timings and source checksums](results/cursor-queries-node.json)
+
+## Four workers querying an edited tile
+
+Use a worker-local cursor when a reader follows a large set of recent edits
+across revisions. When 1,024 imported lanes were waiting to enter the base
+index, the median duration of the slowest of four reader queries was
+**1.71 ms with the direct scan and 0.13 ms with the cursor**. Their p95s were
+10.01 ms and 2.14 ms respectively. After the replacement index absorbed
+the import, the same workers took a median **0.07 ms direct and 0.11 ms
+with the cursor**.
+
+| Initial state | Reader query | Slowest reader query p95 (ms) | All workers replied p95 (ms) | Completed frame p95 (ms) | Peak browser PSS (MiB) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Fully indexed | Direct | 1.10 | 17.8 | 400.3 | 360.0 |
+| Fully indexed | Cursor | 2.93 | 16.5 | 431.8 | 357.5 |
+| 1,024 pending insertions | Direct | 7.24 | 30.2 | 659.1 | 364.0 |
+| 1,024 pending insertions | Cursor | 2.14 | 16.8 | 343.2 | 365.5 |
+
+The table covers **all 64 measured commands** in each trial. The fully indexed
+tile accumulated at most four overlay rows between rebuilds. On the other tile,
+16 of 64 imported batches started in the overlay. Of the measured commands,
+34 ran before workers installed the replacement and 30 ran after installation.
+Both methods used the same owner-side TanStack query, streamed geometry,
+worker session, packed index rebuild and renderer.
+
+Each cell is the median of three fresh Chromium trials. The worker timer
+includes cursor creation or update when needed, spatial search and ID
+conversion. Time to the first validated viewport with pending insertions was
+416 ms direct and 536 ms using cursors. That includes import, setup and
+initial validation. Frame latency was variable on this software renderer.
+With pending insertions the per-trial frame p95s ranged from 276 to 1,232 ms
+direct and from 148 to 473 ms with cursors. Hardware-GPU frame latency
+remains unmeasured.
+
+All 768 measured commands passed the full-scan, worker-revision and TanStack
+membership checks. The 12 trials shared the same browser bundles, 4,096-lane
+Arrow tile and TanStack DB 1.0.0-rc.1.6. Each ran 16 warmups on Linux with an
+AMD EPYC-Milan processor and Chromium 153.0.8010.12 using SwiftShader. The
+direct arm ran first in trials one and three, and the cursor ran first in
+trial two. [Fully indexed direct trials](results/reader-query-normal-direct.json.gz) · [Fully indexed cursor trials](results/reader-query-normal-cursor.json.gz) · [Pending import direct trials](results/reader-query-pending-direct.json.gz) · [Pending import cursor trials](results/reader-query-pending-cursor.json.gz)
+
+After the [replay setup](README.md), run the following command with
+`--reader-query=direct` and `--reader-query=cursor`, giving each a separate
+output file. Omit `--pending-import` to start with the fully indexed tile.
+
+```sh
+node proofs/spatial-editor/run.mjs --mode=packed --readers=4 --reader-query=cursor --pending-import --output=/tmp/pending-cursor.json
+node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed /tmp/pending-cursor.json
+```
