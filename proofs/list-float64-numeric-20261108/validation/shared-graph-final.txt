@@ -1,0 +1,13 @@
+Command: ["node", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/check-shared-graph.mjs", "/workspace/scratch/8d514edd7494/zerocopy", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric", "/workspace/scratch/8d514edd7494/zerocopy-list-float64-numeric/proofs/list-float64-numeric-20261108/shared-graph-comparison-final.json"]
+{
+  "status": "PASSED",
+  "reachableBefore": 5,
+  "reachableAfter": 5,
+  "changes": [],
+  "changedRootSources": [
+    "numeric.ts"
+  ],
+  "wasmIdentical": true,
+  "external": [],
+  "unresolved": []
+}

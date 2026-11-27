@@ -1,0 +1,20 @@
+{
+  "pilot.json.gz": {
+    "sha256": "d5e176766d2ce5ab144461f2c5cf58c9b03ae9e66f3822db805a4392e0b73067",
+    "uncompressedSha256": "cf479f435a4ae2c1afba0f743520b35a5f89ce49c74ca8c2ad77948db3372305",
+    "compressedBytes": 49581,
+    "uncompressedBytes": 350244
+  },
+  "confirmation.json.gz": {
+    "sha256": "967a451709027083fbe30d01deb92869322ce06c7f3a8fe871d7398f83fb5160",
+    "uncompressedSha256": "f8fc8332920617d247b32f11b08a0700040358a2f1bd543948f61c6d253181be",
+    "compressedBytes": 152085,
+    "uncompressedBytes": 1238665
+  },
+  "aa.json.gz": {
+    "sha256": "cc161192d6a4f64746cef8140b1475c290a886544cc14c7c67bd5fc7e43dfba4",
+    "uncompressedSha256": "4c2a711e7e0fcc791e723c2bac5eb4d05cd7acf821a72e087e2fc6a9ea776ce6",
+    "compressedBytes": 63427,
+    "uncompressedBytes": 450236
+  }
+}

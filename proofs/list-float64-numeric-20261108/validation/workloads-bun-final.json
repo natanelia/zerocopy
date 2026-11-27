@@ -1,0 +1,96 @@
+{
+  "runtime": {
+    "node": "26.3.0",
+    "bun": "1.4.2",
+    "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+    "openssl": "1.1.0",
+    "llhttp": "9.3.0",
+    "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+    "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+    "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+    "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+    "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+    "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+    "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+    "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+    "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+    "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+    "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+    "v8": "14.6.202.34-node.20",
+    "uv": "1.48.0",
+    "napi": "10",
+    "icu": "78.3",
+    "unicode": "17.0",
+    "sqlite": "3.53.2",
+    "modules": "147"
+  },
+  "timingMeasurements": false,
+  "source": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "workload": "28864a99be94cc1383789cc5882eae5917db19d6083020cf653cf158309ec8dd",
+  "driver": "7fd643843b6b0652b8caae74003d86840b57476443cdd9bef055971501b3ee2e",
+  "checks": [
+    {
+      "case": "float64-32",
+      "expectedDigest": "bdbade95260e9cf9fd879a8ca799797aad70ca0b7d818c753983257df725073e",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-4096",
+      "expectedDigest": "7507d58507b7864846f7600fbba98ee2a17c4709d976f376e02d165ac605769b",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-65536",
+      "expectedDigest": "539d63f70303aa05e6d3739a4c928db5c6241009b9c97331d8d42b4d7de05e67",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-1048576",
+      "expectedDigest": "66521c30b78f1518a4082180205d11e001bb29f86639fb68169cba1acbaf0d3b",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-subview-65536",
+      "expectedDigest": "eb46fa40ae59fbade54b1f8dfe9aba7501f799229da0e964329a787a20c36384",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-shared-65536",
+      "expectedDigest": "6a31da077c5c7dd1caf5ea5b6b9adcafb47dddac218660a517426c11577d0f23",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-only-4096",
+      "expectedDigest": "fa4637e0dc71225c6e6cdbffba8d7914215792fc64c682eb9aec601de24c502d",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "float64-only-65536",
+      "expectedDigest": "1add44bb3fc56753582447d9e14442561bbdedc6fda28c55d1640d69d7c827e3",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "array-build-control-32",
+      "expectedDigest": "0c0f9a512101237fdbbaa4fdcf204ba448b1c805373a654c1d7a21f93570cdf3",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "scalar-append-control-2048",
+      "expectedDigest": "927d2d0c0cae12a35ef9f354f03760ddb8616a20e35db2fb025dc22018d26227",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "numeric-range-control-65569",
+      "expectedDigest": "87641bf1df4d1d21958693ea1ade200539295bc33ddb5ab5b58998b665f87fa9",
+      "completeOutputOraclesPassed": true
+    },
+    {
+      "case": "numeric-box-control-65538",
+      "expectedDigest": "f8c0dc8e92acc2f8045a006c837b5391a6d472a314cc8ef24ec95c676ba24463",
+      "completeOutputOraclesPassed": true
+    }
+  ]
+}

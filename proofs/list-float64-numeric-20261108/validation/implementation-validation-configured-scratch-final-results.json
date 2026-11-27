@@ -1,0 +1,35 @@
+{
+  "source": "b22d734d47523ca408605971c991b87aa499b6e9f3ec0c0c4ede7d6625cb786d",
+  "results": [
+    {
+      "check": "full-bun-configured",
+      "exitCode": 0,
+      "outerDeadline": false,
+      "seconds": 41.215
+    },
+    {
+      "check": "focused-node",
+      "exitCode": 0,
+      "outerDeadline": false,
+      "seconds": 7.293
+    },
+    {
+      "check": "check-package",
+      "exitCode": 0,
+      "outerDeadline": false,
+      "seconds": 10.948
+    },
+    {
+      "check": "check-doc-examples",
+      "exitCode": 0,
+      "outerDeadline": false,
+      "seconds": 2.275
+    },
+    {
+      "check": "shared-graph",
+      "exitCode": 0,
+      "outerDeadline": false,
+      "seconds": 0.416
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "check": "build-browser",
+    "exitCode": 0,
+    "seconds": 0.025
+  },
+  {
+    "check": "shared-graph-final",
+    "exitCode": 0,
+    "seconds": 0.459
+  },
+  {
+    "check": "build-types",
+    "exitCode": 0,
+    "seconds": 1.606
+  },
+  {
+    "check": "typecheck",
+    "exitCode": 0,
+    "seconds": 1.508
+  },
+  {
+    "check": "typecheck-values",
+    "exitCode": 0,
+    "seconds": 2.477
+  },
+  {
+    "check": "typecheck-values-loose-optional",
+    "exitCode": 0,
+    "seconds": 2.636
+  },
+  {
+    "check": "typecheck-numeric",
+    "exitCode": 0,
+    "seconds": 2.29
+  },
+  {
+    "check": "typecheck-numeric-loose-optional",
+    "exitCode": 0,
+    "seconds": 2.164
+  },
+  {
+    "check": "typecheck-redux",
+    "exitCode": 0,
+    "seconds": 0.911
+  },
+  {
+    "check": "typecheck-geometry",
+    "exitCode": 0,
+    "seconds": 0.498
+  },
+  {
+    "check": "typecheck-text-search",
+    "exitCode": 0,
+    "seconds": 0.785
+  },
+  {
+    "check": "typecheck-worker",
+    "exitCode": 0,
+    "seconds": 0.87
+  },
+  {
+    "check": "focused-main-node",
+    "exitCode": 0,
+    "seconds": 3.033
+  },
+  {
+    "check": "focused-main-bun",
+    "exitCode": 0,
+    "seconds": 4.894
+  },
+  {
+    "check": "check-package",
+    "exitCode": 0,
+    "seconds": 9.29
+  },
+  {
+    "check": "check-doc-examples",
+    "exitCode": 0,
+    "seconds": 2.268
+  }
+]

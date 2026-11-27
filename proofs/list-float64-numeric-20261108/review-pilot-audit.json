@@ -1,0 +1,462 @@
+{
+  "file": "pilot.json",
+  "study": "list-float64-numeric-20261108",
+  "mode": "pilot",
+  "status": "independently verified",
+  "comparison": "Complete existing constructor + pushMany with the same Float64Array versus complete optional numeric fromFloat64 call",
+  "controlScope": "Root-only controls load the identical shared graph; optional numeric controls exercise the changed optional entry",
+  "processes": 72,
+  "measuredBatches": 648,
+  "shortMeasuredBatches": 0,
+  "warmupBatches": 2977,
+  "verifiedOutputCount": 12183552,
+  "sharedGraph": {
+    "proofFile": "shared-graph-result.json",
+    "proofSha256": "14dd64d061fd2e8912c5ce267becbdb1940a6d0ad4fc8ea9c6e30dce2b3ad316",
+    "sourceSnapshotFile": "shared-module-sources.json.gz",
+    "sourceSnapshotRawSha256": "da2a569f9c34f2fe4e93b73ab786d75f6eab20679bc625f06534965a6c4474ea",
+    "modules": 5,
+    "bytes": 145136,
+    "identicalPathsAndContents": true,
+    "externalDependencies": 0,
+    "unresolvedDependencies": 0
+  },
+  "workerProof": {
+    "file": "node-worker-result.json",
+    "nodeWorkers": "Shared and copied workers match measured source, unchanged WASM, every bundle, and proof identities"
+  },
+  "summary": [
+    {
+      "runtime": "node",
+      "name": "float64-32",
+      "role": "small-input",
+      "beforeMs": 0.0009156877441406225,
+      "afterMs": 0.0016644020385742087,
+      "pairedRatio": 1.861583292057946,
+      "interval95": null,
+      "fasterPairs": 0,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.00067559716796875,
+          "after": 0.0019178525390624868,
+          "ratio": 2.8387515963524548
+        },
+        {
+          "pair": 1,
+          "before": 0.001155778320312495,
+          "after": 0.0014109515380859305,
+          "ratio": 1.22078041549044
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "float64-65536",
+      "role": "target",
+      "beforeMs": 0.9386583125000012,
+      "afterMs": 0.19501032812500085,
+      "pairedRatio": 0.207568037850875,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.9545330937500012,
+          "after": 0.20390007812500066,
+          "ratio": 0.21361237180782702
+        },
+        {
+          "pair": 1,
+          "before": 0.9227835312500012,
+          "after": 0.18612057812500105,
+          "ratio": 0.20169473318718897
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "float64-shared-65536",
+      "role": "shared-input",
+      "beforeMs": 1.0709129140625002,
+      "afterMs": 0.2065430078125008,
+      "pairedRatio": 0.1942623449257162,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 1.1995807656250008,
+          "after": 0.20876745312500056,
+          "ratio": 0.17403367835447858
+        },
+        {
+          "pair": 1,
+          "before": 0.9422450624999996,
+          "after": 0.20431856250000102,
+          "ratio": 0.21684227451178723
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "float64-only-4096",
+      "role": "typed-only-history",
+      "beforeMs": 0.019628733886718708,
+      "afterMs": 0.01722832519531242,
+      "pairedRatio": 0.8802414963623472,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.018046660156249894,
+          "after": 0.01770198925781241,
+          "ratio": 0.9809011254462995
+        },
+        {
+          "pair": 1,
+          "before": 0.02121080761718752,
+          "after": 0.016754661132812432,
+          "ratio": 0.7899115128099041
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "float64-only-65536",
+      "role": "typed-only-history",
+      "beforeMs": 0.2322947968750011,
+      "afterMs": 0.20222154687499927,
+      "pairedRatio": 0.8698212627856224,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.2224898906250008,
+          "after": 0.2140573124999996,
+          "ratio": 0.9620990504273561
+        },
+        {
+          "pair": 1,
+          "before": 0.2420997031250014,
+          "after": 0.19038578124999894,
+          "ratio": 0.7863941128077244
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "array-build-control-32",
+      "role": "control",
+      "beforeMs": 0.0005700324096679643,
+      "afterMs": 0.0005173857421874595,
+      "pairedRatio": 0.8977144382610939,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.0006448806152343778,
+          "after": 0.0006190665283202779,
+          "ratio": 0.9599707507028755
+        },
+        {
+          "pair": 1,
+          "before": 0.0004951842041015508,
+          "after": 0.0004157049560546411,
+          "ratio": 0.8394955909566728
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "scalar-append-control-2048",
+      "role": "control",
+      "beforeMs": 0.030262914062499924,
+      "afterMs": 0.028671640624999828,
+      "pairedRatio": 0.9386364139566796,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.025109343749999624,
+          "after": 0.022461238281249685,
+          "ratio": 0.8945370498283143
+        },
+        {
+          "pair": 1,
+          "before": 0.03541648437500022,
+          "after": 0.03488204296874997,
+          "ratio": 0.9849098120357902
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "numeric-range-control-65569",
+      "role": "optional-numeric-control",
+      "beforeMs": 0.03694118457031237,
+      "afterMs": 0.030904427734375073,
+      "pairedRatio": 0.8644131441102684,
+      "interval95": null,
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.027415228515624834,
+          "after": 0.029113537109375143,
+          "ratio": 1.0619476358835522
+        },
+        {
+          "pair": 1,
+          "before": 0.0464671406249999,
+          "after": 0.032695318359375,
+          "ratio": 0.7036223430065011
+        }
+      ]
+    },
+    {
+      "runtime": "node",
+      "name": "numeric-box-control-65538",
+      "role": "optional-numeric-control",
+      "beforeMs": 0.07318692773437507,
+      "afterMs": 0.08669029003906259,
+      "pairedRatio": 1.207469006099296,
+      "interval95": null,
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.0589780390625001,
+          "after": 0.08631925390625006,
+          "ratio": 1.4635829756017487
+        },
+        {
+          "pair": 1,
+          "before": 0.08739581640625005,
+          "after": 0.08706132617187512,
+          "ratio": 0.9961726974112801
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "float64-32",
+      "role": "small-input",
+      "beforeMs": 0.0005678073120117255,
+      "afterMs": 0.0016013251342773538,
+      "pairedRatio": 2.817721587788169,
+      "interval95": null,
+      "fasterPairs": 0,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.00053713830566407,
+          "after": 0.0017106717529296878,
+          "ratio": 3.1847882284521964
+        },
+        {
+          "pair": 1,
+          "before": 0.0005984763183593811,
+          "after": 0.0014919785156250198,
+          "ratio": 2.4929616592265837
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "float64-65536",
+      "role": "target",
+      "beforeMs": 0.3686316640624998,
+      "afterMs": 0.3055873671875009,
+      "pairedRatio": 0.8268768087340526,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.3445754531249996,
+          "after": 0.2761193750000004,
+          "ratio": 0.8013321102702989
+        },
+        {
+          "pair": 1,
+          "before": 0.392687875,
+          "after": 0.3350553593750014,
+          "ratio": 0.853235815786269
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "float64-shared-65536",
+      "role": "shared-input",
+      "beforeMs": 0.3905423203125,
+      "afterMs": 0.30663024218750046,
+      "pairedRatio": 0.7854566570184955,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.3706413906249999,
+          "after": 0.2936538437500005,
+          "ratio": 0.79228561940916
+        },
+        {
+          "pair": 1,
+          "before": 0.41044325000000015,
+          "after": 0.31960664062500044,
+          "ratio": 0.778686555632235
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "float64-only-4096",
+      "role": "typed-only-history",
+      "beforeMs": 0.051692058105468675,
+      "afterMs": 0.05248219726562492,
+      "pairedRatio": 1.0150287369351194,
+      "interval95": null,
+      "fasterPairs": 0,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.04840635156249995,
+          "after": 0.0489444296874999,
+          "ratio": 1.0111158578911945
+        },
+        {
+          "pair": 1,
+          "before": 0.0549777646484374,
+          "after": 0.056019964843749936,
+          "ratio": 1.0189567582817713
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "float64-only-65536",
+      "role": "typed-only-history",
+      "beforeMs": 0.3648877109374995,
+      "afterMs": 0.2738663593749999,
+      "pairedRatio": 0.7531890699064117,
+      "interval95": null,
+      "fasterPairs": 2,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.3314402812499999,
+          "after": 0.2635603906250008,
+          "ratio": 0.795197221143442
+        },
+        {
+          "pair": 1,
+          "before": 0.3983351406249991,
+          "after": 0.28417232812499904,
+          "ratio": 0.7134000974132602
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "array-build-control-32",
+      "role": "control",
+      "beforeMs": 0.0006497097167968702,
+      "afterMs": 0.0006203843994140451,
+      "pairedRatio": 0.9549736839347971,
+      "interval95": null,
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.0006124953613281248,
+          "after": 0.0006546561279296703,
+          "ratio": 1.0688344259622224
+        },
+        {
+          "pair": 1,
+          "before": 0.0006869240722656156,
+          "after": 0.0005861126708984199,
+          "ratio": 0.8532422935264168
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "scalar-append-control-2048",
+      "role": "control",
+      "beforeMs": 0.013983746093749971,
+      "afterMs": 0.017079103515625027,
+      "pairedRatio": 1.2163479220824038,
+      "interval95": null,
+      "fasterPairs": 0,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.013056449218749933,
+          "after": 0.015166390625000137,
+          "ratio": 1.1616014714950362
+        },
+        {
+          "pair": 1,
+          "before": 0.01491104296875001,
+          "after": 0.018991816406249917,
+          "ratio": 1.2736745810505834
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "numeric-range-control-65569",
+      "role": "optional-numeric-control",
+      "beforeMs": 0.028422944335937506,
+      "afterMs": 0.02822887207031244,
+      "pairedRatio": 0.9934047340643077,
+      "interval95": null,
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.029068039062499995,
+          "after": 0.02803614843750002,
+          "ratio": 0.9645008518537739
+        },
+        {
+          "pair": 1,
+          "before": 0.027777849609375016,
+          "after": 0.028421595703124858,
+          "ratio": 1.0231747994464113
+        }
+      ]
+    },
+    {
+      "runtime": "bun",
+      "name": "numeric-box-control-65538",
+      "role": "optional-numeric-control",
+      "beforeMs": 0.08073891796874988,
+      "afterMs": 0.062432854492187495,
+      "pairedRatio": 0.8008366322706695,
+      "interval95": null,
+      "fasterPairs": 1,
+      "points": [
+        {
+          "pair": 0,
+          "before": 0.10174426171874984,
+          "after": 0.06273386523437519,
+          "ratio": 0.6165838168622175
+        },
+        {
+          "pair": 1,
+          "before": 0.05973357421874992,
+          "after": 0.062131843749999804,
+          "ratio": 1.0401494396177802
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "variant": "baseline",
+    "exitCode": 0,
+    "outerDeadline": false,
+    "seconds": 2.322
+  },
+  {
+    "variant": "candidate",
+    "exitCode": 0,
+    "outerDeadline": false,
+    "seconds": 2.43
+  }
+]
