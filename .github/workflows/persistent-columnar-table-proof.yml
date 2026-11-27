@@ -1,4 +1,4 @@
-name: Persistent columns point path and direct JSON control (proof only)
+name: Persistent columnar publication churn baseline (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -8,11 +8,11 @@ permissions:
 jobs:
   screen:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        size: [1000, 10000, 100000]
+        pattern: [single, clustered, spread]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,7 +41,7 @@ jobs:
       - run: bun run build:wasm && bun run build:browser
       - name: Verify persistent column semantics
         run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs
-      - name: Paired feasibility screen
+      - name: Repeated publication baseline
         shell: bash
         run: |
           set -euo pipefail
@@ -49,11 +49,11 @@ jobs:
           git rev-parse HEAD | tee columnar-results/commit.txt
           node --version | tee columnar-results/node.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/bench.mjs columnar-results/results.json 8 ${{ matrix.size }} | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/churn.mjs columnar-results/results.json ${{ matrix.pattern }} 5 | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-proof-${{ matrix.size }}-${{ github.run_id }}
+          name: columnar-churn-${{ matrix.pattern }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn
