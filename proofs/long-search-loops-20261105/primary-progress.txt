@@ -1,0 +1,52 @@
+primary: node pair 1/6 before: 14 verified cases
+primary: node pair 1/6 after: 14 verified cases
+primary: node pair 2/6 after: 14 verified cases
+primary: node pair 2/6 before: 14 verified cases
+primary: node pair 3/6 before: 14 verified cases
+primary: node pair 3/6 after: 14 verified cases
+primary: node pair 4/6 after: 14 verified cases
+primary: node pair 4/6 before: 14 verified cases
+primary: node pair 5/6 before: 14 verified cases
+primary: node pair 5/6 after: 14 verified cases
+primary: node pair 6/6 after: 14 verified cases
+primary: node pair 6/6 before: 14 verified cases
+primary: bun pair 1/6 before: 14 verified cases
+primary: bun pair 1/6 after: 14 verified cases
+primary: bun pair 2/6 after: 14 verified cases
+primary: bun pair 2/6 before: 14 verified cases
+primary: bun pair 3/6 before: 14 verified cases
+primary: bun pair 3/6 after: 14 verified cases
+primary: bun pair 4/6 after: 14 verified cases
+primary: bun pair 4/6 before: 14 verified cases
+primary: bun pair 5/6 before: 14 verified cases
+primary: bun pair 5/6 after: 14 verified cases
+primary: bun pair 6/6 after: 14 verified cases
+primary: bun pair 6/6 before: 14 verified cases
+node missing-first-byte: 0.7628 -> 0.7593 ms, 0.97x
+node late-start-hit: 0.8546 -> 0.8818 ms, 0.98x
+node first-byte-near-end: 0.7622 -> 0.8018 ms, 0.99x
+node multibyte-needle: 0.8413 -> 0.8463 ms, 0.97x
+node needle-longer-than-row: 0.0255 -> 0.0253 ms, 0.97x
+node common-first-byte: 5.2137 -> 3.9194 ms, 1.34x
+node immediate-hit: 0.4024 -> 0.3224 ms, 1.43x
+node overlapping-prefix: 11.8863 -> 8.5507 ms, 1.44x
+node insensitive-ascii: 5.6915 -> 5.2485 ms, 1.07x
+node insensitive-unicode: 8.6947 -> 7.6431 ms, 1.13x
+node short-query: 0.0558 -> 0.0547 ms, 1.03x
+node immediate-hit-33-bytes: 0.3153 -> 0.2101 ms, 1.49x
+node common-suffix-middle-mismatch: 12.0382 -> 9.4621 ms, 1.32x
+node early-false-suffix-candidates: 12.1539 -> 9.4559 ms, 1.32x
+bun missing-first-byte: 0.2349 -> 0.2306 ms, 1.01x
+bun late-start-hit: 0.3103 -> 0.2911 ms, 1.13x
+bun first-byte-near-end: 0.2587 -> 0.2511 ms, 1.05x
+bun multibyte-needle: 0.3045 -> 0.2805 ms, 1.10x
+bun needle-longer-than-row: 0.0557 -> 0.0533 ms, 1.04x
+bun common-first-byte: 5.2478 -> 4.0860 ms, 1.30x
+bun immediate-hit: 0.2736 -> 0.2412 ms, 1.14x
+bun overlapping-prefix: 6.0065 -> 5.5565 ms, 1.06x
+bun insensitive-ascii: 4.9076 -> 4.4353 ms, 1.13x
+bun insensitive-unicode: 11.4630 -> 9.7794 ms, 1.19x
+bun short-query: 0.0718 -> 0.0685 ms, 1.08x
+bun immediate-hit-33-bytes: 0.2202 -> 0.1992 ms, 1.11x
+bun common-suffix-middle-mismatch: 5.9341 -> 5.4862 ms, 1.07x
+bun early-false-suffix-candidates: 8.1744 -> 7.2702 ms, 1.15x
