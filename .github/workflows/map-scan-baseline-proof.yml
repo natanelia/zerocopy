@@ -1,4 +1,4 @@
-name: Worker direct JSON view mixed-read diagnosis (proof only)
+name: Browser direct JSON view qualification (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
@@ -10,10 +10,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        count: [1000, 10000, 100000]
-        shape: [flat, nested]
+        count: [10000, 100000]
+        browser: [chromium, firefox]
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,6 +50,7 @@ jobs:
           PY
           git diff -- shared-map.ts > "$RUNNER_TEMP/projection/direct-view.patch"
           test -s "$RUNNER_TEMP/projection/direct-view.patch"
+          bun run typecheck
           bun run build:browser
           cp -r dist/. "$RUNNER_TEMP/view-direct/"
           printf '{"type":"module"}\n' > "$RUNNER_TEMP/view-direct/package.json"
@@ -59,13 +60,15 @@ jobs:
           git diff --exit-code -- shared-map.ts
           git rev-parse HEAD > "$RUNNER_TEMP/projection/proof-head.txt"
           node --version > "$RUNNER_TEMP/projection/node-version.txt"
-      - name: Compare mixed scans and point reads with same-build keyed and A/A controls
+      - name: Install selected browser
+        run: bunx playwright install --with-deps ${{ matrix.browser }}
+      - name: Qualify isolated browser workers, mixed reads and retained views
         run: |
           set -euo pipefail
-          node proofs/map-scan-projection-paired-20261127.mjs ${{ matrix.count }} ${{ matrix.shape }} "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
+          node proofs/map-scan-projection-browser-20261127.mjs ${{ matrix.browser }} ${{ matrix.count }} "$RUNNER_TEMP/view-base" "$RUNNER_TEMP/view-direct" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: direct-view-mixed-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
+          name: direct-view-browser-${{ matrix.browser }}-${{ matrix.count }}-${{ github.run_id }}
           path: ${{ runner.temp }}/projection/
           retention-days: 14
