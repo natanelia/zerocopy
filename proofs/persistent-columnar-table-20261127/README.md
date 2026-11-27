@@ -157,3 +157,23 @@ Reproduce on proof checkout with pinned #100 control applied as in workflow:
     bun run build:wasm && bun run build:browser
     bunx playwright install --with-deps chromium firefox
     node proofs/persistent-columnar-table-20261127/lane-browser.mjs lane-results.json chromium 4096 5
+
+
+## Variable-geometry browser result — Nov 28 (prefer existing vectors)
+
+[Run 46041419660](https://github.com/natanelia/zerocopy/actions/runs/46041419660), head `165bbc4109e4db741ab3e576cc55dd462661301d`. All four jobs succeeded: 140 measured cases (2 engines × 2 sizes × 7 modes × 5 rounds), four real workers, 24 revisions with full verified retained digests. Raw artifacts: [Chromium 4k](https://github.com/natanelia/zerocopy/actions/runs/46041419660/artifacts/15220625885), [Chromium 16k](https://github.com/natanelia/zerocopy/actions/runs/46041419660/artifacts/15221105501), [Firefox 4k](https://github.com/natanelia/zerocopy/actions/runs/46041419660/artifacts/15221405261), [Firefox 16k](https://github.com/natanelia/zerocopy/actions/runs/46041419660/artifacts/15221200508). Medians derived from the per-trial verified JSON lines; warmups excluded.
+
+| Browser/lanes | Full JSON total ms | Direct JSON total ms | Existing lists total ms | Table32 total ms | Table256 total ms | Native copy total ms |
+|---|---:|---:|---:|---:|---:|---:|
+| Chromium 4096 | 497.45 | 217.81 | 117.24 | 128.24 | 126.03 | 1272.83 |
+| Chromium 16384 | 1410.51 | 325.16 | 203.57 | 230.06 | 224.59 | 4303.47 |
+| Firefox 4096 | 495.74 | 146.24 | 87.36 | 114.50 | 108.46 | 1881.08 |
+| Firefox 16384 | 1056.82 | 235.40 | 116.82 | 165.16 | 166.60 | 6084.94 |
+
+At 16k table32 final used arena 12,527,324 vs lists 13,011,188 bytes (3.7% lower), but direct JSON 11,611,812 bytes; no browser resident-memory claim. Table32 median paired latency/list ratios 1.102/1.163/1.288/1.436; table256 1.197/1.059/1.266/1.397. Tables won only 3 of 40 comparisons to lists. Direct JSON A/A shows some noise but the list advantage is consistent. **Do not promote custom fixed-width directory as a faster default.** Retain experiments; use existing persistent numeric vectors for schema functionality instead of another directory optimization. Existing numeric vector geometry remains packed across leaves, not one contiguous Arrow array. The hybrid uses separate map/list arenas.
+
+### Next: dynamic row identity and bounded slot/geometry reuse
+
+A realistic changing tile cannot keep a fixed number of identities forever, nor should scans visit every deleted slot. The fixed-size proof only soft-deleted rows. Add a proof-only schema integration on existing SharedList/SharedMap (no public format change). Stable external key → private dense slot index, occupied/metadata columns, one packed persistent numeric geometry vector, per-slot logical count and allocated capacity. Compare append-only slot allocation with recycled vacant slots and additionally reuse of old geometry capacity when replacement geometry fits, with immutable COW updates so old readers retain the original contents. This bounds row slots under steady replacement, not the append-only arena itself; old paths and capacity slack still require compaction. Slot numbers are not stable external IDs; never use them as identity across publications. All modes include the same string-key index and materialization/validation; direct JSON and native immutable copy are external controls. Duplicate span-reuse mode is A/A.
+
+At 4096 and 16384 rows run 48 revisions, 10% physical row replacement every fourth revision at similar positions with unrelated UTF-8 keys, ordinary vertex edits and changing viewports, four browser workers. Compare end-to-end, p95, build/first-answer and actual used/capacity bytes plus logical slot/coordinate high-water; no inference of process RSS. Verify removed IDs absent and all live rows, sizes and retained roots at revisions 0/24/48; tests cover deletion-only batch, reuse after deletion, fork, geometry shortening/growing, identity checks and duplicate rejection. This is a functional feasibility step; no claim of universally better performance, arbitrary schema support, compaction, direct Arrow export, or single arena across collections. If span reuse regresses dense replacement, retain slot-only evidence and consider bounded capacity classes only when justified; prioritize actual row insert/delete and compact retained geometry before an integrated public storage design. No merge or deployment; #100 remains on review/publication hold.
