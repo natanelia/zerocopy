@@ -1,4 +1,4 @@
-name: Exact PR 100 JSON view qualification (proof only)
+name: Exact PR 100 Bun JSON view qualification (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine: [node, chromium, firefox]
+        engine: [bun]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -62,17 +62,10 @@ jobs:
           git rev-parse HEAD > "$RUNNER_TEMP/projection/proof-head.txt"
           node --version > "$RUNNER_TEMP/projection/node-version.txt"
           bun --version > "$RUNNER_TEMP/projection/bun-version.txt"
-      - name: Install selected browser
-        if: matrix.engine != 'node'
-        run: bunx playwright install --with-deps ${{ matrix.engine }}
       - name: Qualify exact candidate with independent baseline and A/A controls
         run: |
           set -euo pipefail
-          if [ "${{ matrix.engine }}" = node ]; then
-            node proofs/map-scan-projection-paired-20261127.mjs 100000 nested "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
-          else
-            node proofs/map-scan-projection-browser-20261127.mjs ${{ matrix.engine }} 100000 "$RUNNER_TEMP/view-base" "$RUNNER_TEMP/view-direct" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
-          fi
+          bun proofs/map-scan-projection-paired-20261127.mjs 100000 nested "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
