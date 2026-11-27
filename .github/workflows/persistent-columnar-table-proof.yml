@@ -1,0 +1,46 @@
+name: Persistent columnar table feasibility (proof only)
+on:
+  push:
+    branches: [proof/persistent-columnar-table-20261127]
+    paths: ['proofs/persistent-columnar-table-20261127/**', '.github/workflows/persistent-columnar-table-proof.yml']
+permissions:
+  contents: read
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        size: [1000, 10000, 100000]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+      - uses: ./.github/actions/setup-rust
+      - run: bun install --frozen-lockfile
+      - run: bun run build:wasm && bun run build:browser
+      - name: Verify persistent column semantics
+        run: node --test proofs/persistent-columnar-table-20261127/table.test.mjs
+      - name: Paired feasibility screen
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p columnar-results
+          git rev-parse HEAD | tee columnar-results/commit.txt
+          node --version | tee columnar-results/node.txt
+          sha256sum proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
+          node proofs/persistent-columnar-table-20261127/bench.mjs columnar-results/results.json 5 ${{ matrix.size }} | tee columnar-results/raw.log
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: columnar-proof-${{ matrix.size }}-${{ github.run_id }}
+          path: columnar-results/
+          retention-days: 30
+          if-no-files-found: warn
