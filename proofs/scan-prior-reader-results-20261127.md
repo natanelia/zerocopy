@@ -1,0 +1,16 @@
+# Prior-reader scan reuse and projection follow-up — 2026-11-27
+
+Pinned runtime main: `84ad23a76ee197f45cbc7316017f28b5bbe93d6c`. Proof head `324a1acfaca2210d39a3a4bc7862442a96f10b76`. [Completed run 45934372682](https://github.com/natanelia/zerocopy/actions/runs/45934372682) ([10k raw](https://github.com/natanelia/zerocopy/actions/runs/45934372682/artifacts/15170231616), [100k raw](https://github.com/natanelia/zerocopy/actions/runs/45934372682/artifacts/15169359905)). Both jobs passed; ten balanced measured fresh-process rounds per five arms per size (100 measured executions, excluding warmup). Each trial uses two actual Node worker threads, five viewport filters, ~100 sparse updates, retained snapshot and point reads; paired driver asserts identical ordered and unordered scan digests and full original/new record verification. A/A compares prior with identical prior. Numbers below are arm medians (not paired ratios), taken from successful job logs.
+
+| Size / comparison | Initial ms | Repeated ms | Updated ms | Retained ms | Peak process RSS KiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 10k base → previous | 76.49→76.78 | 52.36→51.80 | 45.90→49.00 | 38.87→38.95 | 121582→121652 |
+| 10k larger → larger+previous | 77.87→77.33 | 22.16→23.28 | 28.06→21.61 | 16.38→9.71 | 144008→132898 |
+| 100k base → previous | 242.21→242.14 | 809.90→797.17 | 798.45→802.58 | 777.99→787.47 | 243508→244626 |
+| 100k larger → larger+previous | 313.46→314.77 | 235.50→225.05 | 367.24→247.30 | 206.88→205.62 | 322998→290756 |
+
+At 100k, larger+previous reduces paired updated time 33.4% and process peak RSS 9.75% relative to the same large cache without previous. Against normal-cache previous it still raises paired first-answer time 30.6% and peak RSS 19.3%. At 10k, larger+previous reduces retained scan time 40.9% paired versus larger alone, but increases peak RSS 9.4% versus normal-cache previous. Default-cache reuse does not resolve full-scan bottlenecks. Do not enlarge default caches or reintroduce the retired adaptive admission experiment (`proof/moving-window-reader-20261126`). The existing previous-reader feature is useful where a larger working set is already cached; this is not a new runtime improvement.
+
+## Next baseline: full scan without whole-record decoding
+
+The earlier 100k CPU profiles attributed 69% of repeat-scan CPU to decoding/parsing/freezing and 16.1% to traversal. Test the existing public projection API before introducing a new scan path: forEach of frozen objects vs keys() + getView() with short-circuit numeric predicates, plus native Map equivalent copied snapshots and identical-build full-object A/A. Use the same lane-like flat shape and a nested geometry/attributes variant; 1k, 10k, 100k records, two workers, initial publication, five scans per phase, sparse revision, retained root, point reads and full value verification. All results are identical viewport ID sets; shared order must also match. This is a comparison of existing APIs, not a speedup claim, not a duplicate of #68 or #99's spatial index, and not a policy to use projections for arbitrary full-object scans. If projection is promising but redundant key lookup dominates, investigate a direct view iteration path only after profiling and API scope review. No production modifications or deployment.

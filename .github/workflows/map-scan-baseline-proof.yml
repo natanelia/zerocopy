@@ -1,18 +1,19 @@
-name: Worker map scan prior-reader reuse (proof only)
+name: Worker full-scan JSON projection baseline (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
-    paths: ['.github/workflows/map-scan-baseline-proof.yml', 'proofs/scan-prior-reader-*-20261127.mjs']
+    paths: ['.github/workflows/map-scan-baseline-proof.yml', 'proofs/map-scan-projection-*-20261127.mjs']
 permissions:
   contents: read
 jobs:
-  sensitivity:
+  projection:
     strategy:
       fail-fast: false
       matrix:
-        count: [10000, 100000]
+        count: [1000, 10000, 100000]
+        shape: [flat, nested]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,54 +26,24 @@ jobs:
         with:
           bun-version: '1.4.2'
       - uses: ./.github/actions/setup-rust
-      - name: Build pinned baseline and temporary cache-limit probes
+      - name: Build unchanged pinned runtime
         run: |
           set -euo pipefail
           git diff --exit-code 84ad23a76ee197f45cbc7316017f28b5bbe93d6c HEAD -- '*.ts' '*.rs' 'package.json' 'bun.lock'
           bun install --frozen-lockfile
           bun run build:wasm
-          out="$RUNNER_TEMP/cache-builds"
-          evidence="$RUNNER_TEMP/map-scan-cache"
-          mkdir -p "$out" "$evidence"
-          cp arena.ts "$RUNNER_TEMP/arena.base.ts"
-          trap 'cp "$RUNNER_TEMP/arena.base.ts" arena.ts' EXIT
-          large=mid
-          if [ '${{ matrix.count }}' = '100000' ]; then large=high; fi
-          for mode in base "$large"; do
-            cp "$RUNNER_TEMP/arena.base.ts" arena.ts
-            case "$mode" in
-              base) ;;
-              mid) sed -i 's/const MAX_DECODED_RECORDS = 2048;/const MAX_DECODED_RECORDS = 16384;/' arena.ts ;;
-              high)
-                sed -i 's/const MAX_DECODED_RECORDS = 2048;/const MAX_DECODED_RECORDS = 100000;/' arena.ts
-                sed -i 's/const MAX_DECODED_BYTES = 2 \* 1024 \* 1024;/const MAX_DECODED_BYTES = 16 * 1024 * 1024;/' arena.ts ;;
-            esac
-            grep '^const MAX_DECODED_' arena.ts | tee "$evidence/$mode-limits.txt"
-            case "$mode" in
-              base) grep -Fx 'const MAX_DECODED_RECORDS = 2048;' arena.ts ;;
-              mid) grep -Fx 'const MAX_DECODED_RECORDS = 16384;' arena.ts ;;
-              high) grep -Fx 'const MAX_DECODED_RECORDS = 100000;' arena.ts; grep -Fx 'const MAX_DECODED_BYTES = 16 * 1024 * 1024;' arena.ts ;;
-            esac
-            sha256sum arena.ts persistent-core.wasm > "$evidence/$mode-source.sha256"
-            git diff -- arena.ts > "$evidence/$mode.patch"
-            bun run build:browser
-            mkdir -p "$out/$mode"
-            cp -r dist/. "$out/$mode/"
-            printf '{"type":"module"}\n' > "$out/$mode/package.json"
-            (cd "$out/$mode"; find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$evidence/$mode-build.sha256"
-          done
-          cp "$RUNNER_TEMP/arena.base.ts" arena.ts
-          git diff --exit-code -- arena.ts
-          git rev-parse HEAD > "$evidence/proof-head.txt"
-          node --version > "$evidence/node-version.txt"
-          bun --version > "$evidence/bun-version.txt"
-      - name: Run balanced paired fresh-process worker scans
+          bun run build:browser
+          mkdir -p "$RUNNER_TEMP/projection"
+          sha256sum dist/shared.js persistent-core.wasm > "$RUNNER_TEMP/projection/build.sha256"
+          git rev-parse HEAD > "$RUNNER_TEMP/projection/proof-head.txt"
+          node --version > "$RUNNER_TEMP/projection/node-version.txt"
+      - name: Compare existing full object and selective view scans
         run: |
           set -euo pipefail
-          node proofs/scan-prior-reader-paired-20261127.mjs ${{ matrix.count }} "$RUNNER_TEMP/cache-builds" "$RUNNER_TEMP/map-scan-cache" | tee "$RUNNER_TEMP/map-scan-cache/run.log"
+          node proofs/map-scan-projection-paired-20261127.mjs ${{ matrix.count }} ${{ matrix.shape }} "$PWD/dist/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: scan-prior-reader-${{ matrix.count }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/map-scan-cache/
+          name: projection-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/projection/
           retention-days: 14
