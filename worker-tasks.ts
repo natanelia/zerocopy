@@ -1,5 +1,5 @@
 import { createSharedSession, connectSharedSession, type SharedEndpoint, type SharedShape, type SharedSource, type SharedReader } from './worker';
-import { errorOf, listen } from './worker-protocol';
+import { capture, errorOf, listen } from './worker-protocol';
 export interface TaskContext<S> {
     readonly state: S;
     readonly signal: AbortSignal;
@@ -29,12 +29,15 @@ export interface Executor<T extends TaskSet<any>> {
     readonly closed: boolean;
     dispose(): void;
 }
+export interface PoolMapOptions extends CallOptions {
+    chunkSize?: number;
+    /** 'batch' shares the roots captured at map invocation across every input. */
+    snapshot?: 'task' | 'batch';
+}
 export interface PoolExecutor<T extends TaskSet<any>> extends Executor<T> {
     readonly size: number;
     readonly map: {
-        readonly [K in keyof T]: (inputs: readonly Input<T[K]>[], options?: CallOptions & {
-            chunkSize?: number;
-        }) => Promise<Output<T[K]>[]>;
+        readonly [K in keyof T]: (inputs: readonly Input<T[K]>[], options?: PoolMapOptions) => Promise<Output<T[K]>[]>;
     };
 }
 export interface ClientOptions<S extends SharedShape<S>> {
@@ -114,7 +117,7 @@ function report(options: {
     }
 }
 /** Create one session and remove all of its listeners on every shutdown path. */
-function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any, options: ClientOptions<S>, owned: boolean): Executor<T> & {
+function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any, options: ClientOptions<S>, owned: boolean, boundSource?: SharedSource<S>): Executor<T> & {
     readonly _ready: Promise<void>;
 } {
     if (options.memory !== undefined && options.memory !== 'share' && options.memory !== 'copy') {
@@ -122,7 +125,7 @@ function client<T extends TaskSet<any>, S extends SharedShape<S>>(resource: any,
     }
     const endpoint = endpointOf(resource), channel = options.channel ?? 'default';
     const clientId = Date.now().toString(36) + '-' + (++clients);
-    const source = sourceOf(options.state);
+    const source = boundSource ?? sourceOf(options.state);
     let closed = false, id = 0, constructed = false;
     let state: ReturnType<typeof createSharedSession<S>> | undefined;
     let remove = () => { };
@@ -445,6 +448,47 @@ export async function serve<T extends TaskSet<any>, S extends SharedShape<S> = S
     }, fail);
     return () => { shutdown(new Error('Task server closed')); };
 }
+interface BatchSnapshot<S> {
+    value: S;
+    finished: boolean;
+    releaseIdleSlots: Set<() => void>;
+}
+
+/** Each pool slot has one existing session and runs at most one handler at a time. */
+function poolClient<T extends TaskSet<any>, S extends SharedShape<S>>(
+    resource: any, options: PoolOptions<S>, owned: boolean, source: SharedSource<S>,
+) {
+    let batch: BatchSnapshot<S> | undefined, busy = false;
+    let refresh: () => void;
+    const state: SharedSource<S> = {
+        getSnapshot: () => batch ? batch.value : source.getSnapshot(),
+        subscribe(notify) {
+            refresh = notify;
+            return source.subscribe(() => { if (!batch) notify(); });
+        },
+    };
+    const connection = client<T, S>(resource, options, owned, state);
+    function resumeLive() {
+        if (busy || !batch?.finished) return;
+        batch.releaseIdleSlots.delete(resumeLive);
+        batch = undefined;
+        if (!connection.closed) refresh();
+    }
+    return Object.assign(connection, {
+        select(next: BatchSnapshot<S> | undefined) {
+            busy = true;
+            if (batch === next) return;
+            batch?.releaseIdleSlots.delete(resumeLive);
+            batch = next;
+            batch?.releaseIdleSlots.add(resumeLive);
+        },
+        finish() {
+            busy = false;
+            resumeLive();
+        },
+    });
+}
+
 /** Create a bounded pool, or borrow existing endpoints without owning them. */
 export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = StateFor<T>>(workers: readonly any[] | (() => any), options: PoolOptions<S>): Promise<PoolExecutor<T>> {
     const owned = !Array.isArray(workers);
@@ -455,9 +499,9 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
     if (!Number.isSafeInteger(max) || max < 0)
         throw new RangeError('maxPending must be a non-negative integer');
     const resources: any[] = [];
-    const executors: (Executor<T> & {
-        readonly _ready: Promise<void>;
-    })[] = [];
+    type Slot = ReturnType<typeof poolClient<T, S>>;
+    const executors: Slot[] = [];
+    const source = sourceOf(options.state);
     try {
         if (owned)
             for (let index = 0; index < size; index++)
@@ -465,7 +509,7 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
         else
             resources.push(...workers as readonly any[]);
         for (const resource of resources)
-            executors.push(client<T, S>(resource, options, owned));
+            executors.push(poolClient<T, S>(resource, options, owned, source));
         await Promise.all(executors.map(executor => executor._ready));
     }
     catch (error) {
@@ -477,12 +521,12 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
         throw error;
     }
     let closed = false;
-    const idle: Executor<T>[] = executors.slice();
+    const idle = executors.slice();
     const queue: {
-        run: (executor: Executor<T>) => void;
+        run: (executor: Slot) => void;
         reject: (error: Error) => void;
     }[] = [];
-    const schedule = <R>(operation: (executor: Executor<T>) => Promise<R>, signal?: AbortSignal): Promise<R> => new Promise((resolve, reject) => {
+    const schedule = <R>(operation: (executor: Executor<T>) => Promise<R>, signal?: AbortSignal, batch?: BatchSnapshot<S>): Promise<R> => new Promise((resolve, reject) => {
         if (closed) {
             reject(new Error('Worker pool is closed'));
             return;
@@ -504,13 +548,14 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
             cleanup();
             reject(signal?.reason ?? new Error('Task aborted'));
         };
-        const item = { reject(error: Error) { cleanup(); reject(error); }, run(executor: Executor<T>) {
+        const item = { reject(error: Error) { cleanup(); reject(error); }, run(executor: Slot) {
                 cleanup();
                 let released = false;
                 const release = () => {
                     if (released)
                         return;
                     released = true;
+                    executor.finish();
                     if (closed)
                         return;
                     const next = queue.shift();
@@ -521,6 +566,7 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
                 };
                 let result: Promise<R>;
                 try {
+                    executor.select(batch);
                     result = operation(executor);
                 }
                 catch (error) {
@@ -545,9 +591,7 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
         }
     });
     const run = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? (input?: unknown, call?: CallOptions) => schedule(e => (e.run as any)[key](input, call), call?.signal) : undefined }) as TaskCalls<T>;
-    const map = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? async (inputs: readonly unknown[], call?: CallOptions & {
-            chunkSize?: number;
-        }) => {
+    const map = new Proxy(Object.create(null), { get: (_t, key) => typeof key === 'string' ? async (inputs: readonly unknown[], call?: PoolMapOptions) => {
             if (closed)
                 throw new Error('Worker pool is closed');
             if (call?.signal?.aborted)
@@ -556,8 +600,14 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
             const width = call?.chunkSize ?? size;
             if (!Number.isSafeInteger(width) || width < 1)
                 throw new RangeError('chunkSize must be a positive integer');
+            const snapshot = call?.snapshot ?? 'task';
+            if (snapshot !== 'task' && snapshot !== 'batch')
+                throw new TypeError('snapshot must be task or batch');
             if (!inputs.length)
                 return results;
+            const batch: BatchSnapshot<S> | undefined = snapshot === 'batch'
+                ? { value: capture(source.getSnapshot()).value, finished: false, releaseIdleSlots: new Set() }
+                : undefined;
             let next = 0, failed = false;
             const feed = async () => {
                 try {
@@ -565,7 +615,7 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
                         const index = next++;
                         if (index >= inputs.length)
                             return;
-                        results[index] = await schedule(e => (e.run as any)[key](inputs[index], call), call?.signal);
+                        results[index] = await schedule(e => (e.run as any)[key](inputs[index], call), call?.signal, batch);
                     }
                 }
                 catch (error) {
@@ -573,8 +623,17 @@ export async function pool<T extends TaskSet<any>, S extends SharedShape<S> = St
                     throw error;
                 }
             };
-            await Promise.all(Array.from({ length: Math.min(width, size, inputs.length) }, () => feed()));
-            return results;
+            try {
+                await Promise.all(Array.from({ length: Math.min(width, size, inputs.length) }, () => feed()));
+                return results;
+            } finally {
+                if (batch) {
+                    batch.finished = true;
+                    // A cancelled handler can outlive map(). Its slot releases
+                    // on physical completion, even if the caller has moved on.
+                    for (const resume of batch.releaseIdleSlots) resume();
+                }
+            }
         } : undefined }) as PoolExecutor<T>['map'];
     return { run, map, size, get closed() { return closed; }, dispose() {
             if (closed)

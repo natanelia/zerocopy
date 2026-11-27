@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest';
 import { SharedMap, SharedList, compact } from '../dist/shared.js';
-import { createSharedSession, createSharedState } from '../dist/worker.js';
+import { createSharedSession, createSharedState, pool } from '../dist/worker.js';
 import { applySpatialEdits, buildSpatialIndex } from '../dist/spatial.js';
+import type { tasks as spatialTasks } from './spatial-pool-worker';
 function result(worker: Worker, version: number): Promise<any> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => finish(new Error(`Missing browser version ${version}`)), 10000);
@@ -29,6 +30,36 @@ it('auto-publishes to an isolated browser module worker without resending known 
     expect(await moved).toMatchObject({ seed: 2, oldSeed: 1, last: 9999, memoryHandles: 1, readOnly: true });
   } finally { state.dispose(); worker.terminate(); }
 }, 20000);
+
+it('validates overlapping batches on a live worker pool while a lane moves', async () => {
+  const west = [0, 0, 1, 1] as const, east = [9, 0, 10, 1] as const;
+  const base = buildSpatialIndex([{ id: 7, bounds: west }]);
+  const state = createSharedState({
+    rows: new SharedMap('number').set('lane', 0),
+    geometry: new SharedList('number').pushMany(west),
+    changes: applySpatialEdits(undefined, 0, []),
+  });
+  const workers = await pool<typeof spatialTasks>(
+    () => new Worker(new URL('./spatial-pool-worker.ts', import.meta.url), { type: 'module' }),
+    { state, size: 2, memory: 'share' },
+  );
+  try {
+    const jobs = Array.from({ length: 16 }, (_, i) => ({ base, viewport: i % 2 ? east : west }));
+    const original = workers.map.validate(jobs, { snapshot: 'batch' });
+    state.update(old => ({
+      rows: old.rows.set('lane', 1),
+      geometry: new SharedList('number').pushMany(east),
+      changes: applySpatialEdits(old.changes, 1, [{ id: 7, bounds: east }]),
+    }));
+    const moved = workers.map.validate(jobs, { snapshot: 'batch' });
+    const results = await Promise.all([original, moved]);
+    for (const [revision, batch] of results.entries()) {
+      const bounds = revision === 0 ? west : east;
+      expect(batch).toEqual(jobs.map(job => ({ revision, bounds, visible: job.viewport === bounds ? [7] : [] })));
+    }
+    expect(await workers.run.validate({ base, viewport: east })).toEqual({ revision: 1, bounds: east, visible: [7] });
+  } finally { workers.dispose(); state.dispose(); }
+});
 
 it('uses matching row, geometry and index roots for outstanding viewport jobs on two workers', async () => {
   const base = buildSpatialIndex([{ id: 7, bounds: [0, 0, 1, 1] }]);

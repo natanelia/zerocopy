@@ -170,6 +170,9 @@ Pass `{ signal }` to cancel an individual wait. A disconnect or transport
 failure rejects outstanding waits. Only snapshots retained by the caller
 remain available after the reader advances.
 
+For a validation split across a worker pool, `compute.map.validate(groups,
+{ snapshot: 'batch' })` captures the same roots for every group. [Pool consistency](workers.md#consistency)
+
 ## Manual and one-shot use
 
 `createSharedSession(initial)` supports manual `publish(next)`. Connect endpoints before publication. For a one-shot send, use `shareWithWorker(endpoint, value)` on the sender and `receiveShared<State>()` on the reader. Returned collection handles retain their arenas after the one-shot session closes.

@@ -95,6 +95,12 @@ confirmed snapshot untouched. A metadata subscription covers rows only. When
 geometry and index roots must advance together, publish them in one session
 record with the corresponding confirmed rows.
 
+A task pool can use the same confirmed source as its `state`. Call
+`workers.map.validate(groups, { snapshot: 'batch' })` to validate every group
+against the rows confirmed at the time of the call. Further confirmations can
+arrive while jobs are queued. For geometry validation, bind the grouped row,
+path and spatial change roots to the pool. [Worker pool consistency](workers.md#consistency)
+
 ### Confirm a group of edits
 
 For a manual TanStack transaction, call the adapter's acceptance helper once

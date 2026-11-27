@@ -187,7 +187,9 @@ try {
     const groups = Array.from({ length: 1000 }, (_, i) =>
       i % 2 === 0 ? ['headphones', 'mouse'] : ['keyboard', 'mouse'],
     );
-    const matches = await compute.map.findAvailable(groups);
+    const pending = compute.map.findAvailable(groups, { snapshot: 'batch' });
+    state.update('stock', stock => stock.set('headphones', 0));
+    const matches = await pending;
     console.log([matches.length, matches[0], matches[999]]);
     // [1000, ['headphones'], ['keyboard']]
   } finally {
@@ -204,7 +206,7 @@ The pool assigns jobs to idle workers. A large `map` call feeds a bounded number
 
 `maxPending` limits queued pool calls. Zero disables waiting when workers are busy. Batches share this queue with other work and can reject when it is full. `chunkSize` currently limits a batch's feeder concurrency, up to the pool size; it does **not** put several jobs into one wire message. On an error, the batch stops feeding new inputs. Already-running work is not rolled back.
 
-A queued job reads the source when it is assigned to a worker. A batch can therefore use different revisions if state changes during execution. See [Consistency](#consistency).
+The default `snapshot: 'task'` reads the source as the pool assigns each job. Use `snapshot: 'batch'` for a report or map validation that needs one consistent input across all workers. In the example, the first group still contains headphones even if its worker starts after the stock update. [Consistency](#consistency)
 
 ## Keep an existing message protocol
 
@@ -421,15 +423,15 @@ A task client accepts a collection record or a source with `getSnapshot()` and `
 
 For Redux, pass `reduxSource(store, state => ({ stock: state.stock }))` from `zerocopy/redux` as the executor's `state`. Keep ordinary UI state out of that selection. For continuous publication without tasks, use [`bindRedux()`](worker-sessions.md#redux-and-other-stores).
 
-Before a remote task is sent, the client reads `getSnapshot()` again. An update whose store notification is still pending is therefore included. This does not change how reducers run or permit concurrent writers.
+An ordinary remote call reads `getSnapshot()` again at dispatch. A batch with `snapshot: 'batch'` reads it when the batch starts. Both include updates already visible in the source, even if its notification is still pending.
 
 ## Consistency
 
 A remote call waits for **at least** the publication it requests. Newer state may be used when transport coalesces updates. Once a handler starts, its immutable snapshot remains fixed across `await` expressions.
 
-A pool reads state on assignment, not when the job first enters its queue. A whole batch is not snapshot-pinned. Exact invocation-time snapshots, `.at(snapshot)`, and cross-worker transactions are not implemented.
+With `compute.map.validate(groups, { snapshot: 'batch' })`, the pool captures the source's collection handles synchronously when the nonempty batch starts. Each group uses those roots, including jobs that spend time in the queue. The owner can keep editing. Overlapping batches each retain their own roots, and ordinary queued calls read the live source on assignment. Workers reuse their existing sessions and resume live updates when they finish the batch or switch to live work.
 
-To use one fixed input for a calculation, create an executor with a retained plain collection record instead of a changing source. Do not replace those handles while the calculation runs. To reject stale results in an application, track your own edit/request revision and compare it before applying the result.
+Group rows, editable paths and spatial changes in one source record. A batch captures bound state only. If a task also needs a packed base index, supply its matching immutable index as part of the task input. Tag results with the application revision so the UI can discard work that became obsolete. Retained roots keep their arenas alive during validation.
 
 `createState()` is an alias for `createSharedState()`: `current` changes synchronously, while `version` and subscriptions follow publication. See [Publication and delivery](worker-sessions.md#publication-and-delivery-are-separate).
 

@@ -40,7 +40,7 @@ These examples model a local catalog view, not a checkout system. The server rem
 
 A pool is useful when independent calculations can use any worker. It keeps a bounded waiting queue and feeds large batches incrementally.
 
-A pool batch can see different state revisions when the owner changes during execution. To use fixed inputs, bind a retained plain collection record rather than a changing source, and do not replace its handles during the calculation. This is not a cross-worker transaction.
+A pool reads live state as it assigns each job. For a report that needs one consistent input, pass `{ snapshot: 'batch' }` to the pool's `map` call. Every worker reads the stock values captured when the batch started, even if the owner processes another update. [Worker pool example](../../docs/workers.md#use-a-worker-pool)
 
 Do not send huge result arrays back for every query without measuring that cost. Ordinary results use structured cloning. Shared collection results need a separate snapshot transport; task replies do not automatically reconstruct them.
 
