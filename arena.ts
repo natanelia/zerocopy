@@ -917,9 +917,9 @@ export class Arena {
   // Leaves are already encoded in this arena. Only new branch nodes are needed.
   mergeMapLeaves(root: number, leaves: readonly number[]): number {
     this.assertWritable();
-    if (!leaves.length) return root;
-    // All callbacks have finished; the 49152-byte writer stage fits 12288 pointers.
-    const input = leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
+    // The writer stage fits 12288 pointers. For an empty iterator preserve
+    // alignment and let the kernel materialize a legacy journal root.
+    const input = leaves.length > 0 && leaves.length <= 12288 ? 16384 : this.alloc(leaves.length * 4), dv = this.dv;
     for (let i = 0; i < leaves.length; i++) dv.setUint32(input + i * 4, leaves[i], true);
     return this.wasm.mapBatch(root, input, leaves.length) >>> 0;
   }

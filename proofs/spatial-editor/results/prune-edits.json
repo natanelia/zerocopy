@@ -1,4 +1,5 @@
 {
+  "measuredCommit": "0d5d31e2b5cb1817d44a68ecc764f3066c855a82",
   "method": "Time only pruning on the owner with a fresh writer per sample. Rotate the three methods, warm up twice, then measure seven rounds. Validate all retained edits after each timing. Arena bytes are the change in the shared arena high-water mark.",
   "command": "bun run build:browser then node or bun proofs/spatial-editor/prune-edits.mjs",
   "sha256": {
