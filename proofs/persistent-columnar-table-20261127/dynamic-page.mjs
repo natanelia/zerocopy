@@ -1,4 +1,4 @@
-import {build,edit,payload,repack,shouldRepack,arenaUsage} from './dynamic-runtime.mjs';
+import {build,edit,payload,repack,shouldRepack,arenaUsage} from './partition-runtime.mjs';
 import {lane,bounds,queryFor,matches,validate,equal,digest} from './lane-fixture.mjs';
 const readerCount=4;
 function send(w,m){return new Promise((resolve,reject)=>{
@@ -12,10 +12,11 @@ const percentile=(a,q)=>a.slice().sort((x,y)=>x-y)[Math.max(0,Math.ceil(a.length
 // A changing tile window: replace 10% of rows every fourth revision at
 // similar map positions, with new unrelated keys and varied vertex lengths.
 // Other revisions move/insert/remove vertices without changing identity.
-function batch(rows,ids,rev,nextId){
+function batch(rows,ids,rev,nextId,pattern){
   const n=ids.length,replace=rev%4===0,count=replace?Math.floor(n/10):rev%6===0?25:1,remove=[],upsert=[];
   for(let j=0;j<count;j++){
-    const slot=((Math.imul(rev,8191)>>>0)+Math.floor(j*n/count))%n,id=ids[slot],old=rows.get(id);
+    const span=pattern==='local'?Math.floor(n/8):n,start=pattern==='local'?(Math.floor((rev-1)/24)%8)*span:0;
+    const slot=start+((Math.imul(rev,8191)>>>0)+Math.floor(j*span/count))%span,id=ids[slot],old=rows.get(id);
     if(replace){
       const fresh=lane(nextId++),dx=old.left-fresh.left,dy=old.bottom-fresh.bottom;
       const xy=fresh.xy.map((v,k)=>v+(k%2?dy:dx)),r={...fresh,xy,...bounds(xy)};
@@ -30,7 +31,7 @@ function batch(rows,ids,rev,nextId){
   }
   return {remove,upsert,nextId};
 }
-export async function run(mode,n,revisions=96,retention=2){
+export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
   if(!Number.isInteger(retention)||retention<1)throw Error('invalid retention');
   if(!crossOriginIsolated)throw Error('not isolated');
   const initial=Array.from({length:n},(_,i)=>lane(i)),rows=new Map(initial.map(r=>[r.id,r])),ids=initial.map(r=>r.id),dead=[],retained=new Map(),events=[];
@@ -44,7 +45,7 @@ export async function run(mode,n,revisions=96,retention=2){
   const initialWorkers=performance.now(),workers=Array.from({length:readerCount},()=>new Worker(new URL('./dynamic-worker.mjs',import.meta.url),{type:'module'}));
   try{
     for(let rev=0;rev<=revisions;rev++){
-      const b=rev?batch(rows,ids,rev,nextId):{remove:[],upsert:[],nextId};nextId=b.nextId;
+      const b=rev?batch(rows,ids,rev,nextId,pattern):{remove:[],upsert:[],nextId};nextId=b.nextId;
       for(const id of b.remove){rows.delete(id);dead.push(id);}for(const [id,r] of b.upsert)rows.set(id,r);
       const hold=rev===0||rev%24===0||rev===revisions;
       if(hold)retained.set(rev,{rows:new Map(rows),missing:dead.slice()});
@@ -88,7 +89,7 @@ export async function run(mode,n,revisions=96,retention=2){
     for(const r of releaseReplies)equal(r.digest,expected.at(-1)[1],'current after release');
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
-    return {mode,n,retention,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
+    return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
       p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
       initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
   }finally{for(const w of workers)w.terminate();}

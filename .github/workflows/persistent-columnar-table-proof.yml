@@ -1,4 +1,4 @@
-name: Persistent schema direct packed rebuild and bounded reader retention (proof only)
+name: Persistent schema independently owned spatial bands (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -14,7 +14,8 @@ jobs:
       matrix:
         engine: [chromium, firefox]
         size: [16384]
-        retention: [2, 5]
+        retention: [2]
+        pattern: [spread, local]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,11 +52,11 @@ jobs:
           mkdir -p columnar-results
           git rev-parse HEAD | tee columnar-results/commit.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 96 ${{ matrix.retention }} | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 5 96 ${{ matrix.retention }} ${{ matrix.pattern }} | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-direct-repack-${{ matrix.engine }}-${{ matrix.size }}-hold${{ matrix.retention }}-${{ github.run_id }}
+          name: columnar-spatial-bands-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn

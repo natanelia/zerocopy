@@ -1,4 +1,4 @@
-import {attach,get,scan,size} from './dynamic-runtime.mjs';
+import {attach,get,scan,size} from './partition-runtime.mjs';
 import {digest} from './lane-fixture.mjs';
 let current,last=-1;const retained=new Map();
 self.onmessage=async({data:m})=>{
