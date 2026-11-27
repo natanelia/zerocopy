@@ -120,6 +120,55 @@ edges, extra dimensions, and null coordinates inside a present lane. Pass
 the returned extension metadata to `toGeoArrowTable(batch, metadata)` to
 carry the original CRS and other extension fields through export.
 
+### Stream an IPC tile
+
+`fromGeoArrowRecordBatch` converts one decoded Arrow record batch. Use
+it with Arrow's `RecordBatchReader` when a server sends IPC stream
+messages. A worker can read or validate the first batch while the owner
+is still receiving the tile. The same `column` and `copy` options as
+`fromGeoArrowTable` apply.
+
+This example stages batches for a complete spatial index. Each feature
+ID belongs to the geometry at the same row of its record batch.
+
+<!-- example: stream-lane-tile -->
+```ts
+import { RecordBatchReader } from 'apache-arrow';
+import { fromGeoArrowRecordBatch } from 'zerocopy/geoarrow';
+import { buildLineStringIndex, buildLineStringLookup, type SpatialLineStringBatch } from 'zerocopy/spatial';
+
+async function openLaneTile(url: string, expectedRows: number, signal: AbortSignal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok || !response.body) throw new Error('Tile download failed');
+  const reader = await RecordBatchReader.from(response.body);
+  const layer: SpatialLineStringBatch<SharedArrayBuffer>[] = [];
+  let rows = 0;
+  try {
+    for await (const record of reader) {
+      const id = record.getChild('id');
+      const handles = id?.toArray();
+      if (!id || id.nullCount || !(handles instanceof Uint32Array)) throw new Error('Expected uint32 lane IDs');
+      const { paths } = fromGeoArrowRecordBatch(record);
+      layer.push({ paths, ids: handles.slice() });
+      rows += record.numRows;
+    }
+  } finally {
+    await reader.cancel();
+  }
+  signal.throwIfAborted();
+  if (rows !== expectedRows) throw new Error('Incomplete tile');
+  return { index: buildLineStringIndex(layer), lookup: buildLineStringLookup(layer) };
+}
+```
+
+The decoder owns the input stream. The shared output retains its packed
+geometry buffers. Copying the small ID vector lets the decoded IPC bytes
+be reclaimed after each iteration. The example returns the complete
+layer only after checking its row count. A progressive preview can send
+each converted batch to a worker inside the loop. Fetch and decoding
+may buffer ahead, and a consumer retaining all geometry still needs
+space for the full shared tile.
+
 ## XY bounds
 
 `bboxXY` recomputes `[minX, minY, maxX, maxY]` from a numeric `SharedList`

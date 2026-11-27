@@ -35,7 +35,11 @@ if (readerCounts.some(n => ![1, 4, 8].includes(n)) || trials.some(n => ![0, 1, 2
 }
 const config = smoke ? { count: 128, vertices: 24, steps: 40, warmup: 0, transport, rebuild, uploads, source } :
   { count: 4096, vertices: 256, steps: soak ? 1024 : 64, warmup: 16, transport, rebuild, uploads, source };
-if (source === 'geoarrow') config.tileLayout = smoke ? 'sparse' : 'ordered';
+if (source === 'geoarrow') {
+  config.tileLayout = smoke ? 'sparse' : 'ordered';
+  config.ipc = option('ipc') ?? 'stream';
+  if (!['stream', 'buffered'].includes(config.ipc)) throw new Error('Expected --ipc=stream|buffered');
+} else if (option('ipc') !== undefined) throw new Error('--ipc requires a GeoArrow source');
 if (trace) config.trace = true;
 const timeoutMs = Number(option('timeout-ms') ?? Math.max(180000, config.steps * 1000));
 if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > 2147483647) throw new Error('Invalid --timeout-ms');

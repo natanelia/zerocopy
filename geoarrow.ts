@@ -146,20 +146,39 @@ function importBatch(lines: Data<List | LargeList>, layout: ReturnType<typeof xy
   return { offsets, coordinates, validity };
 }
 
-/** Import planar XY LineStrings in record-batch order. Shared contiguous XY storage is borrowed unless copy is set. */
-export function fromGeoArrowTable(table: Table, { column = 'geometry', copy = false }: { column?: string; copy?: boolean } = {}): {
-  readonly metadata: PlanarGeoArrowMetadata;
-  readonly batches: readonly LineStringBuffersXY<SharedArrayBuffer>[];
-} {
-  const index = table.schema.fields.findIndex(field => field.name === column);
-  const field = table.schema.fields[index];
+export interface GeoArrowImportOptions {
+  readonly column?: string;
+  readonly copy?: boolean;
+}
+
+function lineStringColumn(schema: Schema, column: string) {
+  const index = schema.fields.findIndex(field => field.name === column);
+  const field = schema.fields[index];
   if (field?.metadata.get('ARROW:extension:name') !== 'geoarrow.linestring') {
     throw new TypeError(`Expected geoarrow.linestring column "${column}"`);
   }
   const metadata: unknown = JSON.parse(field.metadata.get('ARROW:extension:metadata') ?? '{}');
   planarMetadata(metadata);
   if (!(DataType.isList(field.type) || DataType.isLargeList(field.type))) throw new TypeError('Expected a GeoArrow list');
-  const layout = xyLayout(field.type.valueType);
+  return { index, metadata, layout: xyLayout(field.type.valueType) };
+}
+
+/** Import one decoded Arrow record batch, including a slice or a batch from an IPC stream reader. */
+export function fromGeoArrowRecordBatch(batch: RecordBatch, { column = 'geometry', copy = false }: GeoArrowImportOptions = {}): {
+  readonly metadata: PlanarGeoArrowMetadata;
+  readonly paths: LineStringBuffersXY<SharedArrayBuffer>;
+} {
+  const { index, metadata, layout } = lineStringColumn(batch.schema, column);
+  const paths = importBatch(batch.data.children[index] as Data<List | LargeList>, layout, copy);
+  return { metadata, paths };
+}
+
+/** Import planar XY LineStrings in record-batch order. Shared contiguous XY storage is borrowed unless copy is set. */
+export function fromGeoArrowTable(table: Table, { column = 'geometry', copy = false }: GeoArrowImportOptions = {}): {
+  readonly metadata: PlanarGeoArrowMetadata;
+  readonly batches: readonly LineStringBuffersXY<SharedArrayBuffer>[];
+} {
+  const { index, metadata, layout } = lineStringColumn(table.schema, column);
   const batches = table.batches.map(batch => importBatch(batch.data.children[index] as Data<List | LargeList>, layout, copy));
   return { metadata, batches };
 }

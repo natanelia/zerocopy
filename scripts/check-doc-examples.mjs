@@ -11,6 +11,17 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
+  ['docs/geometry.md', 'stream-lane-tile', `
+const { encodeTile } = await import('../proofs/spatial-editor/tile-io.mjs');
+const { getLineStringById } = await import('zerocopy/spatial');
+const url = 'data:application/vnd.apache.arrow.stream;base64,' + Buffer.from(encodeTile(128, 8, 'sparse')).toString('base64');
+const signal = new AbortController().signal;
+const { index, lookup } = await openLaneTile(url, 128, signal);
+assert.equal(index.ids.length, 128);
+assert.equal(getLineStringById(lookup, 0xffffffff).length, 16);
+assert.equal(getLineStringById(lookup, 9), undefined);
+await assert.rejects(openLaneTile(url, 129, signal), /Incomplete tile/);
+await assert.rejects(openLaneTile(url, 128, AbortSignal.abort()), { name: 'AbortError' });`],
   ['README.md', 'map-snapshots', "assert.equal(before.size, 1); assert.equal(after.size, 2); assert.equal(after.get(1), 'Upstream timeout'); assert.notEqual(before, after);"],
   ['website/content/log-explorer.md', 'log-columns', "assert.equal(before.message.get(1), 'Upstream timeout'); assert.equal(before.message.size, 2); assert.equal(next.message.size, 3); assert.equal(next.level.size, next.message.size);"],
   ['website/content/catalog.md', 'catalog-snapshots', "assert.equal(initial.get('product/000000').attributes.priceCents, 0); assert.equal(current.get('product/000000').attributes.priceCents, 2500); assert.equal(initial.get('product/000000').status, 'available'); assert.equal(current.get('product/000000').status, 'unavailable'); assert(Object.isFrozen(current.get('product/000000').attributes)); assert(message.arenas.every(arena => !arena.copy && arena.memory.buffer instanceof SharedArrayBuffer));"],

@@ -17,6 +17,7 @@ const allModes = fromArrow ? ['copy', 'shared', 'packed'] : ['copy', 'shared'];
 if (selectedMode && !allModes.includes(selectedMode)) throw new Error('Unsupported mode: ' + selectedMode);
 const modes = selectedMode ? [selectedMode] : allModes;
 if (fromArrow) assert.match(first.tileSHA256, /^[a-f0-9]{64}$/, 'Missing IPC fixture digest');
+if (first.config.ipc !== undefined) assert(fromArrow && ['stream', 'buffered'].includes(first.config.ipc), 'Unknown IPC loader');
 for (const report of reports) {
   for (const key of ['bundleSHA256', 'tileSHA256', 'config', 'chromium', 'hardware', 'platform', 'frameTimingVersion', 'graphics']) {
     assert.deepEqual(report[key], first[key], 'Mixed benchmark inputs: ' + key);
@@ -48,6 +49,12 @@ for (const readers of readerCounts) {
       if (fromArrow) {
         const { readyMs, initialIndexMs, loadPathsAndRowsMs, initialPathEntries } = c.startup;
         for (const ms of [readyMs, initialIndexMs, loadPathsAndRowsMs]) assert(Number.isFinite(ms) && ms >= 0);
+        if (first.config.ipc) {
+          const { firstBatchMs, importMs, batchCount } = c.startup;
+          assert(Number.isFinite(firstBatchMs) && Number.isFinite(importMs));
+          assert(0 <= firstBatchMs && firstBatchMs <= importMs && importMs <= loadPathsAndRowsMs);
+          assert(Number.isSafeInteger(batchCount) && batchCount > 0);
+        }
         assert(readyMs + 1e-6 >= loadPathsAndRowsMs + initialIndexMs, 'Initialization phases exceed time to ready');
         assert.equal(initialPathEntries, mode === 'packed' ? 0 : first.config.count);
         if (mode === 'packed') assert(c.peakPathEntries > 0 && c.peakPathEntries <= 5, 'Only edited lanes should be materialized');
@@ -92,6 +99,10 @@ for (const readers of readerCounts) {
       p95ValidationMs: median(matching.map(c => c.p95ValidationMs)),
     };
     if (fromArrow) {
+      if (first.config.ipc) {
+        row[mode].firstBatchMs = median(matching.map(c => c.startup.firstBatchMs));
+        row[mode].importMs = median(matching.map(c => c.startup.importMs));
+      }
       row[mode].readyMs = median(matching.map(c => c.startup.readyMs));
       row[mode].loadPathsAndRowsMs = median(matching.map(c => c.startup.loadPathsAndRowsMs));
       row[mode].initialIndexMs = median(matching.map(c => c.startup.initialIndexMs));

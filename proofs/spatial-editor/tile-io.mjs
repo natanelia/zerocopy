@@ -1,6 +1,6 @@
-import { Field, FixedSizeList, Float64, List, RecordBatch, Schema, Struct, Table, Uint32,
+import { Field, FixedSizeList, Float64, List, RecordBatch, RecordBatchReader, Schema, Struct, Table, Uint32,
   makeData, tableFromIPC, tableToIPC } from 'apache-arrow';
-import { fromGeoArrowTable } from '../../dist/geoarrow.js';
+import { fromGeoArrowRecordBatch } from '../../dist/geoarrow.js';
 import { lane } from './workload.mjs';
 const rowsPerBatch = 64;
 
@@ -33,24 +33,40 @@ export function encodeTile(count, vertices, layout = 'ordered') {
   return tableToIPC(new Table(schema, batches), 'stream');
 }
 
-export async function loadTile(packed, count) {
+export async function loadTile(packed, count, ipc = 'stream') {
+  const started = performance.now();
   const response = await fetch('/tile.arrow');
   if (!response.ok) throw new Error('Failed to fetch GeoArrow tile: ' + response.status);
-  const table = tableFromIPC(await response.arrayBuffer());
-  if (table.numRows !== count) throw new Error('Wrong tile row count');
-  const shared = packed ? fromGeoArrowTable(table).batches : undefined;
-  return table.batches.map((batch, i) => {
-    const ids = batch.getChild('id').data[0].values.subarray(0, batch.numRows);
-    if (!(ids instanceof Uint32Array) || ids.length !== batch.numRows) throw new Error('Expected a uint32 handle per lane');
-    if (packed) {
-      // A retained ID view into an IPC stream can keep the entire ordinary file buffer alive.
-      return { ids: ids.slice(), paths: shared[i] };
+  if (!response.body) throw new Error('Missing GeoArrow response body');
+  const reader = ipc === 'stream' ? await RecordBatchReader.from(response.body) : undefined;
+  const records = reader ?? tableFromIPC(await response.arrayBuffer()).batches;
+  const batches = [];
+  let rows = 0, firstBatchMs;
+  try {
+    for await (const batch of records) {
+      rows += batch.numRows;
+      if (rows > count) throw new Error('Wrong tile row count');
+      const handles = batch.getChild('id');
+      const ids = handles?.toArray();
+      if (!(ids instanceof Uint32Array) || handles.nullCount || ids.length !== batch.numRows) {
+        throw new Error('Expected a non-null uint32 handle per lane');
+      }
+      if (packed) {
+        // The retained handles should not keep this IPC chunk's coordinate bytes alive.
+        batches.push({ ids: ids.slice(), paths: fromGeoArrowRecordBatch(batch).paths });
+      } else {
+        // The two controls can read this known, interleaved fixture directly from ordinary Arrow memory.
+        const data = batch.getChild('geometry').data[0];
+        const offsets = data.valueOffsets.subarray(0, batch.numRows + 1);
+        const coordinates = data.children[0].children[0].values.subarray(0, 2 * offsets[batch.numRows]);
+        if (!(coordinates.buffer instanceof ArrayBuffer)) throw new Error('Copy control needs ordinary Arrow buffers');
+        batches.push({ ids, paths: { offsets, coordinates, validity: null } });
+      }
+      firstBatchMs ??= performance.now() - started;
     }
-    // The two controls can read this known, interleaved fixture directly from ordinary Arrow memory.
-    const data = batch.getChild('geometry').data[0];
-    const offsets = data.valueOffsets.subarray(0, batch.numRows + 1);
-    const coordinates = data.children[0].children[0].values.subarray(0, 2 * offsets[batch.numRows]);
-    if (!(coordinates.buffer instanceof ArrayBuffer)) throw new Error('Copy control needs ordinary Arrow buffers');
-    return { ids, paths: { offsets, coordinates, validity: null } };
-  });
+  } finally {
+    await reader?.cancel();
+  }
+  if (rows !== count) throw new Error('Wrong tile row count');
+  return { batches, timing: { firstBatchMs, importMs: performance.now() - started, batchCount: batches.length } };
 }

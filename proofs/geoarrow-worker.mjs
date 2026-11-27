@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
-import { tableFromIPC, tableToIPC } from 'apache-arrow';
+import { RecordBatchReader, tableFromIPC, tableToIPC } from 'apache-arrow';
 import { algorithm } from '@geoarrow/geoarrow-js';
 import { SharedList } from 'zerocopy';
-import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
+import { fromGeoArrowRecordBatch, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
 import { bboxXY, pathIntersectsBoxXY } from 'zerocopy/geometry';
 import { buildLineStringIndex, buildLineStringLookup, getLineStringById, querySpatialIndex } from 'zerocopy/spatial';
 
@@ -12,8 +12,15 @@ if (isMainThread) {
   const path = new SharedList('number').pushMany([0, 1, 2, 3]);
   const original = packLineStringsXY([path, null, new SharedList('number')]);
   const edited = packLineStringsXY([path.set(2, 7), null, new SharedList('number')]);
-  const ipc = tableToIPC(toGeoArrowTable(edited));
-  const imported = fromGeoArrowTable(tableFromIPC(ipc)).batches[0];
+  const ipc = tableToIPC(toGeoArrowTable(edited), 'stream');
+  async function* chunks() {
+    for (let start = 0; start < ipc.length; start += 37) yield ipc.subarray(start, start + 37);
+  }
+  const reader = await RecordBatchReader.from(chunks());
+  const first = await reader.next();
+  assert.equal(first.done, false);
+  const { paths: imported } = fromGeoArrowRecordBatch(first.value);
+  assert.equal((await reader.next()).done, true);
   const batches = [{ paths: imported, ids: Uint32Array.of(17, 0xffffffff, 0) }];
   const index = buildLineStringIndex(batches, 2);
   const lookup = buildLineStringLookup(batches);

@@ -95,6 +95,8 @@ jobs:
           node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-full-readers-4.json.gz
           node proofs/spatial-editor/summarize.mjs --readers=4 proofs/spatial-editor/results/webgl-uploads-range-readers-4.json.gz
           node proofs/spatial-editor/summarize.mjs proofs/spatial-editor/results/geoarrow-editor.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed proofs/spatial-editor/results/ipc-buffered-readers-4.json.gz
+          node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed proofs/spatial-editor/results/ipc-stream-readers-4.json.gz
       - name: Check checkpoint, heap, and batched-list browser workers
         shell: bash
         env:

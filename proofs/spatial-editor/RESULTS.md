@@ -9,6 +9,46 @@ timed the animation callback met the memory target and missed the frame
 target. The previous frame-phase run met both. Keep the spatial path opt-in
 while hardware-GPU measurements are pending.
 
+## Streaming the first geometry batch
+
+Streaming made the first 64 lanes available in a median **63.2 ms**.
+Buffering the complete Arrow IPC response before decoding produced the
+same lanes in **280.5 ms**. The six fresh Chromium runs used the same
+16 MiB of coordinates, 64 record batches, packed shared geometry and four
+validation workers. Only the input loader changed.
+
+| Median of three trials | Buffered response | Streamed response |
+| --- | ---: | ---: |
+| First batch of geometry and handles available (ms) | 280.5 | 63.2 |
+| All batches imported (ms) | 302.0 | 159.2 |
+| Editor ready after first worker validation (ms) | 587.2 | 344.3 |
+| Peak process-tree PSS during startup and editing (MiB) | 362.1 | 377.7 |
+
+The first-batch times ranged from 194.8 to 293.2 ms for buffering and
+30.3 to 72.8 ms for streaming. All three streamed runs delivered their
+first batch sooner. The buffered editor reached full readiness sooner in
+one pair. The replay builds the index and opens the TanStack collections
+after all 4,096 lanes have arrived. A separate Chromium worker test edits
+the first batch while the IPC writer is still withholding the second.
+
+Use streaming when a preview or validator can start with part of a tile.
+Its median peak resident memory was **15.7 MiB higher** over the entire
+replay. That measurement includes the browser, shared output, editors and
+workers. It cannot isolate the decoder's temporary allocations.
+
+The trial order was buffered/streamed, streamed/buffered, buffered/streamed.
+All 384 measured commands passed after 16 warmups per run. The source was
+served over loopback on Linux with Chromium 156.0.8078.4 and SwiftShader.
+[Buffered raw trials](results/ipc-buffered-readers-4.json.gz) · [Streamed raw trials](results/ipc-stream-readers-4.json.gz)
+
+To reproduce each arm, run the following with `--ipc=stream` and then
+`--ipc=buffered`, giving each report its own output path.
+
+```sh
+node proofs/spatial-editor/run.mjs --mode=packed --readers=4 --ipc=stream --output=/tmp/streamed.json
+node proofs/spatial-editor/summarize.mjs --readers=4 --mode=packed /tmp/streamed.json
+```
+
 ## Opening an Arrow tile and editing five lanes
 
 Keep packed geometry available for editors that open a tile and change a
@@ -60,9 +100,9 @@ the measured one-reader rotation encountered a timeout and a renderer
 crash before its missing cases were rerun. The table uses only completed,
 untraced trials. PSS measures resident pages and excludes swapped pages.
 A physical GPU remains necessary to judge interactive frame latency.
-These measurements used the ordered fixture and a direct ordinal-to-row
-lookup. The current replay uses the shared handle directory for arbitrary
-row order. [Measured source](https://github.com/natanelia/zerocopy/tree/7d04eeeb9f61e3a6656910f7d44ed1f80c1bbe45/proofs/spatial-editor) · [Raw samples from all 27 browsers](results/geoarrow-editor.json.gz) · [Replay instructions](README.md#open-and-edit-a-geoarrow-tile)
+These measurements buffered the ordered fixture and used a direct ordinal-to-row
+lookup. The current replay streams incoming batches by default and uses the
+shared handle directory for arbitrary row order. [Measured source](https://github.com/natanelia/zerocopy/tree/7d04eeeb9f61e3a6656910f7d44ed1f80c1bbe45/proofs/spatial-editor) · [Raw samples from all 27 browsers](results/geoarrow-editor.json.gz) · [Replay instructions](README.md#open-and-edit-a-geoarrow-tile)
 
 ## Updating one vertex on the GPU
 

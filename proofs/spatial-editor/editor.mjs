@@ -31,14 +31,15 @@ function reader() {
   };
 }
 
-export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range', source = 'generated', trace = false }) {
+export async function replay({ mode, readers, count, vertices, steps, warmup, transport = 'session', rebuild = 'packed', graphicsMode = 'swiftshader', uploads = 'range', source = 'generated', ipc = 'stream', trace = false }) {
   if (!crossOriginIsolated) throw new Error('A cross-origin-isolated page is required');
   const shared = mode !== 'copy', packed = mode === 'packed';
   const view = await renderer(graphicsMode, uploads);
   if (trace) console.info('Renderer ready');
   const peers = Array.from({ length: readers }, reader);
   const loadStarted = performance.now();
-  let input = source === 'geoarrow' ? await loadTile(packed, count) : undefined;
+  let input, importTiming;
+  if (source === 'geoarrow') ({ batches: input, timing: importTiming } = await loadTile(packed, count, ipc));
   if (trace) console.info('Tile loaded');
   const tile = packed ? buildLineStringLookup(input) : undefined;
   const initialData = [], expectedBounds = new Map(), editedPaths = new Map();
@@ -60,7 +61,7 @@ export async function replay({ mode, readers, count, vertices, steps, warmup, tr
   }
   if (!packed) input = undefined;
   let peakEntries = paths.size;
-  const startup = { initialPathEntries: paths.size, loadPathsAndRowsMs: performance.now() - loadStarted };
+  const startup = { ...importTiming, initialPathEntries: paths.size, loadPathsAndRowsMs: performance.now() - loadStarted };
   if (trace) console.info('Initial paths and rows prepared');
   const local = (id, initialData = []) => localOnlyCollectionOptions({ id, initialData, getKey: row => row.id });
   const options = shared ? sharedCollectionConfig({ id: 'lanes', initialData }) : local('lanes', initialData);

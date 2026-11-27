@@ -1,6 +1,6 @@
 import { SharedList } from 'zerocopy';
 import { bboxXY, lineStringViewXY, pathIntersectsBoxXY, type BoundsXY } from 'zerocopy/geometry';
-import { fromGeoArrowTable, packLineStringsXY, toGeoArrowTable } from 'zerocopy/geoarrow';
+import { fromGeoArrowRecordBatch, fromGeoArrowTable, packLineStringsXY, toGeoArrowTable, type GeoArrowImportOptions } from 'zerocopy/geoarrow';
 import { buildLineStringIndex, buildLineStringLookup, getLineStringById, querySpatialIndex } from 'zerocopy/spatial';
 const bounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]));
 const laneBounds: BoundsXY = bboxXY(new SharedList('number').pushMany([0, 0, 2, 3]), { start: 2, end: 4 });
@@ -19,6 +19,10 @@ const coordinates: Float64Array<SharedArrayBuffer> = batch.coordinates;
 const x: number | undefined = toGeoArrowTable(batch).getChild('geometry')?.get(0)?.get(0)?.get(0) ?? undefined;
 void coordinates; void x;
 const imported = fromGeoArrowTable(toGeoArrowTable(batch, { crs: 'EPSG:3857', crs_type: 'authority_code' }));
+const importOptions: GeoArrowImportOptions = { copy: true };
+const record = fromGeoArrowRecordBatch(toGeoArrowTable(batch).batches[0]!, importOptions);
+const sharedXY: Float64Array<SharedArrayBuffer> = record.paths.coordinates;
+void sharedXY;
 interface ExportOptions { crs: Readonly<Record<string, unknown>> }
 const options: ExportOptions = { crs: { name: 'test' } };
 toGeoArrowTable(batch, options);

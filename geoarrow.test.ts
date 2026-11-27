@@ -1,7 +1,7 @@
 import { Field, Float32, Float64, LargeList, List, RecordBatch, Schema, Struct, Table, makeData, tableFromIPC, tableToIPC,
   vectorFromArray, type Data } from 'apache-arrow';
 import { expect, it } from 'vitest';
-import { fromGeoArrowTable, lineStringViewXY, packLineStringsXY, toGeoArrowTable } from './geoarrow';
+import { fromGeoArrowRecordBatch, fromGeoArrowTable, lineStringViewXY, packLineStringsXY, toGeoArrowTable } from './geoarrow';
 import { SharedList } from './shared-list';
 import { getWorkerData, initWorker } from './shared';
 
@@ -39,7 +39,10 @@ it('imports an independent separated XY column across batches, slices and Arrow 
   const makeTable = (part: typeof rows) => laneTable(vectorFromArray(part, list).data[0], JSON.stringify(metadata));
   const table = makeTable(rows.slice(0, 10)).concat(makeTable(rows.slice(10)));
   for (const source of [table, tableFromIPC(tableToIPC(table, 'stream')), tableFromIPC(tableToIPC(table, 'file'))]) {
-    const { batches, metadata: imported } = fromGeoArrowTable(source.slice(6, 14), { column: 'lanes' });
+    const sliced = source.slice(6, 14);
+    const { batches, metadata: imported } = fromGeoArrowTable(sliced, { column: 'lanes' });
+    expect(sliced.batches.map(batch => fromGeoArrowRecordBatch(batch, { column: 'lanes' })))
+      .toEqual(batches.map(paths => ({ metadata: imported, paths })));
     expect(imported).toEqual(metadata);
     expect(batches.map(b => b.offsets.length - 1)).toEqual([4, 4]);
     for (const batch of batches) {
@@ -60,6 +63,8 @@ it('borrows only the selected shared XY range or copies it for an independent li
   const table = toGeoArrowTable(original).slice(1, 4);
   const batch = fromGeoArrowTable(table).batches[0]!;
   const owned = fromGeoArrowTable(table, { copy: true }).batches[0]!;
+  expect(fromGeoArrowRecordBatch(table.batches[0]!).paths.coordinates.buffer).toBe(original.coordinates.buffer);
+  expect(fromGeoArrowRecordBatch(table.batches[0]!, { copy: true }).paths.coordinates.buffer).not.toBe(original.coordinates.buffer);
   expect(batch.coordinates.buffer).toBe(original.coordinates.buffer);
   expect(batch.coordinates.byteOffset).toBe(original.coordinates.byteOffset + 32);
   expect([...batch.offsets]).toEqual([0, 2, 2, 2]);
@@ -83,6 +88,7 @@ it('normalizes LargeList offsets and excludes hidden coordinates of null rows', 
   const data = makeData({ type, length: 4, child: source.children[0], nullBitmap: Uint8Array.of(13),
     valueOffsets: BigInt64Array.of(0n, 1n, 2n, 2n, 4n) });
   const batch = fromGeoArrowTable(laneTable(data), { column: 'lanes' }).batches[0]!;
+  expect(fromGeoArrowRecordBatch(laneTable(data).batches[0], { column: 'lanes' }).paths).toEqual(batch);
   expect([...batch.offsets]).toEqual([0, 1, 1, 1, 3]);
   expect([...batch.coordinates]).toEqual([1, 2, 3, 4, 5, 6]);
   expect(lineStringViewXY(batch, 1)).toBeNull();
@@ -119,12 +125,16 @@ it('checks the column type and edge interpretation even on empty tables, and rej
   const options = { column: 'lanes' };
   const table = laneTable(data);
   expect(fromGeoArrowTable(new Table(table.schema), options).batches).toEqual([]);
+  expect([...fromGeoArrowRecordBatch(new RecordBatch(table.schema, undefined), options).paths.offsets]).toEqual([0]);
   expect(() => fromGeoArrowTable(table)).toThrow(/column/);
+  expect(() => fromGeoArrowRecordBatch(table.batches[0])).toThrow(/column/);
   expect(() => fromGeoArrowTable(table, options)).toThrow(/valid/);
+  expect(() => fromGeoArrowRecordBatch(table.batches[0], options)).toThrow(/valid/);
   expect([...fromGeoArrowTable(table.slice(1), options).batches[0]!.coordinates]).toEqual([1, 2]);
   for (const invalid of [laneTable(data, '{"edges":"spherical"}'), laneTable(data, 'null'),
     laneTable(data, '{}', 'geoarrow.polygon'), laneTable(vectorFromArray([], new Float32()).data[0])]) {
     expect(() => fromGeoArrowTable(new Table(invalid.schema), options)).toThrow(TypeError);
+    expect(() => fromGeoArrowRecordBatch(new RecordBatch(invalid.schema, undefined), options)).toThrow(TypeError);
   }
 });
 

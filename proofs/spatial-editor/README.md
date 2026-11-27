@@ -75,7 +75,7 @@ fixture uses descending sparse handles up to `0xffffffff` in uneven batches.
 | --- | --- | --- |
 | `copy` | Float64 row views into an ordinary decoded Arrow buffer | Each worker receives its own copy on first attachment and sparse edits thereafter. |
 | `shared` | One immutable ZeroCopy numeric list per imported row | Workers share every list from the first publication. |
-| `packed` | Shared coordinate and offset buffers from `fromGeoArrowTable` | Workers receive the base buffers once. The owner creates lists for edited lanes and publishes those with confirmed metadata. |
+| `packed` | Shared coordinate and offset buffers from `fromGeoArrowRecordBatch` | Workers receive the base buffers once. The owner creates lists for edited lanes and publishes those with confirmed metadata. |
 
 The packed editor builds its initial Flatbush index with `buildLineStringIndex`
 and resolves stable handles through `buildLineStringLookup`.
@@ -88,6 +88,13 @@ publication. Only the visible paths are packed for deck.gl.
 node proofs/spatial-editor/run.mjs --source=geoarrow --output=/tmp/geoarrow-editor.json
 node proofs/spatial-editor/summarize.mjs /tmp/geoarrow-editor.json
 ```
+
+GeoArrow runs stream the response through Apache Arrow's record batch reader.
+Pass `--ipc=buffered` to download the entire response and decode a table
+before importing its batches. Both loaders apply the same conversion to
+each batch. The first-batch and total import timers start before the fetch
+and end when the corresponding geometry and feature IDs are available.
+TanStack and the spatial index are initialized after the full tile arrives.
 
 The report records the IPC fixture hash, list or path-map entry counts, the
 time to load coordinates and create initial metadata rows, the initial
