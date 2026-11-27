@@ -1,5 +1,5 @@
 import { SharedMap } from './shared-map.ts';
-import type { JsonType } from './types.ts';
+import type { JsonObject, JsonType, JsonValue } from './types.ts';
 import { checkSpatialId } from './spatial-id.ts';
 import type { SpatialPair, SpatialJoinDelta } from './spatial.ts';
 
@@ -70,8 +70,68 @@ type SyncParams<T, K extends string | number = string> = {
   markError?: (error: unknown) => void;
   collection?: { cleanup?: () => Promise<void> };
 };
-type Mutation<T> = { type: 'insert' | 'update' | 'delete'; modified: T; changes?: Partial<T>; collection?: object };
+type Mutation<T> = { type: 'insert' | 'update' | 'delete'; modified: T; original?: Partial<T>; changes?: Partial<T>; collection?: object };
 type Transaction<T> = { mutations: readonly Mutation<T>[] };
+
+function jsonRecord(value: JsonValue | undefined): value is JsonObject {
+  return value != null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function sameJson(a: JsonValue | undefined, b: JsonValue | undefined): boolean {
+  if (a === b) return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((value, index) => sameJson(value, b[index]));
+  }
+  if (!jsonRecord(a) || !jsonRecord(b)) return false;
+  const keys = Object.keys(a);
+  return keys.length === Object.keys(b).length && keys.every(key => Object.hasOwn(b, key) && sameJson(a[key], b[key]));
+}
+
+function ownField<T extends object>(object: T, key: keyof T) {
+  return Object.hasOwn(object, key) ? object[key] : undefined;
+}
+
+// TanStack tracks the top-level field. A nested edit carries the entire
+// optimistic field, including sibling values from other pending transactions.
+function rebaseField(
+  before: JsonValue | undefined, after: JsonValue | undefined,
+  confirmed: JsonValue | undefined, path: string,
+): JsonValue | undefined {
+  if (sameJson(before, after)) return confirmed;
+  if (sameJson(before, confirmed) || sameJson(after, confirmed)) return after;
+  if (jsonRecord(before) && jsonRecord(after) && jsonRecord(confirmed)) {
+    const result: Record<string, JsonValue> = Object.assign(Object.create(null), confirmed);
+    for (const key of Object.keys(before)) {
+      if (!Object.hasOwn(after, key)) delete result[key];
+    }
+    for (const [key, value] of Object.entries(after)) {
+      const next = rebaseField(ownField(before, key), value, ownField(confirmed, key), path + '.' + key);
+      if (next === undefined) delete result[key];
+      else result[key] = next;
+    }
+    return result;
+  }
+  // Arrays have no element identities. A descendant edit also needs its
+  // original object to exist. Retrying from the current row resolves either.
+  if ((Array.isArray(before) && Array.isArray(after)) || (jsonRecord(before) && jsonRecord(after))) {
+    throw new Error(`Cannot confirm overlapping edits to ${path}`);
+  }
+  return after;
+}
+
+function confirmedUpdate<T extends object>(confirmed: T, changes: Partial<T>, original?: Partial<T>): T {
+  if (!original) return { ...confirmed, ...changes };
+  const fields = Object.keys(changes) as (keyof T & string)[];
+  const updates = fields.map(key => {
+    const before = ownField(original, key), after = changes[key];
+    if (before === after) return [key, ownField(confirmed, key)];
+    if (before == null || after == null || typeof before !== 'object' || typeof after !== 'object') return [key, after];
+    // Compare in the shared map's JSON representation (including toJSON).
+    const pair: { before?: JsonValue; after?: JsonValue } = JSON.parse(JSON.stringify({ before, after }));
+    return [key, rebaseField(pair.before, pair.after, ownField(confirmed, key) as JsonValue, key)];
+  });
+  return { ...confirmed, ...Object.fromEntries(updates) };
+}
 
 function stringKey<T>(item: T, field: keyof T): string {
   const key = item[field];
@@ -293,7 +353,7 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
       // must leave both the old root and the TanStack collection readable.
       let next = collection;
       const writes: Write<T>[] = [];
-      for (const { type, modified, changes } of mutations) {
+      for (const { type, modified, changes, original } of mutations) {
         const key = getKey(modified);
         if (type === 'delete') {
           next = next.delete(key);
@@ -304,7 +364,7 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
           if (type === 'update' && changes) {
             const confirmed = next.get(key);
             if (!confirmed) throw new Error(`Cannot update missing confirmed row: ${key}`);
-            value = { ...confirmed, ...changes };
+            value = confirmedUpdate(confirmed, changes, original);
           }
           next = next.insert(value, key);
           writes.push({ type, value: next.get(key)! });

@@ -5,7 +5,8 @@ import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery } from '../di
 import { sharedCollectionConfig, spatialJoinCollectionConfig } from '../dist/tanstack-db-collection.js';
 
 it('attaches confirmed rows and geometry from the same edit in a browser worker', async () => {
-  const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'lane', revision: 0 }] });
+  const firstRow = { id: 'lane', revision: 0, style: { color: 'black', width: 2 } };
+  const options = sharedCollectionConfig({ id: 'lanes', initialData: [firstRow] });
   const lanes = createCollection(options);
   const overlaps = createCollection(spatialJoinCollectionConfig({ id: 'lane-road-overlaps' }));
   const reader = new Worker(new URL('./tanstack-worker.ts', import.meta.url), { type: 'module' });
@@ -24,7 +25,7 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
   });
   try {
     await lanes.preload();
-    const before = { row: { id: 'lane', revision: 0 }, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [],
+    const before = { row: firstRow, bounds: [0, 0, 2, 3], candidates: [], rebuiltCandidates: [],
       preparedCandidates: [], narrowCandidates: [7], intersectsNarrow: false, narrowPairs: [] };
     const empty = { added: [], removed: [] };
     const seed = await read(initial);
@@ -34,17 +35,21 @@ it('attaches confirmed rows and geometry from the same edit in a browser worker'
 
     const geometry = initial.set(0, -12);
     const edits = applySpatialEdits(initialChanges, 1, [{ id: 7, bounds: [-12, 0, 2, 3] }]);
+    const color = createTransaction({ autoCommit: false, mutationFn: async () => {} });
+    color.mutate(() => lanes.update('lane', lane => { lane.style.color = 'red'; }));
     const tx = createTransaction({ autoCommit: false,
       mutationFn: ({ transaction }) => options.utils.acceptMutations(transaction) });
-    tx.mutate(() => lanes.update('lane', lane => { lane.revision = 1; }));
+    tx.mutate(() => lanes.update('lane', lane => { lane.revision = 1; lane.style.width = 6; }));
     expect(lanes.get('lane')?.revision).toBe(1);
     expect(await read(initial)).toEqual({ first: before, current: before, delta: empty });
     await tx.commit();
-    const after = { row: { id: 'lane', revision: 1 }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
+    const after = { row: { id: 'lane', revision: 1, style: { color: 'black', width: 6 } }, bounds: [-12, 0, 2, 3], candidates: [7], rebuiltCandidates: [7],
       preparedCandidates: [7], narrowCandidates: [7], intersectsNarrow: true, narrowPairs: [[7, 23]] };
     const reply = read(geometry, edits);
     const published = overlaps.utils.applyPairChanges(reply.then(({ delta }) => delta), version);
     expect(await reply).toEqual({ first: before, current: after, delta: { added: [[7, 23]], removed: [] } });
+    color.rollback();
+    expect(lanes.get('lane')?.style).toEqual(after.row.style);
     expect(await published).toBe(true);
     expect(overlaps.get('7:23')).toMatchObject({ leftId: 7, rightId: 23 });
   } finally {

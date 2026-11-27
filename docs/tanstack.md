@@ -56,10 +56,27 @@ own mutable metadata rows while worker snapshots retain immutable values.
 For a manual TanStack transaction, call the adapter's acceptance helper once
 inside the mutation function, after validation or persistence succeeds. The
 helper processes the transaction's mutations for this collection in order.
-It applies updated fields to the confirmed row, which keeps an unrelated
-optimistic edit out of the worker snapshot. Await the helper as the final
-step in a successful mutation function. A downstream write failure discards
-the pending sync batch on TanStack DB 1.0.0-rc.1.5.
+For an update, the adapter compares TanStack's original and edited values and
+applies the changed JSON fields to the latest confirmed row. For example, an
+editor can preview a red lane while a second transaction confirms a wider line.
+Workers see the wider line in its confirmed color. Rolling back the color edit
+preserves the new width. When two edits change the same scalar, the last
+confirmation wins.
+
+Each array is a single value. If a transaction edits an array using a version
+that differs from the confirmed one, and its result also differs, the adapter
+rejects the batch before publishing any rows. The same applies when a nested
+edit needs an object that another edit removed or replaced with a scalar.
+Serialize dependent edits to the same array or retry the edit against the
+current row. For a manual transaction that edits the same row several times,
+group those updates in one synchronous `mutate` call. If another transaction
+edits the same nested field between those calls, TanStack can fold its pending
+value into the combined mutation. The adapter then sees that value as part of
+the edit being confirmed.
+
+Await the helper as the final step in a successful mutation function. A
+downstream write failure discards the pending sync batch on TanStack DB
+1.0.0-rc.1.5.
 
 ```ts
 import { createCollection, createTransaction } from '@tanstack/db';

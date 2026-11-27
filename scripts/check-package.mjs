@@ -99,9 +99,9 @@ if (isMainThread) {
   // Exercise both transaction APIs with the published archive and real npm peer resolution.
   writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
-import { BTreeIndex, createCollection, createLiveQueryCollection, eq } from '@tanstack/db';
+import { BTreeIndex, createCollection, createLiveQueryCollection, createTransaction, eq } from '@tanstack/db';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
-const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2 } }] });
+const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2, color: 'black' } }] });
 const lanes = createCollection(options);
 lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
 const viewport = createCollection(viewportCollectionConfig({ id: 'visible' }));
@@ -133,10 +133,13 @@ try {
   assert.equal([...joined.values()][0].id, 'n');
   const initial = options.getSnapshot();
   await settled(lanes.update('n', draft => { draft.style.width = 4; }));
+  const color = createTransaction({ autoCommit: false, mutationFn: async () => {} });
+  color.mutate(() => lanes.update('n', draft => { draft.style.color = 'red'; }));
   await settled(lanes.update('n', draft => { draft.style.width = 6; }));
   assert.equal(initial.get('n').style.width, 2);
-  assert.equal(options.getSnapshot().get('n').style.width, 6);
-  assert.equal([...joined.values()][0].style.width, 6);
+  assert.deepEqual(options.getSnapshot().get('n').style, { width: 6, color: 'black' });
+  color.rollback();
+  assert.deepEqual([...joined.values()][0].style, { width: 6, color: 'black' });
   assert.equal([...matches.values()][0].style.width, 6);
   await settled(lanes.delete('n'));
   assert.equal(options.getSnapshot().size, 0);
@@ -148,6 +151,7 @@ try {
   for (const version of peers) {
     run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save', '@tanstack/db@' + version]);
     run(process.execPath, ['tanstack-peer.mjs', version]);
+    run('bun', ['tanstack-peer.mjs', version]);
   }
   const arrow = pkg.devDependencies['apache-arrow'];
   run('npm', ['install', '--strict-peer-deps', '--ignore-scripts', '--no-audit', '--no-fund', '--no-save',
