@@ -82,6 +82,17 @@ export class SharedMap<T extends string = ValueType> extends Snapshot {
     const a = this.arena, view = a.dv;
     for (const leaf of a.leaves(this.root)) yield a.leafKey(leaf, view);
   }
+  /** Iterate independent JSON views in map traversal order without decoding keys or warming the key lookup cache. */
+  *valuesView(this: T extends 'object' ? SharedMap<T> : never): Generator<JsonView> {
+    if (this.valueType !== 'object') throw new TypeError('JSON views require an object map');
+    if (!this.root) return;
+    const a = this.arena, view = a.dv;
+    // Published leaves fit this view, including after shared-memory growth.
+    for (const leaf of a.leaves(this.root)) {
+      const start = leaf + 16 + view.getUint32(leaf + 8, true);
+      yield new JsonView(a, start, view.getUint32(leaf + 12, true));
+    }
+  }
   *values(): Generator<ValueOf<T>> {
     if (!this.root) return;
     const a = this.arena, view = a.dv;
