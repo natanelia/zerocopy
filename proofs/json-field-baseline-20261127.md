@@ -32,3 +32,16 @@ Code inspection: each selected ID constructs a view, the per-view last-field cur
 Ordinary cold get instead shows decodeAt 25%, readObject 20%, freezeJSON 15.4% and findUncached 10.9% of sampled in-query time (716 samples). The profile does not support reviving #86's broad per-record index. Candidate targets avoidable view setup work: map header and bytes use one refresh; nested views use the parent's immutable range and do not calculate a root end only to discard it. Same public constructor, distinct views, range validation, no record cache, no format or WASM changes. Not a claim that all sampled view creation cost disappears.
 
 Screen against pinned main with original website verification, 12 alternating pairs and independent same-run A/A controls, three sizes, ordinary get and explicit frozen materialization controls. Gate: meaningful repeat or updated query gain (at least ~15% paired median in larger relevant sizes, consistent across pairs and outside A/A noise), no material adverse cold/control or p95 results. If no clear gain, retire rather than tune. If positive, qualify random/scatter, more realistic query sequences, Bun/Chromium/Firefox, retained memory and exact-head CI before PR. No deployment or merge.
+
+
+## Decision: retire view-setup candidate (2026-11-27)
+
+[Screen 45911087783](https://github.com/natanelia/zerocopy/actions/runs/45911087783), exact baseline `84ad23a76ee197f45cbc7316017f28b5bbe93d6c`, candidate `4f56579e0d1f22c0f849dc025f17852e0c658030`. All 324 measured executions (including 108 A/A and 216 A/B) passed the website verification. Each size used six A/A and twelve alternating A/B pairs per API. Recomputed paired median baseline/candidate ratios from raw JSON lines (separate controls, no excluded samples):
+
+| Records | View repeat A/A | View repeat A/B | View updated A/B | View retained A/B |
+|---:|---:|---:|---:|---:|
+| 1k | 1.008 | 1.010 | 1.049 | 1.187 |
+| 10k | 0.826 | 1.160 | 0.996 | 0.852 |
+| 100k | 0.770 | 0.932 | 1.017 | 0.683 |
+
+100k retained view query median 4.395→6.433 ms, 0/12 faster pairs; retained round trip 6.148→7.961 ms, 2/12 faster. A/A paired retained ratios 1.082 (query), 0.977 (round trip). Frozen materialization repeat 3.200→4.911 ms, paired 0.747 versus A/A 0.994. 10k repeat win only 7/12 faster; 100k repeat and updated do not meet gate. No retained-memory advantage was established. Correctness pass is not a performance pass. Reject the candidate rather than tune noise; no more qualification or PR. Preserve exact branch and raw [1k](https://github.com/natanelia/zerocopy/actions/runs/45911087783/artifacts/15159614088), [10k](https://github.com/natanelia/zerocopy/actions/runs/45911087783/artifacts/15160061962), [100k](https://github.com/natanelia/zerocopy/actions/runs/45911087783/artifacts/15159789484). Do not revive #86 or #79 solely from these measurements. Main unchanged; no publication.
