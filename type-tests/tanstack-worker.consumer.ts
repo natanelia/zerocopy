@@ -1,6 +1,7 @@
 import { createCollection, createTransaction } from '@tanstack/db';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 import { getWorkerData, initWorker } from 'zerocopy';
+import { createSharedSession } from 'zerocopy/worker';
 import { applySpatialEdits, buildSpatialIndex, diffSpatialJoin, diffSpatialViewport, prepareSpatialQuery, pruneSpatialEdits, querySpatialIndex, querySpatialJoin, rebuildSpatialIndex } from 'zerocopy/spatial';
 
 interface Lane { id: string; revision: number }
@@ -12,6 +13,10 @@ const tx = createTransaction<Lane>({
 tx.mutate(() => lanes.insert({ id: 'north', revision: 1 }));
 await tx.when('settled');
 const rows = options.getSnapshot();
+const confirmed = createSharedSession({ source: options }, { copy: false });
+const sessionRows: typeof rows = confirmed.current;
+const unsubscribe = options.subscribe(() => { const snapshot: typeof sessionRows = options.getSnapshot(); });
+unsubscribe(); confirmed.dispose();
 const worker = await initWorker<{ rows: typeof rows }>(getWorkerData({ rows }));
 const row = worker.rows.get('north');
 const revision: number | undefined = row?.revision;

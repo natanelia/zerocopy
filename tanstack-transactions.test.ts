@@ -1,5 +1,5 @@
 import { createCollection, createTransaction } from '@tanstack/db';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { sharedCollectionConfig } from './tanstack-db-collection.ts';
 
 type Lane = { id: string; revision: number };
@@ -7,11 +7,14 @@ const first: Lane = { id: 'north', revision: 0 };
 
 it('publishes confirmed transactions and keeps older worker snapshots readable', async () => {
   const options = sharedCollectionConfig({ id: 'lanes', initialData: [first] });
+  const received: ReturnType<typeof options.getSnapshot>[] = [];
+  const unsubscribe = options.subscribe(() => { received.push(options.getSnapshot()); });
   const lanes = createCollection(options);
   const observer = lanes.subscribeChanges(() => {});
   try {
     await lanes.preload();
     const initial = options.getSnapshot();
+    expect(received).toEqual([initial]);
     const tx = createTransaction<Lane>({
       autoCommit: false,
       mutationFn: ({ transaction }) => options.utils.acceptMutations(transaction),
@@ -22,6 +25,7 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     });
     expect(lanes.get('north')?.revision).toBe(1);
     expect(options.getSnapshot()).toBe(initial);
+    expect(received).toHaveLength(1);
     await tx.commit();
     expect(options.getSnapshot().get('north')).toEqual({ ...first, revision: 1 });
     expect(options.getSnapshot().size).toBe(2);
@@ -29,6 +33,8 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     expect(initial.get('north')).toEqual(first);
 
     const committed = options.getSnapshot();
+    expect(received).toHaveLength(2);
+    expect(received[1]).toBe(committed);
     const north = { type: 'update', key: 'north', before: first, after: { ...first, revision: 1 } };
     expect([...committed.changesSince(initial)]).toHaveLength(2);
     expect([...committed.changesSince(initial)]).toEqual(expect.arrayContaining([
@@ -43,6 +49,7 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     await expect(rejected.commit()).rejects.toThrow('Invalid geometry');
     expect(lanes.has('south')).toBe(true);
     expect(options.getSnapshot()).toBe(committed);
+    expect(received).toHaveLength(2);
 
     await lanes.delete('south').when('settled');
     expect(options.getSnapshot().has('south')).toBe(false);
@@ -51,7 +58,10 @@ it('publishes confirmed transactions and keeps older worker snapshots readable',
     await lanes.preload();
     expect(lanes.get('north')?.revision).toBe(1);
     expect(lanes.has('south')).toBe(false);
+    expect(received).toHaveLength(3);
+    expect(received[2]).toBe(options.getSnapshot());
   } finally {
+    unsubscribe();
     observer.unsubscribe();
     await lanes.cleanup();
   }
@@ -88,6 +98,8 @@ it('rejects a batch before opening sync when a later shared value cannot be enco
 
 it('never installs a delayed commit into a replacement sync connection', async () => {
   const options = sharedCollectionConfig<Lane>({ id: 'reconnect' });
+  const listener = vi.fn();
+  options.subscribe(listener);
   let release!: () => void, entered!: () => void;
   const called = new Promise<void>(resolve => { entered = resolve; });
   const close = options.sync.sync({
@@ -101,10 +113,13 @@ it('never installs a delayed commit into a replacement sync connection', async (
   release();
   await expect(result).rejects.toThrow('ended during confirmation');
   expect(options.getSnapshot().size).toBe(0);
+  expect(listener).not.toHaveBeenCalled();
 });
 
 it('reports a rejected initial commit and can retry from its initial rows', async () => {
   const options = sharedCollectionConfig({ id: 'startup', initialData: [first] });
+  const listener = vi.fn();
+  options.subscribe(listener);
   const error = new Error('Initial write rejected');
   let fail!: (error: unknown) => void;
   const failed = new Promise(resolve => { fail = resolve; });
@@ -114,8 +129,36 @@ it('reports a rejected initial commit and can retry from its initial rows', asyn
   });
   expect(await failed).toBe(error);
   expect(options.getSnapshot().size).toBe(0);
+  expect(listener).not.toHaveBeenCalled();
   options.sync.sync({ begin() {}, write() {}, commit() {}, markReady() {} });
   expect(options.getSnapshot().get('north')).toEqual(first);
+  expect(listener).toHaveBeenCalledTimes(1);
+});
+
+it('isolates snapshot listener failures and releases each subscription independently', async () => {
+  const config = sharedCollectionConfig<Lane>({ id: 'snapshot-source' });
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const error = new Error('Subscriber failed');
+  const listener = vi.fn(), releaseFirst = config.subscribe(listener);
+  const removeThrow = config.subscribe(() => { throw error; });
+  const removeReject = config.subscribe(async () => { throw error; });
+  const releaseSecond = config.subscribe(listener);
+  try {
+    config.sync.sync({ begin() {}, write() {}, commit() {}, markReady() {} });
+    await config.utils.acceptMutations({ mutations: [{ type: 'insert', modified: first }] });
+    expect(config.getSnapshot().get(first.id)).toEqual(first);
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(logged).toHaveBeenCalledTimes(2);
+    removeThrow(); removeReject(); releaseFirst(); releaseFirst();
+    const state = config.getSharedState();
+    await config.utils.acceptMutations({ mutations: [{ type: 'delete', modified: first }] });
+    expect(listener).toHaveBeenCalledTimes(3);
+    config.fromSharedState(state);
+    expect(listener).toHaveBeenCalledTimes(4);
+    releaseSecond();
+    await config.utils.acceptMutations({ mutations: [{ type: 'delete', modified: first }] });
+    expect(listener).toHaveBeenCalledTimes(4);
+  } finally { logged.mockRestore(); }
 });
 
 it('confirms changed fields without copying another optimistic edit into shared storage', async () => {

@@ -2,6 +2,7 @@ import { SharedMap } from './shared-map.ts';
 import type { JsonObject, JsonType, JsonValue } from './types.ts';
 import { checkSpatialId } from './spatial-id.ts';
 import type { SpatialPair, SpatialJoinDelta } from './spatial.ts';
+import { notifySubscribers } from './snapshot-listeners.ts';
 
 type CollectionItem = { id: string };
 
@@ -340,6 +341,13 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
   let active: SyncParams<T> | undefined;
   let pending: Promise<void> = Promise.resolve();
   const confirmations = new WeakMap<Transaction<T>, Promise<void>>();
+  const listeners = new Set<() => void>();
+
+  function install(next: SharedCollection<T>): void {
+    if (next.getSnapshot() === collection.getSnapshot()) return;
+    collection = next;
+    notifySubscribers(listeners, error => console.error('[zerocopy/tanstack] snapshot listener failed', error));
+  }
 
   function acceptMutations(transaction: Transaction<T>): Promise<void> {
     const prior = confirmations.get(transaction);
@@ -373,7 +381,7 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
       const receipt = writeSyncRows(sync, writes);
       if (receipt && receipt !== true) await accepted(receipt);
       if (active !== sync) throw new Error('Collection sync ended during confirmation');
-      collection = next;
+      install(next);
     };
     const result = pending.then(apply);
     confirmations.set(transaction, result);
@@ -397,9 +405,9 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
         }
         const ready = () => {
           if (active !== params) return;
-          collection = next;
           initialRows = undefined;
-          params.markReady();
+          install(next);
+          if (active === params) params.markReady();
         };
         active = params;
         try {
@@ -433,10 +441,17 @@ export function sharedCollectionConfig<T extends CollectionItem>(config: {
     startSync: true,
     gcTime: 0,
     getSnapshot: () => collection.getSnapshot(),
+    /** Observe changes to the confirmed snapshot. Read the current value with getSnapshot(). */
+    subscribe: (listener: () => void) => {
+      const subscription = () => listener();
+      listeners.add(subscription);
+      return () => { listeners.delete(subscription); };
+    },
     getSharedState: () => ({ id, root: collection.getRoot(), size: collection.size }),
     fromSharedState: (state: { root: number; size: number }) => {
-      collection = SharedCollection.fromRoot<T>(id, state.root, state.size);
+      const restored = SharedCollection.fromRoot<T>(id, state.root, state.size);
       initialRows = undefined;
+      install(restored);
     },
   };
 }

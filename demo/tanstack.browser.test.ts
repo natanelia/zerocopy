@@ -1,9 +1,48 @@
 import { createCollection, createTransaction } from '@tanstack/db';
 import { expect, it } from 'vitest';
 import { SharedList, getWorkerData } from '../dist/shared.js';
+import { createSharedSession } from '../dist/worker.js';
 import { applySpatialEdits, buildSpatialIndex, prepareSpatialQuery } from '../dist/spatial.js';
 import type { SpatialViewportDelta } from '../spatial.ts';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from '../dist/tanstack-db-collection.js';
+
+it('automatically publishes confirmed rows to a worker that skips intermediate revisions', async () => {
+  const first = { id: 'north', revision: 0, label: 'confirmed' };
+  const options = sharedCollectionConfig({ id: 'session-lanes', initialData: [first] });
+  const lanes = createCollection(options);
+  await lanes.preload();
+  const session = createSharedSession({ source: options }, { copy: false });
+  const worker = new Worker(new URL('./tanstack-session-worker.ts', import.meta.url), { type: 'module' });
+  const { port1, port2 } = new MessageChannel();
+  const request = (message, transfer = []) => new Promise((resolve, reject) => {
+    worker.onerror = reject;
+    worker.onmessage = ({ data }) => data.error ? reject(new Error(data.error)) : resolve(data);
+    worker.postMessage(message, transfer);
+  });
+  try {
+    const ready = request({ port: port2 }, [port2]);
+    await session.connect(port1);
+    expect(await ready).toEqual({ revision: 0 });
+    const preview = createTransaction({ autoCommit: false, mutationFn: async () => {} });
+    preview.mutate(() => lanes.update('north', lane => { lane.label = 'optimistic'; }));
+    expect(lanes.get('north')?.label).toBe('optimistic');
+    expect(session.version).toBe(0);
+    await lanes.update('north', lane => { lane.revision++; }).when('settled');
+    await lanes.insert({ ...first, id: 'temporary' }).when('settled');
+    await lanes.delete('temporary').when('settled');
+    const nextRevision = options.getSnapshot().get('north')!.revision + 1;
+    await lanes.update('north', lane => { lane.revision = nextRevision; }).when('settled');
+    preview.rollback();
+    expect(session.version).toBe(4);
+    expect(options.getSnapshot().get('north')).toEqual({ ...first, revision: 2 });
+    expect(await request({ version: session.version })).toEqual({
+      version: 4, latest: true, sameMemory: true, original: first,
+      changes: [{ type: 'update', key: 'north', before: first, after: { ...first, revision: 2 } }],
+    });
+  } finally {
+    session.dispose(); port1.close(); worker.terminate(); await lanes.cleanup();
+  }
+});
 
 it('attaches confirmed rows and geometry from the same edit in a browser worker', async () => {
   const firstRow = { id: 'lane', handle: 7, bounds: [0, 0, 2, 3], revision: 0, style: { color: 'black', width: 2 } };

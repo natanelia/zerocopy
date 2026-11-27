@@ -67,6 +67,10 @@ A single collection also works: `createState(new SharedMap('number'))`. Update i
 
 ## Redux and other stores
 
+For a TanStack metadata collection, pass the result of `sharedCollectionConfig`
+as the session's `source`. Accepted edits automatically publish confirmed row
+snapshots. [TanStack worker setup](tanstack.md#send-confirmed-rows-to-a-worker-automatically)
+
 Use `bindRedux()` to publish selected collections from an existing store. This example continues an application that already has `store` and `workers`:
 
 ```ts

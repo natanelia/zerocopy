@@ -102,9 +102,11 @@ if (isMainThread) {
   writeFileSync(join(temporary, 'tanstack-peer.mjs'), `
 import assert from 'node:assert/strict';
 import { BTreeIndex, createCollection, createLiveQueryCollection, createTransaction, eq } from '@tanstack/db';
+import { createSharedSession } from 'zerocopy/worker';
 import { sharedCollectionConfig, spatialJoinCollectionConfig, viewportCollectionConfig } from 'zerocopy/tanstack';
 const options = sharedCollectionConfig({ id: 'lanes', initialData: [{ id: 'n', handle: 2, style: { width: 2, color: 'black' } }] });
 const lanes = createCollection(options);
+const confirmed = createSharedSession({ source: options }, { copy: false });
 lanes.createIndex(row => row.handle, { indexType: BTreeIndex });
 const viewport = createCollection(viewportCollectionConfig({ id: 'visible' }));
 const pairs = createCollection(spatialJoinCollectionConfig({ id: 'overlaps' }));
@@ -137,11 +139,15 @@ try {
   assert.equal([...joined.values()][0].id, 'n');
   const initial = options.getSnapshot();
   await settled(lanes.update('n', draft => { draft.style.width = 4; }));
+  assert.equal(confirmed.current.get('n').style.width, 4);
+  const widthVersion = confirmed.version;
   const color = createTransaction({ autoCommit: false, mutationFn: async () => {} });
   color.mutate(() => lanes.update('n', draft => { draft.style.color = 'red'; }));
+  assert.equal(confirmed.version, widthVersion);
   await settled(lanes.update('n', draft => { draft.style.width = 6; }));
   assert.equal(initial.get('n').style.width, 2);
   assert.deepEqual(options.getSnapshot().get('n').style, { width: 6, color: 'black' });
+  assert.equal(confirmed.current, options.getSnapshot());
   color.rollback();
   assert.deepEqual([...joined.values()][0].style, { width: 6, color: 'black' });
   assert.equal([...matches.values()][0].style.width, 6);
@@ -149,7 +155,7 @@ try {
   assert.equal(options.getSnapshot().size, 0);
   assert.equal(joined.size, 0);
   assert.equal(matches.size, 0);
-} finally { await matches.cleanup(); await joined.cleanup(); await pairs.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
+} finally { confirmed.dispose(); await matches.cleanup(); await joined.cleanup(); await pairs.cleanup(); await viewport.cleanup(); await lanes.cleanup(); }
 `);
   const peers = ['0.5.0', pkg.devDependencies['@tanstack/db']];
   for (const version of peers) {

@@ -51,6 +51,50 @@ readable. The packed-package check edits nested metadata on both the minimum
 supported peer (0.5.0) and the pinned release candidate. TanStack receives its
 own mutable metadata rows while worker snapshots retain immutable values.
 
+### Send confirmed rows to a worker automatically
+
+Pass the collection options as the session's `source`. Each accepted batch
+installs one row snapshot. Sessions connected to that source pick it up
+automatically, including inserts and deletes made through the collection.
+
+<!-- example: tanstack-confirmed-source -->
+```ts
+import { createCollection } from '@tanstack/db';
+import { sharedCollectionConfig } from 'zerocopy/tanstack';
+import { createSharedSession, type SharedEndpoint } from 'zerocopy/worker';
+
+export async function shareLanes(worker: SharedEndpoint) {
+  const options = sharedCollectionConfig({
+    id: 'lanes', initialData: [{ id: 'north', revision: 0 }],
+  });
+  const lanes = createCollection(options);
+  await lanes.preload();
+  const session = createSharedSession({ source: options }, { copy: false });
+  try {
+    await session.connect(worker);
+    return { lanes, session };
+  } catch (error) {
+    session.dispose();
+    await lanes.cleanup();
+    throw error;
+  }
+}
+```
+
+In the worker, call `connectSharedSession()`, retain the last processed map
+and use `current.changesSince(previous)` to catch up. A shared session sends
+the memory handle once per arena. Later publications in that arena can skip
+shared branches even across messages. At teardown, dispose the session and
+clean up the collection. [Worker sessions](worker-sessions.md) · [Compare snapshots](api.md#compare-map-snapshots)
+
+For an existing store, `options.subscribe(listener)` returns an unsubscribe
+function. Read the initial value with `options.getSnapshot()`. The listener
+runs after a new snapshot is installed, including initial seeding and an
+explicit `fromSharedState` restore. Pending or rejected writes leave the
+confirmed snapshot untouched. A metadata subscription covers rows only. When
+geometry and index roots must advance together, publish them in one session
+record with the corresponding confirmed rows.
+
 ### Confirm a group of edits
 
 For a manual TanStack transaction, call the adapter's acceptance helper once
@@ -62,6 +106,11 @@ editor can preview a red lane while a second transaction confirms a wider line.
 Workers see the wider line in its confirmed color. Rolling back the color edit
 preserves the new width. When two edits change the same scalar, the last
 confirmation wins.
+
+An open optimistic edit can keep an older revision visible in TanStack's
+draft. For an edit that increments a confirmed revision, read it from
+`config.getSnapshot()` when assigning the next number and serialize those
+assignments on the writer.
 
 Each array is a single value. If a transaction edits an array using a version
 that differs from the confirmed one, and its result also differs, the adapter

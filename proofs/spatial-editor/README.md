@@ -55,6 +55,19 @@ snapshots must compare values across independent memories. Snapshot creation,
 transport, result validation, UI publication and drawing are outside the
 timer. [Source checksums and raw timings](results/row-changes-node.json)
 
+For an editor that sends revisions in separate messages, run
+`node proofs/spatial-editor/session-changes.mjs`. A worker retains the last
+processed map while two TanStack transactions update the same eight rows
+among 16,384. Both paths share the underlying storage. With
+`createSharedSession({ source: options }, { copy: false })`, extracting the
+eight net changes took **0.17 ms**. With a fresh `getWorkerData` envelope
+sent for the next comparison it took **24.6 ms**. In all 36 measured
+comparisons the session reused the same worker-side WebAssembly memory
+object. The fresh envelopes received distinct objects, requiring both maps
+to be scanned. These medians of three Node 26.13.1 process medians cover
+change extraction after attachment. They exclude transactions, messaging,
+validation and rendering. [Source checksums and raw timings](results/session-changes-node.json)
+
 To measure the owner's work after a rebuilt index arrives, run
 `node proofs/spatial-editor/prune-edits.mjs` or `bun proofs/spatial-editor/prune-edits.mjs`
 after the browser build. The worker's input contains 16,384 edits. While the

@@ -11,6 +11,21 @@ const temporary = mkdtempSync(join(root, '.docs-examples-'));
 
 // Expected results belong here; the code under test comes from the reader's example.
 const cases = [
+  ['docs/tanstack.md', 'tanstack-confirmed-source', `
+const { connectSharedSession } = await import('zerocopy/worker');
+const { port1, port2 } = new MessageChannel();
+const receiving = connectSharedSession({ endpoint: port2 });
+const { lanes, session } = await shareLanes(port1);
+const reader = await receiving;
+try {
+  const first = reader.current;
+  const snapshots = reader.snapshots({ emitCurrent: false });
+  await lanes.update('north', lane => { lane.revision = 1; }).when('settled');
+  const { value: current } = await snapshots.next();
+  assert.deepEqual([...current.changesSince(first)], [{ type: 'update', key: 'north',
+    before: { id: 'north', revision: 0 }, after: { id: 'north', revision: 1 } }]);
+  await snapshots.return();
+} finally { reader.dispose(); session.dispose(); port1.close(); port2.close(); await lanes.cleanup(); }`],
   ['docs/api.md', 'map-changes', "assert.deepEqual(changes.sort((a, b) => a.key.localeCompare(b.key)), [{ type: 'update', key: 'lane-7', before: 40, after: 50 }, { type: 'insert', key: 'lane-9', before: undefined, after: 30 }]);"],
   ['docs/spatial.md', 'spatial-viewport-edits', "assert.deepEqual(delta, { added: [7], removed: [9] });"],
   ['docs/geometry.md', 'stream-lane-tile', `
