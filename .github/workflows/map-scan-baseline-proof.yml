@@ -1,4 +1,4 @@
-name: Worker direct JSON view traversal (proof only)
+name: Worker direct JSON view mixed-read diagnosis (proof only)
 on:
   push:
     branches: [proof/map-scan-baseline-20261127]
@@ -59,13 +59,13 @@ jobs:
           git diff --exit-code -- shared-map.ts
           git rev-parse HEAD > "$RUNNER_TEMP/projection/proof-head.txt"
           node --version > "$RUNNER_TEMP/projection/node-version.txt"
-      - name: Compare keyed and direct view scans with A/A and full-object control
+      - name: Compare mixed scans and point reads with same-build keyed and A/A controls
         run: |
           set -euo pipefail
           node proofs/map-scan-projection-paired-20261127.mjs ${{ matrix.count }} ${{ matrix.shape }} "$RUNNER_TEMP/view-base/shared.js" "$RUNNER_TEMP/view-direct/shared.js" "$RUNNER_TEMP/projection" | tee "$RUNNER_TEMP/projection/run.log"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: direct-view-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
+          name: direct-view-mixed-${{ matrix.count }}-${{ matrix.shape }}-${{ github.run_id }}
           path: ${{ runner.temp }}/projection/
           retention-days: 14

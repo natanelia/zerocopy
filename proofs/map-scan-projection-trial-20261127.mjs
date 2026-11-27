@@ -85,7 +85,11 @@ if (!isMainThread) {
         next = shared ? (await S.initWorker(payload, workerData.reusePrevious ? {previous:{map:old}} : undefined)).map : payload;
         map = next; starts = windows;
       } else if (phase === 'retained') { map = old; starts = windows; }
-      else if (phase === 'points') {
+      else if (phase === 'points' || phase === 'points-repeat' || phase === 'cold-points') {
+        if (phase === 'cold-points') {
+          old = (await S.initWorker(payload.initial)).map;
+          next = (await S.initWorker(payload.updated, workerData.reusePrevious ? {previous:{map:old}} : undefined)).map;
+        }
         const ids = Array.from({length: 1000}, (_, j) => (j * 7919 + 17) % n);
         const values = [];
         const t0 = performance.now();
@@ -136,7 +140,7 @@ if (!isMainThread) {
   assert(output && [1000,10000,100000].includes(n) && Number.isInteger(rounds) && rounds > 0);
   const profileEnabled = process.env.ZEROCOPY_SCAN_PROFILE === '1';
   const cases = [process.env.ZEROCOPY_SCAN_MODE];
-  assert(['shared-forEach','shared-view','shared-direct','native-forEach'].includes(cases[0]));
+  assert(['shared-view','shared-direct'].includes(cases[0]));
   const reusePrevious = process.env.ZEROCOPY_SCAN_PREVIOUS === '1';
   const report = { source: execFileSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).trim(), node: process.version,
     cpu: cpus()[0].model, os: release(), n, shape, rounds, profileEnabled, reusePrevious, runtimeBuild: process.env.ZEROCOPY_SCAN_BUILD, samples: [] };
@@ -152,9 +156,9 @@ if (!isMainThread) {
     const old = shared ? new S.SharedMap('object').setMany(rows) : new Map(rows);
     const constructionMs = performance.now() - t;
     const workers = Array.from({length:2}, () => new Worker(new URL(import.meta.url), {workerData:{api,n,shared,reusePrevious,profileEnabled:profileEnabled && round >= 0}}));
-    async function exchange(phase, payload, revision) {
+    async function exchange(phase, payload, revision, recipients = workers) {
       const start = performance.now();
-      const pending = workers.map(async worker => {
+      const pending = recipients.map(async worker => {
         const response = once(worker,'message'); worker.postMessage({phase,payload});
         const [result] = await response;
         if (result.error) throw Error(result.error);
@@ -163,7 +167,7 @@ if (!isMainThread) {
       const readers = await Promise.all(pending);
       const roundTripMs = performance.now() - start;
       if (phase === 'verify') { assert(readers.every(r => r.verified)); return {verified:true}; }
-      if (phase === 'points') { assert(readers.every(r => r.verified)); return {roundTripMs, readers, rss: process.memoryUsage.rss()}; }
+      if (['points','points-repeat','cold-points'].includes(phase)) { assert(readers.every(r => r.verified)); return {roundTripMs, readers, rss: process.memoryUsage.rss()}; }
       for (const reader of readers) for (const scan of reader.scans)
         assert.equal(scan.digest, expectedDigests.get(revision + ':' + scan.start));
       if (shared) assert.deepEqual(readers[0].scans.map(x=>x.ordered),readers[1].scans.map(x=>x.ordered));
@@ -206,9 +210,15 @@ if (!isMainThread) {
       const updated = await exchange('updated',payload,1);
       const retained = await exchange('retained',undefined,0);
       const points = await exchange('points');
+      const pointsRepeat = await exchange('points-repeat');
       const measuredPeakRssKiB = process.resourceUsage().maxRSS;
       await exchange('verify');
-      return {measuredPeakRssKiB,id,round,warmup:round<0,constructionMs,prepareInitialMs,prepareUpdateMs,mutationMs,edits:edits.length,first,repeat,updated,retained,points,peakProcessRssKiB:process.resourceUsage().maxRSS,verified:true};
+      // Fresh worker isolates have never traversed either map. Loop timings exclude startup.
+      const fresh = Array.from({length:2}, () => new Worker(new URL(import.meta.url), {workerData:{api,n,shared,reusePrevious,profileEnabled:false}}));
+      let coldPoints;
+      try { coldPoints = await exchange('cold-points',{initial,updated:payload},undefined,fresh); }
+      finally { await Promise.all(fresh.map(w=>w.terminate())); }
+      return {measuredPeakRssKiB,id,round,warmup:round<0,constructionMs,prepareInitialMs,prepareUpdateMs,mutationMs,edits:edits.length,first,repeat,updated,retained,points,pointsRepeat,coldPoints,peakProcessRssKiB:process.resourceUsage().maxRSS,verified:true};
     } finally { await Promise.all(workers.map(w=>w.terminate())); }
   }
   for (let round = 0; round < rounds; round++) {
