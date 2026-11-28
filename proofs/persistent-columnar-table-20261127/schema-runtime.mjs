@@ -61,7 +61,7 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     profile.lookupMs+=found-start;profile.materializeMs+=end-found;profile.count++;if(i!==undefined)profile.hits++;
     return value;
   };
-  function edit(s,{remove,upsert},packedPayloads=false,profile){
+  function edit(s,{remove,upsert},packedPayloads=false,profile,columnBulk=false){
     let tick=profile?performance.now():0;
     const mark=name=>{if(profile){const now=performance.now();profile[name]=now-tick;tick=now;}};
     // Validate all user inputs and key collisions before allocating.
@@ -69,6 +69,28 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     for(const id of remove){const k=keyOf(id),i=lookup(s,id);if(i===undefined||seen.has(k))throw Error('invalid deletion');seen.add(k);deletions.push([k,i]);}
     for(const [id,row] of upsert){const k=checkRow(id,row);if(seen.has(k))throw Error('duplicate operation');seen.add(k);updates.push([k,lookup(s,id),row]);}
     mark('validateLookupMs');
+    // A batch containing only new rows can append whole columns directly.
+    // Validation, identity lookup and duplicate detection above remain identical.
+    // Existing-row edits still use the ordinary sparse/mixed planner.
+    if(columnBulk&&packedPayloads&&!profile&&updates.length&&updates.every(([,old])=>old===undefined)){
+      const rows=updates.map(x=>x[2]),lengths={};
+      for(const f of fields)if(f.kind==='number[]'){
+        let length=0;
+        for(const row of rows){
+          length+=row[f.name]?.length??0;
+          if(!Number.isSafeInteger(length))throw RangeError('array capacity');
+        }
+        lengths[f.root]=length;
+      }
+      const c=s.columns,values=packFreshRows(rows,lengths,c),columns={...c};
+      if(deletions.length)columns.occupied=columns.occupied.setMany(deletions.map(([,i])=>[i,false]));
+      for(const r of roots)if(values[r].length)columns[r]=columns[r].pushMany(values[r]);
+      const next=slotCount(s),additions=updates.map(([k],i)=>[k,next+i]);
+      let index=s.index;
+      if(deletions.length)index=index.deleteMany(deletions.map(x=>x[0]));
+      index=index.setMany(additions);
+      return {index,columns};
+    }
     const c=s.columns,plans=Object.fromEntries(roots.map(r=>[r,{append:[],patch:[]}]));
     // Proof-only bulk append variant: count variable payloads once, allocate
     // exact typed storage and avoid growing a JS number array plus converting it.
@@ -151,21 +173,27 @@ export function compileSchema(definition, keyOf = id => String(id)) {
         lengths[f.root]=length;
       }
     }
+    const values=packFreshRows(rows,lengths);
+    const columns=Object.fromEntries(roots.map(r=>[r,new SharedList(kinds[r]).pushMany(values[r])]));
+    return {index:new SharedMap('number').setMany(entries),columns};
+  }
+  function packFreshRows(rows,lengths,existing){
+    const n=rows.length;
     const values=Object.fromEntries(roots.map(r=>[r,kinds[r]==='number'?new Float64Array(r.endsWith('a')?lengths[r.slice(0,-1)]:n):new Array(n)]));
     values.occupied.fill(true);
     for(const f of fields){
       const r=f.root;let at=0;
+      const base=f.kind==='number[]'?(existing?.[r+'a'].size??0):0;
       for(let i=0;i<n;i++){
         const v=rows[i][f.name],present=v!==null;
         if(f.nullable)values[r+'p'][i]=present;
         if(f.kind==='number[]'){
-          const a=present?v:[];values[r][i]=at;values[r+'n'][i]=a.length;
+          const a=present?v:[];values[r][i]=base+at;values[r+'n'][i]=a.length;
           for(let j=0;j<a.length;j++)values[r+'a'][at++]=number(a[j]);
         }else values[r][i]=present?(f.kind==='number'?number(v):v):f.kind==='number'?0:f.kind==='boolean'?false:'';
       }
     }
-    const columns=Object.fromEntries(roots.map(r=>[r,new SharedList(kinds[r]).pushMany(values[r])]));
-    return {index:new SharedMap('number').setMany(entries),columns};
+    return values;
   }
   function wire(s){return {signature,data:getWorkerData({index:s.index,...s.columns},{copy:false})};}
   async function attach(p,previous){

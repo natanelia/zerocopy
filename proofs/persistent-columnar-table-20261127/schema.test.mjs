@@ -71,3 +71,34 @@ test('packed bulk payload appends preserve exact rows, old roots and mixed lengt
   assert.throws(()=>schema.edit(old,{remove:[],upsert:[[a.id,{...a,xy:[Infinity]}]]},true),TypeError);
   assert.throws(()=>schema.edit(old,{remove:[a.id],upsert:[[a.id,a]]},true),/duplicate/);
 });
+
+test('direct fresh-column append matches ordinary planner, offsets, fallback, errors and historical snapshots',async()=>{
+  const old=schema.buildPacked([a,b,c]),reader=await schema.attach(structuredClone(schema.wire(old)));
+  const d={...a,id:'d',xy:[-0,4]},e={...b,id:'e',xy:null},f={...c,id:'f',xy:[]};
+  const batches=[
+    {remove:['b'],upsert:[['d',d],['e',e],['f',f]]},
+    {remove:[],upsert:[['g',{...d,id:'g',xy:[6,7,8]}]]},
+    {remove:['c'],upsert:[['d',{...d,xy:[9]}],['h',{...a,id:'h'}]]},
+    {remove:['e'],upsert:[]}
+  ];
+  let x=old,y=old,previous=reader;
+  for(const batch of batches){
+    x=schema.edit(x,batch,true,undefined,true);y=schema.edit(y,batch,true);
+    previous=await schema.attach(structuredClone(schema.wire(x)),previous);
+    assert.equal(schema.size(x),schema.size(y));
+    assert.equal(schema.slotCount(x),schema.slotCount(y));
+    for(const id of [a.id,'b','c','d','e','f','g','h']){
+      assert.deepEqual(schema.get(x,id),schema.get(y,id));
+      assert.deepEqual(schema.get(previous,id),schema.get(y,id));
+    }
+  }
+  assert.deepEqual(schema.get(reader,a.id),a);
+  assert.deepEqual(schema.get(reader,'b'),b);
+  assert.throws(()=>schema.edit(old,{remove:[],upsert:[['d',{...d,xy:[Infinity]}]]},true,undefined,true),TypeError);
+  assert.throws(()=>schema.edit(old,{remove:[],upsert:[['d',d],['d',d]]},true,undefined,true),/duplicate/);
+  assert.throws(()=>schema.edit(old,{remove:['missing'],upsert:[['d',d]]},true,undefined,true),/deletion/);
+  const collision=compileSchema({id:'string'},()=> 'same');
+  const root=collision.buildPacked([{id:'a'}]);
+  assert.throws(()=>collision.edit(root,{remove:[],upsert:[['b',{id:'b'}]]},true,undefined,true),/identity/);
+  assert.deepEqual(collision.get(root,'a'),{id:'a'});
+});
