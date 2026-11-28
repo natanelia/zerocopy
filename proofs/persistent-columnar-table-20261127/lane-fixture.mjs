@@ -14,6 +14,19 @@ export function lane(id){
   for(let j=0;j<n;j++)xy.push(x+Math.round(500*j/(n-1))/100,y+(j%5)/8);
   return {id,kind:id%4,active:true,...bounds(xy),xy};
 }
+// Synthetic mixed lane records: stable UTF-8 labels, optional speed and links,
+// and independent metadata changes. Null, empty, and nonempty are distinct.
+export function mixedMetadata(id,rev=0){
+  const k=id+rev,labels=['Main Street','道路/北','école','道路/🛣️',''];
+  return {roadName:k%7===0?null:labels[k%labels.length]+(k%5===4?'':String(id%128)),
+    speedLimit:k%6===0?null:20+(k%7)*10,reviewed:k%3!==0,
+    connections:k%5===0?null:k%5===1?[]:Array.from({length:k%5},(_,j)=>(id*7+j)%100003)};
+}
+export const mixedMode=m=>m.includes('-mixed-');
+export function mixedLane(id){return {...lane(id),...mixedMetadata(id)};}
+export function mixedQuery(n,rev,w){return {...queryFor(n,rev,w),reviewedOnly:(rev+w)%2===0,minimumSpeed:(rev+w)%3===0?40:0};}
+export function mixedMatches(r,q){return matches(r,q)&&(!q.reviewedOnly||r.reviewed===true)&&(!q.minimumSpeed||(r.speedLimit!==null&&r.speedLimit>=q.minimumSpeed));}
+export function validateMixed(r){return [...validate(r),r.roadName,r.speedLimit,r.reviewed,r.connections];}
 export function editsFor(rows,rev){
   const n=rows.length,count=rev%12===0?Math.max(1,Math.floor(n/20)):rev%6===0?25:1;
   return Array.from({length:Math.min(n,count)},(_,j)=>{
@@ -42,7 +55,7 @@ export function validate(r){
 }
 export function equal(a,b,label){if(JSON.stringify(a)!==JSON.stringify(b))throw Error(label+' mismatch');}
 export async function digest(n,get){
-  const chunks=[];for(let i=0;i<n;i++){const r=get(i);chunks.push(JSON.stringify([r.id,r.kind,r.active,r.left,r.bottom,r.right,r.top,r.xy]));}
+  const chunks=[];for(let i=0;i<n;i++){const r=get(i);chunks.push(JSON.stringify([r.id,r.kind,r.active,r.left,r.bottom,r.right,r.top,r.xy,...(Object.hasOwn(r,'roadName')?[r.roadName,r.speedLimit,r.reviewed,r.connections]:[])]));}
   const bytes=new TextEncoder().encode(chunks.join('\n'));
   return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');
 }

@@ -271,3 +271,21 @@ Median paired schema/append ratios .904/.756 Chromium and .842/.759 Firefox; 19/
 ### Next: packed schema ingestion and matched predicate control
 
 Keep the same schema, persistent vectors, updates and query path. Add direct pre-sized typed column/payload construction for cold ingest after validation, preserving original schema build as A/A and A/B control. Hand-written append-predicate control checks the same cheap bounds before materializing metadata. Include build + first reply separately, point/attach/mutation p95, scan and full replay; verify exact rows, nullable/string/array correctness, duplicates, collision, empty input and subsequent edits. Six balanced rounds across six modes, same four browser/size cells. No new production runtime, no merge or publishing. A useful cold improvement must not be inferred until results return; mixed string/nullable throughput and larger representative workloads remain next gates. #100 still draft and no human review, main unchanged.
+
+
+## Packed ingestion and matched predicate — Nov 28
+
+[Run 46082132617](https://github.com/natanelia/zerocopy/actions/runs/46082132617), exact head `30d781c15dd63f7dec317b9f25c5f9bb0e118f9e`. All four jobs succeeded, 144 measured verified cases (6 balanced rounds × 6 modes × 4 engine/size cells, warmups excluded). Medians recalculated from full verified job-log JSON, including paired ratios by round. Raw artifacts: [Chromium 4k](https://github.com/natanelia/zerocopy/actions/runs/46082132617/artifacts/15237710514), [Chromium 16k](https://github.com/natanelia/zerocopy/actions/runs/46082132617/artifacts/15237283446), [Firefox 4k](https://github.com/natanelia/zerocopy/actions/runs/46082132617/artifacts/15237443910), [Firefox 16k](https://github.com/natanelia/zerocopy/actions/runs/46082132617/artifacts/15236279883).
+
+| Engine / lanes | Original schema → packed build ms | Build + first reply (original → packed) ms | Matched numeric total ms | Packed schema total ms | Direct JSON total ms |
+|---|---:|---:|---:|---:|---:|
+| Chromium 4096 | 68.84 → 51.44 | 179.54 → 163.43 | 224.28 | 253.22 | 341.55 |
+| Chromium 16384 | 128.64 → 90.08 | 204.61 → 172.59 | 414.82 | 455.98 | 691.10 |
+| Firefox 4096 | 39.12 → 26.82 | 144.76 → 133.21 | 169.62 | 177.48 | 301.31 |
+| Firefox 16384 | 136.42 → 95.56 | 315.07 → 260.31 | 393.89 | 417.85 | 1014.42 |
+
+Median paired packed/original build ratios .757/.712 Chromium and .691/.665 Firefox. Packed versus matched numeric total paired ratios 1.132/1.081 and 1.073/1.072. At 16k, p95 matched numeric/packed 25.51/33.22 ms Chromium, 25.60/27.60 ms Firefox. Final used arena bytes unchanged at 29,606,000 schema, versus 29,948,688 hand-written and 27,240,340 JSON. No process RSS/PSS claim. Cold packed ingestion is a useful schema improvement; matching cheap predicates removes the previously reported speed advantage over hand-written storage. Keep the schema as a functionality proof, not a claim of faster numeric scans or a new runtime default.
+
+### Next gate: mixed nullable metadata replay
+
+Test the existing schema storage rather than optimize more numeric-only fixtures. Add nullable UTF-8 road labels, nullable speed limits, review flags, and nullable variable-length numeric connection lists; metadata changes independently on some revisions and new identities have varied values. Identical initial rows, edits, viewport predicates (including review and speed), and visible metadata materialization for JSON full scan, pinned #100 selective JSON scan and its duplicate, original schema ingest and packed schema ingest plus duplicate. Full point results and retained digests include all new fields; expired roots and deleted keys remain checked. Six paired rounds, 4k/16k lanes, four browser readers, 48 revisions, same retention. This is a synthetic structured workload, not actual user map data; no 100k/1M or real application claim yet. No production code, new PR, merge, preview deletion or publication. #100 remains draft on scope/review hold. If mixed performance fails, investigate measured phase overhead before any further runtime work.

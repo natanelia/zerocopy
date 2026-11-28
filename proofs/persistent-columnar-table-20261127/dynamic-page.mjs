@@ -1,5 +1,5 @@
 import {build,edit,payload,repack,shouldRepack,arenaUsage} from './schema-lane-runtime.mjs';
-import {lane,bounds,queryFor,matches,validate,equal,digest} from './lane-fixture.mjs';
+import {lane,bounds,queryFor,matches,validate,equal,digest,mixedMode,mixedLane,mixedMetadata,mixedQuery,mixedMatches,validateMixed} from './lane-fixture.mjs';
 const readerCount=4;
 function send(w,m){return new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>done(Error('worker timeout')),90000);
@@ -12,13 +12,13 @@ const percentile=(a,q)=>a.slice().sort((x,y)=>x-y)[Math.max(0,Math.ceil(a.length
 // A changing tile window: replace 10% of rows every fourth revision at
 // similar map positions, with new unrelated keys and varied vertex lengths.
 // Other revisions move/insert/remove vertices without changing identity.
-function batch(rows,ids,rev,nextId,pattern){
+function batch(rows,ids,rev,nextId,pattern,mixed){
   const n=ids.length,replace=rev%4===0,count=replace?Math.floor(n/10):rev%6===0?25:1,remove=[],upsert=[];
   for(let j=0;j<count;j++){
     const span=pattern==='local'?Math.floor(n/8):n,start=pattern==='local'?(Math.floor((rev-1)/24)%8)*span:0;
     const slot=start+((Math.imul(rev,8191)>>>0)+Math.floor(j*span/count))%span,id=ids[slot],old=rows.get(id);
     if(replace){
-      const fresh=lane(nextId++),dx=old.left-fresh.left,dy=old.bottom-fresh.bottom;
+      const fresh=(mixed?mixedLane:lane)(nextId++),dx=old.left-fresh.left,dy=old.bottom-fresh.bottom;
       const xy=fresh.xy.map((v,k)=>v+(k%2?dy:dx)),r={...fresh,xy,...bounds(xy)};
       remove.push(id);upsert.push([r.id,r]);ids[slot]=r.id;
     }else{
@@ -26,7 +26,7 @@ function batch(rows,ids,rev,nextId,pattern){
       if(rev%3===0)xy.splice(2,0,(xy[0]+xy[2])/2,(xy[1]+xy[3])/2);
       else if(rev%3===1&&xy.length>8)xy.splice(2,2);
       else xy[(j%(xy.length/2))*2]+=rev%2?2:-1;
-      upsert.push([id,{...old,xy,...bounds(xy)}]);
+      upsert.push([id,{...old,xy,...bounds(xy),...(mixed&&rev%5===0?mixedMetadata(id,rev):{})}]);
     }
   }
   return {remove,upsert,nextId};
@@ -34,7 +34,7 @@ function batch(rows,ids,rev,nextId,pattern){
 export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
   if(!Number.isInteger(retention)||retention<1)throw Error('invalid retention');
   if(!crossOriginIsolated)throw Error('not isolated');
-  const initial=Array.from({length:n},(_,i)=>lane(i)),rows=new Map(initial.map(r=>[r.id,r])),ids=initial.map(r=>r.id),dead=[],retained=new Map(),events=[];
+  const mixed=mixedMode(mode),initial=Array.from({length:n},(_,i)=>(mixed?mixedLane:lane)(i)),rows=new Map(initial.map(r=>[r.id,r])),ids=initial.map(r=>r.id),dead=[],retained=new Map(),events=[];
   // Track only named retained/current arena generations, not GC or resident memory.
   const heldArenas=new Map(),lastUsage=new Map();
   const heldIds=()=>[...heldArenas.values()].flat();
@@ -45,13 +45,13 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
   const initialWorkers=performance.now(),workers=Array.from({length:readerCount},()=>new Worker(new URL('./dynamic-worker.mjs',import.meta.url),{type:'module'}));
   try{
     for(let rev=0;rev<=revisions;rev++){
-      const b=rev?batch(rows,ids,rev,nextId,pattern):{remove:[],upsert:[],nextId};nextId=b.nextId;
+      const b=rev?batch(rows,ids,rev,nextId,pattern,mixed):{remove:[],upsert:[],nextId};nextId=b.nextId;
       for(const id of b.remove){rows.delete(id);dead.push(id);}for(const [id,r] of b.upsert)rows.set(id,r);
       const hold=rev===0||rev%24===0||rev===revisions;
       if(hold)retained.set(rev,{rows:new Map(rows),missing:dead.slice()});
-      const queries=workers.map((_,w)=>rev%3===0?queryFor(n,rev,w):null);
+      const queries=workers.map((_,w)=>rev%3===0?(mixed?mixedQuery:queryFor)(n,rev,w):null);
       const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
-      const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>matches(r,q)).map(validate).sort((a,b)=>a[0]-b[0]):null}));
+      const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>(mixed?mixedMatches:matches)(r,q)).map(mixed?validateMixed:validate).sort((a,b)=>a[0]-b[0]):null}));
       const t=performance.now();if(rev)owner=edit(mode,owner,b);const editMs=performance.now()-t;
       let compactionMs=0,handoff=null;
       if(shouldRepack(mode,rev,owner)){
