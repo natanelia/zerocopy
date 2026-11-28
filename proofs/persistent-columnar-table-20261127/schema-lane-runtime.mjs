@@ -7,34 +7,43 @@ const table=compileSchema({id:'number',kind:'number',active:'boolean',left:'numb
 const mixedTable=compileSchema({id:'number',kind:'number',active:'boolean',left:'number',bottom:'number',right:'number',top:'number',xy:'number[]',roadName:'string?',speedLimit:'number?',reviewed:'boolean',connections:'number[]?'},key);
 const typed=m=>m.startsWith('schema-');
 const tableFor=m=>mixedMode(m)?mixedTable:table;
-// Four independent map/list arena pairs. Numeric fixture ids choose a stable
+// Independent map/list arena pairs. Numeric fixture ids choose a stable
 // shard, never a physical slot. Global reset is only for this isolated writer
 // when allocating a fresh shard; existing roots retain their own arena.
-const shardCount=4,sharded=m=>m.includes('-shard-'),stagger=m=>m.includes('-shard-stagger-');
-const shardOf=id=>{if(!Number.isSafeInteger(id)||id<0)throw TypeError('invalid shard identity');return id%shardCount;};
+const shardCount=m=>m.includes('-eight-')?8:4,sharded=m=>m.includes('-shard-'),stagger=m=>m.includes('-shard-stagger-'),quiet=m=>m.includes('-quiet-');
+const shardOf=(m,id)=>{if(!Number.isSafeInteger(id)||id<0)throw TypeError('invalid shard identity');return id%shardCount(m);};
+const cadence=m=>48/shardCount(m);
 const shardMode='schema-mixed-packed-column-bulk-range-repack48';
 export function build(m,rows){
   if(!sharded(m))return typed(m)?(m.includes('packed')?tableFor(m).buildPacked(rows):tableFor(m).build(rows)):base.build(m,rows);
-  const groups=Array.from({length:shardCount},()=>[]);
-  for(const row of rows)groups[shardOf(row.id)].push(row);
-  return {shards:groups.map(group=>{resetMap();resetSharedList();return build(shardMode,group);})};
+  const groups=Array.from({length:shardCount(m)},()=>[]);
+  for(const row of rows)groups[shardOf(m,row.id)].push(row);
+  return {repacked:0,shards:groups.map(group=>{resetMap();resetSharedList();return build(shardMode,group);})};
 }
 export function edit(m,o,b,profile){
   if(!sharded(m))return typed(m)?tableFor(m).edit(o,b,m.includes('-bulk'),profile,m.includes('-column-bulk')):base.edit(m,o,b);
-  const groups=Array.from({length:shardCount},()=>({remove:[],upsert:[]}));
-  for(const id of b.remove)groups[shardOf(id)].remove.push(id);
-  for(const entry of b.upsert)groups[shardOf(entry[0])].upsert.push(entry);
-  return {shards:o.shards.map((s,i)=>groups[i].remove.length||groups[i].upsert.length?edit(shardMode,s,groups[i]):s)};
+  const groups=Array.from({length:shardCount(m)},()=>({remove:[],upsert:[]}));
+  for(const id of b.remove)groups[shardOf(m,id)].remove.push(id);
+  for(const entry of b.upsert)groups[shardOf(m,entry[0])].upsert.push(entry);
+  return {...o,shards:o.shards.map((s,i)=>groups[i].remove.length||groups[i].upsert.length?edit(shardMode,s,groups[i]):s)};
 }
-export const get=(m,s,id,profile)=>sharded(m)?get(shardMode,s.shards[shardOf(id)],id,profile):typed(m)?tableFor(m).get(s,id,profile,m.includes('-direct-row')):base.get(m,s,id);
+export const get=(m,s,id,profile)=>sharded(m)?get(shardMode,s.shards[shardOf(m,id)],id,profile):typed(m)?tableFor(m).get(s,id,profile,m.includes('-direct-row')):base.get(m,s,id);
 export const size=(m,s)=>sharded(m)?s.shards.reduce((n,x)=>n+size(shardMode,x),0):typed(m)?tableFor(m).size(s):base.size(m,s);
 // Matched fixed cadence is an experimental control, not a production policy.
-export const shouldRepack=(m,rev,o)=>stagger(m)?rev>0&&rev%12===0:m.endsWith('-repack48')?rev>0&&rev%48===0:typed(m)?false:base.shouldRepack(m,rev,o);
-export function repack(m,o,rev){
+// A two-revision advance window, with a hard deadline even under load.
+// No future fixture knowledge and no work hidden from measured latency.
+export function shouldRepack(m,rev,o,work){
+  if(quiet(m)){
+    const due=(o.repacked+1)*cadence(m);
+    return rev>=due||(rev>=due-2&&work?.removed===0&&work.changed<=25&&!work.scan);
+  }
+  return stagger(m)?rev>0&&rev%cadence(m)===0:m.endsWith('-repack48')?rev>0&&rev%48===0:typed(m)?false:base.shouldRepack(m,rev,o);
+}
+export function repack(m,o,rev,work){
   if(!sharded(m))return typed(m)?tableFor(m).repack(o,m.includes('-range-')):base.repack(m,o);
-  if(!shouldRepack(m,rev,o))throw Error('unexpected shard repack');
-  const selected=(rev/12-1)%shardCount;
-  return {shards:o.shards.map((s,i)=>!stagger(m)||selected===i?repack(shardMode,s):s)};
+  if(!shouldRepack(m,rev,o,work))throw Error('unexpected shard repack');
+  const selected=o.repacked%shardCount(m);
+  return {repacked:o.repacked+1,shards:o.shards.map((s,i)=>!stagger(m)||selected===i?repack(shardMode,s):s)};
 }
 export const arenaUsage=(o,m)=>sharded(m)?o.shards.flatMap(s=>arenaUsage(s,shardMode)):typed(m)?tableFor(m).arenaUsage(o):base.arenaUsage(o,m);
 export function payload(m,o){
@@ -49,9 +58,9 @@ export function payload(m,o){
 }
 export async function attach(m,p,prev){
   if(!sharded(m))return typed(m)?tableFor(m).attach(p,prev):base.attach(m,p,prev);
-  if(!Array.isArray(p.shards)||p.shards.length!==shardCount)throw Error('invalid shard wire');
+  if(!Array.isArray(p.shards)||p.shards.length!==shardCount(m))throw Error('invalid shard wire');
   const shards=[];
-  for(let i=0;i<shardCount;i++)shards.push(await attach(shardMode,p.shards[i],prev?.shards[i]));
+  for(let i=0;i<shardCount(m);i++)shards.push(await attach(shardMode,p.shards[i],prev?.shards[i]));
   return {shards};
 }
 export function scan(m,s,q){

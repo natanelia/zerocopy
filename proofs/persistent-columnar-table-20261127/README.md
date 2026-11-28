@@ -450,3 +450,31 @@ All 8 primary and all 8 duplicate paired totals favor range copies; median total
 ### Next gate: independently compactable shards
 
 Eager scattered slot/span recycling was already rejected on actual arena growth and throughput in run 46049425584. Try separating lifetime domains instead: four independently allocated map/list arena pairs, stable numeric-id partition, same schema and range compaction, no global production contract change. Compare unsharded range baseline, all four shards repacked together every 48 revisions, and one shard repacked every 12 revisions (duplicate stagger arm for A/A). Over 96 revisions each shard gets two repacks in both shard variants; staggered current bytes at end are expected to differ because last repack ages differ. Compare aggregate high-water and final used/live arena bytes, per-arena cap caveat (512 MiB each, not a matched aggregate hard limit), sampled PSS, maximum individual edit and repack pause, all-edit and bulk/sparse p95, total latency, startup/scan/point, exact current/retained worker results. Note staggered compactions occur on bulk revisions in this fixture; no hidden deferred work. No assumption of uniform partition workloads or general public sharding API; numeric IDs are proof-only and old roots keep their original arenas. If extra arena/attachment costs outweigh lower maximum pauses, reject instead of shipping. Same 100k spread churn, four workers and two named retained checkpoints, four balanced measured rounds. Synchronous sharding isolates partition overhead, stagger duplicate estimates noise, prior range run supplies baseline A/A context, not cross-run speed proof. No new production PR or deployment; #100 still held in draft with no formal reviews and main unchanged.
+
+
+## Staggered shard compaction decision — Nov 28
+
+[Run 46135200506](https://github.com/natanelia/zerocopy/actions/runs/46135200506), exact head `aaf79338928a933d3d05756fc2ddc2cdd0273045`: both jobs succeeded, all 32 timed cases verified, four balanced rounds per mode/engine (warmup excluded). Raw artifacts [Chromium](https://github.com/natanelia/zerocopy/actions/runs/46135200506/artifacts/15260070514), [Firefox](https://github.com/natanelia/zerocopy/actions/runs/46135200506/artifacts/15259059970). Medians recomputed from complete verified job-log JSON. 100k rows, four readers, 96 revisions, 24 replacement bursts, two held checkpoints.
+
+| Engine / metric (ms unless noted) | Unsharded | Four sync | Four stagger | Stagger duplicate |
+|---|---:|---:|---:|---:|
+| Chromium total | 5057.29 | 5138.55 | 5196.89 | 5242.94 |
+| Chromium build + first | 719.98 | 892.66 | 883.33 | 871.45 |
+| Chromium max edit | 676.95 | 722.32 | 351.28 | 375.79 |
+| Chromium max repack | 555.19 | 576.55 | 199.44 | 205.31 |
+| Chromium bulk edit p95 | 624.32 | 560.03 | 315.74 | 317.32 |
+| Chromium all edit p95 | 140.55 | 154.17 | 253.26 | 250.14 |
+| Chromium peak sampled PSS MiB | 2064.30 | 1963.88 | 2222.74 | 2245.96 |
+| Firefox total | 4096.29 | 4372.14 | 4160.89 | 4109.73 |
+| Firefox build + first | 644.61 | 777.32 | 755.49 | 745.27 |
+| Firefox max edit | 602.08 | 643.06 | 358.35 | 359.39 |
+| Firefox max repack | 495.60 | 503.15 | 177.78 | 179.70 |
+| Firefox bulk edit p95 | 565.73 | 590.84 | 295.12 | 287.92 |
+| Firefox all edit p95 | 122.76 | 141.77 | 200.39 | 197.87 |
+| Firefox peak sampled PSS MiB | 2744.27 | 2687.10 | 2480.23 | 2859.93 |
+
+Stagger cuts median trial maximum edit ~48%/40% and bulk p95 ~49%/48% versus unsharded, but all-edit p95 worsens ~80%/63%, cold build+first ~23%/17%, total ~2.8%/1.6% slower. Current used after historical release 81,489,600 → 123,744,424 B (+52%, different generation ages); final retained 281,967,020 → 221,123,600 B, peak handoff 345,076,912 → 322,893,140 B. Firefox PSS gain reverses in duplicate; Chromium PSS increases. Whole-tree sampled peaks include verification, not storage-only resident memory. Each shard repacked twice. Reject fixed stagger as default: exchanges rare extreme pauses for more frequent moderate ones and startup overhead. Preserve proof control. Main unchanged; #100 exact head still draft, no formal review or scope approval.
+
+### Next gate: finer lifetime domains and bounded quiet-window scheduling
+
+Prior schedule places all eight repacks on bulk+scan revisions. Test a quiet revision (no removal, at most 25 changed rows, no full scan) within two revisions before each round-robin deadline, otherwise execute at deadline. No lookahead or hidden idle time. Compare four fixed, four quiet, eight quiet and identical eight control in four balanced fresh rounds. Both counts repack each shard twice within 96 revisions; eight uses six-revision period. Partition count and threshold are experimental, not defaults. Report event type, max and p95 all/sparse/bulk edits, total, startup, scans, point, current/held/handoff and sampled PSS. Unit test early window, forced deadline, each shard twice, attached roots and old reads. Include a local-window replay alongside spread to expose uneven work. If sparse tails or overhead outweigh gains, reject; if synchronous approaches remain slow, investigate worker-owned generations with bounded replay rather than more cadence tuning. No production PR or publication.

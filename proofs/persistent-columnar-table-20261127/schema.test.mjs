@@ -210,3 +210,42 @@ test('four isolated shard arenas and staggered repacks preserve previous roots, 
   assert.equal(api.payload(stagger,x).memory.slots,32);
   assert.throws(()=>api.edit(stagger,x,{remove:[0],upsert:[]}),/deletion/);
 });
+
+test('quiet shard compaction respects deadlines and old roots for 4/8 shards',async()=>{
+  const api=await import('./schema-lane-runtime.mjs');
+  const {mixedLane,mixedQuery}=await import('./lane-fixture.mjs');
+  const base='schema-mixed-packed-column-bulk-range-shard-stagger-';
+  for(const count of [4,8]){
+    const mode=base+'quiet-'+(count===8?'eight-':'')+'repack48';
+    const rows=Array.from({length:32},(_,i)=>mixedLane(i));
+    let owner=api.build(mode,rows),previous=await api.attach(mode,structuredClone(api.payload(mode,owner).wire));
+    const old=previous,original=api.arenaUsage(owner,mode).map(a=>a.id),interval=48/count;
+    assert.equal(new Set(original).size,2*count);
+    const expected=new Map(rows.map(r=>[r.id,r])),events=[];
+    for(let rev=1;rev<=96;rev++){
+      const id=rev%32,row={...expected.get(id),reviewed:rev%2===0};
+      expected.set(id,row);owner=api.edit(mode,owner,{remove:[],upsert:[[id,row]]});
+      const work=rev<=48?{removed:rev%4===0?1:0,changed:1,scan:rev%3===0}:{removed:1,changed:10000,scan:true};
+      if(api.shouldRepack(mode,rev,owner,work)){
+        const before=api.arenaUsage(owner,mode).map(a=>a.id);
+        owner=api.repack(mode,owner,rev,work);
+        const after=api.arenaUsage(owner,mode).map(a=>a.id);
+        assert.equal(after.filter(id=>!before.includes(id)).length,2);
+        const due=(events.length+1)*interval;
+        assert(rev>=due-2&&rev<=due);
+        if(rev>48)assert.equal(rev,due);
+        events.push(rev);
+        previous=await api.attach(mode,structuredClone(api.payload(mode,owner).wire),previous);
+        for(const [id,r] of expected)assert.deepEqual(api.get(mode,previous,id),r);
+      }
+      assert.equal(api.size(mode,owner),32);
+    }
+    assert.equal(events.length,count*2);
+    assert(events.some((rev,i)=>rev<(i+1)*interval));
+    assert(api.arenaUsage(owner,mode).every(a=>!original.includes(a.id)));
+    const last=await api.attach(mode,structuredClone(api.payload(mode,owner).wire),previous);
+    for(const [id,r] of expected)assert.deepEqual(api.get(mode,last,id),r);
+    for(const r of rows)assert.deepEqual(api.get(mode,old,r.id),r);
+    assert.deepEqual(api.scan(mode,last,mixedQuery(32,96,0)),api.scan(mode,owner,mixedQuery(32,96,0)));
+  }
+});
