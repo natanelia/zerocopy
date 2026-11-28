@@ -44,7 +44,10 @@ export function compileSchema(definition, keyOf = id => String(id)) {
   }
   function readAt(s,i,name){
     const f=byName.get(name);if(!f)throw TypeError('unknown field');
-    const c=s.columns,r=f.root;
+    return readField(s.columns,i,f);
+  }
+  function readField(c,i,f){
+    const r=f.root;
     if(f.nullable&&!c[r+'p'].get(i))return null;
     if(f.kind!=='number[]')return c[r].get(i);
     const start=c[r].get(i),count=c[r+'n'].get(i);
@@ -54,10 +57,19 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     return Array.from(out);
   }
   const rowAt=(s,i)=>Object.fromEntries(fields.map(f=>[f.name,readAt(s,i,f.name)]));
-  const get=(s,id,profile)=>{
-    if(!profile){const i=lookup(s,id);return i===undefined?undefined:rowAt(s,i);}
+  // Proof-only direct row materialization: descriptors are already resolved by
+  // the schema. Avoid per-row entry arrays and repeated name lookups; retain
+  // the identical field decoder, including array bounds and fresh arrays.
+  function directRowAt(s,i){
+    const row={},c=s.columns;
+    for(const f of fields)row[f.name]=readField(c,i,f);
+    return row;
+  }
+  const get=(s,id,profile,directRow=false)=>{
+    const materialize=directRow?directRowAt:rowAt;
+    if(!profile){const i=lookup(s,id);return i===undefined?undefined:materialize(s,i);}
     const start=performance.now(),i=lookup(s,id),found=performance.now();
-    const value=i===undefined?undefined:rowAt(s,i),end=performance.now();
+    const value=i===undefined?undefined:materialize(s,i),end=performance.now();
     profile.lookupMs+=found-start;profile.materializeMs+=end-found;profile.count++;if(i!==undefined)profile.hits++;
     return value;
   };

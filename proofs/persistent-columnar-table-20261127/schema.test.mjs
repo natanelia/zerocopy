@@ -102,3 +102,24 @@ test('direct fresh-column append matches ordinary planner, offsets, fallback, er
   assert.throws(()=>collision.edit(root,{remove:[],upsert:[['b',{id:'b'}]]},true,undefined,true),/identity/);
   assert.deepEqual(collision.get(root,'a'),{id:'a'});
 });
+
+
+test('direct full-row reads match original on retained, current and attached roots; return independent objects',async()=>{
+  const old=schema.buildPacked([a,b,c]),reader=await schema.attach(structuredClone(schema.wire(old)));
+  const d={...a,id:'d',xy:[-0,7]},next=schema.edit(old,{remove:['b'],upsert:[['d',d]]},true,undefined,true);
+  const attached=await schema.attach(structuredClone(schema.wire(next)),reader);
+  for(const root of [old,reader,next,attached])for(const id of [a.id,'b','c','d','missing']){
+    const expected=schema.get(root,id),actual=schema.get(root,id,undefined,true);
+    assert.deepEqual(actual,expected);
+    if(actual){assert.deepEqual(Object.keys(actual),Object.keys(expected));assert.equal(Object.getPrototypeOf(actual),Object.prototype);}
+  }
+  const detached=schema.get(attached,'d',undefined,true);detached.xy[0]=99;detached.label='changed';
+  assert.deepEqual(schema.get(attached,'d',undefined,true),{...d,xy:[0,7]});
+  assert.deepEqual(schema.get(reader,a.id,undefined,true),a);
+  const reordered=compileSchema({flag:'boolean',id:'string',xy:'number[]?'});
+  const r={flag:false,id:'🛣️',xy:[]},s=reordered.buildPacked([r]);
+  assert.deepEqual(Object.keys(reordered.get(s,r.id,undefined,true)),['flag','id','xy']);
+  assert.deepEqual(reordered.get(s,r.id,undefined,true),r);
+  const collision=compileSchema({id:'string'},()=> 'same');
+  assert.throws(()=>collision.get(collision.buildPacked([{id:'a'}]),'b',undefined,true),/identity/);
+});

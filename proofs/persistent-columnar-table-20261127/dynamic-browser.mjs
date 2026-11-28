@@ -21,8 +21,9 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url='http://127.0.0.1:'+server.address().port,report={engine,n,rounds,revisions,retention,pattern,cpu:cpus()[0]?.model,rows:[]};
 const profile=process.argv[9]==='mixed-profile';
 const columnBulk=process.argv[9]==='mixed-column-bulk';
-const scale=profile||columnBulk||process.argv[9]==='mixed-scale';
-const modes=columnBulk?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
+const directRow=process.argv[9]==='mixed-direct-row';
+const scale=profile||columnBulk||directRow||process.argv[9]==='mixed-scale';
+const modes=directRow?['schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control','schema-mixed-packed-column-bulk-direct-row','schema-mixed-packed-column-bulk-direct-row-control']:columnBulk?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
   for(let round=-1;round<rounds;round++){
     const offset=(round+1)%modes.length;
