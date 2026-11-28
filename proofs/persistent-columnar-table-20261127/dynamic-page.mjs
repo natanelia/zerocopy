@@ -49,8 +49,9 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
       for(const id of b.remove){rows.delete(id);dead.push(id);}for(const [id,r] of b.upsert)rows.set(id,r);
       const hold=rev===0||rev%24===0||rev===revisions;
       if(hold)retained.set(rev,{rows:new Map(rows),missing:dead.slice()});
-      const queries=workers.map((_,w)=>rev%3===0?(mixed?mixedQuery:queryFor)(n,rev,w):null);
-      const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
+      const pointHeavy=pattern==='spread-point',scanNow=pointHeavy?(rev===0||rev%12===1):rev%3===0;
+      const queries=workers.map((_,w)=>scanNow?(mixed?mixedQuery:queryFor)(n,rev,w):null);
+      const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:pointHeavy?128:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
       const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>(mixed?mixedMatches:matches)(r,q)).map(mixed?validateMixed:validate).sort((a,b)=>a[0]-b[0]):null}));
       const t=performance.now();if(rev)owner=edit(mode,owner,b);const editMs=performance.now()-t;
       let compactionMs=0,handoff=null;
@@ -84,12 +85,13 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
     const history=[],expected=[];
     for(const [rev,r] of retained){const ids=[...r.rows.keys()].sort((a,b)=>a-b);history.push({rev,ids,missing:r.missing});expected.push([rev,await digest(ids.length,i=>r.rows.get(ids[i]))]);}
     for(const r of await Promise.all(workers.map(w=>send(w,{verify:true,mode,history}))))equal(r.digests,expected,'retained full rows');
-    const timed=events.slice(1);
+    const timed=events.slice(1),bulk=timed.filter(e=>e.removed>0),sparse=timed.filter(e=>e.removed===0);
+    const phaseStats=group=>group.length?{count:group.length,totalMs:group.reduce((a,e)=>a+e.editToAnswerMs,0),p95EditMs:percentile(group.map(e=>e.editToAnswerMs),.95),p95MutationMs:percentile(group.map(e=>e.mutationMs),.95),p95PointMs:percentile(group.map(e=>e.pointMs),.95)}:null;
     const releaseReplies=await Promise.all(workers.map(w=>send(w,{release:true,mode,ids:history.at(-1).ids})));
     for(const r of releaseReplies)equal(r.digest,expected.at(-1)[1],'current after release');
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
-    return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
+    return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,buildAndFirstMs:buildMs+events[0].firstElapsedMs,bulk:phaseStats(bulk),sparse:phaseStats(sparse),scanRevisions:timed.filter(e=>e.scan).length,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
       p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
       initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
   }finally{for(const w of workers)w.terminate();}

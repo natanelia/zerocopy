@@ -19,10 +19,14 @@ const server=createServer((req,res)=>{
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url='http://127.0.0.1:'+server.address().port,report={engine,n,rounds,revisions,retention,pattern,cpu:cpus()[0]?.model,rows:[]};
-const modes=process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
+const scale=process.argv[9]==='mixed-scale';
+const modes=scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
   for(let round=-1;round<rounds;round++){
-    const offset=(round+1)%modes.length,order=[...modes.slice(offset),...modes.slice(0,offset)];if(round%2===1)order.reverse();
+    const offset=(round+1)%modes.length;
+    const order=scale?([-1,0,1,2,3].includes(round)?(round<0?[0,1,2,3]:[[0,1,2,3],[3,2,1,0],[2,3,0,1],[1,0,3,2]][round]).map(i=>modes[i]):null):[...modes.slice(offset),...modes.slice(0,offset)];
+    if(!order)throw Error('scale proof requires exactly four measured rounds');
+    if(!scale&&round%2===1)order.reverse();
     for(const mode of order){
       const browser=await launcher.launch({headless:true});
       try{

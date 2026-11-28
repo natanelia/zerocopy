@@ -55,7 +55,16 @@ export function validate(r){
 }
 export function equal(a,b,label){if(JSON.stringify(a)!==JSON.stringify(b))throw Error(label+' mismatch');}
 export async function digest(n,get){
-  const chunks=[];for(let i=0;i<n;i++){const r=get(i);chunks.push(JSON.stringify([r.id,r.kind,r.active,r.left,r.bottom,r.right,r.top,r.xy,...(Object.hasOwn(r,'roadName')?[r.roadName,r.speedLimit,r.reviewed,r.connections]:[])]));}
-  const bytes=new TextEncoder().encode(chunks.join('\n'));
-  return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');
+  // Bounded diagnostic memory for 100k rows. Hash ordered 512-row chunks,
+  // then hash their fixed-width digests. Every row and field remains checked.
+  // This is intentionally outside the measured edit-to-answer path.
+  const block=512,hashes=new Uint8Array(Math.ceil(n/block)*32),encoder=new TextEncoder();
+  for(let start=0;start<n;start+=block){
+    const chunks=[];
+    for(let i=start;i<Math.min(n,start+block);i++){
+      const r=get(i);chunks.push(JSON.stringify([r.id,r.kind,r.active,r.left,r.bottom,r.right,r.top,r.xy,...(Object.hasOwn(r,'roadName')?[r.roadName,r.speedLimit,r.reviewed,r.connections]:[])]));
+    }
+    hashes.set(new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(chunks.join('\n')))),start/block*32);
+  }
+  return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',hashes)),x=>x.toString(16).padStart(2,'0')).join('');
 }
