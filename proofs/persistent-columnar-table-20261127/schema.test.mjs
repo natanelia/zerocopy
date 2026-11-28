@@ -124,12 +124,12 @@ test('direct full-row reads match original on retained, current and attached roo
   assert.throws(()=>collision.get(collision.buildPacked([{id:'a'}]),'b',undefined,true),/identity/);
 });
 
-test('live-column repack resets slots and ranges, preserves old attachments and supports subsequent edits',async()=>{
+for(const bulkRanges of [false,true])test(`live-column repack (${bulkRanges?'range':'scalar'}) resets slots and ranges, preserves old attachments and supports subsequent edits`,async()=>{
   const old=schema.buildPacked([a,b,c]),reader=await schema.attach(structuredClone(schema.wire(old)));
   const d={...a,id:'d',xy:[-0,7,8]},changed={...c,xy:[1,2],label:'道路'};
   const before=schema.edit(old,{remove:['b'],upsert:[['c',changed],['d',d]]},true,undefined,true);
   const beforeReader=await schema.attach(structuredClone(schema.wire(before)),reader);
-  const packed=schema.repack(before);
+  const packed=schema.repack(before,bulkRanges);
   assert.equal(schema.slotCount(packed),3);
   assert.equal(schema.size(packed),3);
   const afterReader=await schema.attach(structuredClone(schema.wire(packed)),beforeReader);
@@ -140,12 +140,31 @@ test('live-column repack resets slots and ranges, preserves old attachments and 
   const beforeIds=schema.arenaUsage(before).map(x=>x.id),afterIds=schema.arenaUsage(packed).map(x=>x.id);
   assert(afterIds.every(id=>!beforeIds.includes(id)));
   const later=schema.edit(packed,{remove:[a.id],upsert:[['d',{...d,xy:null}],['e',{...b,id:'e'}]]},true,undefined,true);
-  const again=schema.repack(later),last=await schema.attach(structuredClone(schema.wire(again)),afterReader);
+  const again=schema.repack(later,bulkRanges),last=await schema.attach(structuredClone(schema.wire(again)),afterReader);
   assert.equal(schema.slotCount(last),3);
   for(const id of [a.id,'b','c','d','e'])assert.deepEqual(schema.get(last,id),schema.get(later,id));
   assert.deepEqual(schema.get(reader,'b'),b);
   assert.deepEqual(schema.get(beforeReader,'d'),{...d,xy:[0,7,8]});
   assert.deepEqual(schema.get(afterReader,'c'),changed);
-  const empty=schema.repack(schema.edit(again,{remove:['c','d','e'],upsert:[]}));
+  const empty=schema.repack(schema.edit(again,{remove:['c','d','e'],upsert:[]}),bulkRanges);
   assert.equal(schema.size(empty),0);assert.equal(schema.slotCount(empty),0);
+});
+
+
+test('range gather preserves numeric identities, gaps, reordered payloads, nullable values and historical readers',async()=>{
+  const t=compileSchema({id:'number',value:'number?',xy:'number[]?',links:'number[]'});
+  const rows=Array.from({length:31},(_,id)=>({id,value:id%3===0?null:id,xy:id%4===0?null:id%5===0?[]:[id,id+1],links:[id]}));
+  const old=t.buildPacked(rows),reader=await t.attach(structuredClone(t.wire(old)));
+  const changed={...rows[2],xy:[9,8,7],links:[42,43]};
+  const inserted={id:31,value:0,xy:[],links:[]};
+  const before=t.edit(old,{remove:[1,4,7],upsert:[[2,changed],[31,inserted]]},true,undefined,true);
+  const scalar=t.repack(before),range=t.repack(before,true),attached=await t.attach(structuredClone(t.wire(range)),reader);
+  assert.equal(t.slotCount(range),29);
+  for(let id=0;id<=31;id++){
+    assert.deepEqual(t.get(range,id),t.get(scalar,id));
+    assert.deepEqual(t.get(attached,id),t.get(before,id));
+    assert.deepEqual(t.get(reader,id),rows[id]);
+  }
+  assert.deepEqual(t.get(range,2),changed);
+  assert.deepEqual(t.get(range,31),inserted);
 });

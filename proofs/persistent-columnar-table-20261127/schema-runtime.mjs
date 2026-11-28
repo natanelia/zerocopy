@@ -210,19 +210,36 @@ export function compileSchema(definition, keyOf = id => String(id)) {
   // Dedicated single-writer proof only. Gather live slots into fresh columns
   // without materializing row objects or per-row numeric payload arrays.
   // Module defaults are reset only after gathering; old handles remain valid.
-  function repack(s){
+  function repack(s,bulkRanges=false){
     const c=s.columns,slots=Array.from(s.index.values()).sort((a,b)=>a-b),n=slots.length;
     const arrays=fields.filter(f=>f.kind==='number[]'),lengths={};
     for(const f of arrays)lengths[f.root]=0;
+    // Bounded temporary gather: at most one full numeric source column at a
+    // time, plus the dense destination. Reuse gathered range metadata below.
+    const gatherNumeric=col=>{
+      const src=new Float64Array(col.size),out=new Float64Array(n);
+      if(src.length)col.copyToFloat64Array(src,{start:0,end:src.length});
+      for(let j=0;j<n;j++)out[j]=src[slots[j]];
+      return out;
+    };
+    const gathered={};
+    if(bulkRanges){
+      if(idField.kind==='number')gathered[idField.root]=gatherNumeric(c[idField.root]);
+      for(const f of arrays){
+        gathered[f.root]=gatherNumeric(c[f.root]);
+        gathered[f.root+'n']=gatherNumeric(c[f.root+'n']);
+      }
+    }
+    const scalar=(r,i,j)=>gathered[r]?gathered[r][j]:c[r].get(i);
     const entries=new Array(n);
     for(let j=0;j<n;j++){
       const i=slots[j];
       if(!Number.isSafeInteger(i)||i<0||i>=slotCount(s)||!isLive(s,i))throw Error('invalid live slot');
-      const id=c[idField.root].get(i),key=keyOf(id);
+      const id=scalar(idField.root,i,j),key=keyOf(id);
       if(s.index.get(key)!==i)throw Error('invalid live identity');
       entries[j]=[key,j];
       for(const f of arrays){
-        const r=f.root,start=c[r].get(i),count=c[r+'n'].get(i);
+        const r=f.root,start=scalar(r,i,j),count=scalar(r+'n',i,j);
         if(!Number.isSafeInteger(start)||!Number.isSafeInteger(count)||start<0||count<0||start+count>c[r+'a'].size)throw Error('invalid array range');
         if(f.nullable&&!c[r+'p'].get(i)&&count!==0)throw Error('invalid null array range');
         lengths[r]+=count;
@@ -233,16 +250,29 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     values.occupied.fill(true);
     for(const f of fields){
       const r=f.root;let at=0;
+      // Copy adjacent source payloads as one range, but preserve destination
+      // slot order even when sparse updates appended payloads out of order.
+      let pendingStart=0,pendingEnd=0,pendingOffset=0;
+      const flush=()=>{
+        if(pendingEnd>pendingStart)c[r+'a'].copyToFloat64Array(values[r+'a'],{start:pendingStart,end:pendingEnd,offset:pendingOffset});
+        pendingStart=pendingEnd=0;
+      };
+      if(bulkRanges&&f.kind==='number')values[r]=gathered[r]??gatherNumeric(c[r]);
       for(let j=0;j<n;j++){
         const i=slots[j];
         if(f.nullable)values[r+'p'][j]=c[r+'p'].get(i);
         if(f.kind==='number[]'){
-          const start=c[r].get(i),count=c[r+'n'].get(i);
+          const start=scalar(r,i,j),count=scalar(r+'n',i,j);
           values[r][j]=at;values[r+'n'][j]=count;
-          if(count)c[r+'a'].copyToFloat64Array(values[r+'a'],{start,end:start+count,offset:at});
+          if(count){
+            if(!bulkRanges)c[r+'a'].copyToFloat64Array(values[r+'a'],{start,end:start+count,offset:at});
+            else if(pendingEnd>pendingStart&&pendingEnd===start)pendingEnd=start+count;
+            else{flush();pendingStart=start;pendingEnd=start+count;pendingOffset=at;}
+          }
           at+=count;
-        }else values[r][j]=c[r].get(i);
+        }else if(!bulkRanges||f.kind!=='number')values[r][j]=c[r].get(i);
       }
+      if(bulkRanges&&f.kind==='number[]')flush();
     }
     resetMap();resetSharedList();
     const columns=Object.fromEntries(roots.map(r=>[r,new SharedList(kinds[r]).pushMany(values[r])]));

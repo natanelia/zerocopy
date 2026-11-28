@@ -12,7 +12,7 @@ export const get=(m,s,id,profile)=>typed(m)?tableFor(m).get(s,id,profile,m.inclu
 export const size=(m,s)=>typed(m)?tableFor(m).size(s):base.size(m,s);
 // Matched fixed cadence is an experimental control, not a production policy.
 export const shouldRepack=(m,rev,o)=>m.endsWith('-repack48')?rev>0&&rev%48===0:typed(m)?false:base.shouldRepack(m,rev,o);
-export const repack=(m,o)=>typed(m)?tableFor(m).repack(o):base.repack(m,o);
+export const repack=(m,o)=>typed(m)?tableFor(m).repack(o,m.includes('-range-')):base.repack(m,o);
 export const arenaUsage=(o,m)=>typed(m)?tableFor(m).arenaUsage(o):base.arenaUsage(o,m);
 export function payload(m,o){
   if(!typed(m))return base.payload(m,o);
