@@ -1,3 +1,4 @@
+import {configureMemory} from '../../dist/shared.js';
 import {build,edit,payload,repack,shouldRepack,arenaUsage} from './schema-lane-runtime.mjs';
 import {lane,bounds,queryFor,matches,validate,equal,digest,mixedMode,mixedLane,mixedMetadata,mixedQuery,mixedMatches,validateMixed} from './lane-fixture.mjs';
 const readerCount=4;
@@ -31,7 +32,9 @@ function batch(rows,ids,rev,nextId,pattern,mixed){
   }
   return {remove,upsert,nextId};
 }
-export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
+export async function run(mode,n,revisions=96,retention=2,pattern='spread',maximumBytes){
+  // Only the long-churn proof opts into a larger reservation. No runtime default change.
+  if(maximumBytes!==undefined)configureMemory({maximumBytes});
   if(!Number.isInteger(retention)||retention<1)throw Error('invalid retention');
   if(!crossOriginIsolated)throw Error('not isolated');
   const mixed=mixedMode(mode),initial=Array.from({length:n},(_,i)=>(mixed?mixedLane:lane)(i)),rows=new Map(initial.map(r=>[r.id,r])),ids=initial.map(r=>r.id),dead=[],retained=new Map(),events=[];
@@ -54,7 +57,15 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
       const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:pointHeavy?128:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
       const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>(mixed?mixedMatches:matches)(r,q)).map(mixed?validateMixed:validate).sort((a,b)=>a[0]-b[0]):null}));
       const editProfile=rev&&mode.includes('-profile')?{}:undefined;
-      const t=performance.now();if(rev)owner=edit(mode,owner,b,editProfile);const editMs=performance.now()-t;
+      const t=performance.now();
+      if(rev){
+        try{owner=edit(mode,owner,b,editProfile);}
+        catch(error){
+          let after;try{after=arenaUsage(owner,mode);}catch(e){after={error:String(e)};}
+          throw Error('edit failure '+JSON.stringify({mode,rev,maximumBytes,removed:b.remove.length,changed:b.upsert.length,lastVerified:events.at(-1)?.memory,after})+'; '+String(error),{cause:error});
+        }
+      }
+      const editMs=performance.now()-t;
       let compactionMs=0,handoff=null;
       if(shouldRepack(mode,rev,owner)){
         const start=performance.now(),before=arenaUsage(owner,mode);updateUsage(before);

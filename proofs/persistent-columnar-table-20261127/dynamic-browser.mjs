@@ -24,6 +24,8 @@ const profile=process.argv[9]==='mixed-profile';
 const columnBulk=process.argv[9]==='mixed-column-bulk';
 const directRow=process.argv[9]==='mixed-direct-row';
 const longChurn=process.argv[9]==='mixed-long-churn';
+const maximumBytes=longChurn?512*1024*1024:undefined;
+if(longChurn)report.maximumBytes=maximumBytes;
 const scale=longChurn||profile||columnBulk||directRow||process.argv[9]==='mixed-scale';
 const modes=longChurn?['json-mixed-direct','json-mixed-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:directRow?['schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control','schema-mixed-packed-column-bulk-direct-row','schema-mixed-packed-column-bulk-direct-row-control']:columnBulk?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
@@ -38,7 +40,7 @@ try{
       try{
         report.version=browser.version();
         const page=await browser.newPage();await page.goto(url);
-        const result=await page.evaluate(async({dir,mode,n,revisions,retention,pattern})=>(await import(dir+'/dynamic-page.mjs')).run(mode,n,revisions,retention,pattern),{dir,mode,n,revisions,retention,pattern});
+        const result=await page.evaluate(async({dir,mode,n,revisions,retention,pattern,maximumBytes})=>(await import(dir+'/dynamic-page.mjs')).run(mode,n,revisions,retention,pattern,maximumBytes),{dir,mode,n,revisions,retention,pattern,maximumBytes});
         assert(result.verified);result.round=round;
         if(stopSampler){result.processMemory=await stopSampler();stopSampler=null;}
         report.rows.push(result);writeFileSync(output,JSON.stringify(report));
@@ -51,6 +53,11 @@ try{
           summary.attribution={bulk:aggregate(attribution.bulk),sparse:aggregate(attribution.sparse)};
         }
         console.log(JSON.stringify(summary));await page.close();
+      }catch(error){
+        const failure={mode,round,error:String(error),stack:error?.stack};
+        if(stopSampler){failure.processMemory=await stopSampler();stopSampler=null;}
+        report.failure=failure;writeFileSync(output,JSON.stringify(report));
+        console.error(JSON.stringify({mode,round,error:failure.error}));throw error;
       }finally{if(stopSampler)await stopSampler();await browser.close();}
     }
   }
