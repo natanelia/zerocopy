@@ -55,12 +55,25 @@ export function compileSchema(definition, keyOf = id => String(id)) {
   }
   const rowAt=(s,i)=>Object.fromEntries(fields.map(f=>[f.name,readAt(s,i,f.name)]));
   const get=(s,id)=>{const i=lookup(s,id);return i===undefined?undefined:rowAt(s,i);};
-  function edit(s,{remove,upsert}){
+  function edit(s,{remove,upsert},packedPayloads=false){
     // Validate all user inputs and key collisions before allocating.
     const seen=new Set(),deletions=[],updates=[];
     for(const id of remove){const k=keyOf(id),i=lookup(s,id);if(i===undefined||seen.has(k))throw Error('invalid deletion');seen.add(k);deletions.push([k,i]);}
     for(const [id,row] of upsert){const k=checkRow(id,row);if(seen.has(k))throw Error('duplicate operation');seen.add(k);updates.push([k,lookup(s,id),row]);}
     const c=s.columns,plans=Object.fromEntries(roots.map(r=>[r,{append:[],patch:[]}]));
+    // Proof-only bulk append variant: count variable payloads once, allocate
+    // exact typed storage and avoid growing a JS number array plus converting it.
+    const payloads=new Map();
+    if(packedPayloads)for(const f of fields)if(f.kind==='number[]'){
+      const r=f.root;let count=0;
+      for(const [,old,row] of updates){
+        const length=row[f.name]?.length??0;
+        if(old===undefined||c[r+'n'].get(old)!==length){
+          count+=length;if(!Number.isSafeInteger(count))throw RangeError('array capacity');
+        }
+      }
+      payloads.set(r+'a',{values:new Float64Array(count),at:0});
+    }
     let next=slotCount(s);const additions=[];
     const write=(r,i,v,fresh)=>{
       if(fresh)plans[r].append.push(v);
@@ -78,9 +91,14 @@ export function compileSchema(definition, keyOf = id => String(id)) {
           if(!fresh&&prevCount===a.length){
             for(let j=0;j<a.length;j++)write(r+'a',prevStart+j,number(a[j]),false);
           }else{
-            const start=c[r+'a'].size+plans[r+'a'].append.length;
+            const packed=payloads.get(r+'a');
+            const start=c[r+'a'].size+(packed?packed.at:plans[r+'a'].append.length);
             write(r,i,start,fresh);write(r+'n',i,a.length,fresh);
-            for(const x of a)plans[r+'a'].append.push(number(x));
+            if(packed){
+              // Values were checked before allocation; assigning into typed
+              // storage still canonicalizes signed zero as the original path.
+              for(const x of a)packed.values[packed.at++]=number(x);
+            }else for(const x of a)plans[r+'a'].append.push(number(x));
           }
         }else{
           const value=present?(f.kind==='number'?number(v):v):f.kind==='number'?0:f.kind==='boolean'?false:'';
@@ -89,7 +107,15 @@ export function compileSchema(definition, keyOf = id => String(id)) {
       }
     }
     const columns={...c};
-    for(const r of roots){const p=plans[r];let col=c[r];if(p.patch.length)col=col.setMany(p.patch);if(p.append.length)col=col.pushMany(r.endsWith('a')&&kinds[r]==='number'?Float64Array.from(p.append):p.append);columns[r]=col;}
+    for(const r of roots){
+      const p=plans[r],packed=payloads.get(r);let col=c[r];
+      if(p.patch.length)col=col.setMany(p.patch);
+      if(packed){
+        if(packed.at!==packed.values.length)throw Error('packed append length mismatch');
+        if(packed.at)col=col.pushMany(packed.values);
+      }else if(p.append.length)col=col.pushMany(r.endsWith('a')&&kinds[r]==='number'?Float64Array.from(p.append):p.append);
+      columns[r]=col;
+    }
     let index=s.index;if(deletions.length)index=index.deleteMany(deletions.map(x=>x[0]));if(additions.length)index=index.setMany(additions);
     return {index,columns};
   }

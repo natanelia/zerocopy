@@ -1,4 +1,4 @@
-name: Persistent schema mixed nullable metadata replay (proof only)
+name: Persistent schema packed bulk payload replay (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-schema-mixed-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
+          name: columnar-schema-bulk-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn

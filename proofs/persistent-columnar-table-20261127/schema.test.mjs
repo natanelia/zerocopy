@@ -48,3 +48,26 @@ test('packed ingestion is equivalent to original build across types, nulls, empt
   const collision=compileSchema({id:'string'},()=> 'same');
   assert.throws(()=>collision.buildPacked([{id:'a'},{id:'b'}]),/duplicate/);
 });
+
+test('packed bulk payload appends preserve exact rows, old roots and mixed length changes',async()=>{
+  const old=schema.buildPacked([a,b,c]),reader=await schema.attach(structuredClone(schema.wire(old)));
+  const d={...a,id:'new',xy:[-0,4,5]},a2={...a,xy:[8,7,6,5]},b2={...b,xy:[1,2]},c2={...c,xy:[]};
+  const batches=[
+    {remove:[],upsert:[[a.id,a2],['b',b2],['c',c2],['new',d]]},
+    {remove:['b'],upsert:[[a.id,{...a2,xy:null}],['c',{...c2,xy:[9]}],['new',{...d,xy:[0,6]}]]},
+    {remove:[],upsert:[[a.id,{...a2,xy:[]}],['c',{...c2,xy:[3]}]]}
+  ];
+  let x=old,y=old,previous=reader;
+  for(const batch of batches){
+    x=schema.edit(x,batch,true);y=schema.edit(y,batch);
+    previous=await schema.attach(structuredClone(schema.wire(x)),previous);
+    for(const id of [a.id,'b','c','new']){
+      assert.deepEqual(schema.get(x,id),schema.get(y,id));
+      assert.deepEqual(schema.get(previous,id),schema.get(y,id));
+    }
+  }
+  assert.deepEqual(schema.get(reader,a.id),a);
+  assert.deepEqual(schema.get(reader,'b'),b);
+  assert.throws(()=>schema.edit(old,{remove:[],upsert:[[a.id,{...a,xy:[Infinity]}]]},true),TypeError);
+  assert.throws(()=>schema.edit(old,{remove:[a.id],upsert:[[a.id,a]]},true),/duplicate/);
+});

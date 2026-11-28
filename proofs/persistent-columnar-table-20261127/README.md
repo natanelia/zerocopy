@@ -289,3 +289,21 @@ Median paired packed/original build ratios .757/.712 Chromium and .691/.665 Fire
 ### Next gate: mixed nullable metadata replay
 
 Test the existing schema storage rather than optimize more numeric-only fixtures. Add nullable UTF-8 road labels, nullable speed limits, review flags, and nullable variable-length numeric connection lists; metadata changes independently on some revisions and new identities have varied values. Identical initial rows, edits, viewport predicates (including review and speed), and visible metadata materialization for JSON full scan, pinned #100 selective JSON scan and its duplicate, original schema ingest and packed schema ingest plus duplicate. Full point results and retained digests include all new fields; expired roots and deleted keys remain checked. Six paired rounds, 4k/16k lanes, four browser readers, 48 revisions, same retention. This is a synthetic structured workload, not actual user map data; no 100k/1M or real application claim yet. No production code, new PR, merge, preview deletion or publication. #100 remains draft on scope/review hold. If mixed performance fails, investigate measured phase overhead before any further runtime work.
+
+
+## Mixed nullable metadata qualification — Nov 28
+
+[Run 46087917233](https://github.com/natanelia/zerocopy/actions/runs/46087917233), head `a5573b588f1b22752b6cc293532defd1064053c7`: all four jobs succeeded, 144 measured verified cases, six balanced rounds (0–5; -1 excluded), six modes, four actual browser readers, 48 revisions. Raw artifacts: [Chromium 16k](https://github.com/natanelia/zerocopy/actions/runs/46087917233/artifacts/15240580102), [Firefox 16k](https://github.com/natanelia/zerocopy/actions/runs/46087917233/artifacts/15240316841), [Chromium 4k](https://github.com/natanelia/zerocopy/actions/runs/46087917233/artifacts/15240246286), [Firefox 4k](https://github.com/natanelia/zerocopy/actions/runs/46087917233/artifacts/15239329787). Medians from complete verified job-log JSON.
+
+| Engine / lanes | Direct JSON total → packed schema total ms | Direct → schema p95 edit ms | Direct → schema p95 mutation ms | Direct → schema p95 scan ms | Schema/direct paired total ratio |
+|---|---:|---:|---:|---:|---:|
+| Chromium 4096 | 168.00 → 167.50 | 9.84 → 9.73 | 3.93 → 6.77 | 9.24 → 4.28 | 1.011 |
+| Chromium 16384 | 734.45 → 645.00 | 40.84 → 46.91 | 22.72 → 36.87 | 41.18 → 15.14 | .879 |
+| Firefox 4096 | 359.73 → 270.00 | 19.44 → 15.07 | 8.52 → 8.94 | 18.11 → 8.96 | .746 |
+| Firefox 16384 | 863.79 → 492.39 | 54.43 → 34.50 | 25.04 → 25.96 | 35.76 → 12.92 | .568 |
+
+JSON A/A total ratios .990/1.008 Chromium, 1.024/1.025 Firefox. Packed schema versus original build medians at 16k: 151.46 vs 217.38 ms Chromium, 122.45 vs 188.53 Firefox. Final distinct used arena bytes 32,555,824 vs 30,238,132 JSON (7.7% higher); at 4k 8,388,260 vs 7,347,860 (14.2% higher). No process memory claim. Chromium 16k p95 mutation regresses ~62%; faster scans alone do not clear the interactive gate. No universal win, no default or production PR.
+
+### Next: eliminate intermediate JS arrays during variable-payload bulk append
+
+The measured Chromium mutation tail is the limiting phase; source inspection shows full validated geometry and connections appended element-by-element to growable JS arrays, then converted to Float64Array before persistent append. Hypothesis, not a measured attribution: for 10% replacement bursts, sizing and directly filling numeric payloads will lower transient allocation and mutation time. Keep same layout, validation, operations and persistent updates. Count append lengths after validation; allocate exact typed buffers and verify offsets/lengths. Compare packed ingest + original edit and duplicate against packed ingest + direct payload edit and duplicate, and pinned #100 JSON + duplicate, on unchanged mixed fixture and 4k/16k Chromium/Firefox. No skipping validation, no change to point or scan paths; all historical roots, nulls, signed zero, mixed length, invalid rows, deleted keys and final digests remain checked. Report paired total, bulk revision mutation/round-trip p95, sparse controls, and used bytes separately; no RSS/GC claim absent direct measurement. If not useful, reject instead of tuning further. Proof-only, main and #100 unchanged, no merge/publication.
