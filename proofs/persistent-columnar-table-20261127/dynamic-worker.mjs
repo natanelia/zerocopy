@@ -20,8 +20,9 @@ self.onmessage=async({data:m})=>{
     if(m.rev!==last+1)throw Error('out of order revision');
     const a=performance.now();current=await attach(m.mode,m.wire,current);const attachMs=performance.now()-a;
     if(m.hold)retained.set(m.rev,current);
-    const p=performance.now(),points=m.ids.map(i=>get(m.mode,current,i)),pointMs=performance.now()-p;
+    const pointProfile=m.mode.includes('-profile')?{lookupMs:0,materializeMs:0,count:0,hits:0}:undefined;
+    const p=performance.now(),points=m.ids.map(i=>get(m.mode,current,i,pointProfile)),pointMs=performance.now()-p;
     const t=performance.now(),visible=m.query?scan(m.mode,current,m.query):null,scanMs=performance.now()-t;
-    last=m.rev;self.postMessage({rev:last,points,visible,attachMs,pointMs,scanMs,size:size(m.mode,current)});
+    last=m.rev;self.postMessage({rev:last,points,visible,attachMs,pointMs,pointProfile,scanMs,size:size(m.mode,current)});
   }catch(e){self.postMessage({error:String(e?.stack??e)});}
 };

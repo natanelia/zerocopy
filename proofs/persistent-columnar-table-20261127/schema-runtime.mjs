@@ -54,12 +54,21 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     return Array.from(out);
   }
   const rowAt=(s,i)=>Object.fromEntries(fields.map(f=>[f.name,readAt(s,i,f.name)]));
-  const get=(s,id)=>{const i=lookup(s,id);return i===undefined?undefined:rowAt(s,i);};
-  function edit(s,{remove,upsert},packedPayloads=false){
+  const get=(s,id,profile)=>{
+    if(!profile){const i=lookup(s,id);return i===undefined?undefined:rowAt(s,i);}
+    const start=performance.now(),i=lookup(s,id),found=performance.now();
+    const value=i===undefined?undefined:rowAt(s,i),end=performance.now();
+    profile.lookupMs+=found-start;profile.materializeMs+=end-found;profile.count++;if(i!==undefined)profile.hits++;
+    return value;
+  };
+  function edit(s,{remove,upsert},packedPayloads=false,profile){
+    let tick=profile?performance.now():0;
+    const mark=name=>{if(profile){const now=performance.now();profile[name]=now-tick;tick=now;}};
     // Validate all user inputs and key collisions before allocating.
     const seen=new Set(),deletions=[],updates=[];
     for(const id of remove){const k=keyOf(id),i=lookup(s,id);if(i===undefined||seen.has(k))throw Error('invalid deletion');seen.add(k);deletions.push([k,i]);}
     for(const [id,row] of upsert){const k=checkRow(id,row);if(seen.has(k))throw Error('duplicate operation');seen.add(k);updates.push([k,lookup(s,id),row]);}
+    mark('validateLookupMs');
     const c=s.columns,plans=Object.fromEntries(roots.map(r=>[r,{append:[],patch:[]}]));
     // Proof-only bulk append variant: count variable payloads once, allocate
     // exact typed storage and avoid growing a JS number array plus converting it.
@@ -74,6 +83,7 @@ export function compileSchema(definition, keyOf = id => String(id)) {
       }
       payloads.set(r+'a',{values:new Float64Array(count),at:0});
     }
+    mark('sizePayloadMs');
     let next=slotCount(s);const additions=[];
     const write=(r,i,v,fresh)=>{
       if(fresh)plans[r].append.push(v);
@@ -106,8 +116,11 @@ export function compileSchema(definition, keyOf = id => String(id)) {
         }
       }
     }
+    mark('planMs');
     const columns={...c};
+    if(profile)profile.columns={};
     for(const r of roots){
+      const start=profile?performance.now():0;
       const p=plans[r],packed=payloads.get(r);let col=c[r];
       if(p.patch.length)col=col.setMany(p.patch);
       if(packed){
@@ -115,8 +128,11 @@ export function compileSchema(definition, keyOf = id => String(id)) {
         if(packed.at)col=col.pushMany(packed.values);
       }else if(p.append.length)col=col.pushMany(r.endsWith('a')&&kinds[r]==='number'?Float64Array.from(p.append):p.append);
       columns[r]=col;
+      if(profile)profile.columns[r]={ms:performance.now()-start,patch:p.patch.length,append:packed?packed.at:p.append.length};
     }
+    mark('applyColumnsMs');
     let index=s.index;if(deletions.length)index=index.deleteMany(deletions.map(x=>x[0]));if(additions.length)index=index.setMany(additions);
+    mark('indexMs');
     return {index,columns};
   }
   const build=rows=>edit(empty(),{remove:[],upsert:rows.map(r=>[r.id,r])});

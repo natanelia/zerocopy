@@ -19,8 +19,9 @@ const server=createServer((req,res)=>{
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url='http://127.0.0.1:'+server.address().port,report={engine,n,rounds,revisions,retention,pattern,cpu:cpus()[0]?.model,rows:[]};
-const scale=process.argv[9]==='mixed-scale';
-const modes=scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
+const profile=process.argv[9]==='mixed-profile';
+const scale=profile||process.argv[9]==='mixed-scale';
+const modes=profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
   for(let round=-1;round<rounds;round++){
     const offset=(round+1)%modes.length;
@@ -34,7 +35,14 @@ try{
         const page=await browser.newPage();await page.goto(url);
         const result=await page.evaluate(async({dir,mode,n,revisions,retention,pattern})=>(await import(dir+'/dynamic-page.mjs')).run(mode,n,revisions,retention,pattern),{dir,mode,n,revisions,retention,pattern});
         assert(result.verified);result.round=round;report.rows.push(result);writeFileSync(output,JSON.stringify(report));
-        const {events,digests,...summary}=result;console.log(JSON.stringify(summary));await page.close();
+        const {events,digests,attribution,...summary}=result;
+        if(attribution){
+          const stages=['validateLookupMs','sizePayloadMs','planMs','applyColumnsMs','indexMs'];
+          const sum=(a,f)=>a.reduce((n,x)=>n+f(x),0);
+          const aggregate=group=>({stages:Object.fromEntries(stages.map(k=>[k,sum(group,e=>e.edit[k])])),columns:Object.fromEntries(Object.keys(group[0].edit.columns).map(k=>[k,{ms:sum(group,e=>e.edit.columns[k].ms),patch:sum(group,e=>e.edit.columns[k].patch),append:sum(group,e=>e.edit.columns[k].append)}])),points:{lookupMs:sum(group,e=>sum(e.points,x=>x.lookupMs)),materializeMs:sum(group,e=>sum(e.points,x=>x.materializeMs)),count:sum(group,e=>sum(e.points,x=>x.count)),hits:sum(group,e=>sum(e.points,x=>x.hits))}});
+          summary.attribution={bulk:aggregate(attribution.bulk),sparse:aggregate(attribution.sparse)};
+        }
+        console.log(JSON.stringify(summary));await page.close();
       }finally{await browser.close();}
     }
   }

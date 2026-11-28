@@ -53,7 +53,8 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
       const queries=workers.map((_,w)=>scanNow?(mixed?mixedQuery:queryFor)(n,rev,w):null);
       const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:pointHeavy?128:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
       const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>(mixed?mixedMatches:matches)(r,q)).map(mixed?validateMixed:validate).sort((a,b)=>a[0]-b[0]):null}));
-      const t=performance.now();if(rev)owner=edit(mode,owner,b);const editMs=performance.now()-t;
+      const editProfile=rev&&mode.includes('-profile')?{}:undefined;
+      const t=performance.now();if(rev)owner=edit(mode,owner,b,editProfile);const editMs=performance.now()-t;
       let compactionMs=0,handoff=null;
       if(shouldRepack(mode,rev,owner)){
         const start=performance.now(),before=arenaUsage(owner,mode);updateUsage(before);
@@ -69,7 +70,7 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
       const usage=arenaUsage(owner,mode);updateUsage(usage);if(hold)heldArenas.set(rev,usage.map(x=>x.id));
       const retainedUsage=sumUsage([...heldIds(),...usage.map(x=>x.id)]);
       for(let i=0;i<replies.length;i++){const r=replies[i];equal(r.rev,rev,'revision');equal(r.size,n,'size');equal(r.points,expected[i].points,'points');equal(r.visible,expected[i].visible,'visible');}
-      events.push({rev,removed:b.remove.length,changed:b.upsert.length,mutationMs,editMs,compactionMs,handoff,retainedUsage,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,firstElapsedMs:rev===0?performance.now()-initialWorkers:null,
+      events.push({rev,removed:b.remove.length,changed:b.upsert.length,mutationMs,editMs,editProfile,pointProfiles:replies.map(r=>r.pointProfile??null),compactionMs,handoff,retainedUsage,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,firstElapsedMs:rev===0?performance.now()-initialWorkers:null,
         scan:!!queries[0],visibleRows:replies.reduce((s,r)=>s+(r.visible?.length??0),0),attachMs:Math.max(...replies.map(r=>r.attachMs)),pointMs:Math.max(...replies.map(r=>r.pointMs)),scanMs:Math.max(...replies.map(r=>r.scanMs)),memory:p.memory});
       // Verify each expiring root in all readers before releasing it. The same
       // lifetime and verification policy applies to every arm. This diagnostic
@@ -93,6 +94,10 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread'){
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
     return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,buildAndFirstMs:buildMs+events[0].firstElapsedMs,bulk:phaseStats(bulk),sparse:phaseStats(sparse),scanRevisions:timed.filter(e=>e.scan).length,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
       p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
+      attribution:mode.includes('-profile')?{
+        bulk:bulk.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles})),
+        sparse: sparse.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles}))
+      }:undefined,
       initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
   }finally{for(const w of workers)w.terminate();}
 }

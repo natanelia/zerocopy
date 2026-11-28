@@ -7,8 +7,8 @@ const mixedTable=compileSchema({id:'number',kind:'number',active:'boolean',left:
 const typed=m=>m.startsWith('schema-');
 const tableFor=m=>mixedMode(m)?mixedTable:table;
 export const build=(m,rows)=>typed(m)?(m.includes('packed')?tableFor(m).buildPacked(rows):tableFor(m).build(rows)):base.build(m,rows);
-export const edit=(m,o,b)=>typed(m)?tableFor(m).edit(o,b,m.includes('-bulk')):base.edit(m,o,b);
-export const get=(m,s,id)=>typed(m)?tableFor(m).get(s,id):base.get(m,s,id);
+export const edit=(m,o,b,profile)=>typed(m)?tableFor(m).edit(o,b,m.includes('-bulk'),profile):base.edit(m,o,b);
+export const get=(m,s,id,profile)=>typed(m)?tableFor(m).get(s,id,profile):base.get(m,s,id);
 export const size=(m,s)=>typed(m)?tableFor(m).size(s):base.size(m,s);
 export const shouldRepack=(m,rev,o)=>typed(m)?false:base.shouldRepack(m,rev,o);
 export const repack=(m,o)=>typed(m)?o:base.repack(m,o);
