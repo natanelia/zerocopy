@@ -44,7 +44,17 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
   let expiredVerified=0,verificationMs=0;
   const updateUsage=items=>{for(const a of items)lastUsage.set(a.id,a);};
   const sumUsage=ids=>{const a=[...new Set(ids)].map(id=>lastUsage.get(id));return {used:a.reduce((s,x)=>s+x.used,0),capacity:a.reduce((s,x)=>s+x.capacity,0),arenas:a.length};};
-  let nextId=n;const t0=performance.now();let owner=build(mode,initial);const buildMs=performance.now()-t0;
+  // A dedicated writer owns all mutable arenas for its entire lifetime.
+  // The page relays only immutable wire roots; it never attaches as a writer.
+  const remote=mode.includes('-writer-');
+  let nextId=n,owner,writer,initialPublication,currentUsage;
+  const t0=performance.now();
+  if(remote){
+    writer=new Worker(new URL('./dynamic-writer.mjs',import.meta.url),{type:'module'});
+    try{initialPublication=await send(writer,{mode,rev:0,initial,maximumBytes});}
+    catch(error){writer.terminate();throw error;}
+  }else owner=build(mode,initial);
+  const buildMs=performance.now()-t0;
   const initialWorkers=performance.now(),workers=Array.from({length:readerCount},()=>new Worker(new URL('./dynamic-worker.mjs',import.meta.url),{type:'module'}));
   try{
     for(let rev=0;rev<=revisions;rev++){
@@ -57,7 +67,28 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
       const pointIds=workers.map((_,w)=>[...b.remove.slice(0,8),...b.upsert.slice(0,8).map(([id])=>id),...Array.from({length:pointHeavy?128:8},(_,j)=>ids[(rev*997+w*103+j*7187)%n])]);
       const expected=queries.map((q,w)=>({points:pointIds[w].map(id=>rows.get(id)),visible:q?[...rows.values()].filter(r=>(mixed?mixedMatches:matches)(r,q)).map(mixed?validateMixed:validate).sort((a,b)=>a[0]-b[0]):null}));
       const editProfile=rev&&mode.includes('-profile')?{}:undefined;
+      // A real page task scheduled before each edit. This includes task
+      // scheduling/CPU contention, not just synchronous JS execution.
+      const queuedAt=performance.now();
+      const probe=new Promise(resolve=>setTimeout(()=>resolve(performance.now()-queuedAt),0));
       const t=performance.now();
+      const work={removed:b.remove.length,changed:b.upsert.length,scan:!!queries[0]};
+      let editMs=0,compactionMs=0,handoff=null,p,usage,mainMutationTaskMs=0,writerRoundTripMs=0,payloadMs=0;
+      if(remote){
+        const d=performance.now(),pending=rev?send(writer,{mode,rev,b,work}):null;
+        mainMutationTaskMs=performance.now()-d;
+        const publication=rev?await pending:initialPublication;
+        initialPublication=null;
+        if(publication.rev!==rev)throw Error('writer revision mismatch');
+        writerRoundTripMs=rev?performance.now()-d:0;
+        const resume=performance.now();
+        ({editMs,compactionMs,payloadMs,p,usage}=publication);
+        if(publication.before){
+          updateUsage(publication.before);updateUsage(usage);
+          handoff=sumUsage([...heldIds(),...publication.before.map(a=>a.id),...usage.map(a=>a.id)]);
+        }
+        mainMutationTaskMs+=performance.now()-resume;
+      }else{
       if(rev){
         try{owner=edit(mode,owner,b,editProfile);}
         catch(error){
@@ -65,9 +96,7 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
           throw Error('edit failure '+JSON.stringify({mode,rev,maximumBytes,removed:b.remove.length,changed:b.upsert.length,lastVerified:events.at(-1)?.memory,after})+'; '+String(error),{cause:error});
         }
       }
-      const editMs=performance.now()-t;
-      let compactionMs=0,handoff=null;
-      const work={removed:b.remove.length,changed:b.upsert.length,scan:!!queries[0]};
+      editMs=performance.now()-t;
       if(shouldRepack(mode,rev,owner,work)){
         const start=performance.now(),before=arenaUsage(owner,mode);updateUsage(before);
         owner=repack(mode,owner,rev,work);
@@ -75,14 +104,19 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
         handoff=sumUsage([...heldIds(),...before.map(a=>a.id),...after.map(a=>a.id)]);
         compactionMs=performance.now()-start;
       }
+      const p0=performance.now();p=payload(mode,owner);payloadMs=performance.now()-p0;
+      mainMutationTaskMs=performance.now()-t;
+      }
       const mutationMs=performance.now()-t;
-      const a=performance.now(),p=payload(mode,owner),payloadMs=performance.now()-a;
+      const a=performance.now();
       const replies=await Promise.all(workers.map((w,i)=>send(w,{mode,n,rev,wire:p.wire,query:queries[i],ids:pointIds[i],hold})));
       const replyMs=performance.now()-a;
-      const usage=arenaUsage(owner,mode);updateUsage(usage);if(hold)heldArenas.set(rev,usage.map(x=>x.id));
+      const pageTaskDelayMs=await probe;
+      usage=remote?usage:arenaUsage(owner,mode);currentUsage=usage;
+      updateUsage(usage);if(hold)heldArenas.set(rev,usage.map(x=>x.id));
       const retainedUsage=sumUsage([...heldIds(),...usage.map(x=>x.id)]);
       for(let i=0;i<replies.length;i++){const r=replies[i];equal(r.rev,rev,'revision');equal(r.size,n,'size');equal(r.points,expected[i].points,'points');equal(r.visible,expected[i].visible,'visible');}
-      events.push({rev,removed:b.remove.length,changed:b.upsert.length,mutationMs,editMs,editProfile,pointProfiles:replies.map(r=>r.pointProfile??null),compactionMs,handoff,retainedUsage,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,firstElapsedMs:rev===0?performance.now()-initialWorkers:null,
+      events.push({rev,removed:b.remove.length,changed:b.upsert.length,mutationMs,editMs,mainMutationTaskMs,writerRoundTripMs,pageTaskDelayMs,editProfile,pointProfiles:replies.map(r=>r.pointProfile??null),compactionMs,handoff,retainedUsage,payloadMs,replyMs,editToAnswerMs:mutationMs+replyMs,firstElapsedMs:rev===0?performance.now()-initialWorkers:null,
         scan:!!queries[0],visibleRows:replies.reduce((s,r)=>s+(r.visible?.length??0),0),attachMs:Math.max(...replies.map(r=>r.attachMs)),pointMs:Math.max(...replies.map(r=>r.pointMs)),scanMs:Math.max(...replies.map(r=>r.scanMs)),memory:p.memory});
       // Verify each expiring root in all readers before releasing it. The same
       // lifetime and verification policy applies to every arm. This diagnostic
@@ -105,11 +139,11 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
     return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,buildAndFirstMs:buildMs+events[0].firstElapsedMs,bulk:phaseStats(bulk),sparse:phaseStats(sparse),scanRevisions:timed.filter(e=>e.scan).length,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
-      p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),maxEditToAnswerMs:Math.max(...timed.map(r=>r.editToAnswerMs)),maxCompactionMs:Math.max(...timed.map(r=>r.compactionMs)),compactionEvents:timed.filter(r=>r.handoff).map(r=>({rev:r.rev,removed:r.removed,changed:r.changed,scan:r.scan,ms:r.compactionMs,editToAnswerMs:r.editToAnswerMs,used:r.memory.used,handoff:r.handoff.used})),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
+      p95MainMutationTaskMs:percentile(timed.map(r=>r.mainMutationTaskMs),.95),maxMainMutationTaskMs:Math.max(...timed.map(r=>r.mainMutationTaskMs)),p95PageTaskDelayMs:percentile(timed.map(r=>r.pageTaskDelayMs),.95),maxPageTaskDelayMs:Math.max(...timed.map(r=>r.pageTaskDelayMs)),p95WriterRoundTripMs:percentile(timed.map(r=>r.writerRoundTripMs),.95),p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),maxEditToAnswerMs:Math.max(...timed.map(r=>r.editToAnswerMs)),maxCompactionMs:Math.max(...timed.map(r=>r.compactionMs)),compactionEvents:timed.filter(r=>r.handoff).map(r=>({rev:r.rev,removed:r.removed,changed:r.changed,scan:r.scan,ms:r.compactionMs,editToAnswerMs:r.editToAnswerMs,used:r.memory.used,handoff:r.handoff.used})),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
       attribution:mode.includes('-profile')?{
         bulk:bulk.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles})),
         sparse: sparse.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles}))
       }:undefined,
-      initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(arenaUsage(owner,mode).map(a=>a.id)),events,digests:expected,verified:true};
-  }finally{for(const w of workers)w.terminate();}
+      initial:events[0].memory,final:events.at(-1).memory,peakRetainedUsed,peakHandoffUsed,finalRetained:events.at(-1).afterExpiryUsage,compactions:timed.filter(e=>e.handoff).length,compactionMs:timed.reduce((s,e)=>s+e.compactionMs,0),releasedCurrentOnly:sumUsage(currentUsage.map(a=>a.id)),events,digests:expected,verified:true};
+  }finally{for(const w of workers)w.terminate();writer?.terminate();}
 }
