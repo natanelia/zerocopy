@@ -69,7 +69,7 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
       let compactionMs=0,handoff=null;
       if(shouldRepack(mode,rev,owner)){
         const start=performance.now(),before=arenaUsage(owner,mode);updateUsage(before);
-        owner=repack(mode,owner);
+        owner=repack(mode,owner,rev);
         const after=arenaUsage(owner,mode);updateUsage(after);
         handoff=sumUsage([...heldIds(),...before.map(a=>a.id),...after.map(a=>a.id)]);
         compactionMs=performance.now()-start;
@@ -104,7 +104,7 @@ export async function run(mode,n,revisions=96,retention=2,pattern='spread',maxim
     const peakRetainedUsed=Math.max(...events.map(e=>e.retainedUsage.used));
     const peakHandoffUsed=Math.max(peakRetainedUsed,...events.map(e=>e.handoff?.used??0));
     return {mode,n,retention,pattern,expiredVerified,verificationMs,buildMs,firstMs:events[0].firstElapsedMs,buildAndFirstMs:buildMs+events[0].firstElapsedMs,bulk:phaseStats(bulk),sparse:phaseStats(sparse),scanRevisions:timed.filter(e=>e.scan).length,totalEditToAnswerMs:timed.reduce((s,r)=>s+r.editToAnswerMs,0),
-      p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
+      p95EditToAnswerMs:percentile(timed.map(r=>r.editToAnswerMs),.95),maxEditToAnswerMs:Math.max(...timed.map(r=>r.editToAnswerMs)),maxCompactionMs:Math.max(...timed.map(r=>r.compactionMs)),compactionEvents:timed.filter(r=>r.handoff).map(r=>({rev:r.rev,ms:r.compactionMs,editToAnswerMs:r.editToAnswerMs,used:r.memory.used,handoff:r.handoff.used})),p95PointMs:percentile(timed.map(r=>r.pointMs),.95),p95AttachMs:percentile(timed.map(r=>r.attachMs),.95),p95MutationMs:percentile(timed.map(r=>r.mutationMs),.95),p95ScanMs:percentile(timed.filter(r=>r.scan).map(r=>r.scanMs),.95),
       attribution:mode.includes('-profile')?{
         bulk:bulk.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles})),
         sparse: sparse.map(e=>({rev:e.rev,edit:e.editProfile,points:e.pointProfiles}))

@@ -168,3 +168,45 @@ test('range gather preserves numeric identities, gaps, reordered payloads, nulla
   assert.deepEqual(t.get(range,2),changed);
   assert.deepEqual(t.get(range,31),inserted);
 });
+
+
+test('four isolated shard arenas and staggered repacks preserve previous roots, routing and scan results',async()=>{
+  const api=await import('./schema-lane-runtime.mjs');
+  const {mixedLane,mixedQuery}=await import('./lane-fixture.mjs');
+  const baseline='schema-mixed-packed-column-bulk-range-repack48',stagger='schema-mixed-packed-column-bulk-range-shard-stagger-repack48',sync='schema-mixed-packed-column-bulk-range-shard-sync-repack48';
+  const rows=Array.from({length:32},(_,i)=>mixedLane(i));
+  const ids=Array.from({length:40},(_,i)=>i);
+  const old=api.build(stagger,rows),reader=await api.attach(stagger,structuredClone(api.payload(stagger,old).wire));
+  const originalArenas=api.arenaUsage(old,stagger).map(a=>a.id);
+  assert.equal(new Set(originalArenas).size,8);
+  let x=old,y=api.build(baseline,rows),z=api.build(sync,rows);
+  const fresh=mixedLane(32),changed={...rows[1],roadName:'道路🌏',connections:[]};
+  const batch={remove:[0,4],upsert:[[32,fresh],[1,changed],[33,mixedLane(33)]]};
+  x=api.edit(stagger,x,batch);y=api.edit(baseline,y,batch);z=api.edit(sync,z,batch);
+  assert.equal(api.size(stagger,x),32);
+  let attached=reader;
+  for(let rev=12;rev<=96;rev+=12){
+    assert(api.shouldRepack(stagger,rev,x));
+    const before=api.arenaUsage(x,stagger).map(a=>a.id);
+    x=api.repack(stagger,x,rev);
+    const after=api.arenaUsage(x,stagger).map(a=>a.id);
+    assert.equal(after.filter(id=>!before.includes(id)).length,2);
+    if(rev%48===0){
+      const oldSync=api.arenaUsage(z,sync).map(a=>a.id);
+      z=api.repack(sync,z,rev);y=api.repack(baseline,y,rev);
+      assert.equal(api.arenaUsage(z,sync).filter(a=>!oldSync.includes(a.id)).length,8);
+    }
+    attached=await api.attach(stagger,structuredClone(api.payload(stagger,x).wire),attached);
+    for(const id of ids){
+      assert.deepEqual(api.get(stagger,x,id),api.get(baseline,y,id));
+      assert.deepEqual(api.get(stagger,attached,id),api.get(baseline,y,id));
+      assert.deepEqual(api.get(sync,z,id),api.get(baseline,y,id));
+      assert.deepEqual(api.get(stagger,reader,id),rows[id]);
+    }
+    const q=mixedQuery(32,rev,0);
+    assert.deepEqual(api.scan(stagger,attached,q),api.scan(baseline,y,q));
+  }
+  assert(!api.shouldRepack(stagger,13,x));
+  assert.equal(api.payload(stagger,x).memory.slots,32);
+  assert.throws(()=>api.edit(stagger,x,{remove:[0],upsert:[]}),/deletion/);
+});
