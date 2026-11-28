@@ -1,7 +1,7 @@
 // Proof only. Schema-defined persistent columns on the existing SharedList/Map.
 // Explicit null, finite number (JSON-compatible signed zero), boolean, string,
 // and variable-length numeric arrays. No JSON row encoding or new arena format.
-import {SharedMap,SharedList,getWorkerData,initWorker} from '../../dist/shared.js';
+import {SharedMap,SharedList,getWorkerData,initWorker,resetMap,resetSharedList} from '../../dist/shared.js';
 
 export function compileSchema(definition, keyOf = id => String(id)) {
   const fields=Object.entries(definition).map(([name,type],i)=>{
@@ -207,6 +207,47 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     }
     return values;
   }
+  // Dedicated single-writer proof only. Gather live slots into fresh columns
+  // without materializing row objects or per-row numeric payload arrays.
+  // Module defaults are reset only after gathering; old handles remain valid.
+  function repack(s){
+    const c=s.columns,slots=Array.from(s.index.values()).sort((a,b)=>a-b),n=slots.length;
+    const arrays=fields.filter(f=>f.kind==='number[]'),lengths={};
+    for(const f of arrays)lengths[f.root]=0;
+    const entries=new Array(n);
+    for(let j=0;j<n;j++){
+      const i=slots[j];
+      if(!Number.isSafeInteger(i)||i<0||i>=slotCount(s)||!isLive(s,i))throw Error('invalid live slot');
+      const id=c[idField.root].get(i),key=keyOf(id);
+      if(s.index.get(key)!==i)throw Error('invalid live identity');
+      entries[j]=[key,j];
+      for(const f of arrays){
+        const r=f.root,start=c[r].get(i),count=c[r+'n'].get(i);
+        if(!Number.isSafeInteger(start)||!Number.isSafeInteger(count)||start<0||count<0||start+count>c[r+'a'].size)throw Error('invalid array range');
+        if(f.nullable&&!c[r+'p'].get(i)&&count!==0)throw Error('invalid null array range');
+        lengths[r]+=count;
+        if(!Number.isSafeInteger(lengths[r]))throw RangeError('array capacity');
+      }
+    }
+    const values=Object.fromEntries(roots.map(r=>[r,kinds[r]==='number'?new Float64Array(r.endsWith('a')?lengths[r.slice(0,-1)]:n):new Array(n)]));
+    values.occupied.fill(true);
+    for(const f of fields){
+      const r=f.root;let at=0;
+      for(let j=0;j<n;j++){
+        const i=slots[j];
+        if(f.nullable)values[r+'p'][j]=c[r+'p'].get(i);
+        if(f.kind==='number[]'){
+          const start=c[r].get(i),count=c[r+'n'].get(i);
+          values[r][j]=at;values[r+'n'][j]=count;
+          if(count)c[r+'a'].copyToFloat64Array(values[r+'a'],{start,end:start+count,offset:at});
+          at+=count;
+        }else values[r][j]=c[r].get(i);
+      }
+    }
+    resetMap();resetSharedList();
+    const columns=Object.fromEntries(roots.map(r=>[r,new SharedList(kinds[r]).pushMany(values[r])]));
+    return {index:new SharedMap('number').setMany(entries),columns};
+  }
   function wire(s){return {signature,data:getWorkerData({index:s.index,...s.columns},{copy:false})};}
   async function attach(p,previous){
     if(p.signature!==signature)throw TypeError('schema mismatch');
@@ -215,6 +256,6 @@ export function compileSchema(definition, keyOf = id => String(id)) {
     for(const r of roots){if(!columns[r]||columns[r].type!==kinds[r]||(!r.endsWith('a')&&columns[r].size!==n))throw Error('column shape mismatch');}
     return {attached,index:attached.index,columns};
   }
-  return {build,buildPacked,edit,get,rowAt,readAt,slotCount,isLive,wire,attach,size:s=>s.index.size,
+  return {build,buildPacked,repack,edit,get,rowAt,readAt,slotCount,isLive,wire,attach,size:s=>s.index.size,
     arenaUsage:s=>wire(s).data.arenas.map(a=>({id:a.id,used:a.used,capacity:a.memory.buffer.byteLength}))};
 }
