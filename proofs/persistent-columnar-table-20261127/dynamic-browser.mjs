@@ -4,6 +4,7 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {resolve,sep} from 'node:path';
 import {cpus} from 'node:os';
 import {chromium,firefox} from 'playwright';
+import {startTreeSampler} from './process-memory.mjs';
 const [output='dynamic-results.json',engine='chromium',size='4096',roundsArg='5',revisionsArg='96',retentionArg='2',pattern='spread']=process.argv.slice(2),n=Number(size),rounds=Number(roundsArg),revisions=Number(revisionsArg),retention=Number(retentionArg);
 const launcher={chromium,firefox}[engine];assert(launcher);
 const root=resolve('.'),dir='/proofs/persistent-columnar-table-20261127';
@@ -22,8 +23,9 @@ const url='http://127.0.0.1:'+server.address().port,report={engine,n,rounds,revi
 const profile=process.argv[9]==='mixed-profile';
 const columnBulk=process.argv[9]==='mixed-column-bulk';
 const directRow=process.argv[9]==='mixed-direct-row';
-const scale=profile||columnBulk||directRow||process.argv[9]==='mixed-scale';
-const modes=directRow?['schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control','schema-mixed-packed-column-bulk-direct-row','schema-mixed-packed-column-bulk-direct-row-control']:columnBulk?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
+const longChurn=process.argv[9]==='mixed-long-churn';
+const scale=longChurn||profile||columnBulk||directRow||process.argv[9]==='mixed-scale';
+const modes=longChurn?['json-mixed-direct','json-mixed-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:directRow?['schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control','schema-mixed-packed-column-bulk-direct-row','schema-mixed-packed-column-bulk-direct-row-control']:columnBulk?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-column-bulk','schema-mixed-packed-column-bulk-control']:profile?['schema-mixed-packed-bulk','schema-mixed-packed-bulk-control','schema-mixed-packed-bulk-profile','schema-mixed-packed-bulk-profile-control']:scale?['json-mixed-direct','json-mixed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:process.argv[9]==='mixed'?['json-mixed-direct','json-mixed-control','schema-mixed-packed','schema-mixed-packed-control','schema-mixed-packed-bulk','schema-mixed-packed-bulk-control']:['json-direct','append','append-predicate','schema-append','schema-append-control','schema-packed'];
 try{
   for(let round=-1;round<rounds;round++){
     const offset=(round+1)%modes.length;
@@ -32,12 +34,16 @@ try{
     if(!scale&&round%2===1)order.reverse();
     for(const mode of order){
       const browser=await launcher.launch({headless:true});
+      let stopSampler=longChurn?startTreeSampler():null;
       try{
         report.version=browser.version();
         const page=await browser.newPage();await page.goto(url);
         const result=await page.evaluate(async({dir,mode,n,revisions,retention,pattern})=>(await import(dir+'/dynamic-page.mjs')).run(mode,n,revisions,retention,pattern),{dir,mode,n,revisions,retention,pattern});
-        assert(result.verified);result.round=round;report.rows.push(result);writeFileSync(output,JSON.stringify(report));
-        const {events,digests,attribution,...summary}=result;
+        assert(result.verified);result.round=round;
+        if(stopSampler){result.processMemory=await stopSampler();stopSampler=null;}
+        report.rows.push(result);writeFileSync(output,JSON.stringify(report));
+        const {events,digests,attribution,processMemory,...summary}=result;
+        if(processMemory){const {samples,...memorySummary}=processMemory;summary.processMemory=memorySummary;}
         if(attribution){
           const stages=['validateLookupMs','sizePayloadMs','planMs','applyColumnsMs','indexMs'];
           const sum=(a,f)=>a.reduce((n,x)=>n+f(x),0);
@@ -45,7 +51,7 @@ try{
           summary.attribution={bulk:aggregate(attribution.bulk),sparse:aggregate(attribution.sparse)};
         }
         console.log(JSON.stringify(summary));await page.close();
-      }finally{await browser.close();}
+      }finally{if(stopSampler)await stopSampler();await browser.close();}
     }
   }
 }finally{server.close();}

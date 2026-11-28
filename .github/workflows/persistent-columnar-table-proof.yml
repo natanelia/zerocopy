@@ -1,4 +1,4 @@
-name: Persistent schema 100k direct full row reads (proof only)
+name: Persistent schema 100k long churn and process memory (proof only)
 on:
   push:
     branches: [proof/persistent-columnar-table-20261127]
@@ -15,7 +15,7 @@ jobs:
         engine: [chromium, firefox]
         size: [100000]
         retention: [2]
-        pattern: [spread-point, spread]
+        pattern: [spread]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,11 +52,11 @@ jobs:
           mkdir -p columnar-results
           git rev-parse HEAD | tee columnar-results/commit.txt
           sha256sum shared-map.ts proofs/persistent-columnar-table-20261127/*.mjs dist/*.js > columnar-results/hashes.txt
-          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 4 48 ${{ matrix.retention }} ${{ matrix.pattern }} mixed-direct-row | tee columnar-results/raw.log
+          node proofs/persistent-columnar-table-20261127/dynamic-browser.mjs columnar-results/results.json ${{ matrix.engine }} ${{ matrix.size }} 4 96 ${{ matrix.retention }} ${{ matrix.pattern }} mixed-long-churn | tee columnar-results/raw.log
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: columnar-schema-direct-row-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
+          name: columnar-schema-long-churn-${{ matrix.engine }}-${{ matrix.size }}-${{ matrix.pattern }}-hold${{ matrix.retention }}-${{ github.run_id }}
           path: columnar-results/
           retention-days: 30
           if-no-files-found: warn
